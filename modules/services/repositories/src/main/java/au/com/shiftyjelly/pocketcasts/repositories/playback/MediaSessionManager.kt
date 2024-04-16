@@ -33,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
@@ -73,7 +72,6 @@ class MediaSessionManager(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playlistManager: PlaylistManager,
-    val widgetManager: WidgetManager,
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
@@ -763,7 +761,7 @@ class MediaSessionManager(
             // update global playback speed
             val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects, needsSync = true)
+            settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

@@ -73,6 +73,7 @@ interface UserEpisodeManager {
     fun observeEpisode(uuid: String): Flow<UserEpisode>
     fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
+    suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
     fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean)
     fun performUploadToServer(userEpisode: UserEpisode, playbackManager: PlaybackManager): Completable
     fun removeFromCloud(userEpisode: UserEpisode)
@@ -250,6 +251,10 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun findEpisodeByUuid(uuid: String): UserEpisode? {
         return userEpisodeDao.findEpisodeByUuid(uuid)
+    }
+
+    override suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode> {
+        return userEpisodeDao.findEpisodesByUuids(episodeUuids)
     }
 
     override fun downloadMissingUserEpisode(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode> {

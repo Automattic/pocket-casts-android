@@ -138,6 +138,8 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -1368,6 +1370,7 @@ class MainActivity :
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
+        timestamp: Duration?,
     ) {
         episodeUuid ?: return
 
@@ -1382,6 +1385,7 @@ class MainActivity :
                     source = source,
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark,
+                    timestamp = timestamp,
                 )
             } else if (episode is PodcastEpisode) {
                 EpisodeContainerFragment.newInstance(
@@ -1389,6 +1393,7 @@ class MainActivity :
                     source = source,
                     podcastUuid = podcastUuid,
                     forceDark = forceDark,
+                    timestamp = timestamp,
                 )
             } else {
                 CloudFileBottomSheetFragment.newInstance(episode.uuid, forceDark = true)
@@ -1441,6 +1446,7 @@ class MainActivity :
         if (intent.data?.pathSegments?.size == 1) {
             sharePath = "$SOCIAL_SHARE_PATH$sharePath"
         }
+        val timestamp = intent.data?.getQueryParameter("t")?.toIntOrNull()
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
             sharePath,
@@ -1467,6 +1473,7 @@ class MainActivity :
                             source = EpisodeViewSource.SHARE,
                             podcastUuid = podcastUuid,
                             forceDark = false,
+                            timestamp = timestamp?.seconds,
                         )
                     } else {
                         openPodcastPage(podcastUuid)

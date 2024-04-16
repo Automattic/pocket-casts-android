@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
@@ -225,6 +226,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 },
                 podcastBookmarksSortType = settings.podcastBookmarksSortType.getSyncSetting { setting, modifiedAt ->
+                    NamedChangedSettingInt(
+                        value = setting.serverId,
+                        modifiedAt = modifiedAt,
+                    )
+                },
+                profileBookmarksSortType = settings.profileBookmarksSortType.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingInt(
                         value = setting.serverId,
                         modifiedAt = modifiedAt,
@@ -496,7 +503,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                             newSettingValue = (changedSettingResponse.value as? String)?.let(AutoPlaySource::fromServerId),
                         )
                         if (syncedValue != null) {
-                            settings.trackingAutoPlaySource.set(syncedValue, needsSync = false)
+                            settings.trackingAutoPlaySource.set(syncedValue, updateModifiedAt = false)
                         }
                     }
                     "notificationActions" -> updateSettingIfPossible(
@@ -547,6 +554,11 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         changedSettingResponse = changedSettingResponse,
                         setting = settings.podcastBookmarksSortType,
                         newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeForPodcast.fromServerId(it) ?: BookmarksSortTypeForPodcast.DATE_ADDED_NEWEST_TO_OLDEST },
+                    )
+                    "bookmarksSortOrder" -> updateSettingIfPossible(
+                        changedSettingResponse = changedSettingResponse,
+                        setting = settings.profileBookmarksSortType,
+                        newSettingValue = (changedSettingResponse.value as? Number)?.toInt()?.let { BookmarksSortTypeForProfile.fromServerId(it) ?: BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST },
                     )
                     "useDarkUpNextTheme" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
@@ -613,14 +625,14 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
             }
 
             val localModifiedAt = setting.modifiedAt
-            if (localModifiedAt > serverModifiedAt) {
+            if ((localModifiedAt ?: Instant.EPOCH) >= serverModifiedAt) {
                 Timber.i("Not syncing ${setting.sharedPrefKey} value of $newSettingValue from the server because setting was modified more recently locally")
                 return null
             }
 
             setting.set(
                 value = newSettingValue,
-                needsSync = false,
+                updateModifiedAt = false,
             )
             return newSettingValue
         }
@@ -648,17 +660,17 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
 
                     if (value.value is Number) { // Probably will have to change this when we do other settings, but for now just Number is fine
                         when (key) {
-                            "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt(), needsSync = false)
-                            "skipBack" -> settings.skipBackInSecs.set(value.value.toInt(), needsSync = false)
+                            "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt(), updateModifiedAt = false)
+                            "skipBack" -> settings.skipBackInSecs.set(value.value.toInt(), updateModifiedAt = false)
                             "gridOrder" -> {
                                 val sortType = PodcastsSortType.fromServerId(value.value.toInt())
-                                settings.podcastsSortType.set(sortType, needsSync = false)
+                                settings.podcastsSortType.set(sortType, updateModifiedAt = false)
                             }
                         }
                     } else if (value.value is Boolean) {
                         when (key) {
-                            "marketingOptIn" -> settings.marketingOptIn.set(value.value, needsSync = false)
-                            "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value, needsSync = false)
+                            "marketingOptIn" -> settings.marketingOptIn.set(value.value, updateModifiedAt = false)
+                            "freeGiftAcknowledgement" -> settings.freeGiftAcknowledged.set(value.value, updateModifiedAt = false)
                         }
                     }
                 } else {

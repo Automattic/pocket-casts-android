@@ -148,10 +148,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
                 "auto_start_from" -> podcast.startFromSecs = reader.nextIntOrNull()
                 "episodes_sort_order" -> podcast.episodesSortOrder = reader.nextIntOrNull()
                 "auto_skip_last" -> podcast.skipLastSecs = reader.nextIntOrNull()
-                "folder_uuid" -> {
-                    val folderUuid = reader.nextStringOrNull()
-                    podcast.folderUuid = if (folderUuid == null || folderUuid == Folder.homeFolderUuid) null else folderUuid
-                }
+                "folder_uuid" -> podcast.folderUuid = reader.nextStringOrNull()
                 "sort_position" -> podcast.sortPosition = reader.nextIntOrNull()
                 "date_added" -> podcast.dateAdded = reader.nextStringOrNull()?.parseIsoDate()
                 else -> reader.skipValue()

@@ -206,6 +206,14 @@ class DownloadManagerImpl @Inject constructor(
                                 )
                                 if (!wasCancelled) {
                                     episodeDidDownload(DownloadResult.successResult(episodeUUID))
+                                } else {
+                                    episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
+                                        episodeManager.updateDownloadTaskId(episode, null)
+                                        if (!episode.isDownloaded && episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
+                                            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
+                                        }
+                                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up workmanager cancelled download task for ${episode.uuid}.")
+                                    }
                                 }
                             }
                         }
@@ -231,7 +239,11 @@ class DownloadManagerImpl @Inject constructor(
 
             try {
                 val state = workManager.getWorkInfoById(uuid).get()
-                if (state == null) {
+                val wasCancelled = state.outputData.getBoolean(
+                    DownloadEpisodeTask.OUTPUT_CANCELLED,
+                    false,
+                )
+                if (state == null || wasCancelled) {
                     episodeManager.updateDownloadTaskId(episode, null)
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up old workmanager task for ${episode.uuid}.")
                 } else {

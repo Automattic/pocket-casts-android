@@ -349,13 +349,13 @@ platform :android do
     commit_version_bump
     UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
 
-#     # Download Localizations
-#     android_download_translations(
-#       res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
-#       glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
-#       locales: SUPPORTED_LOCALES,
-#       lint_task: 'lintRelease'
-#     )
+    # Download Localizations
+    android_download_translations(
+      res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
+      glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
+      locales: SUPPORTED_LOCALES,
+      lint_task: 'lintRelease'
+    )
 
     version = release_version_current
 

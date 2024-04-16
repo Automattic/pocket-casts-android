@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
@@ -44,7 +45,6 @@ interface Settings {
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
         const val WP_COM_API_URL = "https://public-api.wordpress.com"
-        const val SLUMBER_STUDIOS_PROMO_URL = "https://slumberstudios.com/pocketcasts"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
@@ -61,7 +61,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9119
+        const val WHATS_NEW_VERSION_CODE = 9120
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -93,6 +93,7 @@ interface Settings {
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_EPISODE = "bookmarksSortTypeForEpisode"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST = "bookmarksSortTypeForPodcast"
+        const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PROFILE = "bookmarksSortTypeForProfile"
 
         val SUPPORTED_LANGUAGE_CODES = arrayOf("us", "se", "jp", "gb", "fr", "es", "de", "ca", "au", "it", "ru", "br", "no", "be", "cn", "dk", "sw", "ch", "ie", "pl", "kr", "nl")
 
@@ -497,6 +498,7 @@ interface Settings {
     val episodeBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val playerBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val podcastBookmarksSortType: UserSetting<BookmarksSortTypeForPodcast>
+    val profileBookmarksSortType: UserSetting<BookmarksSortTypeForProfile>
 
     fun addReviewRequestedDate()
     fun getReviewRequestedDates(): List<String>

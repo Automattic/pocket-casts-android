@@ -19,10 +19,6 @@ Language: ru
     <string name="upgrade_to_patron">Перейти на Patron</string>
     <string name="upgrade_to_plus">Перейти на Plus</string>
     <string name="whats_new_got_it_button">Понятно</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Подпишитесь на Patron, и вы сможете предварительно выбирать и автоматически пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Подпишитесь на Plus, и вы сможете предварительно выбирать и автоматически пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
-    <string name="whats_new_deselect_chapters_plus_message">В рамках подписки на Plus вы теперь можете предварительно выбирать и автоматически пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
-    <string name="whats_new_deselect_chapters_patron_message">В рамках подписки на Patron вы теперь можете предварительно выбирать и автоматически пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
     <string name="skip_chapters_patron_prompt">Возможность предварительно выбирать главы и множество других функций с Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Возможность предварительно выбирать главы и множество других функций с Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Выберите хотя бы одну главу</string>
@@ -31,10 +27,6 @@ Language: ru
     <string name="single_chapter">1 глава</string>
     <string name="number_of_chapters">Глав: %d</string>
     <string name="onboarding_plus_feature_slumber_studios_title">Эксклюзивный контент от &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; на 1 год</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Использовать код</string>
-    <string name="whats_new_slumber_studios_body_free_user">Подпишитесь на Plus Yearly и получите в качестве бонуса годовую подписку на контент Slumber Studios — подкасты, которые подарят вам самые сладкие сны. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Примените код %1$s и получайте удовольствие, пользуясь годовой подпиской на контент Slumber Studios в качестве бонуса за подписку на Yearly Plus. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_title">Мечтайте о большем</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">по окончании первого года</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж %s</string>
     <string name="half_price_first_year">Скидка 50 % на первый год</string>

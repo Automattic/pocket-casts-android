@@ -102,7 +102,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
             onNextActionSave = { viewModel.onNextActionSave(it) },
             onPreviousActionSave = { viewModel.onPreviousActionSave(it) },
             onConfirmationSoundSave = { newValue ->
-                settings.headphoneControlsPlayBookmarkConfirmationSound.set(newValue, needsSync = true)
+                settings.headphoneControlsPlayBookmarkConfirmationSound.set(newValue, updateModifiedAt = true)
                 if (newValue) {
                     playbackManager.playTone()
                 }

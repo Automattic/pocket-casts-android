@@ -19,10 +19,6 @@ Language: de
     <string name="upgrade_to_patron">Upgrade auf Patron durchführen </string>
     <string name="upgrade_to_plus">Upgrade auf Plus durchführen</string>
     <string name="whats_new_got_it_button">Verstanden</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Abonniere Patron jetzt, damit du in jeder Folge Kapitel vorauswählen und automatisch überspringen kannst (falls unterstützt).</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Abonniere Plus jetzt, damit du in jeder Folge Kapitel vorauswählen und automatisch überspringen kannst (falls unterstützt).</string>
-    <string name="whats_new_deselect_chapters_plus_message">Als Teil deines Plus-Abonnements kannst du nun in jeder Folge Kapitel vorauswählen und automatisch überspringen (falls unterstützt).</string>
-    <string name="whats_new_deselect_chapters_patron_message">Als Teil deines Patron-Abonnements kannst du nun in jeder Folge Kapitel vorauswählen und automatisch überspringen (falls unterstützt).</string>
     <string name="skip_chapters_patron_prompt">Kapitel vorauswählen und mehr mit Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Kapitel vorauswählen und mehr mit Pocket Casts Plus</string>
     <string name="select_one_chapter_message">Bitte wähle mindestens ein Kapitel aus</string>
@@ -31,10 +27,6 @@ Language: de
     <string name="single_chapter">1 Kapitel</string>
     <string name="number_of_chapters">%d Kapitel</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 Jahr exklusive Inhalte von &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Code einlösen</string>
-    <string name="whats_new_slumber_studios_body_free_user">Abonniere das Plus-Jahresabonnement und erhalte ein 1-Jahres-Abonnement für Slumber Studios-Inhalte, die Podcasts für süße Träume. &lt;a href=\"https://slumberstudios.com/\"&gt;Weitere Informationen&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Im Rahmen deines Plus-Jahresabonnements erhältst du mit dem Code %1$s ein 1-Jahres-Abonnement für Slumber Studios-Inhalte. &lt;a href=\"https://slumberstudios.com/\"&gt;Weitere Informationen&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_title">Große Träume</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">nach deinem ersten Jahr</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Wiederkehrende Zahlung zum Preis von %s</string>
     <string name="half_price_first_year">50 % Rabatt auf dein erstes Jahr</string>

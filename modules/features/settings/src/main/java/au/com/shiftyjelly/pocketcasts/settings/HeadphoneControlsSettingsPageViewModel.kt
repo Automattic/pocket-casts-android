@@ -81,7 +81,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     fun onNextActionSave(action: HeadphoneAction) {
         if (action.canSave()) {
-            settings.headphoneControlsNextAction.set(action, needsSync = true)
+            settings.headphoneControlsNextAction.set(action, updateModifiedAt = true)
             trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED)
         } else {
             _state.update { it.copy(startUpsellFromSource = UpsellSourceAction.NEXT) }
@@ -90,7 +90,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
 
     fun onPreviousActionSave(action: HeadphoneAction) {
         if (action.canSave()) {
-            settings.headphoneControlsPreviousAction.set(action, needsSync = true)
+            settings.headphoneControlsPreviousAction.set(action, updateModifiedAt = true)
             trackHeadphoneAction(action, AnalyticsEvent.SETTINGS_HEADPHONE_CONTROLS_PREVIOUS_CHANGED)
         } else {
             _state.update { it.copy(startUpsellFromSource = UpsellSourceAction.PREVIOUS) }

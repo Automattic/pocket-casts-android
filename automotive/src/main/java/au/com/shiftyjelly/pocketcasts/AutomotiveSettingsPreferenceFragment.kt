@@ -64,7 +64,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun setupAutoPlay() {
         preferenceAutoPlay.setOnPreferenceChangeListener { _, newValue ->
-            settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, needsSync = true)
+            settings.autoPlayNextEpisodeOnEmpty.set(newValue as Boolean, updateModifiedAt = true)
             true
         }
         settings.autoPlayNextEpisodeOnEmpty.flow
@@ -74,7 +74,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun setupAutoSubscribeToPlayed() {
         preferenceAutoSubscribeToPlayed.setOnPreferenceChangeListener { _, newValue ->
-            settings.autoSubscribeToPlayed.set(newValue as Boolean, needsSync = true)
+            settings.autoSubscribeToPlayed.set(newValue as Boolean, updateModifiedAt = true)
             true
         }
         settings.autoSubscribeToPlayed.flow
@@ -84,7 +84,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun setupAutoShowPlayed() {
         preferenceAutoShowPlayed.setOnPreferenceChangeListener { _, newValue ->
-            settings.autoShowPlayed.set(newValue as Boolean, needsSync = true)
+            settings.autoShowPlayed.set(newValue as Boolean, updateModifiedAt = true)
             true
         }
         settings.autoShowPlayed.flow
@@ -97,7 +97,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceSkipForward.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
             if (value > 0) {
-                settings.skipForwardInSecs.set(value, needsSync = true)
+                settings.skipForwardInSecs.set(value, updateModifiedAt = true)
                 true
             } else {
                 false
@@ -116,7 +116,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceSkipBackward.setOnPreferenceChangeListener { _, newValue ->
             val value = newValue.toString().toIntOrNull() ?: 0
             if (value > 0) {
-                settings.skipBackInSecs.set(value, needsSync = true)
+                settings.skipBackInSecs.set(value, updateModifiedAt = true)
                 true
             } else {
                 false

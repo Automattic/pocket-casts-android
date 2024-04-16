@@ -124,6 +124,7 @@ interface EpisodeManager {
     fun episodeCanBeCleanedUp(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun markAsUnplayed(episodes: List<BaseEpisode>)
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
+    suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode>
     fun observeDownloadingEpisodesRx(): Flowable<List<BaseEpisode>>
     fun setDownloadFailed(episode: BaseEpisode, errorMessage: String)
     fun observeEpisodeCount(queryAfterWhere: String): Flowable<Int>

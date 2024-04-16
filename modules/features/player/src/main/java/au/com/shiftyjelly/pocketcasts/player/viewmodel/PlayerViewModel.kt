@@ -60,6 +60,8 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -520,7 +522,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun sleepTimerAfter(mins: Int) {
-        sleepTimer.sleepAfter(mins = mins) {
+        sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
             playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
         }
     }
@@ -559,7 +561,7 @@ class PlayerViewModel @Inject constructor(
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {
-                settings.globalPlaybackEffects.set(effects, needsSync = true)
+                settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
             }
             playbackManager.updatePlayerEffects(effects)
         }

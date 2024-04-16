@@ -1,14 +1,14 @@
 *   New Features
-    *   Support embedded chapters from [Podcast Index](https://github.com/Podcastindex-org/podcast-namespace/blob/c40c127d9e1a3e9b800766d6f01e0dcd5b09ab2a/docs/1.0.md#chapters) and [Podlove](https://podlove.org/simple-chapters/).
-        ([#1965](https://github.com/Automattic/pocket-casts-android/pull/1940))
+    *   Allow sharing of bookmarks from bookmarks list
+        ([#2022](https://github.com/Automattic/pocket-casts-android/pull/2022))
+    *   Add profile bookmark screen where all user bookmarks can be managed
+        ([#2037](https://github.com/Automattic/pocket-casts-android/pull/2037))
+    *   Sleep Timer restarts automatically if you play again within 5 minutes
+        ([#2048](https://github.com/Automattic/pocket-casts-android/pull/2048))
 *   Updates:
-    *   Display episode's RSS artwork in more places in the app.
-        ([#1943](https://github.com/Automattic/pocket-casts-android/pull/1943))
-    *   Consolidate episode's embedded file artwork and RSS artwork into a single setting.
-        ([#1987](https://github.com/Automattic/pocket-casts-android/pull/1987))
-    *   Add alphabetical sort order for podcast episodes.
-        ([#1969](https://github.com/Automattic/pocket-casts-android/pull/1969))
-* Bug Fixes:
-    *   Subscription cancellation redirects now to a correct page.
-        ([#1973](https://github.com/Automattic/pocket-casts-android/pull/1973))
+    *   Updated widget and added two new variants - small and large.
+        ([#2043](https://github.com/Automattic/pocket-casts-android/pull/2043))
+*   Bug Fixes
+    *   Improved player view in landscape mode. Added chapter artwork, podcast title, and improved video experience.
+        ([#2044](https://github.com/Automattic/pocket-casts-android/pull/1944))
 

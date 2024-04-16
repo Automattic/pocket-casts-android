@@ -19,10 +19,6 @@ Language: zh_CN
     <string name="upgrade_to_patron">升级至 Patron</string>
     <string name="upgrade_to_plus">升级至 Plus</string>
     <string name="whats_new_got_it_button">知道了</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">立即订阅 Patron，然后您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">立即订阅 Plus，然后您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
-    <string name="whats_new_deselect_chapters_plus_message">订阅 Plus 后，您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
-    <string name="whats_new_deselect_chapters_patron_message">订阅 Patron 后，您就能在任何支持相应功能的剧集中自动预选和跳过章节。</string>
     <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受预选章节等更多功能</string>
     <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受预选章节等更多功能</string>
     <string name="select_one_chapter_message">请至少选择一个章节</string>
@@ -31,10 +27,6 @@ Language: zh_CN
     <string name="single_chapter">1 个章节</string>
     <string name="number_of_chapters">%d 个章节</string>
     <string name="onboarding_plus_feature_slumber_studios_title">由 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 提供的一年独家内容</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">兑换您的代码</string>
-    <string name="whats_new_slumber_studios_body_free_user">订阅年度 Plus 并享受为期一年的 Slumber Studios 内容订阅，这是为实现最甜蜜的梦想而打造的播客。 &lt;a href=\"https://slumberstudios.com/\"&gt;了解更多&lt;/a&gt;。</string>
-    <string name="whats_new_slumber_studios_body">订阅年度 Plus 后，使用代码 %1$s 即可享受为期一年的 Slumber Studios 内容订阅。 &lt;a href=\"https://slumberstudios.com/\"&gt;了解更多&lt;/a&gt;。</string>
-    <string name="whats_new_slumber_studios_title">怀揣远大梦想</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">第一年之后</string>
     <string name="onboarding_plus_recurring_after_intro_offer">定期付款费用为 %s</string>
     <string name="half_price_first_year">首年享 5 折优惠</string>

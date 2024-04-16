@@ -27,6 +27,7 @@ compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.andro
 compose-kotlin-compiler = "1.5.9"
 espresso = "3.4.0"
 firebase = "30.5.0"
+glance = "1.0.0"
 glide = "4.13.2"
 google-services = "4.3.14"
 hilt = "2.51"
@@ -74,6 +75,7 @@ compose-animation = { module = "androidx.compose.animation:animation" }
 compose-icons = { module = "androidx.compose.material:material-icons-extended" }
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-material = { module = "androidx.compose.material:material" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
 compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
@@ -83,6 +85,8 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 compose-activity = "androidx.activity:activity-compose:1.8.2"
 compose-constraint = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+compose-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+compose-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 
 # Coroutines
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
@@ -248,7 +252,7 @@ desugar-jdk = "com.android.tools:desugar_jdk_libs:1.1.5"
 device-names = "com.jaredrummler:android-device-names:2.1.0"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 fragment-ktx = "androidx.fragment:fragment-ktx:1.5.2"
-guava = "com.google.guava:guava:27.1-android" # Required to fix conflict between versions in exoplayer and workmanager
+guava = "com.google.guava:guava:33.1.0-android" # Required to fix conflict between versions in exoplayer and workmanager
 jsonassert = "org.skyscreamer:jsonassert:1.5.0"
 junit = "junit:junit:4.13.2"
 junit-ext = "androidx.test.ext:junit:1.1.3"

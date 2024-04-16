@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.content.Context
-import android.graphics.Color.WHITE
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -17,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPillListAdapter.CategoryPillViewHolder
 import au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 
 val CATEGORY_PILL_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
     override fun areItemsTheSame(oldItem: CategoryPill, newItem: CategoryPill): Boolean =
@@ -65,14 +65,12 @@ class CategoryPillListAdapter(
 
         private fun setUpCategories(context: Context, category: CategoryPill) {
             if (category.isSelected) {
-                binding.categoryPill.background =
-                    getDrawable(context, R.drawable.category_pill_selected_background)
-                binding.categoryName.setTextColor(WHITE)
+                binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_selected_background)
             } else {
                 binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
-                binding.categoryName.setTextAppearance(au.com.shiftyjelly.pocketcasts.ui.R.style.H40)
             }
             binding.categoryName.setCategory(category.discoverCategory.name)
+            binding.categoryName.setCategoryColor(category.isSelected)
             binding.categoryIcon.isVisible = false
         }
     }
@@ -93,6 +91,7 @@ class CategoryPillListAdapter(
                     onAllCategoriesClick(
                         onCategorySelectionCancel@{
                             binding.categoryName.setCategory(category.discoverCategory.name)
+                            binding.categoryName.setCategoryColor(isSelected = false)
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
                         },
                         onCategorySelectionSuccess@{
@@ -125,6 +124,13 @@ private fun TextView.setCategory(category: String) {
     isVisible = true
     text = category
     contentDescription = category
+}
+private fun TextView.setCategoryColor(isSelected: Boolean) {
+    if (isSelected) {
+        this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_ui_02_selected))
+    } else {
+        this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_text_01))
+    }
 }
 
 private fun ImageView.setIcon(resourceId: Int, contentDescription: CharSequence? = null) {
