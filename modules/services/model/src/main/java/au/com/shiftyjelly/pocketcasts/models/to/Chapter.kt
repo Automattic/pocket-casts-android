@@ -34,9 +34,9 @@ data class Chapter(
         }
     }
 
-    fun calculateProgress(playbackPosition: Duration): Float = if (playbackPosition == Duration.ZERO || playbackPosition !in this) {
-        0f
-    } else {
-        (playbackPosition - startTime).inWholeMilliseconds.toFloat() / duration.inWholeMilliseconds.toFloat()
+    fun calculateProgress(playbackPosition: Duration): Float = when {
+        playbackPosition == Duration.ZERO || playbackPosition !in this -> 0f
+        duration.inWholeMilliseconds == 0L -> 0f
+        else -> (playbackPosition - startTime).inWholeMilliseconds.toFloat() / duration.inWholeMilliseconds
     }
 }
