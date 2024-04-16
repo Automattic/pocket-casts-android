@@ -185,6 +185,10 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         player?.volume = volume
     }
 
+    fun getVolume(): Float? {
+        return player?.volume
+    }
+
     override fun setPodcast(podcast: Podcast?) {}
 
     @OptIn(UnstableApi::class)

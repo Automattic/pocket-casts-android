@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.widget.Toast
@@ -2226,9 +2228,32 @@ open class PlaybackManager @Inject constructor(
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
+                if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !sleepAfterEpisode) { // Does not apply to end of episode sleep time
+                    setupFadeOutWhenFinishingSleepTimer()
+                }
             }
             .switchMapCompletable { updateCurrentPositionRx() }
             .subscribeBy(onError = { Timber.e(it) })
+    }
+
+    private fun setupFadeOutWhenFinishingSleepTimer() {
+        // Needs to run in main thread because of player getVolume
+        Handler(Looper.getMainLooper()).post {
+            val timeLeft = sleepTimer.timeLeftInSecs()
+            timeLeft?.let {
+                val fadeDuration = 5
+                val maxVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
+                val minVolume = 0.0f
+
+                if (timeLeft <= fadeDuration) {
+                    val fraction = timeLeft.toFloat() / fadeDuration
+                    val newVolume = minVolume + (maxVolume - minVolume) * fraction
+                    player?.setVolume(newVolume)
+                } else {
+                    player?.setVolume(maxVolume)
+                }
+            }
+        }
     }
 
     private fun cancelUpdateTimer() {
