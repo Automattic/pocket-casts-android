@@ -9,6 +9,7 @@ import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -20,6 +21,7 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
     private val sleepTimer: SleepTimer,
     private var playbackManager: PlaybackManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val settings: Settings,
     @ApplicationContext private val context: Context,
 ) : SensorEventListener {
 
@@ -46,7 +48,7 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
                 val acceleration = sqrt((x * x + y * y + z * z).toDouble())
 
                 // If acceleration is above a certain threshold, consider it a shake
-                if (acceleration > SHAKE_THRESHOLD) {
+                if (acceleration > settings.getSleepTimerDeviceShakeThreshold()) {
                     onDeviceShaken()
                 }
             }
@@ -70,7 +72,6 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
     }
 
     companion object {
-        private const val SHAKE_THRESHOLD = 30 // A higher value for SHAKE_THRESHOLD makes the detection less sensitive
         private const val TIME_KEY = "time"
         private const val SHAKING_PHONE_VALUE = "shaking_phone"
     }

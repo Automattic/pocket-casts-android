@@ -385,6 +385,8 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
+    fun getSleepTimerDeviceShakeThreshold(): Long
+
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>
