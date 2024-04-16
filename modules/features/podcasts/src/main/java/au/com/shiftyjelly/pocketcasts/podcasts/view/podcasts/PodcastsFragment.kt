@@ -8,6 +8,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -18,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -133,6 +143,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 navigationIcon = navigationIcon,
             )
 
+            setupSearchBar()
+
             toolbar.menu.findItem(R.id.folders_locked)?.run {
                 isVisible = !isSignedInAsPlusOrPatron
                 setIcon(theme.folderLockedImageName)
@@ -210,6 +222,22 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
 
         return binding.root
+    }
+
+    private fun setupSearchBar() {
+        binding.layoutSearch.setContent {
+            val focusRequester = remember { FocusRequester() }
+            SearchBar(
+                text = "",
+                placeholder = stringResource(LR.string.search_podcasts_or_add_url),
+                onTextChanged = {},
+                onSearch = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .focusRequester(focusRequester),
+            )
+        }
     }
 
     override fun onDestroyView() {
