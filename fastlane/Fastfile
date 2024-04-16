@@ -143,7 +143,7 @@ platform :android do
   end
 
   # @option [String] base_version The "x.y" version number to create a beta from. Defaults to the current version as defined in the version file of `main` branch
-  # @option [Integer] version_code The versionCode to use for the new beta. Defaults to the versionCode defined in the version file of the `release/<base_version>` branch
+  # @option [Integer] version_code The versionCode to use for the new beta. Defaults to one more than the versionCode defined in the version file of the `release/<base_version>` branch
   lane :new_beta_release do |options|
     ensure_git_status_clean
 
