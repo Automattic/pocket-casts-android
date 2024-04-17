@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
@@ -16,9 +15,6 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.text.FontWeight
-import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
 import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -47,14 +43,11 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
                 verticalAlignment = Alignment.Vertical.Top,
                 modifier = GlanceModifier.height(58.dp),
             ) {
-                Text(
+                NonScalingText(
                     text = state.episode?.title ?: LocalContext.current.getString(LR.string.widget_no_episode_playing),
-                    maxLines = 1,
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onPrimaryContainer,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                    ),
+                    textSize = 13.dp,
+                    useDynamicColors = state.useDynamicColors,
+                    isBold = true,
                 )
                 PlaybackControls(
                     isPlaying = state.isPlaying,

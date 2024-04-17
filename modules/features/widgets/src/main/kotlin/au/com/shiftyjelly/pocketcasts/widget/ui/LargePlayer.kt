@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
@@ -16,9 +15,6 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import androidx.glance.text.FontWeight
-import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -47,29 +43,25 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                     useDynamicColors = state.useDynamicColors,
                 )
             } else {
-                val secondaryTextColor = if (state.useDynamicColors) {
-                    GlanceTheme.colors.onPrimaryContainer
-                } else {
-                    GlanceTheme.colors.onSecondaryContainer
-                }
-
                 Column(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = GlanceModifier.fillMaxSize().clickable(OpenPocketCastsAction.action()),
                 ) {
-                    Text(
+                    NonScalingText(
                         text = LocalContext.current.getString(LR.string.widget_nothing_in_up_next),
-                        maxLines = 1,
-                        style = TextStyle(color = GlanceTheme.colors.onPrimaryContainer, fontSize = 15.sp, fontWeight = FontWeight.Bold),
+                        textSize = 16.dp,
+                        useDynamicColors = state.useDynamicColors,
+                        isBold = true,
                     )
                     Spacer(
                         modifier = GlanceModifier.height(4.dp),
                     )
-                    Text(
+                    NonScalingText(
                         text = LocalContext.current.getString(LR.string.widget_check_out_discover),
-                        maxLines = 1,
-                        style = TextStyle(color = secondaryTextColor, fontSize = 13.sp),
+                        textSize = 13.dp,
+                        useDynamicColors = state.useDynamicColors,
+                        alpha = 0.8,
                     )
                 }
             }

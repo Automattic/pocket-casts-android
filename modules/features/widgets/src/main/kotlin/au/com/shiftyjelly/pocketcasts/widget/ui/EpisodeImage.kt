@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 internal fun EpisodeImage(
     episode: PlayerWidgetEpisode?,
     useEpisodeArtwork: Boolean,
-    size: Dp?,
+    size: Dp,
     backgroundColor: ((ColorProviders) -> ColorProvider)? = null,
     iconColor: ((ColorProviders) -> ColorProvider)? = null,
     onClick: (PlayerWidgetEpisode?) -> Action = { currentEpisode ->
@@ -61,13 +61,13 @@ internal fun EpisodeImage(
             .clickable(onClick(episode))
             .background(backgroundColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.primary)
             .cornerRadius(6.dp)
-            .then(if (size != null) GlanceModifier.size(size) else GlanceModifier),
+            .size(size),
     ) {
         Image(
             provider = ImageProvider(IR.drawable.ic_logo_background),
             contentDescription = null,
             colorFilter = ColorFilter.tint(iconColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.padding(if (size == null) 12.dp else size / 6),
+            modifier = GlanceModifier.padding(size / 6),
         )
 
         val bitmap = episodeBitmap
