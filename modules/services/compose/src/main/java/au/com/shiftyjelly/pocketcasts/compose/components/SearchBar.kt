@@ -44,6 +44,7 @@ fun SearchBar(
     placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     onSearch: () -> Unit = {},
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
@@ -55,12 +56,17 @@ fun SearchBar(
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = MaterialTheme.theme.colors.primaryText02,
             textColor = MaterialTheme.theme.colors.primaryText01,
+            disabledTextColor = MaterialTheme.theme.colors.primaryText01,
             placeholderColor = MaterialTheme.theme.colors.primaryText02,
+            disabledPlaceholderColor = MaterialTheme.theme.colors.primaryText02,
             leadingIconColor = MaterialTheme.theme.colors.primaryIcon02,
+            disabledLeadingIconColor = MaterialTheme.theme.colors.primaryIcon02,
             trailingIconColor = MaterialTheme.theme.colors.primaryIcon02,
+            disabledTrailingIconColor = MaterialTheme.theme.colors.primaryIcon02,
             backgroundColor = MaterialTheme.theme.colors.primaryField01,
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
+            disabledBorderColor = Color.Transparent,
         ),
         shape = RoundedCornerShape(10.dp),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -92,6 +98,7 @@ fun SearchBar(
                 }
             }
         },
+        enabled = enabled,
         modifier = modifier.onKeyEvent {
             // close the keyboard on enter
             if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -155,7 +162,7 @@ private fun SearchBarDarkPreview() {
 @Composable
 private fun SearchBarPreview() {
     Column(modifier = Modifier.padding(8.dp)) {
-        SearchBar("Material", onTextChanged = {}, modifier = Modifier.padding(bottom = 8.dp))
+        SearchBar("Materiaxdzsdasd asdasdas sdadsa asdadsa asdasdas asdsada asdadsl", onTextChanged = {}, modifier = Modifier.padding(bottom = 8.dp))
         SearchBar("", onTextChanged = {})
     }
 }
