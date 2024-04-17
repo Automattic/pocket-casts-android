@@ -2242,15 +2242,14 @@ open class PlaybackManager @Inject constructor(
             val timeLeft = sleepTimer.timeLeftInSecs()
             timeLeft?.let {
                 val fadeDuration = 5
-                val maxVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
-                val minVolume = 0.0f
+                val startVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
 
                 if (timeLeft <= fadeDuration) {
                     val fraction = timeLeft.toFloat() / fadeDuration
-                    val newVolume = minVolume + (maxVolume - minVolume) * fraction
+                    val newVolume = startVolume * fraction
                     player?.setVolume(newVolume)
                 } else {
-                    player?.setVolume(maxVolume)
+                    player?.setVolume(startVolume)
                 }
             }
         }
