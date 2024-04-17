@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -52,7 +53,13 @@ fun SearchBar(
         onValueChange = {
             onTextChanged(it.removeNewLines())
         },
-        placeholder = { Text(placeholder) },
+        placeholder = {
+            Text(
+                placeholder,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = MaterialTheme.theme.colors.primaryText02,
             textColor = MaterialTheme.theme.colors.primaryText01,
