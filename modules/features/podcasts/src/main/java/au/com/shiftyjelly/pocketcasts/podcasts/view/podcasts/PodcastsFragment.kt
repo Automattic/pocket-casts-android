@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.android.material.transition.MaterialFadeThrough
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -73,6 +74,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         private const val OPTION_KEY = "option"
         private const val SORT_BY = "sort_by"
         private const val EDIT_FOLDER = "edit_folder"
+        private const val SEARCH_TRANSITION_DURATION = 500L
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -274,6 +276,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     private fun search() {
         val searchFragment = SearchFragment.newInstance(source = SourceView.PODCAST_LIST)
+        searchFragment.enterTransition = MaterialFadeThrough().apply { duration = SEARCH_TRANSITION_DURATION }
         (activity as FragmentHostListener).addFragment(searchFragment, onTop = true)
         realBinding?.recyclerView?.smoothScrollToPosition(0)
     }
