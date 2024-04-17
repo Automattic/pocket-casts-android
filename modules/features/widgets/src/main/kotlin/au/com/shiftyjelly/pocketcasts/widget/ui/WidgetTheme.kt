@@ -30,14 +30,13 @@ private val DefaultColors = ColorProviders(
         primary = Color(0xFFF8FAF6),
         onPrimary = Color(0xFFF43E37),
         primaryContainer = Color(0xFFF43E37),
-        onPrimaryContainer = Color(0xFFF8FAF6),
+        onPrimaryContainer = UndefinedColor,
         inversePrimary = UndefinedColor,
         // Used as a trick to have different small player placeholder colors.
         secondary = Color(0xFFF43E37),
         onSecondary = Color(0xFFF8FAF6),
         secondaryContainer = UndefinedColor,
-        // Used as a trick to have alpha on secondary texts with non dynamic themes.
-        onSecondaryContainer = Color(0xCCF8FAF6),
+        onSecondaryContainer = UndefinedColor,
         tertiary = UndefinedColor,
         onTertiary = UndefinedColor,
         tertiaryContainer = UndefinedColor,
@@ -64,14 +63,13 @@ private val DefaultColors = ColorProviders(
         primary = Color(0xFFD9201C),
         onPrimary = Color(0xFFFFFFFF),
         primaryContainer = Color(0xFF292B2E),
-        onPrimaryContainer = Color(0xFFFFFFFF),
+        onPrimaryContainer = UndefinedColor,
         inversePrimary = UndefinedColor,
         // Used as a trick to have different small player placeholder colors.
         secondary = Color(0xFFD9201C),
         onSecondary = Color(0xFFFFFFFF),
         secondaryContainer = UndefinedColor,
-        // Used as a trick to have alpha on secondary texts with non dynamic themes.
-        onSecondaryContainer = Color(0xCCFFFFFF),
+        onSecondaryContainer = UndefinedColor,
         tertiary = UndefinedColor,
         onTertiary = UndefinedColor,
         tertiaryContainer = UndefinedColor,

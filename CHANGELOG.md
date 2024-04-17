@@ -21,6 +21,8 @@
 *   Bug Fixes
     *   Improved player view in landscape mode. Added chapter artwork, podcast title, and improved video experience.
         ([#2044](https://github.com/Automattic/pocket-casts-android/pull/1944))
+    *   Sleep Timer: End of episode option was not being preserved after switching to another episode from Up Next
+        ([#2075](https://github.com/Automattic/pocket-casts-android/pull/2075))
 
 7.61
 -----

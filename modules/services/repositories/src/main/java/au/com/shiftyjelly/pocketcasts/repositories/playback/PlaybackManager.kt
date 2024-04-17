@@ -1691,8 +1691,6 @@ open class PlaybackManager @Inject constructor(
         val currentPlayer = this.player
         val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
 
-        sleepAfterEpisode = sleepAfterEpisode && playbackStateRelay.blockingFirst().episodeUuid == episode.uuid
-
         // completed episodes should play from the start
         if (episode.isFinished) {
             episodeManager.markAsNotPlayed(episode)

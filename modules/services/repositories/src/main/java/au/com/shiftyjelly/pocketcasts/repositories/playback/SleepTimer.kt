@@ -114,7 +114,9 @@ class SleepTimer @Inject constructor(
 
     fun cancelTimer() {
         getAlarmManager().cancel(getSleepIntent())
-        cleanUpSleepTimer()
+        cancelSleepTime()
+        cancelAutomaticSleepAfterTimeRestart()
+        cancelAutomaticSleepOnEpisodeEndRestart()
     }
 
     val isSleepAfterTimerRunning: Boolean
@@ -125,7 +127,7 @@ class SleepTimer @Inject constructor(
 
         val timeLeft = sleepTimeMs - System.currentTimeMillis()
         if (timeLeft < 0) {
-            cleanUpSleepTimer()
+            cancelSleepTime()
             return null
         }
         return (timeLeft / DateUtils.SECOND_IN_MILLIS).toInt()
@@ -140,10 +142,8 @@ class SleepTimer @Inject constructor(
         return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
 
-    private fun cleanUpSleepTimer() {
+    private fun cancelSleepTime() {
         sleepTimeMs = null
-        cancelAutomaticSleepAfterTimeRestart()
-        cancelAutomaticSleepOnEpisodeEndRestart()
     }
 
     private fun cancelAutomaticSleepAfterTimeRestart() {

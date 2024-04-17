@@ -104,7 +104,7 @@ class EpisodeContainerFragment :
         get() = arguments?.getString(ARG_EPISODE_UUID)
 
     private val timestamp: Duration?
-        get() = arguments?.getLong(ARG_TIMESTAMP_IN_SECS)?.seconds
+        get() = arguments?.getLong(ARG_TIMESTAMP_IN_SECS, -1)?.takeIf { it >= 0 }?.seconds
 
     private val episodeViewSource: EpisodeViewSource
         get() = EpisodeViewSource.fromString(arguments?.getString(ARG_EPISODE_VIEW_SOURCE))
