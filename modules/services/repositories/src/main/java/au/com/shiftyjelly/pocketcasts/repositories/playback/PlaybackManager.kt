@@ -2224,9 +2224,31 @@ open class PlaybackManager @Inject constructor(
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
+                if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !sleepAfterEpisode) { // Does not apply to end of episode sleep time
+                    setupFadeOutWhenFinishingSleepTimer()
+                }
             }
             .switchMapCompletable { updateCurrentPositionRx() }
             .subscribeBy(onError = { Timber.e(it) })
+    }
+
+    private fun setupFadeOutWhenFinishingSleepTimer() {
+        // it needs to run in the main thread because of player getVolume
+        applicationScope.launch(Dispatchers.Main) {
+            val timeLeft = sleepTimer.timeLeftInSecs()
+            timeLeft?.let {
+                val fadeDuration = 5
+                val startVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
+
+                if (timeLeft <= fadeDuration) {
+                    val fraction = timeLeft.toFloat() / fadeDuration
+                    val newVolume = startVolume * fraction
+                    player?.setVolume(newVolume)
+                } else {
+                    player?.setVolume(startVolume)
+                }
+            }
+        }
     }
 
     private fun cancelUpdateTimer() {
