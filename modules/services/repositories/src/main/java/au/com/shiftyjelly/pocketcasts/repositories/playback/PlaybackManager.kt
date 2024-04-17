@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.widget.Toast
@@ -2237,8 +2235,8 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun setupFadeOutWhenFinishingSleepTimer() {
-        // Needs to run in main thread because of player getVolume
-        Handler(Looper.getMainLooper()).post {
+        // it needs to run in the main thread because of player getVolume
+        applicationScope.launch(Dispatchers.Main) {
             val timeLeft = sleepTimer.timeLeftInSecs()
             timeLeft?.let {
                 val fadeDuration = 5
