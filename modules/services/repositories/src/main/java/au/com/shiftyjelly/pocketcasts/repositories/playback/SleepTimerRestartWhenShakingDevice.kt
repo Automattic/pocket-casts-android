@@ -67,6 +67,8 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
                     context.getString(R.string.player_sleep_timer_restarted_after_device_shake),
                     Toast.LENGTH_SHORT,
                 ).show()
+            } else {
+                playbackManager.playSleepTimeTone()
             }
         }
     }

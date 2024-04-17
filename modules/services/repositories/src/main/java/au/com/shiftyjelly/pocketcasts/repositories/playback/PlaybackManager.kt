@@ -170,6 +170,13 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    private val sleepTimeTonePlayer: MediaPlayer by lazy {
+        MediaPlayer().apply {
+            setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.sleep_time_device_shake_confirmation_sound}"))
+            prepare()
+        }
+    }
+
     val playbackStateRelay: Relay<PlaybackState> by lazy {
         val relay = BehaviorRelay.create<PlaybackState>().toSerialized()
         relay.accept(PlaybackState(lastChangeFrom = LastChangeFrom.OnInit.value))
@@ -2359,6 +2366,14 @@ open class PlaybackManager @Inject constructor(
     fun playTone() {
         try {
             tonePlayer.start()
+        } catch (e: Exception) {
+            Timber.e("Unable to play tone: $e")
+        }
+    }
+
+    fun playSleepTimeTone() {
+        try {
+            sleepTimeTonePlayer.start()
         } catch (e: Exception) {
             Timber.e("Unable to play tone: $e")
         }
