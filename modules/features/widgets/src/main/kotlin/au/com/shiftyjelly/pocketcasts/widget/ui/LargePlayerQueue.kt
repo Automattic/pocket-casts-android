@@ -25,7 +25,9 @@ internal fun LargePlayerQueue(
 ) {
     val lastIndex = queue.lastIndex
     LazyColumn(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(190.dp),
     ) {
         itemsIndexed(queue, { _, episode -> episode.longId }) { index, episode ->
             Row(
