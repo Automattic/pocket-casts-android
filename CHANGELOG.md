@@ -3,6 +3,8 @@
 *   New Features
     *   Sleep timer: Restart timer when shaking phone
         ([#2054](https://github.com/Automattic/pocket-casts-android/pull/2054))
+    *   Sleep timer: Start fading out audio when sleep timer has 5 seconds left
+        ([#2069](https://github.com/Automattic/pocket-casts-android/pull/2069))
 
 7.62
 -----
