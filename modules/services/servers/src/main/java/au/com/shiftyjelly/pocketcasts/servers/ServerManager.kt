@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokenedOkHttpClient
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshPodcastBatcher
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -123,40 +124,28 @@ open class ServerManager @Inject constructor(
         )
     }
 
-    fun refreshPodcastsSync(podcasts: List<Podcast>, callback: ServerCallback<RefreshResponse>): Call? {
-        if (podcasts.isEmpty()) {
-            callback.dataReturned(null)
-            return null
-        }
+    suspend fun refreshPodcastsSync(podcasts: List<Podcast>): Result<RefreshResponse?> {
+        val batcher = RefreshPodcastBatcher(batchSize = 200)
+        return batcher.refreshPodcasts(podcasts) { parameters ->
+            suspendCancellableCoroutine { continuation ->
+                val call = postToMainServer(
+                    "/user/update",
+                    parameters,
+                    async = false,
+                    object : PostCallback {
+                        override fun onSuccess(data: String?, response: ServerResponse) {
+                            continuation.resume(DataParser.parseRefreshPodcasts(data))
+                        }
 
-        val podcastsStr = StringBuilder()
-        val episodesStr = StringBuilder()
+                        override fun onFailed(errorCode: Int, userMessage: String?, serverMessageId: String?, serverMessage: String?, throwable: Throwable?) {
+                            continuation.resumeWithException(ServerResponseException(errorCode, userMessage, serverMessageId, serverMessage, throwable))
+                        }
+                    },
+                )
 
-        for (i in podcasts.indices) {
-            val podcast = podcasts[i]
-            if (i > 0) {
-                podcastsStr.append(LIST_SEPERATOR)
-                episodesStr.append(LIST_SEPERATOR)
+                continuation.invokeOnCancellation { call?.cancel() }
             }
-            podcastsStr.append(podcast.uuid)
-            episodesStr.append(podcast.latestEpisodeUuid)
         }
-
-        val parameters = Parameters()
-            .add("podcasts", podcastsStr.toString())
-            .add("last_episodes", episodesStr.toString())
-            .add("push_on", "false")
-
-        return postToMainServer(
-            "/user/update",
-            parameters,
-            false,
-            object : PostCallback, ServerFailure by callback {
-                override fun onSuccess(data: String?, response: ServerResponse) {
-                    callback.dataReturned(DataParser.parseRefreshPodcasts(data))
-                }
-            },
-        )
     }
 
     private fun <T> getRxServerCallback(emitter: SingleEmitter<T>): ServerCallback<T> {
@@ -359,6 +348,10 @@ open class ServerManager @Inject constructor(
             pairs.add(Pair(name, value))
             return this
         }
+
+        operator fun get(key: String) = pairs.associate { (first, _) ->
+            first to pairs.filter { it.first == first }.map { it.second }
+        }[key]?.joinToString(",")
 
         fun toFormBody(): FormBody {
             val builder = FormBody.Builder()
