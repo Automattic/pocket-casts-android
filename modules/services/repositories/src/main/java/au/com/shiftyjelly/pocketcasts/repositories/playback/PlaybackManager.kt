@@ -163,9 +163,16 @@ open class PlaybackManager @Inject constructor(
     private var audioNoisyManager =
         AudioNoisyManager(application)
 
-    private val tonePlayer: MediaPlayer by lazy {
+    private val bookmarkTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
             setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.bookmark_creation_sound}"))
+            prepare()
+        }
+    }
+
+    private val sleepTimeTonePlayer: MediaPlayer by lazy {
+        MediaPlayer().apply {
+            setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.sleep_time_device_shake_confirmation_sound}"))
             prepare()
         }
     }
@@ -2356,9 +2363,17 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun playTone() {
+    fun playBookmarkTone() {
         try {
-            tonePlayer.start()
+            bookmarkTonePlayer.start()
+        } catch (e: Exception) {
+            Timber.e("Unable to play tone: $e")
+        }
+    }
+
+    fun playSleepTimeTone() {
+        try {
+            sleepTimeTonePlayer.start()
         } catch (e: Exception) {
             Timber.e("Unable to play tone: $e")
         }
