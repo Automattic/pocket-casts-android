@@ -346,7 +346,7 @@ open class ServerManager @Inject constructor(
         }
     }
 
-    private inner class Parameters {
+    internal class Parameters {
         private val pairs = mutableListOf<Pair<String, String?>>()
 
         constructor()
