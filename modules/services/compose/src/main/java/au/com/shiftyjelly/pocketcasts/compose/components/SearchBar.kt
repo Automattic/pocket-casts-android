@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -44,6 +45,7 @@ fun SearchBar(
     placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     onSearch: () -> Unit = {},
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
@@ -51,16 +53,27 @@ fun SearchBar(
         onValueChange = {
             onTextChanged(it.removeNewLines())
         },
-        placeholder = { Text(placeholder) },
+        placeholder = {
+            Text(
+                placeholder,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = MaterialTheme.theme.colors.primaryText02,
             textColor = MaterialTheme.theme.colors.primaryText01,
+            disabledTextColor = MaterialTheme.theme.colors.primaryText01,
             placeholderColor = MaterialTheme.theme.colors.primaryText02,
+            disabledPlaceholderColor = MaterialTheme.theme.colors.primaryText02,
             leadingIconColor = MaterialTheme.theme.colors.primaryIcon02,
+            disabledLeadingIconColor = MaterialTheme.theme.colors.primaryIcon02,
             trailingIconColor = MaterialTheme.theme.colors.primaryIcon02,
+            disabledTrailingIconColor = MaterialTheme.theme.colors.primaryIcon02,
             backgroundColor = MaterialTheme.theme.colors.primaryField01,
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
+            disabledBorderColor = Color.Transparent,
         ),
         shape = RoundedCornerShape(10.dp),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -92,6 +105,7 @@ fun SearchBar(
                 }
             }
         },
+        enabled = enabled,
         modifier = modifier.onKeyEvent {
             // close the keyboard on enter
             if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {

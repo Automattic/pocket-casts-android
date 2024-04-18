@@ -8,6 +8,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -18,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -45,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.Chrome
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.android.material.transition.MaterialFadeThrough
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -61,6 +70,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         private const val OPTION_KEY = "option"
         private const val SORT_BY = "sort_by"
         private const val EDIT_FOLDER = "edit_folder"
+        private const val SEARCH_TRANSITION_DURATION = 500L
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -133,13 +143,15 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 navigationIcon = navigationIcon,
             )
 
+            setupSearchBar()
+
             toolbar.menu.findItem(R.id.folders_locked)?.run {
                 isVisible = !isSignedInAsPlusOrPatron
                 setIcon(theme.folderLockedImageName)
             }
 
             toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
-            toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
+            binding.layoutSearch.showIf(rootFolder)
 
             adapter?.setFolderItems(folderState.items)
 
@@ -212,6 +224,25 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         return binding.root
     }
 
+    private fun setupSearchBar() {
+        binding.layoutSearch.setContent {
+            AppTheme(theme.activeTheme) {
+                SearchBar(
+                    text = "",
+                    placeholder = stringResource(LR.string.search_podcasts_or_add_url),
+                    onTextChanged = {},
+                    onSearch = {},
+                    enabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { search() }
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp),
+                )
+            }
+        }
+    }
+
     override fun onDestroyView() {
         listState = binding.recyclerView.layoutManager?.onSaveInstanceState()
         binding.recyclerView.adapter = null
@@ -227,10 +258,6 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 openOptions()
                 true
             }
-            R.id.search_podcasts -> {
-                search()
-                true
-            }
             R.id.create_folder -> {
                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
                 createFolder()
@@ -242,6 +269,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     private fun search() {
         val searchFragment = SearchFragment.newInstance(source = SourceView.PODCAST_LIST)
+        searchFragment.enterTransition = MaterialFadeThrough().apply { duration = SEARCH_TRANSITION_DURATION }
         (activity as FragmentHostListener).addFragment(searchFragment, onTop = true)
         realBinding?.recyclerView?.smoothScrollToPosition(0)
     }
