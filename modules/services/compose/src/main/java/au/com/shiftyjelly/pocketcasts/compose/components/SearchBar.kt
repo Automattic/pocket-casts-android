@@ -169,7 +169,7 @@ private fun SearchBarDarkPreview() {
 @Composable
 private fun SearchBarPreview() {
     Column(modifier = Modifier.padding(8.dp)) {
-        SearchBar("Materiaxdzsdasd asdasdas sdadsa asdadsa asdasdas asdsada asdadsl", onTextChanged = {}, modifier = Modifier.padding(bottom = 8.dp))
+        SearchBar("Material", onTextChanged = {}, modifier = Modifier.padding(bottom = 8.dp))
         SearchBar("", onTextChanged = {})
     }
 }
