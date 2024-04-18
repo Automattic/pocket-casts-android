@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parceler
 
 object DurationParceler : Parceler<Duration?> {
     override fun create(parcel: Parcel): Duration? {
-        val isPresent = parcel.readByte() == 0.toByte()
+        val isPresent = parcel.readByte() == 1.toByte()
         return if (isPresent) parcel.readLong().milliseconds else null
     }
 
