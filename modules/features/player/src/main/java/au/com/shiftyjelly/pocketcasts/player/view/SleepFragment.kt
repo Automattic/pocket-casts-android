@@ -77,7 +77,7 @@ class SleepFragment : BaseDialogFragment() {
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.endOfEpisodeCustomPlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
-        binding.buttonEndOfEpisodeCustom.setOnClickListener { startTimerEndOfEpisode(episodes = viewModel.sleepCustomEndOfEpisodes) }
+        binding.buttonEndOfEpisodeCustom.setOnClickListener { startTimerEndOfEpisode(episodes = viewModel.getSleepEndOfEpisodes()) }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
@@ -104,6 +104,10 @@ class SleepFragment : BaseDialogFragment() {
 
         viewModel.sleepCustomEndOfEpisodesText.observe(viewLifecycleOwner) { text ->
             binding?.labelEndOfEpisodeCustom?.text = text
+        }
+
+        viewModel.sleepWhenEpisodeEndText.observe(viewLifecycleOwner) { text ->
+            binding?.sleepingEndOfEpisode?.text = text
         }
 
         viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
@@ -177,8 +181,8 @@ class SleepFragment : BaseDialogFragment() {
         binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
     }
     private fun plusEndOfEpisodeButtonClicked() {
-        viewModel.sleepCustomEndOfEpisodes += 1
-        binding?.root?.announceForAccessibility("Custom sleep time end of episode ${viewModel.sleepCustomEndOfEpisodes}")
+        viewModel.setSleepEndOfEpisodes(viewModel.getSleepEndOfEpisodes() + 1)
+        binding?.root?.announceForAccessibility("Custom sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
     }
 
     private fun minusButtonClicked() {
@@ -191,10 +195,11 @@ class SleepFragment : BaseDialogFragment() {
     }
 
     private fun minusEndOfEpisodeButtonClicked() {
-        if (viewModel.sleepCustomEndOfEpisodes > 1) {
-            viewModel.sleepCustomEndOfEpisodes -= 1
+        val endOfEpisodes = viewModel.getSleepEndOfEpisodes()
+        if (endOfEpisodes > 1) {
+            viewModel.setSleepEndOfEpisodes(endOfEpisodes - 1)
         }
-        binding?.root?.announceForAccessibility("Custom sleep time end of episode ${viewModel.sleepCustomEndOfEpisodes}")
+        binding?.root?.announceForAccessibility("Custom sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
     }
 
     private fun startTimerEndOfEpisode(episodes: Int = 1) {

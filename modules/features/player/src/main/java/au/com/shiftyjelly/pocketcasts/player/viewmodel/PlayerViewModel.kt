@@ -277,6 +277,9 @@ class PlayerViewModel @Inject constructor(
     val sleepCustomEndOfEpisodesText = MutableLiveData<String>().apply {
         postValue(calcCustomEndOfEpisodeText())
     }
+    val sleepWhenEpisodeEndText = MutableLiveData<String>().apply {
+        postValue(calcWhenEpisodeEndText())
+    }
     var sleepCustomTimeMins: Int = 5
         set(value) {
             field = value.coerceIn(1, 240)
@@ -287,16 +290,16 @@ class PlayerViewModel @Inject constructor(
         get() {
             return settings.getSleepTimerCustomMins()
         }
-    var sleepCustomEndOfEpisodes: Int = 1
-        set(value) {
-            field = value.coerceIn(1, 240)
-            settings.setSleepTimerCustomEndOfEpisodes(field)
-            sleepCustomEndOfEpisodesText.postValue(calcCustomEndOfEpisodeText())
+    fun setSleepEndOfEpisodes(episodes: Int = 1, shouldCallUpdateTimer: Boolean = true) {
+        val newValue = episodes.coerceIn(1, 240)
+        settings.setSleepTimerCustomEndOfEpisodes(newValue)
+        sleepCustomEndOfEpisodesText.postValue(calcCustomEndOfEpisodeText())
+        sleepWhenEpisodeEndText.postValue(calcWhenEpisodeEndText())
+        if (shouldCallUpdateTimer) {
             updateSleepTimer()
         }
-        get() {
-            return settings.getSleepTimerCustomEndOfEpisodes()
-        }
+    }
+    fun getSleepEndOfEpisodes(): Int = settings.getSleepTimerCustomEndOfEpisodes()
 
     init {
         updateSleepTimer()
@@ -519,10 +522,18 @@ class PlayerViewModel @Inject constructor(
         return context.resources.getString(LR.string.minutes_plural, sleepCustomTimeMins)
     }
     private fun calcCustomEndOfEpisodeText(): String {
-        return if (sleepCustomEndOfEpisodes == 1) {
+        return if (getSleepEndOfEpisodes() == 1) {
             context.resources.getString(LR.string.player_sleep_end_of_episode_singular)
         } else {
-            context.resources.getString(LR.string.player_sleep_end_of_episode_plural, sleepCustomEndOfEpisodes)
+            context.resources.getString(LR.string.player_sleep_end_of_episode_plural, getSleepEndOfEpisodes())
+        }
+    }
+
+    private fun calcWhenEpisodeEndText(): String {
+        return if (getSleepEndOfEpisodes() == 1) {
+            context.resources.getString(LR.string.player_sleep_when_episode_ends)
+        } else {
+            context.resources.getString(LR.string.player_sleep_when_episodes_ends, getSleepEndOfEpisodes())
         }
     }
 
@@ -531,6 +542,8 @@ class PlayerViewModel @Inject constructor(
         if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
             isSleepAtEndOfEpisode.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
+            setSleepEndOfEpisodes(playbackManager.sleepAfterEpisode, shouldCallUpdateTimer = false)
+            sleepWhenEpisodeEndText.postValue(calcWhenEpisodeEndText())
         } else {
             isSleepAtEndOfEpisode.postValue(false)
             playbackManager.updateSleepTimerStatus(false)

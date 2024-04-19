@@ -216,7 +216,7 @@ open class PlaybackManager @Inject constructor(
         bookmarkFeature = bookmarkFeature,
     )
 
-    private var sleepAfterEpisode: Int = 0
+    var sleepAfterEpisode: Int = 0
 
     var player: Player? = null
 
