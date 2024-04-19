@@ -5,5 +5,8 @@ import android.support.v4.media.session.MediaSessionCompat
 
 interface NotificationDrawer {
 
-    fun buildPlayingNotification(sessionToken: MediaSessionCompat.Token): Notification
+    fun buildPlayingNotification(
+        sessionToken: MediaSessionCompat.Token,
+        useEpisodeArtwork: Boolean,
+    ): Notification
 }
