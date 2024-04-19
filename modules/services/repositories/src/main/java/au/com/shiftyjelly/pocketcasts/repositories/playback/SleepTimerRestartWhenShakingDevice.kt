@@ -63,7 +63,7 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
 
     private fun onDeviceShaken() {
         val time = sleepTimer.restartTimerIfIsRunning onSuccess@{
-            playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = 0)
+            playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
 
             if (context.isAppForeground()) {
                 Toast.makeText(

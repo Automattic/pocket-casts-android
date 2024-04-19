@@ -543,17 +543,17 @@ class PlayerViewModel @Inject constructor(
 
     fun sleepTimerAfter(mins: Int) {
         sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
-            playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = 0)
+            playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
         }
     }
 
     fun sleepTimerAfterEpisode(episodes: Int = 1) {
-        playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = episodes)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
         sleepTimer.cancelTimer()
     }
 
     fun cancelSleepTimer() {
-        playbackManager.updateSleepTimerStatus(running = false)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
         sleepTimer.cancelTimer()
     }
 

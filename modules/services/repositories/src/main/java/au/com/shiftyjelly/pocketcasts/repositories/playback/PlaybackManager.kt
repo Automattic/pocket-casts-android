@@ -294,10 +294,10 @@ open class PlaybackManager @Inject constructor(
         return player?.isStreaming ?: false
     }
 
-    fun updateSleepTimerStatus(running: Boolean, sleepAfterEpisode: Int = 0) {
-        this.sleepAfterEpisode = sleepAfterEpisode
+    fun updateSleepTimerStatus(sleepTimeRunning: Boolean, sleepAfterEpisodes: Int = 0) {
+        this.sleepAfterEpisode = sleepAfterEpisodes
         playbackStateRelay.blockingFirst().let {
-            playbackStateRelay.accept(it.copy(isSleepTimerRunning = running, lastChangeFrom = LastChangeFrom.OnUpdateSleepTimerStatus.value))
+            playbackStateRelay.accept(it.copy(isSleepTimerRunning = sleepTimeRunning, lastChangeFrom = LastChangeFrom.OnUpdateSleepTimerStatus.value))
         }
     }
 
@@ -1273,7 +1273,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         // keep hold of this as deleting the episode might change the member variable
-        val shouldSleepAfterEpisode = isSleepAfterEpisodeEnabled()
+        val hadSleepAfterEpisode = isSleepAfterEpisodeEnabled()
         val wasPlaying = isPlaying()
 
         cancelUpdateTimer()
@@ -1281,11 +1281,11 @@ open class PlaybackManager @Inject constructor(
 
         val episode = getCurrentEpisode()
 
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode ${episode?.title} finished, should sleep: $shouldSleepAfterEpisode")
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode ${episode?.title} finished, should sleep: $hadSleepAfterEpisode")
 
-        if (shouldSleepAfterEpisode) {
+        if (hadSleepAfterEpisode) {
             sleep(episode)
-            return
+            if (!isSleepAfterEpisodeEnabled()) return // keep sleep time running if still has end of episodes
         }
 
         cancelUpdateTimer()
@@ -1348,7 +1348,10 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        val autoPlay = !shouldSleepAfterEpisode && wasPlaying
+        // Auto play if it had sleep time enabled for end of episodes and still has episodes set on sleep time
+        // or if it did not have sleep time end of episode configured
+        // and it was playing episode
+        val autoPlay = ((hadSleepAfterEpisode && isSleepAfterEpisodeEnabled()) || !hadSleepAfterEpisode) && wasPlaying
 
         var nextEpisode = getCurrentEpisode()
         if (nextEpisode == null) {
@@ -1437,7 +1440,10 @@ open class PlaybackManager @Inject constructor(
 
     private suspend fun sleep(episode: BaseEpisode?) {
         episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
-        sleepAfterEpisode = 0
+
+        sleepAfterEpisode -= 1
+
+        if (isSleepAfterEpisodeEnabled()) return
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let {
@@ -2059,10 +2065,10 @@ open class PlaybackManager @Inject constructor(
             currentEpisodeUuid = episode.uuid,
             isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
             onRestartSleepAfterTime = {
-                updateSleepTimerStatus(running = true, sleepAfterEpisode = 0)
+                updateSleepTimerStatus(sleepTimeRunning = true)
             },
             onRestartSleepOnEpisodeEnd = {
-                updateSleepTimerStatus(running = true, sleepAfterEpisode = 1)
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = 1)
             },
         )
 

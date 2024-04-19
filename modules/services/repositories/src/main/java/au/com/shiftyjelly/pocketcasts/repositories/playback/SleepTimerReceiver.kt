@@ -19,6 +19,6 @@ class SleepTimerReceiver : BroadcastReceiver() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
         Toast.makeText(context, context.getString(R.string.player_sleep_timer_stopped_your_podcast), Toast.LENGTH_LONG).show()
         playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
-        playbackManager.updateSleepTimerStatus(running = false)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
     }
 }
