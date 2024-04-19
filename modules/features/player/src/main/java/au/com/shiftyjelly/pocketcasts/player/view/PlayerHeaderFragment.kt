@@ -363,24 +363,30 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         return ThemeColor.playerHighlight01(viewModel.theme, viewModel.iconTintColor)
     }
 
-    private var lastLoadedBaseEpisode: BaseEpisode? = null
+    private var lastLoadedBaseEpisodeId: String? = null
     private var lastUseEpisodeArtwork: Boolean? = null
+    private var lastLoadedChapterPath: String? = null
 
     private fun loadArtwork(
         baseEpisode: BaseEpisode,
         useEpisodeArtwork: Boolean,
         imageView: ImageView,
     ) {
-        if (lastLoadedBaseEpisode == baseEpisode && lastUseEpisodeArtwork == useEpisodeArtwork) {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
             return
         }
 
-        lastLoadedBaseEpisode = baseEpisode
+        lastLoadedBaseEpisodeId = baseEpisode.uuid
         lastUseEpisodeArtwork = useEpisodeArtwork
         imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }
 
     private fun loadChapterArtwork(chapter: Chapter?, imageView: ImageView) {
+        if (lastLoadedChapterPath == chapter?.imagePath) {
+            return
+        }
+
+        lastLoadedChapterPath = chapter?.imagePath
         chapter?.imagePath?.let { pathOrUrl ->
             imageRequestFactory.createForFileOrUrl(pathOrUrl).loadInto(imageView)
         } ?: run {

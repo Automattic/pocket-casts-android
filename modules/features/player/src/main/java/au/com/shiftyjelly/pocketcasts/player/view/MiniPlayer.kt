@@ -213,7 +213,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         button.contentDescription = if (isPlaying) stringPause else stringPlay
     }
 
-    private var lastLoadedBaseEpisode: BaseEpisode? = null
+    private var lastLoadedBaseEpisodeId: String? = null
     private var lastUseEpisodeArtwork: Boolean? = null
 
     private fun loadEpisodeArtwork(
@@ -221,11 +221,11 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         useEpisodeArtwork: Boolean,
         imageView: ImageView,
     ): Disposable? {
-        if (lastLoadedBaseEpisode == baseEpisode && lastUseEpisodeArtwork == useEpisodeArtwork) {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
             return null
         }
 
-        lastLoadedBaseEpisode = baseEpisode
+        lastLoadedBaseEpisodeId = baseEpisode.uuid
         lastUseEpisodeArtwork = useEpisodeArtwork
         return imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }
