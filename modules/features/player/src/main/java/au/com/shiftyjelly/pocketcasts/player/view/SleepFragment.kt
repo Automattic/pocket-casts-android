@@ -68,16 +68,15 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
         binding.buttonMins60.setOnClickListener { startTimer(mins = 60) }
-        binding.buttonEndOfEpisode.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
-            startTimerEndOfEpisode()
-        }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
         binding.endOfEpisodeCustomMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.endOfEpisodeCustomPlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
-        binding.buttonEndOfEpisodeCustom.setOnClickListener { startTimerEndOfEpisode(episodes = viewModel.getSleepEndOfEpisodes()) }
+        binding.buttonEndOfEpisodeCustom.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
+            startTimerEndOfEpisode(episodes = viewModel.getSleepEndOfEpisodes())
+        }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
