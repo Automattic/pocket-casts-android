@@ -77,6 +77,7 @@ class SleepFragment : BaseDialogFragment() {
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.endOfEpisodeCustomPlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
+        binding.buttonEndOfEpisodeCustom.setOnClickListener { startTimerEndOfEpisode(episodes = viewModel.sleepCustomEndOfEpisodes) }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
@@ -196,8 +197,8 @@ class SleepFragment : BaseDialogFragment() {
         binding?.root?.announceForAccessibility("Custom sleep time end of episode ${viewModel.sleepCustomEndOfEpisodes}")
     }
 
-    private fun startTimerEndOfEpisode() {
-        viewModel.sleepTimerAfterEpisode()
+    private fun startTimerEndOfEpisode(episodes: Int = 1) {
+        viewModel.sleepTimerAfterEpisode(episodes)
         binding?.root?.announceForAccessibility("Sleep timer set for end of episode")
         close()
     }

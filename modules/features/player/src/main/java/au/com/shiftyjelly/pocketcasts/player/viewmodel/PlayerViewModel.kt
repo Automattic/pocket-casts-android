@@ -528,8 +528,8 @@ class PlayerViewModel @Inject constructor(
 
     fun updateSleepTimer() {
         val timeLeft = sleepTimer.timeLeftInSecs()
-        if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.sleepAfterEpisode) {
-            isSleepAtEndOfEpisode.postValue(playbackManager.sleepAfterEpisode)
+        if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
+            isSleepAtEndOfEpisode.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
         } else {
             isSleepAtEndOfEpisode.postValue(false)
@@ -543,12 +543,12 @@ class PlayerViewModel @Inject constructor(
 
     fun sleepTimerAfter(mins: Int) {
         sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
-            playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+            playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = 0)
         }
     }
 
-    fun sleepTimerAfterEpisode() {
-        playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = true)
+    fun sleepTimerAfterEpisode(episodes: Int = 1) {
+        playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = episodes)
         sleepTimer.cancelTimer()
     }
 

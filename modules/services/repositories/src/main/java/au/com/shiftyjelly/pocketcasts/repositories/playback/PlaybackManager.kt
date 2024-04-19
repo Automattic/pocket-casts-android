@@ -215,7 +215,8 @@ open class PlaybackManager @Inject constructor(
         applicationScope = applicationScope,
         bookmarkFeature = bookmarkFeature,
     )
-    var sleepAfterEpisode: Boolean = false
+
+    private var sleepAfterEpisode: Int = 0
 
     var player: Player? = null
 
@@ -293,7 +294,7 @@ open class PlaybackManager @Inject constructor(
         return player?.isStreaming ?: false
     }
 
-    fun updateSleepTimerStatus(running: Boolean, sleepAfterEpisode: Boolean = false) {
+    fun updateSleepTimerStatus(running: Boolean, sleepAfterEpisode: Int = 0) {
         this.sleepAfterEpisode = sleepAfterEpisode
         playbackStateRelay.blockingFirst().let {
             playbackStateRelay.accept(it.copy(isSleepTimerRunning = running, lastChangeFrom = LastChangeFrom.OnUpdateSleepTimerStatus.value))
@@ -1272,7 +1273,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         // keep hold of this as deleting the episode might change the member variable
-        val shouldSleepAfterEpisode = sleepAfterEpisode
+        val shouldSleepAfterEpisode = isSleepAfterEpisodeEnabled()
         val wasPlaying = isPlaying()
 
         cancelUpdateTimer()
@@ -1436,7 +1437,7 @@ open class PlaybackManager @Inject constructor(
 
     private suspend fun sleep(episode: BaseEpisode?) {
         episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
-        sleepAfterEpisode = false
+        sleepAfterEpisode = 0
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let {
@@ -2058,10 +2059,10 @@ open class PlaybackManager @Inject constructor(
             currentEpisodeUuid = episode.uuid,
             isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
             onRestartSleepAfterTime = {
-                updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+                updateSleepTimerStatus(running = true, sleepAfterEpisode = 0)
             },
             onRestartSleepOnEpisodeEnd = {
-                updateSleepTimerStatus(running = true, sleepAfterEpisode = true)
+                updateSleepTimerStatus(running = true, sleepAfterEpisode = 1)
             },
         )
 
@@ -2171,7 +2172,7 @@ open class PlaybackManager @Inject constructor(
         if (skipLast.isPositive() && durationMs.isPositive() && durationMs > skipLast) {
             val timeRemaining = (durationMs - positionMs) / 1000
             if (timeRemaining < skipLast) {
-                if (sleepAfterEpisode) {
+                if (isSleepAfterEpisodeEnabled()) {
                     sleep(episode)
                 } else {
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
@@ -2231,7 +2232,7 @@ open class PlaybackManager @Inject constructor(
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
-                if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !sleepAfterEpisode) { // Does not apply to end of episode sleep time
+                if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !isSleepAfterEpisodeEnabled()) { // Does not apply to end of episode sleep time
                     setupFadeOutWhenFinishingSleepTimer()
                 }
             }
@@ -2431,6 +2432,8 @@ open class PlaybackManager @Inject constructor(
     fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {
         this.notificationPermissionChecker = notificationPermissionChecker
     }
+
+    fun isSleepAfterEpisodeEnabled(): Boolean = sleepAfterEpisode != 0
 
     private enum class ContentType(val analyticsValue: String) {
         AUDIO("audio"),
