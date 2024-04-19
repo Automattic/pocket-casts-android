@@ -277,8 +277,8 @@ class PlayerViewModel @Inject constructor(
     val sleepCustomEndOfEpisodesText = MutableLiveData<String>().apply {
         postValue(calcCustomEndOfEpisodeText())
     }
-    val sleepWhenEpisodeEndText = MutableLiveData<String>().apply {
-        postValue(calcWhenEpisodeEndText())
+    val sleepInEpisodesText = MutableLiveData<String>().apply {
+        postValue(calcSleepInEpisodesText())
     }
     var sleepCustomTimeMins: Int = 5
         set(value) {
@@ -292,14 +292,14 @@ class PlayerViewModel @Inject constructor(
         }
     fun setSleepEndOfEpisodes(episodes: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = episodes.coerceIn(1, 240)
-        settings.setSleepTimerCustomEndOfEpisodes(newValue)
+        settings.setSleepEndOfEpisodes(newValue)
         sleepCustomEndOfEpisodesText.postValue(calcCustomEndOfEpisodeText())
-        sleepWhenEpisodeEndText.postValue(calcWhenEpisodeEndText())
+        sleepInEpisodesText.postValue(calcSleepInEpisodesText())
         if (shouldCallUpdateTimer) {
             updateSleepTimer()
         }
     }
-    fun getSleepEndOfEpisodes(): Int = settings.getSleepTimerCustomEndOfEpisodes()
+    fun getSleepEndOfEpisodes(): Int = settings.getSleepEndOfEpisodes()
 
     init {
         updateSleepTimer()
@@ -529,11 +529,11 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    private fun calcWhenEpisodeEndText(): String {
+    private fun calcSleepInEpisodesText(): String {
         return if (getSleepEndOfEpisodes() == 1) {
-            context.resources.getString(LR.string.player_sleep_when_episode_ends)
+            context.resources.getString(LR.string.player_sleep_in_one_episode)
         } else {
-            context.resources.getString(LR.string.player_sleep_when_episodes_ends, getSleepEndOfEpisodes())
+            context.resources.getString(LR.string.player_sleep_in_episodes, getSleepEndOfEpisodes())
         }
     }
 
@@ -543,7 +543,7 @@ class PlayerViewModel @Inject constructor(
             isSleepAtEndOfEpisode.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
             setSleepEndOfEpisodes(playbackManager.sleepAfterEpisode, shouldCallUpdateTimer = false)
-            sleepWhenEpisodeEndText.postValue(calcWhenEpisodeEndText())
+            sleepInEpisodesText.postValue(calcSleepInEpisodesText())
         } else {
             isSleepAtEndOfEpisode.postValue(false)
             playbackManager.updateSleepTimerStatus(false)

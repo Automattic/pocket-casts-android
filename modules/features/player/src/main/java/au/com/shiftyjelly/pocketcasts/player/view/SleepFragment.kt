@@ -105,7 +105,7 @@ class SleepFragment : BaseDialogFragment() {
             binding?.labelEndOfEpisodeCustom?.text = text
         }
 
-        viewModel.sleepWhenEpisodeEndText.observe(viewLifecycleOwner) { text ->
+        viewModel.sleepInEpisodesText.observe(viewLifecycleOwner) { text ->
             binding?.sleepingEndOfEpisode?.text = text
         }
 

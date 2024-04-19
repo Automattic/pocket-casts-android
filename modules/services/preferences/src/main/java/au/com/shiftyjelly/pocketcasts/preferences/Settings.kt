@@ -352,9 +352,9 @@ interface Settings {
     fun getClearHistoryTime(): Long
 
     fun setSleepTimerCustomMins(minutes: Int)
-    fun setSleepTimerCustomEndOfEpisodes(episodes: Int)
+    fun setSleepEndOfEpisodes(episodes: Int)
     fun getSleepTimerCustomMins(): Int
-    fun getSleepTimerCustomEndOfEpisodes(): Int
+    fun getSleepEndOfEpisodes(): Int
 
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
