@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -184,18 +186,19 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         super.onViewCreated(view, savedInstanceState)
         val binding = binding ?: return
 
-        setupToolbarAndStatusBar(
-            toolbar = binding.toolbar,
-            title = getString(LR.string.discover),
-            menu = R.menu.discover_menu,
-            navigationIcon = NavigationIcon.None,
-            profileButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                ProfileButton.Shown
-            } else {
-                ProfileButton.None
-            },
-        )
-        binding.toolbar.menu.findItem(UR.id.menu_profile).isVisible = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
+        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+            binding.appBarLayout.isVisible = true
+            setupToolbarAndStatusBar(
+                toolbar = binding.toolbar,
+                title = getString(LR.string.discover),
+                menu = R.menu.discover_menu,
+                navigationIcon = NavigationIcon.None,
+                profileButton = ProfileButton.Shown,
+            )
+            binding.toolbar.menu.findItem(UR.id.menu_profile).isVisible = true
+        } else {
+            binding.recyclerView.updateLayoutParams<FrameLayout.LayoutParams> { topMargin = 0 }
+        }
 
         val recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
