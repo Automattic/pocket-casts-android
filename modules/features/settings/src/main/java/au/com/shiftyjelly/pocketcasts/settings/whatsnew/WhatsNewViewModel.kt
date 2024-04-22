@@ -27,11 +27,9 @@ class WhatsNewViewModel @Inject constructor(
     val navigationState = _navigationState.asSharedFlow()
 
     init {
-        _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.NewWidgets,
-            fullModel = true,
-            tier = UserTier.Free,
-        )
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.ForceClose)
+        }
     }
 
     fun onConfirm() {
@@ -84,5 +82,6 @@ class WhatsNewViewModel @Inject constructor(
         ) : NavigationState()
 
         data object NewWidgetsClose : NavigationState()
+        data object ForceClose : NavigationState()
     }
 }

@@ -46,6 +46,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -107,6 +109,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesPlayerFactory(playerFactoryImpl: PlayerFactoryImpl): PlayerFactory
+
+    @Binds
+    @Singleton
+    abstract fun providesWidgetManager(widgetManagerImpl: WidgetManagerImpl): WidgetManager
 
     @Binds
     @Singleton
