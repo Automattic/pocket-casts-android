@@ -74,8 +74,9 @@ class SleepFragment : BaseDialogFragment() {
         binding.endOfEpisodePlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
         binding.buttonEndOfEpisode.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
-            startTimerEndOfEpisode(episodes = viewModel.getSleepEndOfEpisodes())
+            val episodes = viewModel.getSleepEndOfEpisodes()
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE, AMOUNT_KEY to episodes))
+            startTimerEndOfEpisode(episodes = episodes)
         }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
