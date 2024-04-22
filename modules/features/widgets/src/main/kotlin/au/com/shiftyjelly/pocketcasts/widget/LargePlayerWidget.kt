@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
 import au.com.shiftyjelly.pocketcasts.widget.ui.LargePlayer
 
-class LargePlayerWidget : GlanceAppWidget() {
+internal class LargePlayerWidget : GlanceAppWidget() {
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {

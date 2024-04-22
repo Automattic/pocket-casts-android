@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
@@ -16,6 +18,7 @@ internal fun NonScalingText(
     textSize: Dp,
     useDynamicColors: Boolean,
     modifier: GlanceModifier = GlanceModifier,
+    nonDynamicTextColor: Color? = null,
     alpha: Double = 1.0,
     maxLines: Int = 1,
     isBold: Boolean = false,
@@ -30,6 +33,9 @@ internal fun NonScalingText(
         setTextViewTextSize(R.id.nonScalingText, COMPLEX_UNIT_DIP, textSize.value)
         setInt(R.id.nonScalingText, "setMaxLines", normalizedMaxLines)
         setFloat(R.id.nonScalingText, "setAlpha", normalizedAlpha)
+        if (!useDynamicColors && nonDynamicTextColor != null) {
+            setTextColor(R.id.nonScalingText, nonDynamicTextColor.toArgb())
+        }
     }
     AndroidRemoteViews(
         remoteViews = remoteView,

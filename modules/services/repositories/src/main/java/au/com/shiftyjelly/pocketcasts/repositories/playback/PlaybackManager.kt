@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -117,6 +118,7 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
+    private val widgetManager: WidgetManager,
     private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
@@ -217,6 +219,10 @@ open class PlaybackManager @Inject constructor(
 
     @SuppressLint("CheckResult")
     fun setup() {
+        if (!Util.isAutomotive(application)) {
+            widgetManager.updateWidgetFromPlaybackState(this)
+        }
+
         // load an initial playback state
         upNextQueue.setup()
         mediaSessionManager.startObserving()
@@ -302,7 +308,7 @@ open class PlaybackManager @Inject constructor(
                         .toObservable<EpisodeSyncResponse>()
                         .onErrorResumeNext(Observable.empty())
                 } else {
-                    Observable.empty<EpisodeSyncResponse>()
+                    Observable.empty()
                 }
             }
             .doOnError { LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not sync episode progress. ${it.javaClass.name} ${it.message ?: ""}") }
@@ -551,6 +557,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.WIDGET_PLAYER_SMALL,
             SourceView.WIDGET_PLAYER_MEDIUM,
             SourceView.WIDGET_PLAYER_LARGE,
+            SourceView.WIDGET_PLAYER_OLD,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
@@ -775,6 +782,7 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.EMPTY, lastChangeFrom = LastChangeFrom.OnShutdown.value))
         }
         castManager.endSession()
+        widgetManager.updateWidgetNotPlaying()
     }
 
     suspend fun hibernatePlayback() {
@@ -1209,6 +1217,7 @@ open class PlaybackManager @Inject constructor(
         Timber.i("PlaybackService onPlayerPlaying")
 
         val episode = getCurrentEpisode() ?: return
+        val podcast = findPodcastByEpisode(episode)
 
         playbackStateRelay.blockingFirst().let { playbackState ->
             playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PLAYING, transientLoss = false, lastChangeFrom = LastChangeFrom.OnPlayerPlaying.value))
@@ -1219,6 +1228,8 @@ open class PlaybackManager @Inject constructor(
         setupUpdateTimer()
         setupBufferUpdateTimer(episode)
         cancelPauseTimer()
+
+        widgetManager.updateWidget(podcast, true, episode)
     }
 
     fun markPodcastNeedsUpdating(podcastUuid: String) {
@@ -1256,6 +1267,10 @@ open class PlaybackManager @Inject constructor(
         }
 
         cancelUpdateTimer()
+
+        val podcast = if (episode == null) null else findPodcastByEpisode(episode)
+        widgetManager.updateWidget(podcast, false, episode)
+
         setupPauseTimer()
     }
 
@@ -1885,6 +1900,8 @@ open class PlaybackManager @Inject constructor(
         player?.setPlaybackEffects(playbackEffects)
 
         episodeManager.updatePlaybackInteractionDate(episode)
+
+        widgetManager.updateWidget(podcast, play, episode)
 
         if (play) {
             if (sameEpisode && currentPositionMs != null) {
