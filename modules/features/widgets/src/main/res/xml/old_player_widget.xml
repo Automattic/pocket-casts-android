@@ -1,8 +1,0 @@
-<appwidget-provider
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/glance_default_loading_layout"
-    android:minWidth="300dp"
-    android:minHeight="40dp"
-    android:minResizeWidth="220dp"
-    android:previewImage="@drawable/widget_old_preview"
-    android:resizeMode="horizontal" />
