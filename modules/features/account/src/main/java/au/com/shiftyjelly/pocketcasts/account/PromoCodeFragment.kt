@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -80,7 +81,7 @@ class PromoCodeFragment : BaseFragment() {
 
                         binding.lblTitle.setText(LR.string.profile_promo_sign_in_or_create)
                         binding.lblDetail.setText(LR.string.profile_promo_sign_in_or_create_summary)
-                        binding.imgDone.setup(ContextCompat.getDrawable(binding.imgDone.context, R.drawable.ic_plus_account))
+                        binding.imgDone.setup(ContextCompat.getDrawable(binding.imgDone.context, IR.drawable.ic_plus_account))
 
                         binding.btnSignIn.setOnClickListener {
                             findNavController().navigate(R.id.action_promoCodeFragment_to_signInFragment)

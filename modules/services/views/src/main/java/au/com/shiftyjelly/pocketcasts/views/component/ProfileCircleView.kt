@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account
+package au.com.shiftyjelly.pocketcasts.views.component
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -14,12 +14,19 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.toRect
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.utils.Gravatar
+import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
+import au.com.shiftyjelly.pocketcasts.utils.days
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
 import coil.transform.CircleCropTransformation
+import java.util.Date
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val DRAW_FULL = 0
@@ -49,8 +56,8 @@ class ProfileCircleView @JvmOverloads constructor(
     private var bounds2Rect = RectF()
     private var bounds3Rect = RectF()
     private val iconColor = context.getThemeColor(UR.attr.primary_ui_01)
-    private var iconDrawable0: Drawable? = context.getTintedDrawable(R.drawable.ic_plus_account, iconColor)
-    private var iconDrawable1: Drawable? = context.getTintedDrawable(R.drawable.ic_free_account, iconColor)
+    private var iconDrawable0: Drawable? = context.getTintedDrawable(IR.drawable.ic_plus_account, iconColor)
+    private var iconDrawable1: Drawable? = context.getTintedDrawable(IR.drawable.ic_free_account, iconColor)
     private var bitmap: Bitmap? = null
     private var isPatron: Boolean = false
 
@@ -172,5 +179,46 @@ class ProfileCircleView @JvmOverloads constructor(
             .transformations(CircleCropTransformation())
             .target(target)
         context.imageLoader.enqueue(request.build())
+    }
+
+    fun updateProfileImageAndDaysRemaining(
+        signInState: SignInState?,
+    ) {
+        when (signInState) {
+            is SignInState.SignedIn -> {
+                val gravatarUrl = Gravatar.getUrl(signInState.email)
+                var percent = 1.0f
+                val daysLeft = daysLeft(signInState, 30)
+                if (daysLeft != null && daysLeft > 0 && daysLeft <= 30) {
+                    percent = daysLeft / 30f
+                }
+                setup(
+                    percent = percent,
+                    plusOnly = signInState.isSignedInAsPlus,
+                    isPatron = signInState.isSignedInAsPatron,
+                    gravatarUrl = gravatarUrl,
+                )
+            }
+            is SignInState.SignedOut -> setup(
+                percent = 0.0f,
+                plusOnly = false,
+                isPatron = false,
+            )
+            else -> setup(
+                percent = 0.0f,
+                plusOnly = false,
+                isPatron = false,
+            )
+        }
+    }
+
+    private fun daysLeft(signInState: SignInState.SignedIn, maxDays: Int): Int? {
+        val timeInXDays = Date(Date().time + maxDays.days())
+        val paidStatus = signInState.subscriptionStatus as? SubscriptionStatus.Paid
+        if (paidStatus != null && paidStatus.expiry.before(timeInXDays)) {
+            // probably shouldn't be do straight millisecond maths because of day light savings
+            return ((paidStatus.expiry.time - Date().time) / TimeConstants.MILLISECONDS_IN_ONE_DAY).toInt()
+        }
+        return null
     }
 }
