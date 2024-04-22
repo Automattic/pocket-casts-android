@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
 import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.ui.MediumPlayer
 
-class MediumPlayerWidget : GlanceAppWidget() {
+internal class MediumPlayerWidget : GlanceAppWidget() {
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {

@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -80,6 +81,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         forceDark: Boolean,
         timestamp: Duration?,
     ) {
+        var playAtTimestamp = timestamp != null
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
             .filter { it.episodeUuid == episodeUuid }
@@ -130,12 +132,9 @@ class EpisodeFragmentViewModel @Inject constructor(
             .doOnNext {
                 if (it is EpisodeFragmentState.Loaded) {
                     timestamp?.let { timestamp ->
-                        if (it.episode.playedUpTo.toInt() != timestamp.toInt(DurationUnit.SECONDS) &&
-                            episode is PodcastEpisode
-                        ) {
-                            it.episode.playedUpTo = timestamp.toDouble(DurationUnit.SECONDS)
-                            seekToTimeMs(timestamp.toInt(DurationUnit.MILLISECONDS))
-                        }
+                        if (!playAtTimestamp) return@let
+                        playAtTimestamp(it.episode, timestamp)
+                        playAtTimestamp = false
                     }
                     episode = it.episode
                 }
@@ -299,6 +298,20 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
 
         return false
+    }
+
+    private fun playAtTimestamp(
+        episode: BaseEpisode,
+        timestamp: Duration,
+    ) {
+        viewModelScope.launch {
+            val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
+                playbackManager.getCurrentEpisode()?.uuid != episode.uuid
+            if (shouldLoadOrSwitchEpisode) {
+                playbackManager.playNowSync(episode, sourceView = source)
+            }
+            playbackManager.seekToTimeMs(positionMs = timestamp.toInt(DurationUnit.MILLISECONDS))
+        }
     }
 
     fun starClicked() {

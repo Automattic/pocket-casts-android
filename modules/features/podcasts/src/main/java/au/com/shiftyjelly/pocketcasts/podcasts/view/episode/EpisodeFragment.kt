@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,7 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
-import androidx.core.os.bundleOf
+import androidx.core.os.BundleCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -49,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
@@ -63,7 +65,8 @@ import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -72,7 +75,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class EpisodeFragment : BaseFragment() {
     companion object {
-
+        private const val NEW_INSTANCE_ARG = "EpisodeFragmentArg"
         private object AnalyticsProp {
             object Key {
                 const val SOURCE = "source"
@@ -90,17 +93,25 @@ class EpisodeFragment : BaseFragment() {
             timestamp: Duration? = null,
         ): EpisodeFragment {
             return EpisodeFragment().apply {
-                arguments = bundleOf(
-                    EpisodeContainerFragment.ARG_EPISODE_UUID to episodeUuid,
-                    EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS to timestamp?.inWholeSeconds,
-                    EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE to source.value,
-                    EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
-                    EpisodeContainerFragment.ARG_PODCAST_UUID to podcastUuid,
-                    EpisodeContainerFragment.ARG_FROMLIST_UUID to fromListUuid,
-                    EpisodeContainerFragment.ARG_FORCE_DARK to forceDark,
-                )
+                arguments = Bundle().apply {
+                    putParcelable(
+                        NEW_INSTANCE_ARG,
+                        EpisodeFragmentArgs(
+                            episodeUuid = episodeUuid,
+                            source = source,
+                            overridePodcastLink = overridePodcastLink,
+                            podcastUuid = podcastUuid,
+                            fromListUuid = fromListUuid,
+                            forceDark = forceDark,
+                            timestamp = timestamp,
+                        ),
+                    )
+                }
             }
         }
+
+        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? =
+            bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
     override lateinit var statusBarColor: StatusBarColor
@@ -123,26 +134,29 @@ class EpisodeFragment : BaseFragment() {
     private var formattedNotes: String? = null
     private lateinit var showNotesFormatter: ShowNotesFormatter
 
-    private val episodeUUID: String?
-        get() = arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_UUID)
+    private val args: EpisodeFragmentArgs
+        get() = extractArgs(arguments) ?: throw IllegalStateException("${this::class.java.simpleName} is missing arguments. It must be created with newInstance function")
+
+    private val episodeUUID: String
+        get() = args.episodeUuid
 
     private val timestamp: Duration?
-        get() = arguments?.getLong(EpisodeContainerFragment.ARG_TIMESTAMP_IN_SECS, -1)?.takeIf { it >= 0 }?.seconds
+        get() = args.timestamp
 
     private val episodeViewSource: EpisodeViewSource
-        get() = EpisodeViewSource.fromString(arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE))
+        get() = args.source
 
     private val overridePodcastLink: Boolean
-        get() = arguments?.getBoolean(EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK) ?: false
+        get() = args.overridePodcastLink
 
     val podcastUuid: String?
-        get() = arguments?.getString(EpisodeContainerFragment.ARG_PODCAST_UUID)
+        get() = args.podcastUuid
 
     val fromListUuid: String?
-        get() = arguments?.getString(EpisodeContainerFragment.ARG_FROMLIST_UUID)
+        get() = args.fromListUuid
 
     private val forceDarkTheme: Boolean
-        get() = arguments?.getBoolean(EpisodeContainerFragment.ARG_FORCE_DARK) ?: false
+        get() = args.forceDark
 
     var listener: FragmentHostListener? = null
     private var episodeLoadedListener: EpisodeLoadedListener? = null
@@ -188,12 +202,10 @@ class EpisodeFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        episodeUUID?.let { episodeUuid ->
-            podcastUuid?.let { podcastUuid ->
-                if (!viewModel.isFragmentChangingConfigurations) {
-                    analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
-                    FirebaseAnalyticsTracker.openedEpisode(podcastUuid, episodeUuid)
-                }
+        podcastUuid?.let { podcastUuid ->
+            if (!viewModel.isFragmentChangingConfigurations) {
+                analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
+                FirebaseAnalyticsTracker.openedEpisode(podcastUuid, episodeUUID)
             }
         }
     }
@@ -215,7 +227,7 @@ class EpisodeFragment : BaseFragment() {
         binding?.loadingGroup?.isInvisible = true
 
         viewModel.setup(
-            episodeUuid = episodeUUID!!,
+            episodeUuid = episodeUUID,
             podcastUuid = podcastUuid,
             forceDark = forceDarkTheme,
             timestamp = timestamp,
@@ -468,7 +480,7 @@ class EpisodeFragment : BaseFragment() {
             } else {
                 context?.let { context ->
                     if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context) && viewModel.shouldDownload()) {
-                        warningsHelper.downloadWarning(episodeUUID!!, "episode card")
+                        warningsHelper.downloadWarning(episodeUUID, "episode card")
                             .show(parentFragmentManager, "download warning")
                     } else {
                         viewModel.downloadEpisode()
@@ -592,4 +604,15 @@ class EpisodeFragment : BaseFragment() {
         val onShareClicked: () -> Unit,
         val onFavClicked: () -> Unit,
     )
+
+    @Parcelize
+    data class EpisodeFragmentArgs(
+        val episodeUuid: String,
+        val source: EpisodeViewSource,
+        val overridePodcastLink: Boolean = false,
+        val podcastUuid: String? = null,
+        val fromListUuid: String? = null,
+        val forceDark: Boolean = false,
+        @TypeParceler<Duration?, DurationParceler>() val timestamp: Duration? = null,
+    ) : Parcelable
 }
