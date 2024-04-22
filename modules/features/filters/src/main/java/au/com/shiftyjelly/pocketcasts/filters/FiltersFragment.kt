@@ -16,8 +16,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -70,10 +72,15 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             toolbar = binding.toolbar,
             title = getString(LR.string.filters),
             menu = R.menu.menu_filters,
-            chromeCastButton = Shown(chromeCastAnalytics),
+            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                ChromeCastButton.None
+            } else {
+                ChromeCastButton.Shown(chromeCastAnalytics)
+            },
             navigationIcon = None,
         )
         binding.toolbar.setOnMenuItemClickListener(this)
+        binding.toolbar.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
 
         val recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)

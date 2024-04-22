@@ -46,10 +46,12 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -195,10 +197,14 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         setupToolbarAndStatusBar(
             toolbar = toolbar,
             menu = R.menu.podcasts_menu,
-            chromeCastButton = Shown(chromeCastAnalytics),
+            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                ChromeCastButton.None
+            } else {
+                ChromeCastButton.Shown(chromeCastAnalytics)
+            },
         )
         toolbar.setOnMenuItemClickListener(this)
-
+        toolbar.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
             OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             true
@@ -258,11 +264,13 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 openOptions()
                 true
             }
+
             R.id.create_folder -> {
                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
                 createFolder()
                 true
             }
+
             else -> false
         }
     }
