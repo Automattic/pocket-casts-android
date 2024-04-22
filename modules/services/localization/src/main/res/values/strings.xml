@@ -313,7 +313,6 @@
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
-    <string name="player_sleep_when_episode_ends">Sleeping when 1 episode ends</string>
     <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
     <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Sleep timer restarted after device shake</string>

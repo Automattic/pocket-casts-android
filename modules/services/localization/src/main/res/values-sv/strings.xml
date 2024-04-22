@@ -1464,7 +1464,6 @@ Language: sv_SE
     <string name="player_time_saved_detail">Sammanlagt har du sparat %s genom att använda den här funktionen.</string>
     <string name="player_tab_playing_wide">Spelar nu upp</string>
     <string name="player_tab_playing">Spelar</string>
-    <string name="player_sleep_when_episode_ends">Sova när avsnittet slutar</string>
     <string name="player_sleep_timer">Sömntimer</string>
     <string name="player_sleep_timer_title">Sömntimer</string>
     <string name="player_sleep_end_of_episode">Avsnittets slut</string>

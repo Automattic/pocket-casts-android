@@ -1464,7 +1464,6 @@ Language: it
     <string name="player_time_saved_detail">In totale hai risparmiato %s utilizzando questa funzionalità.</string>
     <string name="player_tab_playing_wide">Riproduzione in corso</string>
     <string name="player_tab_playing">Riproduzione</string>
-    <string name="player_sleep_when_episode_ends">In sospensione fino alla fine dell\'episodio</string>
     <string name="player_sleep_timer">Autospegnimento</string>
     <string name="player_sleep_timer_title">Autospegnimento</string>
     <string name="player_sleep_end_of_episode">Fine dell\'episodio</string>
