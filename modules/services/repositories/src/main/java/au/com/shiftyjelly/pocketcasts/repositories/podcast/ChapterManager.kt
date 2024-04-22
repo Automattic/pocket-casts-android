@@ -8,7 +8,6 @@ interface ChapterManager {
     suspend fun updateChapters(
         episodeUuid: String,
         chapters: List<Chapter>,
-        forceUpdate: Boolean = true,
     )
 
     fun observerChaptersForEpisode(episodeUuid: String): Flow<Chapters>
