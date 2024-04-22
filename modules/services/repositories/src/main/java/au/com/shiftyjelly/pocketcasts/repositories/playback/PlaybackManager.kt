@@ -165,9 +165,16 @@ open class PlaybackManager @Inject constructor(
     private var audioNoisyManager =
         AudioNoisyManager(application)
 
-    private val tonePlayer: MediaPlayer by lazy {
+    private val bookmarkTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
             setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.bookmark_creation_sound}"))
+            prepare()
+        }
+    }
+
+    private val sleepTimeTonePlayer: MediaPlayer by lazy {
+        MediaPlayer().apply {
+            setDataSource(application, Uri.parse("android.resource://${application.packageName}/${R.raw.sleep_time_device_shake_confirmation_sound}"))
             prepare()
         }
     }
@@ -2241,9 +2248,31 @@ open class PlaybackManager @Inject constructor(
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
+                if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !sleepAfterEpisode) { // Does not apply to end of episode sleep time
+                    setupFadeOutWhenFinishingSleepTimer()
+                }
             }
             .switchMapCompletable { updateCurrentPositionRx() }
             .subscribeBy(onError = { Timber.e(it) })
+    }
+
+    private fun setupFadeOutWhenFinishingSleepTimer() {
+        // it needs to run in the main thread because of player getVolume
+        applicationScope.launch(Dispatchers.Main) {
+            val timeLeft = sleepTimer.timeLeftInSecs()
+            timeLeft?.let {
+                val fadeDuration = 5
+                val startVolume = (player as? SimplePlayer)?.getVolume() ?: 1.0f
+
+                if (timeLeft <= fadeDuration) {
+                    val fraction = timeLeft.toFloat() / fadeDuration
+                    val newVolume = startVolume * fraction
+                    player?.setVolume(newVolume)
+                } else {
+                    player?.setVolume(startVolume)
+                }
+            }
+        }
     }
 
     private fun cancelUpdateTimer() {
@@ -2351,9 +2380,17 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun playTone() {
+    fun playBookmarkTone() {
         try {
-            tonePlayer.start()
+            bookmarkTonePlayer.start()
+        } catch (e: Exception) {
+            Timber.e("Unable to play tone: $e")
+        }
+    }
+
+    fun playSleepTimeTone() {
+        try {
+            sleepTimeTonePlayer.start()
         } catch (e: Exception) {
             Timber.e("Unable to play tone: $e")
         }
