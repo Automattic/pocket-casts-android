@@ -23,6 +23,9 @@ abstract class ChapterDao {
     @Transaction
     open suspend fun replaceAllChapters(episodeUuid: String, chapters: List<Chapter>) {
         val newEpisodeChapters = chapters.filter { it.episodeUuid == episodeUuid }
+        if (newEpisodeChapters.isEmpty()) {
+            return
+        }
 
         when {
             newEpisodeChapters.all(Chapter::isEmbedded) -> {

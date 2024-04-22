@@ -122,6 +122,23 @@ class ChapterDaoTest {
     }
 
     @Test
+    fun doNotReplaceEmptyEmbeddedChapters() = runBlocking {
+        val chapters = List(10) { index ->
+            Chapter(
+                episodeUuid = "episode-id",
+                startTimeMs = 0L + index,
+                isEmbedded = true,
+            )
+        }
+        chapterDao.replaceAllChapters("episode-id", chapters)
+
+        chapterDao.replaceAllChapters("episode-id", emptyList())
+
+        val result = chapterDao.findAll()
+        assertEquals(chapters, result)
+    }
+
+    @Test
     fun replaceNotEmbeddedWithEmbeddedChapters() = runBlocking {
         val chapters1 = List(10) { index ->
             Chapter(
