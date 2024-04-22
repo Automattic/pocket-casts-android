@@ -18,6 +18,7 @@ interface FragmentHostListener {
     fun openTab(tabId: Int)
     fun closeToRoot()
     fun closePodcastsToRoot()
+    fun openProfile()
     fun openPodcastPage(uuid: String)
     fun openCloudFiles()
     fun snackBarView(): View

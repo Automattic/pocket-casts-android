@@ -1356,6 +1356,11 @@ class MainActivity :
         }
     }
 
+    override fun openProfile() {
+        FirebaseAnalyticsTracker.navigatedToProfile()
+        addFragment(ProfileFragment())
+    }
+
     override fun openPodcastPage(uuid: String) {
         closePlayer()
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED

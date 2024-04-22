@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.component.ProfileCircleView
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
@@ -54,6 +55,7 @@ fun Toolbar.setup(
         ProfileButton.None -> {}
         is ProfileButton.Shown ->
             setupProfileButton(context) {
+                (activity as? FragmentHostListener)?.openProfile()
             }
     }
     if (toolbarColors != null) {
