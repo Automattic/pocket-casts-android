@@ -660,12 +660,20 @@ class SettingsImpl @Inject constructor(
         setInt("sleepEndOfEpisodes", episodes)
     }
 
+    override fun setlastSleepEndOfEpisodes(episodes: Int) {
+        setInt("lastSleepEndOfEpisodes", episodes)
+    }
+
     override fun getSleepTimerCustomMins(): Int {
         return getInt("sleepTimerCustomMins", 5)
     }
 
     override fun getSleepEndOfEpisodes(): Int {
         return getInt("sleepEndOfEpisodes", 1)
+    }
+
+    override fun getlastSleepEndOfEpisodes(): Int {
+        return getInt("lastSleepEndOfEpisodes", 0)
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {

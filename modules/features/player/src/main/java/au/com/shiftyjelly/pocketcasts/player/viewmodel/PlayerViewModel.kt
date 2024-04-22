@@ -561,6 +561,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun sleepTimerAfterEpisode(episodes: Int = 1) {
+        settings.setlastSleepEndOfEpisodes(episodes)
         playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
         sleepTimer.cancelTimer()
     }
