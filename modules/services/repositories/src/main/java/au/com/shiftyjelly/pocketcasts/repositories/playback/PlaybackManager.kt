@@ -1529,8 +1529,7 @@ open class PlaybackManager @Inject constructor(
             launch {
                 chapterManager.updateChapters(
                     playbackState.episodeUuid,
-                    episodeMetadata.chapters.toDbChapters(playbackState.episodeUuid),
-                    forceUpdate = false,
+                    episodeMetadata.chapters.toDbChapters(playbackState.episodeUuid, isEmbedded = true),
                 )
             }
         }
