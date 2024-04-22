@@ -265,6 +265,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             },
             toolbarColors = null,
         )
+        if (upNextSource != UpNextSource.UP_NEXT_TAB) {
+            toolbar.setNavigationIcon(IR.drawable.ic_close)
+        }
         binding.toolbar.menu.findItem(UR.id.menu_profile).isVisible = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) &&
             upNextSource == UpNextSource.UP_NEXT_TAB
         toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(overrideTheme))
