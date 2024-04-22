@@ -274,8 +274,8 @@ class PlayerViewModel @Inject constructor(
     val sleepCustomTimeText = MutableLiveData<String>().apply {
         postValue(calcCustomTimeText())
     }
-    val sleepCustomEndOfEpisodesText = MutableLiveData<String>().apply {
-        postValue(calcCustomEndOfEpisodeText())
+    val sleepEndOfEpisodesText = MutableLiveData<String>().apply {
+        postValue(calcEndOfEpisodeText())
     }
     val sleepInEpisodesText = MutableLiveData<String>().apply {
         postValue(calcSleepInEpisodesText())
@@ -293,7 +293,7 @@ class PlayerViewModel @Inject constructor(
     fun setSleepEndOfEpisodes(episodes: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = episodes.coerceIn(1, 240)
         settings.setSleepEndOfEpisodes(newValue)
-        sleepCustomEndOfEpisodesText.postValue(calcCustomEndOfEpisodeText())
+        sleepEndOfEpisodesText.postValue(calcEndOfEpisodeText())
         sleepInEpisodesText.postValue(calcSleepInEpisodesText())
         if (shouldCallUpdateTimer) {
             updateSleepTimer()
@@ -521,7 +521,7 @@ class PlayerViewModel @Inject constructor(
     private fun calcCustomTimeText(): String {
         return context.resources.getString(LR.string.minutes_plural, sleepCustomTimeMins)
     }
-    private fun calcCustomEndOfEpisodeText(): String {
+    private fun calcEndOfEpisodeText(): String {
         return if (getSleepEndOfEpisodes() == 1) {
             context.resources.getString(LR.string.player_sleep_end_of_episode_singular)
         } else {

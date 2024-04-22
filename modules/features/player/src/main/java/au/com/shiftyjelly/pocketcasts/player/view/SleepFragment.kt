@@ -69,11 +69,11 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
         binding.buttonMins60.setOnClickListener { startTimer(mins = 60) }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
-        binding.endOfEpisodeCustomMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
+        binding.endOfEpisodeMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
-        binding.endOfEpisodeCustomPlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
+        binding.endOfEpisodePlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
-        binding.buttonEndOfEpisodeCustom.setOnClickListener {
+        binding.buttonEndOfEpisode.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
             startTimerEndOfEpisode(episodes = viewModel.getSleepEndOfEpisodes())
         }
@@ -101,8 +101,8 @@ class SleepFragment : BaseDialogFragment() {
             binding?.labelCustom?.text = customTimeText
         }
 
-        viewModel.sleepCustomEndOfEpisodesText.observe(viewLifecycleOwner) { text ->
-            binding?.labelEndOfEpisodeCustom?.text = text
+        viewModel.sleepEndOfEpisodesText.observe(viewLifecycleOwner) { text ->
+            binding?.labelEndOfEpisode?.text = text
         }
 
         viewModel.sleepInEpisodesText.observe(viewLifecycleOwner) { text ->

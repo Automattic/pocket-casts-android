@@ -16,7 +16,7 @@
             android:id="@+id/sleepSetup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="sleepTitle,labelMins5,buttonMins5,separator1,labelMins15,buttonMins15,separator2,labelMins30,buttonMins30,separator3,labelMins60,buttonMins60,separator4,separator5,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator6, labelEndOfEpisodeCustom, buttonEndOfEpisodeCustom, endOfEpisodeCustomMinusButton, endOfEpisodeCustomPlusButton"
+            app:constraint_referenced_ids="sleepTitle,labelMins5,buttonMins5,separator1,labelMins15,buttonMins15,separator2,labelMins30,buttonMins30,separator3,labelMins60,buttonMins60,separator5,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator6, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
@@ -260,7 +260,7 @@
             app:layout_constraintTop_toBottomOf="@+id/labelCustom" />
 
         <TextView
-            android:id="@+id/labelEndOfEpisodeCustom"
+            android:id="@+id/labelEndOfEpisode"
             style="@style/DarkSubtitle1"
             android:layout_width="wrap_content"
             android:layout_height="64dp"
@@ -271,31 +271,31 @@
             app:layout_constraintTop_toBottomOf="@+id/separator6" />
 
         <View
-            android:id="@+id/buttonEndOfEpisodeCustom"
+            android:id="@+id/buttonEndOfEpisode"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfEpisodeCustom"
+            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfEpisode"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/labelEndOfEpisodeCustom" />
+            app:layout_constraintTop_toTopOf="@+id/labelEndOfEpisode" />
 
         <ImageView
-            android:id="@+id/endOfEpisodeCustomMinusButton"
+            android:id="@+id/endOfEpisodeMinusButton"
             android:layout_width="44dp"
             android:layout_height="0dp"
             android:contentDescription="@string/player_sleep_custom_minus"
             android:scaleType="center"
             android:src="@drawable/ic_minus"
             app:tint="?attr/player_contrast_01"
-            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfEpisodeCustom"
-            app:layout_constraintEnd_toStartOf="@+id/endOfEpisodeCustomPlusButton"
-            app:layout_constraintTop_toTopOf="@+id/labelEndOfEpisodeCustom" />
+            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfEpisode"
+            app:layout_constraintEnd_toStartOf="@+id/endOfEpisodePlusButton"
+            app:layout_constraintTop_toTopOf="@+id/labelEndOfEpisode" />
 
         <ImageView
-            android:id="@+id/endOfEpisodeCustomPlusButton"
+            android:id="@+id/endOfEpisodePlusButton"
             android:layout_width="44dp"
             android:layout_height="0dp"
             android:layout_marginEnd="24dp"
@@ -303,9 +303,9 @@
             android:scaleType="center"
             android:src="@drawable/ic_effects_plus"
             app:tint="?attr/player_contrast_01"
-            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfEpisodeCustom"
+            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfEpisode"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/labelEndOfEpisodeCustom" />
+            app:layout_constraintTop_toTopOf="@+id/labelEndOfEpisode" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/sleepAnimation"
