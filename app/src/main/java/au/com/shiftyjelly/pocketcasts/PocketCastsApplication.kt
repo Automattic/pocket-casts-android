@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -104,6 +105,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
 
     @Inject lateinit var syncManager: SyncManager
+
+    @Inject lateinit var widgetManager: WidgetManager
 
     @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 
@@ -269,6 +272,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
 
+        settings.useDynamicColorsForWidget.flow
+            .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
+            .launchIn(applicationScope)
+        settings.useEpisodeArtwork.flow
+            .onEach { widgetManager.updateWidgetEpisodeArtwork(playbackManager) }
+            .launchIn(applicationScope)
         keepPlayerWidgetsUpdated()
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")

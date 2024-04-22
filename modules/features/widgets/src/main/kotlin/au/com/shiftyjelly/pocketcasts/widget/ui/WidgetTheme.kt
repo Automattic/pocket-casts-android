@@ -30,7 +30,8 @@ private val DefaultColors = ColorProviders(
         primary = Color(0xFFF8FAF6),
         onPrimary = Color(0xFFF43E37),
         primaryContainer = Color(0xFFF43E37),
-        onPrimaryContainer = UndefinedColor,
+        // Used for old widget icon colors in non-dynamic theme.
+        onPrimaryContainer = Color(0xFFFFFFFF),
         inversePrimary = UndefinedColor,
         // Used as a trick to have different small player placeholder colors.
         secondary = Color(0xFFF43E37),
@@ -63,7 +64,8 @@ private val DefaultColors = ColorProviders(
         primary = Color(0xFFD9201C),
         onPrimary = Color(0xFFFFFFFF),
         primaryContainer = Color(0xFF292B2E),
-        onPrimaryContainer = UndefinedColor,
+        // Used for old widget icon colors in non-dynamic theme.
+        onPrimaryContainer = Color(0xFFFFFFFF),
         inversePrimary = UndefinedColor,
         // Used as a trick to have different small player placeholder colors.
         secondary = Color(0xFFD9201C),

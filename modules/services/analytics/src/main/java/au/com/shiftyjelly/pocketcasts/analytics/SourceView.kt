@@ -40,6 +40,7 @@ enum class SourceView(val analyticsValue: String) {
     WIDGET_PLAYER_SMALL("widget_player_small"),
     WIDGET_PLAYER_MEDIUM("widget_player_medium"),
     WIDGET_PLAYER_LARGE("widget_player_large"),
+    WIDGET_PLAYER_OLD("widget_player_old"),
     ;
 
     fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
