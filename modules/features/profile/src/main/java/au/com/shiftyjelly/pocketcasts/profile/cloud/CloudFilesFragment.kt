@@ -39,10 +39,12 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -170,10 +172,15 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            chromeCastButton = Shown(chromeCastAnalytics),
+            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                ChromeCastButton.None
+            } else {
+                ChromeCastButton.Shown(chromeCastAnalytics)
+            },
             menu = R.menu.menu_cloudfiles,
         )
         binding?.toolbar?.setOnMenuItemClickListener(this)
+        binding?.toolbar?.menu?.findItem(R.id.media_route_menu_item)?.isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
 
         binding?.recyclerView?.let {
             it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)
