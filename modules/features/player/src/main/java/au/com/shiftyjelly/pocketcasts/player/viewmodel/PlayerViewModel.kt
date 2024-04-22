@@ -290,6 +290,7 @@ class PlayerViewModel @Inject constructor(
         get() {
             return settings.getSleepTimerCustomMins()
         }
+
     fun setSleepEndOfEpisodes(episodes: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = episodes.coerceIn(1, 240)
         settings.setSleepEndOfEpisodes(newValue)
@@ -299,6 +300,7 @@ class PlayerViewModel @Inject constructor(
             updateSleepTimer()
         }
     }
+
     fun getSleepEndOfEpisodes(): Int = settings.getSleepEndOfEpisodes()
 
     init {
@@ -521,6 +523,7 @@ class PlayerViewModel @Inject constructor(
     private fun calcCustomTimeText(): String {
         return context.resources.getString(LR.string.minutes_plural, sleepCustomTimeMins)
     }
+
     private fun calcEndOfEpisodeText(): String {
         return if (getSleepEndOfEpisodes() == 1) {
             context.resources.getString(LR.string.player_sleep_end_of_episode_singular)

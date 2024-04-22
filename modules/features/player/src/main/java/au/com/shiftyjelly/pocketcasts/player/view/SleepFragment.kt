@@ -182,7 +182,7 @@ class SleepFragment : BaseDialogFragment() {
     }
     private fun plusEndOfEpisodeButtonClicked() {
         viewModel.setSleepEndOfEpisodes(viewModel.getSleepEndOfEpisodes() + 1)
-        binding?.root?.announceForAccessibility("Custom sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
+        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
     }
 
     private fun minusButtonClicked() {
@@ -199,7 +199,7 @@ class SleepFragment : BaseDialogFragment() {
         if (endOfEpisodes > 1) {
             viewModel.setSleepEndOfEpisodes(endOfEpisodes - 1)
         }
-        binding?.root?.announceForAccessibility("Custom sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
+        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
     }
 
     private fun startTimerEndOfEpisode(episodes: Int = 1) {
