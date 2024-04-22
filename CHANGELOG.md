@@ -5,6 +5,8 @@
         ([#2054](https://github.com/Automattic/pocket-casts-android/pull/2054))
     *   Sleep timer: Start fading out audio when sleep timer has 5 seconds left
         ([#2069](https://github.com/Automattic/pocket-casts-android/pull/2069))
+    *   Sleep timer: Set sleep time end of episode for multiple episodes
+        ([#2097](https://github.com/Automattic/pocket-casts-android/pull/2097))
 *   Bug Fixes
     *   Fix flashing artwork
         ([#2086](https://github.com/Automattic/pocket-casts-android/pull/2086))
