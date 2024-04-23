@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
@@ -32,9 +33,15 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectFragment.Listener {
@@ -175,8 +182,22 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val binding = binding ?: return
 
-        val recyclerView = binding?.recyclerView ?: return
+        setupToolbarAndStatusBar(
+            toolbar = binding.toolbar,
+            title = getString(LR.string.discover),
+            menu = R.menu.discover_menu,
+            navigationIcon = NavigationIcon.None,
+            profileButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                ProfileButton.Shown
+            } else {
+                ProfileButton.None
+            },
+        )
+        binding.toolbar.menu.findItem(UR.id.menu_profile).isVisible = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
+
+        val recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         if (adapter == null) {
             adapter = DiscoverAdapter(
@@ -197,7 +218,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->
-                val binding = binding ?: return@Observer
                 when (state) {
                     is DiscoverState.DataLoaded -> {
                         binding.errorLayout.isVisible = false
@@ -241,6 +261,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             },
         )
     }
+
     override fun onRegionSelected(region: DiscoverRegion) {
         viewModel.changeRegion(region, resources)
 

@@ -6,12 +6,16 @@ import android.content.res.ColorStateList
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.component.ProfileCircleView
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 fun Toolbar.updateColors(toolbarColors: ToolbarColors, navigationIcon: NavigationIcon) {
     setBackgroundColor(toolbarColors.backgroundColor)
@@ -25,6 +29,7 @@ fun Toolbar.setup(
     title: String? = null,
     @MenuRes menu: Int? = null,
     chromeCastButton: ChromeCastButton = ChromeCastButton.None,
+    profileButton: ProfileButton = ProfileButton.None,
     navigationIcon: NavigationIcon = None,
     onNavigationClick: (() -> Unit)? = null,
     activity: Activity?,
@@ -43,6 +48,12 @@ fun Toolbar.setup(
         is ChromeCastButton.Shown ->
             setupChromeCastButton(context) {
                 chromeCastButton.chromeCastAnalytics.trackChromeCastViewShown()
+            }
+    }
+    when (profileButton) {
+        ProfileButton.None -> {}
+        is ProfileButton.Shown ->
+            setupProfileButton(context) {
             }
     }
     if (toolbarColors != null) {
@@ -69,6 +80,18 @@ fun Toolbar.setup(
     }
 }
 
+fun Toolbar.updateProfileMenuImage(
+    signInState: SignInState? = null,
+) {
+    val profileMenuActionView = menu.findProfileItem()?.actionView
+    val imgView = profileMenuActionView?.findViewById<ProfileCircleView>(UR.id.menu_profile_picture)
+    imgView?.updateProfileImageAndDaysRemaining(signInState)
+}
+
 fun Toolbar.setupChromeCastButton(context: Context?, onClick: () -> Unit) {
     menu.setupChromeCastButton(context, onClick)
+}
+
+fun Toolbar.setupProfileButton(context: Context?, onClick: () -> Unit) {
+    menu.setupProfileButton(context, onClick)
 }
