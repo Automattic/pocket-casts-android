@@ -28,6 +28,7 @@ class SleepTimer @Inject constructor(
     companion object {
         private val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5.minutes
         private const val TIME_KEY = "time"
+        private const val NUMBER_OF_EPISODES_KEY = "number_of_episodes"
         private const val END_OF_EPISODE_VALUE = "end_of_episode"
     }
 
@@ -71,6 +72,7 @@ class SleepTimer @Inject constructor(
         currentEpisodeUuid: String,
         isSleepTimerRunning: Boolean,
         isSleepEndOfEpisodeRunning: Boolean,
+        numberOfEpisodes: Int,
         onRestartSleepAfterTime: () -> Unit,
         onRestartSleepOnEpisodeEnd: () -> Unit,
     ) {
@@ -79,7 +81,7 @@ class SleepTimer @Inject constructor(
 
             if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, isSleepEndOfEpisodeRunning)) {
                 onRestartSleepOnEpisodeEnd()
-                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE))
+                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to numberOfEpisodes))
             } else if (shouldRestartSleepAfterTime(diffTime, isSleepTimerRunning)) {
                 lastSleepAfterTime?.let {
                     analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))

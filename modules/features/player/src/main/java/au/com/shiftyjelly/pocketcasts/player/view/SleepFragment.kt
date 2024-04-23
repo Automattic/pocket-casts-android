@@ -75,14 +75,15 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
         binding.buttonEndOfEpisode.setOnClickListener {
             val episodes = viewModel.getSleepEndOfEpisodes()
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE, AMOUNT_KEY to episodes))
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodes))
             startTimerEndOfEpisode(episodes = episodes)
         }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE))
-            startTimerEndOfEpisode()
+            val episodesAmountToExtend = 1
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodesAmountToExtend))
+            startTimerEndOfEpisode(episodes = episodesAmountToExtend)
         }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisode.setOnClickListener { cancelTimer() }
@@ -202,7 +203,7 @@ class SleepFragment : BaseDialogFragment() {
         binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
     }
 
-    private fun startTimerEndOfEpisode(episodes: Int = 1) {
+    private fun startTimerEndOfEpisode(episodes: Int) {
         viewModel.sleepTimerAfterEpisode(episodes)
         binding?.root?.announceForAccessibility("Sleep timer set for end of episode")
         close()
@@ -229,6 +230,7 @@ class SleepFragment : BaseDialogFragment() {
     companion object {
         private const val TIME_KEY = "time" // in seconds
         private const val AMOUNT_KEY = "amount"
+        private const val NUMBER_OF_EPISODES_KEY = "number_of_episodes"
         private const val END_OF_EPISODE = "end_of_episode"
     }
 }

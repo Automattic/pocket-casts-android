@@ -2081,6 +2081,7 @@ open class PlaybackManager @Inject constructor(
             currentEpisodeUuid = episode.uuid,
             isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
             isSleepEndOfEpisodeRunning = isSleepAfterEpisodeEnabled(),
+            numberOfEpisodes = settings.getlastSleepEndOfEpisodes(),
             onRestartSleepAfterTime = {
                 updateSleepTimerStatus(sleepTimeRunning = true)
             },
