@@ -168,6 +168,10 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         val upNextCount: Int = upNextState.queueSize()
         binding.countText.text = upNextCount.toString()
         binding.countText.isVisible = upNextCount > 0
+        binding.upNextButton.showIf(
+            !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) ||
+                (upNextCount > 0),
+        )
 
         val drawableId = when {
             upNextCount == 0 -> R.drawable.mini_player_upnext

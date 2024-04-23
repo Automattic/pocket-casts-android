@@ -28,6 +28,7 @@
         android:layout_width="68dp"
         android:layout_height="68dp"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:background="?android:attr/actionBarItemBackground"
         android:scaleType="centerInside"
         android:clickable="false"
@@ -67,21 +68,31 @@
     <androidx.mediarouter.app.MediaRouteButton
         android:id="@+id/mediaRouteButton"
         android:layout_width="48dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:visibility="gone"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toStartOf="@+id/upNextButton"
+        app:layout_constraintStart_toEndOf="@+id/skipForward"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/upNextButton"
         android:layout_width="48dp"
-        android:layout_height="68dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
         android:background="?android:attr/actionBarItemBackground"
         android:scaleType="centerInside"
         android:clickable="false"
         android:contentDescription="@string/player_up_next"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toStartOf="@+id/spacer"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/spacer"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
