@@ -16,7 +16,7 @@
             android:id="@+id/sleepSetup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelMins60,buttonMins60,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator4, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton"
+            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelMins60,buttonMins60,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterPlusButton, endOfChapterMinusButton"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
@@ -225,7 +225,7 @@
             app:layout_constraintTop_toBottomOf="@+id/labelCustom" />
 
         <TextView
-            android:id="@+id/labelEndOfEpisode"
+            android:id="@+id/labelEndOfChapter"
             style="@style/DarkSubtitle1"
             android:layout_width="wrap_content"
             android:layout_height="64dp"
@@ -234,6 +234,63 @@
             android:textColor="?attr/player_contrast_01"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/separator4" />
+
+        <View
+            android:id="@+id/buttonEndOfChapter"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfChapter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelEndOfChapter" />
+
+        <ImageView
+            android:id="@+id/endOfChapterMinusButton"
+            android:layout_width="44dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/player_sleep_custom_minus"
+            android:scaleType="center"
+            android:src="@drawable/ic_minus"
+            app:tint="?attr/player_contrast_01"
+            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfChapter"
+            app:layout_constraintEnd_toStartOf="@+id/endOfChapterPlusButton"
+            app:layout_constraintTop_toTopOf="@+id/labelEndOfChapter" />
+
+        <ImageView
+            android:id="@+id/endOfChapterPlusButton"
+            android:layout_width="44dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="24dp"
+            android:contentDescription="@string/player_sleep_custom_plus"
+            android:scaleType="center"
+            android:src="@drawable/ic_effects_plus"
+            app:tint="?attr/player_contrast_01"
+            app:layout_constraintBottom_toBottomOf="@+id/labelEndOfChapter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelEndOfChapter" />
+
+        <View
+            android:id="@+id/separator5"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/player_contrast_05"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labelEndOfChapter" />
+
+        <TextView
+            android:id="@+id/labelEndOfEpisode"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:gravity="center_vertical"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/separator5" />
 
         <View
             android:id="@+id/buttonEndOfEpisode"
