@@ -1464,7 +1464,6 @@ Language: nl
     <string name="player_time_saved_detail">In totaal heb je %s bespaard met deze functie.</string>
     <string name="player_tab_playing_wide">Bezig met afspelen</string>
     <string name="player_tab_playing">Wordt afgespeeld</string>
-    <string name="player_sleep_when_episode_ends">In slaapstand als de aflevering stopt</string>
     <string name="player_sleep_timer">Slaaptimer</string>
     <string name="player_sleep_timer_title">Slaaptimer</string>
     <string name="player_sleep_end_of_episode">Einde van de aflevering</string>

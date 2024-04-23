@@ -308,10 +308,13 @@
     <string name="player_sleep_custom_minus">Custom minus</string>
     <string name="player_sleep_custom_plus">Custom plus</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
+    <string name="player_sleep_end_of_episode_singular">End of 1 episode</string>
+    <string name="player_sleep_end_of_episode_plural">End of %d episodes</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
-    <string name="player_sleep_when_episode_ends">Sleeping when episode ends</string>
+    <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
+    <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Sleep timer restarted after device shake</string>
     <string name="player_sleep_timer_stopped_your_podcast">Sleep timer stopped your podcast.</string>
     <string name="player_star" translatable="false">@string/star</string>
