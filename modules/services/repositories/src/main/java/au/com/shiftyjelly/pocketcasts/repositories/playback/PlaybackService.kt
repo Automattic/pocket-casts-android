@@ -57,6 +57,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -185,18 +186,19 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 accept(currentMetadataCompat)
             }
         }
+        private val useEpisodeArtwork = settings.useEpisodeArtwork.flow.asObservable()
 
         init {
-            Observables.combineLatest(playbackStatusRelay, mediaMetadataRelay)
+            Observables.combineLatest(playbackStatusRelay, mediaMetadataRelay, useEpisodeArtwork)
                 .observeOn(SchedulerProvider.io)
                 // only generate new notifications for a different playback state and episode. Also if we are playing but aren't a foreground service something isn't right
-                .distinctUntilChanged { oldPair: Pair<PlaybackStateCompat, MediaMetadataCompat>, newPair: Pair<PlaybackStateCompat, MediaMetadataCompat> ->
+                .distinctUntilChanged { (state1, metadata1, useEpisodeArtwork1), (state2, metadata2, useEpisodeArtwork2) ->
                     val isForegroundService = isForegroundService()
-                    (oldPair.first.state == newPair.first.state && oldPair.second.id == newPair.second.id) &&
-                        (isForegroundService && (newPair.first.state == PlaybackStateCompat.STATE_PLAYING || newPair.first.state == PlaybackStateCompat.STATE_BUFFERING))
+                    (state1.state == state2.state && metadata1.id == metadata2.id && useEpisodeArtwork1 == useEpisodeArtwork2) &&
+                        (isForegroundService && (state2.state == PlaybackStateCompat.STATE_PLAYING || state2.state == PlaybackStateCompat.STATE_BUFFERING))
                 }
                 // build the notification including artwork in the background
-                .map { (playbackState, metadata) -> playbackState to buildNotification(playbackState.state, metadata) }
+                .map { (playbackState, metadata, useEpisodeArtwork) -> playbackState to buildNotification(playbackState.state, metadata, useEpisodeArtwork) }
                 .observeOn(SchedulerProvider.mainThread)
                 .subscribeBy(
                     onNext = { (state: PlaybackStateCompat, notification: Notification?) ->
@@ -325,7 +327,11 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
-        private fun buildNotification(state: Int, metadata: MediaMetadataCompat?): Notification? {
+        private fun buildNotification(
+            state: Int,
+            metadata: MediaMetadataCompat?,
+            useEpisodeArtwork: Boolean,
+        ): Notification? {
             if (Util.isAutomotive(this@PlaybackService)) {
                 return null
             }
@@ -336,7 +342,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
             val sessionToken = sessionToken
             if (metadata == null || metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).isEmpty()) return null
-            return if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken) else null
+            return if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken, useEpisodeArtwork) else null
         }
     }
 

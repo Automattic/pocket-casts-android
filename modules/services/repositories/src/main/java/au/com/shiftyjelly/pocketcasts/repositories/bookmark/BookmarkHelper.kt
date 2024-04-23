@@ -67,7 +67,7 @@ class BookmarkHelper @Inject constructor(
             }
 
             if (settings.headphoneControlsPlayBookmarkConfirmationSound.value) {
-                playbackManager.playTone()
+                playbackManager.playBookmarkTone()
             }
 
             buildAndShowNotification(context, bookmark.uuid)

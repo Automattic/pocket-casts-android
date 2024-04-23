@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.widget.data.LocalSource
 import au.com.shiftyjelly.pocketcasts.widget.data.SmallPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.ui.SmallPlayer
 
-class SmallPlayerWidget : GlanceAppWidget() {
+internal class SmallPlayerWidget : GlanceAppWidget() {
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     override val sizeMode = SizeMode.Exact

@@ -58,9 +58,12 @@ class SleepTimer @Inject constructor(
         createAlarm(time.timeInMillis)
     }
 
-    fun restartTimerIfIsRunning(onSuccess: () -> Unit) {
-        if (isSleepAfterTimerRunning) {
+    fun restartTimerIfIsRunning(onSuccess: () -> Unit): Duration? {
+        return if (isSleepAfterTimerRunning) {
             lastSleepAfterTime?.let { sleepAfter(it, onSuccess) }
+            lastSleepAfterTime
+        } else {
+            null
         }
     }
 
