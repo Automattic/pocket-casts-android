@@ -79,7 +79,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
                 ChromeCastButton.Shown(chromeCastAnalytics)
             },
             profileButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                ProfileButton.Shown
+                ProfileButton.Shown()
             } else {
                 ProfileButton.None
             },

@@ -9,7 +9,9 @@ object BaseFragmentToolbar {
     }
 
     sealed class ProfileButton {
-        data object Shown : ProfileButton()
+        data class Shown(
+            val onClick: (() -> Unit)? = null,
+        ) : ProfileButton()
         data object None : ProfileButton()
     }
 }

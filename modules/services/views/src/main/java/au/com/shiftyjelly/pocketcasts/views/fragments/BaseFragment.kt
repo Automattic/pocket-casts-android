@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
+import au.com.shiftyjelly.pocketcasts.views.extensions.updateProfileMenuBadge
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateProfileMenuImage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
@@ -96,7 +97,17 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
             title = title,
             menu = menu,
             chromeCastButton = chromeCastButton,
-            profileButton = profileButton,
+            profileButton = when (profileButton) {
+                is ProfileButton.None -> profileButton
+                is ProfileButton.Shown -> {
+                    ProfileButton.Shown(
+                        onClick = {
+                            viewModel.onMenuItemTapped(UR.id.menu_profile)
+                            (activity as? FragmentHostListener)?.openProfile()
+                        },
+                    )
+                }
+            },
             navigationIcon = navigationIcon,
             onNavigationClick = onNavigationClick,
             activity = activity,
@@ -113,6 +124,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
                     if (profileButton is ProfileButton.Shown) {
                         toolbar.post {
                             toolbar.updateProfileMenuImage(state.signInState)
+                            toolbar.updateProfileMenuBadge(state.showBadgeOnProfileMenu)
                         }
                     }
                 }

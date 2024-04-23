@@ -193,7 +193,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                 title = getString(LR.string.discover),
                 menu = R.menu.discover_menu,
                 navigationIcon = NavigationIcon.None,
-                profileButton = ProfileButton.Shown,
+                profileButton = ProfileButton.Shown(),
             )
             binding.toolbar.menu.findItem(UR.id.menu_profile).isVisible = true
         } else {
