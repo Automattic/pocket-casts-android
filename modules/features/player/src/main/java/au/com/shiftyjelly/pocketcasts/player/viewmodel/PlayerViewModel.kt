@@ -278,6 +278,9 @@ class PlayerViewModel @Inject constructor(
     val sleepEndOfEpisodesText = MutableLiveData<String>().apply {
         postValue(calcEndOfEpisodeText())
     }
+    val sleepEndOfChaptersText = MutableLiveData<String>().apply {
+        postValue(calcEndOfChapterText())
+    }
     val sleepInEpisodesText = MutableLiveData<String>().apply {
         postValue(calcSleepInEpisodesText())
     }
@@ -291,6 +294,17 @@ class PlayerViewModel @Inject constructor(
         get() {
             return settings.getSleepTimerCustomMins()
         }
+
+    fun setSleepEndOfChapters(chapters: Int = 1, shouldCallUpdateTimer: Boolean = true) {
+        val newValue = chapters.coerceIn(1, 240)
+        settings.setSleepEndOfChapters(newValue)
+        sleepEndOfChaptersText.postValue(calcEndOfChapterText())
+        if (shouldCallUpdateTimer) {
+            updateSleepTimer()
+        }
+    }
+
+    fun getSleepEndOfChapters(): Int = settings.getSleepEndOfChapters()
 
     fun setSleepEndOfEpisodes(episodes: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = episodes.coerceIn(1, 240)
@@ -530,6 +544,14 @@ class PlayerViewModel @Inject constructor(
             context.resources.getString(LR.string.player_sleep_end_of_episode_singular)
         } else {
             context.resources.getString(LR.string.player_sleep_end_of_episode_plural, getSleepEndOfEpisodes())
+        }
+    }
+
+    private fun calcEndOfChapterText(): String {
+        return if (getSleepEndOfChapters() == 1) {
+            context.resources.getString(LR.string.player_sleep_end_of_chapter_singular)
+        } else {
+            context.resources.getString(LR.string.player_sleep_end_of_chapter_plural, getSleepEndOfChapters())
         }
     }
 

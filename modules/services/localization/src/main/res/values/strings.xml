@@ -310,6 +310,8 @@
     <string name="player_sleep_end_of_episode">End of episode</string>
     <string name="player_sleep_end_of_episode_singular">End of 1 episode</string>
     <string name="player_sleep_end_of_episode_plural">End of %d episodes</string>
+    <string name="player_sleep_end_of_chapter_singular">End of 1 chapter</string>
+    <string name="player_sleep_end_of_chapter_plural">End of %d chapters</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>

@@ -69,8 +69,10 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonMins60.setOnClickListener { startTimer(mins = 60) }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
         binding.endOfEpisodeMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
+        binding.endOfChapterMinusButton.setOnClickListener { minusEndOfChapterButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.endOfEpisodePlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
+        binding.endOfChapterPlusButton.setOnClickListener { plusEndOfChapterButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
         binding.buttonEndOfEpisode.setOnClickListener {
             val episodes = viewModel.getSleepEndOfEpisodes()
@@ -104,6 +106,10 @@ class SleepFragment : BaseDialogFragment() {
 
         viewModel.sleepEndOfEpisodesText.observe(viewLifecycleOwner) { text ->
             binding?.labelEndOfEpisode?.text = text
+        }
+
+        viewModel.sleepEndOfChaptersText.observe(viewLifecycleOwner) { text ->
+            binding?.labelEndOfChapter?.text = text
         }
 
         viewModel.sleepInEpisodesText.observe(viewLifecycleOwner) { text ->
@@ -180,9 +186,15 @@ class SleepFragment : BaseDialogFragment() {
         }
         binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
     }
+
     private fun plusEndOfEpisodeButtonClicked() {
         viewModel.setSleepEndOfEpisodes(viewModel.getSleepEndOfEpisodes() + 1)
         binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
+    }
+
+    private fun plusEndOfChapterButtonClicked() {
+        viewModel.setSleepEndOfChapters(viewModel.getSleepEndOfChapters() + 1)
+        binding?.root?.announceForAccessibility("Sleep time chapter ${viewModel.getSleepEndOfChapters()}")
     }
 
     private fun minusButtonClicked() {
@@ -200,6 +212,14 @@ class SleepFragment : BaseDialogFragment() {
             viewModel.setSleepEndOfEpisodes(endOfEpisodes - 1)
         }
         binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
+    }
+
+    private fun minusEndOfChapterButtonClicked() {
+        val endOfChapters = viewModel.getSleepEndOfChapters()
+        if (endOfChapters > 1) {
+            viewModel.setSleepEndOfChapters(endOfChapters - 1)
+        }
+        binding?.root?.announceForAccessibility("Sleep time end of chapter ${viewModel.getSleepEndOfChapters() }")
     }
 
     private fun startTimerEndOfEpisode(episodes: Int) {
