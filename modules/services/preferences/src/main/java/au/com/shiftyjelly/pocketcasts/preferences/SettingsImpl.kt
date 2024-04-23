@@ -1192,12 +1192,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun setEndOfYearShowBadge2023(value: Boolean) {
-        setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
-    }
-
-    override fun getEndOfYearShowBadge2023(): Boolean =
-        getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
+    override val endOfYearShowBadge2023 = UserSetting.BoolPref(
+        sharedPrefKey = END_OF_YEAR_SHOW_BADGE_2023_KEY,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun setEndOfYearShowModal(value: Boolean) {
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
