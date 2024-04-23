@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 fun Toolbar.updateColors(toolbarColors: ToolbarColors, navigationIcon: NavigationIcon) {
     setBackgroundColor(toolbarColors.backgroundColor)
@@ -90,7 +91,10 @@ fun Toolbar.updateProfileMenuImage(
 ) {
     val profileMenuActionView = menu.findProfileItem()?.actionView
     val imgView = profileMenuActionView?.findViewById<ProfileCircleView>(UR.id.menu_profile_picture)
-    imgView?.updateProfileImageAndDaysRemaining(signInState)
+    imgView?.updateProfileImageAndDaysRemaining(
+        signInState = signInState,
+        imageSize = imgView.resources.getDimensionPixelSize(VR.dimen.profile_menu_size),
+    )
 }
 
 fun Toolbar.updateProfileMenuBadge(

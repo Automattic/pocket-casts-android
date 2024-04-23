@@ -183,10 +183,14 @@ class ProfileCircleView @JvmOverloads constructor(
 
     fun updateProfileImageAndDaysRemaining(
         signInState: SignInState?,
+        imageSize: Int = 400,
     ) {
         when (signInState) {
             is SignInState.SignedIn -> {
-                val gravatarUrl = Gravatar.getUrl(signInState.email)
+                val gravatarUrl = Gravatar.getUrl(
+                    email = signInState.email,
+                    imageSize = imageSize,
+                )
                 var percent = 1.0f
                 val daysLeft = daysLeft(signInState, 30)
                 if (daysLeft != null && daysLeft > 0 && daysLeft <= 30) {
