@@ -220,6 +220,8 @@ open class PlaybackManager @Inject constructor(
 
     var sleepAfterEpisode: Int = 0
 
+    var sleepAfterChapter: Int = 0
+
     var player: Player? = null
 
     val mediaSession: MediaSessionCompat
@@ -300,8 +302,9 @@ open class PlaybackManager @Inject constructor(
         return player?.isStreaming ?: false
     }
 
-    fun updateSleepTimerStatus(sleepTimeRunning: Boolean, sleepAfterEpisodes: Int = 0) {
+    fun updateSleepTimerStatus(sleepTimeRunning: Boolean, sleepAfterEpisodes: Int = 0, sleepAfterChapters: Int = 0) {
         this.sleepAfterEpisode = sleepAfterEpisodes
+        this.sleepAfterChapter = sleepAfterChapters
         playbackStateRelay.blockingFirst().let {
             playbackStateRelay.accept(it.copy(isSleepTimerRunning = sleepTimeRunning, lastChangeFrom = LastChangeFrom.OnUpdateSleepTimerStatus.value))
         }
@@ -2462,6 +2465,8 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun isSleepAfterEpisodeEnabled(): Boolean = sleepAfterEpisode != 0
+
+    fun isSleepAfterChapterEnabled(): Boolean = sleepAfterChapter != 0
 
     private enum class ContentType(val analyticsValue: String) {
         AUDIO("audio"),

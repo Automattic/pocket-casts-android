@@ -79,6 +79,10 @@ class SleepFragment : BaseDialogFragment() {
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodes))
             startTimerEndOfEpisode(episodes = episodes)
         }
+        binding.buttonEndOfChapter.setOnClickListener {
+            val chapters = viewModel.getSleepEndOfChapters()
+            startTimerEndOfChapter(chapters = chapters)
+        }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
@@ -225,6 +229,12 @@ class SleepFragment : BaseDialogFragment() {
     private fun startTimerEndOfEpisode(episodes: Int) {
         viewModel.sleepTimerAfterEpisode(episodes)
         binding?.root?.announceForAccessibility("Sleep timer set for end of episode")
+        close()
+    }
+
+    private fun startTimerEndOfChapter(chapters: Int) {
+        viewModel.sleepTimerAfterChapter(chapters)
+        binding?.root?.announceForAccessibility("Sleep timer set for end of chapter")
         close()
     }
 

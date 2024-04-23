@@ -592,6 +592,11 @@ class PlayerViewModel @Inject constructor(
         sleepTimer.cancelTimer()
     }
 
+    fun sleepTimerAfterChapter(chapters: Int = 1) {
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapters)
+        sleepTimer.cancelTimer()
+    }
+
     fun cancelSleepTimer() {
         playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
         sleepTimer.cancelTimer()
