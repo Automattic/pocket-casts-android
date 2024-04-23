@@ -34,10 +34,10 @@
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
-            android:id="@+id/sleepRunningEndOfEpisode"
+            android:id="@+id/sleepRunningEndOfEpisodeOrChapter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="sleepingEndOfEpisode,buttonCancelEndOfEpisode"
+            app:constraint_referenced_ids="sleepingInText,buttonCancelEndOfEpisodeOrChapter"
             tools:ignore="MissingConstraints" />
 
         <View
@@ -437,7 +437,7 @@
             app:textAllCaps="false" />
 
         <TextView
-            android:id="@+id/sleepingEndOfEpisode"
+            android:id="@+id/sleepingInText"
             style="@style/DarkSubtitle1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -448,7 +448,7 @@
             app:layout_constraintTop_toBottomOf="@+id/sleepAnimation" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonCancelEndOfEpisode"
+            android:id="@+id/buttonCancelEndOfEpisodeOrChapter"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -462,7 +462,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sleepingEndOfEpisode"
+            app:layout_constraintTop_toBottomOf="@+id/sleepingInText"
             app:strokeColor="?attr/player_contrast_01"
             app:textAllCaps="false" />
 

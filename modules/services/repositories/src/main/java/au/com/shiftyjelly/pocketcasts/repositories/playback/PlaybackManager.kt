@@ -218,9 +218,14 @@ open class PlaybackManager @Inject constructor(
         bookmarkFeature = bookmarkFeature,
     )
 
-    var sleepAfterEpisode: Int = 0
+    var sleepAfterEpisode: Int = 0 // Represents the number of episodes the user will listen until sleep
 
-    var sleepAfterChapter: Int = 0
+    var sleepAfterChapter: Int = 0 // Represents the number of chapters the user will listen until sleep
+
+    private val lastListenedEpisodeForEndOfChapter = mutableMapOf<String, String?>(
+        "chapterUui" to null,
+        "episodeUui" to null,
+    )
 
     var player: Player? = null
 
@@ -1306,9 +1311,10 @@ open class PlaybackManager @Inject constructor(
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode ${episode?.title} finished, should sleep: $hadSleepAfterEpisode")
 
         if (hadSleepAfterEpisode) {
-            sleep(episode)
-            if (!isSleepAfterEpisodeEnabled()) return // keep sleep time running if still has end of episodes
+            sleepEndOfEpisode(episode)
         }
+
+        if (!isSleepAfterEpisodeEnabled() && !isSleepAfterChapterEnabled()) return // keep sleep time running if still has end of episodes or chapters
 
         cancelUpdateTimer()
         cancelBufferUpdateTimer()
@@ -1373,7 +1379,7 @@ open class PlaybackManager @Inject constructor(
         // Auto play if it had sleep time enabled for end of episodes and still has episodes set on sleep time
         // or if it did not have sleep time end of episode configured
         // and it was playing episode
-        val autoPlay = ((hadSleepAfterEpisode && isSleepAfterEpisodeEnabled()) || !hadSleepAfterEpisode) && wasPlaying
+        val autoPlay = (!hadSleepAfterEpisode || isSleepAfterEpisodeEnabled()) && wasPlaying
 
         var nextEpisode = getCurrentEpisode()
         if (nextEpisode == null) {
@@ -1460,20 +1466,20 @@ open class PlaybackManager @Inject constructor(
             .flatten()
     }
 
-    private suspend fun sleep(episode: BaseEpisode?) {
-        episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
+    private suspend fun sleepEndOfEpisode(episode: BaseEpisode?) {
+        if (isSleepAfterEpisodeEnabled()) {
+            episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
+            sleepAfterEpisode -= 1
+        }
 
-        sleepAfterEpisode -= 1
-
-        if (isSleepAfterEpisodeEnabled()) return
+        if (isSleepAfterEpisodeEnabled() || isSleepAfterChapterEnabled()) return
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let {
                 playbackStateRelay.accept(it.copy(isSleepTimerRunning = false, lastChangeFrom = LastChangeFrom.OnCompletion.value))
             }
         }
-
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback")
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of episode")
 
         showToast(application.getString(LR.string.player_sleep_time_fired))
 
@@ -1491,6 +1497,31 @@ open class PlaybackManager @Inject constructor(
                 episodeManager.updatePlayedUpTo(episode, currentTimeSecs, false)
             }
         }
+
+        stop()
+    }
+
+    private suspend fun sleepEndOfChapter() {
+        if (isSleepAfterChapterEnabled()) {
+            sleepAfterChapter -= 1
+        }
+
+        if (isSleepAfterChapterEnabled()) return
+
+        withContext(Dispatchers.Main) {
+            playbackStateRelay.blockingFirst().let {
+                playbackStateRelay.accept(it.copy(isSleepTimerRunning = false, lastChangeFrom = LastChangeFrom.OnCompletion.value))
+            }
+        }
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Sleeping playback for end of chapters")
+
+        showToast(application.getString(LR.string.player_sleep_time_fired_end_of_chapter))
+
+        val podcast = playbackStateRelay.blockingFirst().podcast
+        if (podcast != null && podcast.skipLastSecs > 0) {
+            pause(sourceView = SourceView.AUTO_PAUSE)
+        }
+        onPlayerPaused()
 
         stop()
     }
@@ -2204,7 +2235,7 @@ open class PlaybackManager @Inject constructor(
             val timeRemaining = (durationMs - positionMs) / 1000
             if (timeRemaining < skipLast) {
                 if (isSleepAfterEpisodeEnabled()) {
-                    sleep(episode)
+                    sleepEndOfEpisode(episode)
                 } else {
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
                     episodeManager.markAsPlayed(episode, this, podcastManager)
@@ -2266,9 +2297,48 @@ open class PlaybackManager @Inject constructor(
                 if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !isSleepAfterEpisodeEnabled()) { // Does not apply to end of episode sleep time
                     setupFadeOutWhenFinishingSleepTimer()
                 }
+                verifySleepTimeForEndOfChapter()
             }
             .switchMapCompletable { updateCurrentPositionRx() }
             .subscribeBy(onError = { Timber.e(it) })
+    }
+
+    private fun verifySleepTimeForEndOfChapter() {
+        val playbackState = playbackStateRelay.blockingFirst()
+        val currentChapterUuid = getCurrentChapterUuidForSleepTime(playbackState)
+        val currentEpisodeUui = getCurrentEpisode()?.uuid
+
+        if (!isSleepAfterChapterEnabled()) {
+            lastListenedEpisodeForEndOfChapter["chapterUui"] = null
+            lastListenedEpisodeForEndOfChapter["episodeUui"] = null
+            return
+        }
+
+        if (lastListenedEpisodeForEndOfChapter["chapterUui"] == null) {
+            lastListenedEpisodeForEndOfChapter["chapterUui"] = currentChapterUuid
+        }
+
+        if (lastListenedEpisodeForEndOfChapter["episodeUui"] == null) {
+            lastListenedEpisodeForEndOfChapter["episodeUui"] = currentEpisodeUui
+        }
+
+        // When we switch from a episode that contains chapters to another one that does not have chapters
+        // the current chapter is null, so for this case we would need to verify if the episode changed to update the sleep timer counter for end of chapter
+        if (currentChapterUuid == null && lastListenedEpisodeForEndOfChapter["episodeUui"] != null && lastListenedEpisodeForEndOfChapter["episodeUui"] != currentEpisodeUui) {
+            applicationScope.launch {
+                lastListenedEpisodeForEndOfChapter["chapterUui"] = null
+                lastListenedEpisodeForEndOfChapter["episodeUui"] = currentEpisodeUui
+                sleepEndOfChapter()
+            }
+        } else if (lastListenedEpisodeForEndOfChapter["chapterUui"] == currentChapterUuid) { // Same chapter
+            return
+        } else { // Changed chapter
+            applicationScope.launch {
+                lastListenedEpisodeForEndOfChapter["chapterUui"] = currentChapterUuid
+                lastListenedEpisodeForEndOfChapter["episodeUui"] = getCurrentEpisode()?.uuid
+                sleepEndOfChapter()
+            }
+        }
     }
 
     private fun setupFadeOutWhenFinishingSleepTimer() {
@@ -2467,6 +2537,12 @@ open class PlaybackManager @Inject constructor(
     fun isSleepAfterEpisodeEnabled(): Boolean = sleepAfterEpisode != 0
 
     fun isSleepAfterChapterEnabled(): Boolean = sleepAfterChapter != 0
+
+    private fun getCurrentChapterUuidForSleepTime(playbackState: PlaybackState): String? {
+        val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
+
+        return currentChapter?.let { it.title + it.startTime }
+    }
 
     private enum class ContentType(val analyticsValue: String) {
         AUDIO("audio"),

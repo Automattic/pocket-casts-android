@@ -91,7 +91,7 @@ class SleepFragment : BaseDialogFragment() {
             startTimerEndOfEpisode(episodes = episodesAmountToExtend)
         }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
-        binding.buttonCancelEndOfEpisode.setOnClickListener { cancelTimer() }
+        binding.buttonCancelEndOfEpisodeOrChapter.setOnClickListener { cancelTimer() }
 
         return binding.root
     }
@@ -116,8 +116,8 @@ class SleepFragment : BaseDialogFragment() {
             binding?.labelEndOfChapter?.text = text
         }
 
-        viewModel.sleepInEpisodesText.observe(viewLifecycleOwner) { text ->
-            binding?.sleepingEndOfEpisode?.text = text
+        viewModel.sleepingInText.observe(viewLifecycleOwner) { text ->
+            binding?.sleepingInText?.text = text
         }
 
         viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
@@ -125,10 +125,10 @@ class SleepFragment : BaseDialogFragment() {
             binding?.sleepRunning?.isVisible = isSleepRunning
         }
 
-        viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisode)
+        viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisodeOrChapter)
             .observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfEpisode) ->
                 binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode
-                binding?.sleepRunningEndOfEpisode?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
+                binding?.sleepRunningEndOfEpisodeOrChapter?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
             }
 
         viewModel.playingEpisodeLive.observe(
@@ -143,8 +143,8 @@ class SleepFragment : BaseDialogFragment() {
                 binding.buttonAdd5Minute.setTextColor(tintColorStateList)
                 binding.buttonAdd1Minute.strokeColor = tintColorStateList
                 binding.buttonAdd1Minute.setTextColor(tintColorStateList)
-                binding.buttonCancelEndOfEpisode.strokeColor = tintColorStateList
-                binding.buttonCancelEndOfEpisode.setTextColor(tintColorStateList)
+                binding.buttonCancelEndOfEpisodeOrChapter.strokeColor = tintColorStateList
+                binding.buttonCancelEndOfEpisodeOrChapter.setTextColor(tintColorStateList)
                 binding.buttonCancelTime.strokeColor = tintColorStateList
                 binding.buttonCancelTime.setTextColor(tintColorStateList)
                 binding.buttonEndOfEpisode2.strokeColor = tintColorStateList

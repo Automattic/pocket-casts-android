@@ -317,6 +317,8 @@
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
     <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
     <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>
+up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
+    <string name="player_sleep_in_chapters">Sleeping in %d chapters</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Sleep timer restarted after device shake</string>
     <string name="player_sleep_timer_stopped_your_podcast">Sleep timer stopped your podcast.</string>
     <string name="player_star" translatable="false">@string/star</string>
@@ -352,6 +354,7 @@
     <string name="player_actions_hidden_for_custom">Hidden for custom episodes</string>
     <string name="player_actions_show_as_delete_for_custom">Shown as delete for custom episodes</string>
     <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.\nNight night!</string>
+    <string name="player_sleep_time_fired_end_of_chapter">Sleep timer stopped at the end of your chapter.</string>
     <string name="player_skipped_last">Skipped the last %d seconds</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>

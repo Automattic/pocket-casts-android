@@ -270,7 +270,7 @@ class PlayerViewModel @Inject constructor(
     var podcast: Podcast? = null
 
     val isSleepRunning = MutableLiveData<Boolean>().apply { postValue(false) }
-    val isSleepAtEndOfEpisode = MutableLiveData<Boolean>().apply { postValue(false) }
+    val isSleepAtEndOfEpisodeOrChapter = MutableLiveData<Boolean>().apply { postValue(false) }
     val sleepTimeLeftText = MutableLiveData<String>()
     val sleepCustomTimeText = MutableLiveData<String>().apply {
         postValue(calcCustomTimeText())
@@ -281,8 +281,8 @@ class PlayerViewModel @Inject constructor(
     val sleepEndOfChaptersText = MutableLiveData<String>().apply {
         postValue(calcEndOfChapterText())
     }
-    val sleepInEpisodesText = MutableLiveData<String>().apply {
-        postValue(calcSleepInEpisodesText())
+    val sleepingInText = MutableLiveData<String>().apply {
+        postValue(calcSleepingInEpisodesText())
     }
     var sleepCustomTimeMins: Int = 5
         set(value) {
@@ -299,6 +299,7 @@ class PlayerViewModel @Inject constructor(
         val newValue = chapters.coerceIn(1, 240)
         settings.setSleepEndOfChapters(newValue)
         sleepEndOfChaptersText.postValue(calcEndOfChapterText())
+        sleepingInText.postValue(calcSleepingInChaptersText())
         if (shouldCallUpdateTimer) {
             updateSleepTimer()
         }
@@ -310,7 +311,7 @@ class PlayerViewModel @Inject constructor(
         val newValue = episodes.coerceIn(1, 240)
         settings.setSleepEndOfEpisodes(newValue)
         sleepEndOfEpisodesText.postValue(calcEndOfEpisodeText())
-        sleepInEpisodesText.postValue(calcSleepInEpisodesText())
+        sleepingInText.postValue(calcSleepingInEpisodesText())
         if (shouldCallUpdateTimer) {
             updateSleepTimer()
         }
@@ -555,7 +556,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    private fun calcSleepInEpisodesText(): String {
+    private fun calcSleepingInEpisodesText(): String {
         return if (getSleepEndOfEpisodes() == 1) {
             context.resources.getString(LR.string.player_sleep_in_one_episode)
         } else {
@@ -563,15 +564,27 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
+    private fun calcSleepingInChaptersText(): String {
+        return if (getSleepEndOfChapters() == 1) {
+            context.resources.getString(LR.string.player_sleep_in_one_chapter)
+        } else {
+            context.resources.getString(LR.string.player_sleep_in_chapters, getSleepEndOfChapters())
+        }
+    }
+
     fun updateSleepTimer() {
         val timeLeft = sleepTimer.timeLeftInSecs()
         if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
-            isSleepAtEndOfEpisode.postValue(playbackManager.isSleepAfterEpisodeEnabled())
+            isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
             setSleepEndOfEpisodes(playbackManager.sleepAfterEpisode, shouldCallUpdateTimer = false)
-            sleepInEpisodesText.postValue(calcSleepInEpisodesText())
+            sleepingInText.postValue(calcSleepingInEpisodesText())
+        } else if (playbackManager.isSleepAfterChapterEnabled()) {
+            isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterChapterEnabled())
+            setSleepEndOfChapters(playbackManager.sleepAfterChapter, shouldCallUpdateTimer = false)
+            sleepingInText.postValue(calcSleepingInChaptersText())
         } else {
-            isSleepAtEndOfEpisode.postValue(false)
+            isSleepAtEndOfEpisodeOrChapter.postValue(false)
             playbackManager.updateSleepTimerStatus(false)
         }
     }
