@@ -348,11 +348,10 @@ class MainActivity :
         }
 
         var selectedTab = settings.selectedTab()
-        val tabs = mutableMapOf(
-            VR.id.navigation_podcasts to { FragmentInfo(PodcastsFragment(), true) },
-            VR.id.navigation_filters to { FragmentInfo(FiltersFragment(), true) },
-            VR.id.navigation_discover to { FragmentInfo(DiscoverFragment(), false) },
-        ).apply {
+        val tabs = buildMap {
+            put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
+            put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
+            put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
             if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
                 put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
             }
