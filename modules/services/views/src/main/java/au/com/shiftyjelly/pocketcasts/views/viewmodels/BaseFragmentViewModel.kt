@@ -48,7 +48,11 @@ class BaseFragmentViewModel
         when (resId) {
             UR.id.menu_profile -> {
                 analyticsTracker.track(AnalyticsEvent.PROFILE_TAB_OPENED)
-                settings.endOfYearShowBadge2023.set(false, updateModifiedAt = false)
+                viewModelScope.launch {
+                    if (endOfYearManager.isEligibleForStories()) {
+                        settings.endOfYearShowBadge2023.set(false, updateModifiedAt = false)
+                    }
+                }
             }
         }
     }
