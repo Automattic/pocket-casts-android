@@ -99,7 +99,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     override fun closePodcastsToRoot() {
     }
 
-    override fun openPodcastPage(uuid: String) {
+    override fun openPodcastPage(uuid: String, sourceView: String?) {
     }
 
     override fun openCloudFiles() {

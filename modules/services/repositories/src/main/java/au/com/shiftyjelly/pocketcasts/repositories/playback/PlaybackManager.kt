@@ -566,6 +566,10 @@ open class PlaybackManager @Inject constructor(
             SourceView.WIDGET_PLAYER_MEDIUM,
             SourceView.WIDGET_PLAYER_LARGE,
             SourceView.WIDGET_PLAYER_OLD,
+            SourceView.SHARE_LIST,
+            SourceView.BOTTOM_SHELF,
+            SourceView.SEARCH,
+            SourceView.SEARCH_RESULTS,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,

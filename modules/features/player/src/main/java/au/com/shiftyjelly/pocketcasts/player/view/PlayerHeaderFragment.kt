@@ -227,7 +227,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 )
                 (activity as? FragmentHostListener)?.let { listener ->
                     listener.closePlayer()
-                    listener.openPodcastPage(podcastUuid)
+                    listener.openPodcastPage(podcastUuid, sourceView.analyticsValue)
                 }
             }
 
@@ -453,7 +453,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val podcast = viewModel.podcast
         (activity as FragmentHostListener).closePlayer()
         if (podcast != null) {
-            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid)
+            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid, sourceView.analyticsValue)
         } else {
             (activity as? FragmentHostListener)?.openCloudFiles()
         }
