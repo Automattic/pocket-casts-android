@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.views.fragments
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import android.view.ViewTreeObserver
 import androidx.annotation.ColorInt
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
@@ -122,10 +123,13 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.uiState.collect { state ->
                     if (profileButton is ProfileButton.Shown) {
-                        toolbar.post {
-                            toolbar.updateProfileMenuImage(state.signInState)
-                            toolbar.updateProfileMenuBadge(state.showBadgeOnProfileMenu)
-                        }
+                        toolbar.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                            override fun onGlobalLayout() {
+                                toolbar.updateProfileMenuImage(state.signInState)
+                                toolbar.updateProfileMenuBadge(state.showBadgeOnProfileMenu)
+                                toolbar.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                            }
+                        })
                     }
                 }
             }
