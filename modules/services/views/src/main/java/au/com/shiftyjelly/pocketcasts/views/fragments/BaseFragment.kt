@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.views.fragments
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
-import android.view.ViewTreeObserver
 import androidx.annotation.ColorInt
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
@@ -17,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.extensions.doOnGlobalLayout
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateProfileMenuBadge
@@ -123,13 +123,10 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.uiState.collect { state ->
                     if (profileButton is ProfileButton.Shown) {
-                        toolbar.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-                            override fun onGlobalLayout() {
-                                toolbar.updateProfileMenuImage(state.signInState)
-                                toolbar.updateProfileMenuBadge(state.showBadgeOnProfileMenu)
-                                toolbar.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                            }
-                        })
+                        toolbar.doOnGlobalLayout {
+                            toolbar.updateProfileMenuImage(state.signInState)
+                            toolbar.updateProfileMenuBadge(state.showBadgeOnProfileMenu)
+                        }
                     }
                 }
             }
