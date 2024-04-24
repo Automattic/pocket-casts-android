@@ -331,6 +331,8 @@ class MainActivity :
 
         if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
             binding.bottomNavigation.menu.removeItem(VR.id.navigation_profile)
+        } else {
+            binding.bottomNavigation.menu.removeItem(VR.id.navigation_upnext)
         }
 
         lifecycleScope.launch {
@@ -352,6 +354,17 @@ class MainActivity :
             put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
             put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
+            if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                put(VR.id.navigation_upnext) {
+                    FragmentInfo(
+                        UpNextFragment.newInstance(
+                            embedded = false,
+                            source = UpNextSource.UP_NEXT_TAB,
+                        ),
+                        true,
+                    )
+                }
+            }
             if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
                 put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
             }
@@ -1577,6 +1590,7 @@ class MainActivity :
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
             VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
+            VR.id.navigation_upnext -> AnalyticsEvent.UP_NEXT_TAB_OPENED
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED
