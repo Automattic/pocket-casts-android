@@ -168,9 +168,9 @@ class BookmarksViewModel
             isMultiSelectingFlow,
             selectedListFlow,
             settings.cachedSubscriptionStatus.flow,
-            settings.useEpisodeArtwork.flow,
+            settings.artworkConfiguration.flow,
             bookmarkSearchResults,
-        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork, searchResults ->
+        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, artworkConfiguration, searchResults ->
             val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
             _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
                 UiState.Upsell(sourceView)
@@ -192,7 +192,7 @@ class BookmarksViewModel
                     bookmarks = filteredBookmarks,
                     bookmarkIdAndEpisodeMap = bookmarkIdAndEpisodeMap,
                     isMultiSelecting = isMultiSelecting,
-                    useEpisodeArtwork = useEpisodeArtwork,
+                    useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
                     isSelected = { selectedBookmark ->
                         selectedList.map { bookmark -> bookmark.uuid }
                             .contains(selectedBookmark.uuid)

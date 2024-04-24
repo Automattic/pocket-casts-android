@@ -41,12 +41,12 @@ fun FilterScreen(
     columnState: ScalingLazyColumnState,
 ) {
     val uiState by viewModel.uiState.collectAsState(UiState.Loading)
-    val useEpisodeArtwork by viewModel.useEpisodeArtwork.collectAsState()
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     when (val state = uiState) {
         is UiState.Loaded -> Content(
             state = state,
-            useEpisodeArtwork = useEpisodeArtwork,
+            useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
             listState = columnState,

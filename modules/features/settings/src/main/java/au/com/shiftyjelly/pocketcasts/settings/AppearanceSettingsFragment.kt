@@ -199,7 +199,7 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtShowArtwork.isChecked = !binding.swtShowArtwork.isChecked
         }
 
-        binding.swtUseEpisodeArtwork.isChecked = viewModel.useEpisodeArtwork.value
+        binding.swtUseEpisodeArtwork.isChecked = viewModel.artworkConfiguration.value.useEpisodeArtwork
         binding.swtUseEpisodeArtwork.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateUseEpisodeArtwork(isChecked)
         }

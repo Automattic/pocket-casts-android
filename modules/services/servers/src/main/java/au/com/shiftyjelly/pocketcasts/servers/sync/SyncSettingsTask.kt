@@ -186,7 +186,12 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                         modifiedAt = modifiedAt,
                     )
                 },
-                useEpisodeArtwork = settings.useEpisodeArtwork.getSyncSetting(::NamedChangedSettingBool),
+                useEpisodeArtwork = settings.artworkConfiguration.getSyncSetting { configuration, modifiedAt ->
+                    NamedChangedSettingBool(
+                        value = configuration.useEpisodeArtwork,
+                        modifiedAt = modifiedAt,
+                    )
+                },
                 notificationSettingActions = settings.newEpisodeNotificationActions.getSyncSetting { setting, modifiedAt ->
                     NamedChangedSettingString(
                         value = setting.joinToString(separator = ",", transform = NewEpisodeNotificationAction::serverId),
@@ -443,8 +448,10 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                     "useEmbeddedArtworkGlobal" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,
-                        setting = settings.useEpisodeArtwork,
-                        newSettingValue = (changedSettingResponse.value as? Boolean),
+                        setting = settings.artworkConfiguration,
+                        newSettingValue = (changedSettingResponse.value as? Boolean)?.let { newValue ->
+                            settings.artworkConfiguration.value.copy(useEpisodeArtwork = newValue)
+                        },
                     )
                     "privacyCrashReports" -> updateSettingIfPossible(
                         changedSettingResponse = changedSettingResponse,

@@ -280,7 +280,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         settings.useDynamicColorsForWidget.flow
             .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
             .launchIn(applicationScope)
-        settings.useEpisodeArtwork.flow
+        settings.artworkConfiguration.flow
             .onEach { widgetManager.updateWidgetEpisodeArtwork(playbackManager) }
             .launchIn(applicationScope)
         keepPlayerWidgetsUpdated()
@@ -289,8 +289,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     private fun keepPlayerWidgetsUpdated() {
-        settings.useEpisodeArtwork.flow
-            .onEach(playerWidgetManager::updateUseEpisodeArtwork)
+        settings.artworkConfiguration.flow
+            .onEach { playerWidgetManager.updateUseEpisodeArtwork(it.useEpisodeArtwork) }
             .launchIn(applicationScope)
         settings.useDynamicColorsForWidget.flow
             .onEach(playerWidgetManager::updateUseDynamicColors)

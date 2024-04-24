@@ -172,10 +172,9 @@ class MediaSessionManager(
                     episodeOne.uuid == episodeTwo.uuid && episodeOne.duration == episodeTwo.duration
                 }
             }
-        val useEpisodeArtworkChanges = settings.useEpisodeArtwork.flow
 
-        combine(upNextQueueChanges, useEpisodeArtworkChanges) { queueState, useEpisodeArtwork -> queueState to useEpisodeArtwork }
-            .onEach { (queueState, useEpisodeArtwork) -> updateUpNext(queueState, useEpisodeArtwork) }
+        combine(upNextQueueChanges, settings.artworkConfiguration.flow) { queueState, artworkConfiguration -> queueState to artworkConfiguration }
+            .onEach { (queueState, artworkConfiguration) -> updateUpNext(queueState, artworkConfiguration.useEpisodeArtwork) }
             .catch { Timber.e(it) }
             .launchIn(this)
     }
@@ -306,7 +305,7 @@ class MediaSessionManager(
                     val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
-                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, settings.useEpisodeArtwork.value)
+                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, settings.artworkConfiguration.value.useEpisodeArtwork)
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)

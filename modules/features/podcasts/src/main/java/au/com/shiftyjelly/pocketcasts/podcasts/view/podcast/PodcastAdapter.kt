@@ -573,7 +573,7 @@ class PodcastAdapter(
                                         bookmark,
                                     )
                                 },
-                                useEpisodeArtwork = settings.useEpisodeArtwork.value,
+                                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
                             )
                         },
                     )
