@@ -32,10 +32,14 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -50,6 +54,7 @@ import kotlin.math.abs
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
@@ -243,12 +248,26 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         super.onViewCreated(view, savedInstanceState)
 
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(LR.string.up_next)
-        toolbar.setNavigationOnClickListener {
-            close()
-        }
+        setupToolbarAndStatusBar(
+            toolbar = binding.toolbar,
+            title = getString(LR.string.up_next),
+            menu = R.menu.upnext,
+            navigationIcon = if (upNextSource != UpNextSource.UP_NEXT_TAB) {
+                NavigationIcon.Close
+            } else {
+                NavigationIcon.None
+            },
+            onNavigationClick = { close() },
+            profileButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                ProfileButton.Shown()
+            } else {
+                ProfileButton.None
+            },
+            toolbarColors = null,
+        )
+        binding.toolbar.menu.findItem(UR.id.menu_profile).isVisible = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) &&
+            upNextSource == UpNextSource.UP_NEXT_TAB
         toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(overrideTheme))
-        toolbar.inflateMenu(R.menu.upnext)
         toolbar.menu.tintIcons(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
