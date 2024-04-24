@@ -51,6 +51,6 @@ enum class SourceView(val analyticsValue: String) {
 
     companion object {
         fun fromString(source: String?) =
-            SourceView.values().find { it.analyticsValue == source } ?: UNKNOWN
+            SourceView.entries.find { it.analyticsValue == source } ?: UNKNOWN
     }
 }
