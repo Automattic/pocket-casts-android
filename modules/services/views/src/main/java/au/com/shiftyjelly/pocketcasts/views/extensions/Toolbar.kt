@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.annotation.MenuRes
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
+import com.google.android.material.badge.ExperimentalBadgeUtils
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -97,6 +99,7 @@ fun Toolbar.updateProfileMenuImage(
     )
 }
 
+@OptIn(ExperimentalBadgeUtils::class)
 fun Toolbar.updateProfileMenuBadge(
     showBadge: Boolean = false,
 ) {
