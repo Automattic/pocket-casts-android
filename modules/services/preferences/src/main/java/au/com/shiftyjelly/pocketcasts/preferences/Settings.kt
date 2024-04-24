@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import au.com.shiftyjelly.pocketcasts.preferences.model.EpisodeArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
@@ -330,6 +331,7 @@ interface Settings {
     val autoDownloadUpNext: UserSetting<Boolean>
 
     val useEpisodeArtwork: UserSetting<Boolean>
+    val episodeArtworkConfiguration: UserSetting<EpisodeArtworkConfiguration>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
