@@ -19,7 +19,7 @@ interface FragmentHostListener {
     fun closeToRoot()
     fun closePodcastsToRoot()
     fun openProfile()
-    fun openPodcastPage(uuid: String)
+    fun openPodcastPage(uuid: String, sourceView: String? = null)
     fun openCloudFiles()
     fun snackBarView(): View
     fun showAccountUpgradeNow(autoSelectPlus: Boolean)

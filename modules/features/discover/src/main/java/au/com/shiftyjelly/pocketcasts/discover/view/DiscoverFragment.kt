@@ -65,7 +65,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?) {
-        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid)
+        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid, sourceView = SourceView.DISCOVER)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 

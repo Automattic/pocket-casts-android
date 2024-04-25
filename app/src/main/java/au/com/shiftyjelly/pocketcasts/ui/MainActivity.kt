@@ -1178,8 +1178,8 @@ class MainActivity :
         )
     }
 
-    override fun onSearchPodcastClick(podcastUuid: String) {
-        val fragment = PodcastFragment.newInstance(podcastUuid)
+    override fun onSearchPodcastClick(podcastUuid: String, source: SourceView) {
+        val fragment = PodcastFragment.newInstance(podcastUuid, source)
         addFragment(fragment)
     }
 
@@ -1386,13 +1386,13 @@ class MainActivity :
         addFragment(ProfileFragment())
     }
 
-    override fun openPodcastPage(uuid: String) {
+    override fun openPodcastPage(uuid: String, sourceView: String?) {
         closePlayer()
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
         val currentFragment = navigator.currentFragment()
         if (currentFragment is PodcastFragment && uuid == currentFragment.podcastUuid) return // We are already showing it
-        addFragment(PodcastFragment.newInstance(podcastUuid = uuid))
+        addFragment(PodcastFragment.newInstance(podcastUuid = uuid, sourceView = SourceView.fromString(sourceView)))
     }
 
     override fun openEpisodeDialog(

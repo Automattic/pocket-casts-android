@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -86,6 +87,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -95,27 +97,36 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     companion object {
-        const val ARG_PODCAST_UUID = "ARG_PODCAST_UUID"
-        const val ARG_LIST_UUID = "ARG_LIST_INDEX_UUID"
-        const val ARG_FEATURED_PODCAST = "ARG_FEATURED_PODCAST"
+        private const val NEW_INSTANCE_ARGS = "PodcastFragmentArgs"
         private const val OPTION_KEY = "option"
         private const val IS_EXPANDED_KEY = "is_expanded"
         private const val PODCAST_UUID_KEY = "podcast_uuid"
         private const val LIST_ID_KEY = "list_id"
         private const val EPISODE_UUID_KEY = "episode_uuid"
+        private const val SOURCE_KEY = "source"
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
         private const val EPISODE_CARD = "episode_card"
 
-        fun newInstance(podcastUuid: String, fromListUuid: String? = null, featuredPodcast: Boolean = false): PodcastFragment {
-            return PodcastFragment().apply {
-                arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid,
-                    ARG_LIST_UUID to fromListUuid,
-                    ARG_FEATURED_PODCAST to featuredPodcast,
-                )
-            }
+        fun newInstance(
+            podcastUuid: String,
+            sourceView: SourceView,
+            fromListUuid: String? = null,
+            featuredPodcast: Boolean = false,
+        ): PodcastFragment = PodcastFragment().apply {
+            arguments = bundleOf(
+                NEW_INSTANCE_ARGS to PodcastFragmentArgs(
+                    podcastUuid = podcastUuid,
+                    sourceView = sourceView,
+                    fromListUuid = fromListUuid,
+                    featuredPodcast = featuredPodcast,
+                ),
+            )
+        }
+
+        private fun extractArgs(bundle: Bundle?) = bundle?.let {
+            BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, PodcastFragmentArgs::class.java)
         }
     }
 
@@ -151,8 +162,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private var binding: FragmentPodcastBinding? = null
     private var itemTouchHelper: EpisodeItemTouchHelper? = null
 
-    private var featuredPodcast = false
-    private var fromListUuid: String? = null
     private var listState: Parcelable? = null
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
@@ -524,22 +533,30 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
     }
 
-    val podcastUuid
-        get() = arguments?.getString(ARG_PODCAST_UUID)!!
+    private val args: PodcastFragmentArgs
+        get() = extractArgs(arguments) ?: error("$NEW_INSTANCE_ARGS argument is missing. Fragment must be created using newInstance function")
+
+    val podcastUuid: String
+        get() = args.podcastUuid
+
+    private val sourceView: SourceView
+        get() = args.sourceView
+
+    private val featuredPodcast: Boolean
+        get() = args.featuredPodcast
+
+    private val fromListUuid: String?
+        get() = args.fromListUuid
 
     private var lastSearchTerm: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val arguments = arguments ?: return
-        fromListUuid = arguments.getString(ARG_LIST_UUID)
-        featuredPodcast = arguments.getBoolean(ARG_FEATURED_PODCAST)
-
         adapter?.fromListUuid = fromListUuid
 
         if (savedInstanceState == null) {
-            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN)
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN, mapOf(SOURCE_KEY to sourceView.analyticsValue))
             FirebaseAnalyticsTracker.openedPodcast(podcastUuid)
         }
     }
@@ -975,4 +992,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         } else {
             0
         }
+
+    @Parcelize
+    data class PodcastFragmentArgs(
+        val podcastUuid: String,
+        val sourceView: SourceView,
+        val fromListUuid: String?,
+        val featuredPodcast: Boolean,
+    ) : Parcelable
 }

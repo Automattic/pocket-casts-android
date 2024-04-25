@@ -154,7 +154,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 (activity as FragmentHostListener).closePlayer()
                 val podcast = playerViewModel.podcast
                 if (podcast != null) {
-                    (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid)
+                    (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid, SourceView.BOTTOM_SHELF.analyticsValue)
                 } else {
                     (activity as? FragmentHostListener)?.openCloudFiles()
                 }
