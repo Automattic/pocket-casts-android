@@ -57,7 +57,7 @@ internal fun LargePlayerHeader(
                     text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
                     textSize = 13.dp,
                     useDynamicColors = state.useDynamicColors,
-                    alpha = 0.8,
+                    isTransparent = true,
                     modifier = GlanceModifier.padding(end = 32.dp),
                 )
                 NonScalingText(
@@ -74,7 +74,7 @@ internal fun LargePlayerHeader(
                     text = episode?.getTimeLeft(LocalContext.current) ?: " ",
                     textSize = 13.dp,
                     useDynamicColors = state.useDynamicColors,
-                    alpha = 0.8,
+                    isTransparent = true,
                 )
                 PlaybackControls(
                     isPlaying = state.isPlaying,

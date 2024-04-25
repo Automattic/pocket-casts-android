@@ -19,7 +19,6 @@ import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
-import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.color.ColorProviders
 import androidx.glance.layout.Alignment
