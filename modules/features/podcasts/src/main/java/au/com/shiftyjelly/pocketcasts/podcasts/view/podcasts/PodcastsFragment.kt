@@ -390,7 +390,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     override fun onPodcastClick(podcast: Podcast, view: View) {
         analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_PODCAST_TAPPED)
-        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid)
+        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, sourceView = SourceView.PODCAST_LIST)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
