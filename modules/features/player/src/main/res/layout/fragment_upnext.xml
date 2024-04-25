@@ -17,9 +17,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/secondary_ui_01"
-            app:navigationContentDescription="@string/close"
-            app:navigationIcon="@drawable/ic_close" />
+            android:background="?attr/secondary_ui_01" />
         <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
             android:id="@+id/multiSelectToolbar"
             android:layout_width="match_parent"

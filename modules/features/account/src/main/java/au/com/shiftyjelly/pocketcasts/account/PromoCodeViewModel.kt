@@ -18,6 +18,7 @@ import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import retrofit2.HttpException
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @HiltViewModel
 class PromoCodeViewModel @Inject constructor(
@@ -95,7 +96,7 @@ class PromoCodeViewModel @Inject constructor(
                     val images = when (it.code()) {
                         400 -> R.drawable.ic_promocode_expired to R.drawable.ic_promo_expired_overlay
                         404 -> R.drawable.ic_promocode_expired to R.drawable.ic_promo_expired_overlay
-                        409 -> R.drawable.ic_plus_account to null
+                        409 -> IR.drawable.ic_plus_account to null
                         else -> R.drawable.ic_promocode_expired to R.drawable.ic_promo_expired_overlay
                     }
                     ViewState.Failed(isSignedIn, title, message, images.first, images.second, shouldShowSignup = it.code() == 404)

@@ -9,8 +9,11 @@ object Gravatar {
      * s=400: size of the image
      * https://en.gravatar.com/site/implement/images/
      */
-    fun getUrl(email: String): String? =
+    fun getUrl(
+        email: String,
+        imageSize: Int = 400,
+    ): String? =
         email.sha256()?.let { sha256Email ->
-            "https://www.gravatar.com/avatar/$sha256Email?d=404&s=400"
+            "https://www.gravatar.com/avatar/$sha256Email?d=404&s=$imageSize"
         }
 }

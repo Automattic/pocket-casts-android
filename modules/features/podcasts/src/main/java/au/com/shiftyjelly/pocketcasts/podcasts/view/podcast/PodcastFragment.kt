@@ -628,6 +628,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 theme.toggleDarkLightThemeActivity(activity as AppCompatActivity)
                 true
             }
+            it.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
         }
 
         playButtonListener.source = SourceView.PODCAST_SCREEN

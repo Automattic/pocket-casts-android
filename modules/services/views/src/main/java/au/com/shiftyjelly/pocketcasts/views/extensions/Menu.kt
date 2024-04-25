@@ -11,6 +11,7 @@ import androidx.core.view.iterator
 import androidx.mediarouter.app.MediaRouteButton
 import com.google.android.gms.cast.framework.CastButtonFactory
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 fun Menu.hideItem(vararg ids: Int) {
     ids.forEach {
@@ -48,6 +49,20 @@ fun Menu.setupChromeCastButton(context: Context?, onClick: () -> Unit) {
     try {
         val menuItem = findChromeCastItem() ?: return
         CastButtonFactory.setUpMediaRouteButton(context, this, menuItem.itemId)
+        menuItem.actionView?.setOnClickListener { onClick() }
+    } catch (e: Throwable) {
+        Timber.e(e)
+    }
+}
+
+fun Menu.findProfileItem(): MenuItem? {
+    return this.children.firstOrNull { it.itemId == UR.id.menu_profile }
+}
+
+fun Menu.setupProfileButton(context: Context?, onClick: () -> Unit) {
+    context ?: return
+    try {
+        val menuItem = findProfileItem() ?: return
         menuItem.actionView?.setOnClickListener { onClick() }
     } catch (e: Throwable) {
         Timber.e(e)
