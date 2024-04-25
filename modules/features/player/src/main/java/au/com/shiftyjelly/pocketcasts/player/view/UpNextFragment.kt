@@ -212,6 +212,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 fragmentManager = parentFragmentManager,
                 swipeSource = SwipeSource.UP_NEXT,
             ),
+            playbackManager = playbackManager,
         )
         adapter.theme = overrideTheme
 
@@ -243,7 +244,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             theme.updateWindowStatusBar(
                 it.window,
                 StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), overrideTheme.darkTheme),
-                it
+                it,
             )
         }
     }
