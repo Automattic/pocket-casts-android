@@ -410,7 +410,6 @@ internal class DiscoverAdapter(
         init {
             recyclerView?.layoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
             recyclerView?.adapter = adapter
-            recyclerView?.itemAnimator = null
         }
         fun submitCategories(categories: List<CategoryPill>, source: String, context: Context, clearFilter: Boolean = false, region: String? = null) {
             this.source = source
