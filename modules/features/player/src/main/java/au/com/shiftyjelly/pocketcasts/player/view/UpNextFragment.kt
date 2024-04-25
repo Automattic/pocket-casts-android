@@ -240,7 +240,11 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     private fun updateStatusAndNavColors() {
         activity?.let {
             theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(overrideTheme))
-            theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
+            theme.updateWindowStatusBar(
+                it.window,
+                StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), overrideTheme.darkTheme),
+                it
+            )
         }
     }
 
