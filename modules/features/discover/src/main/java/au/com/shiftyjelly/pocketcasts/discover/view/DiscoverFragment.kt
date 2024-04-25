@@ -126,7 +126,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
-        viewModel.filterPodcasts(categoryWithRegionUpdated.source) {
+        viewModel.filterPodcasts(categoryWithRegionUpdated.source, categoryWithRegionUpdated.source) {
             val podcasts = it.podcasts
 
             val mostPopularPodcasts =
