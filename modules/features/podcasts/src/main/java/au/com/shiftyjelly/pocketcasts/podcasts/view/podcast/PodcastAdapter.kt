@@ -233,6 +233,7 @@ class PodcastAdapter(
                 imageRequestFactory = imageRequestFactory.smallSize(),
                 settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+                artworkContext = null,
             )
         }
     }
