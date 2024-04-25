@@ -60,7 +60,7 @@ internal fun EpisodeImage(
         modifier = GlanceModifier
             .clickable(onClick(episode))
             .background(backgroundColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.primary)
-            .cornerRadius(6.dp)
+            .cornerRadiusCompat(6.dp)
             .size(size),
     ) {
         Image(

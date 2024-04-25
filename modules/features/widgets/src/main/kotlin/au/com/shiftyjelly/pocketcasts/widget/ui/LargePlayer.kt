@@ -28,7 +28,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .cornerRadius(6.dp)
+                .cornerRadiusCompat(6.dp)
                 .background(GlanceTheme.colors.primaryContainer)
                 .padding(16.dp),
         ) {
