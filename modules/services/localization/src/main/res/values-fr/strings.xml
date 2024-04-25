@@ -1464,7 +1464,6 @@ Language: fr
     <string name="player_time_saved_detail">Au total, vous avez économisé %s en utilisant cette fonctionnalité.</string>
     <string name="player_tab_playing_wide">En cours de lecture</string>
     <string name="player_tab_playing">En lecture</string>
-    <string name="player_sleep_when_episode_ends">Mise en veille à la fin de l’épisode</string>
     <string name="player_sleep_timer">Mise en veille</string>
     <string name="player_sleep_timer_title">Mise en veille</string>
     <string name="player_sleep_end_of_episode">Fin de l’épisode</string>

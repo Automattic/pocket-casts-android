@@ -4,6 +4,7 @@
     <item
         android:id="@+id/media_route_menu_item"
         android:title="@string/play_on"
+        android:visible="false"
         app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
         app:showAsAction="always" />
     <item

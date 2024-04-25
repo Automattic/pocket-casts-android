@@ -81,7 +81,10 @@ data class Chapters(
         return getChapterIndex(time) == items.size - 1
     }
 
-    fun toDbChapters(episodeId: String) = items.map { chapter ->
+    fun toDbChapters(
+        episodeId: String,
+        isEmbedded: Boolean,
+    ) = items.map { chapter ->
         DbChapter(
             episodeUuid = episodeId,
             startTimeMs = chapter.startTime.inWholeMilliseconds,
@@ -89,6 +92,7 @@ data class Chapters(
             title = chapter.title,
             imageUrl = chapter.imagePath,
             url = chapter.url?.toString(),
+            isEmbedded = isEmbedded,
         )
     }
 }

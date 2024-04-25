@@ -1464,7 +1464,6 @@ Language: ko_KR
     <string name="player_time_saved_detail">이 기능을 사용하여 절약한 합계는 %s입니다.</string>
     <string name="player_tab_playing_wide">지금 재생 중</string>
     <string name="player_tab_playing">재생 중</string>
-    <string name="player_sleep_when_episode_ends">에피소드 종료 시 절전 유지</string>
     <string name="player_sleep_timer">절전 타이머</string>
     <string name="player_sleep_timer_title">절전 타이머</string>
     <string name="player_sleep_end_of_episode">에피소드 종료</string>

@@ -1464,7 +1464,6 @@ Language: de
     <string name="player_time_saved_detail">Insgesamt hast du mit dieser Funktion %s gespart.</string>
     <string name="player_tab_playing_wide">Aktuelle Wiedergabe</string>
     <string name="player_tab_playing">Wiedergabe</string>
-    <string name="player_sleep_when_episode_ends">Schlummern, wenn Folge endet</string>
     <string name="player_sleep_timer">Schlummerfunktion</string>
     <string name="player_sleep_timer_title">Schlummerfunktion</string>
     <string name="player_sleep_end_of_episode">Ende der Folge</string>

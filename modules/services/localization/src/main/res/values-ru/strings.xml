@@ -1464,7 +1464,6 @@ Language: ru
     <string name="player_time_saved_detail">С помощью этой функции вы сэкономили в целом %s.</string>
     <string name="player_tab_playing_wide">Сейчас воспроизводится</string>
     <string name="player_tab_playing">Воспроизведение</string>
-    <string name="player_sleep_when_episode_ends">Переход в спящий режим после окончания выпуска</string>
     <string name="player_sleep_timer">Таймер сна</string>
     <string name="player_sleep_timer_title">Таймер сна</string>
     <string name="player_sleep_end_of_episode">Конец выпуска</string>

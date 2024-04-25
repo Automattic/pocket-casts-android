@@ -1,6 +1,20 @@
 7.63
 -----
-
+*   New Features
+    *   Sleep timer: Restart timer when shaking phone
+        ([#2054](https://github.com/Automattic/pocket-casts-android/pull/2054))
+    *   Sleep timer: Start fading out audio when sleep timer has 5 seconds left
+        ([#2069](https://github.com/Automattic/pocket-casts-android/pull/2069))
+    *   Sleep timer: Set sleep time end of episode for multiple episodes
+        ([#2097](https://github.com/Automattic/pocket-casts-android/pull/2097))
+*   Updates:
+    *   Improved updating podcast episode when subscribed to thousands podcasts. 
+        ([#2082](https://github.com/Automattic/pocket-casts-android/pull/2082))
+    *   Prioritize embedded chapters over remote ones.
+        ([#2098](https://github.com/Automattic/pocket-casts-android/pull/2098))
+*   Bug Fixes
+    *   Fix flashing artwork
+        ([#2086](https://github.com/Automattic/pocket-casts-android/pull/2086))
 
 7.62
 -----

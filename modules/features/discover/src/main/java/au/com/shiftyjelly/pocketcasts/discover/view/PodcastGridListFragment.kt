@@ -121,7 +121,12 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
         }
-        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid)
+        val sourceView = when (expandedStyle) {
+            is ExpandedStyle.RankedList -> SourceView.DISCOVER_RANKED_LIST
+            is ExpandedStyle.PlainList -> SourceView.DISCOVER_PLAIN_LIST
+            else -> SourceView.DISCOVER
+        }
+        val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid, sourceView = sourceView)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 

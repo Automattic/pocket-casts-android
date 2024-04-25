@@ -352,7 +352,11 @@ interface Settings {
     fun getClearHistoryTime(): Long
 
     fun setSleepTimerCustomMins(minutes: Int)
+    fun setSleepEndOfEpisodes(episodes: Int)
+    fun setlastSleepEndOfEpisodes(episodes: Int)
     fun getSleepTimerCustomMins(): Int
+    fun getSleepEndOfEpisodes(): Int
+    fun getlastSleepEndOfEpisodes(): Int
 
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
@@ -385,6 +389,8 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
+    fun getSleepTimerDeviceShakeThreshold(): Long
+
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>
@@ -449,8 +455,7 @@ interface Settings {
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
-    fun setEndOfYearShowBadge2023(value: Boolean)
-    fun getEndOfYearShowBadge2023(): Boolean
+    val endOfYearShowBadge2023: UserSetting<Boolean>
 
     fun setEndOfYearShowModal(value: Boolean)
     fun getEndOfYearShowModal(): Boolean

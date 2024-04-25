@@ -1464,7 +1464,6 @@ Language: pt_BR
     <string name="player_time_saved_detail">Você economizou %s usando essa funcionalidade.</string>
     <string name="player_tab_playing_wide">Reproduzindo agora</string>
     <string name="player_tab_playing">Reproduzindo</string>
-    <string name="player_sleep_when_episode_ends">Suspender quando o episódio terminar</string>
     <string name="player_sleep_timer">Temporizador</string>
     <string name="player_sleep_timer_title">Temporizador</string>
     <string name="player_sleep_end_of_episode">Fim do episódio</string>

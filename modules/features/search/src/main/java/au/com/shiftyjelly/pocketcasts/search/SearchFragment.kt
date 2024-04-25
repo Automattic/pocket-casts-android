@@ -55,7 +55,7 @@ class SearchFragment : BaseFragment() {
 
     interface Listener {
         fun onSearchEpisodeClick(episodeUuid: String, podcastUuid: String, source: EpisodeViewSource)
-        fun onSearchPodcastClick(podcastUuid: String)
+        fun onSearchPodcastClick(podcastUuid: String, source: SourceView)
         fun onSearchFolderClick(folderUuid: String)
     }
 
@@ -141,7 +141,7 @@ class SearchFragment : BaseFragment() {
                 source = EpisodeViewSource.SEARCH_HISTORY,
             )
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
-            is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
+            is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
             is SearchHistoryEntry.SearchTerm -> {
                 binding?.let {
                     it.searchView.setQuery(entry.term, true)
@@ -286,7 +286,7 @@ class SearchFragment : BaseFragment() {
             },
         )
         searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
-        listener?.onSearchPodcastClick(podcast.uuid)
+        listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 

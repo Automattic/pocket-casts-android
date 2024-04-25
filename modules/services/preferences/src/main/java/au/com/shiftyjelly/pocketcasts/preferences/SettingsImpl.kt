@@ -656,8 +656,24 @@ class SettingsImpl @Inject constructor(
         setInt("sleepTimerCustomMins", minutes)
     }
 
+    override fun setSleepEndOfEpisodes(episodes: Int) {
+        setInt("sleepEndOfEpisodes", episodes)
+    }
+
+    override fun setlastSleepEndOfEpisodes(episodes: Int) {
+        setInt("lastSleepEndOfEpisodes", episodes)
+    }
+
     override fun getSleepTimerCustomMins(): Int {
         return getInt("sleepTimerCustomMins", 5)
+    }
+
+    override fun getSleepEndOfEpisodes(): Int {
+        return getInt("sleepEndOfEpisodes", 1)
+    }
+
+    override fun getlastSleepEndOfEpisodes(): Int {
+        return getInt("lastSleepEndOfEpisodes", 0)
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {
@@ -887,6 +903,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getSlumberStudiosPromoCode(): String {
         return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
+    }
+
+    override fun getSleepTimerDeviceShakeThreshold(): Long {
+        return getRemoteConfigLong(FirebaseConfig.SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD)
     }
 
     private fun getRemoteConfigLong(key: String): Long {
@@ -1188,12 +1208,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun setEndOfYearShowBadge2023(value: Boolean) {
-        setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
-    }
-
-    override fun getEndOfYearShowBadge2023(): Boolean =
-        getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
+    override val endOfYearShowBadge2023 = UserSetting.BoolPref(
+        sharedPrefKey = END_OF_YEAR_SHOW_BADGE_2023_KEY,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun setEndOfYearShowModal(value: Boolean) {
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)

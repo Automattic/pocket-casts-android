@@ -1464,7 +1464,6 @@ Language: ja_JP
     <string name="player_time_saved_detail">この機能を使用して合計%s 節約しました。</string>
     <string name="player_tab_playing_wide">再生中</string>
     <string name="player_tab_playing">再生中</string>
-    <string name="player_sleep_when_episode_ends">エピソード終了時は就寝中</string>
     <string name="player_sleep_timer">スリープタイマー</string>
     <string name="player_sleep_timer_title">スリープタイマー</string>
     <string name="player_sleep_end_of_episode">エピソード終了時</string>
