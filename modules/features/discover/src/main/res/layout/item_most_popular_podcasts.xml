@@ -24,6 +24,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?attr/defaultArtworkSmall" />
+
+        <ImageButton
+            android:id="@+id/btnSubscribe"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/background_large_item_subscribe" />
     </androidx.cardview.widget.CardView>
 
     <TextView
