@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHold
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -573,7 +574,7 @@ class PodcastAdapter(
                                         bookmark,
                                     )
                                 },
-                                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
                             )
                         },
                     )
