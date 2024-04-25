@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -73,8 +74,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
         DbChapter::class,
+        TrendingPodcast::class,
     ],
-    version = 93,
+    version = 94,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -709,6 +711,17 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_93_94 = addMigration(93, 94) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE trending_podcasts(
+                        uuid TEXT NOT NULL PRIMARY KEY, 
+                        title TEXT NOT NULL
+                    )
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1092,6 +1105,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_90_91,
                 MIGRATION_91_92,
                 MIGRATION_92_93,
+                MIGRATION_93_94,
             )
         }
 
