@@ -22,18 +22,21 @@ abstract class ChapterDao {
 
     @Transaction
     open suspend fun replaceAllChapters(episodeUuid: String, chapters: List<Chapter>) {
-        deleteForEpisode(episodeUuid)
-        insertAll(chapters.filter { it.episodeUuid == episodeUuid })
-    }
-
-    @Transaction
-    open suspend fun replaceAllChaptersIfMoreIsPassed(episodeUuid: String, chapters: List<Chapter>) {
-        val storedChapters = findEpisodeChapters(episodeUuid)
-        if (storedChapters.size >= chapters.size) {
+        val newEpisodeChapters = chapters.filter { it.episodeUuid == episodeUuid }
+        if (newEpisodeChapters.isEmpty()) {
             return
         }
-        deleteForEpisode(episodeUuid)
-        insertAll(chapters.filter { it.episodeUuid == episodeUuid })
+
+        when {
+            newEpisodeChapters.all(Chapter::isEmbedded) -> {
+                deleteForEpisode(episodeUuid)
+                insertAll(newEpisodeChapters)
+            }
+            findEpisodeChapters(episodeUuid).let { currentChapters -> currentChapters.size <= chapters.size && currentChapters.none(Chapter::isEmbedded) } -> {
+                deleteForEpisode(episodeUuid)
+                insertAll(newEpisodeChapters)
+            }
+        }
     }
 
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")

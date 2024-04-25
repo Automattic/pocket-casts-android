@@ -1354,7 +1354,6 @@ Language: nb_NO
     <string name="player_time_saved_detail">Totalt har du spart %s ved å bruke denne funksjonen.</string>
     <string name="player_tab_playing_wide">Spilles av nå</string>
     <string name="player_tab_playing">Spiller av</string>
-    <string name="player_sleep_when_episode_ends">I dvalemodus når episoden er ferdig</string>
     <string name="player_sleep_timer">Tidtaker for dvalemodus</string>
     <string name="player_sleep_timer_title">Tidtaker for dvalemodus</string>
     <string name="player_sleep_end_of_episode">Slutt på episode</string>

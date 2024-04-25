@@ -1464,7 +1464,6 @@ Language: es
     <string name="player_time_saved_detail">En total, has ahorrado %s con esta función.</string>
     <string name="player_tab_playing_wide">Reproduciendo</string>
     <string name="player_tab_playing">En reproducción</string>
-    <string name="player_sleep_when_episode_ends">Poner en reposo cuando se termine el episodio</string>
     <string name="player_sleep_timer">Temporizador</string>
     <string name="player_sleep_timer_title">Temporizador</string>
     <string name="player_sleep_end_of_episode">Fin del episodio</string>

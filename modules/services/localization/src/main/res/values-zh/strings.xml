@@ -1464,7 +1464,6 @@ Language: zh_CN
     <string name="player_time_saved_detail">您总共使用此功能节省了 %s。</string>
     <string name="player_tab_playing_wide">正在播放</string>
     <string name="player_tab_playing">正在播放</string>
-    <string name="player_sleep_when_episode_ends">在剧集结束时进入睡眠状态</string>
     <string name="player_sleep_timer">睡眠计时器</string>
     <string name="player_sleep_timer_title">睡眠计时器</string>
     <string name="player_sleep_end_of_episode">剧集结束</string>

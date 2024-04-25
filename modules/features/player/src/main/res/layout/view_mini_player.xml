@@ -91,8 +91,8 @@
 
     <View
         android:id="@+id/spacer"
-        android:layout_width="8dp"
-        android:layout_height="8dp"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -101,7 +101,7 @@
         android:id="@+id/countText"
         android:layout_width="19dp"
         android:layout_height="19dp"
-        android:layout_marginEnd="28.5dp"
+        android:layout_marginEnd="22.5dp"
         android:textStyle="bold"
         app:autoSizeTextType="uniform"
         app:autoSizeMinTextSize="8sp"

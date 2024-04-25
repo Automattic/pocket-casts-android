@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -117,6 +118,7 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
+    private val widgetManager: WidgetManager,
     private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
@@ -215,7 +217,8 @@ open class PlaybackManager @Inject constructor(
         applicationScope = applicationScope,
         bookmarkFeature = bookmarkFeature,
     )
-    var sleepAfterEpisode: Boolean = false
+
+    var sleepAfterEpisode: Int = 0
 
     var player: Player? = null
 
@@ -224,6 +227,10 @@ open class PlaybackManager @Inject constructor(
 
     @SuppressLint("CheckResult")
     fun setup() {
+        if (!Util.isAutomotive(application)) {
+            widgetManager.updateWidgetFromPlaybackState(this)
+        }
+
         // load an initial playback state
         upNextQueue.setup()
         mediaSessionManager.startObserving()
@@ -293,10 +300,10 @@ open class PlaybackManager @Inject constructor(
         return player?.isStreaming ?: false
     }
 
-    fun updateSleepTimerStatus(running: Boolean, sleepAfterEpisode: Boolean = false) {
-        this.sleepAfterEpisode = sleepAfterEpisode
+    fun updateSleepTimerStatus(sleepTimeRunning: Boolean, sleepAfterEpisodes: Int = 0) {
+        this.sleepAfterEpisode = sleepAfterEpisodes
         playbackStateRelay.blockingFirst().let {
-            playbackStateRelay.accept(it.copy(isSleepTimerRunning = running, lastChangeFrom = LastChangeFrom.OnUpdateSleepTimerStatus.value))
+            playbackStateRelay.accept(it.copy(isSleepTimerRunning = sleepTimeRunning, lastChangeFrom = LastChangeFrom.OnUpdateSleepTimerStatus.value))
         }
     }
 
@@ -309,7 +316,7 @@ open class PlaybackManager @Inject constructor(
                         .toObservable<EpisodeSyncResponse>()
                         .onErrorResumeNext(Observable.empty())
                 } else {
-                    Observable.empty<EpisodeSyncResponse>()
+                    Observable.empty()
                 }
             }
             .doOnError { LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not sync episode progress. ${it.javaClass.name} ${it.message ?: ""}") }
@@ -558,6 +565,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.WIDGET_PLAYER_SMALL,
             SourceView.WIDGET_PLAYER_MEDIUM,
             SourceView.WIDGET_PLAYER_LARGE,
+            SourceView.WIDGET_PLAYER_OLD,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
@@ -782,6 +790,7 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.EMPTY, lastChangeFrom = LastChangeFrom.OnShutdown.value))
         }
         castManager.endSession()
+        widgetManager.updateWidgetNotPlaying()
     }
 
     suspend fun hibernatePlayback() {
@@ -1216,6 +1225,7 @@ open class PlaybackManager @Inject constructor(
         Timber.i("PlaybackService onPlayerPlaying")
 
         val episode = getCurrentEpisode() ?: return
+        val podcast = findPodcastByEpisode(episode)
 
         playbackStateRelay.blockingFirst().let { playbackState ->
             playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PLAYING, transientLoss = false, lastChangeFrom = LastChangeFrom.OnPlayerPlaying.value))
@@ -1226,6 +1236,8 @@ open class PlaybackManager @Inject constructor(
         setupUpdateTimer()
         setupBufferUpdateTimer(episode)
         cancelPauseTimer()
+
+        widgetManager.updateWidget(podcast, true, episode)
     }
 
     fun markPodcastNeedsUpdating(podcastUuid: String) {
@@ -1263,6 +1275,10 @@ open class PlaybackManager @Inject constructor(
         }
 
         cancelUpdateTimer()
+
+        val podcast = if (episode == null) null else findPodcastByEpisode(episode)
+        widgetManager.updateWidget(podcast, false, episode)
+
         setupPauseTimer()
     }
 
@@ -1272,7 +1288,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         // keep hold of this as deleting the episode might change the member variable
-        val shouldSleepAfterEpisode = sleepAfterEpisode
+        val hadSleepAfterEpisode = isSleepAfterEpisodeEnabled()
         val wasPlaying = isPlaying()
 
         cancelUpdateTimer()
@@ -1280,11 +1296,11 @@ open class PlaybackManager @Inject constructor(
 
         val episode = getCurrentEpisode()
 
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode ${episode?.title} finished, should sleep: $shouldSleepAfterEpisode")
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Episode ${episode?.title} finished, should sleep: $hadSleepAfterEpisode")
 
-        if (shouldSleepAfterEpisode) {
+        if (hadSleepAfterEpisode) {
             sleep(episode)
-            return
+            if (!isSleepAfterEpisodeEnabled()) return // keep sleep time running if still has end of episodes
         }
 
         cancelUpdateTimer()
@@ -1347,7 +1363,10 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
-        val autoPlay = !shouldSleepAfterEpisode && wasPlaying
+        // Auto play if it had sleep time enabled for end of episodes and still has episodes set on sleep time
+        // or if it did not have sleep time end of episode configured
+        // and it was playing episode
+        val autoPlay = ((hadSleepAfterEpisode && isSleepAfterEpisodeEnabled()) || !hadSleepAfterEpisode) && wasPlaying
 
         var nextEpisode = getCurrentEpisode()
         if (nextEpisode == null) {
@@ -1436,7 +1455,10 @@ open class PlaybackManager @Inject constructor(
 
     private suspend fun sleep(episode: BaseEpisode?) {
         episode?.uuid?.let { sleepTimer.setEndOfEpisodeUuid(it) }
-        sleepAfterEpisode = false
+
+        sleepAfterEpisode -= 1
+
+        if (isSleepAfterEpisodeEnabled()) return
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let {
@@ -1529,8 +1551,7 @@ open class PlaybackManager @Inject constructor(
             launch {
                 chapterManager.updateChapters(
                     playbackState.episodeUuid,
-                    episodeMetadata.chapters.toDbChapters(playbackState.episodeUuid),
-                    forceUpdate = false,
+                    episodeMetadata.chapters.toDbChapters(playbackState.episodeUuid, isEmbedded = true),
                 )
             }
         }
@@ -1893,6 +1914,8 @@ open class PlaybackManager @Inject constructor(
 
         episodeManager.updatePlaybackInteractionDate(episode)
 
+        widgetManager.updateWidget(podcast, play, episode)
+
         if (play) {
             if (sameEpisode && currentPositionMs != null) {
                 player?.seekToTimeMs(currentPositionMs)
@@ -2057,11 +2080,13 @@ open class PlaybackManager @Inject constructor(
         sleepTimer.restartSleepTimerIfApplies(
             currentEpisodeUuid = episode.uuid,
             isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
+            isSleepEndOfEpisodeRunning = isSleepAfterEpisodeEnabled(),
+            numberOfEpisodes = settings.getlastSleepEndOfEpisodes(),
             onRestartSleepAfterTime = {
-                updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+                updateSleepTimerStatus(sleepTimeRunning = true)
             },
             onRestartSleepOnEpisodeEnd = {
-                updateSleepTimerStatus(running = true, sleepAfterEpisode = true)
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = settings.getlastSleepEndOfEpisodes())
             },
         )
 
@@ -2171,7 +2196,7 @@ open class PlaybackManager @Inject constructor(
         if (skipLast.isPositive() && durationMs.isPositive() && durationMs > skipLast) {
             val timeRemaining = (durationMs - positionMs) / 1000
             if (timeRemaining < skipLast) {
-                if (sleepAfterEpisode) {
+                if (isSleepAfterEpisodeEnabled()) {
                     sleep(episode)
                 } else {
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
@@ -2231,7 +2256,7 @@ open class PlaybackManager @Inject constructor(
                 if (isPlaying()) {
                     statsManager.addTotalListeningTime(UPDATE_TIMER_POLL_TIME)
                 }
-                if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !sleepAfterEpisode) { // Does not apply to end of episode sleep time
+                if (playbackStateRelay.blockingFirst().isSleepTimerRunning && !isSleepAfterEpisodeEnabled()) { // Does not apply to end of episode sleep time
                     setupFadeOutWhenFinishingSleepTimer()
                 }
             }
@@ -2431,6 +2456,8 @@ open class PlaybackManager @Inject constructor(
     fun setNotificationPermissionChecker(notificationPermissionChecker: NotificationPermissionChecker) {
         this.notificationPermissionChecker = notificationPermissionChecker
     }
+
+    fun isSleepAfterEpisodeEnabled(): Boolean = sleepAfterEpisode != 0
 
     private enum class ContentType(val analyticsValue: String) {
         AUDIO("audio"),

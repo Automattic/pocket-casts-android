@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PCWidgetDynamicColorsTheme" parent="PCWidgetDefaultTheme" />
+
+    <style name="PCWidgetDefaultTheme">
+        <item name="colorPrimaryContainer">#000000</item>
+        <item name="colorOnPrimaryContainer">#ffffff</item>
+    </style>
+</resources>
