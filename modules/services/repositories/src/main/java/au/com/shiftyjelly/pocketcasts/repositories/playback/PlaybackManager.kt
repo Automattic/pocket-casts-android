@@ -1314,9 +1314,9 @@ open class PlaybackManager @Inject constructor(
             sleepEndOfEpisode(episode)
         }
 
-        if (!isSleepAfterEpisodeEnabled() && !isSleepAfterChapterEnabled()) return // keep sleep time running if still has end of episodes or chapters
-
-        cancelUpdateTimer()
+        if (!isSleepAfterEpisodeEnabled()) {
+            cancelUpdateTimer()
+        }
         cancelBufferUpdateTimer()
 
         if (episode != null) {
@@ -1472,7 +1472,7 @@ open class PlaybackManager @Inject constructor(
             episodesUntilSleep -= 1
         }
 
-        if (isSleepAfterEpisodeEnabled() || isSleepAfterChapterEnabled()) return
+        if (isSleepAfterEpisodeEnabled()) return
 
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let {
@@ -1504,6 +1504,7 @@ open class PlaybackManager @Inject constructor(
     private suspend fun sleepEndOfChapter() {
         if (isSleepAfterChapterEnabled()) {
             chaptersUntilSleep -= 1
+            sleepTimer.setEndOfChapter()
         }
 
         if (isSleepAfterChapterEnabled()) return
@@ -2119,12 +2120,16 @@ open class PlaybackManager @Inject constructor(
             currentEpisodeUuid = episode.uuid,
             isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
             isSleepEndOfEpisodeRunning = isSleepAfterEpisodeEnabled(),
+            isSleepEndOfChapterRunning = isSleepAfterChapterEnabled(),
             numberOfEpisodes = settings.getlastSleepEndOfEpisodes(),
             onRestartSleepAfterTime = {
                 updateSleepTimerStatus(sleepTimeRunning = true)
             },
             onRestartSleepOnEpisodeEnd = {
                 updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = settings.getlastSleepEndOfEpisodes())
+            },
+            onRestartSleepOnChapterEnd = {
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = settings.getSleepEndOfChapters())
             },
         )
 
