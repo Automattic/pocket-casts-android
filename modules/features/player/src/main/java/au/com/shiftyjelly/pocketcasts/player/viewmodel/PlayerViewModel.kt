@@ -577,11 +577,11 @@ class PlayerViewModel @Inject constructor(
         if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
-            setSleepEndOfEpisodes(playbackManager.sleepAfterEpisode, shouldCallUpdateTimer = false)
+            setSleepEndOfEpisodes(playbackManager.episodesUntilSleep, shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInEpisodesText())
         } else if (playbackManager.isSleepAfterChapterEnabled()) {
             isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterChapterEnabled())
-            setSleepEndOfChapters(playbackManager.sleepAfterChapter, shouldCallUpdateTimer = false)
+            setSleepEndOfChapters(playbackManager.chaptersUntilSleep, shouldCallUpdateTimer = false)
             sleepingInText.postValue(calcSleepingInChaptersText())
         } else {
             isSleepAtEndOfEpisodeOrChapter.postValue(false)
