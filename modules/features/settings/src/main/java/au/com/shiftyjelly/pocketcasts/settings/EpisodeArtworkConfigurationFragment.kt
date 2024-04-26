@@ -85,7 +85,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
                 showDivider = false,
             ) {
                 elements.forEach { element ->
-                    EnableFeature(artworkConfiguration, element, onUpdateConfiguration)
+                    ArtworkElement(artworkConfiguration, element, onUpdateConfiguration)
                 }
             }
         }
@@ -107,7 +107,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
     }
 
     @Composable
-    private fun EnableFeature(
+    private fun ArtworkElement(
         configuration: ArtworkConfiguration,
         element: ArtworkConfiguration.Element,
         onUpdateConfiguration: (ArtworkConfiguration) -> Unit,
