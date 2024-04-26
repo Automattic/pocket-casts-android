@@ -41,7 +41,7 @@ fun UpNextScreen(
     columnState: ScalingLazyColumnState,
 ) {
     val queueState by viewModel.upNextQueue.subscribeAsState(initial = null)
-    val useEpisodeArtwork by viewModel.useEpisodeArtwork.collectAsState()
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     when (queueState) {
         null -> { /* Show nothing while loading */ }
@@ -65,7 +65,7 @@ fun UpNextScreen(
                         items(list) { episode ->
                             EpisodeChip(
                                 episode = episode,
-                                useEpisodeArtwork = useEpisodeArtwork,
+                                useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
                                 useUpNextIcon = false,
                                 onClick = {
                                     navigateToEpisode(episode.uuid)

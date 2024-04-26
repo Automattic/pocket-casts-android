@@ -193,7 +193,7 @@ class UpNextAdapter(
             binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
 
             if (loadedUuid != playingState.episode.uuid) {
-                imageRequestFactory.create(playingState.episode, settings.useEpisodeArtwork.value).loadInto(binding.image)
+                imageRequestFactory.create(playingState.episode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(binding.image)
                 loadedUuid = playingState.episode.uuid
             }
 

@@ -47,7 +47,7 @@ fun NowPlayingChip(
 
     val state by viewModel.state.collectAsState()
     val playbackState = state.playbackState
-    val useEpisodeArtwork by viewModel.useEpisodeArtwork.collectAsState()
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     val upNextQueue = state.upNextQueue
     val podcast = (upNextQueue as? UpNextQueue.State.Loaded)?.podcast
@@ -57,7 +57,7 @@ fun NowPlayingChip(
         podcast = podcast,
         episode = episode,
         isPlaying = playbackState?.isPlaying == true,
-        useEpisodeArtwork = useEpisodeArtwork,
+        useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
         onClick = onClick,
     )
 }

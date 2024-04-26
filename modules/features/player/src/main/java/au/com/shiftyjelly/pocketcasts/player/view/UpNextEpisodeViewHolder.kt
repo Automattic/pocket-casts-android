@@ -118,7 +118,7 @@ class UpNextEpisodeViewHolder(
             false
         }
 
-        imageRequestFactory.create(episode, settings.useEpisodeArtwork.value).loadInto(binding.image)
+        imageRequestFactory.create(episode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(binding.image)
 
         val context = binding.itemContainer.context
         val transition = AutoTransition()

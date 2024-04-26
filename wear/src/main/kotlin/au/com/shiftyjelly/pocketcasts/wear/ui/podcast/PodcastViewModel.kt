@@ -40,7 +40,7 @@ class PodcastViewModel @Inject constructor(
         ) : UiState()
     }
 
-    val useEpisodeArtwork = settings.useEpisodeArtwork.flow
+    val artworkConfiguration = settings.artworkConfiguration.flow
 
     var uiState: UiState by mutableStateOf(UiState.Empty)
         private set

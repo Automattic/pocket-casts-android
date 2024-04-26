@@ -55,7 +55,7 @@ internal data class LargePlayerWidgetState(
             return LargePlayerWidgetState(
                 queue = queue,
                 isPlaying = playbackManager.isPlaying(),
-                useEpisodeArtwork = settings.useEpisodeArtwork.value,
+                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
                 useDynamicColors = settings.useDynamicColorsForWidget.value,
             )
         }
