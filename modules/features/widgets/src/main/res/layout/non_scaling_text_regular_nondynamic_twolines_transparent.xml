@@ -4,6 +4,8 @@
     android:id="@+id/nonScalingText"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:alpha="0.8"
     android:ellipsize="end"
+    android:maxLines="2"
     android:textColor="@color/widget_text_color"
-    android:textStyle="bold" />
+    android:textStyle="normal" />
