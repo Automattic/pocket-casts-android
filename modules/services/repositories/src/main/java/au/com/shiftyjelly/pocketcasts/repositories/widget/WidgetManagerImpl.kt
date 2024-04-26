@@ -98,7 +98,7 @@ class WidgetManagerImpl @Inject constructor(
             RemoteViews(context.packageName, remoteViewsLayoutId),
             R.id.widget_artwork,
         )
-        imageRequestFactory.create(currentEpisode, settings.useEpisodeArtwork.value).loadInto(target)
+        imageRequestFactory.create(currentEpisode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(target)
     }
 
     override fun updateWidgetFromPlaybackState(playbackManager: PlaybackManager?) {
@@ -198,7 +198,7 @@ class WidgetManagerImpl @Inject constructor(
             views,
             R.id.widget_artwork,
         )
-        imageRequestFactory.create(playingEpisode, settings.useEpisodeArtwork.value).loadInto(target)
+        imageRequestFactory.create(playingEpisode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(target)
     }
 
     private fun showPlayButton(playing: Boolean, views: RemoteViews) {

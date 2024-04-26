@@ -7,6 +7,11 @@
         android:title="@string/podcasts" />
 
     <item
+        android:id="@+id/navigation_upnext"
+        android:icon="@drawable/ic_upnext"
+        android:title="@string/up_next" />
+
+    <item
         android:id="@+id/navigation_filters"
         android:icon="@drawable/ic_filters"
         android:title="@string/filters" />

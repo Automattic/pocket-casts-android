@@ -29,7 +29,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val createAccountState = MutableLiveData<SettingsAppearanceState>().apply { value = SettingsAppearanceState.Empty }
     val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow
-    val useEpisodeArtwork = settings.useEpisodeArtwork.flow
+    val artworkConfiguration = settings.artworkConfiguration.flow
 
     var changeThemeType: Pair<Theme.ThemeType?, Theme.ThemeType?> = Pair(null, null)
     var changeAppIconType: Pair<AppIcon.AppIconType?, AppIcon.AppIconType?> = Pair(null, null)
@@ -132,7 +132,8 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUseEpisodeArtwork(value: Boolean) {
-        settings.useEpisodeArtwork.set(value, updateModifiedAt = true)
+        val currentConfiguration = settings.artworkConfiguration.value
+        settings.artworkConfiguration.set(currentConfiguration.copy(useEpisodeArtwork = value), updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED,
             mapOf("enabled" to value),

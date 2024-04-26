@@ -52,7 +52,7 @@ internal data class MediumPlayerWidgetState(
             return MediumPlayerWidgetState(
                 episode = episode,
                 isPlaying = playbackManager.isPlaying(),
-                useEpisodeArtwork = settings.useEpisodeArtwork.value,
+                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
                 useDynamicColors = settings.useDynamicColorsForWidget.value,
             )
         }

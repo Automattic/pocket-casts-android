@@ -68,18 +68,22 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
         binding.buttonMins60.setOnClickListener { startTimer(mins = 60) }
-        binding.buttonEndOfEpisode.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
-            startTimerEndOfEpisode()
-        }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
+        binding.endOfEpisodeMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
+        binding.endOfEpisodePlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
+        binding.buttonEndOfEpisode.setOnClickListener {
+            val episodes = viewModel.getSleepEndOfEpisodes()
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodes))
+            startTimerEndOfEpisode(episodes = episodes)
+        }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE))
-            startTimerEndOfEpisode()
+            val episodesAmountToExtend = 1
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodesAmountToExtend))
+            startTimerEndOfEpisode(episodes = episodesAmountToExtend)
         }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisode.setOnClickListener { cancelTimer() }
@@ -97,6 +101,14 @@ class SleepFragment : BaseDialogFragment() {
 
         viewModel.sleepCustomTimeText.observe(viewLifecycleOwner) { customTimeText ->
             binding?.labelCustom?.text = customTimeText
+        }
+
+        viewModel.sleepEndOfEpisodesText.observe(viewLifecycleOwner) { text ->
+            binding?.labelEndOfEpisode?.text = text
+        }
+
+        viewModel.sleepInEpisodesText.observe(viewLifecycleOwner) { text ->
+            binding?.sleepingEndOfEpisode?.text = text
         }
 
         viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
@@ -169,6 +181,10 @@ class SleepFragment : BaseDialogFragment() {
         }
         binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
     }
+    private fun plusEndOfEpisodeButtonClicked() {
+        viewModel.setSleepEndOfEpisodes(viewModel.getSleepEndOfEpisodes() + 1)
+        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
+    }
 
     private fun minusButtonClicked() {
         if (viewModel.sleepCustomTimeMins <= 5) {
@@ -179,8 +195,16 @@ class SleepFragment : BaseDialogFragment() {
         binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
     }
 
-    private fun startTimerEndOfEpisode() {
-        viewModel.sleepTimerAfterEpisode()
+    private fun minusEndOfEpisodeButtonClicked() {
+        val endOfEpisodes = viewModel.getSleepEndOfEpisodes()
+        if (endOfEpisodes > 1) {
+            viewModel.setSleepEndOfEpisodes(endOfEpisodes - 1)
+        }
+        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
+    }
+
+    private fun startTimerEndOfEpisode(episodes: Int) {
+        viewModel.sleepTimerAfterEpisode(episodes)
         binding?.root?.announceForAccessibility("Sleep timer set for end of episode")
         close()
     }
@@ -206,6 +230,7 @@ class SleepFragment : BaseDialogFragment() {
     companion object {
         private const val TIME_KEY = "time" // in seconds
         private const val AMOUNT_KEY = "amount"
+        private const val NUMBER_OF_EPISODES_KEY = "number_of_episodes"
         private const val END_OF_EPISODE = "end_of_episode"
     }
 }

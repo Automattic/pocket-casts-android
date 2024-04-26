@@ -185,6 +185,10 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         player?.volume = volume
     }
 
+    fun getVolume(): Float? {
+        return player?.volume
+    }
+
     override fun setPodcast(podcast: Podcast?) {}
 
     @OptIn(UnstableApi::class)
@@ -225,7 +229,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             override fun onTracksChanged(tracks: Tracks) {
                 episodeUuid?.let { onEpisodeChanged(it) }
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
-                episodeMetadata.read(tracks, settings.useEpisodeArtwork.value, context)
+                episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
             }
 

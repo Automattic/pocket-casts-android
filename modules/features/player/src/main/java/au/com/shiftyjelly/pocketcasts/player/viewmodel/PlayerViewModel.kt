@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
@@ -177,7 +178,7 @@ class PlayerViewModel @Inject constructor(
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.globalPlaybackEffects.flow.asObservable(coroutineContext),
-        settings.useEpisodeArtwork.flow.asObservable(coroutineContext),
+        settings.artworkConfiguration.flow.asObservable(coroutineContext),
         this::mergeListData,
     )
         .distinctUntilChanged()
@@ -274,6 +275,12 @@ class PlayerViewModel @Inject constructor(
     val sleepCustomTimeText = MutableLiveData<String>().apply {
         postValue(calcCustomTimeText())
     }
+    val sleepEndOfEpisodesText = MutableLiveData<String>().apply {
+        postValue(calcEndOfEpisodeText())
+    }
+    val sleepInEpisodesText = MutableLiveData<String>().apply {
+        postValue(calcSleepInEpisodesText())
+    }
     var sleepCustomTimeMins: Int = 5
         set(value) {
             field = value.coerceIn(1, 240)
@@ -284,6 +291,18 @@ class PlayerViewModel @Inject constructor(
         get() {
             return settings.getSleepTimerCustomMins()
         }
+
+    fun setSleepEndOfEpisodes(episodes: Int = 1, shouldCallUpdateTimer: Boolean = true) {
+        val newValue = episodes.coerceIn(1, 240)
+        settings.setSleepEndOfEpisodes(newValue)
+        sleepEndOfEpisodesText.postValue(calcEndOfEpisodeText())
+        sleepInEpisodesText.postValue(calcSleepInEpisodesText())
+        if (shouldCallUpdateTimer) {
+            updateSleepTimer()
+        }
+    }
+
+    fun getSleepEndOfEpisodes(): Int = settings.getSleepEndOfEpisodes()
 
     init {
         updateSleepTimer()
@@ -304,7 +323,7 @@ class PlayerViewModel @Inject constructor(
             }
     }
 
-    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, useEpisodeArtwork: Boolean): ListData {
+    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, artworkConfiguration: ArtworkConfiguration): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -339,7 +358,7 @@ class PlayerViewModel @Inject constructor(
                 isBuffering = playbackState.isBuffering,
                 bufferedUpToMs = playbackState.bufferedMs,
                 theme = theme.activeTheme,
-                useEpisodeArtwork = useEpisodeArtwork,
+                useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
             )
         }
         val chapters = playbackState.chapters
@@ -506,11 +525,29 @@ class PlayerViewModel @Inject constructor(
         return context.resources.getString(LR.string.minutes_plural, sleepCustomTimeMins)
     }
 
+    private fun calcEndOfEpisodeText(): String {
+        return if (getSleepEndOfEpisodes() == 1) {
+            context.resources.getString(LR.string.player_sleep_end_of_episode_singular)
+        } else {
+            context.resources.getString(LR.string.player_sleep_end_of_episode_plural, getSleepEndOfEpisodes())
+        }
+    }
+
+    private fun calcSleepInEpisodesText(): String {
+        return if (getSleepEndOfEpisodes() == 1) {
+            context.resources.getString(LR.string.player_sleep_in_one_episode)
+        } else {
+            context.resources.getString(LR.string.player_sleep_in_episodes, getSleepEndOfEpisodes())
+        }
+    }
+
     fun updateSleepTimer() {
         val timeLeft = sleepTimer.timeLeftInSecs()
-        if ((sleepTimer.isRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.sleepAfterEpisode) {
-            isSleepAtEndOfEpisode.postValue(playbackManager.sleepAfterEpisode)
+        if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
+            isSleepAtEndOfEpisode.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
+            setSleepEndOfEpisodes(playbackManager.sleepAfterEpisode, shouldCallUpdateTimer = false)
+            sleepInEpisodesText.postValue(calcSleepInEpisodesText())
         } else {
             isSleepAtEndOfEpisode.postValue(false)
             playbackManager.updateSleepTimerStatus(false)
@@ -523,17 +560,18 @@ class PlayerViewModel @Inject constructor(
 
     fun sleepTimerAfter(mins: Int) {
         sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
-            playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+            playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
         }
     }
 
-    fun sleepTimerAfterEpisode() {
-        playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = true)
+    fun sleepTimerAfterEpisode(episodes: Int = 1) {
+        settings.setlastSleepEndOfEpisodes(episodes)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
         sleepTimer.cancelTimer()
     }
 
     fun cancelSleepTimer() {
-        playbackManager.updateSleepTimerStatus(running = false)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
         sleepTimer.cancelTimer()
     }
 

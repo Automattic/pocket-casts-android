@@ -15,7 +15,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.widget.ConstraintLayout
-import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
@@ -27,11 +26,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.Gravatar
-import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
+import au.com.shiftyjelly.pocketcasts.views.component.ProfileCircleView
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -70,51 +67,10 @@ open class UserView @JvmOverloads constructor(
     }
 
     open fun update(signInState: SignInState?) {
-        updateProfileImageAndDaysRemaining(signInState)
+        imgProfilePicture.updateProfileImageAndDaysRemaining(signInState)
         updateEmail(signInState)
         updateSubscriptionBadge(signInState)
         updateAccountButton(signInState)
-    }
-
-    private fun updateProfileImageAndDaysRemaining(
-        signInState: SignInState?,
-    ) {
-        when (signInState) {
-            is SignInState.SignedIn -> {
-                val gravatarUrl = Gravatar.getUrl(signInState.email)
-                var percent = 1.0f
-                val daysLeft = daysLeft(signInState, 30)
-                if (daysLeft != null && daysLeft > 0 && daysLeft <= 30) {
-                    percent = daysLeft / 30f
-                }
-                imgProfilePicture.setup(
-                    percent = percent,
-                    plusOnly = signInState.isSignedInAsPlus,
-                    isPatron = signInState.isSignedInAsPatron,
-                    gravatarUrl = gravatarUrl,
-                )
-            }
-            is SignInState.SignedOut -> imgProfilePicture.setup(
-                percent = 0.0f,
-                plusOnly = false,
-                isPatron = false,
-            )
-            else -> imgProfilePicture.setup(
-                percent = 0.0f,
-                plusOnly = false,
-                isPatron = false,
-            )
-        }
-    }
-
-    private fun daysLeft(signInState: SignInState.SignedIn, maxDays: Int): Int? {
-        val timeInXDays = Date(Date().time + maxDays.days())
-        val paidStatus = signInState.subscriptionStatus as? SubscriptionStatus.Paid
-        if (paidStatus != null && paidStatus.expiry.before(timeInXDays)) {
-            // probably shouldn't be do straight millisecond maths because of day light savings
-            return ((paidStatus.expiry.time - Date().time) / TimeConstants.MILLISECONDS_IN_ONE_DAY).toInt()
-        }
-        return null
     }
 
     private fun setDaysRemainingTextIfNeeded(signInState: SignInState.SignedIn) {

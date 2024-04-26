@@ -42,8 +42,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServerResponseException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -164,30 +164,20 @@ class RefreshPodcastsThread(
         val serverManager = entryPoint.serverManager()
         val podcasts = podcastManager.findSubscribed()
         val startTime = SystemClock.elapsedRealtime()
-        serverManager.refreshPodcastsSync(
-            podcasts,
-            object : ServerCallback<RefreshResponse> {
-                override fun dataReturned(result: RefreshResponse?) {
-                    val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
-                    processRefreshResponse(result)
-                }
+        runBlocking { serverManager.refreshPodcastsSync(podcasts) }
+            .onSuccess { response ->
+                val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
+                processRefreshResponse(response)
+            }
+            .onFailure { throwable ->
+                val serverError = throwable as? ServerResponseException
+                val message = "Not refreshing as server call failed errorCode: ${serverError?.errorCode} serverMessage: ${serverError?.serverMessage ?: ""}"
 
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?,
-                ) {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
-                    if (throwable != null) {
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
-                    }
-                    refreshFailedOrCancelled("Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
-                }
-            },
-        )
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
+                refreshFailedOrCancelled(message)
+            }
     }
 
     private fun processRefreshResponse(result: RefreshResponse?) {
@@ -671,7 +661,7 @@ class RefreshPodcastsThread(
             val resources = context.resources
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
 
-            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.useEpisodeArtwork.value)
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.artworkConfiguration.value.useEpisodeArtwork)
             return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
         }
 

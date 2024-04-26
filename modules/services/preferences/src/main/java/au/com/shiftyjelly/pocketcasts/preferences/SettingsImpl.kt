@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
+import androidx.core.content.edit
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
@@ -25,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
@@ -42,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getString
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
@@ -539,11 +542,28 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val useEpisodeArtwork = UserSetting.BoolPref(
-        sharedPrefKey = "useEpisodeArtwork",
-        defaultValue = false,
+    override val artworkConfiguration = object : UserSetting<ArtworkConfiguration>(
+        sharedPrefKey = "artworkConfiguration",
         sharedPrefs = sharedPreferences,
-    )
+    ) {
+        override fun get(): ArtworkConfiguration {
+            return sharedPreferences.getString(sharedPrefKey)?.split(",")?.let { stringValues ->
+                val isEnabled = stringValues.getOrNull(0)?.toBooleanStrictOrNull() ?: return@let null
+                val elements = stringValues.drop(1).mapNotNullTo(mutableSetOf(), ArtworkConfiguration.Element::fromKey)
+                ArtworkConfiguration(isEnabled, elements)
+            } ?: ArtworkConfiguration(false)
+        }
+
+        override fun persist(value: ArtworkConfiguration, commit: Boolean) {
+            val stringValue = buildList {
+                add(value.useEpisodeArtwork.toString())
+                addAll(value.enabledElements.map(ArtworkConfiguration.Element::key))
+            }.joinToString(",")
+            sharedPrefs.edit(commit) {
+                putString(sharedPrefKey, stringValue)
+            }
+        }
+    }
 
     override val globalPlaybackEffects = object : UserSetting<PlaybackEffects>(
         sharedPrefKey = "globalPlaybackEffects",
@@ -656,8 +676,24 @@ class SettingsImpl @Inject constructor(
         setInt("sleepTimerCustomMins", minutes)
     }
 
+    override fun setSleepEndOfEpisodes(episodes: Int) {
+        setInt("sleepEndOfEpisodes", episodes)
+    }
+
+    override fun setlastSleepEndOfEpisodes(episodes: Int) {
+        setInt("lastSleepEndOfEpisodes", episodes)
+    }
+
     override fun getSleepTimerCustomMins(): Int {
         return getInt("sleepTimerCustomMins", 5)
+    }
+
+    override fun getSleepEndOfEpisodes(): Int {
+        return getInt("sleepEndOfEpisodes", 1)
+    }
+
+    override fun getlastSleepEndOfEpisodes(): Int {
+        return getInt("lastSleepEndOfEpisodes", 0)
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {
@@ -887,6 +923,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getSlumberStudiosPromoCode(): String {
         return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
+    }
+
+    override fun getSleepTimerDeviceShakeThreshold(): Long {
+        return getRemoteConfigLong(FirebaseConfig.SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD)
     }
 
     private fun getRemoteConfigLong(key: String): Long {
@@ -1188,12 +1228,11 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun setEndOfYearShowBadge2023(value: Boolean) {
-        setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
-    }
-
-    override fun getEndOfYearShowBadge2023(): Boolean =
-        getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
+    override val endOfYearShowBadge2023 = UserSetting.BoolPref(
+        sharedPrefKey = END_OF_YEAR_SHOW_BADGE_2023_KEY,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun setEndOfYearShowModal(value: Boolean) {
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
@@ -1336,11 +1375,24 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val useDynamicColorsForWidget: UserSetting<Boolean> = UserSetting.BoolPref(
+    override val useDynamicColorsForWidget: UserSetting<Boolean> = object : UserSetting<Boolean>(
         sharedPrefKey = "useDynamicColorsForWidget",
-        defaultValue = false,
         sharedPrefs = sharedPreferences,
-    )
+    ) {
+        override fun get(): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                sharedPrefs.getBoolean(sharedPrefKey, false)
+            } else {
+                false
+            }
+        }
+
+        override fun persist(value: Boolean, commit: Boolean) {
+            sharedPrefs.edit(commit) {
+                putBoolean(sharedPrefKey, value)
+            }
+        }
+    }
 
     private val _themeReconfigurationEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     override val themeReconfigurationEvents: Flow<Unit>

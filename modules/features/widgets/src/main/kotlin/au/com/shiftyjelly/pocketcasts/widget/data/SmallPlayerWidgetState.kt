@@ -7,7 +7,6 @@ import androidx.glance.GlanceId
 import androidx.glance.appwidget.state.updateAppWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.di.widgetEntryPoint
 import com.squareup.moshi.JsonClass
-import kotlinx.coroutines.flow.firstOrNull
 
 @JsonClass(generateAdapter = true)
 internal data class SmallPlayerWidgetState(
@@ -53,7 +52,7 @@ internal data class SmallPlayerWidgetState(
             return SmallPlayerWidgetState(
                 episode = episode,
                 isPlaying = playbackManager.isPlaying(),
-                useEpisodeArtwork = settings.useEpisodeArtwork.value,
+                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
                 useDynamicColors = settings.useDynamicColorsForWidget.value,
             )
         }

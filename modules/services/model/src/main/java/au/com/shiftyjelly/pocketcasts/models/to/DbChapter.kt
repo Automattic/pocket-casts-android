@@ -14,6 +14,7 @@ import androidx.room.Index
 data class DbChapter(
     @ColumnInfo(name = "episode_uuid") val episodeUuid: String,
     @ColumnInfo(name = "start_time") val startTimeMs: Long,
+    @ColumnInfo(name = "is_embedded", defaultValue = "0") val isEmbedded: Boolean = false,
     @ColumnInfo(name = "end_time") val endTimeMs: Long? = null,
     @ColumnInfo(name = "title") val title: String? = null,
     @ColumnInfo(name = "image_url") val imageUrl: String? = null,

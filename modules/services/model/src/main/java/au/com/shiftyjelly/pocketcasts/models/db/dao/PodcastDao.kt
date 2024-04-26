@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -386,4 +387,16 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET auto_archive_episode_limit = :value, auto_archive_episode_limit_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?, modified: Date = Date())
+
+    @Query("DELETE FROM trending_podcasts")
+    protected abstract suspend fun deleteAllTrendingPodcasts()
+
+    @Insert(onConflict = REPLACE)
+    protected abstract suspend fun insertAllTrendingPodcasts(podcasts: List<TrendingPodcast>)
+
+    @Transaction
+    open suspend fun replaceAllTrendingPodcasts(podcasts: List<TrendingPodcast>) {
+        deleteAllTrendingPodcasts()
+        insertAllTrendingPodcasts(podcasts)
+    }
 }
