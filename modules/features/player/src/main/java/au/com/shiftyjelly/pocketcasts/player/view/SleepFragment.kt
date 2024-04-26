@@ -81,6 +81,7 @@ class SleepFragment : BaseDialogFragment() {
         }
         binding.buttonEndOfChapter.setOnClickListener {
             val chapters = viewModel.getSleepEndOfChapters()
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_CHAPTER, NUMBER_OF_CHAPTERS_KEY to chapters))
             startTimerEndOfChapter(chapters = chapters)
         }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
@@ -261,5 +262,7 @@ class SleepFragment : BaseDialogFragment() {
         private const val AMOUNT_KEY = "amount"
         private const val NUMBER_OF_EPISODES_KEY = "number_of_episodes"
         private const val END_OF_EPISODE = "end_of_episode"
+        private const val NUMBER_OF_CHAPTERS_KEY = "number_of_chapters"
+        private const val END_OF_CHAPTER = "end_of_chapter"
     }
 }
