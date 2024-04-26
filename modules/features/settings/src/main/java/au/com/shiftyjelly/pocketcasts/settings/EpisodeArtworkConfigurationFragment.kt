@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -64,7 +66,11 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
         onUpdateConfiguration: (ArtworkConfiguration) -> Unit,
         onBackPressed: () -> Unit,
     ) {
-        Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .verticalScroll(rememberScrollState()),
+        ) {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_use_episode_artwork_title),
                 onNavigationClick = onBackPressed,
