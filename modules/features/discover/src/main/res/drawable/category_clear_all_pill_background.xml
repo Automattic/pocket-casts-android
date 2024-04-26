@@ -7,7 +7,8 @@
     <solid android:color="?attr/primary_ui_01" />
 
     <padding
-        android:right="8dp"
+        android:right="12dp"
+        android:left="4dp"
         android:bottom="8dp"
         android:top="8dp" />
 
