@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
+import androidx.transition.TransitionInflater
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -57,6 +58,8 @@ import au.com.shiftyjelly.pocketcasts.settings.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -67,6 +70,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class StatsFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: StatsViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+            val inflater = TransitionInflater.from(requireContext())
+            enterTransition = inflater.inflateTransition(au.com.shiftyjelly.pocketcasts.ui.R.transition.slide_in)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = ComposeView(requireContext()).apply {
         setContent {
@@ -94,6 +105,11 @@ class StatsFragment : BaseFragment() {
     override fun onBackPressed(): Boolean {
         analyticsTracker.track(AnalyticsEvent.STATS_DISMISSED)
         return super.onBackPressed()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        enterTransition = false
     }
 }
 
