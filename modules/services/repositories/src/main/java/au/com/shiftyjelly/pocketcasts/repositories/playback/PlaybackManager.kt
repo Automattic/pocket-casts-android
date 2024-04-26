@@ -2118,11 +2118,12 @@ open class PlaybackManager @Inject constructor(
 
         sleepTimer.restartSleepTimerIfApplies(
             currentEpisodeUuid = episode.uuid,
-            sleepTimerState = SleepTimer.SleepTimerState(
+            timerState = SleepTimer.SleepTimerState(
                 isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,
                 isSleepEndOfEpisodeRunning = isSleepAfterEpisodeEnabled(),
                 isSleepEndOfChapterRunning = isSleepAfterChapterEnabled(),
                 numberOfEpisodes = settings.getlastSleepEndOfEpisodes(),
+                numberOfChapters = settings.getlastSleepEndOfChapter(),
             ),
             onRestartSleepAfterTime = {
                 updateSleepTimerStatus(sleepTimeRunning = true)
@@ -2131,7 +2132,7 @@ open class PlaybackManager @Inject constructor(
                 updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = settings.getlastSleepEndOfEpisodes())
             },
             onRestartSleepOnChapterEnd = {
-                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = settings.getSleepEndOfChapters())
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = settings.getlastSleepEndOfChapter())
             },
         )
 

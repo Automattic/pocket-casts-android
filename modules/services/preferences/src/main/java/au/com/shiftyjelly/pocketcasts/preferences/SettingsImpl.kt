@@ -684,6 +684,10 @@ class SettingsImpl @Inject constructor(
         setInt("lastSleepEndOfEpisodes", episodes)
     }
 
+    override fun setlastSleepEndOfChapters(chapters: Int) {
+        setInt("lastSleepEndOfChapters", chapters)
+    }
+
     override fun setSleepEndOfChapters(chapters: Int) {
         setInt("sleepEndOfChapters", chapters)
     }
@@ -702,6 +706,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getlastSleepEndOfEpisodes(): Int {
         return getInt("lastSleepEndOfEpisodes", 0)
+    }
+
+    override fun getlastSleepEndOfChapter(): Int {
+        return getInt("lastSleepEndOfChapters", 0)
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {
