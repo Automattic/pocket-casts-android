@@ -91,7 +91,6 @@ import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
@@ -527,9 +526,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private fun onHeadsetSettingsClicked() {
         val fragmentHostListener = (activity as? FragmentHostListener)
         fragmentHostListener?.apply {
-            openTab(VR.id.navigation_profile)
-            addFragment(SettingsFragment())
-            addFragment(HeadphoneControlsSettingsFragment())
+            if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                addFragment(SettingsFragment(), overTabs = true)
+                addFragment(HeadphoneControlsSettingsFragment(), overTabs = true)
+            } else {
+                openTab(au.com.shiftyjelly.pocketcasts.views.R.id.navigation_profile)
+                addFragment(SettingsFragment())
+                addFragment(HeadphoneControlsSettingsFragment())
+            }
         }
     }
 

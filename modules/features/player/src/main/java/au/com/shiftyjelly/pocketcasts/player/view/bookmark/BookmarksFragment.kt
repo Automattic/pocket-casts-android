@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -125,9 +127,14 @@ class BookmarksFragment : BaseFragment() {
                             val fragmentHostListener = (activity as? FragmentHostListener)
                             fragmentHostListener?.apply {
                                 closePlayer() // Closes player if open
-                                openTab(R.id.navigation_profile)
-                                addFragment(SettingsFragment())
-                                addFragment(fragment)
+                                if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                                    addFragment(SettingsFragment(), overTabs = true)
+                                    addFragment(fragment, overTabs = true)
+                                } else {
+                                    openTab(R.id.navigation_profile)
+                                    addFragment(SettingsFragment())
+                                    addFragment(fragment)
+                                }
                             }
                         },
                     )
