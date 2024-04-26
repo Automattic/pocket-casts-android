@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">Die Schlummerfunktion hat deinen Podcast angehalten.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Die Schlummerfunktion wurde nach dem Schütteln des Geräts neu gestartet</string>
+    <string name="whats_new_new_widgets_message">Dank zwei neuer Größen und einem aktualisierten Design ist die Verwaltung deiner Podcasts von der Startseite aus nun viel einfacher. Schau dir die Neuheiten an!</string>
+    <string name="whats_new_new_widgets_title">Neue Widgets</string>
+    <string name="widget_check_out_discover">Unter „Entdecken“ erfährst du mehr</string>
+    <string name="widget_nothing_in_up_next">Keine Inhalte in „Als Nächstes“</string>
+    <string name="widget_no_episode_playing">Es wird keine Folge abgespielt</string>
+    <string name="large_player_widget_label">Großer Player</string>
+    <string name="medium_player_widget_label">Mittlerer Player</string>
+    <string name="small_player_widget_label">Kleiner Player</string>
     <string name="clear_search">Suche löschen</string>
+    <string name="bookmarks_search_results_not_found">Wir konnten kein Lesezeichen für diese Suche finden.</string>
     <string name="podcast_and_episode">Podcast &amp; Folge</string>
     <string name="skip_chapters">Kapitel vorauswählen</string>
     <string name="settings_use_episode_artwork_details">Für manche Shows stehen für bestimmte Folgen individuelle Cover zur Verfügung. Aktiviere diese Option, damit Pocket Casts diese anstelle des Show-Covers anzeigt.</string>

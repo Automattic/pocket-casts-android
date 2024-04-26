@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 17:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">El temporizador ha detenido tu podcast.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">El temporizador se reinició tras agitar el dispositivo</string>
+    <string name="whats_new_new_widgets_message">Con dos tamaños nuevos y un diseño actualizado, gestionar tus podcasts desde la pantalla de inicio es ya mucho más fácil. ¡Comprueba cómo!</string>
+    <string name="whats_new_new_widgets_title">Nuevos widgets</string>
+    <string name="widget_check_out_discover">Comprueba y descubre más</string>
+    <string name="widget_nothing_in_up_next">Nada pendiente en cola</string>
+    <string name="widget_no_episode_playing">Ningún episodio en reproducción</string>
+    <string name="large_player_widget_label">Reproductor grande</string>
+    <string name="medium_player_widget_label">Reproductor mediano</string>
+    <string name="small_player_widget_label">Reproductor pequeño</string>
     <string name="clear_search">Borrar la búsqueda</string>
+    <string name="bookmarks_search_results_not_found">No hemos podido encontrar ningún marcador para esa búsqueda.</string>
     <string name="podcast_and_episode">Podcast y episodio</string>
     <string name="skip_chapters">Preselección de capítulos</string>
     <string name="settings_use_episode_artwork_details">Algunos programas disponen de carátulas personalizadas para determinados episodios. Activa esta opción y Pocket Casts las mostrará en lugar de la carátula del programa.</string>

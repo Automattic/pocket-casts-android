@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-22 13:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">Vilolägestimern stoppade din podcast.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Vilolägestimern återstartad efter att enheten skakats</string>
+    <string name="whats_new_new_widgets_message">Med två nya storlekar och uppdaterad design har det blivit mycket enklare att hantera dina podcasts från startskärmen. Kolla in dem!</string>
+    <string name="whats_new_new_widgets_title">Nya widgetar</string>
+    <string name="widget_check_out_discover">Kolla in Discover om du vill veta mer</string>
+    <string name="widget_nothing_in_up_next">Inget i Nästa</string>
+    <string name="widget_no_episode_playing">Inget avsnitt spelas</string>
+    <string name="large_player_widget_label">Stor spelare</string>
+    <string name="medium_player_widget_label">Mellanstor spelare</string>
+    <string name="small_player_widget_label">Liten spelare</string>
     <string name="clear_search">Rensa sökning</string>
+    <string name="bookmarks_search_results_not_found">Vi kunde inte hitta något bokmärke för denna sökning.</string>
     <string name="podcast_and_episode">Podcast och avsnitt</string>
     <string name="skip_chapters">Förvalda kapitel</string>
     <string name="settings_use_episode_artwork_details">Vissa shower har anpassade omslag för specifika avsnitt. Aktivera det här alternativet så visar Pocket Casts dem istället för showens omslag.</string>

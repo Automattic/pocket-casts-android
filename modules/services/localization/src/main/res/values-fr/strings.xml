@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">La mise en veille a arrêté votre podcast.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">La mise en veille a été redémarrée après secousse de l’appareil</string>
+    <string name="whats_new_new_widgets_message">Avec deux nouvelles tailles et un design mis à jour, il est désormais bien plus facile de gérer vos podcasts depuis l’écran d’accueil. Découvrez ces nouveautés !</string>
+    <string name="whats_new_new_widgets_title">Nouveaux widgets</string>
+    <string name="widget_check_out_discover">Appuyez sur Découvrir pour en savoir plus</string>
+    <string name="widget_nothing_in_up_next">Rien dans la file d’attente</string>
+    <string name="widget_no_episode_playing">Aucun épisode en cours de lecture</string>
+    <string name="large_player_widget_label">Grand lecteur</string>
+    <string name="medium_player_widget_label">Lecteur moyen</string>
+    <string name="small_player_widget_label">Petit lecteur</string>
     <string name="clear_search">Supprimer la recherche</string>
+    <string name="bookmarks_search_results_not_found">Nous n’avons trouvé aucun signet pour cette recherche.</string>
     <string name="podcast_and_episode">Podcast et épisode</string>
     <string name="skip_chapters">Présélectionner des chapitres</string>
     <string name="settings_use_episode_artwork_details">Certaines émissions ont des illustrations personnalisées pour certains épisodes. Activez cette option et Pocket Casts les affichera à la place de l’illustration de l’émission.</string>
