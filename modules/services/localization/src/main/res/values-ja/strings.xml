@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">スリープタイマーにより、ポッドキャストが停止しました。</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">端末を振った後、スリープタイマーが再開しました</string>
+    <string name="whats_new_new_widgets_message">2つの新しいサイズが加わりデザインが一新されたことで、ホーム画面からのポッドキャストの管理がはるかに簡単になりました。 ぜひお試しください。</string>
+    <string name="whats_new_new_widgets_title">新しいウィジェット</string>
+    <string name="widget_check_out_discover">Discover をチェックして他のエピソードを見つけましょう</string>
+    <string name="widget_nothing_in_up_next">次のエピソードには何もありません</string>
+    <string name="widget_no_episode_playing">再生中のエピソードはありません</string>
+    <string name="large_player_widget_label">大型プレーヤー</string>
+    <string name="medium_player_widget_label">中型プレーヤー</string>
+    <string name="small_player_widget_label">小型プレーヤー</string>
     <string name="clear_search">検索をクリア</string>
+    <string name="bookmarks_search_results_not_found">その検索に該当するブックマークは見つかりませんでした。</string>
     <string name="podcast_and_episode">ポッドキャストとエピソード</string>
     <string name="skip_chapters">チャプターを事前に選択</string>
     <string name="settings_use_episode_artwork_details">一部の番組には特定のエピソードにカスタムのアートワークがあります。 このオプションを有効化すると、Pocket Casts は番組のアートワークではなく、そのカスタムのアートワークを表示します。</string>
@@ -1464,7 +1475,6 @@ Language: ja_JP
     <string name="player_time_saved_detail">この機能を使用して合計%s 節約しました。</string>
     <string name="player_tab_playing_wide">再生中</string>
     <string name="player_tab_playing">再生中</string>
-    <string name="player_sleep_when_episode_ends">エピソード終了時は就寝中</string>
     <string name="player_sleep_timer">スリープタイマー</string>
     <string name="player_sleep_timer_title">スリープタイマー</string>
     <string name="player_sleep_end_of_episode">エピソード終了時</string>

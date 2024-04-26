@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 17:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">Таймер сна остановил ваш подкаст.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Таймер сна перезагружен после встряхивания устройства</string>
+    <string name="whats_new_new_widgets_message">Два новых размера и обновлённый дизайн делают управление подкастами с главного экрана ещё проще. Попробуйте сами!</string>
+    <string name="whats_new_new_widgets_title">Новые виджеты</string>
+    <string name="widget_check_out_discover">Испытайте Discover и убедитесь сами</string>
+    <string name="widget_nothing_in_up_next">Очередь пуста</string>
+    <string name="widget_no_episode_playing">Ни один выпуск не воспроизводится</string>
+    <string name="large_player_widget_label">Крупный плеер</string>
+    <string name="medium_player_widget_label">Средний плеер</string>
+    <string name="small_player_widget_label">Малый плеер</string>
     <string name="clear_search">Очистить поле поиска</string>
+    <string name="bookmarks_search_results_not_found">Не удалось найти закладку по этому запросу.</string>
     <string name="podcast_and_episode">Подкаст и выпуск</string>
     <string name="skip_chapters">Предварительный выбор глав</string>
     <string name="settings_use_episode_artwork_details">В некоторых шоу есть специальное оформление отдельных выпусков. Включите эту опцию, и Pocket Casts будет отображать его вместо общего оформления шоу.</string>
@@ -1464,7 +1475,6 @@ Language: ru
     <string name="player_time_saved_detail">С помощью этой функции вы сэкономили в целом %s.</string>
     <string name="player_tab_playing_wide">Сейчас воспроизводится</string>
     <string name="player_tab_playing">Воспроизведение</string>
-    <string name="player_sleep_when_episode_ends">Переход в спящий режим после окончания выпуска</string>
     <string name="player_sleep_timer">Таймер сна</string>
     <string name="player_sleep_timer_title">Таймер сна</string>
     <string name="player_sleep_end_of_episode">Конец выпуска</string>

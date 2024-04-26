@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">睡眠計時器停止播放 Podcast。</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">裝置晃動後重新啟動睡眠計時器</string>
+    <string name="whats_new_new_widgets_message">搭載兩種新尺寸和更新版設計，讓你從主畫面管理 Podcast 變得更加簡單。 不妨探索一下！</string>
+    <string name="whats_new_new_widgets_title">全新小工具</string>
+    <string name="widget_check_out_discover">查看「探索」深入更多內容</string>
+    <string name="widget_nothing_in_up_next">「接下來播放」沒有內容</string>
+    <string name="widget_no_episode_playing">沒有正在播放的單集</string>
+    <string name="large_player_widget_label">大型播放器</string>
+    <string name="medium_player_widget_label">中型播放器</string>
+    <string name="small_player_widget_label">小型播放器</string>
     <string name="clear_search">清除搜尋</string>
+    <string name="bookmarks_search_results_not_found">找不到符合搜尋內容的書籤。</string>
     <string name="podcast_and_episode">Podcast 與節目</string>
     <string name="skip_chapters">預先選取的章節</string>
     <string name="settings_use_episode_artwork_details">有些節目會針對特定單集推出自訂封面圖片。 若啟用此選項，Pocket Casts 就會顯示這些封面圖片，而非節目的封面圖片。</string>
@@ -1464,7 +1475,6 @@ Language: zh_TW
     <string name="player_time_saved_detail">使用此功能總共為你省下 %s。</string>
     <string name="player_tab_playing_wide">正在播放</string>
     <string name="player_tab_playing">播放中</string>
-    <string name="player_sleep_when_episode_ends">單集結束時睡眠</string>
     <string name="player_sleep_timer">睡眠計時器</string>
     <string name="player_sleep_timer_title">睡眠計時器</string>
     <string name="player_sleep_end_of_episode">單集結束</string>

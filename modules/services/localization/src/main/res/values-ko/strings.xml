@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">절전 타이머로 인해 팟캐스트가 중단되었습니다.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">기기가 흔들려 절전 타이머가 재시작되었습니다</string>
+    <string name="whats_new_new_widgets_message">새로운 크기가 두 가지 있고 디자인이 업데이트되어서 홈 화면에서 훨씬 쉽게 팟캐스트를 관리할 수 있습니다. 직접 확인해 보세요!</string>
+    <string name="whats_new_new_widgets_title">새로운 위젯</string>
+    <string name="widget_check_out_discover">발견에서 자세히 알아보기</string>
+    <string name="widget_nothing_in_up_next">다음 차례에 아무것도 없음</string>
+    <string name="widget_no_episode_playing">재생 중인 에피소드 없음</string>
+    <string name="large_player_widget_label">대형 플레이어</string>
+    <string name="medium_player_widget_label">중형 플레이어</string>
+    <string name="small_player_widget_label">소형 플레이어</string>
     <string name="clear_search">검색 지우기</string>
+    <string name="bookmarks_search_results_not_found">해당 검색에 대한 북마크를 찾을 수 없습니다.</string>
     <string name="podcast_and_episode">팟캐스트 &amp; 에피소드</string>
     <string name="skip_chapters">챕터 미리 선택</string>
     <string name="settings_use_episode_artwork_details">일부 프로그램에는 특정 에피소드에 대한 사용자 정의 아트워크가 있습니다. 이 옵션을 활성화하면 프로그램의 아트워크 대신에 이 아트워크가 Pocket Casts를 통해 표시됩니다.</string>
@@ -1464,7 +1475,6 @@ Language: ko_KR
     <string name="player_time_saved_detail">이 기능을 사용하여 절약한 합계는 %s입니다.</string>
     <string name="player_tab_playing_wide">지금 재생 중</string>
     <string name="player_tab_playing">재생 중</string>
-    <string name="player_sleep_when_episode_ends">에피소드 종료 시 절전 유지</string>
     <string name="player_sleep_timer">절전 타이머</string>
     <string name="player_sleep_timer_title">절전 타이머</string>
     <string name="player_sleep_end_of_episode">에피소드 종료</string>

@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">睡眠计时器让您的播客停止了播放。</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">摇晃设备后睡眠计时器重新启动</string>
+    <string name="whats_new_new_widgets_message">我们新增两种尺寸，设计也进行了更新，让您可以更轻松地从主屏幕管理您的播客。 敬请查看！</string>
+    <string name="whats_new_new_widgets_title">新增小工具</string>
+    <string name="widget_check_out_discover">查看“发现”，了解更多信息</string>
+    <string name="widget_nothing_in_up_next">“接下来播放”列表无内容</string>
+    <string name="widget_no_episode_playing">未播放剧集</string>
+    <string name="large_player_widget_label">大型播放器</string>
+    <string name="medium_player_widget_label">中型播放器</string>
+    <string name="small_player_widget_label">小型播放器</string>
     <string name="clear_search">清除搜索</string>
+    <string name="bookmarks_search_results_not_found">我们未搜索到任何相关书签。</string>
     <string name="podcast_and_episode">播客与剧集</string>
     <string name="skip_chapters">预选章节</string>
     <string name="settings_use_episode_artwork_details">有些节目会为特定剧集定制插图。 启用此选项后，Pocket Casts 将显示剧集的插图，而非节目的插图。</string>
@@ -1464,7 +1475,6 @@ Language: zh_CN
     <string name="player_time_saved_detail">您总共使用此功能节省了 %s。</string>
     <string name="player_tab_playing_wide">正在播放</string>
     <string name="player_tab_playing">正在播放</string>
-    <string name="player_sleep_when_episode_ends">在剧集结束时进入睡眠状态</string>
     <string name="player_sleep_timer">睡眠计时器</string>
     <string name="player_sleep_timer_title">睡眠计时器</string>
     <string name="player_sleep_end_of_episode">剧集结束</string>
