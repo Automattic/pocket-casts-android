@@ -163,7 +163,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         binding.btnChangeEmail?.setOnClickListener {
             val fragment = ChangeEmailFragment.newInstance()
-            (activity as FragmentHostListener).addFragment(fragment)
+            (activity as FragmentHostListener).addFragment(fragment, overTabs = true)
         }
 
         val showChangeButtons = !syncManager.isGoogleLogin()
@@ -171,7 +171,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         binding.btnChangePwd?.setOnClickListener {
             val fragment = ChangePwdFragment.newInstance()
-            (this.activity as FragmentHostListener).addFragment(fragment)
+            (this.activity as FragmentHostListener).addFragment(fragment, overTabs = true)
         }
 
         binding.btnUpgradeAccount?.setOnClickListener {

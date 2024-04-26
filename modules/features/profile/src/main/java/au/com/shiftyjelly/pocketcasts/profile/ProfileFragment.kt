@@ -14,6 +14,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -110,6 +111,15 @@ class ProfileFragment : BaseFragment() {
 
         val binding = binding ?: return
 
+        val addFragmentOverTabs = { fragment: Fragment ->
+            (activity as? FragmentHostListener)?.let {
+                if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    it.bottomSheetClosePressed(this)
+                }
+                it.addFragment(fragment, overTabs = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+            }
+        }
+
         binding.closeButton?.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
         binding.closeButton?.setOnClickListener {
             (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
@@ -117,7 +127,7 @@ class ProfileFragment : BaseFragment() {
 
         binding.btnSettings.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
-            (activity as FragmentHostListener).addFragment(SettingsFragment())
+            addFragmentOverTabs(SettingsFragment())
         }
 
         val linearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -133,7 +143,7 @@ class ProfileFragment : BaseFragment() {
                 when (fragmentClass) {
                     StatsFragment::class.java -> {
                         analyticsTracker.track(AnalyticsEvent.STATS_SHOWN)
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
+                        addFragmentOverTabs(fragmentClass.getDeclaredConstructor().newInstance())
                     }
                     CloudFilesFragment::class.java -> {
                         analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
@@ -165,7 +175,7 @@ class ProfileFragment : BaseFragment() {
                         (activity as? FragmentHostListener)?.addFragment(fragment)
                     }
                     HelpFragment::class.java -> {
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
+                        addFragmentOverTabs(fragmentClass.getDeclaredConstructor().newInstance())
                     }
                     else -> Timber.e("Profile section is invalid")
                 }
@@ -248,7 +258,15 @@ class ProfileFragment : BaseFragment() {
         analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
         if (viewModel.isSignedIn) {
             val fragment = AccountDetailsFragment.newInstance()
-            (activity as FragmentHostListener).addFragment(fragment)
+            val fragmentHostListener = (activity as FragmentHostListener)
+            with(fragmentHostListener) {
+                if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    bottomSheetClosePressed(this@ProfileFragment)
+                    addFragment(fragment, overTabs = true)
+                } else {
+                    addFragment(fragment)
+                }
+            }
         } else {
             OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
         }

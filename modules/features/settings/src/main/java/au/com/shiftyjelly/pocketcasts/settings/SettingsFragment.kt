@@ -67,7 +67,7 @@ class SettingsFragment : BaseFragment() {
                                 isDebug = BuildConfig.DEBUG,
                                 isUnrestrictedBattery = isUnrestrictedBattery,
                                 openFragment = { fragment ->
-                                    (activity as? FragmentHostListener)?.addFragment(fragment)
+                                    (activity as? FragmentHostListener)?.addFragment(fragment, overTabs = true)
                                 },
                             )
                         }

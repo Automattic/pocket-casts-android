@@ -1135,8 +1135,8 @@ class MainActivity :
         playbackManager.skipForward(sourceView = SourceView.MINIPLAYER)
     }
 
-    override fun addFragment(fragment: Fragment, onTop: Boolean) {
-        navigator.addFragment(fragment, onTop = onTop)
+    override fun addFragment(fragment: Fragment, onTop: Boolean, overTabs: Boolean) {
+        navigator.addFragment(fragment, onTop = onTop, modal = overTabs)
     }
 
     override fun replaceFragment(fragment: Fragment) {

@@ -118,13 +118,13 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         when (item.itemId) {
             R.id.menu_logs -> {
                 val fragment = LogsFragment()
-                (activity as? FragmentHostListener)?.addFragment(fragment)
+                (activity as? FragmentHostListener)?.addFragment(fragment, overTabs = true)
                 true
             }
 
             R.id.menu_status_page -> {
                 val fragment = StatusFragment()
-                (activity as? FragmentHostListener)?.addFragment(fragment)
+                (activity as? FragmentHostListener)?.addFragment(fragment, overTabs = true)
                 true
             }
 

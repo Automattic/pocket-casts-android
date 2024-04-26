@@ -7,7 +7,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlin.time.Duration
 
 interface FragmentHostListener {
-    fun addFragment(fragment: Fragment, onTop: Boolean = false)
+    fun addFragment(
+        fragment: Fragment,
+        onTop: Boolean = false,
+        overTabs: Boolean = false,
+    )
     fun replaceFragment(fragment: Fragment)
     fun showBottomSheet(fragment: Fragment)
     fun bottomSheetClosePressed(fragment: Fragment)
