@@ -110,6 +110,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -417,6 +418,7 @@ class MainActivity :
                 if (it is NavigatorAction.TabSwitched) {
                     val currentTab = navigator.currentTab()
                     if (settings.selectedTab() != currentTab) {
+                        popToRootFragmentIfNeeded(currentTab)
                         trackTabOpened(currentTab)
                         when (currentTab) {
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
@@ -449,6 +451,15 @@ class MainActivity :
         mediaRouter = MediaRouter.getInstance(this)
 
         ThemeSettingObserver(this, theme, settings.themeReconfigurationEvents).observeThemeChanges()
+    }
+
+    private fun popToRootFragmentIfNeeded(currentTab: Int) {
+        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) return
+        if (navigator.stackSize(currentTab) > 1 &&
+            navigator.currentFragment() is CloseOnTabSwitch
+        ) {
+            navigator.reset(currentTab, resetRootFragment = false)
+        }
     }
 
     private fun resetEoYBadgeIfNeeded() {

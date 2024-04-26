@@ -120,6 +120,15 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
+        val addFragmentBehindTabs = { fragment: Fragment ->
+            (activity as? FragmentHostListener)?.let {
+                if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    it.bottomSheetClosePressed(this)
+                }
+                it.addFragment(fragment)
+            }
+        }
+
         binding.closeButton?.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
         binding.closeButton?.setOnClickListener {
             (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
@@ -147,7 +156,7 @@ class ProfileFragment : BaseFragment() {
                     }
                     CloudFilesFragment::class.java -> {
                         analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
-                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.getDeclaredConstructor().newInstance())
+                        addFragmentBehindTabs(fragmentClass.getDeclaredConstructor().newInstance())
                     }
                     ProfileEpisodeListFragment::class.java -> {
                         val fragment = when (section.title) {
@@ -165,14 +174,14 @@ class ProfileFragment : BaseFragment() {
                             }
                             else -> throw IllegalStateException("Unknown row")
                         }
-                        (activity as? FragmentHostListener)?.addFragment(fragment)
+                        addFragmentBehindTabs(fragment)
                     }
                     BookmarksContainerFragment::class.java -> {
                         analyticsTracker.track(AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN)
                         val fragment = BookmarksContainerFragment.newInstance(
                             sourceView = SourceView.PROFILE,
                         )
-                        (activity as? FragmentHostListener)?.addFragment(fragment)
+                        addFragmentBehindTabs(fragment)
                     }
                     HelpFragment::class.java -> {
                         addFragmentOverTabs(fragmentClass.getDeclaredConstructor().newInstance())
