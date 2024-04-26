@@ -110,10 +110,9 @@ class ProfileFragment : BaseFragment() {
 
         val binding = binding ?: return
 
-        binding.backButton?.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
-        binding.backButton?.setOnClickListener {
-            @Suppress("DEPRECATION")
-            activity?.onBackPressed()
+        binding.closeButton?.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+        binding.closeButton?.setOnClickListener {
+            (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
         }
 
         binding.btnSettings.setOnClickListener {
