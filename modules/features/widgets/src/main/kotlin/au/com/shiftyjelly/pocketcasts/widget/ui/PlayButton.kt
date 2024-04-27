@@ -34,7 +34,7 @@ internal fun PlayButton(
             .semantics { this.contentDescription = contentDescription },
     ) {
         Image(
-            provider = ImageProvider(IR.drawable.ic_circle),
+            provider = ImageProvider(IR.drawable.rounded_rectangle),
             contentDescription = null,
             colorFilter = ColorFilter.tint(LocalWidgetTheme.current.buttonBackground),
             modifier = GlanceModifier.size(size),
