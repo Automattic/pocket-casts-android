@@ -23,8 +23,6 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
-import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 import coil.imageLoader
 import kotlinx.coroutines.Dispatchers
@@ -36,13 +34,7 @@ internal fun EpisodeImage(
     useEpisodeArtwork: Boolean,
     size: Dp,
     backgroundColor: ((WidgetTheme) -> ColorProvider)? = null,
-    onClick: (PlayerWidgetEpisode?) -> Action = { currentEpisode ->
-        if (currentEpisode == null) {
-            OpenPocketCastsAction.action()
-        } else {
-            OpenEpisodeDetailsAction.action(currentEpisode.uuid)
-        }
-    },
+    onClick: Action? = null,
 ) {
     var episodeBitmap by remember(episode?.uuid, useEpisodeArtwork) {
         mutableStateOf<Bitmap?>(null)
@@ -51,7 +43,7 @@ internal fun EpisodeImage(
     Box(
         contentAlignment = Alignment.Center,
         modifier = GlanceModifier
-            .clickable(onClick(episode))
+            .applyIf(onClick != null) { it.clickable(onClick!!) }
             .background(backgroundColor?.invoke(LocalWidgetTheme.current) ?: LocalWidgetTheme.current.buttonBackground)
             .cornerRadiusCompat(6.dp)
             .size(size),

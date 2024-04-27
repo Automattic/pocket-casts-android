@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.action.clickable
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
@@ -14,6 +15,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -23,6 +25,7 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = GlanceModifier
+                .clickable(OpenPocketCastsAction.action())
                 .fillMaxWidth()
                 .height(90.dp)
                 .cornerRadiusCompat(6.dp)

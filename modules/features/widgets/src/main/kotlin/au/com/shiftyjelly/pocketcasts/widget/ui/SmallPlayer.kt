@@ -47,7 +47,7 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 size = width,
                 backgroundColor = { it.background },
-                onClick = { controlPlayback },
+                onClick = controlPlayback,
             )
             if (state.episode != null) {
                 PlaybackButton(
