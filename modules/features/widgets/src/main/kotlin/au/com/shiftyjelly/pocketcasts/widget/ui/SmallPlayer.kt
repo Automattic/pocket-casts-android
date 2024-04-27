@@ -8,6 +8,7 @@ import androidx.glance.action.clickable
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.semantics.contentDescription
 import androidx.glance.semantics.semantics
@@ -52,9 +53,8 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
             if (state.episode != null) {
                 PlaybackButton(
                     isPlaying = state.isPlaying,
-                    height = width / 2,
                     iconPadding = width / 16,
-                    modifier = GlanceModifier.width(width / 2),
+                    modifier = GlanceModifier.size(width / 2),
                 )
             }
         }
