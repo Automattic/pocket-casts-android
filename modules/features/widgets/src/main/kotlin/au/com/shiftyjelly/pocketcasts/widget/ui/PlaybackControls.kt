@@ -16,6 +16,7 @@ internal fun PlaybackControls(
     buttonHeight: Dp,
     iconPadding: Dp,
     modifier: GlanceModifier = GlanceModifier,
+    isClickable: Boolean = true,
 ) {
     Row(
         verticalAlignment = Alignment.Vertical.Bottom,
@@ -24,6 +25,7 @@ internal fun PlaybackControls(
         SkipForwardButton(
             height = buttonHeight,
             iconPadding = iconPadding,
+            isClickable = isClickable,
             modifier = GlanceModifier.defaultWeight(),
         )
         Spacer(
@@ -33,6 +35,7 @@ internal fun PlaybackControls(
             isPlaying = isPlaying,
             height = buttonHeight,
             iconPadding = iconPadding,
+            isClickable = isClickable,
             modifier = GlanceModifier.defaultWeight(),
         )
         Spacer(
@@ -41,7 +44,9 @@ internal fun PlaybackControls(
         SkipBackButton(
             height = buttonHeight,
             iconPadding = iconPadding,
+            isClickable = isClickable,
             modifier = GlanceModifier.defaultWeight(),
+
         )
     }
 }

@@ -24,6 +24,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
     WidgetTheme(state.useDynamicColors) {
         Column(
             modifier = GlanceModifier
+                .clickable(OpenPocketCastsAction.action())
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .cornerRadiusCompat(6.dp)
@@ -35,10 +36,20 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                 Spacer(
                     modifier = GlanceModifier.height(12.dp),
                 )
+                val expectedHeight = when (upNextEpisodes.size) {
+                    0 -> 0
+                    1 -> 58
+                    2 -> 124
+                    else -> 190
+                }.dp
                 LargePlayerQueue(
                     queue = upNextEpisodes,
                     useEpisodeArtwork = state.useEpisodeArtwork,
                     useDynamicColors = state.useDynamicColors,
+                    modifier = GlanceModifier.height(expectedHeight),
+                )
+                Spacer(
+                    modifier = GlanceModifier.fillMaxWidth().height(190.dp - expectedHeight),
                 )
             } else {
                 Column(
@@ -46,8 +57,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = GlanceModifier
                         .fillMaxWidth()
-                        .height(190.dp)
-                        .clickable(OpenPocketCastsAction.action()),
+                        .height(190.dp),
                 ) {
                     NonScalingText(
                         text = LocalContext.current.getString(LR.string.widget_nothing_in_up_next),

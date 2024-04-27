@@ -10,3 +10,9 @@ internal fun GlanceModifier.cornerRadiusCompat(radius: Dp) = if (Build.VERSION.S
 } else {
     this
 }
+
+internal fun GlanceModifier.applyIf(condition: Boolean, modify: (GlanceModifier) -> GlanceModifier) = if (condition) {
+    modify(this)
+} else {
+    this
+}
