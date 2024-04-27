@@ -11,19 +11,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.background
-import androidx.glance.color.ColorProviders
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
-import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -33,15 +29,13 @@ import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 import coil.imageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 internal fun EpisodeImage(
     episode: PlayerWidgetEpisode?,
     useEpisodeArtwork: Boolean,
     size: Dp,
-    backgroundColor: ((ColorProviders) -> ColorProvider)? = null,
-    iconColor: ((ColorProviders) -> ColorProvider)? = null,
+    backgroundColor: ((WidgetTheme) -> ColorProvider)? = null,
     onClick: (PlayerWidgetEpisode?) -> Action = { currentEpisode ->
         if (currentEpisode == null) {
             OpenPocketCastsAction.action()
@@ -58,15 +52,12 @@ internal fun EpisodeImage(
         contentAlignment = Alignment.Center,
         modifier = GlanceModifier
             .clickable(onClick(episode))
-            .background(backgroundColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.primary)
+            .background(backgroundColor?.invoke(LocalWidgetTheme.current) ?: LocalWidgetTheme.current.buttonBackground)
             .cornerRadiusCompat(6.dp)
             .size(size),
     ) {
-        Image(
-            provider = ImageProvider(IR.drawable.ic_logo_background),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(iconColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.padding(size / 6),
+        PocketCastsLogo(
+            size = size / 2.5f,
         )
 
         val bitmap = episodeBitmap

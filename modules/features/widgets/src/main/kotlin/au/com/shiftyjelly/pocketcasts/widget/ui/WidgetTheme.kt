@@ -3,10 +3,13 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 import android.os.Build
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.glance.GlanceComposable
 import androidx.glance.GlanceTheme
 import androidx.glance.material3.ColorProviders
+import androidx.glance.unit.ColorProvider
 
 @Composable
 internal fun WidgetTheme(
@@ -20,32 +23,53 @@ internal fun WidgetTheme(
     } else {
         DefaultColors
     }
-    GlanceTheme(colors, content)
+    GlanceTheme(colors) {
+        val glanceColors = GlanceTheme.colors
+        val widgetColors = WidgetTheme(
+            background = glanceColors.secondaryContainer,
+            text = glanceColors.onSecondaryContainer,
+            buttonBackground = glanceColors.onSecondary,
+            icon = glanceColors.secondary,
+            logoBackground = if (useDynamicColors) glanceColors.secondary else glanceColors.tertiary,
+            logoLines = if (useDynamicColors) glanceColors.onSecondary else glanceColors.onTertiary,
+        )
+        CompositionLocalProvider(LocalWidgetTheme provides widgetColors, content)
+    }
 }
+
+internal val LocalWidgetTheme = staticCompositionLocalOf<WidgetTheme> { error("No default widget colors") }
+
+internal data class WidgetTheme(
+    val background: ColorProvider,
+    val text: ColorProvider,
+    val buttonBackground: ColorProvider,
+    val icon: ColorProvider,
+    val logoBackground: ColorProvider,
+    val logoLines: ColorProvider,
+)
 
 private val UndefinedColor = Color.Magenta
 
 private val DefaultColors = ColorProviders(
     light = ColorScheme(
-        primary = Color(0xFFF8FAF6),
-        onPrimary = Color(0xFFF43E37),
-        primaryContainer = Color(0xFFF43E37),
+        primary = UndefinedColor,
+        onPrimary = UndefinedColor,
+        primaryContainer = UndefinedColor,
         onPrimaryContainer = UndefinedColor,
         inversePrimary = UndefinedColor,
-        // Used as a trick to have different small player placeholder colors.
-        secondary = Color(0xFFF43E37),
-        onSecondary = Color(0xFFF8FAF6),
-        secondaryContainer = UndefinedColor,
-        onSecondaryContainer = UndefinedColor,
-        tertiary = UndefinedColor,
-        onTertiary = UndefinedColor,
+        secondary = Color(0xFF292B2E),
+        onSecondary = Color(0xFFE0E6EA),
+        secondaryContainer = Color(0xFFFAFAF9),
+        onSecondaryContainer = Color(0xFF292B2E),
+        // Used as a trick for different Pocket Casts logo colors
+        tertiary = Color(0xFFF43E37),
+        onTertiary = Color(0xFFFAFAF9),
         tertiaryContainer = UndefinedColor,
         onTertiaryContainer = UndefinedColor,
         background = UndefinedColor,
         onBackground = UndefinedColor,
-        // Used as a trick to have different small player button colors for small widget with non dynamic themes in dark mode.
-        surface = Color(0xFFF8FAF6),
-        onSurface = Color(0xFFF43E37),
+        surface = UndefinedColor,
+        onSurface = UndefinedColor,
         surfaceVariant = UndefinedColor,
         onSurfaceVariant = UndefinedColor,
         surfaceTint = UndefinedColor,
@@ -60,25 +84,24 @@ private val DefaultColors = ColorProviders(
         scrim = UndefinedColor,
     ),
     dark = ColorScheme(
-        primary = Color(0xFFD9201C),
-        onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFF292B2E),
+        primary = UndefinedColor,
+        onPrimary = UndefinedColor,
+        primaryContainer = UndefinedColor,
         onPrimaryContainer = UndefinedColor,
         inversePrimary = UndefinedColor,
-        // Used as a trick to have different small player placeholder colors.
-        secondary = Color(0xFFD9201C),
-        onSecondary = Color(0xFFFFFFFF),
-        secondaryContainer = UndefinedColor,
-        onSecondaryContainer = UndefinedColor,
-        tertiary = UndefinedColor,
-        onTertiary = UndefinedColor,
+        secondary = Color(0xFFFFFFFF),
+        onSecondary = Color(0xFF404247),
+        secondaryContainer = Color(0xFF292B2E),
+        onSecondaryContainer = Color(0xFFFFFFFF),
+        // Used as a trick for different Pocket Casts logo colors
+        tertiary = Color(0xFFD9201C),
+        onTertiary = Color(0xFFFAFAF9),
         tertiaryContainer = UndefinedColor,
         onTertiaryContainer = UndefinedColor,
         background = UndefinedColor,
         onBackground = UndefinedColor,
-        // Used as a trick to have different small player button colors for small widget with non dynamic themes.
-        surface = Color(0xFFF8FAF6),
-        onSurface = Color(0xFFD9201C),
+        surface = UndefinedColor,
+        onSurface = UndefinedColor,
         surfaceVariant = UndefinedColor,
         onSurfaceVariant = UndefinedColor,
         surfaceTint = UndefinedColor,

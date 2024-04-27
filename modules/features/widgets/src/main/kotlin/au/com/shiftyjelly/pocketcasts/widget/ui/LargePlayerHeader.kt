@@ -3,9 +3,7 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
-import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -31,8 +29,7 @@ internal fun LargePlayerHeader(
         contentAlignment = Alignment.TopEnd,
         modifier = modifier
             .fillMaxWidth()
-            .height(116.dp)
-            .background(GlanceTheme.colors.primaryContainer),
+            .height(116.dp),
     ) {
         Row(
             verticalAlignment = Alignment.Top,
