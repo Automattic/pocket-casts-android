@@ -15,6 +15,8 @@
 *   Bug Fixes
     *   Fix flashing artwork
         ([#2086](https://github.com/Automattic/pocket-casts-android/pull/2086))
+    *   Fix embedded artwork not being extracted when adding files
+        ([#2124](https://github.com/Automattic/pocket-casts-android/pull/2124))
 
 7.62
 -----
