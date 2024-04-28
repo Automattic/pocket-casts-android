@@ -15,6 +15,8 @@
 *   Bug Fixes
     *   Fix flashing artwork
         ([#2086](https://github.com/Automattic/pocket-casts-android/pull/2086))
+    *   Fix an issue when sorting podcast by episodes could hide some podcasts
+        ([#2125](https://github.com/Automattic/pocket-casts-android/pull/2125))
 
 7.62
 -----
