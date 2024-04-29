@@ -845,6 +845,14 @@ internal class DiscoverAdapter(
                         listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
                     }
 
+                    val btnSubscribe = adHolder.binding.btnSubscribe
+                    btnSubscribe.updateSubscribeButtonIcon(podcast.isSubscribed)
+                    btnSubscribe.setOnClickListener {
+                        btnSubscribe.updateSubscribeButtonIcon(true)
+                        listener.onPodcastSubscribe(podcast = podcast, listUuid = row.discoverRow.listUuid)
+                        row.discoverRow.listUuid?.let { listUuid -> trackDiscoverListPodcastSubscribed(listUuid, podcast.uuid) }
+                    }
+
                     val lblSponsored = adHolder.binding.lblSponsored
                     if (row.discoverRow.sponsored) {
                         lblSponsored.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
