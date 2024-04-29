@@ -202,6 +202,7 @@ class BookmarksViewModel
                     showIcon = sourceView == SourceView.PROFILE,
                     searchEnabled = sourceView == SourceView.PROFILE,
                     searchText = searchText,
+                    showEpisodeTitle = sourceView == SourceView.PROFILE,
                 )
             }
         }.stateIn(viewModelScope)
@@ -381,6 +382,7 @@ class BookmarksViewModel
             val showIcon: Boolean = false,
             val searchText: String = "",
             val searchEnabled: Boolean = false,
+            val showEpisodeTitle: Boolean = false,
         ) : UiState() {
             val headerRowColors: HeaderRowColors
                 get() = when (sourceView) {
