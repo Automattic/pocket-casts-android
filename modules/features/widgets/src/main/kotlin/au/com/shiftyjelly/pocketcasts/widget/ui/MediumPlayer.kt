@@ -9,6 +9,7 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -33,24 +34,38 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 size = 58.dp,
             )
-
             Spacer(
-                modifier = GlanceModifier.width(15.dp),
+                modifier = GlanceModifier.width(4.dp),
             )
-            Column(
-                verticalAlignment = Alignment.Vertical.Top,
-                modifier = GlanceModifier.height(58.dp),
-            ) {
-                NonScalingText(
-                    text = state.episode?.title ?: LocalContext.current.getString(LR.string.widget_no_episode_playing),
-                    textSize = 13.dp,
-                    useDynamicColors = state.useDynamicColors,
-                    isBold = true,
-                )
+            if (state.episode != null) {
                 PlaybackControls(
                     isPlaying = state.isPlaying,
+                    buttonHeight = 58.dp,
+                    iconPadding = 16.dp,
                     modifier = GlanceModifier.defaultWeight(),
                 )
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = GlanceModifier.fillMaxSize(),
+                ) {
+                    NonScalingText(
+                        text = LocalContext.current.getString(LR.string.widget_no_episode_playing),
+                        textSize = 16.dp,
+                        useDynamicColors = state.useDynamicColors,
+                        isBold = true,
+                    )
+                    Spacer(
+                        modifier = GlanceModifier.height(2.dp),
+                    )
+                    NonScalingText(
+                        text = LocalContext.current.getString(LR.string.widget_check_out_discover),
+                        textSize = 13.dp,
+                        useDynamicColors = state.useDynamicColors,
+                        isTransparent = true,
+                    )
+                }
             }
         }
     }

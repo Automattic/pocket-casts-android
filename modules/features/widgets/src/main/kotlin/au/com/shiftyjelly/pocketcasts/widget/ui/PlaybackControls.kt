@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.layout.Alignment
@@ -12,22 +13,35 @@ import androidx.glance.layout.width
 @Composable
 internal fun PlaybackControls(
     isPlaying: Boolean,
+    buttonHeight: Dp,
+    iconPadding: Dp,
     modifier: GlanceModifier = GlanceModifier,
 ) {
     Row(
         verticalAlignment = Alignment.Vertical.Bottom,
         modifier = modifier.fillMaxWidth(),
     ) {
-        SkipBackButton()
+        SkipForwardButton(
+            height = buttonHeight,
+            iconPadding = iconPadding,
+            modifier = GlanceModifier.defaultWeight(),
+        )
         Spacer(
-            modifier = GlanceModifier.width(8.dp),
+            modifier = GlanceModifier.width(4.dp),
         )
         PlaybackButton(
             isPlaying = isPlaying,
+            height = buttonHeight,
+            iconPadding = iconPadding,
+            modifier = GlanceModifier.defaultWeight(),
         )
         Spacer(
-            modifier = GlanceModifier.width(8.dp),
+            modifier = GlanceModifier.width(4.dp),
         )
-        SkipForwardButton()
+        SkipBackButton(
+            height = buttonHeight,
+            iconPadding = iconPadding,
+            modifier = GlanceModifier.defaultWeight(),
+        )
     }
 }
