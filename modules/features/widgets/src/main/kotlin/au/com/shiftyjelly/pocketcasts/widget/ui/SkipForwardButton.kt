@@ -26,15 +26,20 @@ internal fun SkipForwardButton(
     height: Dp,
     iconPadding: Dp,
     modifier: GlanceModifier = GlanceModifier,
+    isClickable: Boolean = true,
 ) {
     val contentDescription = LocalContext.current.getString(LR.string.skip_forward)
+    val source = LocalSource.current
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .height(height)
-            .clickable(SkipForwardAction.action(LocalSource.current))
-            .semantics { this.contentDescription = contentDescription },
+            .applyIf(isClickable) { continuation ->
+                continuation
+                    .clickable(SkipForwardAction.action(source))
+                    .semantics { this.contentDescription = contentDescription }
+            },
     ) {
         Image(
             provider = ImageProvider(IR.drawable.rounded_rectangle),

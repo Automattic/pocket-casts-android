@@ -27,15 +27,20 @@ internal fun PlaybackButton(
     height: Dp,
     iconPadding: Dp,
     modifier: GlanceModifier = GlanceModifier,
+    isClickable: Boolean = true,
 ) {
     val contentDescription = LocalContext.current.getString(if (isPlaying) LR.string.play_episode else LR.string.pause_episode)
+    val source = LocalSource.current
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .height(height)
-            .clickable(controlPlaybackAction(isPlaying, LocalSource.current))
-            .semantics { this.contentDescription = contentDescription },
+            .applyIf(isClickable) { continuation ->
+                continuation
+                    .clickable(controlPlaybackAction(isPlaying, source))
+                    .semantics { this.contentDescription = contentDescription }
+            },
     ) {
         Image(
             provider = ImageProvider(IR.drawable.rounded_rectangle),

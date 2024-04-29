@@ -64,6 +64,7 @@ internal fun LargePlayerHeader(
                     isPlaying = state.isPlaying,
                     buttonHeight = 58.dp,
                     iconPadding = 16.dp,
+                    isClickable = episode != null,
                     modifier = GlanceModifier.defaultWeight(),
                 )
             }
