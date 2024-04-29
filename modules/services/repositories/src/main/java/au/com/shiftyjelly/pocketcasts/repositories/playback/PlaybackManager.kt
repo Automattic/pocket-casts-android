@@ -223,8 +223,8 @@ open class PlaybackManager @Inject constructor(
     var chaptersUntilSleep: Int = 0
 
     private val lastListenedForEndOfChapter = mutableMapOf<String, String?>(
-        "chapterUui" to null,
-        "episodeUui" to null,
+        "chapterUuid" to null,
+        "episodeUuid" to null,
     )
 
     var player: Player? = null
@@ -2553,19 +2553,19 @@ open class PlaybackManager @Inject constructor(
     }
 
     private fun MutableMap<String, String?>.getlastListenedEpisodeUuid(): String? {
-        return this["episodeUui"]
+        return this["episodeUuid"]
     }
 
     private fun MutableMap<String, String?>.getlastListenedChapterUuid(): String? {
-        return this["chapterUui"]
+        return this["chapterUuid"]
     }
 
     private fun MutableMap<String, String?>.setlastListenedEpisodeUuid(value: String?) {
-        this["episodeUui"] = value
+        this["episodeUuid"] = value
     }
 
     private fun MutableMap<String, String?>.setlastListenedChapterUuid(value: String?) {
-        this["chapterUui"] = value
+        this["chapterUuid"] = value
     }
 
     private enum class ContentType(val analyticsValue: String) {
