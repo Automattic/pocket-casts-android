@@ -1149,8 +1149,8 @@ class MainActivity :
         playbackManager.skipForward(sourceView = SourceView.MINIPLAYER)
     }
 
-    override fun addFragment(fragment: Fragment, onTop: Boolean, overTabs: Boolean) {
-        if (overTabs) {
+    override fun addFragment(fragment: Fragment, onTop: Boolean, overBottomSheet: Boolean) {
+        if (overBottomSheet) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentOverBottomSheet, fragment)
                 .addToBackStack(null)

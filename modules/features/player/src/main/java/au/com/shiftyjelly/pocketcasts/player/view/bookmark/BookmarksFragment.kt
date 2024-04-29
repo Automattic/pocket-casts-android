@@ -128,8 +128,8 @@ class BookmarksFragment : BaseFragment() {
                             fragmentHostListener?.apply {
                                 closePlayer() // Closes player if open
                                 if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                                    addFragment(SettingsFragment(), overTabs = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
-                                    addFragment(fragment, overTabs = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+                                    addFragment(SettingsFragment(), overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+                                    addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
                                 } else {
                                     openTab(R.id.navigation_profile)
                                     addFragment(SettingsFragment())

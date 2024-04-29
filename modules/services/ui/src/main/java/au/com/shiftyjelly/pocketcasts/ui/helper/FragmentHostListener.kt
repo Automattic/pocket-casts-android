@@ -10,7 +10,7 @@ interface FragmentHostListener {
     fun addFragment(
         fragment: Fragment,
         onTop: Boolean = false,
-        overTabs: Boolean = false,
+        overBottomSheet: Boolean = false,
     )
     fun replaceFragment(fragment: Fragment)
     fun showBottomSheet(fragment: Fragment)
