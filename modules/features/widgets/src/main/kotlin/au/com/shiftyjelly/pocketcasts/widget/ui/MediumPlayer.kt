@@ -2,10 +2,11 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
-import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -22,6 +23,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun MediumPlayer(state: MediumPlayerWidgetState) {
+    val expectedHeight = 90.dp
+    val widgetHeight = min(expectedHeight, LocalSize.current.height)
+    val (coverSize, padding) = if (widgetHeight == expectedHeight) {
+        56.dp to 16.dp
+    } else {
+        (widgetHeight - 24.dp) to 12.dp
+    }
+
     WidgetTheme(state.useDynamicColors) {
         RounderCornerBox(
             contentAlignment = Alignment.TopCenter,
@@ -29,19 +38,19 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
             modifier = GlanceModifier
                 .clickable(OpenPocketCastsAction.action())
                 .fillMaxWidth()
-                .height(90.dp),
+                .height(widgetHeight),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = GlanceModifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(16.dp),
+                    .padding(padding),
             ) {
                 EpisodeImage(
                     episode = state.episode,
                     useEpisodeArtwork = state.useEpisodeArtwork,
-                    size = 58.dp,
+                    size = coverSize,
                 )
                 Spacer(
                     modifier = GlanceModifier.width(4.dp),
@@ -49,8 +58,7 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
                 if (state.episode != null) {
                     PlaybackControls(
                         isPlaying = state.isPlaying,
-                        buttonHeight = 58.dp,
-                        iconPadding = 16.dp,
+                        buttonHeight = coverSize,
                         modifier = GlanceModifier.defaultWeight(),
                     )
                 } else {
