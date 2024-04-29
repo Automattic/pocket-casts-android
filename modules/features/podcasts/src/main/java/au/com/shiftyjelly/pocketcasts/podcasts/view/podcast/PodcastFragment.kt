@@ -527,9 +527,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private fun onHeadsetSettingsClicked() {
         val fragmentHostListener = (activity as? FragmentHostListener)
         fragmentHostListener?.apply {
-            openTab(VR.id.navigation_profile)
-            addFragment(SettingsFragment())
-            addFragment(HeadphoneControlsSettingsFragment())
+            if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                addFragment(SettingsFragment(), overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+                addFragment(HeadphoneControlsSettingsFragment(), overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+            } else {
+                openTab(VR.id.navigation_profile)
+                addFragment(SettingsFragment())
+                addFragment(HeadphoneControlsSettingsFragment())
+            }
         }
     }
 

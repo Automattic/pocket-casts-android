@@ -110,6 +110,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -417,6 +418,7 @@ class MainActivity :
                 if (it is NavigatorAction.TabSwitched) {
                     val currentTab = navigator.currentTab()
                     if (settings.selectedTab() != currentTab) {
+                        popToRootFragmentIfNeeded(currentTab)
                         trackTabOpened(currentTab)
                         when (currentTab) {
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
@@ -449,6 +451,15 @@ class MainActivity :
         mediaRouter = MediaRouter.getInstance(this)
 
         ThemeSettingObserver(this, theme, settings.themeReconfigurationEvents).observeThemeChanges()
+    }
+
+    private fun popToRootFragmentIfNeeded(currentTab: Int) {
+        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) return
+        if (navigator.stackSize(currentTab) > 1 &&
+            navigator.currentFragment() is CloseOnTabSwitch
+        ) {
+            navigator.reset(currentTab, resetRootFragment = false)
+        }
     }
 
     private fun resetEoYBadgeIfNeeded() {
@@ -589,9 +600,12 @@ class MainActivity :
             }
         }
 
-        if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
-            frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            return
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentOverBottomSheet)
+        if (fragment == null) {
+            if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
+                frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                return
+            }
         }
 
         if (navigator.isShowingModal()) {
@@ -1135,8 +1149,15 @@ class MainActivity :
         playbackManager.skipForward(sourceView = SourceView.MINIPLAYER)
     }
 
-    override fun addFragment(fragment: Fragment, onTop: Boolean) {
-        navigator.addFragment(fragment, onTop = onTop)
+    override fun addFragment(fragment: Fragment, onTop: Boolean, overBottomSheet: Boolean) {
+        if (overBottomSheet) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentOverBottomSheet, fragment)
+                .addToBackStack(null)
+                .commitAllowingStateLoss()
+        } else {
+            navigator.addFragment(fragment, onTop = onTop)
+        }
     }
 
     override fun replaceFragment(fragment: Fragment) {
@@ -1383,7 +1404,7 @@ class MainActivity :
 
     override fun openProfile() {
         FirebaseAnalyticsTracker.navigatedToProfile()
-        addFragment(ProfileFragment())
+        showBottomSheet(ProfileFragment())
     }
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {
