@@ -79,7 +79,7 @@ class SettingsFragment : BaseFragment() {
                                 isDebug = BuildConfig.DEBUG,
                                 isUnrestrictedBattery = isUnrestrictedBattery,
                                 openFragment = { fragment ->
-                                    (activity as? FragmentHostListener)?.addFragment(fragment, overTabs = true)
+                                    (activity as? FragmentHostListener)?.addFragment(fragment, overTabs = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
                                 },
                             )
                         }

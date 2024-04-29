@@ -1405,7 +1405,6 @@ class MainActivity :
     override fun openProfile() {
         FirebaseAnalyticsTracker.navigatedToProfile()
         showBottomSheet(ProfileFragment())
-//        addFragment(ProfileFragment(), overTabs = true)
     }
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {
