@@ -600,9 +600,12 @@ class MainActivity :
             }
         }
 
-        if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
-            frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            return
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentOverBottomSheet)
+        if (fragment == null) {
+            if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
+                frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                return
+            }
         }
 
         if (navigator.isShowingModal()) {
@@ -1147,7 +1150,14 @@ class MainActivity :
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean, overTabs: Boolean) {
-        navigator.addFragment(fragment, onTop = onTop, modal = overTabs)
+        if (overTabs) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentOverBottomSheet, fragment)
+                .addToBackStack(null)
+                .commitAllowingStateLoss()
+        } else {
+            navigator.addFragment(fragment, onTop = onTop)
+        }
     }
 
     override fun replaceFragment(fragment: Fragment) {
@@ -1395,6 +1405,7 @@ class MainActivity :
     override fun openProfile() {
         FirebaseAnalyticsTracker.navigatedToProfile()
         showBottomSheet(ProfileFragment())
+//        addFragment(ProfileFragment(), overTabs = true)
     }
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {

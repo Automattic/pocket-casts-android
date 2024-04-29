@@ -112,12 +112,7 @@ class ProfileFragment : BaseFragment() {
         val binding = binding ?: return
 
         val addFragmentOverTabs = { fragment: Fragment ->
-            (activity as? FragmentHostListener)?.let {
-                if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                    it.bottomSheetClosePressed(this)
-                }
-                it.addFragment(fragment, overTabs = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
-            }
+            (activity as? FragmentHostListener)?.addFragment(fragment, overTabs = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
         }
 
         val addFragmentBehindTabs = { fragment: Fragment ->
@@ -268,14 +263,7 @@ class ProfileFragment : BaseFragment() {
         if (viewModel.isSignedIn) {
             val fragment = AccountDetailsFragment.newInstance()
             val fragmentHostListener = (activity as FragmentHostListener)
-            with(fragmentHostListener) {
-                if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                    bottomSheetClosePressed(this@ProfileFragment)
-                    addFragment(fragment, overTabs = true)
-                } else {
-                    addFragment(fragment)
-                }
-            }
+            fragmentHostListener.addFragment(fragment, overTabs = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
         } else {
             OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
         }
