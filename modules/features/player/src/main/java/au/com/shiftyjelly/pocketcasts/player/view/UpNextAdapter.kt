@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBind
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -193,7 +194,7 @@ class UpNextAdapter(
             binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
 
             if (loadedUuid != playingState.episode.uuid) {
-                imageRequestFactory.create(playingState.episode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(binding.image)
+                imageRequestFactory.create(playingState.episode, settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext)).loadInto(binding.image)
                 loadedUuid = playingState.episode.uuid
             }
 

@@ -67,7 +67,9 @@ sealed class SettingRowToggle {
 fun SettingSection(
     modifier: Modifier = Modifier,
     heading: String? = null,
+    subHeading: String? = null,
     indent: Boolean = true,
+    showDivider: Boolean = true,
     content: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier) {
@@ -86,9 +88,24 @@ fun SettingSection(
                     ),
                 )
             }
+            if (subHeading != null) {
+                TextP50(
+                    text = subHeading,
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.padding(
+                        start = if (indent) indentedStartPadding else horizontalPadding,
+                        end = horizontalPadding,
+                        top = if (heading == null) verticalPadding else 0.dp,
+                        bottom = verticalPadding,
+                    ),
+                )
+            }
             content()
         }
-        HorizontalDivider()
+        if (showDivider) {
+            HorizontalDivider()
+        }
     }
 }
 

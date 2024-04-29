@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -155,6 +156,11 @@ class ProfileEpisodeListFragment : BaseFragment(), CloseOnTabSwitch, Toolbar.OnM
                     Mode.Starred -> EpisodeItemTouchHelper.SwipeSource.STARRED
                 },
             ),
+            artworkContext = when (mode) {
+                Mode.Downloaded -> Element.Downloads
+                Mode.History -> Element.ListeningHistory
+                Mode.Starred -> Element.Starred
+            },
         )
     }
 

@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceState
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceViewModel
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.worker.RefreshArtworkWorker
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -207,6 +208,10 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtUseEpisodeArtwork.isChecked = !binding.swtUseEpisodeArtwork.isChecked
         }
 
+        binding.lblEpisodeArtworkConfiguration.setOnClickListener {
+            showEpisodeArtworkConfigurationFragment()
+        }
+
         binding.lblRefreshAllPodcastArtwork.setOnClickListener {
             refreshArtwork()
         }
@@ -242,6 +247,10 @@ class AppearanceSettingsFragment : BaseFragment() {
             val selectedIndex = adapter.selectedIconIndex() ?: 0
             binding?.appIconRecyclerView?.scrollToPosition(selectedIndex)
         }
+    }
+
+    private fun showEpisodeArtworkConfigurationFragment() {
+        (activity as? FragmentHostListener)?.addFragment(EpisodeArtworkConfigurationFragment())
     }
 
     private fun refreshArtwork() {

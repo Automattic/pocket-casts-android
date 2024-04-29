@@ -1,3 +1,7 @@
+7.64
+-----
+
+
 7.63
 -----
 *   New Features
@@ -7,6 +11,8 @@
         ([#2069](https://github.com/Automattic/pocket-casts-android/pull/2069))
     *   Sleep timer: Set sleep time end of episode for multiple episodes
         ([#2097](https://github.com/Automattic/pocket-casts-android/pull/2097))
+    *   Enable toggling episode artwork separately in different contexts
+        ([#2112](https://github.com/Automattic/pocket-casts-android/pull/2112))
 *   Updates:
     *   Improved updating podcast episode when subscribed to thousands podcasts. 
         ([#2082](https://github.com/Automattic/pocket-casts-android/pull/2082))
