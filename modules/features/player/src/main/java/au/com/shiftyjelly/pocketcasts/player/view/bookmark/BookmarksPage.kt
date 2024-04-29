@@ -231,6 +231,7 @@ private fun BookmarksView(
                 },
                 showIcon = state.showIcon,
                 useEpisodeArtwork = state.useEpisodeArtwork,
+                showEpisodeTitle = state.showEpisodeTitle,
             )
         }
     }
