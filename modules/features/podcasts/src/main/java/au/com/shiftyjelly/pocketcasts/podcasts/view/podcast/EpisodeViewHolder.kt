@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -61,6 +62,7 @@ class EpisodeViewHolder(
     val imageRequestFactory: PocketCastsImageRequestFactory,
     val settings: Settings,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
+    private val artworkContext: ArtworkConfiguration.Element?,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
@@ -290,7 +292,9 @@ class EpisodeViewHolder(
         val artworkVisible = viewMode is ViewMode.Artwork
         imgArtwork.isVisible = artworkVisible
         if (!sameEpisode && artworkVisible) {
-            imageRequestFactory.create(episode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(imgArtwork)
+            val artworkConfiguration = settings.artworkConfiguration.value
+            val useEpisodeArtwork = artworkContext?.let(artworkConfiguration::useEpisodeArtwork) ?: artworkConfiguration.useEpisodeArtwork
+            imageRequestFactory.create(episode, useEpisodeArtwork).loadInto(imgArtwork)
         }
 
         val transition = AutoTransition()
