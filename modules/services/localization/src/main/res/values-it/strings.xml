@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">L\'autospegnimento ha interrotto il tuo podcast.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Autospegnimento riavviato dopo un movimento del dispositivo</string>
+    <string name="whats_new_new_widgets_message">Con due nuove dimensioni e un design aggiornato, la gestione dei podcast dalla schermata iniziale ora è molto più facile. Dai un\'occhiata.</string>
+    <string name="whats_new_new_widgets_title">Nuovi widget</string>
+    <string name="widget_check_out_discover">Visita Scopri per altro</string>
+    <string name="widget_nothing_in_up_next">Nulla in Prossimo</string>
+    <string name="widget_no_episode_playing">Nessun episodio in riproduzione</string>
+    <string name="large_player_widget_label">Player grande</string>
+    <string name="medium_player_widget_label">Player medio</string>
+    <string name="small_player_widget_label">Player piccolo</string>
     <string name="clear_search">Cancella la ricerca</string>
+    <string name="bookmarks_search_results_not_found">Non abbiamo trovato alcun segnalibro per la ricerca.</string>
     <string name="podcast_and_episode">Podcast ed episodio</string>
     <string name="skip_chapters">Preseleziona i capitoli</string>
     <string name="settings_use_episode_artwork_details">Alcuni programmi hanno grafiche personalizzate per certi episodi. Abilita questa opzione e Pocket Casts le mostrerà al posto della grafica del programma.</string>

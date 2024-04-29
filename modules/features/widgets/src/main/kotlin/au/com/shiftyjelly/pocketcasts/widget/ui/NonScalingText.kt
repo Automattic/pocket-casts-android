@@ -19,20 +19,15 @@ internal fun NonScalingText(
     useDynamicColors: Boolean,
     modifier: GlanceModifier = GlanceModifier,
     nonDynamicTextColor: Color? = null,
-    alpha: Double = 1.0,
-    maxLines: Int = 1,
+    isTransparent: Boolean = false,
+    isSingleLine: Boolean = true,
     isBold: Boolean = false,
 ) {
-    val normalizedMaxLines = maxLines.coerceIn(1, 2)
-    val normalizedAlpha = alpha.toFloat().coerceIn(0f, 1f)
-
-    val remoteView = RemoteViews(LocalContext.current.packageName, remoteViewId(useDynamicColors, isBold))
+    val remoteView = RemoteViews(LocalContext.current.packageName, remoteViewId(isBold, useDynamicColors, isSingleLine, isTransparent))
 
     with(remoteView) {
         setTextViewText(R.id.nonScalingText, text)
         setTextViewTextSize(R.id.nonScalingText, COMPLEX_UNIT_DIP, textSize.value)
-        setInt(R.id.nonScalingText, "setMaxLines", normalizedMaxLines)
-        setFloat(R.id.nonScalingText, "setAlpha", normalizedAlpha)
         if (!useDynamicColors && nonDynamicTextColor != null) {
             setTextColor(R.id.nonScalingText, nonDynamicTextColor.toArgb())
         }
@@ -43,11 +38,72 @@ internal fun NonScalingText(
     )
 }
 
+// This is awful but some OEMs do not allow to set alpha with `remoteView.setFloat(R.id.nonScalingText, "setAlpha", alpha)`
+// Instead they crash without a chance to catch the exception and the whole widget fails to render.
+// See: https://github.com/Automattic/pocket-casts-android/issues/2096
 private fun remoteViewId(
-    useDynamicColors: Boolean,
     isBold: Boolean,
-) = if (useDynamicColors) {
-    if (isBold) R.layout.non_scaling_text_dynamic_bold else R.layout.non_scaling_text_dynamic
+    useDynamicColors: Boolean,
+    isSingleLine: Boolean,
+    isTransparent: Boolean,
+) = if (isBold) {
+    if (useDynamicColors) {
+        if (isSingleLine) {
+            if (isTransparent) {
+                R.layout.non_scaling_text_bold_dynamic_oneline_transparent
+            } else {
+                R.layout.non_scaling_text_bold_dynamic_oneline_opaque
+            }
+        } else {
+            if (isTransparent) {
+                R.layout.non_scaling_text_bold_dynamic_twolines_transparent
+            } else {
+                R.layout.non_scaling_text_bold_dynamic_twolines_opaque
+            }
+        }
+    } else {
+        if (isSingleLine) {
+            if (isTransparent) {
+                R.layout.non_scaling_text_bold_nondynamic_oneline_transparent
+            } else {
+                R.layout.non_scaling_text_bold_nondynamic_oneline_opaque
+            }
+        } else {
+            if (isTransparent) {
+                R.layout.non_scaling_text_bold_nondynamic_twolines_transparent
+            } else {
+                R.layout.non_scaling_text_bold_nondynamic_twolines_opaque
+            }
+        }
+    }
 } else {
-    if (isBold) R.layout.non_scaling_text_bold else R.layout.non_scaling_text
+    if (useDynamicColors) {
+        if (isSingleLine) {
+            if (isTransparent) {
+                R.layout.non_scaling_text_regular_dynamic_oneline_transparent
+            } else {
+                R.layout.non_scaling_text_regular_dynamic_oneline_opaque
+            }
+        } else {
+            if (isTransparent) {
+                R.layout.non_scaling_text_regular_dynamic_twolines_transparent
+            } else {
+                R.layout.non_scaling_text_regular_dynamic_twolines_opaque
+            }
+        }
+    } else {
+        if (isSingleLine) {
+            if (isTransparent) {
+                R.layout.non_scaling_text_regular_nondynamic_oneline_transparent
+            } else {
+                R.layout.non_scaling_text_regular_nondynamic_oneline_opaque
+            }
+        } else {
+            if (isTransparent) {
+                R.layout.non_scaling_text_regular_nondynamic_twolines_transparent
+            } else {
+                R.layout.non_scaling_text_regular_nondynamic_twolines_opaque
+            }
+        }
+    }
 }

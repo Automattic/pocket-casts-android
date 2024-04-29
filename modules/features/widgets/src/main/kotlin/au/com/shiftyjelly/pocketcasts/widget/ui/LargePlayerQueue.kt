@@ -50,7 +50,7 @@ internal fun LargePlayerQueue(
                         text = episode.title,
                         textSize = 13.dp,
                         useDynamicColors = useDynamicColors,
-                        maxLines = 2,
+                        isSingleLine = false,
                         isBold = true,
                         modifier = GlanceModifier.padding(end = 16.dp),
                     )
@@ -61,7 +61,7 @@ internal fun LargePlayerQueue(
                         text = episode.getTimeLeft(LocalContext.current),
                         textSize = 13.dp,
                         useDynamicColors = useDynamicColors,
-                        alpha = 0.8,
+                        isTransparent = true,
                         modifier = GlanceModifier.padding(end = 16.dp),
                     )
                 }

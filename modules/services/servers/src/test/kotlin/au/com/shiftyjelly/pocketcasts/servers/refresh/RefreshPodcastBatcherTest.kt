@@ -133,7 +133,7 @@ class RefreshPodcastBatcherTest {
     fun `return null result for empty podcasts`() = runTest {
         val batcher = RefreshPodcastBatcher(1)
 
-        val result = batcher.refreshPodcasts(emptyList()) { TODO() }
+        val result = batcher.refreshPodcasts(emptyList()) { error("Unexpected call") }
 
         assertNull(result.getOrThrow())
     }

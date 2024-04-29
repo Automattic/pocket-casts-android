@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-11 14:10:07+0000
+Translation-Revision-Date: 2024-04-23 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="player_sleep_timer_stopped_your_podcast">De slaaptimer heeft je podcast gepauzeerd.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">De slaaptimer is opnieuw gestart omdat er met het apparaat is geschud</string>
+    <string name="whats_new_new_widgets_message">Met twee nieuwe maten en een bijgewerkt ontwerp is het beheren van je podcasts vanuit je startscherm ineens een stuk eenvoudiger geworden. Probeer het eens uit!</string>
+    <string name="whats_new_new_widgets_title">Nieuwe widgets</string>
+    <string name="widget_check_out_discover">Bekijk Ontdekken voor nog meer</string>
+    <string name="widget_nothing_in_up_next">Niets in Hierna</string>
+    <string name="widget_no_episode_playing">Er wordt geen aflevering afgespeeld</string>
+    <string name="large_player_widget_label">Grote speler</string>
+    <string name="medium_player_widget_label">Middelgrote speler</string>
+    <string name="small_player_widget_label">Kleine speler</string>
     <string name="clear_search">Zoekopdracht wissen</string>
+    <string name="bookmarks_search_results_not_found">We kunnen geen bladwijzer vinden voor die zoekopdracht.</string>
     <string name="podcast_and_episode">Podcast en aflevering</string>
     <string name="skip_chapters">Hoofdstukken voorselecteren</string>
     <string name="settings_use_episode_artwork_details">Sommige shows hebben apart artwork voor bepaalde afleveringen Als je deze optie inschakelt, zal dit worden weergegeven in plaats van het artwork van de show.</string>
