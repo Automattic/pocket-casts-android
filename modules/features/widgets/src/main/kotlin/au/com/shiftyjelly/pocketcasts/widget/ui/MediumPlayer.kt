@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -26,7 +25,7 @@ internal fun MediumPlayer(state: MediumPlayerWidgetState) {
                 .fillMaxWidth()
                 .height(90.dp)
                 .cornerRadiusCompat(6.dp)
-                .background(GlanceTheme.colors.primaryContainer)
+                .background(LocalWidgetTheme.current.background)
                 .padding(16.dp),
         ) {
             EpisodeImage(

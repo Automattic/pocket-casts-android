@@ -45,16 +45,13 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
                 episode = state.episode,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 size = width,
-                backgroundColor = if (!state.useDynamicColors) { { it.secondary } } else null,
-                iconColor = if (!state.useDynamicColors) { { it.onSecondary } } else null,
+                backgroundColor = { it.background },
                 onClick = { controlPlayback },
             )
             if (state.episode != null) {
                 PlaybackButton(
-                    state.isPlaying,
+                    isPlaying = state.isPlaying,
                     size = width / 2,
-                    backgroundColor = if (!state.useDynamicColors) { { it.surface } } else null,
-                    iconColor = if (!state.useDynamicColors) { { it.onSurface } } else null,
                 )
             }
         }

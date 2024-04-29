@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
@@ -37,13 +36,13 @@ internal fun PlayButton(
         Image(
             provider = ImageProvider(IR.drawable.ic_circle),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
+            colorFilter = ColorFilter.tint(LocalWidgetTheme.current.buttonBackground),
             modifier = GlanceModifier.size(size),
         )
         Image(
             provider = ImageProvider(IR.drawable.ic_widget_play),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary),
+            colorFilter = ColorFilter.tint(LocalWidgetTheme.current.icon),
             modifier = GlanceModifier.size(size).padding(size / 5),
         )
     }
