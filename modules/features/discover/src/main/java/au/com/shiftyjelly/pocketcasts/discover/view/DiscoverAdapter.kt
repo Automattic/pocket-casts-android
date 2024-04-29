@@ -841,6 +841,10 @@ internal class DiscoverAdapter(
                     adHolder.itemView.setOnClickListener {
                         row.discoverRow.categoryId?.let { categoryId ->
                             analyticsTracker.track(DISCOVER_AD_CATEGORY_TAPPED, mapOf(CATEGORY_ID_KEY to categoryId))
+                            row.discoverRow.listUuid?.let { listUuid ->
+                                FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcast.uuid)
+                                analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcast.uuid))
+                            }
                         }
                         listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
                     }
