@@ -464,7 +464,21 @@ internal class DiscoverAdapter(
 
     class ErrorViewHolder(val binding: RowErrorBinding) : RecyclerView.ViewHolder(binding.root)
     class ChangeRegionViewHolder(val binding: RowChangeRegionBinding) : RecyclerView.ViewHolder(binding.root)
-    class CategoryAdViewHolder(val binding: RowCategoryAdBinding) : NetworkLoadableViewHolder(binding.root)
+    inner class CategoryAdViewHolder(val binding: RowCategoryAdBinding) : NetworkLoadableViewHolder(binding.root) {
+
+        private var listIdImpressionTracked = mutableListOf<String>()
+
+        fun trackSponsoredListImpression(listId: String) {
+            if (listIdImpressionTracked.contains(listId)) return
+
+            FirebaseAnalyticsTracker.listImpression(listId)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
+                mapOf(LIST_ID to listId),
+            )
+            listIdImpressionTracked.add(listId)
+        }
+    }
     class SinglePodcastViewHolder(val binding: RowSinglePodcastBinding) : NetworkLoadableViewHolder(binding.root)
     class SingleEpisodeViewHolder(val binding: RowSingleEpisodeBinding) : NetworkLoadableViewHolder(binding.root)
     class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root)
@@ -871,6 +885,7 @@ internal class DiscoverAdapter(
                     onRestoreInstanceState(adHolder)
                 },
             )
+            row.discoverRow.listUuid?.let { adHolder.trackSponsoredListImpression(it) }
         }
     }
 
