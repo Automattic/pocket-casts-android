@@ -464,7 +464,21 @@ internal class DiscoverAdapter(
 
     class ErrorViewHolder(val binding: RowErrorBinding) : RecyclerView.ViewHolder(binding.root)
     class ChangeRegionViewHolder(val binding: RowChangeRegionBinding) : RecyclerView.ViewHolder(binding.root)
-    class CategoryAdViewHolder(val binding: RowCategoryAdBinding) : NetworkLoadableViewHolder(binding.root)
+    inner class CategoryAdViewHolder(val binding: RowCategoryAdBinding) : NetworkLoadableViewHolder(binding.root) {
+
+        private var listIdImpressionTracked = mutableListOf<String>()
+
+        fun trackSponsoredListImpression(listId: String) {
+            if (listIdImpressionTracked.contains(listId)) return
+
+            FirebaseAnalyticsTracker.listImpression(listId)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
+                mapOf(LIST_ID to listId),
+            )
+            listIdImpressionTracked.add(listId)
+        }
+    }
     class SinglePodcastViewHolder(val binding: RowSinglePodcastBinding) : NetworkLoadableViewHolder(binding.root)
     class SingleEpisodeViewHolder(val binding: RowSingleEpisodeBinding) : NetworkLoadableViewHolder(binding.root)
     class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root)
@@ -841,8 +855,20 @@ internal class DiscoverAdapter(
                     adHolder.itemView.setOnClickListener {
                         row.discoverRow.categoryId?.let { categoryId ->
                             analyticsTracker.track(DISCOVER_AD_CATEGORY_TAPPED, mapOf(CATEGORY_ID_KEY to categoryId))
+                            row.discoverRow.listUuid?.let { listUuid ->
+                                FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcast.uuid)
+                                analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcast.uuid))
+                            }
                         }
                         listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
+                    }
+
+                    val btnSubscribe = adHolder.binding.btnSubscribe
+                    btnSubscribe.updateSubscribeButtonIcon(podcast.isSubscribed)
+                    btnSubscribe.setOnClickListener {
+                        btnSubscribe.updateSubscribeButtonIcon(true)
+                        listener.onPodcastSubscribe(podcast = podcast, listUuid = row.discoverRow.listUuid)
+                        row.discoverRow.listUuid?.let { listUuid -> trackDiscoverListPodcastSubscribed(listUuid, podcast.uuid) }
                     }
 
                     val lblSponsored = adHolder.binding.lblSponsored
@@ -859,6 +885,7 @@ internal class DiscoverAdapter(
                     onRestoreInstanceState(adHolder)
                 },
             )
+            row.discoverRow.listUuid?.let { adHolder.trackSponsoredListImpression(it) }
         }
     }
 
