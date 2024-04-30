@@ -7,8 +7,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.test.runTest
@@ -186,6 +188,41 @@ class PodcastDaoTest {
                 latestReleaseTimestamp = 0,
                 lastUsedTimestamp = null,
             ),
+        )
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun getAllTrendingPodcastsForNovaLauncher() = runTest {
+        val trendingPodcasts = List(65) {
+            TrendingPodcast("id-$it", "title-$it")
+        }
+        podcastDao.replaceAllTrendingPodcasts(trendingPodcasts)
+
+        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts()
+
+        val expected = List(65) {
+            NovaLauncherTrendingPodcast("id-$it", "title-$it")
+        }
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun doNotIncludeTrendingPodcastsThatAreTrendingForNovaLauncher() = runTest {
+        val trendingPodcasts = listOf(
+            TrendingPodcast("id-1", "title-1"),
+            TrendingPodcast("id-2", "title-2"),
+            TrendingPodcast("id-3", "title-3"),
+        )
+        podcastDao.replaceAllTrendingPodcasts(trendingPodcasts)
+        podcastDao.insert(Podcast("id-1", isSubscribed = true))
+        podcastDao.insert(Podcast("id-2", isSubscribed = false))
+
+        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts()
+
+        val expected = listOf(
+            NovaLauncherTrendingPodcast("id-2", "title-2"),
+            NovaLauncherTrendingPodcast("id-3", "title-3"),
         )
         assertEquals(expected, podcasts)
     }
