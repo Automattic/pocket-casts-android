@@ -117,6 +117,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         sheetBehavior = BottomSheetBehavior.from(this).apply {
             addBottomSheetCallback(bottomSheetCallback!!)
         }
+        sheetBehavior?.isDraggable = false
 
         if (shouldPlayerOpenOnAttach) {
             shouldPlayerOpenOnAttach = false
@@ -138,6 +139,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
         when (upNext) {
             is UpNextQueue.State.Loaded -> {
+                sheetBehavior?.isDraggable = true
                 if ((isHidden() || !hasLoadedFirstTime)) {
                     show()
                     if (!shouldPlayerOpenOnAttach && shouldAnimateOnAttach) {
@@ -160,6 +162,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
             is UpNextQueue.State.Empty -> {
                 if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    sheetBehavior?.isDraggable = false
                     listener?.onMiniPlayerVisible()
                     closePlayer()
                 } else if (isVisible()) {
