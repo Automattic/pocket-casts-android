@@ -168,15 +168,19 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
                 binding.skipBack.isVisible = true
                 binding.skipForward.isVisible = true
                 binding.miniPlayButton.isVisible = true
+                binding.root.isClickable = true
+                binding.root.isFocusable = true
             }
 
-            is UpNextQueue.State.Empty  -> {
+            is UpNextQueue.State.Empty -> {
                 binding.artwork.setImageDrawable(null)
                 binding.artwork.setBackgroundColor(ThemeColor.primaryUi05(theme.activeTheme))
                 binding.nothingPlayingText.isVisible = true
                 binding.skipBack.isVisible = false
                 binding.skipForward.isVisible = false
                 binding.miniPlayButton.isVisible = false
+                binding.root.isClickable = false
+                binding.root.isFocusable = false
             }
         }
 
@@ -202,6 +206,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun openPlayer() {
+        if (binding.root.isClickable.not()) return
         clickListener?.onPlayerClicked()
     }
 
