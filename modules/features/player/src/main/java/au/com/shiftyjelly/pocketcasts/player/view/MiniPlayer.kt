@@ -171,6 +171,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             }
 
             is UpNextQueue.State.Empty  -> {
+                binding.artwork.setImageDrawable(null)
                 binding.artwork.setBackgroundColor(ThemeColor.primaryUi05(theme.activeTheme))
                 binding.nothingPlayingText.isVisible = true
                 binding.skipBack.isVisible = false
@@ -259,7 +260,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         useEpisodeArtwork: Boolean,
         imageView: ImageView,
     ): Disposable? {
-        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork && imageView.drawable != null) {
             return null
         }
 
