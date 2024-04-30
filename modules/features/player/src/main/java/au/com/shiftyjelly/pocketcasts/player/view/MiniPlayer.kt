@@ -169,6 +169,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
                 binding.skipBack.isVisible = true
                 binding.skipForward.isVisible = true
                 binding.miniPlayButton.isVisible = true
+                binding.progressBar.isVisible = true
                 binding.root.isClickable = true
                 binding.root.isFocusable = true
             }
@@ -176,10 +177,12 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             is UpNextQueue.State.Empty -> {
                 binding.artwork.setImageDrawable(null)
                 binding.artwork.setBackgroundColor(ThemeColor.primaryUi05(theme.activeTheme))
+                binding.miniPlayerTint.setBackgroundColor(ThemeColor.primaryUi01(theme.activeTheme))
                 binding.nothingPlayingText.isVisible = true
                 binding.skipBack.isVisible = false
                 binding.skipForward.isVisible = false
                 binding.miniPlayButton.isVisible = false
+                binding.progressBar.isVisible = false
                 binding.root.isClickable = false
                 binding.root.isFocusable = false
             }
