@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.nova
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
-import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import javax.inject.Inject
 
 class NovaLauncherManagerImpl @Inject constructor(
