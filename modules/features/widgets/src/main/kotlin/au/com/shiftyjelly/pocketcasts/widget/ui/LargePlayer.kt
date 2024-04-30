@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
-import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Spacer
@@ -21,12 +21,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun LargePlayer(state: LargePlayerWidgetState) {
     val upNextEpisodes = state.upNextEpisodes
+    val headerAndPaddingHeight = 160.dp
+    val availableContentHeight = LocalSize.current.height - headerAndPaddingHeight
+    val fittingItemCount = ((availableContentHeight - 58.dp) / 66.dp).toInt().coerceAtLeast(0) + 1
+    val actualDisplayedItemCount = upNextEpisodes.size.coerceAtMost(fittingItemCount)
+    val expectedContentHeight = contentHeight(fittingItemCount)
+    val actualContentHeight = contentHeight(actualDisplayedItemCount)
 
     WidgetTheme(state.useDynamicColors) {
         RounderCornerBox(
             contentAlignment = Alignment.TopCenter,
             backgroundTint = LocalWidgetTheme.current.background,
-            modifierCompat = GlanceModifier.fillMaxWidth().height(350.dp),
+            modifierCompat = GlanceModifier.fillMaxWidth().height(headerAndPaddingHeight + expectedContentHeight),
             modifier = GlanceModifier
                 .clickable(OpenPocketCastsAction.action())
                 .fillMaxWidth()
@@ -43,20 +49,15 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                     Spacer(
                         modifier = GlanceModifier.height(12.dp),
                     )
-                    val expectedHeight = when (upNextEpisodes.size) {
-                        0 -> 0
-                        1 -> 58
-                        2 -> 124
-                        else -> 190
-                    }.dp
                     LargePlayerQueue(
                         queue = upNextEpisodes,
                         useEpisodeArtwork = state.useEpisodeArtwork,
                         useDynamicColors = state.useDynamicColors,
-                        modifier = GlanceModifier.height(expectedHeight),
+                        modifier = GlanceModifier.height(actualContentHeight),
                     )
+                    // This spacer is needed to enable tapping on empty content when queue doesn't fill the whole widget
                     Spacer(
-                        modifier = GlanceModifier.fillMaxWidth().height(190.dp - expectedHeight),
+                        modifier = GlanceModifier.fillMaxWidth().height(expectedContentHeight - actualContentHeight),
                     )
                 } else {
                     Column(
@@ -64,7 +65,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = GlanceModifier
                             .fillMaxWidth()
-                            .height(202.dp),
+                            .height(expectedContentHeight + 12.dp),
                     ) {
                         NonScalingText(
                             text = LocalContext.current.getString(LR.string.widget_nothing_in_up_next),
@@ -87,3 +88,8 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
         }
     }
 }
+
+private fun contentHeight(size: Int) = when (size) {
+    0 -> 58
+    else -> 58 + (size - 1) * 66
+}.dp
