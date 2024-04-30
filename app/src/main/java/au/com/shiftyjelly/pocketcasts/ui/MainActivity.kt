@@ -985,9 +985,11 @@ class MainActivity :
 
         // Handle up next shortcut
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
-            intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
-            binding.playerBottomSheet.openPlayer()
-            showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
+            if (!playbackManager.upNextQueue.isEmpty) {
+                intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
+                binding.playerBottomSheet.openPlayer()
+                showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
+            }
         }
     }
 
