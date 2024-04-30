@@ -23,7 +23,7 @@ internal fun PlaybackControls(
         verticalAlignment = Alignment.Vertical.Bottom,
         modifier = modifier.fillMaxWidth(),
     ) {
-        SkipForwardButton(
+        SkipBackButton(
             iconPadding = iconPadding,
             isClickable = isClickable,
             modifier = GlanceModifier.height(buttonHeight).defaultWeight(),
@@ -40,7 +40,7 @@ internal fun PlaybackControls(
         Spacer(
             modifier = GlanceModifier.width(4.dp),
         )
-        SkipBackButton(
+        SkipForwardButton(
             iconPadding = iconPadding,
             isClickable = isClickable,
             modifier = GlanceModifier.height(buttonHeight).defaultWeight(),
