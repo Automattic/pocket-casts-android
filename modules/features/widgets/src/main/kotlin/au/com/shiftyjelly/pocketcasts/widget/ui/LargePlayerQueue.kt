@@ -34,10 +34,10 @@ internal fun LargePlayerQueue(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = GlanceModifier
-                    .clickable(OpenPocketCastsAction.action())
                     .fillMaxWidth()
                     .height(if (index == lastIndex) 58.dp else 66.dp)
-                    .padding(bottom = if (index == lastIndex) 0.dp else 8.dp),
+                    .padding(bottom = if (index == lastIndex) 0.dp else 8.dp)
+                    .clickable(OpenPocketCastsAction.action()),
             ) {
                 EpisodeImage(
                     episode = episode,
@@ -67,7 +67,11 @@ internal fun LargePlayerQueue(
                         modifier = GlanceModifier.padding(end = 16.dp),
                     )
                 }
-                PlayButton(episode = episode)
+                PlayButton(
+                    episode = episode,
+                    iconPadding = 8.dp,
+                    modifier = GlanceModifier.size(38.dp),
+                )
             }
         }
     }

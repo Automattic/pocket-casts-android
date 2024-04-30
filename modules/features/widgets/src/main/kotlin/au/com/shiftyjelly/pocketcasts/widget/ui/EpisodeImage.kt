@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
@@ -17,9 +16,7 @@ import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
-import androidx.glance.background
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -40,13 +37,10 @@ internal fun EpisodeImage(
         mutableStateOf<Bitmap?>(null)
     }
 
-    Box(
+    RounderCornerBox(
         contentAlignment = Alignment.Center,
-        modifier = GlanceModifier
-            .applyIf(onClick != null) { it.clickable(onClick!!) }
-            .background(backgroundColor?.invoke(LocalWidgetTheme.current) ?: LocalWidgetTheme.current.buttonBackground)
-            .cornerRadiusCompat(6.dp)
-            .size(size),
+        backgroundTint = backgroundColor?.invoke(LocalWidgetTheme.current) ?: LocalWidgetTheme.current.buttonBackground,
+        modifier = GlanceModifier.size(size).applyIf(onClick != null) { it.clickable(onClick!!) },
     ) {
         PocketCastsLogo(
             size = size / 2.5f,
@@ -64,7 +58,7 @@ internal fun EpisodeImage(
     if (episode != null) {
         val context = LocalContext.current
         LaunchedEffect(episode.uuid, useEpisodeArtwork) {
-            val requestFactory = PocketCastsImageRequestFactory(context).smallSize()
+            val requestFactory = PocketCastsImageRequestFactory(context, cornerRadius = if (isSystemCornerRadiusSupported) 0 else 6).smallSize()
             val request = requestFactory.create(episode.toBaseEpisode(), useEpisodeArtwork)
             var drawable: Drawable? = null
             while (drawable == null) {
