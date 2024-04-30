@@ -3,9 +3,7 @@ package au.com.shiftyjelly.pocketcasts.widget.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
-import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -31,8 +29,7 @@ internal fun LargePlayerHeader(
         contentAlignment = Alignment.TopEnd,
         modifier = modifier
             .fillMaxWidth()
-            .height(116.dp)
-            .background(GlanceTheme.colors.primaryContainer),
+            .height(116.dp),
     ) {
         Row(
             verticalAlignment = Alignment.Top,
@@ -50,25 +47,12 @@ internal fun LargePlayerHeader(
                 verticalAlignment = Alignment.Vertical.Top,
                 modifier = GlanceModifier.defaultWeight().height(116.dp),
             ) {
-                Spacer(
-                    modifier = GlanceModifier.height(4.dp),
-                )
-                NonScalingText(
-                    text = LocalContext.current.getString(LR.string.player_tab_playing_wide),
-                    textSize = 13.dp,
-                    useDynamicColors = state.useDynamicColors,
-                    isTransparent = true,
-                    modifier = GlanceModifier.padding(end = 32.dp),
-                )
                 NonScalingText(
                     text = episode?.title ?: LocalContext.current.getString(LR.string.widget_no_episode_playing),
                     textSize = 16.dp,
                     useDynamicColors = state.useDynamicColors,
                     isBold = true,
                     modifier = GlanceModifier.padding(end = 32.dp),
-                )
-                Spacer(
-                    modifier = GlanceModifier.height(4.dp),
                 )
                 NonScalingText(
                     text = episode?.getTimeLeft(LocalContext.current) ?: " ",
@@ -78,10 +62,10 @@ internal fun LargePlayerHeader(
                 )
                 PlaybackControls(
                     isPlaying = state.isPlaying,
+                    buttonHeight = 58.dp,
+                    iconPadding = 16.dp,
+                    isClickable = episode != null,
                     modifier = GlanceModifier.defaultWeight(),
-                )
-                Spacer(
-                    modifier = GlanceModifier.height(4.dp),
                 )
             }
         }
