@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.isHidden
 import au.com.shiftyjelly.pocketcasts.views.extensions.isVisible
@@ -134,31 +136,37 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     fun setUpNext(upNext: UpNextQueue.State, theme: Theme, shouldAnimateOnAttach: Boolean, useEpisodeArtwork: Boolean) {
         binding.miniPlayer.setUpNext(upNext, theme, useEpisodeArtwork)
 
-        // only show the mini player when an episode is loaded
-        if (upNext is UpNextQueue.State.Loaded) {
-            if ((isHidden() || !hasLoadedFirstTime)) {
-                show()
-                if (!shouldPlayerOpenOnAttach && shouldAnimateOnAttach) {
-                    translationY = 68.dpToPx(context).toFloat()
-                    animate().translationY(0f).setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
+        when (upNext) {
+            is UpNextQueue.State.Loaded -> {
+                if ((isHidden() || !hasLoadedFirstTime)) {
+                    show()
+                    if (!shouldPlayerOpenOnAttach && shouldAnimateOnAttach) {
+                        translationY = 68.dpToPx(context).toFloat()
+                        animate().translationY(0f).setListener(object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                listener?.onMiniPlayerVisible()
+                                hasLoadedFirstTime = true
+                            }
+                        })
+                    } else {
+                        translationY = 0f
+                        if (!shouldAnimateOnAttach) {
                             listener?.onMiniPlayerVisible()
                             hasLoadedFirstTime = true
                         }
-                    })
-                } else {
-                    translationY = 0f
-                    if (!shouldAnimateOnAttach) {
-                        listener?.onMiniPlayerVisible()
-                        hasLoadedFirstTime = true
                     }
                 }
             }
-        } else {
-            if (isVisible()) {
-                hide()
-                closePlayer()
-                listener?.onMiniPlayerHidden()
+
+            is UpNextQueue.State.Empty -> {
+                if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    listener?.onMiniPlayerVisible()
+                    closePlayer()
+                } else if (isVisible()) {
+                    hide()
+                    closePlayer()
+                    listener?.onMiniPlayerHidden()
+                }
             }
         }
     }

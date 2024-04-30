@@ -394,7 +394,11 @@ class MainActivity :
             activity = this,
         )
 
-        val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
+        val showMiniPlayerImmediately = if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+            savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
+        } else {
+            true
+        }
         binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
 
         setupPlayerViews(showMiniPlayerImmediately)
@@ -532,7 +536,9 @@ class MainActivity :
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(SAVEDSTATE_PLAYER_OPEN, binding.playerBottomSheet.isPlayerOpen)
-        outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
+        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+            outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
+        }
     }
 
     override fun overrideNextRefreshTimer() {

@@ -154,14 +154,28 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     fun setUpNext(upNextState: UpNextQueue.State, theme: Theme, useEpisodeArtwork: Boolean) {
-        if (upNextState is UpNextQueue.State.Loaded) {
-            loadEpisodeArtwork(upNextState.episode, useEpisodeArtwork, binding.artwork)
+        when (upNextState) {
+            is UpNextQueue.State.Loaded -> {
+                loadEpisodeArtwork(upNextState.episode, useEpisodeArtwork, binding.artwork)
 
-            val podcast = upNextState.podcast
-            if (podcast != null) {
-                updateTintColor(podcast.getPlayerTintColor(theme.isDarkTheme), theme)
-            } else {
-                updateTintColor(context.getThemeColor(androidx.appcompat.R.attr.colorAccent), theme)
+                val podcast = upNextState.podcast
+                if (podcast != null) {
+                    updateTintColor(podcast.getPlayerTintColor(theme.isDarkTheme), theme)
+                } else {
+                    updateTintColor(context.getThemeColor(androidx.appcompat.R.attr.colorAccent), theme)
+                }
+                binding.nothingPlayingText.isVisible = false
+                binding.skipBack.isVisible = true
+                binding.skipForward.isVisible = true
+                binding.miniPlayButton.isVisible = true
+            }
+
+            is UpNextQueue.State.Empty  -> {
+                binding.artwork.setBackgroundColor(ThemeColor.primaryUi05(theme.activeTheme))
+                binding.nothingPlayingText.isVisible = true
+                binding.skipBack.isVisible = false
+                binding.skipForward.isVisible = false
+                binding.miniPlayButton.isVisible = false
             }
         }
 
