@@ -447,12 +447,12 @@ abstract class PodcastDao {
           podcasts
         WHERE
         -- Select only episodes that were used at most 2 months ago
-          last_used_timestamp >= (UNIXEPOCH() - 5184000)
+          last_used_timestamp * 1000 >= (:currentTime - 5184000000)
         ORDER BY
           last_used_timestamp DESC
         LIMIT
           200
         """,
     )
-    abstract suspend fun getNovaLauncherRecentlyPlayedPodcasts(): List<NovaLauncherRecentlyPlayedPodcast>
+    abstract suspend fun getNovaLauncherRecentlyPlayedPodcasts(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherRecentlyPlayedPodcast>
 }

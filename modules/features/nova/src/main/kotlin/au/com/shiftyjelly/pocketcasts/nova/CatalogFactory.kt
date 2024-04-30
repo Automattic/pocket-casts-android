@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherRecentlyPlayedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -19,6 +20,25 @@ internal class CatalogFactory(
     fun subscribedPodcasts(data: List<NovaLauncherSubscribedPodcast>) = Catalog(
         id = "SubscribedPodcasts",
         label = context.getString(LR.string.nova_launcher_subscribed_podcasts),
+        items = data.map { podcast ->
+            CatalogItem.Base(
+                id = podcast.id,
+                intent = podcast.intent,
+                lastUsedTimestamp = podcast.lastUsedTimestamp,
+                typeData = TypeData.Podcast(
+                    name = podcast.title,
+                    iconUrl = podcast.coverUrl,
+                    originalReleaseTimestamp = podcast.initialReleaseTimestamp,
+                    latestReleaseTimestamp = podcast.latestReleaseTimestamp,
+                ),
+            )
+        },
+    )
+
+    fun recentlyPlayedPodcasts(data: List<NovaLauncherRecentlyPlayedPodcast>) = Catalog(
+        id = "RecentlyPlayed",
+        label = context.getString(LR.string.nova_launcher_recently_played),
+        type = CatalogType.CONTINUE,
         items = data.map { podcast ->
             CatalogItem.Base(
                 id = podcast.id,
@@ -98,6 +118,13 @@ internal class CatalogFactory(
     private val NovaLauncherSubscribedPodcast.coverUrl get() = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$id.webp"
 
     private val NovaLauncherSubscribedPodcast.intent get() = context.launcherIntent
+        .setAction(Settings.INTENT_OPEN_APP_PODCAST_UUID)
+        .putExtra(Settings.PODCAST_UUID, id)
+        .putExtra(Settings.SOURCE_VIEW, SourceView.NOVA_LAUNCHER.analyticsValue)
+
+    private val NovaLauncherRecentlyPlayedPodcast.coverUrl get() = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$id.webp"
+
+    private val NovaLauncherRecentlyPlayedPodcast.intent get() = context.launcherIntent
         .setAction(Settings.INTENT_OPEN_APP_PODCAST_UUID)
         .putExtra(Settings.PODCAST_UUID, id)
         .putExtra(Settings.SOURCE_VIEW, SourceView.NOVA_LAUNCHER.analyticsValue)

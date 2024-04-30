@@ -1932,6 +1932,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
 
     <!-- Nova Launcher -->
     <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
+    <string name="nova_launcher_recently_played">Recently Played</string>
     <string name="nova_launcher_new_releases">New Releases</string>
 <string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
     <string name="nova_launcher_continue_listening">Continue listening</string>
