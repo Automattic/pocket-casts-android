@@ -165,7 +165,7 @@ class VersionMigrationsJob : JobService() {
             consolidateEmbeddedArtworkSettings(applicationContext)
         }
 
-        if (previousVersionCode < 9224) {
+        if (previousVersionCode < 9226) {
             migrateToGranularEpisodeArtworkSettings(applicationContext)
         }
     }
