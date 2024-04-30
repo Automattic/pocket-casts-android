@@ -33,7 +33,7 @@ internal fun EpisodeImage(
     backgroundColor: ((WidgetTheme) -> ColorProvider)? = null,
     onClick: Action? = null,
 ) {
-    var episodeBitmap by remember(episode?.uuid, useEpisodeArtwork) {
+    var episodeBitmap by remember(episode?.uuid, useEpisodeArtwork, size) {
         mutableStateOf<Bitmap?>(null)
     }
 
@@ -57,8 +57,12 @@ internal fun EpisodeImage(
 
     if (episode != null) {
         val context = LocalContext.current
-        LaunchedEffect(episode.uuid, useEpisodeArtwork) {
-            val requestFactory = PocketCastsImageRequestFactory(context, cornerRadius = if (isSystemCornerRadiusSupported) 0 else 6).smallSize()
+        LaunchedEffect(episode.uuid, useEpisodeArtwork, size) {
+            val requestFactory = PocketCastsImageRequestFactory(
+                context,
+                size = size.value.toInt(),
+                cornerRadius = if (isSystemCornerRadiusSupported) 0 else 6,
+            )
             val request = requestFactory.create(episode.toBaseEpisode(), useEpisodeArtwork)
             var drawable: Drawable? = null
             while (drawable == null) {
