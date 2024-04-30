@@ -54,6 +54,23 @@
         app:layout_constraintTop_toBottomOf="@id/lblSponsored"
         tools:text="Title" />
 
+    <ImageView
+        android:id="@+id/btnSubscribe"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical|end"
+        android:background="?android:attr/actionBarItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="centerInside"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@string/subscribe"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?attr/primary_icon_02" />
+
     <TextView
         android:id="@+id/lblBody"
         style="@style/P40"
