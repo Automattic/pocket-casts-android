@@ -24,9 +24,11 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBind
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -53,6 +55,7 @@ class UpNextAdapter(
     private val upNextSource: UpNextSource,
     private val settings: Settings,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
+    private val playbackManager: PlaybackManager,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 3).themed()
@@ -156,6 +159,8 @@ class UpNextAdapter(
                 btnClear.isEnabled = header.episodeCount > 0
                 emptyUpNextContainer.isVisible = header.episodeCount == 0
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
+                btnClear.isVisible = playbackManager.getCurrentEpisode() != null
+                lblUpNextTime.isVisible = playbackManager.getCurrentEpisode() != null
                 lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
@@ -189,7 +194,7 @@ class UpNextAdapter(
             binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
 
             if (loadedUuid != playingState.episode.uuid) {
-                imageRequestFactory.create(playingState.episode, settings.useEpisodeArtwork.value).loadInto(binding.image)
+                imageRequestFactory.create(playingState.episode, settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext)).loadInto(binding.image)
                 loadedUuid = playingState.episode.uuid
             }
 

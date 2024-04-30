@@ -19,6 +19,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.TransitionInflater
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -29,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.HelpViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -82,6 +85,10 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         savedInstanceState?.let {
             loadedUrl = savedInstanceState.getString("url")
         }
+        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+            val inflater = TransitionInflater.from(requireContext())
+            enterTransition = inflater.inflateTransition(au.com.shiftyjelly.pocketcasts.ui.R.transition.slide_in)
+        }
         viewModel.onShown()
     }
 
@@ -118,13 +125,13 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         when (item.itemId) {
             R.id.menu_logs -> {
                 val fragment = LogsFragment()
-                (activity as? FragmentHostListener)?.addFragment(fragment)
+                (activity as? FragmentHostListener)?.addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
                 true
             }
 
             R.id.menu_status_page -> {
                 val fragment = StatusFragment()
-                (activity as? FragmentHostListener)?.addFragment(fragment)
+                (activity as? FragmentHostListener)?.addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
                 true
             }
 
@@ -263,5 +270,10 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
                 UiUtil.displayDialogNoEmailApp(context)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        enterTransition = null
     }
 }

@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     tools:layout_height="wrap_content">
 
-    <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
+    <au.com.shiftyjelly.pocketcasts.views.component.ProfileCircleView
         android:id="@+id/imgProfilePicture"
         android:layout_width="@dimen/profile_picture_size"
         android:layout_height="@dimen/profile_picture_size"

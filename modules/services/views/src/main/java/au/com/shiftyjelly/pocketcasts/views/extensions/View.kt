@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import androidx.appcompat.widget.Toolbar
@@ -110,4 +111,13 @@ fun View.collapse() {
 
     animation.duration = (initialHeight / context.resources.displayMetrics.density).toInt().toLong()
     startAnimation(animation)
+}
+
+fun View.doOnGlobalLayout(action: () -> Unit) {
+    viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+            action()
+            viewTreeObserver.removeOnGlobalLayoutListener(this)
+        }
+    })
 }

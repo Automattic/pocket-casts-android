@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
@@ -329,7 +330,7 @@ interface Settings {
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
     val autoDownloadUpNext: UserSetting<Boolean>
 
-    val useEpisodeArtwork: UserSetting<Boolean>
+    val artworkConfiguration: UserSetting<ArtworkConfiguration>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
@@ -352,7 +353,11 @@ interface Settings {
     fun getClearHistoryTime(): Long
 
     fun setSleepTimerCustomMins(minutes: Int)
+    fun setSleepEndOfEpisodes(episodes: Int)
+    fun setlastSleepEndOfEpisodes(episodes: Int)
     fun getSleepTimerCustomMins(): Int
+    fun getSleepEndOfEpisodes(): Int
+    fun getlastSleepEndOfEpisodes(): Int
 
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
@@ -385,6 +390,8 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
+    fun getSleepTimerDeviceShakeThreshold(): Long
+
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>
@@ -449,8 +456,7 @@ interface Settings {
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
-    fun setEndOfYearShowBadge2023(value: Boolean)
-    fun getEndOfYearShowBadge2023(): Boolean
+    val endOfYearShowBadge2023: UserSetting<Boolean>
 
     fun setEndOfYearShowModal(value: Boolean)
     fun getEndOfYearShowModal(): Boolean

@@ -74,5 +74,6 @@ class ShowNotesProcessor @Inject constructor(
         title = title,
         imageUrl = image,
         url = url,
+        isEmbedded = false,
     )
 }

@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -40,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -61,7 +63,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 private const val ARG_MODE = "profile_list_mode"
 
 @AndroidEntryPoint
-class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+class ProfileEpisodeListFragment : BaseFragment(), CloseOnTabSwitch, Toolbar.OnMenuItemClickListener {
     sealed class Mode(val index: Int, val showMenu: Boolean) {
         object Downloaded : Mode(0, true)
         object Starred : Mode(1, false)
@@ -154,6 +156,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     Mode.Starred -> EpisodeItemTouchHelper.SwipeSource.STARRED
                 },
             ),
+            artworkContext = when (mode) {
+                Mode.Downloaded -> Element.Downloads
+                Mode.History -> Element.ListeningHistory
+                Mode.Starred -> Element.Starred
+            },
         )
     }
 

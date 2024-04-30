@@ -83,6 +83,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    UPNEXT_IN_TAB_BAR(
+        key = "upnext_in_tab_bar",
+        title = "Show Up Next in tab bar",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

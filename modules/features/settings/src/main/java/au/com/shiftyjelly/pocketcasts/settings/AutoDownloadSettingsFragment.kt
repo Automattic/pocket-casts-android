@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel
+import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
@@ -58,7 +59,8 @@ class AutoDownloadSettingsFragment :
     CoroutineScope,
     PodcastSelectFragment.Listener,
     FilterSelectFragment.Listener,
-    HasBackstack {
+    HasBackstack,
+    CloseOnTabSwitch {
 
     companion object {
         const val PREFERENCE_PODCASTS_CATEGORY = "podcasts_category"

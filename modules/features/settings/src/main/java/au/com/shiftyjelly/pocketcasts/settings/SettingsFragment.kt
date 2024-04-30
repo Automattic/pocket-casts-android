@@ -13,10 +13,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.transition.TransitionInflater
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -29,6 +33,14 @@ class SettingsFragment : BaseFragment() {
 
     @Inject
     lateinit var batteryRestrictions: SystemBatteryRestrictions
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+            val inflater = TransitionInflater.from(requireContext())
+            enterTransition = inflater.inflateTransition(R.transition.slide_in)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,11 +79,16 @@ class SettingsFragment : BaseFragment() {
                                 isDebug = BuildConfig.DEBUG,
                                 isUnrestrictedBattery = isUnrestrictedBattery,
                                 openFragment = { fragment ->
-                                    (activity as? FragmentHostListener)?.addFragment(fragment)
+                                    (activity as? FragmentHostListener)?.addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
                                 },
                             )
                         }
                 }
             }
         }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        enterTransition = null
+    }
 }

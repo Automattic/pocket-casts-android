@@ -13,8 +13,6 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -113,6 +111,7 @@ fun BookmarkRow(
     timePlayButtonColors: TimePlayButtonColors,
     showIcon: Boolean,
     useEpisodeArtwork: Boolean,
+    showEpisodeTitle: Boolean = false,
 ) {
     Column(
         modifier = modifier,
@@ -162,7 +161,8 @@ fun BookmarkRow(
                     .weight(1f)
                     .padding(horizontal = 16.dp),
             ) {
-                if (bookmark.episodeTitle.isNotEmpty()) {
+                val shouldShowEpisodeTitle = showEpisodeTitle && bookmark.episodeTitle.isNotEmpty()
+                if (shouldShowEpisodeTitle) {
                     TextH70(
                         text = bookmark.episodeTitle,
                         color = colors.secondaryTextColor(),
@@ -173,7 +173,7 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        top = if (bookmark.episodeTitle.isNotEmpty()) 4.dp else 16.dp,
+                        top = if (shouldShowEpisodeTitle) 4.dp else 16.dp,
                     ),
                 )
 
@@ -192,7 +192,7 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        bottom = if (bookmark.episodeTitle.isNotEmpty()) 8.dp else 16.dp,
+                        bottom = if (shouldShowEpisodeTitle) 8.dp else 16.dp,
                     ),
                 )
             }

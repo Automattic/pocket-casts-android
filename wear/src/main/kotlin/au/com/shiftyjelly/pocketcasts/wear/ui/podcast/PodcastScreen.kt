@@ -48,12 +48,12 @@ fun PodcastScreen(
     viewModel: PodcastViewModel = hiltViewModel(),
     columnState: ScalingLazyColumnState,
 ) {
-    val useEpisodeArtwork by viewModel.useEpisodeArtwork.collectAsState()
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     when (val state = viewModel.uiState) {
         is UiState.Loaded -> Content(
             state = state,
-            useEpisodeArtwork = useEpisodeArtwork,
+            useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
             columnState = columnState,

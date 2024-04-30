@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -108,10 +109,10 @@ class BookmarksViewModelTest {
             .thenReturn(MutableLiveData<Boolean>().apply { value = false })
         whenever(multiSelectHelper.selectedListLive)
             .thenReturn(MutableLiveData<List<Bookmark>>().apply { value = emptyList() })
-        val useEpisodeArtwork = mock<UserSetting<Boolean>> {
-            on { flow } doReturn MutableStateFlow(false)
+        val artworkConfiguration = mock<UserSetting<ArtworkConfiguration>> {
+            on { flow } doReturn MutableStateFlow(ArtworkConfiguration(false))
         }
-        whenever(settings.useEpisodeArtwork).thenReturn(useEpisodeArtwork)
+        whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
         bookmarkSearchHandler = BookmarkSearchHandler(bookmarkManager)
         bookmarksViewModel = BookmarksViewModel(
             analyticsTracker = analyticsTracker,
