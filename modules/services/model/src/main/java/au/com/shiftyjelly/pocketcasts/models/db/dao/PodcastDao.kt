@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherRecentlyPlayedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -432,4 +433,26 @@ abstract class PodcastDao {
         """,
     )
     abstract suspend fun getNovaLauncherTrendingPodcasts(): List<NovaLauncherTrendingPodcast>
+
+    @Query(
+        """
+        SELECT 
+          podcasts.uuid AS id, 
+          podcasts.title AS title, 
+          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
+          (SELECT MIN(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
+          (SELECT MAX(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
+          (SELECT MAX(podcast_episodes.last_playback_interaction_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
+        FROM 
+          podcasts
+        WHERE
+        -- Select only episodes that were used at most 2 months ago
+          last_used_timestamp >= (UNIXEPOCH() - 5184000)
+        ORDER BY
+          last_used_timestamp DESC
+        LIMIT
+          200
+        """,
+    )
+    abstract suspend fun getNovaLauncherRecentlyPlayedPodcasts(): List<NovaLauncherRecentlyPlayedPodcast>
 }
