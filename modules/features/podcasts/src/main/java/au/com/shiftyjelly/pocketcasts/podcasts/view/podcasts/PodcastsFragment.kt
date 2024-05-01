@@ -163,7 +163,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
             toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder && !FeatureFlag.isEnabled(Feature.PODCASTS_TAB_SEARCH_BAR)
 
-            binding.layoutSearch.showIf(rootFolder)
+            binding.layoutSearch.showIf(rootFolder && FeatureFlag.isEnabled(Feature.PODCASTS_TAB_SEARCH_BAR))
 
             adapter?.setFolderItems(folderState.items)
 
@@ -220,6 +220,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             true
         }
+
+        binding.layoutSearch.showIf(FeatureFlag.isEnabled(Feature.PODCASTS_TAB_SEARCH_BAR))
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshPodcasts()
