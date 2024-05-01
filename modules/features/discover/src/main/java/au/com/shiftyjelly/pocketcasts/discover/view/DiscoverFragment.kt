@@ -47,7 +47,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectFragment.Listener {
-    override var statusBarColor: StatusBarColor = StatusBarColor.Dark
+    override var statusBarColor: StatusBarColor = StatusBarColor.Light
 
     @Inject lateinit var settings: Settings
 
