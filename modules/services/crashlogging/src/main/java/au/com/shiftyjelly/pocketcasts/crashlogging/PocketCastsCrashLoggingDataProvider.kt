@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.crashlogging
 
-import au.com.shiftyjelly.pocketcasts.crashlogging.BuildConfig
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import com.automattic.android.tracks.crashlogging.CrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLoggingUser
@@ -13,7 +13,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class PocketCastsCrashLoggingDataProvider @Inject constructor() : CrashLoggingDataProvider {
+class PocketCastsCrashLoggingDataProvider @Inject constructor(
+    private val settings: Settings
+) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
         mapOf(
@@ -31,13 +33,13 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor() : CrashLoggingDa
 
     override val releaseName = ReleaseName.SetByTracksLibrary
 
-    override val sentryDSN: String
-        get() = TODO("Not yet implemented")
+    override val sentryDSN: String = settings.getSentryDsn()
+
     override val user: Flow<CrashLoggingUser?>
         get() = TODO("Not yet implemented")
 
     override fun crashLoggingEnabled(): Boolean {
-        TODO("Not yet implemented")
+        return settings.sendCrashReports.value
     }
 
     override fun extraKnownKeys(): List<ExtraKnownKey> {

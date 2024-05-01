@@ -28,7 +28,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
-import io.sentry.android.core.SentryAndroid
 import io.sentry.protocol.User
 import java.io.File
 import java.util.concurrent.Executors
@@ -79,10 +78,6 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     }
 
     private fun setupSentry() {
-        SentryAndroid.init(this) { options ->
-            options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
-        }
-
         // Link email to Sentry crash reports only if the user has opted in
         if (settings.linkCrashReportsToUser.value) {
             syncManager.getEmail()?.let { syncEmail ->

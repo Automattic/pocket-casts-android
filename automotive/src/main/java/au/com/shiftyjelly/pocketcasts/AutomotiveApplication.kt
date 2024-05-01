@@ -26,7 +26,6 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.android.core.SentryAndroid
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -65,7 +64,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         RxJavaUncaughtExceptionHandling.setUp()
-        setupSentry()
         setupLogging()
         setupAnalytics()
         setupApp()
@@ -106,12 +104,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     override fun onTerminate() {
         super.onTerminate()
         Log.d(Settings.LOG_TAG_AUTO, "Terminate")
-    }
-
-    private fun setupSentry() {
-        SentryAndroid.init(this) { options ->
-            options.dsn = settings.getSentryDsn()
-        }
     }
 
     private fun setupLogging() {

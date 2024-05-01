@@ -158,7 +158,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         }
 
         SentryAndroid.init(this) { options ->
-            options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
             options.sampleRate = 0.3
         }
 
