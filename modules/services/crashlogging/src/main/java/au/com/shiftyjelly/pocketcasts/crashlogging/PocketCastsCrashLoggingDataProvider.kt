@@ -1,6 +1,6 @@
-package au.com.shiftyjelly.pocketcasts.utils.crashlogging
+package au.com.shiftyjelly.pocketcasts.crashlogging
 
-import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
+import au.com.shiftyjelly.pocketcasts.crashlogging.BuildConfig
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import com.automattic.android.tracks.crashlogging.CrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLoggingUser

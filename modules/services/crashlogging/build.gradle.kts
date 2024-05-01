@@ -3,16 +3,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
 
 apply(from = "${project.rootDir}/base.gradle")
 
-// utils should have no other module dependencies
-
 android {
-    namespace = "au.com.shiftyjelly.pocketcasts.helper"
+    namespace = "au.com.shiftyjelly.pocketcasts.crashlogging"
     buildFeatures {
         buildConfig = true
     }
+}
+
+dependencies {
+    implementation(project(":modules:services:utils")) //temporarily
+    implementation("com.automattic.tracks:crashlogging:5.0.0")
 }
