@@ -16,6 +16,9 @@ android {
 
 dependencies {
     implementation(project(":modules:services:utils")) //temporarily
+    implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:preferences"))
+    implementation(project(":modules:services:repositories"))
+    implementation(project(":modules:services:servers"))
     implementation("com.automattic.tracks:crashlogging:5.0.0")
 }

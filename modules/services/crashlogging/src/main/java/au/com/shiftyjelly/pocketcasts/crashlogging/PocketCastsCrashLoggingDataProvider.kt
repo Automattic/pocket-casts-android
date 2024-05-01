@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.crashlogging
 
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import com.automattic.android.tracks.crashlogging.CrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLoggingUser
@@ -12,9 +13,11 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 class PocketCastsCrashLoggingDataProvider @Inject constructor(
-    private val settings: Settings
+    private val settings: Settings,
+    syncManager: SyncManager,
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
@@ -35,8 +38,19 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override val sentryDSN: String = settings.getSentryDsn()
 
-    override val user: Flow<CrashLoggingUser?>
-        get() = TODO("Not yet implemented")
+    override val user: Flow<CrashLoggingUser?> = settings.linkCrashReportsToUser.flow.map { linkCrashReportsToUser ->
+        if (linkCrashReportsToUser) {
+            syncManager.getEmail()?.let { email ->
+                CrashLoggingUser(
+                    email = email,
+                    userID = "",
+                    username = "",
+                )
+            }
+        } else {
+            null
+        }
+    }
 
     override fun crashLoggingEnabled(): Boolean {
         return settings.sendCrashReports.value
