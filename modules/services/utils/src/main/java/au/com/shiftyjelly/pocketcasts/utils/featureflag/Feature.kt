@@ -91,6 +91,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    PODCASTS_TAB_SEARCH_BAR(
+        key = "podcasts_tab_search_bar",
+        title = "Replace Podcasts tab search menu in toolbar with search bar",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
