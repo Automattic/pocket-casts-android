@@ -16,3 +16,7 @@ android {
         buildConfig = true
     }
 }
+
+dependencies {
+    implementation("com.automattic.tracks:crashlogging:5.0.0")
+}

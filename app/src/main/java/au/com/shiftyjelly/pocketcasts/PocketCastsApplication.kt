@@ -32,8 +32,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
@@ -161,7 +159,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
         SentryAndroid.init(this) { options ->
             options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
-            options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.MOBILE.value)
             options.sampleRate = 0.3
         }
 
