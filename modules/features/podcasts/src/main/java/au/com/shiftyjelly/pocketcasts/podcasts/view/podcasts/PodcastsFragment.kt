@@ -161,7 +161,9 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
 
             toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
-            binding.layoutSearch.showIf(rootFolder)
+            toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder && !FeatureFlag.isEnabled(Feature.PODCASTS_TAB_SEARCH_BAR)
+
+            binding.layoutSearch.showIf(rootFolder && FeatureFlag.isEnabled(Feature.PODCASTS_TAB_SEARCH_BAR))
 
             adapter?.setFolderItems(folderState.items)
 
@@ -213,10 +215,13 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         )
         toolbar.setOnMenuItemClickListener(this)
         toolbar.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
+        toolbar.menu.findItem(R.id.search_podcasts).isVisible = !FeatureFlag.isEnabled(Feature.PODCASTS_TAB_SEARCH_BAR)
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
             OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             true
         }
+
+        binding.layoutSearch.showIf(FeatureFlag.isEnabled(Feature.PODCASTS_TAB_SEARCH_BAR))
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshPodcasts()
@@ -270,6 +275,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 val event = folderUuid?.let { AnalyticsEvent.FOLDER_OPTIONS_BUTTON_TAPPED } ?: AnalyticsEvent.PODCASTS_LIST_OPTIONS_BUTTON_TAPPED
                 analyticsTracker.track(event)
                 openOptions()
+                true
+            }
+
+            R.id.search_podcasts -> {
+                search()
                 true
             }
 
