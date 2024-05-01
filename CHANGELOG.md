@@ -9,10 +9,12 @@
         ([#2054](https://github.com/Automattic/pocket-casts-android/pull/2054))
     *   Sleep timer: Start fading out audio when sleep timer has 5 seconds left
         ([#2069](https://github.com/Automattic/pocket-casts-android/pull/2069))
-    *   Sleep timer: Set sleep time end of episode for multiple episodes
+    *   Sleep timer: Add the option to select the number of episodes
         ([#2097](https://github.com/Automattic/pocket-casts-android/pull/2097))
     *   Enable toggling episode artwork separately in different contexts
         ([#2112](https://github.com/Automattic/pocket-casts-android/pull/2112))
+    *   Sleep timer: Add the option to select the number of chapters
+        ([#2115](https://github.com/Automattic/pocket-casts-android/pull/2115))
 *   Updates:
     *   Improved updating podcast episode when subscribed to thousands podcasts. 
         ([#2082](https://github.com/Automattic/pocket-casts-android/pull/2082))
