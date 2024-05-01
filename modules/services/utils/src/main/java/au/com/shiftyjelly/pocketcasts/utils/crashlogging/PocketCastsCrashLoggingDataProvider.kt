@@ -29,8 +29,8 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor() : CrashLoggingDa
 
     override val performanceMonitoringConfig = PerformanceMonitoringConfig.Disabled
 
-    override val releaseName: ReleaseName
-        get() = TODO("Not yet implemented")
+    override val releaseName = ReleaseName.SetByTracksLibrary
+
     override val sentryDSN: String
         get() = TODO("Not yet implemented")
     override val user: Flow<CrashLoggingUser?>
