@@ -22,9 +22,9 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor() : CrashLoggingDa
     )
 
     override val buildType: String = BuildConfig.BUILD_TYPE
-    
-    override val enableCrashLoggingLogs: Boolean
-        get() = TODO("Not yet implemented")
+
+    override val enableCrashLoggingLogs: Boolean = false
+
     override val locale: Locale?
         get() = TODO("Not yet implemented")
     override val performanceMonitoringConfig: PerformanceMonitoringConfig
