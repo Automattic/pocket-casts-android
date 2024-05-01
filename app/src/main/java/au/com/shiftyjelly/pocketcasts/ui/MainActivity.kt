@@ -923,8 +923,9 @@ class MainActivity :
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                         removeBottomSheetFragment(it)
                     }
-
-                    binding.playerBottomSheet.isDragEnabled = true
+                    if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) || !playbackManager.upNextQueue.isEmpty) {
+                        binding.playerBottomSheet.isDragEnabled = true
+                    }
 
                     updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
                 } else {
