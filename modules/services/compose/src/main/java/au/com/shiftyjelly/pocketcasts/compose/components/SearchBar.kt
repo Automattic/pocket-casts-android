@@ -110,7 +110,7 @@ fun SearchBar(
             .background(colors.backgroundColor(enabled).value, shape)
             .defaultMinSize(
                 minWidth = TextFieldDefaults.MinWidth,
-                minHeight = 50.dp,
+                minHeight = 42.dp,
             ),
         decorationBox = @Composable { innerTextField ->
             TextFieldDefaults.OutlinedTextFieldDecorationBox(
