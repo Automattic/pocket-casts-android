@@ -27,8 +27,8 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor() : CrashLoggingDa
 
     override val locale: Locale = Locale.getDefault()
 
-    override val performanceMonitoringConfig: PerformanceMonitoringConfig
-        get() = TODO("Not yet implemented")
+    override val performanceMonitoringConfig = PerformanceMonitoringConfig.Disabled
+
     override val releaseName: ReleaseName
         get() = TODO("Not yet implemented")
     override val sentryDSN: String
