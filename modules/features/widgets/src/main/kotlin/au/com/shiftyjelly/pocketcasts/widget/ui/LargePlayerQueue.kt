@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.layout.Alignment
@@ -14,6 +15,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
+import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 
 @Composable
@@ -24,10 +26,9 @@ internal fun LargePlayerQueue(
     modifier: GlanceModifier = GlanceModifier,
 ) {
     val lastIndex = queue.lastIndex
+
     LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(190.dp),
+        modifier = modifier.fillMaxWidth(),
     ) {
         itemsIndexed(queue, { _, episode -> episode.longId }) { index, episode ->
             Row(
@@ -35,7 +36,8 @@ internal fun LargePlayerQueue(
                 modifier = GlanceModifier
                     .fillMaxWidth()
                     .height(if (index == lastIndex) 58.dp else 66.dp)
-                    .padding(bottom = if (index == lastIndex) 0.dp else 8.dp),
+                    .padding(bottom = if (index == lastIndex) 0.dp else 8.dp)
+                    .clickable(OpenPocketCastsAction.action()),
             ) {
                 EpisodeImage(
                     episode = episode,
@@ -65,7 +67,11 @@ internal fun LargePlayerQueue(
                         modifier = GlanceModifier.padding(end = 16.dp),
                     )
                 }
-                PlayButton(episode = episode)
+                PlayButton(
+                    episode = episode,
+                    iconPadding = 8.dp,
+                    modifier = GlanceModifier.size(38.dp),
+                )
             }
         }
     }

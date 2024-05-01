@@ -69,6 +69,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         // open full screen player on click
         binding.root.setOnClickListener { openPlayer() }
         binding.root.setOnLongClickListener {
+            if (binding.root.isClickable.not()) return@setOnLongClickListener false
             clickListener?.onLongClick()
             true
         }
@@ -154,14 +155,36 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     fun setUpNext(upNextState: UpNextQueue.State, theme: Theme, useEpisodeArtwork: Boolean) {
-        if (upNextState is UpNextQueue.State.Loaded) {
-            loadEpisodeArtwork(upNextState.episode, useEpisodeArtwork, binding.artwork)
+        when (upNextState) {
+            is UpNextQueue.State.Loaded -> {
+                loadEpisodeArtwork(upNextState.episode, useEpisodeArtwork, binding.artwork)
 
-            val podcast = upNextState.podcast
-            if (podcast != null) {
-                updateTintColor(podcast.getPlayerTintColor(theme.isDarkTheme), theme)
-            } else {
-                updateTintColor(context.getThemeColor(androidx.appcompat.R.attr.colorAccent), theme)
+                val podcast = upNextState.podcast
+                if (podcast != null) {
+                    updateTintColor(podcast.getPlayerTintColor(theme.isDarkTheme), theme)
+                } else {
+                    updateTintColor(context.getThemeColor(androidx.appcompat.R.attr.colorAccent), theme)
+                }
+                binding.nothingPlayingText.isVisible = false
+                binding.skipBack.isVisible = true
+                binding.skipForward.isVisible = true
+                binding.miniPlayButton.isVisible = true
+                binding.progressBar.isVisible = true
+                binding.root.isClickable = true
+                binding.root.isFocusable = true
+            }
+
+            is UpNextQueue.State.Empty -> {
+                binding.artwork.setImageDrawable(null)
+                binding.artwork.setBackgroundColor(ThemeColor.primaryUi05(theme.activeTheme))
+                binding.miniPlayerTint.setBackgroundColor(ThemeColor.primaryUi01(theme.activeTheme))
+                binding.nothingPlayingText.isVisible = true
+                binding.skipBack.isVisible = false
+                binding.skipForward.isVisible = false
+                binding.miniPlayButton.isVisible = false
+                binding.progressBar.isVisible = false
+                binding.root.isClickable = false
+                binding.root.isFocusable = false
             }
         }
 
@@ -187,6 +210,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun openPlayer() {
+        if (binding.root.isClickable.not()) return
         clickListener?.onPlayerClicked()
     }
 
@@ -245,7 +269,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         useEpisodeArtwork: Boolean,
         imageView: ImageView,
     ): Disposable? {
-        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork && imageView.drawable != null) {
             return null
         }
 
