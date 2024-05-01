@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -23,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -32,6 +35,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,6 +57,7 @@ fun SearchBar(
     onSearch: () -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    textStyle: TextStyle = LocalTextStyle.current,
 ) {
     val focusManager = LocalFocusManager.current
     val colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -70,6 +75,11 @@ fun SearchBar(
         unfocusedBorderColor = Color.Transparent,
         disabledBorderColor = Color.Transparent,
     )
+    val textColor = textStyle.color.takeOrElse {
+        colors.textColor(enabled).value
+    }
+    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+
     val shape = RoundedCornerShape(10.dp)
     BasicTextField(
         value = text,
@@ -85,6 +95,8 @@ fun SearchBar(
         ),
         maxLines = 1,
         enabled = enabled,
+        textStyle = mergedTextStyle,
+        cursorBrush = SolidColor(colors.cursorColor(false).value),
         modifier = modifier
             .onKeyEvent {
                 // close the keyboard on enter
