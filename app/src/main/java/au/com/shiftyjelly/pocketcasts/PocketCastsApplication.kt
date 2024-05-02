@@ -161,14 +161,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             options.sampleRate = 0.3
         }
 
-        // Link email to Sentry crash reports only if the user has opted in
-        if (settings.linkCrashReportsToUser.value) {
-            syncManager.getEmail()?.let { syncEmail ->
-                val user = User().apply { email = syncEmail }
-                Sentry.setUser(user)
-            }
-        }
-
         // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
         FirebaseApp.initializeApp(this)
     }

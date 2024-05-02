@@ -32,9 +32,6 @@ class UserAnalyticsSettings @Inject constructor(
     }
 
     fun updateLinkAccountSetting(enabled: Boolean) {
-        val user = if (enabled) User().apply { email = syncManager.getEmail() } else null
-        Sentry.setUser(user)
-
         settings.linkCrashReportsToUser.set(enabled, updateModifiedAt = true)
     }
 }
