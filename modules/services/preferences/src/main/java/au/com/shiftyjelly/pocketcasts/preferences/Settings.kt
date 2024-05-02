@@ -265,8 +265,6 @@ interface Settings {
     fun getVersion(): String
     fun getVersionCode(): Int
 
-    fun getSentryDsn(): String
-
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>
 

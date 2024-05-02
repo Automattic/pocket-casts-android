@@ -3,21 +3,21 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
 
 apply(from = "${project.rootDir}/base.gradle")
 
 android {
-    namespace = "au.com.shiftyjelly.pocketcasts.analytics"
+    namespace = "au.com.shiftyjelly.pocketcasts.crashlogging"
     buildFeatures {
         buildConfig = true
     }
 }
 
 dependencies {
-    implementation(libs.tracks)
-    implementation(project(":modules:services:utils"))
+    implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:model"))
+    implementation(project(":modules:services:repositories"))
+    implementation(project(":modules:services:servers"))
+    implementation(libs.crashlogging)
 }

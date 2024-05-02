@@ -6,7 +6,6 @@ import java.util.concurrent.CancellationException
 import javax.net.ssl.SSLException
 
 object SentryHelper {
-    const val GLOBAL_TAG_APP_PLATFORM = "app.platform"
 
     fun recordException(throwable: Throwable) {
         if (shouldIgnoreExceptions(throwable)) {
@@ -44,11 +43,5 @@ object SentryHelper {
                 // ignore producer certificate exceptions
                 throwable is SSLException
             )
-    }
-
-    enum class AppPlatform(val value: String) {
-        MOBILE("mobile"),
-        AUTOMOTIVE("automotive"),
-        WEAR("wear"),
     }
 }

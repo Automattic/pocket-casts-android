@@ -39,7 +39,6 @@ android {
             applicationIdSuffix = ".debug"
 
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
-            manifestPlaceholders["sentryDsn"] = ""
         }
 
         named("debugProd") {
@@ -49,13 +48,6 @@ android {
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-            val pocketcastsSentryDsn: String by project
-            if (pocketcastsSentryDsn.isNotBlank()) {
-                manifestPlaceholders["sentryDsn"] = pocketcastsSentryDsn
-            }
-            else {
-                println("WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this.")
-            }
 
             if (!file("${project.rootDir}/sentry.properties").exists()) {
                 println("WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded.")

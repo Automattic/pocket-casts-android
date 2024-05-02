@@ -43,6 +43,13 @@ val getVersionName = {
         else -> versionName
     }
 }
+val getBuildPlatform = {
+    when {
+        isAutomotiveBuild -> "automotive"
+        isWearBuild -> "wear"
+        else -> "mobile"
+    }
+}
 
 project.apply {
     extra.apply {
@@ -51,6 +58,7 @@ project.apply {
 
         set("versionName", getVersionName())
         set("versionCode", getVersionCode())
+        set("buildPlatform", getBuildPlatform())
 
         // Android
         set("minSdkVersion", 23)

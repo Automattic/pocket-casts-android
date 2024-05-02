@@ -19,8 +19,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
@@ -28,7 +26,6 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.android.core.SentryAndroid
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -67,7 +64,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         RxJavaUncaughtExceptionHandling.setUp()
-        setupSentry()
         setupLogging()
         setupAnalytics()
         setupApp()
@@ -108,13 +104,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     override fun onTerminate() {
         super.onTerminate()
         Log.d(Settings.LOG_TAG_AUTO, "Terminate")
-    }
-
-    private fun setupSentry() {
-        SentryAndroid.init(this) { options ->
-            options.dsn = settings.getSentryDsn()
-            options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.AUTOMOTIVE.value)
-        }
     }
 
     private fun setupLogging() {
