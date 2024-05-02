@@ -11,6 +11,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPillListAdapter.CategoryPillViewHolder
@@ -27,6 +29,7 @@ val CATEGORY_PILL_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
 }
 
 class CategoryPillListAdapter(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     private val onCategoryClick: (CategoryPill, (List<CategoryPill>) -> Unit) -> Unit,
     private val onAllCategoriesClick: (() -> Unit, (List<CategoryPill>) -> Unit) -> Unit,
     private val onClearCategoryClick: () -> Unit,
@@ -87,9 +90,11 @@ class CategoryPillListAdapter(
                 if (category.isSelected) {
                     onClearCategoryClick()
                 } else {
+                    trackEvent(AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN)
                     binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
                     onAllCategoriesClick(
                         onCategorySelectionCancel@{
+                            trackEvent(AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_DISMISSED)
                             binding.categoryName.setCategory(category.discoverCategory.name)
                             binding.categoryName.setCategoryColor(isSelected = false)
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
@@ -118,6 +123,10 @@ class CategoryPillListAdapter(
     private fun updateCategoryStatus(position: Int, isSelected: Boolean) {
         getItem(position).isSelected = isSelected
         notifyItemChanged(position)
+    }
+
+    private fun trackEvent(event: AnalyticsEvent) {
+        analyticsTracker.track(event)
     }
 }
 private fun TextView.setCategory(category: String) {

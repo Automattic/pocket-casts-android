@@ -375,6 +375,7 @@ internal class DiscoverAdapter(
         private var mostPopularCategoriesId: List<Int> = emptyList()
 
         private val adapter = CategoryPillListAdapter(
+            analyticsTracker = analyticsTracker,
             onCategoryClick = { selectedCategory, onCategorySelectionSuccess ->
                 listener.onCategoryClick(
                     selectedCategory = selectedCategory,
