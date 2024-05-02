@@ -19,5 +19,5 @@ dependencies {
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:repositories"))
     implementation(project(":modules:services:servers"))
-    implementation("com.automattic.tracks:crashlogging:5.0.0")
+    implementation(libs.crashlogging)
 }
