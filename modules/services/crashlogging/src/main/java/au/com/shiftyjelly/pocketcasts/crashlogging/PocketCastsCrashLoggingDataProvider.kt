@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.automattic.android.tracks.crashlogging.CrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLoggingUser
+import com.automattic.android.tracks.crashlogging.ErrorSampling
 import com.automattic.android.tracks.crashlogging.EventLevel
 import com.automattic.android.tracks.crashlogging.ExtraKnownKey
 import com.automattic.android.tracks.crashlogging.PerformanceMonitoringConfig
@@ -70,7 +71,15 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
         return false
     }
 
+    override val errorSampling: ErrorSampling =
+        if (BuildConfig.BUILD_PLATFORM == "mobile") {
+            ErrorSampling.Enabled(MOBILE_ERROR_SAMPLING)
+        } else {
+            ErrorSampling.Disabled
+        }
+
     companion object {
         const val GLOBAL_TAG_APP_PLATFORM = "app.platform"
+        const val MOBILE_ERROR_SAMPLING = 0.3
     }
 }
