@@ -42,7 +42,6 @@ import coil.ImageLoader
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.android.core.SentryAndroid
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -155,9 +154,9 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             Thread.setDefaultUncaughtExceptionHandler(LogBufferUncaughtExceptionHandler(it))
         }
 
-        SentryAndroid.init(this) { options ->
-            options.sampleRate = 0.3
-        }
+//        SentryAndroid.init(this) { options ->
+//            options.sampleRate = 0.3
+//        }
 
         // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
         FirebaseApp.initializeApp(this)
