@@ -45,10 +45,4 @@ object SentryHelper {
                 throwable is SSLException
             )
     }
-
-    enum class AppPlatform(val value: String) {
-        MOBILE("mobile"),
-        AUTOMOTIVE("automotive"),
-        WEAR("wear"),
-    }
 }
