@@ -57,17 +57,17 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
     }
 
     override fun extraKnownKeys(): List<ExtraKnownKey> {
-        TODO("Not yet implemented")
+        return emptyList()
     }
 
     override fun provideExtrasForEvent(
         currentExtras: Map<ExtraKnownKey, String>,
         eventLevel: EventLevel,
     ): Map<ExtraKnownKey, String> {
-        TODO("Not yet implemented")
+        return emptyMap()
     }
 
     override fun shouldDropWrappingException(module: String, type: String, value: String): Boolean {
-        TODO("Not yet implemented")
+        return false
     }
 }
