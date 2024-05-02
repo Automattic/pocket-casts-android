@@ -27,8 +27,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.Sentry
-import io.sentry.protocol.User
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject

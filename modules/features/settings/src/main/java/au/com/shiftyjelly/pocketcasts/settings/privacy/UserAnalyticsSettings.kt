@@ -6,8 +6,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.sentry.Sentry
-import io.sentry.protocol.User
 import javax.inject.Inject
 
 class UserAnalyticsSettings @Inject constructor(
