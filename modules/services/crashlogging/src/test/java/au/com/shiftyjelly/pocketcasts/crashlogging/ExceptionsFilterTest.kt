@@ -1,18 +1,17 @@
-package au.com.shiftyjelly.pocketcasts.utils
+package au.com.shiftyjelly.pocketcasts.crashlogging
 
 import java.net.SocketTimeoutException
 import org.junit.Test
 
-class SentryHelperTest {
-
+internal class ExceptionsFilterTest {
     @Test
     fun shouldIgnoreExceptions() {
         // ignore java.io.IOException exceptions
         val ioException = Exception(RuntimeException(SocketTimeoutException("failed to connect to api.pocketcasts.com")))
-        assert(SentryHelper.shouldIgnoreExceptions(ioException))
+        assert(ExceptionsFilter.shouldIgnoreExceptions(ioException))
 
         // don't ignore other exceptions
         val nullException = Exception(RuntimeException(NullPointerException()))
-        assert(!SentryHelper.shouldIgnoreExceptions(nullException))
+        assert(!ExceptionsFilter.shouldIgnoreExceptions(nullException))
     }
 }
