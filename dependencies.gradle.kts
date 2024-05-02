@@ -98,7 +98,6 @@ project.apply {
         set("sharingServerSecret", secretProperties.getProperty("pocketcastsSharingServerSecret", ""))
         set("pocketcastsSentryDsn", secretProperties.getProperty("pocketcastsSentryDsn", ""))
         set("googleSignInServerClientId", secretProperties.getProperty("googleSignInServerClientId", ""))
-        set("sentryDsn", secretProperties.getProperty("pocketcastsSentryDsn", ""))
         set("measureBuildsEnabled", secretProperties.getProperty("measureBuildsEnabled", ""))
         set("appsMetricsToken", secretProperties.getProperty("appsMetricsToken", ""))
     }

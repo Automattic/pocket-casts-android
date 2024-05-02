@@ -26,7 +26,7 @@ android {
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
         buildConfigField "String", "GOOGLE_SIGN_IN_SERVER_CLIENT_ID", "\"${project.googleSignInServerClientId}\""
-        buildConfigField "String", "SENTRY_DSN", "\"${project.sentryDsn}\""
+        buildConfigField "String", "SENTRY_DSN", "\"${project.pocketcastsSentryDsn}\""
         buildConfigField "String", "BUILD_PLATFORM", "\"${project.buildPlatform}\""
 
         testInstrumentationRunner project.testInstrumentationRunner

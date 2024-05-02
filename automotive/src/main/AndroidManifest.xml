@@ -80,9 +80,6 @@
         <meta-data
             android:name="pocketcasts_automotive"
             android:value="true" />
-        <meta-data
-            android:name="au.com.shiftyjelly.pocketcasts.sentryDsn"
-            android:value="${sentryDsn}" />
     </application>
 
 </manifest>
