@@ -130,8 +130,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
-        trackCategoryImpression(selectedCategory.discoverCategory)
-
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
@@ -144,7 +142,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             val remainingPodcasts =
                 RemainingPodcastsByCategoryRow(it.listId, it.title, podcasts.drop(MOST_POPULAR_PODCASTS))
 
-            updateDiscoverWithCategorySelected(selectedCategory.discoverCategory.id, mostPopularPodcasts, remainingPodcasts)
+            updateDiscoverWithCategorySelected(selectedCategory.discoverCategory, mostPopularPodcasts, remainingPodcasts)
 
             onCategorySelectionSuccess()
         }
@@ -297,7 +295,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     private fun updateDiscoverWithCategorySelected(
-        categoryId: Int,
+        category: DiscoverCategory,
         mostPopularPodcasts: MostPopularPodcastsByCategoryRow,
         remainingPodcasts: RemainingPodcastsByCategoryRow,
     ) {
@@ -308,12 +306,14 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             updatedList.add(mostPopularPodcasts)
 
             // If there is ad, we add it.
-            viewModel.getAdForCategoryView(categoryId)?.let { updatedList.add(CategoryAdRow(it)) }
+            viewModel.getAdForCategoryView(category.id)?.let { updatedList.add(CategoryAdRow(it)) }
 
             // Lastly, we add the remaining podcast list.
             updatedList.add(remainingPodcasts)
 
             adapter?.submitList(updatedList)
+
+            trackCategoryImpression(category)
         }
     }
     private fun trackCategoryImpression(category: DiscoverCategory) {
