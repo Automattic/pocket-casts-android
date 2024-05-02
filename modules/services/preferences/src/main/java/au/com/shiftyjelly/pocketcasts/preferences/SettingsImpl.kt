@@ -125,20 +125,6 @@ class SettingsImpl @Inject constructor(
         return BuildConfig.VERSION_CODE
     }
 
-    override fun getSentryDsn(): String {
-        return try {
-            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            }
-            applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
-        } catch (e: NameNotFoundException) {
-            ""
-        }
-    }
-
     override val skipBackInSecs = UserSetting.SkipAmountPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
         defaultValue = 10,

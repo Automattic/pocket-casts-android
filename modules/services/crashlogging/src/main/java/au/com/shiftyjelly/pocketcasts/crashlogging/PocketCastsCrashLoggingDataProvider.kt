@@ -36,7 +36,7 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override val releaseName = ReleaseName.SetByTracksLibrary
 
-    override val sentryDSN: String = settings.getSentryDsn()
+    override val sentryDSN: String = BuildConfig.SENTRY_DSN
 
     override val user: Flow<CrashLoggingUser?> = settings.linkCrashReportsToUser.flow.map { linkCrashReportsToUser ->
         if (linkCrashReportsToUser) {
