@@ -26,9 +26,8 @@ internal object ExceptionsFilter {
             // ignore worker job cancels as they will retry
             throwable is CancellationException ||
                 // ignore exceptions such as SocketTimeoutException, SocketException or UnknownHostException, as with episode urls we don't control this
-                throwable is IOException ||
-                // ignore producer certificate exceptions
-                throwable is SSLException
+                // or certificate exceptions
+                throwable is IOException
             )
     }
 }
