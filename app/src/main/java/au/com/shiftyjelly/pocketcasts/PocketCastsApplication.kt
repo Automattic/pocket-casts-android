@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
 import coil.Coil
 import coil.ImageLoader
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
@@ -115,6 +116,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var sleepTimerRestartWhenShakingDevice: SleepTimerRestartWhenShakingDevice
 
+    @Inject lateinit var crashLogging: CrashLogging
+
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
@@ -136,7 +139,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         RxJavaUncaughtExceptionHandling.setUp()
-        setupSentry()
+        setupCrashLogging()
         setupLogging()
         setupAnalytics()
         setupApp()
@@ -149,11 +152,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         downloadStatisticsReporter.setup()
     }
 
-    private fun setupSentry() {
+    private fun setupCrashLogging() {
         Thread.getDefaultUncaughtExceptionHandler()?.let {
             Thread.setDefaultUncaughtExceptionHandler(LogBufferUncaughtExceptionHandler(it))
         }
 
+        crashLogging.initialize()
 //        SentryAndroid.init(this) { options ->
 //            options.sampleRate = 0.3
 //        }

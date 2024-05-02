@@ -64,6 +64,7 @@ dependencies {
     androidTestImplementation(libs.junit.ext)
     androidTestImplementation(libs.espresso.core)
 
+    implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:utils"))
