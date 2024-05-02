@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
