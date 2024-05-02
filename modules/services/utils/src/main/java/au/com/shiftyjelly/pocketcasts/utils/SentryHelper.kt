@@ -6,7 +6,6 @@ import java.util.concurrent.CancellationException
 import javax.net.ssl.SSLException
 
 object SentryHelper {
-    const val GLOBAL_TAG_APP_PLATFORM = "app.platform"
 
     fun recordException(throwable: Throwable) {
         if (shouldIgnoreExceptions(throwable)) {

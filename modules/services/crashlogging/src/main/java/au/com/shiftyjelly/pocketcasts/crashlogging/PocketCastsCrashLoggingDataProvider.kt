@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.crashlogging
 
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import com.automattic.android.tracks.crashlogging.CrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLoggingUser
 import com.automattic.android.tracks.crashlogging.EventLevel
@@ -22,7 +21,7 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
         mapOf(
-            SentryHelper.GLOBAL_TAG_APP_PLATFORM to BuildConfig.BUILD_PLATFORM,
+            GLOBAL_TAG_APP_PLATFORM to BuildConfig.BUILD_PLATFORM,
         ),
     )
 
@@ -69,5 +68,9 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override fun shouldDropWrappingException(module: String, type: String, value: String): Boolean {
         return false
+    }
+
+    companion object {
+        const val GLOBAL_TAG_APP_PLATFORM = "app.platform"
     }
 }

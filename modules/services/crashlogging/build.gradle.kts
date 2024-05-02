@@ -15,7 +15,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:services:utils")) //temporarily
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:repositories"))
