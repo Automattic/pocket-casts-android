@@ -87,7 +87,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId()))
         }
         if (list is DiscoverCategory) {
-            trackCategoryImpression(list)
+            trackCategoryShownImpression(list)
         }
 
         if (list.expandedStyle is ExpandedStyle.GridList) {
@@ -130,6 +130,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
+        trackCategoryPickImpression(selectedCategory.discoverCategory)
+
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
@@ -313,14 +315,26 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
             adapter?.submitList(updatedList)
 
-            trackCategoryImpression(category)
+            trackCategoryShownImpression(category)
         }
     }
-    private fun trackCategoryImpression(category: DiscoverCategory) {
+    private fun trackCategoryShownImpression(category: DiscoverCategory) {
         viewModel.currentRegionCode?.let {
             FirebaseAnalyticsTracker.openedCategory(category.id, it)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_CATEGORY_SHOWN,
+                mapOf(
+                    NAME_KEY to category.name,
+                    REGION_KEY to it,
+                    ID_KEY to category.id,
+                ),
+            )
+        }
+    }
+    private fun trackCategoryPickImpression(category: DiscoverCategory) {
+        viewModel.currentRegionCode?.let {
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_PICK,
                 mapOf(
                     NAME_KEY to category.name,
                     REGION_KEY to it,
