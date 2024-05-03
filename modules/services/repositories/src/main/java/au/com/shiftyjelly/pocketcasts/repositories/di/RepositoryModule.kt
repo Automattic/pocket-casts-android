@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.di
 import androidx.work.WorkerFactory
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.crashlogging.ObserveUser
-import au.com.shiftyjelly.pocketcasts.crashlogging.ShouldSendCrashReports
+import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -45,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.ObserveTrackableUser
-import au.com.shiftyjelly.pocketcasts.repositories.user.SettingsShouldSendCrashReports
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -165,5 +165,5 @@ abstract class RepositoryModule {
     abstract fun provideObserveUser(observeTrackableUser: ObserveTrackableUser): ObserveUser
 
     @Binds
-    abstract fun provideShouldSendCrashReport(settingsShouldSendCrashReports: SettingsShouldSendCrashReports): ShouldSendCrashReports
+    abstract fun provideCrashReportPermissionCheck(userSettingsCrashReportPermission: UserSettingsCrashReportPermission): CrashReportPermissionCheck
 }

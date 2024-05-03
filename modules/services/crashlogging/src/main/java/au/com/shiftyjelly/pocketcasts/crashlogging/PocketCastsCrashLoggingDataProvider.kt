@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 
 class PocketCastsCrashLoggingDataProvider @Inject constructor(
     observeUser: ObserveUser,
-    private val shouldSendCrashReports: ShouldSendCrashReports,
+    private val crashReportPermissionCheck: CrashReportPermissionCheck,
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
@@ -47,7 +47,7 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
     }
 
     override fun crashLoggingEnabled(): Boolean {
-        return shouldSendCrashReports.invoke()
+        return crashReportPermissionCheck.invoke()
     }
 
     override fun extraKnownKeys(): List<ExtraKnownKey> {

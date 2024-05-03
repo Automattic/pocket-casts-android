@@ -1,12 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.repositories.user
 
-import au.com.shiftyjelly.pocketcasts.crashlogging.ShouldSendCrashReports
+import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import javax.inject.Inject
 
-class SettingsShouldSendCrashReports @Inject constructor(
+class UserSettingsCrashReportPermission @Inject constructor(
     private val settings: Settings,
-) : ShouldSendCrashReports {
+) : CrashReportPermissionCheck {
     override fun invoke(): Boolean {
         return settings.sendCrashReports.value
     }

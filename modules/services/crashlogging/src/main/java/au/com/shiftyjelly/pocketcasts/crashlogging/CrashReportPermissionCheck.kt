@@ -1,5 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.crashlogging
 
-fun interface ShouldSendCrashReports {
+fun interface CrashReportPermissionCheck {
     operator fun invoke(): Boolean
 }
