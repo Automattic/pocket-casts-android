@@ -35,6 +35,7 @@ class DeveloperFragment : BaseFragment() {
                         onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode,
                         onTriggerUpdateEpisodeDetails = viewModel::triggerUpdateEpisodeDetails,
                         onTriggerResetEoYModalProfileBadge = viewModel::resetEoYModalProfileBadge,
+                        onSendCrash = viewModel::onSendCrash,
                     )
                 }
             }
