@@ -284,7 +284,7 @@ class PlayerViewModel @Inject constructor(
     val sleepingInText = MutableLiveData<String>().apply {
         postValue(calcSleepingInEpisodesText())
     }
-    var sleepCustomTimeMins: Int = 5
+    var sleepCustomTimeInMinutes: Int = 5
         set(value) {
             field = value.coerceIn(1, 240)
             settings.setSleepTimerCustomMins(field)
@@ -537,7 +537,20 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun calcCustomTimeText(): String {
-        return context.resources.getString(LR.string.minutes_plural, sleepCustomTimeMins)
+        val hours = sleepCustomTimeInMinutes / 60
+        val minutes = sleepCustomTimeInMinutes % 60
+
+        return if (hours == 1 && minutes == 0) {
+            context.resources.getString(LR.string.hours_singular)
+        } else if (hours > 1 && minutes == 0) {
+            context.resources.getString(LR.string.hours_plural, hours)
+        } else if (hours > 0) {
+            context.resources.getString(LR.string.hours_and_minutes, hours, minutes)
+        } else if (hours == 0 && minutes == 1) {
+            context.resources.getString(LR.string.minutes_singular)
+        } else {
+            context.resources.getString(LR.string.minutes_plural, sleepCustomTimeInMinutes)
+        }
     }
 
     private fun calcEndOfEpisodeText(): String {

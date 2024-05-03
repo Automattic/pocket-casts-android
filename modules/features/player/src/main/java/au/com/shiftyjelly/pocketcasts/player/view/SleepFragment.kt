@@ -177,19 +177,19 @@ class SleepFragment : BaseDialogFragment() {
     }
 
     private fun startCustomTimer() {
-        viewModel.sleepTimerAfter(mins = viewModel.sleepCustomTimeMins)
-        binding?.root?.announceForAccessibility("Sleep timer set for ${viewModel.sleepCustomTimeMins} minutes")
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(viewModel.sleepCustomTimeMins.minutes())))
+        viewModel.sleepTimerAfter(mins = viewModel.sleepCustomTimeInMinutes)
+        binding?.root?.announceForAccessibility("Sleep timer set for ${viewModel.sleepCustomTimeInMinutes} minutes")
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(viewModel.sleepCustomTimeInMinutes.minutes())))
         close()
     }
 
     private fun plusButtonClicked() {
-        if (viewModel.sleepCustomTimeMins < 5) {
-            viewModel.sleepCustomTimeMins += 1
+        if (viewModel.sleepCustomTimeInMinutes < 5) {
+            viewModel.sleepCustomTimeInMinutes += 1
         } else {
-            viewModel.sleepCustomTimeMins += 5
+            viewModel.sleepCustomTimeInMinutes += 5
         }
-        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
+        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
     }
 
     private fun plusEndOfEpisodeButtonClicked() {
@@ -203,12 +203,12 @@ class SleepFragment : BaseDialogFragment() {
     }
 
     private fun minusButtonClicked() {
-        if (viewModel.sleepCustomTimeMins <= 5) {
-            viewModel.sleepCustomTimeMins -= 1
+        if (viewModel.sleepCustomTimeInMinutes <= 5) {
+            viewModel.sleepCustomTimeInMinutes -= 1
         } else {
-            viewModel.sleepCustomTimeMins -= 5
+            viewModel.sleepCustomTimeInMinutes -= 5
         }
-        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
+        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
     }
 
     private fun minusEndOfEpisodeButtonClicked() {
