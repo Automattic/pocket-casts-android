@@ -66,7 +66,7 @@ class SleepFragment : BaseDialogFragment() {
 
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
-        binding.buttonMins60.setOnClickListener { startTimer(mins = 60) }
+        binding.buttonOneHour.setOnClickListener { startTimer(mins = 60) }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
         binding.endOfEpisodeMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
         binding.endOfChapterMinusButton.setOnClickListener { minusEndOfChapterButtonClicked() }
