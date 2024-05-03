@@ -63,7 +63,6 @@ internal fun LargePlayerHeader(
                 PlaybackControls(
                     isPlaying = state.isPlaying,
                     buttonHeight = 58.dp,
-                    iconPadding = 16.dp,
                     isClickable = episode != null,
                     modifier = GlanceModifier.defaultWeight(),
                 )
