@@ -43,9 +43,9 @@ import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.CompositeDisposable
@@ -123,6 +123,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     @Inject lateinit var listServerManager: ListServerManager
 
     @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManager
+
+    @Inject lateinit var crashLogging: CrashLogging
 
     var mediaController: MediaControllerCompat? = null
         set(value) {
@@ -276,7 +278,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                                 e is ForegroundServiceStartNotAllowedException
                             ) {
                                 addBatteryWarnings()
-                                SentryHelper.recordException(e)
+                                crashLogging.sendReport(e)
                                 FirebaseAnalyticsTracker.foregroundServiceStartNotAllowedException()
                             }
                         }
