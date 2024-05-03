@@ -5,10 +5,6 @@ import io.sentry.Sentry
 object SentryHelper {
 
     fun recordException(throwable: Throwable) {
-        // TODO
-//        if (shouldIgnoreExceptions(throwable)) {
-//            return
-//        }
         Sentry.captureException(throwable)
     }
 
