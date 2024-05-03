@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 import kotlin.math.min
@@ -40,7 +41,6 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import com.automattic.android.tracks.crashlogging.CrashLogging
 
 private const val WARNING_LIMIT = 3
 class MultiSelectEpisodesHelper @Inject constructor(

@@ -19,10 +19,10 @@ import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import com.automattic.android.tracks.crashlogging.CrashLogging
 
 @AndroidEntryPoint
 class MultiSelectToolbar @JvmOverloads constructor(
@@ -34,8 +34,6 @@ class MultiSelectToolbar @JvmOverloads constructor(
     private var overflowItems: List<MultiSelectAction> = emptyList()
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-
-    @Inject lateinit var crashLogging: CrashLogging
 
     fun <T> setup(
         lifecycleOwner: LifecycleOwner,
@@ -49,7 +47,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
         } else {
             multiSelectHelper.toolbarActions.removeObservers(lifecycleOwner)
             multiSelectHelper.toolbarActions.observe(lifecycleOwner) {
-                crashLogging.recordEvent("MultiSelectToolbar setup observed toolbarActionChange,$it from ${multiSelectHelper.source}")
+                Timber.d("MultiSelectToolbar setup observed toolbarActionChange,$it from ${multiSelectHelper.source}")
 
                 menu.clear()
 

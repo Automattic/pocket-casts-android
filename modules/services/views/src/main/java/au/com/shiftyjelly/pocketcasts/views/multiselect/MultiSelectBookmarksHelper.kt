@@ -13,20 +13,19 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import com.automattic.android.tracks.crashlogging.CrashLogging
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class MultiSelectBookmarksHelper @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val crashLogging: CrashLogging,
 ) : MultiSelectHelper<Bookmark>() {
     override val maxToolbarIcons = 3
 
@@ -37,7 +36,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {
-            crashLogging.recordEvent("MultiSelectBookmarksHelper toolbarActions updated, ${it.size} bookmarks from $source")
+            Timber.d("MultiSelectBookmarksHelper toolbarActions updated, ${it.size} bookmarks from $source")
             listOf(
                 MultiSelectBookmarkAction.ShareBookmark(
                     isVisible = source != SourceView.FILES &&
