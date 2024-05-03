@@ -15,9 +15,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:servers"))
     api(libs.crashlogging)
 }

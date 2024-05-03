@@ -21,8 +21,8 @@ internal class ExceptionsFilterTest {
     fun shouldIgnoreSSLException() {
         assert(
             ExceptionsFilter.shouldIgnoreExceptions(
-                SSLException("failed to connect to api.pocketcasts.com")
-            )
+                SSLException("failed to connect to api.pocketcasts.com"),
+            ),
         )
     }
 }

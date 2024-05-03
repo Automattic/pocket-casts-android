@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.crashlogging
 
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.automattic.android.tracks.crashlogging.CrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLoggingUser
 import com.automattic.android.tracks.crashlogging.ErrorSampling
@@ -16,8 +14,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class PocketCastsCrashLoggingDataProvider @Inject constructor(
-    private val settings: Settings,
-    syncManager: SyncManager,
+    observeUser: ObserveUser,
+    private val shouldSendCrashReports: ShouldSendCrashReports,
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
@@ -38,22 +36,18 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override val sentryDSN: String = BuildConfig.SENTRY_DSN
 
-    override val user: Flow<CrashLoggingUser?> = settings.linkCrashReportsToUser.flow.map { linkCrashReportsToUser ->
-        if (linkCrashReportsToUser) {
-            syncManager.getEmail()?.let { email ->
-                CrashLoggingUser(
-                    email = email,
-                    userID = "",
-                    username = "",
-                )
-            }
-        } else {
-            null
+    override val user: Flow<CrashLoggingUser?> = observeUser.invoke().map { userMail ->
+        userMail?.let {
+            CrashLoggingUser(
+                email = it.email,
+                userID = "",
+                username = "",
+            )
         }
     }
 
     override fun crashLoggingEnabled(): Boolean {
-        return settings.sendCrashReports.value
+        return shouldSendCrashReports.invoke()
     }
 
     override fun extraKnownKeys(): List<ExtraKnownKey> {

@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.crashlogging
 
 import java.io.IOException
 import java.util.concurrent.CancellationException
-import javax.net.ssl.SSLException
 
 internal object ExceptionsFilter {
     fun shouldIgnoreExceptions(throwable: Throwable): Boolean {
