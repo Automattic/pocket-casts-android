@@ -182,13 +182,11 @@ dependencies {
     implementation libs.bundles.protobuf
     implementation libs.bundles.retrofit
     implementation libs.bundles.rxjava
-    implementation libs.bundles.sentry
     implementation libs.bundles.work
 
     implementation platform(libs.compose.bom)
     androidTestImplementation platform(libs.compose.bom)
     implementation platform(libs.firebase.bom)
-    implementation platform(libs.sentry.bom)
 
     implementation libs.appcompat
     implementation libs.auth

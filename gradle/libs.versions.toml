@@ -48,7 +48,6 @@ protobuf = "3.23.4"
 protobuf-plugin = "0.9.4"
 retrofit = "2.9.0"
 room = "2.5.1"
-sentry = "6.28.0"
 sentry-plugin = "3.10.0"
 showkase = "1.0.2"
 test = "1.5.0"
@@ -207,12 +206,6 @@ rxandroid = "io.reactivex.rxjava2:rxandroid:2.1.1"
 rxjava = "io.reactivex.rxjava2:rxjava:2.2.21"
 rxkotlin = "io.reactivex.rxjava2:rxkotlin:2.4.0"
 rxrelay = "com.jakewharton.rxrelay2:rxrelay:2.1.1"
-
-# Sentry
-sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
-sentry-android-core = { module = "io.sentry:sentry-android-core" }
-sentry-fragment = { module = "io.sentry:sentry-android-fragment" }
-sentry-timber = { module = "io.sentry:sentry-android-timber" }
 
 # Showkase
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
@@ -408,12 +401,6 @@ rxjava = [
     "rxjava",
     "rxrelay",
     "rxkotlin"
-]
-
-sentry = [
-    "sentry-android-core",
-    "sentry-fragment",
-    "sentry-timber"
 ]
 
 test = [
