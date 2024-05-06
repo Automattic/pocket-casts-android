@@ -9,10 +9,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -82,6 +91,7 @@ class FolderAdapter(
                     theme,
                 )
             }
+
             FolderItem.Folder.viewTypeId -> {
                 val podcastsLayout = settings.podcastGridLayout.value
                 val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == PodcastGridLayoutType.SMALL_ARTWORK, context = context).pxToDp(parent.context).toInt()
@@ -93,6 +103,7 @@ class FolderAdapter(
                     onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) },
                 )
             }
+
             else -> throw Exception("Unknown view type $viewType")
         }
     }
@@ -175,28 +186,41 @@ class FolderAdapter(
         val countTextMarginSmall: Int = 2.dpToPx(view.resources.displayMetrics)
         val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
         val isListLayout: Boolean = podcastGridLayout == PodcastGridLayoutType.LIST_VIEW
+        val unplayedCountBadgeView = view.findViewById<ComposeView>(R.id.badge_view)
 
         fun bind(podcast: Podcast, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
             button.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
             podcastTitle.show()
             author?.text = podcast.author
+            if (!isListLayout) {
+                UiUtil.setBackgroundColor(podcastTitle, ColorManager.getBackgroundColor(podcast))
+            }
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
             val badgeCount = when (badgeType) {
                 BadgeType.OFF -> 0
                 BadgeType.ALL_UNFINISHED -> unplayedEpisodeCount
                 BadgeType.LATEST_EPISODE -> min(1, unplayedEpisodeCount)
             }
-            setTextViewCount(unplayedBackground, unplayedText, badgeCount, badgeType)
-
-            if (!isListLayout) {
-                UiUtil.setBackgroundColor(podcastTitle, ColorManager.getBackgroundColor(podcast))
-                unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.contrast_01))
+            val displayBadgeCount = if (badgeCount > 99) 99 else badgeCount
+            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+                unplayedText.hide()
+                unplayedCountBadgeView?.let {
+                    it.setBadgeContent(displayBadgeCount, badgeType)
+                    it.show()
+                }
             } else {
-                if (badgeType == BadgeType.LATEST_EPISODE) {
-                    unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.support_05))
+                unplayedText.show()
+                setTextViewCount(unplayedBackground, unplayedText, displayBadgeCount, badgeType)
+
+                if (!isListLayout) {
+                    unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.contrast_01))
                 } else {
-                    unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.primary_text_02))
+                    if (badgeType == BadgeType.LATEST_EPISODE) {
+                        unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.support_05))
+                    } else {
+                        unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.primary_text_02))
+                    }
                 }
             }
 
@@ -208,16 +232,38 @@ class FolderAdapter(
                 .loadInto(podcastThumbnail)
         }
 
+        private fun ComposeView.setBadgeContent(
+            count: Int,
+            badgeType: BadgeType,
+        ) {
+            setContent {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+                AppTheme(theme.activeTheme) {
+                    CountBadge(
+                        count = count,
+                        style = when {
+                            (badgeType == BadgeType.LATEST_EPISODE) -> CountBadgeStyle.Small
+                            isListLayout -> CountBadgeStyle.Big
+                            else -> CountBadgeStyle.Medium
+                        },
+                        modifier = if (isListLayout) {
+                            Modifier
+                        } else {
+                            Modifier
+                                .wrapContentSize(align = Alignment.TopEnd)
+                                .offset(x = 8.dp, y = (-8).dp)
+                        },
+                    )
+                }
+            }
+        }
+
         @Suppress("NAME_SHADOWING")
         private fun setTextViewCount(image: ImageView?, text: TextView, count: Int, badgeType: BadgeType) {
-            var count = count
             if (count == 0) {
                 text.hide()
                 image?.hide()
             } else {
-                if (count > 99) {
-                    count = 99
-                }
                 text.show()
                 image?.show()
                 if (!isListLayout) {

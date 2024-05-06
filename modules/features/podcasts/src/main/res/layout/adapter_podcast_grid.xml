@@ -2,7 +2,9 @@
     android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/primary_ui_01">
+    android:background="?attr/primary_ui_01"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <View
         android:id="@+id/header_background"
@@ -51,6 +53,12 @@
         android:textStyle="bold"
         android:importantForAccessibility="no"
         android:textSize="12dp"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/badge_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <View
         android:id="@+id/button"
