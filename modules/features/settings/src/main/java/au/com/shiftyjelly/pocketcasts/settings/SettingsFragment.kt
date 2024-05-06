@@ -13,10 +13,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.transition.TransitionInflater
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -33,14 +31,6 @@ class SettingsFragment : BaseFragment() {
 
     @Inject
     lateinit var batteryRestrictions: SystemBatteryRestrictions
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            val inflater = TransitionInflater.from(requireContext())
-            enterTransition = inflater.inflateTransition(R.transition.slide_in)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,9 +76,4 @@ class SettingsFragment : BaseFragment() {
                 }
             }
         }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        enterTransition = null
-    }
 }
