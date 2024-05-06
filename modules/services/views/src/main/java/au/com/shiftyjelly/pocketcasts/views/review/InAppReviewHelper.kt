@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.play.core.review.ReviewManager
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,6 +17,7 @@ class InAppReviewHelper @Inject constructor(
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val reviewManager: ReviewManager,
+    private val crashLogging: CrashLogging,
 ) {
     /* Request in-app review from the user
        Right now, this method only allow requesting it once per user */
@@ -44,7 +45,7 @@ class InAppReviewHelper @Inject constructor(
             }
         } catch (e: Exception) {
             Timber.e("Could not launch review dialog.")
-            SentryHelper.recordException(e)
+            crashLogging.sendReport(e)
         }
     }
 

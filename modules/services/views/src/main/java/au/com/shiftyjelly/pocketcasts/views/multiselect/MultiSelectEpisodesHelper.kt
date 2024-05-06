@@ -29,8 +29,8 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import io.reactivex.BackpressureStrategy
-import io.sentry.Sentry
 import javax.inject.Inject
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +53,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val crashLogging: CrashLogging,
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 
@@ -62,7 +63,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         .toLiveData()
         .combineLatest(_selectedListLive)
         .map { (actions, selectedEpisodes) ->
-            Sentry.addBreadcrumb("MultiSelectEpisodesHelper toolbarActions updated (${actions.size}): ${actions.map { it::class.java.simpleName }}, ${selectedEpisodes.size} selectedEpisodes from $source")
+            crashLogging.recordEvent("MultiSelectEpisodesHelper toolbarActions updated (${actions.size}): ${actions.map { it::class.java.simpleName }}, ${selectedEpisodes.size} selectedEpisodes from $source")
             actions.mapNotNull {
                 MultiSelectEpisodeAction.actionForGroup(it.groupId, selectedEpisodes)
             }

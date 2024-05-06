@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
@@ -40,7 +41,6 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.sentry.Sentry
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
@@ -63,6 +63,7 @@ class PodcastManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase,
+    private val crashLogging: CrashLogging,
 ) : PodcastManager, CoroutineScope {
 
     companion object {
@@ -330,7 +331,7 @@ class PodcastManagerImpl @Inject constructor(
                 }
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Error refreshing podcast ${existingPodcast.uuid} in background")
-                Sentry.captureException(e)
+                crashLogging.sendReport(e)
             }
         }
     }

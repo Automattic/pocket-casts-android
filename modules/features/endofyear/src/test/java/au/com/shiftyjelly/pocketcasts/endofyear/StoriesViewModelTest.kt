@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
@@ -261,6 +262,7 @@ class StoriesViewModelTest {
             analyticsTracker = mock(),
             settings = settings,
             subscriptionManager = subscriptionManager,
+            crashLogging = FakeCrashLogging(),
         )
     }
 }
