@@ -16,7 +16,7 @@
             android:id="@+id/sleepSetup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelMins60,buttonMins60,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterPlusButton, endOfChapterMinusButton"
+            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelOneHour,buttonOneHour,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterPlusButton, endOfChapterMinusButton"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
@@ -133,30 +133,30 @@
             app:layout_constraintTop_toBottomOf="@+id/labelMins30" />
 
         <TextView
-            android:id="@+id/labelMins60"
+            android:id="@+id/labelOneHour"
             style="@style/DarkSubtitle1"
             android:layout_width="wrap_content"
             android:layout_height="64dp"
             android:layout_marginStart="32dp"
             android:gravity="center_vertical"
             android:importantForAccessibility="no"
-            android:text="@string/player_sleep_60_minutes"
+            android:text="@string/hours_singular"
             android:textColor="?attr/player_contrast_01"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/separator2" />
 
         <View
-            android:id="@+id/buttonMins60"
+            android:id="@+id/buttonOneHour"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
-            android:contentDescription="@string/player_sleep_60_minutes"
+            android:contentDescription="@string/hours_singular"
             android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="@+id/labelMins60"
+            app:layout_constraintBottom_toBottomOf="@+id/labelOneHour"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/labelMins60" />
+            app:layout_constraintTop_toTopOf="@+id/labelOneHour" />
 
         <View
             android:id="@+id/separator3"
@@ -165,7 +165,7 @@
             android:background="?attr/player_contrast_05"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonMins60" />
+            app:layout_constraintTop_toBottomOf="@+id/buttonOneHour" />
 
         <TextView
             android:id="@+id/labelCustom"
