@@ -39,11 +39,7 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override val user: Flow<CrashLoggingUser?> = observeUser.invoke().map { userMail ->
         userMail?.let {
-            CrashLoggingUser(
-                email = it.email,
-                userID = "",
-                username = "",
-            )
+            CrashLoggingUser(email = it.email)
         }
     }
 

@@ -68,7 +68,7 @@ class PocketCastsCrashLoggingDataProviderTest {
 
         runBlocking {
             assertEquals(
-                CrashLoggingUser(userID = "", email = "mail", username = ""),
+                CrashLoggingUser(userID = null, email = "mail", username = null),
                 sut.user.last(),
             )
         }
