@@ -159,14 +159,14 @@
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <ImageButton
-                android:id="@+id/closeButton"
+                android:id="@+id/backButton"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginStart="7dp"
                 android:background="?android:attr/actionBarItemBackground"
-                android:contentDescription="@string/close"
-                android:src="@drawable/ic_close"
+                android:contentDescription="@string/back"
+                android:src="@drawable/ic_arrow_back_24dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:visible="false"

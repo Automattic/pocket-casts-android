@@ -15,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudSettingsB
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -25,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class CloudSettingsFragment : BaseFragment(), CloseOnTabSwitch {
+class CloudSettingsFragment : BaseFragment() {
     companion object {
         fun newInstance(): CloudSettingsFragment {
             return CloudSettingsFragment()

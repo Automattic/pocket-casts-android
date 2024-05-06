@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.transition.TransitionInflater
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
@@ -41,11 +40,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -92,14 +88,6 @@ class AccountDetailsFragment : BaseFragment() {
     private val viewModel: AccountDetailsViewModel by viewModels()
     private var binding: FragmentAccountDetailsBinding? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            val inflater = TransitionInflater.from(requireContext())
-            enterTransition = inflater.inflateTransition(R.transition.slide_in)
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentAccountDetailsBinding.inflate(inflater, container, false)
         return binding?.root
@@ -108,7 +96,6 @@ class AccountDetailsFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        enterTransition = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -176,7 +163,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         binding.btnChangeEmail?.setOnClickListener {
             val fragment = ChangeEmailFragment.newInstance()
-            (activity as FragmentHostListener).addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+            (activity as FragmentHostListener).addFragment(fragment)
         }
 
         val showChangeButtons = !syncManager.isGoogleLogin()
@@ -184,7 +171,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         binding.btnChangePwd?.setOnClickListener {
             val fragment = ChangePwdFragment.newInstance()
-            (this.activity as FragmentHostListener).addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+            (this.activity as FragmentHostListener).addFragment(fragment)
         }
 
         binding.btnUpgradeAccount?.setOnClickListener {

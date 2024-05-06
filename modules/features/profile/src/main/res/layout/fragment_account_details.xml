@@ -14,9 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/secondary_ui_01"
-            android:minHeight="?android:attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:contentDescription="@string/back"/>
+            android:minHeight="?android:attr/actionBarSize" />
 
         <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
             android:id="@+id/multiSelectToolbar"

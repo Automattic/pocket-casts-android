@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
-import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -61,7 +60,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class CloudFilesFragment : BaseFragment(), CloseOnTabSwitch, Toolbar.OnMenuItemClickListener {
+class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var downloadManager: DownloadManager
 
     @Inject lateinit var playbackManager: PlaybackManager

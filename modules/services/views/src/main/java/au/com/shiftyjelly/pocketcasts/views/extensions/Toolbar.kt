@@ -8,7 +8,6 @@ import androidx.annotation.MenuRes
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.doOnLayout
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -114,9 +113,7 @@ fun Toolbar.updateProfileMenuBadge(
                 badgeGravity = BadgeDrawable.BOTTOM_END
             }
             it.setTag(UR.id.menu_profile_badge, profileIconBadge)
-            it.doOnLayout {
-                BadgeUtils.attachBadgeDrawable(profileIconBadge, it)
-            }
+            BadgeUtils.attachBadgeDrawable(profileIconBadge, it)
         } else {
             val badge = it.getTag(UR.id.menu_profile_badge) as? BadgeDrawable
             BadgeUtils.detachBadgeDrawable(badge, it)
