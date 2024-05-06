@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmark
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
@@ -168,9 +169,9 @@ class BookmarksViewModel
             isMultiSelectingFlow,
             selectedListFlow,
             settings.cachedSubscriptionStatus.flow,
-            settings.useEpisodeArtwork.flow,
+            settings.artworkConfiguration.flow,
             bookmarkSearchResults,
-        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, useEpisodeArtwork, searchResults ->
+        ) { bookmarks, isMultiSelecting, selectedList, cachedSubscriptionStatus, artworkConfiguration, searchResults ->
             val userTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
             _uiState.value = if (!bookmarkFeature.isAvailable(userTier)) {
                 UiState.Upsell(sourceView)
@@ -192,7 +193,7 @@ class BookmarksViewModel
                     bookmarks = filteredBookmarks,
                     bookmarkIdAndEpisodeMap = bookmarkIdAndEpisodeMap,
                     isMultiSelecting = isMultiSelecting,
-                    useEpisodeArtwork = useEpisodeArtwork,
+                    useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork(Element.Bookmarks),
                     isSelected = { selectedBookmark ->
                         selectedList.map { bookmark -> bookmark.uuid }
                             .contains(selectedBookmark.uuid)
@@ -202,6 +203,7 @@ class BookmarksViewModel
                     showIcon = sourceView == SourceView.PROFILE,
                     searchEnabled = sourceView == SourceView.PROFILE,
                     searchText = searchText,
+                    showEpisodeTitle = sourceView == SourceView.PROFILE,
                 )
             }
         }.stateIn(viewModelScope)
@@ -381,6 +383,7 @@ class BookmarksViewModel
             val showIcon: Boolean = false,
             val searchText: String = "",
             val searchEnabled: Boolean = false,
+            val showEpisodeTitle: Boolean = false,
         ) : UiState() {
             val headerRowColors: HeaderRowColors
                 get() = when (sourceView) {

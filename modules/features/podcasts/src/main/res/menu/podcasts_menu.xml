@@ -18,6 +18,7 @@
     <item
         android:id="@+id/media_route_menu_item"
         android:title="@string/play_on"
+        android:visible="false"
         app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
         app:showAsAction="always" />
 
@@ -25,6 +26,7 @@
         android:id="@+id/search_podcasts"
         android:icon="@drawable/ic_search_black_24dp"
         app:showAsAction="always"
+        android:visible="false"
         android:title="@string/podcasts_menu_search_podcasts" />
 
     <item
@@ -32,5 +34,13 @@
         android:icon="@drawable/ic_more_vert_black_24dp"
         app:showAsAction="always"
         android:title="@string/podcasts_menu_more_options" />
+
+    <item
+        android:id="@id/menu_profile"
+        android:icon="@drawable/ic_profile"
+        android:visible="false"
+        app:showAsAction="always"
+        app:actionLayout="@layout/view_profile_circle"
+        android:title="@string/profile" />
 
 </menu>

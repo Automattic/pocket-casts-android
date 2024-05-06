@@ -8,6 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
@@ -27,9 +28,9 @@ fun DownloadsScreen(
 ) {
     val viewModel = hiltViewModel<DownloadsScreenViewModel>()
     val state by viewModel.stateFlow.collectAsState()
-    val useEpisodeArtwork by viewModel.useEpisodeArtwork.collectAsState()
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
-    Content(columnState, state, useEpisodeArtwork, onItemClick)
+    Content(columnState, state, artworkConfiguration.useEpisodeArtwork(Element.Downloads), onItemClick)
 }
 
 @Composable

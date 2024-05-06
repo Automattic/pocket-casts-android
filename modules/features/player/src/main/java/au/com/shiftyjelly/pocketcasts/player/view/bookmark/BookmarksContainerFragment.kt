@@ -16,16 +16,21 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentBookmarksContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
+import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class BookmarksContainerFragment :
-    BaseDialogFragment() {
+    BaseDialogFragment(), CloseOnTabSwitch {
     companion object {
         private const val ARG_EPISODE_UUID = "episodeUUID"
         private const val ARG_SOURCE_VIEW = "sourceView"
@@ -47,11 +52,15 @@ class BookmarksContainerFragment :
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
 
     override val statusBarColor: StatusBarColor
-        get() = StatusBarColor.Custom(
-            context?.getThemeColor(UR.attr.primary_ui_01)
-                ?: Color.WHITE,
-            theme.isDarkTheme,
-        )
+        get() = if (sourceView == SourceView.PROFILE) {
+            StatusBarColor.Light
+        } else {
+            StatusBarColor.Custom(
+                context?.getThemeColor(UR.attr.primary_ui_01)
+                    ?: Color.WHITE,
+                theme.isDarkTheme,
+            )
+        }
 
     var binding: FragmentBookmarksContainerBinding? = null
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
@@ -110,13 +119,30 @@ class BookmarksContainerFragment :
             .addToBackStack(null)
             .commit()
 
+        binding.toolbar.setup(
+            title = getString(LR.string.bookmarks),
+            navigationIcon = if (dialog == null) {
+                NavigationIcon.BackArrow
+            } else {
+                NavigationIcon.Close
+            },
+            onNavigationClick = {
+                if (dialog == null) {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                } else {
+                    dismiss()
+                }
+            },
+            activity = activity,
+            theme = theme,
+        )
+
         dialog?.let {
-            binding.btnClose.setOnClickListener { dismiss() }
-        } ?: run {
-            binding.btnClose.setImageResource(R.drawable.ic_arrow_back)
-            binding.btnClose.setOnClickListener {
-                @Suppress("DEPRECATION")
-                activity?.onBackPressed()
+            with(binding.toolbar) {
+                navigationIcon = requireContext().getThemeTintedDrawable(R.drawable.ic_close, UR.attr.primary_icon_01)
+                setTitleTextColor(requireContext().getThemeColor(UR.attr.primary_text_01))
+                setBackgroundColor(requireContext().getThemeColor(UR.attr.primary_ui_01))
             }
         }
     }
@@ -124,6 +150,7 @@ class BookmarksContainerFragment :
     private fun FragmentBookmarksContainerBinding.setupMultiSelectHelper() {
         bookmarksViewModel.multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             multiSelectToolbar.isVisible = isMultiSelecting
+            toolbar.isVisible = !isMultiSelecting
             multiSelectToolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         }
         bookmarksViewModel.multiSelectHelper.context = context

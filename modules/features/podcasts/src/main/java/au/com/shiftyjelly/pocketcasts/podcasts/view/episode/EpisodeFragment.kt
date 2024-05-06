@@ -351,7 +351,7 @@ class EpisodeFragment : BaseFragment() {
                             )
                             (parentFragment as? BaseDialogFragment)?.dismiss()
                             if (!overridePodcastLink) {
-                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid)
+                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid, SourceView.EPISODE_DETAILS.analyticsValue)
                             }
                         }
 
@@ -366,7 +366,7 @@ class EpisodeFragment : BaseFragment() {
                                 .show()
                             true
                         }
-                        imageRequestFactory.create(state.episode, settings.useEpisodeArtwork.value).loadInto(binding.podcastArtwork)
+                        imageRequestFactory.create(state.episode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(binding.podcastArtwork)
 
                         binding.btnPlay.setOnPlayClicked {
                             val context = binding.root.context

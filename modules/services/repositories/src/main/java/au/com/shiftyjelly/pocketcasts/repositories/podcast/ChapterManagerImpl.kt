@@ -19,13 +19,8 @@ class ChapterManagerImpl @Inject constructor(
     override suspend fun updateChapters(
         episodeUuid: String,
         chapters: List<DbChapter>,
-        forceUpdate: Boolean,
     ) {
-        if (forceUpdate) {
-            chapterDao.replaceAllChapters(episodeUuid, chapters)
-        } else {
-            chapterDao.replaceAllChaptersIfMoreIsPassed(episodeUuid, chapters)
-        }
+        chapterDao.replaceAllChapters(episodeUuid, chapters)
     }
 
     override fun observerChaptersForEpisode(episodeUuid: String) = combine(

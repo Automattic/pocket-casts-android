@@ -7,7 +7,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlin.time.Duration
 
 interface FragmentHostListener {
-    fun addFragment(fragment: Fragment, onTop: Boolean = false)
+    fun addFragment(
+        fragment: Fragment,
+        onTop: Boolean = false,
+        overBottomSheet: Boolean = false,
+    )
     fun replaceFragment(fragment: Fragment)
     fun showBottomSheet(fragment: Fragment)
     fun bottomSheetClosePressed(fragment: Fragment)
@@ -18,7 +22,8 @@ interface FragmentHostListener {
     fun openTab(tabId: Int)
     fun closeToRoot()
     fun closePodcastsToRoot()
-    fun openPodcastPage(uuid: String)
+    fun openProfile()
+    fun openPodcastPage(uuid: String, sourceView: String? = null)
     fun openCloudFiles()
     fun snackBarView(): View
     fun showAccountUpgradeNow(autoSelectPlus: Boolean)

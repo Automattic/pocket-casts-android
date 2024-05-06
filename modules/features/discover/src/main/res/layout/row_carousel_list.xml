@@ -15,7 +15,7 @@
     <LinearLayout
         android:id="@+id/layoutSearch"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="48dp"
         android:orientation="horizontal"
         android:background="@drawable/search_background"
         android:foreground="?attr/selectableItemBackground"
@@ -25,9 +25,7 @@
         android:focusable="true"
         android:contentDescription="@string/search_podcasts_or_add_url"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp">
+        android:paddingEnd="16dp">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

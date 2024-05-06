@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBinding
@@ -36,13 +37,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -57,7 +61,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+class CloudFilesFragment : BaseFragment(), CloseOnTabSwitch, Toolbar.OnMenuItemClickListener {
     @Inject lateinit var downloadManager: DownloadManager
 
     @Inject lateinit var playbackManager: PlaybackManager
@@ -104,6 +108,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,
             ),
+            artworkContext = Element.Files,
         )
     }
 
@@ -170,10 +175,15 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            chromeCastButton = Shown(chromeCastAnalytics),
+            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                ChromeCastButton.None
+            } else {
+                ChromeCastButton.Shown(chromeCastAnalytics)
+            },
             menu = R.menu.menu_cloudfiles,
         )
         binding?.toolbar?.setOnMenuItemClickListener(this)
+        binding?.toolbar?.menu?.findItem(R.id.media_route_menu_item)?.isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
 
         binding?.recyclerView?.let {
             it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)

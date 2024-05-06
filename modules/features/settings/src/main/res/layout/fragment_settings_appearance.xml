@@ -20,6 +20,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/primary_ui_04"
@@ -233,6 +234,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="24dp"
                 android:contentDescription="@string/settings_use_episode_artwork"
+                android:saveEnabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/lblUseEpisodeArtwork" />
 
@@ -252,6 +254,22 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblUseEpisodeArtwork" />
 
             <TextView
+                android:id="@+id/lblEpisodeArtworkConfiguration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_use_episode_artwork_advanced"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:paddingStart="72dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblUseEpisodeArtworkDetails" />
+
+            <TextView
                 android:id="@+id/lblRefreshAllPodcastArtwork"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -265,7 +283,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lblUseEpisodeArtworkDetails" />
+                app:layout_constraintTop_toBottomOf="@+id/lblEpisodeArtworkConfiguration" />
 
             <View
                 android:id="@+id/dividerViewUpNext"

@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -47,10 +48,12 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -129,6 +132,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
             ),
+            artworkContext = Element.Filters,
         )
     }
 
@@ -232,10 +236,15 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbar = toolbar,
             title = arguments?.getString(ARG_PLAYLIST_TITLE),
             menu = R.menu.menu_filter,
-            chromeCastButton = Shown(chromeCastAnalytics),
+            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                ChromeCastButton.None
+            } else {
+                ChromeCastButton.Shown(chromeCastAnalytics)
+            },
             navigationIcon = BackArrow,
             toolbarColors = null,
         )
+        binding.toolbar.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
 
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {

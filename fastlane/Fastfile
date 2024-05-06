@@ -142,9 +142,23 @@ platform :android do
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
 
+  # @option [String] base_version The "x.y" version number to create a beta from. Defaults to the current version as defined in the version file of `main` branch
+  # @option [Integer] version_code The versionCode to use for the new beta. Defaults to one more than the versionCode defined in the version file of the `release/<base_version>` branch
   lane :new_beta_release do |options|
     ensure_git_status_clean
-    Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
+
+    base_version = options[:base_version]
+    if base_version.nil?
+      # If no base_version provided, read it from the version file from `main`
+      Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
+      base_version = release_version_current
+    end
+
+    # Checkout release branch first, so that all computations of `beta_version_*`` and `build_code_*`` are based on the
+    # current values in the current `release/*`` branch, not the values from `main` (which is important in cases like
+    # hotfixes for example, where `main` doesn't have the new versionCode used by the hotfix yet but release/* branch do)
+    checkout_success = Fastlane::Helper::GitHelper.checkout_and_pull(release: base_version)
+    UI.user_error!("Release branch for version #{base_version} doesn't exist.") unless checkout_success
 
     # Check versions
     message = <<-MESSAGE
@@ -153,17 +167,9 @@ platform :android do
       New beta version: #{beta_version_next}
 
       Current build code: #{build_code_current}
-      New build code: #{build_code_next}
+      New build code: #{options[:version_code] || build_code_next}
 
     MESSAGE
-
-    # Check branch
-    unless !options[:base_version].nil? || Fastlane::Helper::GitHelper.checkout_and_pull(release: release_version_current)
-      UI.user_error!("Release branch for version #{release_version_current} doesn't exist.")
-    end
-
-    # Check user override
-    override_default_release_branch(options[:base_version]) unless options[:base_version].nil?
 
     UI.important(message)
     unless options[:skip_confirm] || UI.confirm('Do you want to continue?')
@@ -175,7 +181,7 @@ platform :android do
     ensure_git_branch(branch: '^release/') # Match branch names that begin with `release/`
     VERSION_FILE.write_version(
       version_name: beta_version_next,
-      version_code: build_code_next
+      version_code: options[:version_code] || build_code_next
     )
     commit_version_bump
     UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
@@ -465,13 +471,6 @@ platform :android do
 
   def beta_version?(version)
     version.include? '-rc-'
-  end
-
-  def override_default_release_branch(version)
-    success = Fastlane::Helper::GitHelper.checkout_and_pull(release: version)
-    UI.user_error!("Release branch for version #{version} doesn't exist. Abort.") unless success
-
-    UI.message("Checked out branch `#{git_branch}` as requested by user.\n")
   end
 
   #####################################################################################

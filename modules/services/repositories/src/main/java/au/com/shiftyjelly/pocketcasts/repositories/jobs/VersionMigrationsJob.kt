@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -163,6 +164,10 @@ class VersionMigrationsJob : JobService() {
         if (previousVersionCode < 9209) {
             consolidateEmbeddedArtworkSettings(applicationContext)
         }
+
+        if (previousVersionCode < 9226) {
+            migrateToGranularEpisodeArtworkSettings(applicationContext)
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {
@@ -245,7 +250,14 @@ class VersionMigrationsJob : JobService() {
         if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
             val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
             val useFileArtwork = settings.getBooleanForKey("useEmbeddedArtwork", false)
-            settings.useEpisodeArtwork.set(useEpisodeArtwork || useFileArtwork, updateModifiedAt = true)
+            settings.setBooleanForKey("useEpisodeArtwork", useEpisodeArtwork || useFileArtwork)
+        }
+    }
+
+    private fun migrateToGranularEpisodeArtworkSettings(context: Context) {
+        if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+            val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
+            settings.artworkConfiguration.set(ArtworkConfiguration((useEpisodeArtwork)), updateModifiedAt = true)
         }
     }
 }

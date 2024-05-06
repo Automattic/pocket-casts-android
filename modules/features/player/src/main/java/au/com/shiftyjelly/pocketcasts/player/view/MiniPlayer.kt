@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
+import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -22,18 +23,26 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
+import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import coil.request.Disposable
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
+import com.google.android.gms.cast.framework.CastButtonFactory
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@AndroidEntryPoint
 class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs), CoroutineScope {
 
@@ -53,6 +62,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     var clickListener: OnMiniPlayerClicked? = null
 
+    @Inject
+    lateinit var chromeCastAnalytics: ChromeCastAnalytics
+
     init {
         // open full screen player on click
         binding.root.setOnClickListener { openPlayer() }
@@ -67,6 +79,12 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.skipForward.setOnClickListener { skipForwardClicked() }
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
+        // cast button
+        CastButtonFactory.setUpMediaRouteButton(context, binding.mediaRouteButton)
+        binding.mediaRouteButton.setOnClickListener {
+            chromeCastAnalytics.trackChromeCastViewShown()
+        }
+        binding.mediaRouteButton.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
 
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
@@ -105,13 +123,15 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun updateTintColor(tintColor: Int, theme: Theme) {
+        val iconTintColor = ThemeColor.podcastIcon03(theme.activeTheme, tintColor)
         val tintColorStateList: ColorStateList =
-            ColorStateList.valueOf(ThemeColor.podcastIcon03(theme.activeTheme, tintColor))
+            ColorStateList.valueOf(iconTintColor)
 
         binding.skipForward.imageTintList = tintColorStateList
         binding.miniPlayButton.backgroundTintList = tintColorStateList
         binding.skipBack.imageTintList = tintColorStateList
         binding.upNextButton.imageTintList = tintColorStateList
+        binding.mediaRouteButton.updateColor(iconTintColor)
 
         val colorStateList = ThemeColor.podcastUi02(theme.activeTheme, tintColor)
         binding.miniPlayerTint.setBackgroundColor(colorStateList)
@@ -148,6 +168,10 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         val upNextCount: Int = upNextState.queueSize()
         binding.countText.text = upNextCount.toString()
         binding.countText.isVisible = upNextCount > 0
+        binding.upNextButton.showIf(
+            !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) ||
+                (upNextCount > 0),
+        )
 
         val drawableId = when {
             upNextCount == 0 -> R.drawable.mini_player_upnext
@@ -213,7 +237,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         button.contentDescription = if (isPlaying) stringPause else stringPlay
     }
 
-    private var lastLoadedBaseEpisode: BaseEpisode? = null
+    private var lastLoadedBaseEpisodeId: String? = null
     private var lastUseEpisodeArtwork: Boolean? = null
 
     private fun loadEpisodeArtwork(
@@ -221,11 +245,11 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         useEpisodeArtwork: Boolean,
         imageView: ImageView,
     ): Disposable? {
-        if (lastLoadedBaseEpisode == baseEpisode && lastUseEpisodeArtwork == useEpisodeArtwork) {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
             return null
         }
 
-        lastLoadedBaseEpisode = baseEpisode
+        lastLoadedBaseEpisodeId = baseEpisode.uuid
         lastUseEpisodeArtwork = useEpisodeArtwork
         return imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }

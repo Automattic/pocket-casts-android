@@ -1,6 +1,30 @@
-7.63
+7.64
 -----
 
+
+7.63
+-----
+*   New Features
+    *   Sleep timer: Restart timer when shaking phone
+        ([#2054](https://github.com/Automattic/pocket-casts-android/pull/2054))
+    *   Sleep timer: Start fading out audio when sleep timer has 5 seconds left
+        ([#2069](https://github.com/Automattic/pocket-casts-android/pull/2069))
+    *   Sleep timer: Set sleep time end of episode for multiple episodes
+        ([#2097](https://github.com/Automattic/pocket-casts-android/pull/2097))
+    *   Enable toggling episode artwork separately in different contexts
+        ([#2112](https://github.com/Automattic/pocket-casts-android/pull/2112))
+*   Updates:
+    *   Improved updating podcast episode when subscribed to thousands podcasts. 
+        ([#2082](https://github.com/Automattic/pocket-casts-android/pull/2082))
+    *   Prioritize embedded chapters over remote ones.
+        ([#2098](https://github.com/Automattic/pocket-casts-android/pull/2098))
+*   Bug Fixes
+    *   Fix flashing artwork
+        ([#2086](https://github.com/Automattic/pocket-casts-android/pull/2086))
+    *   Fix embedded artwork not being extracted when adding files
+        ([#2124](https://github.com/Automattic/pocket-casts-android/pull/2124))
+    *   Fix an issue when sorting podcast by episodes could hide some podcasts
+        ([#2125](https://github.com/Automattic/pocket-casts-android/pull/2125))
 
 7.62
 -----
@@ -11,6 +35,9 @@
         ([#2037](https://github.com/Automattic/pocket-casts-android/pull/2037))
     *   Sleep Timer restarts automatically if you play again within 5 minutes
         ([#2048](https://github.com/Automattic/pocket-casts-android/pull/2048))
+*   Updates:
+    *   Updated widget and added two new variants - small and large.
+        ([#2043](https://github.com/Automattic/pocket-casts-android/pull/2043))
 *   Bug Fixes
     *   Improved player view in landscape mode. Added chapter artwork, podcast title, and improved video experience.
         ([#2044](https://github.com/Automattic/pocket-casts-android/pull/1944))

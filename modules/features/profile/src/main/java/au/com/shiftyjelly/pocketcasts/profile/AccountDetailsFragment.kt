@@ -42,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -163,7 +165,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         binding.btnChangeEmail?.setOnClickListener {
             val fragment = ChangeEmailFragment.newInstance()
-            (activity as FragmentHostListener).addFragment(fragment)
+            (activity as FragmentHostListener).addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
         }
 
         val showChangeButtons = !syncManager.isGoogleLogin()
@@ -171,7 +173,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         binding.btnChangePwd?.setOnClickListener {
             val fragment = ChangePwdFragment.newInstance()
-            (this.activity as FragmentHostListener).addFragment(fragment)
+            (this.activity as FragmentHostListener).addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
         }
 
         binding.btnUpgradeAccount?.setOnClickListener {

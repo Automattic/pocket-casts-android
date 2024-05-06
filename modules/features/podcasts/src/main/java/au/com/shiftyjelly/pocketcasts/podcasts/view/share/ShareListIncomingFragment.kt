@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncomingBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -117,7 +118,7 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
     }
 
     override fun onPodcastClick(podcast: Podcast) {
-        val fragment = PodcastFragment.newInstance(podcast.uuid)
+        val fragment = PodcastFragment.newInstance(podcast.uuid, sourceView = SourceView.SHARE_LIST)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
