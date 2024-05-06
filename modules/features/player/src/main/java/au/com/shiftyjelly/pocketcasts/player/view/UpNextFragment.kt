@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -108,7 +109,13 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
 
     val overrideTheme: Theme.ThemeType
-        get() = if (settings.useDarkUpNextTheme.value) Theme.ThemeType.DARK else theme.activeTheme
+        get() = if (settings.useDarkUpNextTheme.value &&
+            upNextSource != UpNextSource.UP_NEXT_TAB
+        ) {
+            Theme.ThemeType.DARK
+        } else {
+            theme.activeTheme
+        }
 
     val multiSelectListener = object : MultiSelectHelper.Listener<BaseEpisode> {
         override fun multiSelectSelectAll() {
@@ -207,6 +214,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 fragmentManager = parentFragmentManager,
                 swipeSource = SwipeSource.UP_NEXT,
             ),
+            playbackManager = playbackManager,
         )
         adapter.theme = overrideTheme
 
@@ -235,7 +243,11 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     private fun updateStatusAndNavColors() {
         activity?.let {
             theme.setNavigationBarColor(it.window, true, ThemeColor.primaryUi03(overrideTheme))
-            theme.updateWindowStatusBar(it.window, StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), true), it)
+            theme.updateWindowStatusBar(
+                it.window,
+                StatusBarColor.Custom(ThemeColor.secondaryUi01(overrideTheme), overrideTheme.darkTheme),
+                it,
+            )
         }
     }
 
@@ -243,12 +255,22 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         super.onViewCreated(view, savedInstanceState)
 
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(LR.string.up_next)
-        toolbar.setNavigationOnClickListener {
-            close()
+        setupToolbarAndStatusBar(
+            toolbar = binding.toolbar,
+            title = getString(LR.string.up_next),
+            menu = R.menu.upnext,
+            navigationIcon = if (upNextSource != UpNextSource.UP_NEXT_TAB) {
+                NavigationIcon.Close
+            } else {
+                NavigationIcon.None
+            },
+            onNavigationClick = { close() },
+            toolbarColors = null,
+        )
+        if (upNextSource != UpNextSource.UP_NEXT_TAB) {
+            toolbar.setNavigationIcon(IR.drawable.ic_close)
         }
         toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(overrideTheme))
-        toolbar.inflateMenu(R.menu.upnext)
         toolbar.menu.tintIcons(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {

@@ -116,6 +116,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -327,6 +329,10 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
+        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+            binding.bottomNavigation.menu.removeItem(VR.id.navigation_upnext)
+        }
+
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
@@ -342,12 +348,23 @@ class MainActivity :
         }
 
         var selectedTab = settings.selectedTab()
-        val tabs = mapOf(
-            VR.id.navigation_podcasts to { FragmentInfo(PodcastsFragment(), true) },
-            VR.id.navigation_filters to { FragmentInfo(FiltersFragment(), true) },
-            VR.id.navigation_discover to { FragmentInfo(DiscoverFragment(), false) },
-            VR.id.navigation_profile to { FragmentInfo(ProfileFragment(), true) },
-        )
+        val tabs = buildMap {
+            put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
+            put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
+            put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
+            put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
+            if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                put(VR.id.navigation_upnext) {
+                    FragmentInfo(
+                        UpNextFragment.newInstance(
+                            embedded = false,
+                            source = UpNextSource.UP_NEXT_TAB,
+                        ),
+                        true,
+                    )
+                }
+            }
+        }
 
         if (!tabs.keys.contains(selectedTab)) {
             // Guard against tab ids changing and settings having an out of date copy
@@ -1556,6 +1573,7 @@ class MainActivity :
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
             VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
+            VR.id.navigation_upnext -> AnalyticsEvent.UP_NEXT_TAB_OPENED
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED
