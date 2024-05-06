@@ -394,11 +394,7 @@ class MainActivity :
             activity = this,
         )
 
-        val showMiniPlayerImmediately = if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
-        } else {
-            true
-        }
+        val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
         binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
 
         setupPlayerViews(showMiniPlayerImmediately)
@@ -536,9 +532,7 @@ class MainActivity :
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(SAVEDSTATE_PLAYER_OPEN, binding.playerBottomSheet.isPlayerOpen)
-        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
-        }
+        outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
     }
 
     override fun overrideNextRefreshTimer() {
@@ -923,9 +917,8 @@ class MainActivity :
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                         removeBottomSheetFragment(it)
                     }
-                    if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) || !playbackManager.upNextQueue.isEmpty) {
-                        binding.playerBottomSheet.isDragEnabled = true
-                    }
+
+                    binding.playerBottomSheet.isDragEnabled = true
 
                     updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)
                 } else {
@@ -986,11 +979,9 @@ class MainActivity :
 
         // Handle up next shortcut
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
-            if (!playbackManager.upNextQueue.isEmpty) {
-                intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
-                binding.playerBottomSheet.openPlayer()
-                showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
-            }
+            intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
+            binding.playerBottomSheet.openPlayer()
+            showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
         }
     }
 
