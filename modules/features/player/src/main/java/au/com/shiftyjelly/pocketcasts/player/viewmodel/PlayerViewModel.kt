@@ -542,6 +542,8 @@ class PlayerViewModel @Inject constructor(
 
         return if (hours == 1 && minutes == 0) {
             context.resources.getString(LR.string.hours_singular)
+        } else if (hours == 1 && minutes > 0) {
+            context.resources.getString(LR.string.hour_and_minutes, minutes)
         } else if (hours > 1 && minutes == 0) {
             context.resources.getString(LR.string.hours_plural, hours)
         } else if (hours > 0) {

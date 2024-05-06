@@ -185,6 +185,7 @@
     <string name="hours_singular">1 hour</string>
     <string name="hours_plural">%d hours</string>
     <string name="hours_and_minutes">%d hours and %d minutes</string>
+    <string name="hour_and_minutes">1 hour and %d minutes</string>
     <string name="days_singular">1 day</string>
     <string name="days_plural">%d days</string>
     <string name="months_singular">1 month</string>
