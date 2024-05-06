@@ -71,14 +71,6 @@ class StatsFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: StatsViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            val inflater = TransitionInflater.from(requireContext())
-            enterTransition = inflater.inflateTransition(au.com.shiftyjelly.pocketcasts.ui.R.transition.slide_in)
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = ComposeView(requireContext()).apply {
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
@@ -105,11 +97,6 @@ class StatsFragment : BaseFragment() {
     override fun onBackPressed(): Boolean {
         analyticsTracker.track(AnalyticsEvent.STATS_DISMISSED)
         return super.onBackPressed()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        enterTransition = false
     }
 }
 
