@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.coerceAtMost
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
@@ -52,10 +54,11 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
                 onClick = controlPlayback,
             )
             if (state.episode != null) {
+                val buttonSize = (size / 2.3f).coerceAtMost(48.dp)
                 PlaybackButton(
                     isPlaying = state.isPlaying,
-                    iconPadding = size / 16,
-                    modifier = GlanceModifier.size(size / 2),
+                    iconPadding = buttonSize / 4.75f,
+                    modifier = GlanceModifier.size(buttonSize),
                 )
             }
         }
