@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.crashlogging
 
+import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider.Companion.GLOBAL_TAG_APP_PLATFORM
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeBuildDataProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeCrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeObserveUser
 import com.automattic.android.tracks.crashlogging.ErrorSampling
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -40,6 +43,19 @@ class PocketCastsCrashLoggingDataProviderTest {
             setUp()
 
             assertEquals(ErrorSampling.Disabled, sut.errorSampling)
+        }
+    }
+
+    @Test
+    fun `should attach platform tag`() {
+        fakeBuildDataProvider.buildPlatform = "mobile"
+        setUp()
+
+        runBlocking {
+            assertEquals(
+                sut.applicationContextProvider.last()[GLOBAL_TAG_APP_PLATFORM],
+                "mobile"
+            )
         }
     }
 }
