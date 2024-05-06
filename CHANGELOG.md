@@ -1,6 +1,8 @@
 7.64
 -----
-
+*   Updates:
+    *   New design for the Podcasts grid layout
+        ([#2165](https://github.com/Automattic/pocket-casts-android/pull/2165))
 
 7.63
 -----

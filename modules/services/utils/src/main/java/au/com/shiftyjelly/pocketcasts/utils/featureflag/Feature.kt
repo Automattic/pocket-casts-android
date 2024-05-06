@@ -94,9 +94,9 @@ enum class Feature(
     PODCASTS_GRID_VIEW_DESIGN_CHANGES(
         key = "podcasts_grid_view_changes",
         title = "Podcasts grid view design changes",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;
