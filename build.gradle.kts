@@ -55,6 +55,9 @@ fun Project.configureSentry() {
         tracingInstrumentation {
             features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
         }
+        autoInstallation.enabled = false
+        includeDependenciesReport = false
+        ignoredBuildTypes = setOf("debug")
     }
 }
 
