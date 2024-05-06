@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataPr
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeBuildDataProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeCrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeObserveUser
+import com.automattic.android.tracks.crashlogging.CrashLoggingUser
 import com.automattic.android.tracks.crashlogging.ErrorSampling
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
@@ -14,10 +15,11 @@ class PocketCastsCrashLoggingDataProviderTest {
 
     private lateinit var sut: PocketCastsCrashLoggingDataProvider
     private val fakeBuildDataProvider = FakeBuildDataProvider()
+    private val fakeObserveUser = FakeObserveUser()
 
     private fun setUp() {
         sut = PocketCastsCrashLoggingDataProvider(
-            FakeObserveUser(),
+            fakeObserveUser,
             FakeCrashReportPermissionCheck(),
             fakeBuildDataProvider,
         )
@@ -54,8 +56,31 @@ class PocketCastsCrashLoggingDataProviderTest {
         runBlocking {
             assertEquals(
                 sut.applicationContextProvider.last()[GLOBAL_TAG_APP_PLATFORM],
-                "mobile"
+                "mobile",
             )
+        }
+    }
+
+    @Test
+    fun `should provide user if available`() {
+        fakeObserveUser.user = User("mail")
+        setUp()
+
+        runBlocking {
+            assertEquals(
+                CrashLoggingUser(userID = "", email = "mail", username = ""),
+                sut.user.last(),
+            )
+        }
+    }
+
+    @Test
+    fun `should provide null if user is unavailable`() {
+        fakeObserveUser.user = null
+        setUp()
+
+        runBlocking {
+            assertEquals(null, sut.user.last())
         }
     }
 }
