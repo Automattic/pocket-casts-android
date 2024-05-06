@@ -57,7 +57,7 @@ fun Project.configureSentry() {
         }
         autoInstallation.enabled = false
         includeDependenciesReport = false
-        ignoredBuildTypes = setOf("debug")
+        ignoredBuildTypes = setOf("debug", "debugProd")
     }
 }
 
