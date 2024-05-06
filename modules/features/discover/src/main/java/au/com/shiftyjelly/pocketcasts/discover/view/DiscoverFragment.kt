@@ -130,8 +130,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
-        trackCategoryPickImpression(selectedCategory.discoverCategory)
-
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
@@ -150,10 +148,15 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         }
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
+        trackDropDownListCategoryPickImpression(ALL_CATEGORIES_NAME_VALUE, ALL_CATEGORIES_ID_VALUE)
+
         viewModel.loadCategories(source) { categories ->
             CategoriesBottomSheet(
                 categories = categories,
-                onCategoryClick = { this.onCategoryClick(it) { onCategorySelectionSuccess(it) } },
+                onCategoryClick = {
+                    trackDropDownListCategoryPickImpression(it.discoverCategory.name, it.discoverCategory.id)
+                    this.onCategoryClick(it) { onCategorySelectionSuccess(it) }
+                },
                 onCategorySelectionCancel = onCategorySelectionCancel,
             ).show(childFragmentManager, "categories_bottom_sheet")
         }
@@ -331,14 +334,14 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             )
         }
     }
-    private fun trackCategoryPickImpression(category: DiscoverCategory) {
+    private fun trackDropDownListCategoryPickImpression(name: String, id: Int) {
         viewModel.currentRegionCode?.let {
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_PICK,
                 mapOf(
-                    NAME_KEY to category.name,
+                    NAME_KEY to name,
                     REGION_KEY to it,
-                    ID_KEY to category.id,
+                    ID_KEY to id,
                 ),
             )
         }
@@ -354,5 +357,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         const val EPISODE_UUID_KEY = "episode_uuid"
         const val SOURCE_KEY = "source"
         const val UUID_KEY = "uuid"
+        const val ALL_CATEGORIES_NAME_VALUE = "all"
+        const val ALL_CATEGORIES_ID_VALUE = -1
     }
 }
