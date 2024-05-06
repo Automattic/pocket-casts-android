@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.testing.FakeReviewManager
 import java.util.Date
@@ -66,6 +67,7 @@ class InAppReviewHelperTest {
             settings = settings,
             analyticsTracker = analyticsTracker,
             reviewManager = reviewManager,
+            crashLogging = FakeCrashLogging(),
         )
     }
 }
