@@ -280,8 +280,6 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_SHOWN("discover_shown"),
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
     DISCOVER_CATEGORIES_PICKER_PICK("discover_categories_picker_pick"),
-    DISCOVER_CATEGORIES_PICKER_SHOWN("discover_categories_picker_shown"),
-    DISCOVER_CATEGORIES_PICKER_DISMISSED("discover_categories_picker_dismissed"),
     DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
     DISCOVER_AD_CATEGORY_TAPPED("discover_ad_category_tapped"),
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
