@@ -64,14 +64,6 @@ android {
     }
 }
 
-sentry {
-    includeProguardMapping = System.getenv()["CI"].toBoolean()
-            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
-    tracingInstrumentation {
-        features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
-    }
-}
-
 dependencies {
     // features
     implementation(project(":modules:features:account"))

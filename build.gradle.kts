@@ -1,4 +1,8 @@
 import com.automattic.android.measure.MeasureBuildsExtension
+import io.sentry.android.gradle.extensions.InstrumentationFeature
+import io.sentry.android.gradle.extensions.SentryPluginExtension
+import java.util.EnumSet
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     // Gradle Plugins
@@ -40,5 +44,22 @@ spotless {
         targetExclude("$buildDir/**/*.kt")
         targetExclude("bin/**/*.kt")
         ktlint("0.50.0")
+    }
+}
+
+fun Project.configureSentry() {
+    extensions.getByType(SentryPluginExtension::class.java).apply {
+        includeProguardMapping = System.getenv()["CI"].toBoolean()
+                && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+
+        tracingInstrumentation {
+            features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
+        }
+    }
+}
+
+rootProject.subprojects {
+    plugins.withId(rootProject.libs.plugins.sentry.get().pluginId) {
+        configureSentry()
     }
 }
