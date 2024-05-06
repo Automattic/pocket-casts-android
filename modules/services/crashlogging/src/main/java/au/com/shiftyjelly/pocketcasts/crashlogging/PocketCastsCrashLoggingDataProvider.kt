@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.map
 class PocketCastsCrashLoggingDataProvider @Inject constructor(
     observeUser: ObserveUser,
     private val crashReportPermissionCheck: CrashReportPermissionCheck,
+    buildDataProvider: BuildDataProvider,
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
@@ -66,7 +67,7 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
     }
 
     override val errorSampling: ErrorSampling =
-        if (BuildConfig.BUILD_PLATFORM == "mobile") {
+        if (buildDataProvider.buildPlatform == "mobile") {
             ErrorSampling.Enabled(MOBILE_ERROR_SAMPLING)
         } else {
             ErrorSampling.Disabled

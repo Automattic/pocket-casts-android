@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.crashlogging.di
 
 import android.app.Application
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.crashlogging.BuildConfig
+import au.com.shiftyjelly.pocketcasts.crashlogging.BuildDataProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.FilteringCrashLogging
 import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -15,6 +17,13 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 class CrashLoggingModule {
+
+    @Provides
+    fun provideBuildDataProvider(): BuildDataProvider {
+        return object : BuildDataProvider {
+            override val buildPlatform: String = BuildConfig.BUILD_PLATFORM
+        }
+    }
 
     @Provides
     fun provideCrashLogging(
