@@ -8,7 +8,7 @@
     android:background="?attr/primary_ui_04"
     tools:layout_height="200dp">
 
-    <au.com.shiftyjelly.pocketcasts.views.component.ProfileCircleView
+    <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
         android:id="@+id/imgProfilePicture"
         android:layout_width="@dimen/account_details_picture_size"
         android:layout_height="@dimen/account_details_picture_size"

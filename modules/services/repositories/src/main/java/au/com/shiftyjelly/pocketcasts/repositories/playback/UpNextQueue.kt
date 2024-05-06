@@ -150,7 +150,6 @@ enum class UpNextSource(val analyticsValue: String) {
     PLAYER("player"),
     NOW_PLAYING("now_playing"),
     UP_NEXT_SHORTCUT("up_next_shortcut"),
-    UP_NEXT_TAB("up_next_tab"),
     UNKNOWN("unknown"),
     ;
 

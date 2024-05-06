@@ -116,8 +116,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -329,12 +327,6 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            binding.bottomNavigation.menu.removeItem(VR.id.navigation_profile)
-        } else {
-            binding.bottomNavigation.menu.removeItem(VR.id.navigation_upnext)
-        }
-
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
@@ -342,7 +334,7 @@ class MainActivity :
                     if (settings.getEndOfYearShowModal()) {
                         setupEndOfYearLaunchBottomSheet()
                     }
-                    if (settings.endOfYearShowBadge2023.value && !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    if (settings.getEndOfYearShowBadge2023()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                     }
                 }
@@ -350,25 +342,12 @@ class MainActivity :
         }
 
         var selectedTab = settings.selectedTab()
-        val tabs = buildMap {
-            put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
-            put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
-            put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
-            if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                put(VR.id.navigation_upnext) {
-                    FragmentInfo(
-                        UpNextFragment.newInstance(
-                            embedded = false,
-                            source = UpNextSource.UP_NEXT_TAB,
-                        ),
-                        true,
-                    )
-                }
-            }
-            if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
-            }
-        }
+        val tabs = mapOf(
+            VR.id.navigation_podcasts to { FragmentInfo(PodcastsFragment(), true) },
+            VR.id.navigation_filters to { FragmentInfo(FiltersFragment(), true) },
+            VR.id.navigation_discover to { FragmentInfo(DiscoverFragment(), false) },
+            VR.id.navigation_profile to { FragmentInfo(ProfileFragment(), true) },
+        )
 
         if (!tabs.keys.contains(selectedTab)) {
             // Guard against tab ids changing and settings having an out of date copy
@@ -423,18 +402,14 @@ class MainActivity :
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
                             VR.id.navigation_profile -> {
-                                if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                                    resetEoYBadgeIfNeeded()
-                                }
+                                resetEoYBadgeIfNeeded()
                                 FirebaseAnalyticsTracker.navigatedToProfile()
                             }
                         }
                     }
                     settings.setSelectedTab(currentTab)
                 } else if (it is NavigatorAction.NewFragmentAdded) {
-                    if (navigator.currentTab() == VR.id.navigation_profile &&
-                        !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
-                    ) {
+                    if (navigator.currentTab() == VR.id.navigation_profile) {
                         resetEoYBadgeIfNeeded()
                     }
                 }
@@ -453,10 +428,10 @@ class MainActivity :
 
     private fun resetEoYBadgeIfNeeded() {
         if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
-            settings.endOfYearShowBadge2023.value
+            settings.getEndOfYearShowBadge2023()
         ) {
             binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-            settings.endOfYearShowBadge2023.set(false, updateModifiedAt = false)
+            settings.setEndOfYearShowBadge2023(false)
         }
     }
 
@@ -1381,11 +1356,6 @@ class MainActivity :
         }
     }
 
-    override fun openProfile() {
-        FirebaseAnalyticsTracker.navigatedToProfile()
-        addFragment(ProfileFragment())
-    }
-
     override fun openPodcastPage(uuid: String, sourceView: String?) {
         closePlayer()
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -1560,11 +1530,7 @@ class MainActivity :
     }
 
     private fun showUpgradedFromPromoCode(description: String) {
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            openProfile()
-        } else {
-            openTab(VR.id.navigation_profile)
-        }
+        openTab(VR.id.navigation_profile)
         PromoCodeUpgradedFragment.newInstance(description)
             .show(supportFragmentManager, "upgraded_from_promocode")
     }
@@ -1590,7 +1556,6 @@ class MainActivity :
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
             VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
-            VR.id.navigation_upnext -> AnalyticsEvent.UP_NEXT_TAB_OPENED
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED

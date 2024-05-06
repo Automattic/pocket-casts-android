@@ -35,12 +35,4 @@
         app:showAsAction="always"
         android:title="@string/podcasts_menu_more_options" />
 
-    <item
-        android:id="@id/menu_profile"
-        android:icon="@drawable/ic_profile"
-        android:visible="false"
-        app:showAsAction="always"
-        app:actionLayout="@layout/view_profile_circle"
-        android:title="@string/profile" />
-
 </menu>

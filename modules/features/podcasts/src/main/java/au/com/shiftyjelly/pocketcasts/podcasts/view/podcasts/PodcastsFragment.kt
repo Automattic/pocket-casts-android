@@ -52,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -60,7 +59,6 @@ import com.google.android.material.transition.MaterialFadeThrough
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
@@ -140,19 +138,13 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 toolbarColors = ToolbarColors.User(color = folder.getColor(context), theme = theme)
                 navigationIcon = NavigationIcon.BackArrow
             }
-            val showProfileButton = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) && rootFolder
             setupToolbarAndStatusBar(
                 toolbar = toolbar,
                 title = folder?.name ?: getString(LR.string.podcasts),
                 toolbarColors = toolbarColors,
                 navigationIcon = navigationIcon,
-                profileButton = if (showProfileButton) {
-                    ProfileButton.Shown()
-                } else {
-                    ProfileButton.None
-                },
             )
-            toolbar.menu.findItem(UR.id.menu_profile).isVisible = showProfileButton
+
             setupSearchBar()
 
             toolbar.menu.findItem(R.id.folders_locked)?.run {

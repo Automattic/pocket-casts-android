@@ -9,7 +9,7 @@
     android:paddingBottom="8dp"
     tools:layout_height="wrap_content">
 
-    <au.com.shiftyjelly.pocketcasts.views.component.ProfileCircleView
+    <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
         android:id="@+id/imgProfilePicture"
         android:layout_width="@dimen/account_details_picture_size"
         android:layout_height="@dimen/account_details_picture_size"

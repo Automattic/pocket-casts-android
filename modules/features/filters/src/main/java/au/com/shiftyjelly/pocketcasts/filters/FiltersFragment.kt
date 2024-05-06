@@ -20,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -78,16 +77,10 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             } else {
                 ChromeCastButton.Shown(chromeCastAnalytics)
             },
-            profileButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                ProfileButton.Shown()
-            } else {
-                ProfileButton.None
-            },
             navigationIcon = None,
         )
         binding.toolbar.setOnMenuItemClickListener(this)
         binding.toolbar.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
-        binding.toolbar.menu.findItem(R.id.menu_profile).isVisible = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
 
         val recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
