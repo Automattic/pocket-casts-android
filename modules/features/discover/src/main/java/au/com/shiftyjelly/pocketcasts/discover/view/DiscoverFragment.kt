@@ -162,6 +162,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         }
     }
     override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED)
         viewModel.loadCategories(source) { categories ->
             onCategoryClearSuccess(categories)
             viewModel.loadData(resources) // Reload discover
