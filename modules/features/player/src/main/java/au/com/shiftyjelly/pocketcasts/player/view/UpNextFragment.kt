@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
@@ -264,12 +265,14 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             } else {
                 NavigationIcon.None
             },
+            chromeCastButton = ChromeCastButton.Shown(chromeCastAnalytics),
             onNavigationClick = { close() },
             toolbarColors = null,
         )
         if (upNextSource != UpNextSource.UP_NEXT_TAB) {
             toolbar.setNavigationIcon(IR.drawable.ic_close)
         }
+        toolbar.menu.findItem(R.id.media_route_menu_item)?.isVisible = upNextSource == UpNextSource.UP_NEXT_TAB
         toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.menu.tintIcons(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.setOnMenuItemClickListener {
