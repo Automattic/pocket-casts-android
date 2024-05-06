@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -57,6 +58,8 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject lateinit var crashLogging: CrashLogging
+
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -64,6 +67,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         RxJavaUncaughtExceptionHandling.setUp()
+        setupCrashLogging()
         setupLogging()
         setupAnalytics()
         setupApp()
@@ -104,6 +108,10 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     override fun onTerminate() {
         super.onTerminate()
         Log.d(Settings.LOG_TAG_AUTO, "Terminate")
+    }
+
+    private fun setupCrashLogging() {
+        crashLogging.initialize()
     }
 
     private fun setupLogging() {
