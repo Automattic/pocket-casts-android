@@ -28,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.FolderItemDiffCallback
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
@@ -71,7 +73,14 @@ class FolderAdapter(
                 val layoutId = if (isLayoutListView) R.layout.adapter_podcast_list else R.layout.adapter_podcast_grid
                 val view = parent.inflate(layoutId, attachToThis = false)
                 val podcastGridLayout = settings.podcastGridLayout.value
-                PodcastViewHolder(view, imageRequestFactory.copy(cornerRadius = if (isLayoutListView) 4.dpToPx(context) else 0), podcastGridLayout, theme)
+                PodcastViewHolder(
+                    view,
+                    imageRequestFactory.copy(
+                        cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4 else 0,
+                    ),
+                    podcastGridLayout,
+                    theme,
+                )
             }
             FolderItem.Folder.viewTypeId -> {
                 val podcastsLayout = settings.podcastGridLayout.value

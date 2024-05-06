@@ -39,6 +39,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val gradientTop = Color(0x00000000)
@@ -59,10 +61,14 @@ fun FolderImage(
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
 ) {
+    val cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .background(color = color)
+            .background(
+                color = color,
+                shape = RoundedCornerShape(cornerRadius),
+            )
             .aspectRatio(1f),
     ) {
         val constraints = this
