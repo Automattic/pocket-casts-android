@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="240dp"
+    android:layout_height="240dp"
+    android:background="@drawable/rounded_rectangle"
+    android:backgroundTint="?colorSecondaryContainer"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:theme="@style/Theme.Material3.DynamicColors.DayNight"
+    tools:ignore="UseAppTint,SpUsage,HardcodedText,RtlHardcoded">
+
+    <RelativeLayout
+        android:layout_width="220dp"
+        android:layout_height="80dp">
+
+        <FrameLayout
+            android:id="@+id/headerImage"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/rounded_rectangle"
+            android:backgroundTint="?colorOnSecondary">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_circle"
+                android:tint="?colorSecondary" />
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_logo_foreground"
+                android:tint="?colorOnSecondary" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/headerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/headerImage"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@+id/headerImage"
+            android:text="Episode title"
+            android:textColor="?colorOnSecondaryContainer"
+            android:textSize="10dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/headerTitle"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@+id/headerImage"
+            android:alpha="0.7"
+            android:text="25m left"
+            android:textColor="?colorOnSecondaryContainer"
+            android:textSize="8dp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_circle"
+            android:tint="?colorSecondary" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_logo_foreground"
+            android:tint="?colorOnSecondary" />
+
+        <LinearLayout
+            android:layout_width="134dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@+id/headerImage"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_rectangle"
+                android:backgroundTint="?colorOnSecondary">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_widget_skip_back"
+                    android:tint="?colorSecondary" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="4dp"
+                android:layout_height="40dp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_rectangle"
+                android:backgroundTint="?colorOnSecondary">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_widget_play"
+                    android:tint="?colorSecondary" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="4dp"
+                android:layout_height="40dp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_rectangle"
+                android:backgroundTint="?colorOnSecondary">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_widget_skip_forward"
+                    android:tint="?colorSecondary" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="220dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp">
+
+        <FrameLayout
+            android:id="@+id/queueImage1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/rounded_rectangle"
+            android:backgroundTint="?colorOnSecondary">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_circle"
+                android:tint="?colorSecondary" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_logo_foreground"
+                android:tint="?colorOnSecondary" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/queueImage1"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@+id/queueImage1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Episode in Up Next"
+                android:textColor="?colorOnSecondaryContainer"
+                android:textSize="8dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:alpha="0.7"
+                android:text="12m left"
+                android:textColor="?colorOnSecondaryContainer"
+                android:textSize="8dp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/rounded_rectangle"
+            android:backgroundTint="?colorOnSecondary">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_widget_play"
+                android:tint="?colorSecondary" />
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="220dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="6dp">
+
+        <FrameLayout
+            android:id="@+id/queueImage2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/rounded_rectangle"
+            android:backgroundTint="?colorOnSecondary">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_circle"
+                android:tint="?colorSecondary" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_logo_foreground"
+                android:tint="?colorOnSecondary" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/queueImage2"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@+id/queueImage2"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Episode in Up Next"
+                android:textColor="?colorOnSecondaryContainer"
+                android:textSize="8dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:alpha="0.7"
+                android:text="55m left"
+                android:textColor="?colorOnSecondaryContainer"
+                android:textSize="8dp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/rounded_rectangle"
+            android:backgroundTint="?colorOnSecondary">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_widget_play"
+                android:tint="?colorSecondary" />
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="220dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="6dp">
+
+        <FrameLayout
+            android:id="@+id/queueImage3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/rounded_rectangle"
+            android:backgroundTint="?colorOnSecondary">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_circle"
+                android:tint="?colorSecondary" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_logo_foreground"
+                android:tint="?colorOnSecondary" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/queueImage3"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@+id/queueImage3"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Episode in Up Next"
+                android:textColor="?colorOnSecondaryContainer"
+                android:textSize="8dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:alpha="0.7"
+                android:text="1h 36m left"
+                android:textColor="?colorOnSecondaryContainer"
+                android:textSize="8dp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/rounded_rectangle"
+            android:backgroundTint="?colorOnSecondary">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_widget_play"
+                android:tint="?colorSecondary" />
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
