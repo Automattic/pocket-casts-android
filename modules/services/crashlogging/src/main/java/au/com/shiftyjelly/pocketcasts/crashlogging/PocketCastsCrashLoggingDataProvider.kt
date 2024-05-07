@@ -22,6 +22,7 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
     buildDataProvider: BuildDataProvider,
     private val encryptedLogging: EncryptedLogging,
     private val applicationFilesDir: File,
+    private val connectionStatusProvider: ConnectionStatusProvider,
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
@@ -72,8 +73,8 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
         encryptedLogging.enqueueSendingEncryptedLogs(
             uuid,
             File(applicationFilesDir, "debug.log"),
-            shouldUploadImmediately = eventLevel != EventLevel.FATAL
-//                    && networkStatus.isConnected()
+            shouldUploadImmediately = eventLevel != EventLevel.FATAL &&
+                connectionStatusProvider.isConnected(),
         )
         return mapOf(EXTRA_UUID to uuid)
     }
