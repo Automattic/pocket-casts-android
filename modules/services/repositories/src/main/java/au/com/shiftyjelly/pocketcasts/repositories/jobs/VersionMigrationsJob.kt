@@ -165,7 +165,8 @@ class VersionMigrationsJob : JobService() {
             consolidateEmbeddedArtworkSettings(applicationContext)
         }
 
-        if (previousVersionCode < 9226) {
+        // Exclude 7.63-rc-3 (9227) from the migration as it was already migrated.
+        if (previousVersionCode < 9230 && previousVersionCode != 9227) {
             migrateToGranularEpisodeArtworkSettings(applicationContext)
         }
     }

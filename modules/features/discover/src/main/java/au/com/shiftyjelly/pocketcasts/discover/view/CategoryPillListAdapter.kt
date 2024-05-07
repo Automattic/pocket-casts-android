@@ -96,6 +96,7 @@ class CategoryPillListAdapter(
                         },
                         onCategorySelectionSuccess@{
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
+                            binding.categoryName.setCategory(category.discoverCategory.name)
                             updateCategoryStatus(position, isSelected = false)
                             loadCategories(it)
                         },
