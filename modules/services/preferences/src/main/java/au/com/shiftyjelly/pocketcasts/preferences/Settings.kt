@@ -354,10 +354,14 @@ interface Settings {
 
     fun setSleepTimerCustomMins(minutes: Int)
     fun setSleepEndOfEpisodes(episodes: Int)
+    fun setSleepEndOfChapters(chapters: Int)
     fun setlastSleepEndOfEpisodes(episodes: Int)
+    fun setlastSleepEndOfChapters(chapters: Int)
     fun getSleepTimerCustomMins(): Int
     fun getSleepEndOfEpisodes(): Int
+    fun getSleepEndOfChapters(): Int
     fun getlastSleepEndOfEpisodes(): Int
+    fun getlastSleepEndOfChapter(): Int
 
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
