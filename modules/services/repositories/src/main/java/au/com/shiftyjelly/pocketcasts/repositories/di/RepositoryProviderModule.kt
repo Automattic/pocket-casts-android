@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.Dispatcher
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 
 @Module
@@ -28,12 +29,13 @@ class RepositoryProviderModule {
     @Provides
     @Singleton
     @DownloadOkHttpClient
-    fun downloadOkHttpClient(): OkHttpClient {
+    fun downloadOkHttpClient(networkInterceptors: Set<@JvmSuppressWildcards Interceptor>): OkHttpClient {
         val dispatcher = Dispatcher().apply {
             maxRequestsPerHost = 5
         }
         return OkHttpClient.Builder()
             .dispatcher(dispatcher)
+            .apply { networkInterceptors().addAll(networkInterceptors) }
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)

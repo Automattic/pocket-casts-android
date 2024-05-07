@@ -154,10 +154,15 @@ class ServersModule {
     }
 
     @Provides
-    internal fun provideOkHttpClientBuilder(@SyncServerCache cache: Cache): OkHttpClient.Builder {
+    internal fun provideOkHttpClientBuilder(
+        @SyncServerCache cache: Cache,
+        networkInterceptors: Set<@JvmSuppressWildcards Interceptor>,
+    ): OkHttpClient.Builder {
         var builder = OkHttpClient.Builder()
-            .addNetworkInterceptor(INTERCEPTOR_CACHE_MODIFIER)
-            .addNetworkInterceptor(INTERCEPTOR_USER_AGENT)
+            .apply {
+                networkInterceptors()
+                    .addAll(networkInterceptors + INTERCEPTOR_CACHE_MODIFIER + INTERCEPTOR_USER_AGENT)
+            }
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)

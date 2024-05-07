@@ -32,7 +32,10 @@ internal class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override val locale: Locale? = localeProvider.provideLocale()
 
-    override val performanceMonitoringConfig = PerformanceMonitoringConfig.Disabled
+    override val performanceMonitoringConfig = PerformanceMonitoringConfig.Enabled(
+        sampleRate = 0.01,
+        profilesSampleRate = 0.01
+    )
 
     override val releaseName = ReleaseName.SetByTracksLibrary
 
