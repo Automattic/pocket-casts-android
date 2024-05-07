@@ -7,7 +7,10 @@ import com.automattic.android.tracks.crashlogging.EventLevel
 import com.automattic.android.tracks.crashlogging.ExtraKnownKey
 import com.automattic.android.tracks.crashlogging.PerformanceMonitoringConfig
 import com.automattic.android.tracks.crashlogging.ReleaseName
+import com.automattic.encryptedlogging.EncryptedLogging
+import java.io.File
 import java.util.Locale
+import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -17,6 +20,8 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
     observeUser: ObserveUser,
     private val crashReportPermissionCheck: CrashReportPermissionCheck,
     buildDataProvider: BuildDataProvider,
+    private val encryptedLogging: EncryptedLogging,
+    private val applicationFilesDir: File,
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
@@ -48,14 +53,29 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
     }
 
     override fun extraKnownKeys(): List<ExtraKnownKey> {
-        return emptyList()
+        return listOf(EXTRA_UUID)
     }
 
     override fun provideExtrasForEvent(
         currentExtras: Map<ExtraKnownKey, String>,
         eventLevel: EventLevel,
     ): Map<ExtraKnownKey, String> {
-        return emptyMap()
+        return currentExtras + if (currentExtras[EXTRA_UUID] == null) {
+            appendEncryptedLogsUuid(eventLevel)
+        } else {
+            emptyMap()
+        }
+    }
+
+    private fun appendEncryptedLogsUuid(eventLevel: EventLevel): Map<ExtraKnownKey, String> {
+        val uuid = UUID.randomUUID().toString()
+        encryptedLogging.enqueueSendingEncryptedLogs(
+            uuid,
+            File(applicationFilesDir, "debug.log"),
+            shouldUploadImmediately = eventLevel != EventLevel.FATAL
+//                    && networkStatus.isConnected()
+        )
+        return mapOf(EXTRA_UUID to uuid)
     }
 
     override fun shouldDropWrappingException(module: String, type: String, value: String): Boolean {
@@ -72,5 +92,6 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
     companion object {
         const val GLOBAL_TAG_APP_PLATFORM = "app.platform"
         const val MOBILE_ERROR_SAMPLING = 0.3
+        const val EXTRA_UUID = "uuid"
     }
 }

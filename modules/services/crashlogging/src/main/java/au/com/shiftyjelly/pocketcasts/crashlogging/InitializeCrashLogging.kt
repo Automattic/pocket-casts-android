@@ -4,8 +4,10 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.di.ProvideApplicationScope
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.encryptedlogging.EncryptedLogging
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.launch
 
+@Singleton
 class InitializeCrashLogging @Inject constructor(
     private val crashLogging: CrashLogging,
     private val encryptedLogging: EncryptedLogging,

@@ -15,6 +15,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.File
 import javax.inject.Singleton
 
 @Module
@@ -35,6 +36,11 @@ class CrashLoggingModule {
         return object : BuildDataProvider {
             override val buildPlatform: String = BuildConfig.BUILD_PLATFORM
         }
+    }
+
+    @Provides
+    fun provideApplicationFilesDir(@ApplicationContext application: Context): File {
+        return application.filesDir
     }
 
     @Provides
