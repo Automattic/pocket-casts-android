@@ -28,6 +28,7 @@ dependencyResolutionManagement {
             content {
                 includeGroup("com.automattic")
                 includeGroup("com.automattic.tracks")
+                includeGroupByRegex("org.wordpress.*")
             }
         }
     }
