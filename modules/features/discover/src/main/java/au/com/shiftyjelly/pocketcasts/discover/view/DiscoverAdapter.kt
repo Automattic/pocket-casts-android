@@ -67,8 +67,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import coil.imageLoader
@@ -614,11 +612,6 @@ internal class DiscoverAdapter(
                             holder.binding.pageIndicatorView.count = it.count()
                         },
                     )
-
-                    if (!FeatureFlag.isEnabled(Feature.CATEGORIES_REDESIGN)) {
-                        holder.binding.layoutSearch.visibility = View.VISIBLE
-                        holder.binding.layoutSearch.setOnClickListener { listener.onSearchClicked() }
-                    }
                 }
                 is SmallListViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
