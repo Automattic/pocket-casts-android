@@ -70,7 +70,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun loadData(resources: Resources) {
-        val feed = repository.getDiscoverFeedWithCategoriesAtTheTop()
+        val feed = repository.getDiscoverFeed()
 
         feed.toFlowable()
             .subscribeBy(
