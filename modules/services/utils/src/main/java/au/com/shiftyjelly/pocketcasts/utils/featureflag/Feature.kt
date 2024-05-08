@@ -78,7 +78,7 @@ enum class Feature(
     CATEGORIES_REDESIGN(
         key = "CATEGORIES_REDESIGN",
         title = "Podcasts by category shown in discover view",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
