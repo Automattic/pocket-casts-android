@@ -26,8 +26,8 @@ class CrashLoggingModule {
     fun provideEncryptedLogging(@ApplicationContext context: Context): EncryptedLogging {
         return AutomatticEncryptedLogging(
             context,
-            encryptedLoggingKey = "",
-            clientSecret = "",
+            encryptedLoggingKey = BuildConfig.ENCRYPTION_KEY,
+            clientSecret = BuildConfig.APP_SECRET,
         )
     }
 
