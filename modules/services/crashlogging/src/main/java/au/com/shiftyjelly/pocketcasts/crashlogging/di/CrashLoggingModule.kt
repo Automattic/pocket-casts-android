@@ -40,7 +40,7 @@ class CrashLoggingModule {
 
     @Provides
     fun provideApplicationFilesDir(@ApplicationContext application: Context): File {
-        return application.filesDir
+        return File(application.filesDir, "logs")
     }
 
     @Provides
