@@ -94,7 +94,7 @@ sealed class CountBadgeStyle {
     abstract val borderWidth: Dp
 
     data object Small : CountBadgeStyle() {
-        override val size = 10.dp
+        override val size = 12.dp
         override val borderWidth = 3.dp
     }
 
