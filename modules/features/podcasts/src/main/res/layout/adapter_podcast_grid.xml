@@ -2,7 +2,6 @@
     android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/primary_ui_01"
     android:clipToPadding="false"
     android:clipChildren="false">
 
@@ -16,7 +15,10 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/podcast_card_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
         <TextView
             android:id="@+id/library_podcast_title"
             android:layout_width="match_parent"
