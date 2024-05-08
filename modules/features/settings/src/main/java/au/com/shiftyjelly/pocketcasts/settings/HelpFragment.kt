@@ -29,8 +29,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.HelpViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -120,13 +118,13 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         when (item.itemId) {
             R.id.menu_logs -> {
                 val fragment = LogsFragment()
-                (activity as? FragmentHostListener)?.addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+                (activity as? FragmentHostListener)?.addFragment(fragment)
                 true
             }
 
             R.id.menu_status_page -> {
                 val fragment = StatusFragment()
-                (activity as? FragmentHostListener)?.addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+                (activity as? FragmentHostListener)?.addFragment(fragment)
                 true
             }
 

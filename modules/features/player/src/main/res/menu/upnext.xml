@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/media_route_menu_item"
+        android:title="@string/play_on"
+        android:visible="false"
+        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
+        app:showAsAction="always" />
+
     <item android:id="@+id/menu_select"
         android:title="@string/player_up_next_select"
         android:icon="@drawable/ic_multiselect"
-        app:showAsAction="always" />
-    <item
-        android:id="@id/menu_profile"
-        android:icon="@drawable/ic_profile"
-        android:title="@string/profile"
-        android:visible="false"
-        app:actionLayout="@layout/view_profile_circle"
         app:showAsAction="always" />
 </menu>

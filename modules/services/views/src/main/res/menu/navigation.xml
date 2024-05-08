@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/navigation_upnext"
-        android:icon="@drawable/ic_upnext"
+        android:icon="@drawable/ic_upnext_tab"
         android:title="@string/up_next" />
 
     <item
