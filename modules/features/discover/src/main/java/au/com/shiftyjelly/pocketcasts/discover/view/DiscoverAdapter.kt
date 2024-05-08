@@ -376,6 +376,7 @@ internal class DiscoverAdapter(
 
         private val adapter = CategoryPillListAdapter(
             onCategoryClick = { selectedCategory, onCategorySelectionSuccess ->
+                trackCategoryPillTapped(selectedCategory.discoverCategory.name, selectedCategory.discoverCategory.id)
                 listener.onCategoryClick(
                     selectedCategory = selectedCategory,
                     onCategorySelectionSuccess = {
@@ -433,6 +434,17 @@ internal class DiscoverAdapter(
             return categories
                 .filter { it.discoverCategory.id in mostPopularCategoriesId }
                 .sortedBy { mostPopularCategoriesId.indexOf(it.discoverCategory.id) }
+        }
+
+        private fun trackCategoryPillTapped(name: String, id: Int) {
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_CATEGORIES_PILL_TAPPED,
+                mapOf(
+                    "name" to name,
+                    "region" to region,
+                    "id" to id,
+                ),
+            )
         }
     }
 
