@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.coerceAtMost
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
@@ -8,6 +11,8 @@ import androidx.glance.action.clickable
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.size
+import androidx.glance.layout.width
 import androidx.glance.semantics.contentDescription
 import androidx.glance.semantics.semantics
 import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
@@ -29,7 +34,7 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
         else -> LR.string.pause_episode
     }.let { LocalContext.current.getString(it) }
 
-    val width = LocalSize.current.width
+    val size = min(LocalSize.current.width, LocalSize.current.height)
 
     WidgetTheme(state.useDynamicColors) {
         Box(
@@ -44,17 +49,16 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
             EpisodeImage(
                 episode = state.episode,
                 useEpisodeArtwork = state.useEpisodeArtwork,
-                size = width,
-                backgroundColor = if (!state.useDynamicColors) { { it.secondary } } else null,
-                iconColor = if (!state.useDynamicColors) { { it.onSecondary } } else null,
-                onClick = { controlPlayback },
+                size = size,
+                backgroundColor = { it.background },
+                onClick = controlPlayback,
             )
             if (state.episode != null) {
+                val buttonSize = (size / 2.3f).coerceAtMost(48.dp)
                 PlaybackButton(
-                    state.isPlaying,
-                    size = width / 2,
-                    backgroundColor = if (!state.useDynamicColors) { { it.surface } } else null,
-                    iconColor = if (!state.useDynamicColors) { { it.onSurface } } else null,
+                    isPlaying = state.isPlaying,
+                    iconPadding = buttonSize / 4.75f,
+                    modifier = GlanceModifier.size(buttonSize),
                 )
             }
         }

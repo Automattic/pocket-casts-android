@@ -9,64 +9,41 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
-import androidx.glance.background
-import androidx.glance.color.ColorProviders
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
-import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.widget.action.OpenEpisodeDetailsAction
-import au.com.shiftyjelly.pocketcasts.widget.action.OpenPocketCastsAction
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
 import coil.imageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 internal fun EpisodeImage(
     episode: PlayerWidgetEpisode?,
     useEpisodeArtwork: Boolean,
     size: Dp,
-    backgroundColor: ((ColorProviders) -> ColorProvider)? = null,
-    iconColor: ((ColorProviders) -> ColorProvider)? = null,
-    onClick: (PlayerWidgetEpisode?) -> Action = { currentEpisode ->
-        if (currentEpisode == null) {
-            OpenPocketCastsAction.action()
-        } else {
-            OpenEpisodeDetailsAction.action(currentEpisode.uuid)
-        }
-    },
+    backgroundColor: ((WidgetTheme) -> ColorProvider)? = null,
+    onClick: Action? = null,
 ) {
-    var episodeBitmap by remember(episode?.uuid, useEpisodeArtwork) {
+    var episodeBitmap by remember(episode?.uuid, useEpisodeArtwork, size) {
         mutableStateOf<Bitmap?>(null)
     }
 
-    Box(
+    RounderCornerBox(
         contentAlignment = Alignment.Center,
-        modifier = GlanceModifier
-            .clickable(onClick(episode))
-            .background(backgroundColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.primary)
-            .cornerRadiusCompat(6.dp)
-            .size(size),
+        backgroundTint = backgroundColor?.invoke(LocalWidgetTheme.current) ?: LocalWidgetTheme.current.buttonBackground,
+        modifier = GlanceModifier.size(size).applyIf(onClick != null) { it.clickable(onClick!!) },
     ) {
-        Image(
-            provider = ImageProvider(IR.drawable.ic_logo_background),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(iconColor?.invoke(GlanceTheme.colors) ?: GlanceTheme.colors.onPrimary),
-            modifier = GlanceModifier.padding(size / 6),
+        PocketCastsLogo(
+            size = size / 2.5f,
         )
 
         val bitmap = episodeBitmap
@@ -80,8 +57,12 @@ internal fun EpisodeImage(
 
     if (episode != null) {
         val context = LocalContext.current
-        LaunchedEffect(episode.uuid, useEpisodeArtwork) {
-            val requestFactory = PocketCastsImageRequestFactory(context).smallSize()
+        LaunchedEffect(episode.uuid, useEpisodeArtwork, size) {
+            val requestFactory = PocketCastsImageRequestFactory(
+                context,
+                size = size.value.toInt(),
+                cornerRadius = if (isSystemCornerRadiusSupported) 0 else 6,
+            )
             val request = requestFactory.create(episode.toBaseEpisode(), useEpisodeArtwork)
             var drawable: Drawable? = null
             while (drawable == null) {

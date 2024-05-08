@@ -30,7 +30,7 @@ enum class Feature(
     SETTINGS_SYNC(
         key = "settings_sync",
         title = "Settings Sync",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
