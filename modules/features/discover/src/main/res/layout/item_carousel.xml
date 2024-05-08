@@ -10,17 +10,14 @@
         android:id="@+id/cardBack"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/carousel_height"
-        android:paddingTop="88dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp"
+        android:layout_height="132dp"
+        android:padding="16dp"
         android:foreground="?attr/selectableItemBackground">
         <TextView
             android:id="@+id/lblRank"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="?attr/primary_text_01"
+            android:textColor="?attr/contrast_01"
             android:layout_marginEnd="16dp"
             android:visibility="gone"
             tools:text="1"/>
@@ -34,7 +31,7 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/defaultArtworkSmall"/>
+                android:background="?attr/primary_ui_01"/>
         </androidx.cardview.widget.CardView>
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,12 +42,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginEnd="28dp"
                 style="@style/Widget.MaterialComponents.Chip.Action"
                 android:textAppearance="@style/ChipTextStyle"
                 android:letterSpacing="0.16"
-                android:singleLine="true"
-                android:ellipsize="end"
                 android:importantForAccessibility="no"
                 app:chipSurfaceColor="@color/transparent"
                 app:chipMinTouchTargetSize="0dp"
@@ -78,6 +72,7 @@
         android:layout_height="44dp"
         android:layout_gravity="end"
         app:srcCompat="@drawable/ic_add_black_24dp"
-        android:layout_marginTop="72dp"
+        app:tint="?attr/contrast_02"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"/>
 </FrameLayout>
