@@ -35,7 +35,7 @@ class RepositoryProviderModule {
         }
         return OkHttpClient.Builder()
             .dispatcher(dispatcher)
-            .apply { networkInterceptors().addAll(networkInterceptors) }
+            .apply { networkInterceptors.forEach(::addNetworkInterceptor) }
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
