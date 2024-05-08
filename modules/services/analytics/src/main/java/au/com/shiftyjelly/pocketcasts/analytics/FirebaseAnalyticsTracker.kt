@@ -5,7 +5,6 @@ import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.FirebaseAnalytics.Event
-import com.google.firebase.analytics.FirebaseAnalytics.Param
 import timber.log.Timber
 
 object FirebaseAnalyticsTracker {
@@ -186,40 +185,6 @@ object FirebaseAnalyticsTracker {
         logEvent("podcast_feed_refreshed")
     }
 
-    fun foregroundServiceStartNotAllowedException() {
-        logEvent("foreground_service_exception")
-    }
-
-    fun plusUpgradeViewed(promotionId: String, promotionName: String) {
-        logEvent(
-            Event.VIEW_PROMOTION,
-            bundleOf(
-                Param.PROMOTION_ID to promotionId,
-                Param.PROMOTION_NAME to promotionName,
-            ),
-        )
-    }
-
-    fun plusUpgradeConfirmed(promotionId: String, promotionName: String) {
-        logEvent(
-            Event.SELECT_PROMOTION,
-            bundleOf(
-                Param.PROMOTION_ID to promotionId,
-                Param.PROMOTION_NAME to promotionName,
-            ),
-        )
-    }
-
-    fun plusUpgradeClosed(promotionId: String, promotionName: String) {
-        logEvent(
-            "close_promotion",
-            bundleOf(
-                Param.PROMOTION_ID to promotionId,
-                Param.PROMOTION_NAME to promotionName,
-            ),
-        )
-    }
-
     fun closeAccountMissingClicked() {
         logEvent("close_account_missing")
     }
@@ -230,26 +195,6 @@ object FirebaseAnalyticsTracker {
 
     fun signInAccountClicked() {
         logEvent("select_sign_in_account")
-    }
-
-    fun plusPlanChosen(sku: String, title: String, price: Double?, currency: String?, isFreeTrial: Boolean) {
-        val plan = bundleOf(
-            Param.ITEM_ID to sku,
-            Param.ITEM_NAME to title,
-            Param.PRICE to price,
-            Param.QUANTITY to 1,
-        )
-        if (isFreeTrial) {
-            plan.putString(Param.COUPON, "FREE TRIAL")
-        }
-        logEvent(
-            Event.ADD_TO_CART,
-            bundleOf(
-                Param.CURRENCY to currency,
-                Param.VALUE to price,
-                Param.ITEMS to arrayOf(plan),
-            ),
-        )
     }
 
     fun plusPurchased() {

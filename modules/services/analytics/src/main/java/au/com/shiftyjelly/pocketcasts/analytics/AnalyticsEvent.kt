@@ -249,6 +249,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SEEK("playback_seek"),
     PLAYBACK_EPISODE_AUTOPLAYED("playback_episode_autoplayed"),
     PLAYBACK_EPISODE_DURATION_CHANGED("playback_episode_duration_changed"),
+    PLAYBACK_FOREGROUND_SERVICE_ERROR("playback_foreground_service_error"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
