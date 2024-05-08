@@ -53,7 +53,7 @@ fun Project.configureSentry() {
                 && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
 
         tracingInstrumentation {
-            features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
+            features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP)
         }
         autoInstallation.enabled = false
         includeDependenciesReport = false
