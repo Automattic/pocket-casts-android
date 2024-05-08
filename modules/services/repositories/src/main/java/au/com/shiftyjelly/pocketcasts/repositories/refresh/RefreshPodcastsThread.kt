@@ -275,7 +275,7 @@ class RefreshPodcastsThread(
 
     private fun dispatchCurrentRefreshedState() {
         val settings = getEntryPoint().settings()
-        (settings.getLastSuccessRefreshState() ?: RefreshState.Never).let(settings::setRefreshState)
+        settings.setRefreshState(settings.getLastSuccessRefreshState() ?: RefreshState.Never)
     }
 
     private fun updatePodcasts(result: RefreshResponse?): List<String> {
