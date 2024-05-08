@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Alignment
@@ -178,12 +179,15 @@ class FolderAdapter(
 
         val button: View = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)
+        val podcastCardView = view.findViewById<CardView>(R.id.podcast_card_view)
         val podcastBackground: View? = view.findViewById(R.id.header_background)
         val podcastTitle: TextView = view.findViewById(R.id.library_podcast_title)
         val author: TextView? = view.findViewById(R.id.podcast_author)
         val unplayedText: TextView = view.findViewById(R.id.unplayed_count)
         val unplayedBackground: ImageView? = view.findViewById(R.id.unplayed_background)
         val countTextMarginSmall: Int = 2.dpToPx(view.resources.displayMetrics)
+        val cardElevation: Float = 2.dpToPx(view.resources.displayMetrics).toFloat()
+        val cardCornerRadius: Float = 4.dpToPx(view.resources.displayMetrics).toFloat()
         val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
         val isListLayout: Boolean = podcastGridLayout == PodcastGridLayoutType.LIST_VIEW
         val unplayedCountBadgeView = view.findViewById<ComposeView>(R.id.badge_view)
@@ -209,12 +213,16 @@ class FolderAdapter(
                     it.setBadgeContent(displayBadgeCount, badgeType)
                     it.show()
                 }
+                podcastCardView?.elevation = cardElevation
+                podcastCardView?.radius = cardCornerRadius
             } else {
                 unplayedText.show()
                 setTextViewCount(unplayedBackground, unplayedText, displayBadgeCount, badgeType)
 
                 if (!isListLayout) {
                     unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.contrast_01))
+                    podcastCardView?.elevation = 0f
+                    podcastCardView?.radius = 0f
                 } else {
                     if (badgeType == BadgeType.LATEST_EPISODE) {
                         unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.support_05))
