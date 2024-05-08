@@ -12,7 +12,7 @@ interface ListWebService {
     @GET("/discover/{platform}/content_v2.json")
     fun getDiscoverFeed(@Path("platform") platform: String): Single<Discover>
 
-    @GET("/discover/{platform}/content.json")
+    @GET("/discover/{platform}/content_v2.json")
     suspend fun getDiscoverFeedSuspend(@Path("platform") platform: String): Discover
 
     @GET
