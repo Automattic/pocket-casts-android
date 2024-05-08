@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_TAPPED
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_CLOSED
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
@@ -385,12 +387,16 @@ internal class DiscoverAdapter(
                 )
             },
             onAllCategoriesClick = { onCategorySelectionCancel, onCategorySelectionSuccess ->
+                analyticsTracker.track(DISCOVER_CATEGORIES_PICKER_SHOWN, mapOf("region" to region))
                 listener.onAllCategoriesClick(
                     source = source,
                     onCategorySelectionSuccess = {
                         onCategorySelectionSuccess(listOf(allCategories.copy(isSelected = true), it.copy(isSelected = true)))
                     },
-                    onCategorySelectionCancel = onCategorySelectionCancel,
+                    onCategorySelectionCancel = {
+                        analyticsTracker.track(DISCOVER_CATEGORIES_PICKER_CLOSED, mapOf("region" to region))
+                        onCategorySelectionCancel.invoke()
+                    },
                 )
             },
             onClearCategoryClick = {
