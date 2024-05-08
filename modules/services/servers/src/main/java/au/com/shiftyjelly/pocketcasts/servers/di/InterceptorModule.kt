@@ -19,8 +19,7 @@ class InterceptorModule {
     fun provideMonitoringInterceptor(): Interceptor = CrashLoggingOkHttpInterceptorProvider
         .createInstance(object : RequestFormatter {
             override fun formatRequestUrl(request: Request): FormattedUrl {
-                // Whitelist the URLs that we want to log. Strip all private information from the URL.
-                return ""
+                return request.url.host.takeIf { it.contains("pocketcasts") } ?: "filtered"
             }
         })
 }
