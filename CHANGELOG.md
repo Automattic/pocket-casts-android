@@ -1,6 +1,8 @@
 7.64
 -----
-
+*   Bug Fixes
+    *   Fix pull to refresh icon sometimes being stuck in a loading state
+        ([#2164](https://github.com/Automattic/pocket-casts-android/pull/2164))
 
 7.63
 -----
