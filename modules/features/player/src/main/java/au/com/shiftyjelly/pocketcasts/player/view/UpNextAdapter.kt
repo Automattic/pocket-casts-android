@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -173,7 +174,9 @@ class UpNextAdapter(
     }
 
     inner class PlayingViewHolder(val binding: AdapterUpNextPlayingBinding) : RecyclerView.ViewHolder(binding.root) {
-        var loadedUuid: String? = null
+        private var loadedUuid: String? = null
+        private val cardCornerRadius: Float = 4.dpToPx(itemView.context.resources.displayMetrics).toFloat()
+        private val cardElevation: Float = 2.dpToPx(itemView.context.resources.displayMetrics).toFloat()
 
         init {
             binding.root.setOnClickListener {
@@ -207,6 +210,9 @@ class UpNextAdapter(
                 isVisible = isPlaying
                 applyColorFilter(ThemeColor.primaryText01(theme))
             }
+
+            binding.imageCardView.radius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardCornerRadius else 0f
+            binding.imageCardView.elevation = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardElevation else 0f
         }
     }
 
