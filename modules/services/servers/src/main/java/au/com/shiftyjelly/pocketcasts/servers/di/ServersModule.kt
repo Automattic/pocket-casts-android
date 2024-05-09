@@ -159,10 +159,9 @@ class ServersModule {
         networkInterceptors: Set<@JvmSuppressWildcards Interceptor>,
     ): OkHttpClient.Builder {
         var builder = OkHttpClient.Builder()
-            .apply {
-                (networkInterceptors + INTERCEPTOR_CACHE_MODIFIER + INTERCEPTOR_USER_AGENT)
-                    .forEach(::addNetworkInterceptor)
-            }
+            .addInterceptor(INTERCEPTOR_CACHE_MODIFIER)
+            .addInterceptor(INTERCEPTOR_USER_AGENT)
+            .apply { networkInterceptors.forEach(::addNetworkInterceptor) }
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -248,7 +247,8 @@ class ServersModule {
         dispatcher.maxRequestsPerHost = 5
         var builder = OkHttpClient.Builder()
             .dispatcher(dispatcher)
-            .apply { (networkInterceptors + INTERCEPTOR_USER_AGENT).forEach(::addNetworkInterceptor) }
+            .addInterceptor(INTERCEPTOR_USER_AGENT)
+            .apply { networkInterceptors.forEach(::addNetworkInterceptor) }
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
