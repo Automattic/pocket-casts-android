@@ -139,8 +139,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         }
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
-        trackDropDownListCategoryPickImpression(ALL_CATEGORIES_NAME_VALUE, ALL_CATEGORIES_ID_VALUE)
-
         viewModel.loadCategories(source) { categories ->
             CategoriesBottomSheet(
                 categories = categories,
@@ -335,7 +333,5 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         const val EPISODE_UUID_KEY = "episode_uuid"
         const val SOURCE_KEY = "source"
         const val UUID_KEY = "uuid"
-        const val ALL_CATEGORIES_NAME_VALUE = "all"
-        const val ALL_CATEGORIES_ID_VALUE = -1
     }
 }
