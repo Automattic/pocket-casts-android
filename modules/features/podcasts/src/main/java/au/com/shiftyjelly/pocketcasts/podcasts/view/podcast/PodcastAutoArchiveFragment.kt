@@ -107,8 +107,8 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
                     preferenceCustomCategory?.isVisible = podcast.overrideGlobalArchive
                     preferenceEpisodeLimitCategory?.isVisible = podcast.overrideGlobalArchive
 
-                    preferenceAutoArchivePodcastPlayedEpisodes?.value = afterPlayingValues[podcast.autoArchiveAfterPlaying.index]
-                    preferenceAutoArchivePodcastInactiveEpisodes?.value = inactiveValues[podcast.autoArchiveInactive.index]
+                    preferenceAutoArchivePodcastPlayedEpisodes?.value = afterPlayingValues[podcast.autoArchiveAfterPlaying?.index ?: 0]
+                    preferenceAutoArchivePodcastInactiveEpisodes?.value = inactiveValues[podcast.autoArchiveInactive?.index ?: 0]
                     val limitIndex = EpisodeLimits.indexOf(podcast.autoArchiveEpisodeLimit).takeIf { it != -1 } ?: 0
                     preferenceAutoArchiveEpisodeLimit?.value = episodeLimitValues[limitIndex]
                 }
