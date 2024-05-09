@@ -5,6 +5,7 @@
     android:minHeight="165dp"
     android:minResizeHeight="140dp"
     android:previewImage="@drawable/widget_player_large_preview"
+    android:previewLayout="@layout/widget_player_large_preview"
     android:resizeMode="vertical|horizontal"
     android:targetCellWidth="4"
     android:targetCellHeight="3" />

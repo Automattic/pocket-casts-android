@@ -164,6 +164,12 @@
     <string name="widget_no_episode_playing">No episode playing</string>
     <string name="widget_nothing_in_up_next">Nothing in Up Next</string>
     <string name="widget_check_out_discover">Check out Discover for more</string>
+    <string name="widget_preview_episode_title">Episode title</string>
+    <string name="widget_preview_episode_in_up_next_title">Episode in Up Next</string>
+    <string name="widget_preview_time_left_1">25m left</string>
+    <string name="widget_preview_time_left_2">12m left</string>
+    <string name="widget_preview_time_left_3">55m left</string>
+    <string name="widget_preview_time_left_4">1h 36m left</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -343,6 +349,11 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
     <string name="player_up_next_time_remaining">Total time remaining %s</string>
+    <string name="player_up_next_time_left">@string/time_left</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one" formatted="true">%1$d episode - %2$s left</item>
+        <item quantity="other" formatted="true">%1$d episodes - %2$s left</item>
+    </plurals>
     <string name="player_open_url_failed">Could not find a browser to open %s.</string>
     <string name="player_archive_title" translatable="false">@string/archive</string>
     <string name="player_archive_summary">Are you sure you want to archive this episode?</string>

@@ -9,13 +9,10 @@ import retrofit2.http.Path
 import retrofit2.http.Url
 
 interface ListWebService {
-    @GET("/discover/{platform}/content.json")
+    @GET("/discover/{platform}/content_v2.json")
     fun getDiscoverFeed(@Path("platform") platform: String): Single<Discover>
 
     @GET("/discover/{platform}/content_v2.json")
-    fun getDiscoverFeedWithCategoriesAtTheTop(@Path("platform") platform: String): Single<Discover>
-
-    @GET("/discover/{platform}/content.json")
     suspend fun getDiscoverFeedSuspend(@Path("platform") platform: String): Discover
 
     @GET
