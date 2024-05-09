@@ -154,7 +154,7 @@ fun FolderImage(
                 style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Medium,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = 8.dp, y = (-8).dp),
+                    .offset(x = 6.dp, y = (-6).dp),
             )
         } else {
             PodcastBadge(

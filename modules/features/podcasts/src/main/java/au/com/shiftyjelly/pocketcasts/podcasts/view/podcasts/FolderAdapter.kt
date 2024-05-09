@@ -260,7 +260,7 @@ class FolderAdapter(
                         } else {
                             Modifier
                                 .wrapContentSize(align = Alignment.TopEnd)
-                                .offset(x = 8.dp, y = (-8).dp)
+                                .offset(x = 6.dp, y = (-6).dp)
                         },
                     )
                 }
