@@ -130,10 +130,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             val toolbarColors: ToolbarColors
             val navigationIcon: NavigationIcon
             if (folder == null) {
-                toolbarColors = ToolbarColors.Theme(theme = theme, context = context, excludeMenuItems = listOf(R.id.folders_locked))
+                toolbarColors = ToolbarColors.theme(theme = theme, context = context, excludeMenuItems = listOf(R.id.folders_locked))
                 navigationIcon = NavigationIcon.None
             } else {
-                toolbarColors = ToolbarColors.User(color = folder.getColor(context), theme = theme)
+                toolbarColors = ToolbarColors.user(color = folder.getColor(context), theme = theme)
                 navigationIcon = NavigationIcon.BackArrow
             }
             setupToolbarAndStatusBar(

@@ -133,7 +133,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         viewModel.podcast.observe(viewLifecycleOwner) { podcast ->
             val context = context ?: return@observe
 
-            val colors = ToolbarColors.Podcast(podcast = podcast, theme = theme)
+            val colors = ToolbarColors.podcast(podcast = podcast, theme = theme)
 
             preferenceFeedIssueDetected?.icon = context.getTintedDrawable(IR.drawable.ic_alert_small, colors.iconColor)
             preferenceFeedIssueDetected?.isVisible = podcast.refreshAvailable

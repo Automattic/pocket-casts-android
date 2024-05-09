@@ -79,7 +79,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         chromeCastButton: ChromeCastButton = ChromeCastButton.None,
         navigationIcon: NavigationIcon = None,
         onNavigationClick: (() -> Unit)? = null,
-        toolbarColors: ToolbarColors? = ToolbarColors.Theme(theme = theme, context = toolbar.context),
+        toolbarColors: ToolbarColors? = ToolbarColors.theme(theme = theme, context = toolbar.context),
     ) {
         toolbar.setup(
             title = title,
