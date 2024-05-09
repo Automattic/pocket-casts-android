@@ -676,7 +676,8 @@ class PlayerViewModel @Inject constructor(
             analyticsTracker = analyticsTracker,
             context = context,
         )
-        dialog.setForceDarkTheme(true)
+        val forceDarkTheme = settings.useDarkUpNextTheme.value && upNextSource != UpNextSource.UP_NEXT_TAB
+        dialog.setForceDarkTheme(forceDarkTheme)
         return dialog
     }
 
