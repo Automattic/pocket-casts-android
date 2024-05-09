@@ -1,5 +1,8 @@
 7.64
 -----
+*   Updates:
+    *   New design for the Podcasts grid layout
+        ([#2165](https://github.com/Automattic/pocket-casts-android/pull/2165))
 *   Bug Fixes
     *   Fix pull to refresh icon sometimes being stuck in a loading state
         ([#2164](https://github.com/Automattic/pocket-casts-android/pull/2164))

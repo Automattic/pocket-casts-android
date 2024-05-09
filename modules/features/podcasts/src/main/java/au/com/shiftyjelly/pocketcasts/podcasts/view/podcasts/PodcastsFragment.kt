@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
+import androidx.core.view.setPadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -38,6 +40,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -95,6 +99,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
 
+    private var gridOuterPadding: Int = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
@@ -105,6 +111,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
         binding.recyclerView.let {
             it.adapter = adapter
+            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+                gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
+                it.addItemDecoration(SpaceItemDecoration())
+            }
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
 
@@ -338,6 +348,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             realBinding?.recyclerView?.adapter = adapter
         }
 
+        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+            val padding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
+            realBinding?.recyclerView?.setPadding(padding)
+        }
+
         realBinding?.recyclerView?.layoutManager = layoutManager
         layoutManager.onRestoreInstanceState(savedInstanceState)
     }
@@ -364,5 +379,13 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
+    }
+
+    inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {
+        private val spacing = resources.getDimensionPixelSize(VR.dimen.grid_item_padding)
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            val margin = if (settings.podcastGridLayout.value != PodcastGridLayoutType.LIST_VIEW) spacing else 0
+            outRect.set(margin, margin, margin, margin)
+        }
     }
 }

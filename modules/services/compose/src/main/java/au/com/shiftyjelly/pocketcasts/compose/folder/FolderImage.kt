@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,9 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val gradientTop = Color(0x00000000)
@@ -59,10 +64,14 @@ fun FolderImage(
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
 ) {
+    val cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .background(color = color)
+            .background(
+                color = color,
+                shape = RoundedCornerShape(cornerRadius),
+            )
             .aspectRatio(1f),
     ) {
         val constraints = this
@@ -139,11 +148,21 @@ fun FolderImage(
                 )
             }
         }
-        PodcastBadge(
-            count = badgeCount,
-            modifier = Modifier.align(Alignment.TopEnd),
-            badgeType = badgeType,
-        )
+        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+            CountBadge(
+                count = badgeCount,
+                style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Medium,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 6.dp, y = (-6).dp),
+            )
+        } else {
+            PodcastBadge(
+                count = badgeCount,
+                modifier = Modifier.align(Alignment.TopEnd),
+                badgeType = badgeType,
+            )
+        }
     }
 }
 

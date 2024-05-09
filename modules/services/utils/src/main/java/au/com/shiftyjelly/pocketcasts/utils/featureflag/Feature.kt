@@ -91,6 +91,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    PODCASTS_GRID_VIEW_DESIGN_CHANGES(
+        key = "podcasts_grid_view_changes",
+        title = "Podcasts grid view design changes",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
