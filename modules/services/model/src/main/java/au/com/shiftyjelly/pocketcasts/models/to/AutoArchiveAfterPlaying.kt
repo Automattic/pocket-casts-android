@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import android.content.Context
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlin.time.Duration.Companion.days
@@ -11,19 +12,12 @@ sealed class AutoArchiveAfterPlaying(
     val serverId: Int,
     val index: Int,
     val analyticsValue: String,
+    @StringRes val stringRes: Int,
 ) {
     companion object {
         fun defaultValue(context: Context) = if (Util.isAutomotive(context)) Never else AfterPlaying
 
-        fun fromString(value: String?, context: Context): AutoArchiveAfterPlaying =
-            when (value) {
-                context.getString(R.string.settings_auto_archive_played_never) -> Never
-                context.getString(R.string.settings_auto_archive_played_after_playing) -> AfterPlaying
-                context.getString(R.string.settings_auto_archive_played_after_24_hours) -> Hours24
-                context.getString(R.string.settings_auto_archive_played_after_2_days) -> Days2
-                context.getString(R.string.settings_auto_archive_played_after_1_week) -> Weeks1
-                else -> defaultValue(context)
-            }
+        fun fromString(value: String?, context: Context) = All.find { context.getString(it.stringRes) == value } ?: defaultValue(context)
 
         val All
             get() = listOf(Never, AfterPlaying, Hours24, Days2, Weeks1)
@@ -38,29 +32,34 @@ sealed class AutoArchiveAfterPlaying(
         serverId = 0,
         index = 0,
         analyticsValue = "never",
+        stringRes = R.string.settings_auto_archive_played_never,
     )
     data object AfterPlaying : AutoArchiveAfterPlaying(
         timeSeconds = 0,
         serverId = 1,
         index = 1,
         analyticsValue = "after_playing",
+        stringRes = R.string.settings_auto_archive_played_after_playing,
     )
     data object Hours24 : AutoArchiveAfterPlaying(
         timeSeconds = 24.hours.inWholeSeconds.toInt(),
         serverId = 2,
         index = 2,
         analyticsValue = "after_24_hours",
+        stringRes = R.string.settings_auto_archive_played_after_24_hours,
     )
     data object Days2 : AutoArchiveAfterPlaying(
         timeSeconds = 2.days.inWholeSeconds.toInt(),
         serverId = 3,
         index = 3,
         analyticsValue = "after_2_days",
+        stringRes = R.string.settings_auto_archive_played_after_2_days,
     )
     data object Weeks1 : AutoArchiveAfterPlaying(
         timeSeconds = 7.days.inWholeSeconds.toInt(),
         serverId = 4,
         index = 4,
         analyticsValue = "after_1_week",
+        stringRes = R.string.settings_auto_archive_played_after_1_week,
     )
 }
