@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_TAPPED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_CLOSED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
@@ -398,7 +399,13 @@ internal class DiscoverAdapter(
                     },
                 )
             },
-            onClearCategoryClick = {
+            onClearCategoryClick = { selectedCategory ->
+                selectedCategory?.let {
+                    analyticsTracker.track(
+                        DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED,
+                        mapOf("name" to it.name, "region" to region, "id" to it.id),
+                    )
+                }
                 listener.onClearCategoryFilterClick(
                     source,
                     onCategoryClearSuccess = {
