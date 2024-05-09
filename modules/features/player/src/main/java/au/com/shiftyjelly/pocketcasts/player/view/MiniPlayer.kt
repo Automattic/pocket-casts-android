@@ -57,8 +57,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     init {
         // open full screen player on click
-        binding.root.setOnClickListener { openPlayer() }
-        binding.root.setOnLongClickListener {
+        binding.miniPlayerCardView.setOnClickListener { openPlayer() }
+        binding.miniPlayerCardView.setOnLongClickListener {
             clickListener?.onLongClick()
             true
         }
