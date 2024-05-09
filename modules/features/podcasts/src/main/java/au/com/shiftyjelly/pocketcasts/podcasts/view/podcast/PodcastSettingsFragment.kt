@@ -264,8 +264,13 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
     private fun setupArchive() {
         preferenceAutoArchive?.setOnPreferenceClickListener {
-            viewModel.podcastUuid?.let { uuid ->
-                (activity as FragmentHostListener).addFragment(PodcastAutoArchiveFragment.newInstance(uuid))
+            viewModel.podcast.value?.let { podcast ->
+                (activity as FragmentHostListener).addFragment(
+                    PodcastAutoArchiveFragment.newInstance(
+                        podcast.uuid,
+                        ToolbarColors.podcast(podcast, theme),
+                    ),
+                )
             }
             true
         }
