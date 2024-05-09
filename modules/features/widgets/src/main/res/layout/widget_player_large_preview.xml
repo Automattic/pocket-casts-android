@@ -385,7 +385,7 @@
                 android:alpha="0.7"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="@string/widget_preview_time_left_3"
+                android:text="@string/widget_preview_time_left_4"
                 android:textColor="?colorOnSecondaryContainer"
                 android:textSize="8dp" />
 
