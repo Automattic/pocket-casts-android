@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 
 @Composable
@@ -33,8 +35,8 @@ fun <T> RadioOptionsDialog(
     title: String,
     selectedOption: T,
     allOptions: List<T>,
-    optionName: @Composable (T) -> String,
     modifier: Modifier = Modifier,
+    optionName: @Composable (T) -> String,
     onSelectOption: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -94,7 +96,10 @@ fun <T> RadioOptionsDialog(
                         onClick = { onDismiss() },
                         modifier = Modifier.padding(end = 8.dp),
                     ) {
-                        TextH40(stringResource(R.string.cancel).uppercase())
+                        TextH40(
+                            text = stringResource(R.string.cancel).uppercase(),
+                            color = MaterialTheme.theme.colors.primaryInteractive01,
+                        )
                     }
                 }
             }
