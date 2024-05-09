@@ -287,6 +287,7 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_CATEGORIES_PICKER_CLOSED("discover_categories_picker_closed"),
     DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
     DISCOVER_AD_CATEGORY_TAPPED("discover_ad_category_tapped"),
+    DISCOVER_AD_CATEGORY_SUBSCRIBED("discover_ad_category_subscribed"),
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),

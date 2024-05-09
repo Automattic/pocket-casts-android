@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_SUBSCRIBED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEGORY_TAPPED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_CLOSED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN
@@ -107,7 +108,7 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
     }
 }
 internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val podcasts: List<DiscoverPodcast>)
-internal data class CategoryAdRow(val categoryId: Int, val categoryName: String, val discoverRow: DiscoverRow)
+internal data class CategoryAdRow(val categoryId: Int, val categoryName: String, val region: String?, val discoverRow: DiscoverRow)
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
@@ -876,16 +877,10 @@ internal class DiscoverAdapter(
 
                     imageRequestFactory.createForPodcast(podcast.uuid).loadInto(adHolder.binding.imgPodcast)
                     adHolder.itemView.setOnClickListener {
-                        val regionCode = row.discoverRow.regionCode
-                        regionCode?.let { region ->
+                        row.region?.let { region ->
                             analyticsTracker.track(
                                 DISCOVER_AD_CATEGORY_TAPPED,
-                                mapOf(
-                                    "name" to row.categoryName,
-                                    "region" to region,
-                                    "id" to row.categoryId,
-                                    "podcast_id" to podcast.uuid,
-                                ),
+                                mapOf("name" to row.categoryName, "region" to region, "id" to row.categoryId, "podcast_id" to podcast.uuid),
                             )
                         }
 
@@ -897,10 +892,21 @@ internal class DiscoverAdapter(
                     }
 
                     val btnSubscribe = adHolder.binding.btnSubscribe
+
                     btnSubscribe.updateSubscribeButtonIcon(podcast.isSubscribed)
+
                     btnSubscribe.setOnClickListener {
                         btnSubscribe.updateSubscribeButtonIcon(true)
+
                         listener.onPodcastSubscribe(podcast = podcast, listUuid = row.discoverRow.listUuid)
+
+                        row.region?.let { region ->
+                            analyticsTracker.track(
+                                DISCOVER_AD_CATEGORY_SUBSCRIBED,
+                                mapOf("name" to row.categoryName, "region" to region, "id" to row.categoryId, "podcast_id" to podcast.uuid),
+                            )
+                        }
+
                         row.discoverRow.listUuid?.let { listUuid -> trackDiscoverListPodcastSubscribed(listUuid, podcast.uuid) }
                     }
 

@@ -137,6 +137,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
             onCategorySelectionSuccess()
         }
+
+        trackCategoryShownImpression(selectedCategory.discoverCategory)
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
         viewModel.loadCategories(source) { categories ->
@@ -286,15 +288,13 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
             // If there is ad, we add it.
             viewModel.getAdForCategoryView(category.id)?.let {
-                updatedList.add(CategoryAdRow(categoryId = category.id, categoryName = category.name, discoverRow = it))
+                updatedList.add(CategoryAdRow(categoryId = category.id, categoryName = category.name, region = viewModel.currentRegionCode, discoverRow = it))
             }
 
             // Lastly, we add the remaining podcast list.
             updatedList.add(remainingPodcasts)
 
             adapter?.submitList(updatedList)
-
-            trackCategoryShownImpression(category)
         }
     }
     private fun trackCategoryShownImpression(category: DiscoverCategory) {
