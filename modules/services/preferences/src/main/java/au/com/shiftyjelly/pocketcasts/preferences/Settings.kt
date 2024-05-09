@@ -391,6 +391,7 @@ interface Settings {
     fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
+    fun getRefreshPodcastsBatchSize(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
