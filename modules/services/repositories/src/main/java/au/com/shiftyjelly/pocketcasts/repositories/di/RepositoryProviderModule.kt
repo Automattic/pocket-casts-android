@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.crashlogging.di.ProvideApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.servers.di.CrashLoggingInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import dagger.Module
 import dagger.Provides
@@ -29,13 +30,13 @@ class RepositoryProviderModule {
     @Provides
     @Singleton
     @DownloadOkHttpClient
-    fun downloadOkHttpClient(networkInterceptors: Set<@JvmSuppressWildcards Interceptor>): OkHttpClient {
+    fun downloadOkHttpClient(@CrashLoggingInterceptor crashLoggingInterceptor: Interceptor): OkHttpClient {
         val dispatcher = Dispatcher().apply {
             maxRequestsPerHost = 5
         }
         return OkHttpClient.Builder()
             .dispatcher(dispatcher)
-            .apply { networkInterceptors.forEach(::addNetworkInterceptor) }
+            .addInterceptor(crashLoggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)

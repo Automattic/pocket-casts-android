@@ -7,7 +7,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
 import okhttp3.Interceptor
 import okhttp3.Request
 
@@ -15,7 +14,7 @@ import okhttp3.Request
 @Module
 class InterceptorModule {
     @Provides
-    @IntoSet
+    @CrashLoggingInterceptor
     fun provideMonitoringInterceptor(): Interceptor = CrashLoggingOkHttpInterceptorProvider
         .createInstance(object : RequestFormatter {
             override fun formatRequestUrl(request: Request): FormattedUrl {

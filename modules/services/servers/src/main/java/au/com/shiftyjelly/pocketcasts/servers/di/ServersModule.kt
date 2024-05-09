@@ -156,12 +156,12 @@ class ServersModule {
     @Provides
     internal fun provideOkHttpClientBuilder(
         @SyncServerCache cache: Cache,
-        networkInterceptors: Set<@JvmSuppressWildcards Interceptor>,
+        @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
     ): OkHttpClient.Builder {
         var builder = OkHttpClient.Builder()
             .addInterceptor(INTERCEPTOR_CACHE_MODIFIER)
             .addInterceptor(INTERCEPTOR_USER_AGENT)
-            .apply { networkInterceptors.forEach(::addNetworkInterceptor) }
+            .addInterceptor(crashLoggingInterceptor)
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -230,10 +230,10 @@ class ServersModule {
     @Singleton
     internal fun provideOkHttpShowNotesCache(
         @ApplicationContext context: Context,
-        networkInterceptors: Set<@JvmSuppressWildcards Interceptor>,
+        @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
     ): OkHttpClient {
         return getShowNotesClient(context).newBuilder()
-            .apply { networkInterceptors.forEach(::addNetworkInterceptor) }
+            .addInterceptor(crashLoggingInterceptor)
             .build()
     }
 
@@ -241,14 +241,14 @@ class ServersModule {
     @NoCacheOkHttpClientBuilder
     @Singleton
     internal fun provideOkHttpClientNoCacheBuilder(
-        networkInterceptors: Set<@JvmSuppressWildcards Interceptor>,
+        @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
     ): OkHttpClient.Builder {
         val dispatcher = Dispatcher()
         dispatcher.maxRequestsPerHost = 5
         var builder = OkHttpClient.Builder()
             .dispatcher(dispatcher)
             .addInterceptor(INTERCEPTOR_USER_AGENT)
-            .apply { networkInterceptors.forEach(::addNetworkInterceptor) }
+            .addInterceptor(crashLoggingInterceptor)
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -433,3 +433,7 @@ annotation class NoCacheOkHttpClientBuilder
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class TokenInterceptor
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class CrashLoggingInterceptor // preferably, should be the last in interceptor chain
