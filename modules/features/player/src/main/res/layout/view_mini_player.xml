@@ -43,8 +43,8 @@
 
             <ImageButton
                 android:id="@+id/skipForward"
-                android:layout_width="68dp"
-                android:layout_height="68dp"
+                android:layout_width="@dimen/mini_player_skip_button_size_68"
+                android:layout_height="@dimen/mini_player_skip_button_size_68"
                 android:layout_marginStart="8dp"
                 android:background="?android:attr/actionBarItemBackground"
                 android:scaleType="centerInside"
@@ -70,8 +70,8 @@
 
             <ImageButton
                 android:id="@+id/skipBack"
-                android:layout_width="68dp"
-                android:layout_height="68dp"
+                android:layout_width="@dimen/mini_player_skip_button_size_68"
+                android:layout_height="@dimen/mini_player_skip_button_size_68"
                 android:layout_marginEnd="8dp"
                 android:background="?android:attr/actionBarItemBackground"
                 android:scaleType="centerInside"

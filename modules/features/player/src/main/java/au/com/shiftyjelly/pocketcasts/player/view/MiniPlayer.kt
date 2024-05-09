@@ -90,6 +90,20 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
         binding.miniPlayButton.setAnimation(playButtonLottieBackground)
 
+        val skipButtonSize = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.dimen.mini_player_skip_button_size_56
+        } else {
+            R.dimen.mini_player_skip_button_size_68
+        }
+        with(binding.skipBack.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
+        with(binding.skipForward.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
+
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
                 openPlayer()
