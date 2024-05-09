@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBindi
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
 import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.CATEGORY_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -107,7 +106,7 @@ internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val ca
     }
 }
 internal data class RemainingPodcastsByCategoryRow(val listId: String?, val category: String?, val podcasts: List<DiscoverPodcast>)
-internal data class CategoryAdRow(val discoverRow: DiscoverRow)
+internal data class CategoryAdRow(val categoryId: Int, val categoryName: String, val discoverRow: DiscoverRow)
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
@@ -870,12 +869,22 @@ internal class DiscoverAdapter(
 
                     imageRequestFactory.createForPodcast(podcast.uuid).loadInto(adHolder.binding.imgPodcast)
                     adHolder.itemView.setOnClickListener {
-                        row.discoverRow.categoryId?.let { categoryId ->
-                            analyticsTracker.track(DISCOVER_AD_CATEGORY_TAPPED, mapOf(CATEGORY_ID_KEY to categoryId))
-                            row.discoverRow.listUuid?.let { listUuid ->
-                                FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcast.uuid)
-                                analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcast.uuid))
-                            }
+                        val regionCode = row.discoverRow.regionCode
+                        regionCode?.let { region ->
+                            analyticsTracker.track(
+                                DISCOVER_AD_CATEGORY_TAPPED,
+                                mapOf(
+                                    "name" to row.categoryName,
+                                    "region" to region,
+                                    "id" to row.categoryId,
+                                    "podcast_id" to podcast.uuid,
+                                ),
+                            )
+                        }
+
+                        row.discoverRow.listUuid?.let { listUuid ->
+                            FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcast.uuid)
+                            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcast.uuid))
                         }
                         listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
                     }
