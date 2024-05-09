@@ -8,8 +8,10 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.compose.ui.res.dimensionResource
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.marginStart
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
@@ -22,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.request.Disposable
 import com.airbnb.lottie.LottieDrawable
@@ -67,6 +71,13 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.skipForward.setOnClickListener { skipForwardClicked() }
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
+
+        val elevation = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_elevation) else 0f
+        binding.miniPlayerCardView.elevation = elevation
+        val cornerRadius = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_corner_radius) else 0f
+        binding.miniPlayerCardView.radius = cornerRadius
+        val margin = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_margin).toInt() else 0
+        (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
 
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
