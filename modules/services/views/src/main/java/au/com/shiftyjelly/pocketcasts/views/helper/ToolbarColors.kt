@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.views.helper
 import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.ColorInt
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastData
@@ -34,6 +35,13 @@ data class ToolbarColors(
             iconColor = ThemeColor.podcastIcon01(theme.activeTheme, podcast.getTintColor(theme.isDarkTheme)),
             titleColor = ThemeColor.podcastText01(theme.activeTheme, podcast.getTintColor(theme.isDarkTheme)),
             backgroundColor = ThemeColor.podcastUi01(theme.activeTheme, podcast.getTintColor(theme.isDarkTheme)),
+            excludeMenuItems = excludeMenuItems,
+        )
+
+        fun podcast(lightColor: Int, darkColor: Int, theme: Theme, excludeMenuItems: List<Int>? = null) = ToolbarColors(
+            iconColor = ThemeColor.podcastIcon01(theme.activeTheme, if (theme.isDarkTheme) darkColor else lightColor),
+            titleColor = ThemeColor.podcastText01(theme.activeTheme, if (theme.isDarkTheme) darkColor else lightColor),
+            backgroundColor = ThemeColor.podcastUi01(theme.activeTheme, if (theme.isDarkTheme) darkColor else lightColor),
             excludeMenuItems = excludeMenuItems,
         )
     }

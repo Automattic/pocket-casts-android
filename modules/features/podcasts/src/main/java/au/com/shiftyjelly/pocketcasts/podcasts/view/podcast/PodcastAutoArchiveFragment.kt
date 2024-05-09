@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -56,30 +58,39 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     )
 
     private val args get() = extractArgs(arguments) ?: error("$NEW_INSTANCE_ARGS argument is missing. Fragment must be created using newInstance function")
+    private var podcastTint: PodcastTint? = null
+    private val fallbackToolbarColors get() = podcastTint?.let { ToolbarColors.podcast(it.lightTint, it.darkTint, theme).also { Timber.tag("LOG_TAG").i("Fallback: ${theme.activeTheme}") } } ?: args.toolbarColors
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            val state by viewModel.state.collectAsState(PodcastAutoArchiveViewModel.State())
+    ): View {
+        podcastTint = savedInstanceState?.let { BundleCompat.getParcelable(it, PODCAST_TINT_KEY, PodcastTint::class.java) }
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state by viewModel.state.collectAsState(PodcastAutoArchiveViewModel.State())
 
-            AppThemeWithBackground(themeType = theme.activeTheme) {
-                AutoArchiveSettings(
-                    state = state,
-                    onBackPressed = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
-                    },
-                )
+                AppThemeWithBackground(themeType = theme.activeTheme) {
+                    AutoArchiveSettings(
+                        state = state,
+                        onBackPressed = {
+                            @Suppress("DEPRECATION")
+                            activity?.onBackPressed()
+                        },
+                    )
+                }
             }
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(PODCAST_TINT_KEY, podcastTint)
+    }
+
     override fun onResume() {
         super.onResume()
-        tintToolbar(args.toolbarColors.backgroundColor)
+        tintToolbar(fallbackToolbarColors.backgroundColor)
     }
 
     private fun tintToolbar(color: Int) {
@@ -104,9 +115,12 @@ class PodcastAutoArchiveFragment : BaseFragment() {
             val toolbarColors = if (state.podcast != null) {
                 ToolbarColors.podcast(state.podcast, theme)
             } else {
-                args.toolbarColors
+                fallbackToolbarColors
             }
             LaunchedEffect(toolbarColors.backgroundColor) {
+                if (state.podcast != null) {
+                    podcastTint = PodcastTint(state.podcast.lightThemeTint(), state.podcast.darkThemeTint())
+                }
                 tintToolbar(toolbarColors.backgroundColor)
             }
             ThemedTopAppBar(
@@ -300,8 +314,15 @@ class PodcastAutoArchiveFragment : BaseFragment() {
         val toolbarColors: ToolbarColors,
     ) : Parcelable
 
+    @Parcelize
+    private data class PodcastTint(
+        val lightTint: Int,
+        val darkTint: Int,
+    ) : Parcelable
+
     companion object {
         private const val NEW_INSTANCE_ARGS = "PodcastAutoArchiveFragmentArg"
+        private const val PODCAST_TINT_KEY = "PodcastTintKey"
 
         private val EpisodeLimits = mapOf(
             null to LR.string.settings_auto_archive_limit_none,
