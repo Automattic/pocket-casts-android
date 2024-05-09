@@ -31,15 +31,21 @@
                 android:layout_height="match_parent"
                 android:background="?attr/primary_ui_01" />
 
-            <ImageView
-                android:id="@+id/artwork"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/round_corners_2dp"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/artworkCardView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:cardCornerRadius="@dimen/mini_player_artwork_corner_radius"
+                app:elevation="@dimen/mini_player_artwork_elevation"
                 app:layout_constraintBottom_toTopOf="@+id/progressBar"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:id="@+id/artwork"
+                    android:layout_width="@dimen/mini_player_artwork_size"
+                    android:layout_height="@dimen/mini_player_artwork_size" />
+            </androidx.cardview.widget.CardView>
 
             <ImageButton
                 android:id="@+id/skipForward"

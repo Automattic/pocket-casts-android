@@ -6,6 +6,9 @@
     <dimen name="player_tab_padding">6dp</dimen>
     <dimen name="mini_player_elevation">4dp</dimen>
     <dimen name="mini_player_corner_radius">12dp</dimen>
+    <dimen name="mini_player_artwork_elevation">1dp</dimen>
+    <dimen name="mini_player_artwork_corner_radius">4dp</dimen>
+    <dimen name="mini_player_artwork_size">44dp</dimen>
     <dimen name="mini_player_margin">6dp</dimen>
     <dimen name="mini_player_play_button_size_32">32dp</dimen>
     <dimen name="mini_player_play_button_size_48">48dp</dimen>
