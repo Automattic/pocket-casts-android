@@ -30,7 +30,7 @@ enum class Feature(
     SETTINGS_SYNC(
         key = "settings_sync",
         title = "Settings Sync",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -78,7 +78,7 @@ enum class Feature(
     CATEGORIES_REDESIGN(
         key = "CATEGORIES_REDESIGN",
         title = "Podcasts by category shown in discover view",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -89,6 +89,14 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    PODCASTS_GRID_VIEW_DESIGN_CHANGES(
+        key = "podcasts_grid_view_changes",
+        title = "Podcasts grid view design changes",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;

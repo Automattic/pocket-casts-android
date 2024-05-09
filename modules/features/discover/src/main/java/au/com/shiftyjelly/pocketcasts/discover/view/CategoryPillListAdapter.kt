@@ -96,6 +96,7 @@ class CategoryPillListAdapter(
                         },
                         onCategorySelectionSuccess@{
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
+                            binding.categoryName.setCategory(category.discoverCategory.name)
                             updateCategoryStatus(position, isSelected = false)
                             loadCategories(it)
                         },
@@ -127,7 +128,7 @@ private fun TextView.setCategory(category: String) {
 }
 private fun TextView.setCategoryColor(isSelected: Boolean) {
     if (isSelected) {
-        this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_ui_02_selected))
+        this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.secondary_ui_01))
     } else {
         this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_text_01))
     }

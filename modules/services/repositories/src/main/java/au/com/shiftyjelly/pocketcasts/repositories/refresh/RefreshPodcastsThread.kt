@@ -56,6 +56,8 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.Date
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -94,7 +96,7 @@ class RefreshPodcastsThread(
     @Volatile
     private var taskHasBeenCancelled = false
 
-    fun isAllowedToRun(runNow: Boolean = false): Boolean {
+    private fun isAllowedToRun(runNow: Boolean = false): Boolean {
         val now = System.currentTimeMillis()
         return now > lastRefreshAllowedTime + if (runNow) THROTTLE_RUN_NOW_MS else THROTTLE_PERIODIC_MS
     }
@@ -130,6 +132,7 @@ class RefreshPodcastsThread(
                 } catch (e: InterruptedException) {
                 }
 
+                dispatchCurrentRefreshedState()
                 return ListenableWorker.Result.success()
             }
             lastRefreshAllowedTime = System.currentTimeMillis()
@@ -273,6 +276,11 @@ class RefreshPodcastsThread(
         getEntryPoint().settings().setRefreshState(RefreshState.Failed(message))
     }
 
+    private fun dispatchCurrentRefreshedState() {
+        val settings = getEntryPoint().settings()
+        settings.setRefreshState(settings.getLastSuccessRefreshState() ?: RefreshState.Never)
+    }
+
     private fun updatePodcasts(result: RefreshResponse?): List<String> {
         if (result == null) {
             return emptyList()
@@ -367,8 +375,8 @@ class RefreshPodcastsThread(
 
         private const val GROUP_NEW_EPISODES = "group_new_episodes"
 
-        private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15000 // 15 seconds
-        private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5L * 60L * 1000L // 5 minutes
+        private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
+        private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
         private var lastRefreshAllowedTime: Long = -10000
 
         fun clearLastRefreshTime() {

@@ -15,10 +15,10 @@ import androidx.glance.layout.width
 internal fun PlaybackControls(
     isPlaying: Boolean,
     buttonHeight: Dp,
-    iconPadding: Dp,
     modifier: GlanceModifier = GlanceModifier,
     isClickable: Boolean = true,
 ) {
+    val iconPadding = buttonHeight / 3.5f
     Row(
         verticalAlignment = Alignment.Vertical.Bottom,
         modifier = modifier.fillMaxWidth(),

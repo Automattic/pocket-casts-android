@@ -155,7 +155,7 @@ class DeveloperViewModel
     }
 
     fun resetEoYModalProfileBadge() {
-        settings.endOfYearShowBadge2023.set(true, updateModifiedAt = false)
+        settings.setEndOfYearShowBadge2023(true)
         settings.setEndOfYearShowModal(true)
     }
 

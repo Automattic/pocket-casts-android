@@ -16,7 +16,8 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -124,7 +125,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManager
 
-    @Inject lateinit var crashLogging: CrashLogging
+    @Inject lateinit var analyticsTrackerWrapper: AnalyticsTrackerWrapper
 
     var mediaController: MediaControllerCompat? = null
         set(value) {
@@ -274,12 +275,9 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
                         } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                                e is ForegroundServiceStartNotAllowedException
-                            ) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
                                 addBatteryWarnings()
-                                crashLogging.sendReport(e)
-                                FirebaseAnalyticsTracker.foregroundServiceStartNotAllowedException()
+                                analyticsTrackerWrapper.track(AnalyticsEvent.PLAYBACK_FOREGROUND_SERVICE_ERROR)
                             }
                         }
                     } else {

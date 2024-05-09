@@ -5,6 +5,6 @@
     android:minHeight="40dp"
     android:minResizeWidth="195dp"
     android:previewImage="@drawable/widget_player_medium_preview"
-    android:resizeMode="vertical|horizontal"
+    android:resizeMode="horizontal"
     android:targetCellWidth="4"
     android:targetCellHeight="1" />

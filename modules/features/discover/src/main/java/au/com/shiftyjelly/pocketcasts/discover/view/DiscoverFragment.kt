@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
@@ -35,19 +32,13 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectFragment.Listener {
-    override var statusBarColor: StatusBarColor = StatusBarColor.Dark
+    override var statusBarColor: StatusBarColor = StatusBarColor.Light
 
     @Inject lateinit var settings: Settings
 
@@ -87,7 +78,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId()))
         }
         if (list is DiscoverCategory) {
-            trackCategoryImpression(list)
+            trackCategoryShownImpression(list)
         }
 
         if (list.expandedStyle is ExpandedStyle.GridList) {
@@ -130,8 +121,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onCategoryClick(selectedCategory: CategoryPill, onCategorySelectionSuccess: () -> Unit) {
-        trackCategoryImpression(selectedCategory.discoverCategory)
-
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
@@ -144,21 +133,27 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             val remainingPodcasts =
                 RemainingPodcastsByCategoryRow(it.listId, it.title, podcasts.drop(MOST_POPULAR_PODCASTS))
 
-            updateDiscoverWithCategorySelected(selectedCategory.discoverCategory.id, mostPopularPodcasts, remainingPodcasts)
+            updateDiscoverWithCategorySelected(selectedCategory.discoverCategory, mostPopularPodcasts, remainingPodcasts)
 
             onCategorySelectionSuccess()
         }
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
+        trackDropDownListCategoryPickImpression(ALL_CATEGORIES_NAME_VALUE, ALL_CATEGORIES_ID_VALUE)
+
         viewModel.loadCategories(source) { categories ->
             CategoriesBottomSheet(
                 categories = categories,
-                onCategoryClick = { this.onCategoryClick(it) { onCategorySelectionSuccess(it) } },
+                onCategoryClick = {
+                    trackDropDownListCategoryPickImpression(it.discoverCategory.name, it.discoverCategory.id)
+                    this.onCategoryClick(it) { onCategorySelectionSuccess(it) }
+                },
                 onCategorySelectionCancel = onCategorySelectionCancel,
             ).show(childFragmentManager, "categories_bottom_sheet")
         }
     }
     override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED)
         viewModel.loadCategories(source) { categories ->
             onCategoryClearSuccess(categories)
             viewModel.loadData(resources) // Reload discover
@@ -184,23 +179,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val binding = binding ?: return
 
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            binding.appBarLayout.isVisible = true
-            setupToolbarAndStatusBar(
-                toolbar = binding.toolbar,
-                title = getString(LR.string.discover),
-                menu = R.menu.discover_menu,
-                navigationIcon = NavigationIcon.None,
-                profileButton = ProfileButton.Shown(),
-            )
-            binding.toolbar.menu.findItem(UR.id.menu_profile).isVisible = true
-        } else {
-            binding.recyclerView.updateLayoutParams<FrameLayout.LayoutParams> { topMargin = 0 }
-        }
-
-        val recyclerView = binding.recyclerView
+        val recyclerView = binding?.recyclerView ?: return
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         if (adapter == null) {
             adapter = DiscoverAdapter(
@@ -221,6 +201,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->
+                val binding = binding ?: return@Observer
                 when (state) {
                     is DiscoverState.DataLoaded -> {
                         binding.errorLayout.isVisible = false
@@ -264,7 +245,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             },
         )
     }
-
     override fun onRegionSelected(region: DiscoverRegion) {
         viewModel.changeRegion(region, resources)
 
@@ -297,7 +277,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     private fun updateDiscoverWithCategorySelected(
-        categoryId: Int,
+        category: DiscoverCategory,
         mostPopularPodcasts: MostPopularPodcastsByCategoryRow,
         remainingPodcasts: RemainingPodcastsByCategoryRow,
     ) {
@@ -308,15 +288,17 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             updatedList.add(mostPopularPodcasts)
 
             // If there is ad, we add it.
-            viewModel.getAdForCategoryView(categoryId)?.let { updatedList.add(CategoryAdRow(it)) }
+            viewModel.getAdForCategoryView(category.id)?.let { updatedList.add(CategoryAdRow(it)) }
 
             // Lastly, we add the remaining podcast list.
             updatedList.add(remainingPodcasts)
 
             adapter?.submitList(updatedList)
+
+            trackCategoryShownImpression(category)
         }
     }
-    private fun trackCategoryImpression(category: DiscoverCategory) {
+    private fun trackCategoryShownImpression(category: DiscoverCategory) {
         viewModel.currentRegionCode?.let {
             FirebaseAnalyticsTracker.openedCategory(category.id, it)
             analyticsTracker.track(
@@ -325,6 +307,18 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
                     NAME_KEY to category.name,
                     REGION_KEY to it,
                     ID_KEY to category.id,
+                ),
+            )
+        }
+    }
+    private fun trackDropDownListCategoryPickImpression(name: String, id: Int) {
+        viewModel.currentRegionCode?.let {
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_PICK,
+                mapOf(
+                    NAME_KEY to name,
+                    REGION_KEY to it,
+                    ID_KEY to id,
                 ),
             )
         }
@@ -340,5 +334,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         const val EPISODE_UUID_KEY = "episode_uuid"
         const val SOURCE_KEY = "source"
         const val UUID_KEY = "uuid"
+        const val ALL_CATEGORIES_NAME_VALUE = "all"
+        const val ALL_CATEGORIES_ID_VALUE = -1
     }
 }

@@ -668,6 +668,14 @@ class SettingsImpl @Inject constructor(
         setInt("lastSleepEndOfEpisodes", episodes)
     }
 
+    override fun setlastSleepEndOfChapters(chapters: Int) {
+        setInt("lastSleepEndOfChapters", chapters)
+    }
+
+    override fun setSleepEndOfChapters(chapters: Int) {
+        setInt("sleepEndOfChapters", chapters)
+    }
+
     override fun getSleepTimerCustomMins(): Int {
         return getInt("sleepTimerCustomMins", 5)
     }
@@ -676,8 +684,16 @@ class SettingsImpl @Inject constructor(
         return getInt("sleepEndOfEpisodes", 1)
     }
 
+    override fun getSleepEndOfChapters(): Int {
+        return getInt("sleepEndOfChapters", 1)
+    }
+
     override fun getlastSleepEndOfEpisodes(): Int {
         return getInt("lastSleepEndOfEpisodes", 0)
+    }
+
+    override fun getlastSleepEndOfChapter(): Int {
+        return getInt("lastSleepEndOfChapters", 0)
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {
@@ -1212,11 +1228,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val endOfYearShowBadge2023 = UserSetting.BoolPref(
-        sharedPrefKey = END_OF_YEAR_SHOW_BADGE_2023_KEY,
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
+    override fun setEndOfYearShowBadge2023(value: Boolean) {
+        setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
+    }
+
+    override fun getEndOfYearShowBadge2023(): Boolean =
+        getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
 
     override fun setEndOfYearShowModal(value: Boolean) {
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)

@@ -7,6 +7,9 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.R
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -177,7 +180,12 @@ object UiUtil {
     fun getGridImageWidthPx(smallArtwork: Boolean, context: Context): Int {
         val columnCount = getGridColumnCount(smallArtwork, context)
         val contentWidthPx = getContentViewWidthPx(context)
-        return (contentWidthPx.toFloat() / columnCount).toInt()
+        val spacingWidth = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+            2 * (columnCount * context.resources.getDimensionPixelSize(R.dimen.grid_item_padding) + context.resources.getDimensionPixelSize(R.dimen.grid_outer_padding))
+        } else {
+            0
+        }
+        return ((contentWidthPx.toFloat() - spacingWidth) / columnCount).toInt()
     }
 
     fun isNavigationDrawerHidden(context: Context): Boolean {

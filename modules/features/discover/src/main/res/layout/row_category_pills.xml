@@ -4,12 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="?attr/secondary_ui_01"
     android:paddingBottom="16dp">
 
     <LinearLayout
         android:id="@+id/layoutSearch"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="48dp"
         android:orientation="horizontal"
         android:background="@drawable/search_with_category_pills_background"
         android:foreground="?attr/selectableItemBackground"
@@ -23,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/ic_search"
-            app:tint="?attr/primary_text_01"
+            app:tint="?attr/primary_text_02"
             android:layout_marginEnd="16dp"/>
         <TextView
             android:layout_width="match_parent"
@@ -31,7 +32,7 @@
             android:layout_gravity="center_vertical"
             android:textAppearance="?attr/textBody1"
             android:importantForAccessibility="no"
-            android:textColor="?attr/primary_text_01"
+            android:textColor="?attr/primary_text_02"
             android:maxLines="1"
             android:ellipsize="end"
             android:text="@string/search_podcasts_or_add_url"

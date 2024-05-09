@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -8,13 +9,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.core.view.setPadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,8 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -51,16 +45,13 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ProfileButton
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import com.google.android.material.transition.MaterialFadeThrough
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
@@ -74,7 +65,6 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         private const val OPTION_KEY = "option"
         private const val SORT_BY = "sort_by"
         private const val EDIT_FOLDER = "edit_folder"
-        private const val SEARCH_TRANSITION_DURATION = 500L
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -109,6 +99,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
 
+    private var gridOuterPadding: Int = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
@@ -119,6 +111,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
         binding.recyclerView.let {
             it.adapter = adapter
+            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+                gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
+                it.addItemDecoration(SpaceItemDecoration())
+            }
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
 
@@ -140,20 +136,12 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 toolbarColors = ToolbarColors.User(color = folder.getColor(context), theme = theme)
                 navigationIcon = NavigationIcon.BackArrow
             }
-            val showProfileButton = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) && rootFolder
             setupToolbarAndStatusBar(
                 toolbar = toolbar,
                 title = folder?.name ?: getString(LR.string.podcasts),
                 toolbarColors = toolbarColors,
                 navigationIcon = navigationIcon,
-                profileButton = if (showProfileButton) {
-                    ProfileButton.Shown()
-                } else {
-                    ProfileButton.None
-                },
             )
-            toolbar.menu.findItem(UR.id.menu_profile).isVisible = showProfileButton
-            setupSearchBar()
 
             toolbar.menu.findItem(R.id.folders_locked)?.run {
                 isVisible = !isSignedInAsPlusOrPatron
@@ -161,7 +149,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
 
             toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
-            binding.layoutSearch.showIf(rootFolder)
+            toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
 
             adapter?.setFolderItems(folderState.items)
 
@@ -205,14 +193,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         setupToolbarAndStatusBar(
             toolbar = toolbar,
             menu = R.menu.podcasts_menu,
-            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                ChromeCastButton.None
-            } else {
-                ChromeCastButton.Shown(chromeCastAnalytics)
-            },
+            chromeCastButton = Shown(chromeCastAnalytics),
         )
         toolbar.setOnMenuItemClickListener(this)
-        toolbar.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
+
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
             OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.FOLDERS))
             true
@@ -238,25 +222,6 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         return binding.root
     }
 
-    private fun setupSearchBar() {
-        binding.layoutSearch.setContent {
-            AppTheme(theme.activeTheme) {
-                SearchBar(
-                    text = "",
-                    placeholder = stringResource(LR.string.search_podcasts_or_add_url),
-                    onTextChanged = {},
-                    onSearch = {},
-                    enabled = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { search() }
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                )
-            }
-        }
-    }
-
     override fun onDestroyView() {
         listState = binding.recyclerView.layoutManager?.onSaveInstanceState()
         binding.recyclerView.adapter = null
@@ -272,20 +237,21 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 openOptions()
                 true
             }
-
+            R.id.search_podcasts -> {
+                search()
+                true
+            }
             R.id.create_folder -> {
                 analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
                 createFolder()
                 true
             }
-
             else -> false
         }
     }
 
     private fun search() {
         val searchFragment = SearchFragment.newInstance(source = SourceView.PODCAST_LIST)
-        searchFragment.enterTransition = MaterialFadeThrough().apply { duration = SEARCH_TRANSITION_DURATION }
         (activity as FragmentHostListener).addFragment(searchFragment, onTop = true)
         realBinding?.recyclerView?.smoothScrollToPosition(0)
     }
@@ -382,6 +348,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             realBinding?.recyclerView?.adapter = adapter
         }
 
+        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+            val padding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
+            realBinding?.recyclerView?.setPadding(padding)
+        }
+
         realBinding?.recyclerView?.layoutManager = layoutManager
         layoutManager.onRestoreInstanceState(savedInstanceState)
     }
@@ -408,5 +379,13 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         }
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
+    }
+
+    inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {
+        private val spacing = resources.getDimensionPixelSize(VR.dimen.grid_item_padding)
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            val margin = if (settings.podcastGridLayout.value != PodcastGridLayoutType.LIST_VIEW) spacing else 0
+            outRect.set(margin, margin, margin, margin)
+        }
     }
 }
