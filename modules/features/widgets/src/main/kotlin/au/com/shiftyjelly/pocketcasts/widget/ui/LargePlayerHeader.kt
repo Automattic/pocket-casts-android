@@ -41,7 +41,7 @@ internal fun LargePlayerHeader(
                 size = 116.dp,
             )
             Spacer(
-                modifier = GlanceModifier.width(12.dp),
+                modifier = GlanceModifier.width(8.dp),
             )
             Column(
                 verticalAlignment = Alignment.Vertical.Top,
