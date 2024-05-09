@@ -57,12 +57,12 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/miniPlayButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/mini_player_play_background"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/mini_player_play_background_48"
                 android:scaleType="centerInside"
                 android:clickable="false"
-                app:lottie_rawRes="@raw/mini_player_play_button"
+                app:lottie_rawRes="@raw/mini_player_play_button_48"
                 app:layout_constraintBottom_toTopOf="@+id/progressBar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

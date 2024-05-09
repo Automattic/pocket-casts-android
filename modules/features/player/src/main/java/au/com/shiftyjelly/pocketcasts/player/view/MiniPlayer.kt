@@ -8,10 +8,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.compose.ui.res.dimensionResource
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.view.marginStart
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
@@ -78,6 +76,19 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.miniPlayerCardView.radius = cornerRadius
         val margin = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_margin).toInt() else 0
         (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
+
+        val playBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.drawable.mini_player_play_background_32
+        } else {
+            R.drawable.mini_player_play_background_48
+        }
+        binding.miniPlayButton.background = ContextCompat.getDrawable(context, playBackground)
+        val playButtonLottieBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.raw.mini_player_play_button_32
+        } else {
+            R.raw.mini_player_play_button_48
+        }
+        binding.miniPlayButton.setAnimation(playButtonLottieBackground)
 
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
