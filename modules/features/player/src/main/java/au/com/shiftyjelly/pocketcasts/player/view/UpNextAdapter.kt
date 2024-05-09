@@ -167,7 +167,16 @@ class UpNextAdapter(
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
                 btnClear.isVisible = playbackManager.getCurrentEpisode() != null
                 lblUpNextTime.isVisible = playbackManager.getCurrentEpisode() != null
-                lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                lblUpNextTime.text = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    if (header.episodeCount == 0) {
+                        root.resources.getString(LR.string.player_up_next_time_left, time)
+                    } else {
+                        root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
+                    }
+                } else {
+                    root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                }
+
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
         }

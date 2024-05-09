@@ -343,6 +343,11 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
     <string name="player_up_next_time_remaining">Total time remaining %s</string>
+    <string name="player_up_next_time_left">%s left</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one" formatted="true">One episode - %2$s left</item>
+        <item quantity="other" formatted="true">%1$d episodes - %2$s left</item>
+    </plurals>
     <string name="player_open_url_failed">Could not find a browser to open %s.</string>
     <string name="player_archive_title" translatable="false">@string/archive</string>
     <string name="player_archive_summary">Are you sure you want to archive this episode?</string>
