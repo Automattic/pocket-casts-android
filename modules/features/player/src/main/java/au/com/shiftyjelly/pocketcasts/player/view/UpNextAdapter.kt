@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -58,7 +60,10 @@ class UpNextAdapter(
     private val playbackManager: PlaybackManager,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 3).themed()
+    private val imageRequestFactory = PocketCastsImageRequestFactory(
+        context,
+        cornerRadius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) 4 else 3,
+    ).themed()
 
     var isPlaying: Boolean = false
         set(value) {
