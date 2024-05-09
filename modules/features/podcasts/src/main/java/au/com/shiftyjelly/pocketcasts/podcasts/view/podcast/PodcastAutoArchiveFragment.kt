@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -59,7 +58,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
 
     private val args get() = extractArgs(arguments) ?: error("$NEW_INSTANCE_ARGS argument is missing. Fragment must be created using newInstance function")
     private var podcastTint: PodcastTint? = null
-    private val fallbackToolbarColors get() = podcastTint?.let { ToolbarColors.podcast(it.lightTint, it.darkTint, theme).also { Timber.tag("LOG_TAG").i("Fallback: ${theme.activeTheme}") } } ?: args.toolbarColors
+    private val fallbackToolbarColors get() = podcastTint?.let { ToolbarColors.podcast(it.lightTint, it.darkTint, theme) } ?: args.toolbarColors
 
     override fun onCreateView(
         inflater: LayoutInflater,
