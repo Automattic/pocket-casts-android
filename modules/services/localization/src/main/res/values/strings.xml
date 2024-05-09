@@ -165,6 +165,12 @@
     <string name="widget_no_episode_playing">No episode playing</string>
     <string name="widget_nothing_in_up_next">Nothing in Up Next</string>
     <string name="widget_check_out_discover">Check out Discover for more</string>
+    <string name="widget_preview_episode_title">Episode title</string>
+    <string name="widget_preview_episode_in_up_next_title">Episode in Up Next</string>
+    <string name="widget_preview_time_left_1">25m left</string>
+    <string name="widget_preview_time_left_2">12m left</string>
+    <string name="widget_preview_time_left_3">55m left</string>
+    <string name="widget_preview_time_left_4">1h 36m left</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

@@ -9,7 +9,7 @@
     android:orientation="vertical"
     android:padding="10dp"
     android:theme="@style/Theme.Material3.DynamicColors.DayNight"
-    tools:ignore="UseAppTint,SpUsage,HardcodedText,RtlHardcoded">
+    tools:ignore="UseAppTint,SpUsage,RtlHardcoded">
 
     <RelativeLayout
         android:layout_width="220dp"
@@ -45,9 +45,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/headerImage"
-            android:layout_marginLeft="6dp"
+            android:layout_marginHorizontal="6dp"
+            android:layout_toLeftOf="@+id/logoBackground"
             android:layout_toRightOf="@+id/headerImage"
-            android:text="Episode title"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/widget_preview_episode_title"
+            android:textAlignment="textStart"
             android:textColor="?colorOnSecondaryContainer"
             android:textSize="10dp"
             android:textStyle="bold" />
@@ -56,14 +60,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/headerTitle"
-            android:layout_marginLeft="6dp"
+            android:layout_marginHorizontal="6dp"
+            android:layout_toLeftOf="@+id/logoBackground"
             android:layout_toRightOf="@+id/headerImage"
             android:alpha="0.7"
-            android:text="25m left"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/widget_preview_time_left_1"
+            android:textAlignment="textStart"
             android:textColor="?colorOnSecondaryContainer"
             android:textSize="8dp" />
 
         <ImageView
+            android:id="@+id/logoBackground"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_alignParentTop="true"
@@ -108,7 +117,8 @@
 
             <FrameLayout
                 android:layout_width="4dp"
-                android:layout_height="40dp" />
+                android:layout_height="40dp"
+                tools:ignore="UselessLeaf" />
 
             <FrameLayout
                 android:layout_width="0dp"
@@ -128,7 +138,8 @@
 
             <FrameLayout
                 android:layout_width="4dp"
-                android:layout_height="40dp" />
+                android:layout_height="40dp"
+                tools:ignore="UselessLeaf" />
 
             <FrameLayout
                 android:layout_width="0dp"
@@ -185,7 +196,8 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignTop="@+id/queueImage1"
-            android:layout_marginLeft="6dp"
+            android:layout_marginHorizontal="6dp"
+            android:layout_toLeftOf="@+id/queuePlayButton1"
             android:layout_toRightOf="@+id/queueImage1"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -193,7 +205,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Episode in Up Next"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@string/widget_preview_episode_in_up_next_title"
                 android:textColor="?colorOnSecondaryContainer"
                 android:textSize="8dp"
                 android:textStyle="bold" />
@@ -203,13 +217,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:alpha="0.7"
-                android:text="12m left"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_preview_time_left_2"
                 android:textColor="?colorOnSecondaryContainer"
                 android:textSize="8dp" />
 
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/queuePlayButton1"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_alignParentRight="true"
@@ -262,7 +279,8 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignTop="@+id/queueImage2"
-            android:layout_marginLeft="6dp"
+            android:layout_marginHorizontal="6dp"
+            android:layout_toLeftOf="@+id/queuePlayButton2"
             android:layout_toRightOf="@+id/queueImage2"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -270,7 +288,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Episode in Up Next"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@string/widget_preview_episode_in_up_next_title"
                 android:textColor="?colorOnSecondaryContainer"
                 android:textSize="8dp"
                 android:textStyle="bold" />
@@ -280,13 +300,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:alpha="0.7"
-                android:text="55m left"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_preview_time_left_3"
                 android:textColor="?colorOnSecondaryContainer"
                 android:textSize="8dp" />
 
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/queuePlayButton2"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_alignParentRight="true"
@@ -339,7 +362,8 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignTop="@+id/queueImage3"
-            android:layout_marginLeft="6dp"
+            android:layout_marginHorizontal="6dp"
+            android:layout_toLeftOf="@+id/queuePlayButton3"
             android:layout_toRightOf="@+id/queueImage3"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -347,7 +371,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Episode in Up Next"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@string/widget_preview_episode_in_up_next_title"
                 android:textColor="?colorOnSecondaryContainer"
                 android:textSize="8dp"
                 android:textStyle="bold" />
@@ -357,13 +383,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:alpha="0.7"
-                android:text="1h 36m left"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/widget_preview_time_left_3"
                 android:textColor="?colorOnSecondaryContainer"
                 android:textSize="8dp" />
 
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/queuePlayButton3"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_alignParentRight="true"
