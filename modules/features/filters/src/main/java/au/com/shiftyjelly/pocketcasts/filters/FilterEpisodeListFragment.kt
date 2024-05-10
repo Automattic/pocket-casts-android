@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -293,6 +294,14 @@ class FilterEpisodeListFragment : BaseFragment() {
                 episodeListBookmarkViewModel.stateFlow.collect {
                     adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
                     adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding.recyclerView.updatePadding(bottom = it)
                 }
             }
         }
