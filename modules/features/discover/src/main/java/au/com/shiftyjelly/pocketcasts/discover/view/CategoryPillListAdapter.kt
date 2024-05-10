@@ -129,11 +129,7 @@ class CategoryPillListAdapter(
     }
 
     private fun updateAllCategoryButton() {
-        if (currentList.size == 2) { // Has category already selected
-            updateCategoryStatus(0, isSelected = true) // Keep all categories pill as selected
-        } else {
-            updateCategoryStatus(0, isSelected = false) // Keep close pill as selected
-        }
+        updateCategoryStatus(0, isSelected = currentList.size == 2)
     }
 }
 private fun TextView.setCategory(category: String) {
