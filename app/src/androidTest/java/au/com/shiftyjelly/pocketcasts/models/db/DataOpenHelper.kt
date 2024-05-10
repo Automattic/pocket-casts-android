@@ -519,14 +519,14 @@ class DataOpenHelper(
     @Suppress("SameParameterValue")
     private fun maxColumn(db: SQLiteDatabase, table: String, column: String): Int {
         val result = firstRowArray("SELECT MAX($column) FROM $table", arrayOf(), db)
-        return result?.filterNotNull()?.first()?.toInt() ?: 0
+        return result?.firstNotNullOfOrNull { it?.toIntOrNull() } ?: 0
     }
 
     @Suppress("SameParameterValue")
     private fun count(db: SQLiteDatabase, name: String, where: String?): Int {
         val whereSql = if (!where.isNullOrEmpty()) " WHERE $where" else ""
         val result = firstRowArray("SELECT count(*) FROM $name$whereSql", arrayOf(), db)
-        return result?.first()?.toInt() ?: 0
+        return result?.firstOrNull()?.toInt() ?: 0
     }
 
     private fun firstRowArray(query: String, params: Array<String?>, db: SQLiteDatabase): Array<String?>? {
