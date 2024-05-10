@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
 import android.content.Context
-import android.database.Cursor
-import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.util.Calendar
@@ -449,66 +447,50 @@ class DataOpenHelper(
 
     private fun getColumnNames(db: SQLiteDatabase, tableName: String): List<String> {
         val names: MutableList<String> = ArrayList()
-        var cursor: Cursor? = null
         try {
-            cursor = db.rawQuery("select * from $tableName limit 1", null)
-            if (cursor != null) names.addAll(listOf(*cursor.columnNames))
+            db.rawQuery("select * from $tableName limit 1", null).use { cursor ->
+                names.addAll(listOf(*cursor.columnNames))
+            }
         } catch (e: Exception) {
             Timber.e(e)
-        } finally {
-            cursor?.close()
         }
         return names
     }
 
-    private fun setNullAddedDates(db: SQLiteDatabase) {
+    private fun setNullAddedDates(database: SQLiteDatabase) {
         val cal = Calendar.getInstance()
         cal.add(Calendar.MONTH, -1)
-        var cursor: Cursor? = null
         try {
-            db.beginTransaction()
-            cursor = db.rawQuery("SELECT uuid FROM podcast", arrayOf())
-            if (cursor.moveToFirst()) {
-                do {
-                    val uuid = cursor.getString(0)
-                    db.execSQL("UPDATE podcast SET added_date=? WHERE uuid=?", arrayOf<Any>(cal.timeInMillis, uuid))
-                    cal.add(Calendar.MINUTE, 1)
-                } while (cursor.moveToNext())
-            }
-            db.setTransactionSuccessful()
-        } catch (e: SQLException) {
-            Timber.e(e, "Migrating database to version 2")
-        } finally {
-            try {
+            database.use { db ->
+                db.beginTransaction()
+                db.rawQuery("SELECT uuid FROM podcast", arrayOf()).use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        do {
+                            val uuid = cursor.getString(0)
+                            db.execSQL("UPDATE podcast SET added_date=? WHERE uuid=?", arrayOf<Any>(cal.timeInMillis, uuid))
+                            cal.add(Calendar.MINUTE, 1)
+                        } while (cursor.moveToNext())
+                    }
+                    db.setTransactionSuccessful()
+                }
                 db.endTransaction()
-            } catch (exception: java.lang.Exception) {
-                Timber.e(exception)
             }
-
-            try {
-                cursor?.close()
-            } catch (exception: java.lang.Exception) {
-                Timber.e(exception)
-            }
+        } catch (exception: Exception) {
+            Timber.e(exception, "Migrating database to version 2")
         }
     }
 
-    private fun updateLatestEpisodeFields(db: SQLiteDatabase) {
+    private fun updateLatestEpisodeFields(database: SQLiteDatabase) {
         try {
-            with(db) {
-                beginTransaction()
-                execSQL("ALTER TABLE podcast ADD latest_episode_date INTEGER", arrayOf())
-                execSQL("UPDATE podcast SET latest_episode_uuid = NULL", arrayOf())
-                setTransactionSuccessful()
-            }
-        } catch (e: SQLException) {
-            Timber.e(e, "Migrating database to version 2")
-        } finally {
-            try {
+            database.use { db ->
+                db.beginTransaction()
+                db.execSQL("ALTER TABLE podcast ADD latest_episode_date INTEGER", arrayOf())
+                db.execSQL("UPDATE podcast SET latest_episode_uuid = NULL", arrayOf())
+                db.setTransactionSuccessful()
                 db.endTransaction()
-            } catch (exception: java.lang.Exception) {
-                Timber.e(exception)
             }
+        } catch (exception: Exception) {
+            Timber.e(exception, "Migrating database to version 2")
         }
     }
 
@@ -530,30 +512,21 @@ class DataOpenHelper(
     }
 
     private fun firstRowArray(query: String, params: Array<String?>, db: SQLiteDatabase): Array<String?>? {
-        var cursor: Cursor? = null
-        try {
-            cursor = db.rawQuery(query, params)
-            if (cursor.moveToNext()) {
-                val result = arrayOfNulls<String>(cursor.columnCount)
-                for (i in 0 until cursor.columnCount) {
-                    result[i] = cursor.getString(i)
+        return try {
+            db.rawQuery(query, params).use { cursor ->
+                if (cursor.moveToNext()) {
+                    val result = arrayOfNulls<String>(cursor.columnCount)
+                    for (i in 0 until cursor.columnCount) {
+                        result[i] = cursor.getString(i)
+                    }
+                    result
+                } else {
+                    null
                 }
-                return result
-            } else {
-                return null
             }
-        } finally {
-            close(cursor)
-        }
-    }
-
-    private fun close(cursor: Cursor?) {
-        if (cursor == null) return
-
-        try {
-            cursor.close()
-        } catch (exception: java.lang.Exception) {
+        } catch (exception: Exception) {
             Timber.e(exception)
+            null
         }
     }
 
