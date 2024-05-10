@@ -527,4 +527,7 @@ interface Settings {
     // system dark mode.
     val themeReconfigurationEvents: Flow<Unit>
     fun requestThemeReconfiguration()
+
+    val bottomInset: Flow<Int>
+    fun updateBottomInset(height: Int)
 }
