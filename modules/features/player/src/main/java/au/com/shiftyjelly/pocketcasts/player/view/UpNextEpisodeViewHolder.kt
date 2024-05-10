@@ -130,7 +130,7 @@ class UpNextEpisodeViewHolder(
         binding.checkbox.setOnClickListener { binding.itemContainer.performClick() }
 
         val selectedColor = context.getThemeColor(UR.attr.primary_ui_02_selected)
-        val unselectedColor = context.getThemeColor(UR.attr.primary_ui_02)
+        val unselectedColor = context.getThemeColor(UR.attr.primary_ui_01)
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             binding.itemContainer.setBackgroundColor(if (isMultiSelecting && isChecked) selectedColor else unselectedColor)
         }
