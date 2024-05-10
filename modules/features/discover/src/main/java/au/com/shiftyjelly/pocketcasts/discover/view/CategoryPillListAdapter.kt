@@ -62,6 +62,7 @@ class CategoryPillListAdapter(
                 binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
                 binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
             }
+            binding.categoryName.setCategoryColor(category.isSelected)
         }
 
         private fun setUpCategories(context: Context, category: CategoryPill) {
@@ -90,6 +91,8 @@ class CategoryPillListAdapter(
                     onClearCategoryClick(currentSelectedCategory?.discoverCategory)
                 } else {
                     binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
+                    binding.categoryName.setCategory(category.discoverCategory.name)
+                    binding.categoryName.setCategoryColor(isSelected = false)
                     onAllCategoriesClick(
                         onCategorySelectionCancel@{
                             binding.categoryName.setCategory(category.discoverCategory.name)
@@ -99,7 +102,7 @@ class CategoryPillListAdapter(
                         onCategorySelectionSuccess@{
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
                             binding.categoryName.setCategory(category.discoverCategory.name)
-                            updateCategoryStatus(position, isSelected = false)
+                            updateAllCategoryButton()
                             loadCategories(it)
                         },
                     )
@@ -119,8 +122,18 @@ class CategoryPillListAdapter(
         submitList(categoryPills)
     }
     private fun updateCategoryStatus(position: Int, isSelected: Boolean) {
-        getItem(position).isSelected = isSelected
-        notifyItemChanged(position)
+        if (getItem(position).isSelected != isSelected) { // This is to avoid UI flickering
+            getItem(position).isSelected = isSelected
+            notifyItemChanged(position)
+        }
+    }
+
+    private fun updateAllCategoryButton() {
+        if (currentList.size == 2) { // Has category already selected
+            updateCategoryStatus(0, isSelected = true) // Keep all categories pill as selected
+        } else {
+            updateCategoryStatus(0, isSelected = false) // Keep close pill as selected
+        }
     }
 }
 private fun TextView.setCategory(category: String) {
