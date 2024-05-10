@@ -210,9 +210,7 @@ data class Podcast(
     var autoArchiveEpisodeLimit: Int?
         get() = rawAutoArchiveEpisodeLimit.takeIf { overrideGlobalArchive }
         set(value) {
-            if (value != null) {
-                rawAutoArchiveEpisodeLimit = value
-            }
+            rawAutoArchiveEpisodeLimit = value
         }
 
     enum class Licensing {

@@ -137,10 +137,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
             onCategorySelectionSuccess()
         }
+
+        trackCategoryShownImpression(selectedCategory.discoverCategory)
     }
     override fun onAllCategoriesClick(source: String, onCategorySelectionSuccess: (CategoryPill) -> Unit, onCategorySelectionCancel: () -> Unit) {
-        trackDropDownListCategoryPickImpression(ALL_CATEGORIES_NAME_VALUE, ALL_CATEGORIES_ID_VALUE)
-
         viewModel.loadCategories(source) { categories ->
             CategoriesBottomSheet(
                 categories = categories,
@@ -153,7 +153,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         }
     }
     override fun onClearCategoryFilterClick(source: String, onCategoryClearSuccess: (List<CategoryPill>) -> Unit) {
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED)
         viewModel.loadCategories(source) { categories ->
             onCategoryClearSuccess(categories)
             viewModel.loadData(resources) // Reload discover
@@ -288,14 +287,14 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             updatedList.add(mostPopularPodcasts)
 
             // If there is ad, we add it.
-            viewModel.getAdForCategoryView(category.id)?.let { updatedList.add(CategoryAdRow(it)) }
+            viewModel.getAdForCategoryView(category.id)?.let {
+                updatedList.add(CategoryAdRow(categoryId = category.id, categoryName = category.name, region = viewModel.currentRegionCode, discoverRow = it))
+            }
 
             // Lastly, we add the remaining podcast list.
             updatedList.add(remainingPodcasts)
 
             adapter?.submitList(updatedList)
-
-            trackCategoryShownImpression(category)
         }
     }
     private fun trackCategoryShownImpression(category: DiscoverCategory) {
@@ -329,12 +328,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         private const val REGION_KEY = "region"
         private const val MOST_POPULAR_PODCASTS = 5
         const val LIST_ID_KEY = "list_id"
-        const val CATEGORY_ID_KEY = "category_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"
         const val EPISODE_UUID_KEY = "episode_uuid"
         const val SOURCE_KEY = "source"
         const val UUID_KEY = "uuid"
-        const val ALL_CATEGORIES_NAME_VALUE = "all"
-        const val ALL_CATEGORIES_ID_VALUE = -1
     }
 }

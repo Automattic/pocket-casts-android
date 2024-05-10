@@ -19,19 +19,30 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="72dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/imageCardView"
+        android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginStart="16dp"
-        android:scaleType="centerInside"
-        android:paddingEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginVertical="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            tools:src="@tools:sample/avatars" />
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@+id/imageSpacer"
+        android:layout_width="16dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageCardView"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/date"
@@ -44,7 +55,7 @@
         android:textColor="?attr/primary_text_02"
         tools:text="TODAY"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/image"
+        app:layout_constraintLeft_toRightOf="@+id/imageSpacer"
         app:layout_constraintRight_toRightOf="parent"/>
 
     <TextView
@@ -59,7 +70,7 @@
         app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintBottom_toTopOf="@+id/info"
         app:layout_constraintEnd_toStartOf="@+id/playingAnimation"
-        app:layout_constraintStart_toEndOf="@+id/image"
+        app:layout_constraintStart_toEndOf="@+id/imageSpacer"
         app:layout_constraintTop_toBottomOf="@+id/date"
         tools:text="Episode description" />
 
@@ -72,7 +83,7 @@
         app:tint="?attr/support_02"
         app:layout_constraintBottom_toBottomOf="@+id/info"
         app:layout_constraintEnd_toStartOf="@+id/info"
-        app:layout_constraintStart_toEndOf="@+id/image"
+        app:layout_constraintStart_toEndOf="@+id/imageSpacer"
         app:layout_constraintTop_toTopOf="@+id/info"
         android:layout_marginEnd="6dp"/>
 
