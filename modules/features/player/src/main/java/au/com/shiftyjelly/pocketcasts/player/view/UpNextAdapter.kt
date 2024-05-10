@@ -181,7 +181,6 @@ class UpNextAdapter(
             Timber.d("Playing state episode: ${playingState.episode.playedUpTo}")
             binding.chapterProgress.theme = theme
             binding.chapterProgress.progress = playingState.progressPercent
-            binding.chapterProgress.isVisible = playingState.progressPercent > 0
             binding.title.text = playingState.episode.title
             binding.downloaded.isVisible = playingState.episode.isDownloaded
             binding.info.setEpisodeTimeLeft(playingState.episode)
