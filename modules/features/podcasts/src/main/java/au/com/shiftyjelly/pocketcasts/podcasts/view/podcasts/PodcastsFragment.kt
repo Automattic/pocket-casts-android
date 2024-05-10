@@ -10,9 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
-import androidx.core.view.setPadding
+import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -187,6 +191,19 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             if (inRootFolder && newFolderUuid != null) {
                 sharedViewModel.folderUuid = null
                 onFolderClick(newFolderUuid, isUserInitiated = false)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                settings.bottomInset.collect {
+                    if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+                        val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
+                        realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + it)
+                    } else {
+                        realBinding?.recyclerView?.updatePadding(bottom = it)
+                    }
+                }
             }
         }
 
@@ -353,10 +370,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             realBinding?.recyclerView?.adapter = adapter
         }
 
-        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-            val padding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
-            realBinding?.recyclerView?.setPadding(padding)
-        }
+//        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+//            val bottomPadding = miniPlayerViewModel.bottomPadding
+//            val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
+//            realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + bottomPadding)
+//        }
 
         realBinding?.recyclerView?.layoutManager = layoutManager
         layoutManager.onRestoreInstanceState(savedInstanceState)
