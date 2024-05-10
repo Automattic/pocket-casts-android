@@ -30,7 +30,7 @@ enum class Feature(
     SETTINGS_SYNC(
         key = "settings_sync",
         title = "Settings Sync",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -91,9 +91,9 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
-    PODCASTS_TAB_SEARCH_BAR(
-        key = "podcasts_tab_search_bar",
-        title = "Replace Podcasts tab search menu in toolbar with search bar",
+    PODCASTS_GRID_VIEW_DESIGN_CHANGES(
+        key = "podcasts_grid_view_changes",
+        title = "Podcasts grid view design changes",
         defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,

@@ -103,9 +103,6 @@ class RefreshPodcastsTask @AssistedInject constructor(
                     applicationScope = applicationScope,
                     runNow = true,
                 )
-                if (!refreshThread.isAllowedToRun(runNow = true)) {
-                    return@withContext
-                }
                 refreshJob = async { refreshThread.run() }
             }
 

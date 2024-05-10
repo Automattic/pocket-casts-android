@@ -17,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -69,7 +67,7 @@ class SettingsFragment : BaseFragment() {
                                 isDebug = BuildConfig.DEBUG,
                                 isUnrestrictedBattery = isUnrestrictedBattery,
                                 openFragment = { fragment ->
-                                    (activity as? FragmentHostListener)?.addFragment(fragment, overBottomSheet = FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+                                    (activity as? FragmentHostListener)?.addFragment(fragment)
                                 },
                             )
                         }

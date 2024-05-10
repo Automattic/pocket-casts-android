@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,9 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val gradientTop = Color(0x00000000)
@@ -59,91 +64,107 @@ fun FolderImage(
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
 ) {
+    val cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
+    val elevation = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .background(color = color)
-            .aspectRatio(1f),
     ) {
         val constraints = this
-
-        Box(
-            modifier = Modifier
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            gradientTop,
-                            gradientBottom,
-                        ),
-                    ),
-                )
-                .fillMaxSize(),
-        ) {}
-        val podcastSize = (constraints.maxWidth.value / imageSizeRatio).dp
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth(),
+        Card(
+            elevation = elevation,
+            shape = RoundedCornerShape(cornerRadius),
+            backgroundColor = color,
+            modifier = modifier
+                .aspectRatio(1f),
         ) {
-            val imagePadding = (constraints.maxWidth.value / paddingImageRatio).dp
-            Spacer(modifier = Modifier.height(imagePadding))
-            Row(horizontalArrangement = Arrangement.Center) {
-                Column(horizontalAlignment = Alignment.End) {
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(0),
-                        color = color,
-                        gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize),
-                    )
-                    Spacer(modifier = Modifier.height(imagePadding))
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(2),
-                        color = color,
-                        gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize),
-                    )
-                }
-                Spacer(modifier = Modifier.width(imagePadding))
-                Column(horizontalAlignment = Alignment.Start) {
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(1),
-                        color = color,
-                        gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize),
-                    )
-                    Spacer(modifier = Modifier.height(imagePadding))
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(3),
-                        color = color,
-                        gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(podcastSize),
-                    )
-                }
-            }
-            if (name.isNotBlank()) {
-                Spacer(modifier = Modifier.height((constraints.maxWidth.value / paddingBottomRatio).dp))
-                Text(
-                    text = name,
-                    color = Color.White,
-                    fontSize = fontSize,
-                    fontWeight = FontWeight(500),
-                    letterSpacing = 0.25.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = LocalTextStyle.current.copy(
-                        shadow = Shadow(
-                            color = Color(0x33000000),
-                            offset = Offset(0f, 2f),
-                            blurRadius = 4f,
+            Box(
+                modifier = Modifier
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                gradientTop,
+                                gradientBottom,
+                            ),
                         ),
-                    ),
-                )
+                    )
+                    .fillMaxSize(),
+            ) {}
+            val podcastSize = (constraints.maxWidth.value / imageSizeRatio).dp
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                val imagePadding = (constraints.maxWidth.value / paddingImageRatio).dp
+                Spacer(modifier = Modifier.height(imagePadding))
+                Row(horizontalArrangement = Arrangement.Center) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        FolderPodcastImage(
+                            uuid = podcastUuids.getOrNull(0),
+                            color = color,
+                            gradientColor = topPodcastImageGradient,
+                            modifier = Modifier.size(podcastSize),
+                        )
+                        Spacer(modifier = Modifier.height(imagePadding))
+                        FolderPodcastImage(
+                            uuid = podcastUuids.getOrNull(2),
+                            color = color,
+                            gradientColor = bottomPodcastImageGradient,
+                            modifier = Modifier.size(podcastSize),
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(imagePadding))
+                    Column(horizontalAlignment = Alignment.Start) {
+                        FolderPodcastImage(
+                            uuid = podcastUuids.getOrNull(1),
+                            color = color,
+                            gradientColor = topPodcastImageGradient,
+                            modifier = Modifier.size(podcastSize),
+                        )
+                        Spacer(modifier = Modifier.height(imagePadding))
+                        FolderPodcastImage(
+                            uuid = podcastUuids.getOrNull(3),
+                            color = color,
+                            gradientColor = bottomPodcastImageGradient,
+                            modifier = Modifier.size(podcastSize),
+                        )
+                    }
+                }
+                if (name.isNotBlank()) {
+                    Spacer(modifier = Modifier.height((constraints.maxWidth.value / paddingBottomRatio).dp))
+                    Text(
+                        text = name,
+                        color = Color.White,
+                        fontSize = fontSize,
+                        fontWeight = FontWeight(500),
+                        letterSpacing = 0.25.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = LocalTextStyle.current.copy(
+                            shadow = Shadow(
+                                color = Color(0x33000000),
+                                offset = Offset(0f, 2f),
+                                blurRadius = 4f,
+                            ),
+                        ),
+                    )
+                }
             }
         }
-        PodcastBadge(
-            count = badgeCount,
-            modifier = Modifier.align(Alignment.TopEnd),
-            badgeType = badgeType,
-        )
+        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+            CountBadge(
+                count = badgeCount,
+                style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Medium,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 6.dp, y = (-6).dp),
+            )
+        } else {
+            PodcastBadge(
+                count = badgeCount,
+                modifier = Modifier.align(Alignment.TopEnd),
+                badgeType = badgeType,
+            )
+        }
     }
 }
 

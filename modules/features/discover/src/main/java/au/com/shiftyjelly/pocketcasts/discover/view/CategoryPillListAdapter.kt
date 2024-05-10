@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPillListAdapter.CategoryPillViewHolder
 import au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 
 val CATEGORY_PILL_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
@@ -29,7 +30,7 @@ val CATEGORY_PILL_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
 class CategoryPillListAdapter(
     private val onCategoryClick: (CategoryPill, (List<CategoryPill>) -> Unit) -> Unit,
     private val onAllCategoriesClick: (() -> Unit, (List<CategoryPill>) -> Unit) -> Unit,
-    private val onClearCategoryClick: () -> Unit,
+    private val onClearCategoryClick: (DiscoverCategory?) -> Unit,
 ) : ListAdapter<CategoryPill, CategoryPillViewHolder>(CATEGORY_PILL_DIFF) {
 
     class CategoryPillViewHolder(
@@ -44,7 +45,7 @@ class CategoryPillListAdapter(
         }
 
         fun bind(category: CategoryPill, context: Context) {
-            if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
+            if (category.discoverCategory.id == ALL_CATEGORIES_ID) {
                 setUpAllCategoriesAndClear(context, category)
             } else {
                 setUpCategories(context, category)
@@ -83,9 +84,10 @@ class CategoryPillListAdapter(
         val binding = CategoryPillBinding.inflate(inflater, parent, false)
         return CategoryPillViewHolder(binding) { position ->
             val category = getItem(position)
-            if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
+            if (category.discoverCategory.id == ALL_CATEGORIES_ID) {
                 if (category.isSelected) {
-                    onClearCategoryClick()
+                    val currentSelectedCategory = currentList.firstOrNull { it.discoverCategory.id != ALL_CATEGORIES_ID }
+                    onClearCategoryClick(currentSelectedCategory?.discoverCategory)
                 } else {
                     binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
                     onAllCategoriesClick(

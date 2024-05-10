@@ -28,5 +28,4 @@ dependencies {
     implementation(project(":modules:services:servers"))
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
-    testImplementation(project(":modules:services:sharedtest"))
 }

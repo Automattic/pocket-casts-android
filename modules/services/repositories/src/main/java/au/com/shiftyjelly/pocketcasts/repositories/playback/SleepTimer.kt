@@ -29,11 +29,14 @@ class SleepTimer @Inject constructor(
         private val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5.minutes
         private const val TIME_KEY = "time"
         private const val NUMBER_OF_EPISODES_KEY = "number_of_episodes"
+        private const val NUMBER_OF_CHAPTERS_KEY = "number_of_chapters"
         private const val END_OF_EPISODE_VALUE = "end_of_episode"
+        private const val END_OF_CHAPTER_VALUE = "end_of_chapter"
     }
 
     private var sleepTimeMs: Long? = null
     private var lastSleepAfterTime: Duration? = null
+    private var lastSleepAfterEndOfChapterTime: Duration? = null
     private var lastTimeSleepTimeHasFinished: Duration? = null
     private var lastEpisodeUuidAutomaticEnded: String? = null
 
@@ -43,6 +46,7 @@ class SleepTimer @Inject constructor(
         if (createAlarm(sleepAt.inWholeMilliseconds)) {
             lastSleepAfterTime = duration
             cancelAutomaticSleepOnEpisodeEndRestart()
+            cancelAutomaticSleepOnChapterEndRestart()
             onSuccess()
         }
     }
@@ -70,19 +74,21 @@ class SleepTimer @Inject constructor(
 
     fun restartSleepTimerIfApplies(
         currentEpisodeUuid: String,
-        isSleepTimerRunning: Boolean,
-        isSleepEndOfEpisodeRunning: Boolean,
-        numberOfEpisodes: Int,
+        timerState: SleepTimerState,
         onRestartSleepAfterTime: () -> Unit,
         onRestartSleepOnEpisodeEnd: () -> Unit,
+        onRestartSleepOnChapterEnd: () -> Unit,
     ) {
         lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
             val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
 
-            if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, isSleepEndOfEpisodeRunning)) {
+            if (shouldRestartSleepEndOfChapter(diffTime, timerState.isSleepEndOfChapterRunning)) {
+                onRestartSleepOnChapterEnd()
+                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_CHAPTER_VALUE, NUMBER_OF_CHAPTERS_KEY to timerState.numberOfChapters))
+            } else if (shouldRestartSleepEndOfEpisode(diffTime, currentEpisodeUuid, timerState.isSleepEndOfEpisodeRunning)) {
                 onRestartSleepOnEpisodeEnd()
-                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to numberOfEpisodes))
-            } else if (shouldRestartSleepAfterTime(diffTime, isSleepTimerRunning)) {
+                analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to END_OF_EPISODE_VALUE, NUMBER_OF_EPISODES_KEY to timerState.numberOfEpisodes))
+            } else if (shouldRestartSleepAfterTime(diffTime, timerState.isSleepTimerRunning)) {
                 lastSleepAfterTime?.let {
                     analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
                     sleepAfter(it, onRestartSleepAfterTime)
@@ -95,6 +101,15 @@ class SleepTimer @Inject constructor(
         lastEpisodeUuidAutomaticEnded = uuid
         lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds
         cancelAutomaticSleepAfterTimeRestart()
+        cancelAutomaticSleepOnChapterEndRestart()
+    }
+
+    fun setEndOfChapter() {
+        val time = System.currentTimeMillis().milliseconds
+        lastSleepAfterEndOfChapterTime = time
+        lastTimeSleepTimeHasFinished = time
+        cancelAutomaticSleepAfterTimeRestart()
+        cancelAutomaticSleepOnEpisodeEndRestart()
     }
 
     private fun shouldRestartSleepAfterTime(diffTime: Duration, isSleepTimerRunning: Boolean) = diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && lastSleepAfterTime != null && !isSleepTimerRunning
@@ -104,6 +119,8 @@ class SleepTimer @Inject constructor(
         currentEpisodeUuid: String,
         isSleepEndOfEpisodeRunning: Boolean,
     ) = diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !lastEpisodeUuidAutomaticEnded.isNullOrEmpty() && currentEpisodeUuid != lastEpisodeUuidAutomaticEnded && !isSleepEndOfEpisodeRunning
+
+    private fun shouldRestartSleepEndOfChapter(diffTime: Duration, isSleepEndOfChapterRunning: Boolean) = diffTime < MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES && !isSleepEndOfChapterRunning && lastSleepAfterEndOfChapterTime != null
 
     private fun createAlarm(timeMs: Long): Boolean {
         val sleepIntent = getSleepIntent()
@@ -136,6 +153,7 @@ class SleepTimer @Inject constructor(
         cancelSleepTime()
         cancelAutomaticSleepAfterTimeRestart()
         cancelAutomaticSleepOnEpisodeEndRestart()
+        cancelAutomaticSleepOnChapterEndRestart()
     }
 
     val isSleepAfterTimerRunning: Boolean
@@ -172,4 +190,16 @@ class SleepTimer @Inject constructor(
     private fun cancelAutomaticSleepOnEpisodeEndRestart() {
         lastEpisodeUuidAutomaticEnded = null
     }
+
+    private fun cancelAutomaticSleepOnChapterEndRestart() {
+        lastSleepAfterEndOfChapterTime = null
+    }
+
+    data class SleepTimerState(
+        val isSleepTimerRunning: Boolean,
+        val isSleepEndOfEpisodeRunning: Boolean,
+        val isSleepEndOfChapterRunning: Boolean,
+        val numberOfEpisodes: Int,
+        val numberOfChapters: Int,
+    )
 }

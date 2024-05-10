@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentBookmarksContai
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
-import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -30,7 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class BookmarksContainerFragment :
-    BaseDialogFragment(), CloseOnTabSwitch {
+    BaseDialogFragment() {
     companion object {
         private const val ARG_EPISODE_UUID = "episodeUUID"
         private const val ARG_SOURCE_VIEW = "sourceView"

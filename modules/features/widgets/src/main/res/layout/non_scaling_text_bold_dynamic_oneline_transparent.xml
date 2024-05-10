@@ -4,9 +4,9 @@
     android:id="@+id/nonScalingText"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:alpha="0.8"
+    android:alpha="0.7"
     android:ellipsize="end"
     android:maxLines="1"
-    android:textColor="?colorOnPrimaryContainer"
+    android:textColor="?colorOnSecondaryContainer"
     android:textStyle="bold"
     android:theme="@style/Theme.Material3.DynamicColors.DayNight" />

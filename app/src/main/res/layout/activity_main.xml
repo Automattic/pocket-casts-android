@@ -68,12 +68,6 @@
             android:layout_height="wrap_content"
             android:translationZ="200dp"/>
 
-        <FrameLayout
-            android:id="@+id/fragmentOverBottomSheet"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:translationZ="300dp"/>
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <au.com.shiftyjelly.pocketcasts.views.component.RadioactiveLineView

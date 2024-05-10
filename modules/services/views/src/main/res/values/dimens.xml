@@ -1,6 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="profile_menu_size">36dp</dimen>
-    <dimen name="profile_badge_size">10dp</dimen>
-    <dimen name="profile_badge_horizontal_offset">16dp</dimen>
-    <dimen name="profile_badge_vertical_offset">8dp</dimen>
+    <dimen name="grid_item_padding">4dp</dimen>
+    <dimen name="grid_outer_padding">12dp</dimen>
 </resources>
