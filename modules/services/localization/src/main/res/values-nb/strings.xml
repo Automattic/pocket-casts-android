@@ -1332,7 +1332,6 @@ Language: nb_NO
     <string name="podcasts">Podcaster</string>
     <string name="player_started_from">Starter podcast fra %d sekunder</string>
     <string name="player_skipped_last">Hoppet over de siste %d sekundene</string>
-    <string name="player_sleep_time_fired">Tidtaker for dvalemodus stoppet ved slutten av episoden.\nNatt natt!</string>
     <string name="player_actions_show_as_delete_for_custom">Vises som sletting for egendefinerte episoder</string>
     <string name="player_actions_hidden_for_custom">Skjult for egendefinerte episoder</string>
     <string name="player_rearrange_actions_hidden">Flere handlinger</string>
@@ -1362,7 +1361,6 @@ Language: nb_NO
     <string name="player_sleep_cancel_timer">Avbryt tidtaker</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutter</string>
     <string name="player_sleep_60_minutes">60 minutter</string>
-    <string name="player_sleep_5_minutes">5 minutter</string>
     <string name="player_sleep_30_minutes">30 minutter</string>
     <string name="player_sleep_15_minutes">15 minutter</string>
     <string name="player_pip">Gå inn i bilde-i-bilde</string>
