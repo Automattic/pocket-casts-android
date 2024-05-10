@@ -133,7 +133,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         viewModel.podcast.observe(viewLifecycleOwner) { podcast ->
             val context = context ?: return@observe
 
-            val colors = ToolbarColors.Podcast(podcast = podcast, theme = theme)
+            val colors = ToolbarColors.podcast(podcast = podcast, theme = theme)
 
             preferenceFeedIssueDetected?.icon = context.getTintedDrawable(IR.drawable.ic_alert_small, colors.iconColor)
             preferenceFeedIssueDetected?.isVisible = podcast.refreshAvailable
@@ -264,8 +264,13 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
     private fun setupArchive() {
         preferenceAutoArchive?.setOnPreferenceClickListener {
-            viewModel.podcastUuid?.let { uuid ->
-                (activity as FragmentHostListener).addFragment(PodcastAutoArchiveFragment.newInstance(uuid))
+            viewModel.podcast.value?.let { podcast ->
+                (activity as FragmentHostListener).addFragment(
+                    PodcastAutoArchiveFragment.newInstance(
+                        podcast.uuid,
+                        ToolbarColors.podcast(podcast, theme),
+                    ),
+                )
             }
             true
         }
