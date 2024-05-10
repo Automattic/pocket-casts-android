@@ -66,17 +66,17 @@ fun FolderImage(
 ) {
     val cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
     val elevation = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
-    Card(
-        elevation = elevation,
-        shape = RoundedCornerShape(cornerRadius),
-        backgroundColor = color,
-        modifier = modifier
-            .aspectRatio(1f),
+    BoxWithConstraints(
+        contentAlignment = Alignment.Center,
     ) {
-        BoxWithConstraints(
-            contentAlignment = Alignment.Center,
+        val constraints = this
+        Card(
+            elevation = elevation,
+            shape = RoundedCornerShape(cornerRadius),
+            backgroundColor = color,
+            modifier = modifier
+                .aspectRatio(1f),
         ) {
-            val constraints = this
             Box(
                 modifier = Modifier
                     .background(
@@ -149,21 +149,21 @@ fun FolderImage(
                     )
                 }
             }
-            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-                CountBadge(
-                    count = badgeCount,
-                    style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Medium,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 6.dp, y = (-6).dp),
-                )
-            } else {
-                PodcastBadge(
-                    count = badgeCount,
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    badgeType = badgeType,
-                )
-            }
+        }
+        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+            CountBadge(
+                count = badgeCount,
+                style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Medium,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 6.dp, y = (-6).dp),
+            )
+        } else {
+            PodcastBadge(
+                count = badgeCount,
+                modifier = Modifier.align(Alignment.TopEnd),
+                badgeType = badgeType,
+            )
         }
     }
 }
