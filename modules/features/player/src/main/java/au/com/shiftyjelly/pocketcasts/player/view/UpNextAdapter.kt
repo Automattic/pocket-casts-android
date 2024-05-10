@@ -34,6 +34,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -58,7 +61,10 @@ class UpNextAdapter(
     private val playbackManager: PlaybackManager,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 3).themed()
+    private val imageRequestFactory = PocketCastsImageRequestFactory(
+        context,
+        cornerRadius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) 4 else 3,
+    ).themed()
 
     var isPlaying: Boolean = false
         set(value) {
@@ -161,14 +167,25 @@ class UpNextAdapter(
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
                 btnClear.isVisible = playbackManager.getCurrentEpisode() != null
                 lblUpNextTime.isVisible = playbackManager.getCurrentEpisode() != null
-                lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                lblUpNextTime.text = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    if (header.episodeCount == 0) {
+                        root.resources.getString(LR.string.player_up_next_time_left, time)
+                    } else {
+                        root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
+                    }
+                } else {
+                    root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                }
+
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
         }
     }
 
     inner class PlayingViewHolder(val binding: AdapterUpNextPlayingBinding) : RecyclerView.ViewHolder(binding.root) {
-        var loadedUuid: String? = null
+        private var loadedUuid: String? = null
+        private val cardCornerRadius: Float = 4.dpToPx(itemView.context.resources.displayMetrics).toFloat()
+        private val cardElevation: Float = 2.dpToPx(itemView.context.resources.displayMetrics).toFloat()
 
         init {
             binding.root.setOnClickListener {
@@ -201,6 +218,9 @@ class UpNextAdapter(
                 isVisible = isPlaying
                 applyColorFilter(ThemeColor.primaryText01(theme))
             }
+
+            binding.imageCardView.radius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardCornerRadius else 0f
+            binding.imageCardView.elevation = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardElevation else 0f
         }
     }
 

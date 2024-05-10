@@ -100,17 +100,30 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="72dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="16dp"
-            android:paddingEnd="16dp"
-            android:scaleType="centerInside"
+        <androidx.cardview.widget.CardView
+                android:id="@+id/imageCardView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginVertical="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/checkbox"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:scaleType="centerInside"
+                    tools:src="@tools:sample/avatars" />
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:id="@+id/imageSpacer"
+            android:layout_width="16dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/checkbox"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintStart_toEndOf="@+id/imageCardView"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/date"
@@ -121,7 +134,7 @@
             android:layout_marginEnd="16dp"
             android:paddingBottom="2dp"
             android:textAllCaps="true"
-            app:layout_constraintLeft_toRightOf="@+id/image"
+            app:layout_constraintLeft_toRightOf="@+id/imageSpacer"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="TODAY" />
@@ -137,7 +150,7 @@
             android:textAppearance="@style/DarkSubtitle1"
             app:layout_constraintBottom_toTopOf="@+id/info"
             app:layout_constraintEnd_toStartOf="@+id/reorder"
-            app:layout_constraintStart_toEndOf="@+id/image"
+            app:layout_constraintStart_toEndOf="@+id/imageSpacer"
             app:layout_constraintTop_toBottomOf="@+id/date"
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="Episode description" />
@@ -152,7 +165,7 @@
             app:tint="?attr/support_02"
             app:layout_constraintBottom_toBottomOf="@+id/info"
             app:layout_constraintEnd_toStartOf="@+id/info"
-            app:layout_constraintStart_toEndOf="@+id/image"
+            app:layout_constraintStart_toEndOf="@+id/imageSpacer"
             app:layout_constraintTop_toTopOf="@+id/info" />
 
         <TextView
@@ -184,4 +197,13 @@
             app:tint="?attr/primary_icon_02"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/dividerView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="?attr/primary_ui_05"
+        android:layout_marginHorizontal="16dp"
+        android:layout_gravity="bottom"/>
+
 </FrameLayout>

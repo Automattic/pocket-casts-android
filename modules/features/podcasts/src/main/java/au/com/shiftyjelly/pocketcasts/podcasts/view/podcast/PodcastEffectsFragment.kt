@@ -94,7 +94,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
         viewModel.podcast.observe(viewLifecycleOwner) { podcast ->
 
-            val colors = ToolbarColors.Podcast(podcast = podcast, theme = theme)
+            val colors = ToolbarColors.podcast(podcast = podcast, theme = theme)
 
             updateTintColor(colors.iconColor)
             toolbar.updateColors(toolbarColors = colors, navigationIcon = BackArrow)

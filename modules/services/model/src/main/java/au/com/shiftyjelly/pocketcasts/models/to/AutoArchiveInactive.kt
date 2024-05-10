@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import android.content.Context
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -10,24 +11,14 @@ sealed class AutoArchiveInactive(
     val serverId: Int,
     val index: Int,
     val analyticsValue: String,
+    @StringRes val stringRes: Int,
 ) {
     companion object {
         val All get() = listOf(Never, Hours24, Days2, Weeks1, Weeks2, Days30, Days90)
 
         val Default get() = Never
 
-        fun fromString(value: String?, context: Context): AutoArchiveInactive {
-            return when (value) {
-                context.getString(R.string.settings_auto_archive_inactive_never) -> Never
-                context.getString(R.string.settings_auto_archive_inactive_24_hours) -> Hours24
-                context.getString(R.string.settings_auto_archive_inactive_2_days) -> Days2
-                context.getString(R.string.settings_auto_archive_inactive_1_week) -> Weeks1
-                context.getString(R.string.settings_auto_archive_inactive_2_weeks) -> Weeks2
-                context.getString(R.string.settings_auto_archive_inactive_30_days) -> Days30
-                context.getString(R.string.settings_auto_archive_inactive_3_months) -> Days90
-                else -> Default
-            }
-        }
+        fun fromString(value: String?, context: Context) = All.find { context.getString(it.stringRes) == value } ?: Default
 
         fun fromServerId(id: Int) = All.find { it.serverId == id }
 
@@ -39,6 +30,7 @@ sealed class AutoArchiveInactive(
         serverId = 0,
         index = 0,
         analyticsValue = "never",
+        stringRes = R.string.settings_auto_archive_inactive_never,
     )
 
     data object Hours24 : AutoArchiveInactive(
@@ -46,6 +38,7 @@ sealed class AutoArchiveInactive(
         serverId = 1,
         index = 1,
         analyticsValue = "after_24_hours",
+        stringRes = R.string.settings_auto_archive_inactive_24_hours,
     )
 
     data object Days2 : AutoArchiveInactive(
@@ -53,6 +46,7 @@ sealed class AutoArchiveInactive(
         serverId = 2,
         index = 2,
         analyticsValue = "after_2_days",
+        stringRes = R.string.settings_auto_archive_inactive_2_days,
     )
 
     data object Weeks1 : AutoArchiveInactive(
@@ -60,6 +54,7 @@ sealed class AutoArchiveInactive(
         serverId = 3,
         index = 3,
         analyticsValue = "after_1_week",
+        stringRes = R.string.settings_auto_archive_inactive_1_week,
     )
 
     data object Weeks2 : AutoArchiveInactive(
@@ -67,6 +62,7 @@ sealed class AutoArchiveInactive(
         serverId = 4,
         index = 4,
         analyticsValue = "after_2_weeks",
+        stringRes = R.string.settings_auto_archive_inactive_2_weeks,
     )
 
     data object Days30 : AutoArchiveInactive(
@@ -74,6 +70,7 @@ sealed class AutoArchiveInactive(
         serverId = 5,
         index = 5,
         analyticsValue = "after_30_days",
+        stringRes = R.string.settings_auto_archive_inactive_30_days,
     )
 
     data object Days90 : AutoArchiveInactive(
@@ -81,5 +78,6 @@ sealed class AutoArchiveInactive(
         serverId = 6,
         index = 6,
         analyticsValue = "after_3_months",
+        stringRes = R.string.settings_auto_archive_inactive_3_months,
     )
 }
