@@ -67,30 +67,30 @@ class DataOpenHelper(
             db.execSQL("DROP TABLE playlist")
             // if the old version of the table create isn't used then the next migration breaks
             db.execSQL(
-                "CREATE TABLE playlists (" +
-                    "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "uuid VARCHAR," +
-                    "title VARCHAR," +
-                    "sortPosition INTEGER," +
-                    "manual INTEGER DEFAULT 0," +
-                    "unplayed INTEGER," +
-                    "partiallyPlayed INTEGER," +
-                    "finished INTEGER," +
-                    "audioVideo INTEGER," +
-                    "allPodcasts INTEGER," +
-                    "podcastUuids VARCHAR," +
-                    "downloaded INTEGER," +
-                    "downloading INTEGER," +
-                    "notDownloaded INTEGER," +
-                    "autoDownload INTEGER," +
-                    "autoDownloadWifiOnly INTEGER," +
-                    "autoDownloadPowerOnly INTEGER," +
-                    "sortId INTEGER," +
-                    "iconId INTEGER," +
-                    "starred INTEGER," +
-                    "deleted INTEGER DEFAULT 0," +
-                    "syncStatus INTEGER DEFAULT 0" +
-                    ")",
+                """
+                CREATE TABLE playlists (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                uuid VARCHAR,
+                title VARCHAR,
+                sortPosition INTEGER,
+                manual INTEGER DEFAULT 0,
+                unplayed INTEGER,
+                partiallyPlayed INTEGER,
+                finished INTEGER,
+                audioVideo INTEGER,
+                allPodcasts INTEGER,
+                podcastUuids VARCHAR,
+                downloaded INTEGER,
+                downloading INTEGER,
+                notDownloaded INTEGER,
+                autoDownload INTEGER,
+                autoDownloadWifiOnly INTEGER,
+                autoDownloadPowerOnly INTEGER,
+                sortId INTEGER,iconId INTEGER,
+                starred INTEGER,
+                deleted INTEGER DEFAULT 0,
+                syncStatus INTEGER DEFAULT 0)
+                """.trimIndent(),
             )
             addDefaultPlaylists(db)
             version = 9
@@ -99,14 +99,13 @@ class DataOpenHelper(
         if (version == 9) {
             with(db) {
                 execSQL(
-                    (
-                        "CREATE TABLE playlist_episodes (" +
-                            "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                            "playlist_id INTEGER," +
-                            "episode_uuid VARCHAR," +
-                            "position INTEGER" +
-                            ")"
-                        ),
+                    """
+                    CREATE TABLE playlist_episodes (
+                    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    playlist_id INTEGER,
+                    episode_uuid VARCHAR,
+                    position INTEGER)
+                    """.trimIndent(),
                 )
                 execSQL("ALTER TABLE podcast ADD COLUMN is_deleted INTEGER DEFAULT 0")
                 execSQL("ALTER TABLE podcast ADD COLUMN sync_status INTEGER DEFAULT 0")
@@ -131,14 +130,13 @@ class DataOpenHelper(
         if (version == 13) {
             db.execSQL("DROP TABLE IF EXISTS playlist_episodes")
             db.execSQL(
-                (
-                    "CREATE TABLE playlist_episodes (" +
-                        "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "playlistId INTEGER," +
-                        "episodeUuid VARCHAR," +
-                        "position INTEGER" +
-                        ")"
-                    ),
+                """
+                CREATE TABLE playlist_episodes (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                playlistId INTEGER,
+                episodeUuid VARCHAR,
+                position INTEGER)
+                """.trimIndent(),
             )
             version = 14
         }
@@ -533,115 +531,126 @@ class DataOpenHelper(
     companion object {
         private const val DATABASE_VERSION = 45
 
-        private const val PODCAST_TABLE_CREATE = "CREATE TABLE podcast (" +
-            "uuid VARCHAR PRIMARY KEY," +
-            "added_date INTEGER," +
-            "thumbnail_url VARCHAR," +
-            "title VARCHAR," +
-            "podcast_language VARCHAR," +
-            "podcast_category VARCHAR," +
-            "media_type VARCHAR," +
-            "podcast_description VARCHAR," +
-            "latest_episode_uuid VARCHAR," +
-            "latest_episode_date INTEGER," +
-            "playback_speed DECIMAL DEFAULT 1," +
-            "silence_removed INTEGER DEFAULT 0," +
-            "volume_boosted INTEGER DEFAULT 0," +
-            "is_deleted INTEGER DEFAULT 0," +
-            "sync_status INTEGER DEFAULT 0," +
-            "author VARCHAR," +
-            "is_folder INTEGER DEFAULT 0," +
-            "subscribed INTEGER DEFAULT 1," +
-            "podcast_url VARCHAR," +
-            "override_global_settings BOOLEAN DEFAULT 0," +
-            "episodes_to_keep INTEGER DEFAULT 0," +
-            "start_from INTEGER," +
-            "sort_order INTEGER," +
-            "episodes_sort_order INTEGER," +
-            "primary_color INTEGER," + // tintForLightBg
-            "secondary_color INTEGER," + // tintForDarkBg
-            "light_overlay_color INTEGER," + // fabForDarkBg
-            "most_popular_color INTEGER," + // background
-            "fab_for_light_bg INTEGER," + // fabForLightBg
-            "link_for_light_bg INTEGER," + // linkForLightBg
-            "link_for_dark_bg INTEGER," + // linkForDarkBg
-            "color_version INTEGER DEFAULT 0," +
-            "color_last_downloaded INTEGER," +
-            "auto_download_status INTEGER DEFAULT 0," +
-            "show_notifications INTEGER DEFAULT 0," +
-            "auto_add_to_up_next INTEGER DEFAULT 0)"
+        private const val PODCAST_TABLE_CREATE =
+            """
+            CREATE TABLE podcast (
+            uuid VARCHAR PRIMARY KEY,
+            added_date INTEGER,
+            thumbnail_url VARCHAR,
+            title VARCHAR,
+            podcast_language VARCHAR,
+            podcast_category VARCHAR,
+            media_type VARCHAR,
+            podcast_description VARCHAR,
+            latest_episode_uuid VARCHAR,
+            latest_episode_date INTEGER,
+            playback_speed DECIMAL DEFAULT 1,
+            silence_removed INTEGER DEFAULT 0,
+            volume_boosted INTEGER DEFAULT 0,
+            is_deleted INTEGER DEFAULT 0,
+            sync_status INTEGER DEFAULT 0,
+            author VARCHAR,is_folder INTEGER DEFAULT 0,
+            subscribed INTEGER DEFAULT 1,
+            podcast_url VARCHAR,
+            override_global_settings BOOLEAN DEFAULT 0,
+            episodes_to_keep INTEGER DEFAULT 0,
+            start_from INTEGER,sort_order INTEGER,
+            episodes_sort_order INTEGER,
+            primary_color INTEGER,
+            secondary_color INTEGER,
+            light_overlay_color INTEGER,
+            most_popular_color INTEGER,
+            fab_for_light_bg INTEGER,
+            link_for_light_bg INTEGER,
+            link_for_dark_bg INTEGER,
+            color_version INTEGER DEFAULT 0,
+            color_last_downloaded INTEGER,
+            auto_download_status INTEGER DEFAULT 0,
+            show_notifications INTEGER DEFAULT 0,
+            auto_add_to_up_next INTEGER DEFAULT 0)
+            """
 
-        private const val EPISODE_TABLE_CREATE = "CREATE TABLE episode (" +
-            "uuid VARCHAR PRIMARY KEY," +
-            "episode_status INTEGER," +
-            "playing_status INTEGER," +
-            "podcast_id VARCHAR," +
-            "published_date INTEGER," +
-            "duration DECIMAL," +
-            "size_in_bytes DECIMAL," +
-            "played_up_to DECIMAL," +
-            "download_url VARCHAR," +
-            "downloaded_file_path VARCHAR," +
-            "file_type VARCHAR," +
-            "title VARCHAR," +
-            "episode_description VARCHAR," +
-            "downloaded_error_details VARCHAR," +
-            "play_error_details VARCHAR," +
-            "is_deleted INTEGER DEFAULT 0," +
-            "auto_download_status INTEGER DEFAULT 0," +
-            "thumbnail_status INTEGER DEFAULT 0," +
-            "starred INTEGER DEFAULT 0," +
-            "added_date INTEGER," +
-            "playing_status_modified INTEGER," +
-            "played_up_to_modified INTEGER," +
-            "duration_modified INTEGER," +
-            "is_deleted_modified INTEGER," +
-            "starred_modified INTEGER," +
-            "last_download_attempt_date INTEGER DEFAULT 0)"
+        private const val EPISODE_TABLE_CREATE =
+            """
+            CREATE TABLE episode (
+            uuid VARCHAR PRIMARY KEY,
+            episode_status INTEGER,
+            playing_status INTEGER,
+            podcast_id VARCHAR,
+            published_date INTEGER,
+            duration DECIMAL,
+            size_in_bytes DECIMAL,
+            played_up_to DECIMAL,
+            download_url VARCHAR,
+            downloaded_file_path VARCHAR,
+            file_type VARCHAR,
+            title VARCHAR,
+            episode_description VARCHAR,
+            downloaded_error_details VARCHAR,
+            play_error_details VARCHAR,
+            is_deleted INTEGER DEFAULT 0,
+            auto_download_status INTEGER DEFAULT 0,
+            thumbnail_status INTEGER DEFAULT 0,
+            starred INTEGER DEFAULT 0,
+            added_date INTEGER,
+            playing_status_modified INTEGER,
+            played_up_to_modified INTEGER,
+            duration_modified INTEGER,
+            is_deleted_modified INTEGER,
+            starred_modified INTEGER,
+            last_download_attempt_date INTEGER DEFAULT 0)
+            """
 
-        private const val PLAYLIST_EPISODES_TABLE_CREATE = "CREATE TABLE playlist_episodes (" +
-            "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "playlistId INTEGER," +
-            "episodeUuid VARCHAR," +
-            "position INTEGER" +
-            ")"
+        private const val PLAYLIST_EPISODES_TABLE_CREATE =
+            """
+            CREATE TABLE playlist_episodes (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            playlistId INTEGER,
+            episodeUuid VARCHAR,
+            position INTEGER)
+            """
 
-        private const val PLAYLISTS_TABLE_CREATE = "CREATE TABLE playlists (" +
-            "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "uuid VARCHAR," +
-            "title VARCHAR," +
-            "sortPosition INTEGER," +
-            "manual INTEGER DEFAULT 0," +
-            "unplayed INTEGER," +
-            "partiallyPlayed INTEGER," +
-            "finished INTEGER," +
-            "audioVideo INTEGER," +
-            "allPodcasts INTEGER," +
-            "podcastUuids VARCHAR," +
-            "downloaded INTEGER," +
-            "downloading INTEGER," +
-            "notDownloaded INTEGER," +
-            "autoDownload INTEGER," +
-            "autoDownloadWifiOnly INTEGER," +
-            "autoDownloadIncludeHotspots INTEGER," +
-            "autoDownloadPowerOnly INTEGER," +
-            "sortId INTEGER," +
-            "iconId INTEGER," +
-            "starred INTEGER," +
-            "deleted INTEGER DEFAULT 0," +
-            "syncStatus INTEGER DEFAULT 0," +
-            "filterHours INTEGER DEFAULT 0" +
-            ")"
+        private const val PLAYLISTS_TABLE_CREATE =
+            """
+            CREATE TABLE playlists (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uuid VARCHAR,
+            title VARCHAR,
+            sortPosition INTEGER,
+            manual INTEGER DEFAULT 0,
+            unplayed INTEGER,
+            partiallyPlayed INTEGER,
+            finished INTEGER,
+            audioVideo INTEGER,
+            allPodcasts INTEGER,
+            podcastUuids VARCHAR,
+            downloaded INTEGER,
+            downloading INTEGER,
+            notDownloaded INTEGER,
+            autoDownload INTEGER,
+            autoDownloadWifiOnly INTEGER,
+            autoDownloadIncludeHotspots INTEGER,
+            autoDownloadPowerOnly INTEGER,
+            sortId INTEGER,
+            iconId INTEGER,
+            starred INTEGER,
+            deleted INTEGER DEFAULT 0,
+            syncStatus INTEGER DEFAULT 0,
+            filterHours INTEGER DEFAULT 0)
+            """
 
-        private const val PLAYER_EPISODES_TABLE_CREATE = "CREATE TABLE player_episodes (" +
-            "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "episodeUuid VARCHAR," +
-            "position INTEGER," +
-            "playlistId INTEGER," +
-            "title VARCHAR," +
-            "publishedDate INTEGER," +
-            "downloadUrl VARCHAR," +
-            "podcastUuid VARCHAR)"
+        private const val PLAYER_EPISODES_TABLE_CREATE =
+            """
+            CREATE TABLE player_episodes (
+            _id INTEGER PRIMARY KEY AUTOINCREMENT,
+            episodeUuid VARCHAR,
+            position INTEGER,
+            playlistId INTEGER,
+            title VARCHAR,
+            publishedDate INTEGER,
+            downloadUrl VARCHAR,
+            podcastUuid VARCHAR)
+            """
 
         private const val ADD_EPISODES_TO_KEEP_TO_PODCASTS = "ALTER TABLE podcast ADD COLUMN episodes_to_keep INTEGER DEFAULT 0"
 
