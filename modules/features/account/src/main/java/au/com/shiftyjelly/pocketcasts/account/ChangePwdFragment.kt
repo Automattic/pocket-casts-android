@@ -9,14 +9,19 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentChangePwdBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangePasswordError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangePasswordState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangePwdViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.DoneViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -25,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -36,6 +43,8 @@ class ChangePwdFragment : BaseFragment() {
             return ChangePwdFragment()
         }
     }
+
+    @Inject lateinit var settings: Settings
 
     private val viewModel: ChangePwdViewModel by viewModels()
     private val doneViewModel: DoneViewModel by activityViewModels()
@@ -158,6 +167,14 @@ class ChangePwdFragment : BaseFragment() {
             progress.isVisible = true
             UiUtil.hideKeyboard(txtPwdConfirm)
             viewModel.changePassword()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect { bottomInset ->
+                    binding.mainScrollView?.updatePadding(bottom = bottomInset)
+                }
+            }
         }
     }
 
