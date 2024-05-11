@@ -889,6 +889,14 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         viewModel.castConnected.observe(viewLifecycleOwner) { castConnected ->
             adapter?.castConnected = castConnected
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding?.episodesRecyclerView?.updatePadding(bottom = it)
+                }
+            }
+        }
     }
 
     /**
