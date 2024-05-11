@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -19,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
@@ -55,6 +59,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
     @Inject lateinit var podcastManager: PodcastManager
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject lateinit var settings: Settings
 
     private var preferenceFeedIssueDetected: Preference? = null
     private var preferenceNotifications: SwitchPreference? = null
@@ -187,6 +193,14 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             }
 
             preferenceAddToUpNextGlobal?.summary = getString(LR.string.podcast_settings_up_next_episode_limit, it.first) + "\n\n" + summary
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    view.updatePadding(bottom = it)
+                }
+            }
         }
 
         setupAddToUpNext()
