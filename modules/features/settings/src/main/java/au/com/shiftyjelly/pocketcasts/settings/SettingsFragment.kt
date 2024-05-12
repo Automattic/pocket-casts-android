@@ -11,12 +11,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -29,6 +34,9 @@ class SettingsFragment : BaseFragment() {
 
     @Inject
     lateinit var batteryRestrictions: SystemBatteryRestrictions
+
+    @Inject
+    lateinit var settings: Settings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,7 +65,7 @@ class SettingsFragment : BaseFragment() {
                         .subscribeAsState(null)
                         .value
                         ?.let { signInState ->
-
+                            val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
                             SettingsFragmentPage(
                                 signInState = signInState,
                                 onBackPressed = {
@@ -69,6 +77,7 @@ class SettingsFragment : BaseFragment() {
                                 openFragment = { fragment ->
                                     (activity as? FragmentHostListener)?.addFragment(fragment)
                                 },
+                                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                             )
                         }
                 }

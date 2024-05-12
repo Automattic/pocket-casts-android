@@ -4,9 +4,9 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -24,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.about.AboutFragment
+import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -42,6 +44,7 @@ fun SettingsFragmentPage(
     isUnrestrictedBattery: Boolean,
     onBackPressed: () -> Unit,
     openFragment: (Fragment) -> Unit,
+    bottomInset: Dp,
 ) {
     val context = LocalContext.current
     Column {
@@ -50,51 +53,81 @@ fun SettingsFragmentPage(
             bottomShadow = true,
             onNavigationClick = onBackPressed,
         )
-
-        Column(
-            Modifier
-                .verticalScroll(rememberScrollState())
+        LazyColumn(
+            contentPadding = PaddingValues(bottom = bottomInset),
+            modifier = Modifier
                 .background(MaterialTheme.theme.colors.primaryUi02)
                 .padding(vertical = 8.dp),
         ) {
             if (isDebug) {
-                DeveloperRow(onClick = { openFragment(au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment()) })
+                item {
+                    DeveloperRow(onClick = { openFragment(DeveloperFragment()) })
+                }
             }
 
             if (isDebug) {
-                BetaFeatures(onClick = { openFragment(BetaFeaturesFragment()) })
+                item {
+                    BetaFeatures(onClick = { openFragment(BetaFeaturesFragment()) })
+                }
             }
 
             if (!isUnrestrictedBattery && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                BatteryOptimizationRow(onClick = { openFragment(BatteryRestrictionsSettingsFragment.newInstance(closeButton = false)) })
+                item {
+                    BatteryOptimizationRow(onClick = { openFragment(BatteryRestrictionsSettingsFragment.newInstance(closeButton = false)) })
+                }
             }
 
             if (!signInState.isSignedIn || signInState.isSignedInAsFree) {
-                PlusRow(onClick = {
-                    OnboardingLauncher.openOnboardingFlow(
-                        context.getActivity(),
-                        OnboardingFlow.Upsell(
-                            OnboardingUpgradeSource.SETTINGS,
-                        ),
-                    )
-                })
+                item {
+                    PlusRow(onClick = {
+                        OnboardingLauncher.openOnboardingFlow(
+                            context.getActivity(),
+                            OnboardingFlow.Upsell(
+                                OnboardingUpgradeSource.SETTINGS,
+                            ),
+                        )
+                    })
+                }
             }
-
-            GeneralRow(onClick = { openFragment(PlaybackSettingsFragment()) })
-            NotificationRow(onClick = { openFragment(NotificationsSettingsFragment()) })
-            AppearanceRow(
-                isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
-                onClick = { openFragment(AppearanceSettingsFragment.newInstance()) },
-            )
-            StorageAndDataUseRow(onClick = { openFragment(StorageSettingsFragment()) })
-            AutoArchiveRow(onClick = { openFragment(AutoArchiveFragment()) })
-            AutoDownloadRow(onClick = { openFragment(AutoDownloadSettingsFragment.newInstance()) })
-            AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
-            HeadphoneControlsRow(onClick = { openFragment(HeadphoneControlsSettingsFragment()) })
-            ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
-            AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
-            PrivacyRow(onClick = { openFragment(PrivacyFragment()) })
-            AboutRow(onClick = { openFragment(AboutFragment()) })
+            item {
+                GeneralRow(onClick = { openFragment(PlaybackSettingsFragment()) })
+            }
+            item {
+                NotificationRow(onClick = { openFragment(NotificationsSettingsFragment()) })
+            }
+            item {
+                AppearanceRow(
+                    isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
+                    onClick = { openFragment(AppearanceSettingsFragment.newInstance()) },
+                )
+            }
+            item {
+                StorageAndDataUseRow(onClick = { openFragment(StorageSettingsFragment()) })
+            }
+            item {
+                AutoArchiveRow(onClick = { openFragment(AutoArchiveFragment()) })
+            }
+            item {
+                AutoDownloadRow(onClick = { openFragment(AutoDownloadSettingsFragment.newInstance()) })
+            }
+            item {
+                AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
+            }
+            item {
+                HeadphoneControlsRow(onClick = { openFragment(HeadphoneControlsSettingsFragment()) })
+            }
+            item {
+                ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
+            }
+            item {
+                AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
+            }
+            item {
+                PrivacyRow(onClick = { openFragment(PrivacyFragment()) })
+            }
+            item {
+                AboutRow(onClick = { openFragment(AboutFragment()) })
+            }
         }
     }
 }
@@ -275,6 +308,7 @@ private fun SettingsPagePreview(@PreviewParameter(ThemePreviewParameterProvider:
             isUnrestrictedBattery = false,
             onBackPressed = {},
             openFragment = {},
+            bottomInset = 0.dp,
         )
     }
 }
