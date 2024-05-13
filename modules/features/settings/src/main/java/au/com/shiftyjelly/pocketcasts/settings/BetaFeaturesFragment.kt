@@ -68,7 +68,7 @@ class BetaFeaturesFragment : BaseFragment() {
         val viewModel = hiltViewModel<BetaFeaturesViewModel>()
         val state by viewModel.state.collectAsState()
         LazyColumn(
-            contentPadding = PaddingValues(bottom = bottomInset)
+            contentPadding = PaddingValues(bottom = bottomInset),
         ) {
             item {
                 ThemedTopAppBar(
