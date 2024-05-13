@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix pull to refresh icon sometimes being stuck in a loading state
         ([#2164](https://github.com/Automattic/pocket-casts-android/pull/2164))
+    *   Fix cases where podcasts were ignoring 'Never archive' setting in some cases
+        ([#2194](https://github.com/Automattic/pocket-casts-android/pull/2194))
 
 7.63
 -----

@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -624,14 +626,9 @@ class EpisodeManagerImpl @Inject constructor(
             if (episode !is PodcastEpisode) return@launch
             // check if we are meant to archive after episode is played
             val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
-            val podcastOverrideSettings = podcast.overrideGlobalArchive
-            val podcastArchiveAfterPlaying = podcast.autoArchiveAfterPlaying
+            val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
 
-            val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcastOverrideSettings, podcastArchiveAfterPlaying)
-
-            if (shouldArchiveBasedOnSettings &&
-                (settings.autoArchiveIncludesStarred.value || !episode.isStarred)
-            ) {
+            if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying && (settings.autoArchiveIncludesStarred.value || !episode.isStarred)) {
                 if (sync) {
                     episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
                 } else {
@@ -643,12 +640,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    private fun shouldArchiveBasedOnSettings(podcastOverrideSettings: Boolean, podcastArchiveAfterPlaying: AutoArchiveAfterPlaying) =
-        (
-            (!podcastOverrideSettings && settings.autoArchiveAfterPlaying.value == AutoArchiveAfterPlaying.AfterPlaying) ||
-                (podcastArchiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying)
-            )
-
     @Suppress("NAME_SHADOWING")
     private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
         val episodesWithoutStarred = if (!settings.autoArchiveIncludesStarred.value) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
@@ -656,10 +647,9 @@ class EpisodeManagerImpl @Inject constructor(
 
         for ((podcastUuid, episodes) in episodesByPodcast) {
             val podcast = podcastManager.findPodcastByUuid(podcastUuid) ?: continue
-            val podcastArchiveAfterPlaying = podcast.autoArchiveAfterPlaying
-            val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcast.overrideGlobalSettings, podcastArchiveAfterPlaying)
+            val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
 
-            if (shouldArchiveBasedOnSettings) {
+            if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying) {
                 archiveAllInList(episodes, playbackManager)
             }
         }
@@ -720,6 +710,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    @OptIn(UnstableApi::class)
     override fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean) {
         episode ?: return
         val messageId: Int
@@ -913,9 +904,8 @@ class EpisodeManagerImpl @Inject constructor(
     override fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?) {
         val now = Date()
 
-        val podcastArchivePlaying = podcast.autoArchiveAfterPlaying
-        val autoArchiveSetting = if (podcast.overrideGlobalArchive) podcastArchivePlaying else settings.autoArchiveAfterPlaying.value
-        val autoArchiveAfterPlayingTime = autoArchiveSetting.timeSeconds * 1000L
+        val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
+        val autoArchiveAfterPlayingTime = archiveAfterPlaying.timeSeconds * 1000L
 
         if (autoArchiveAfterPlayingTime > 0) {
             val playedEpisodes = episodeDao.findByEpisodePlayingAndArchiveStatus(podcast.uuid, EpisodePlayingStatus.COMPLETED, false)
@@ -933,10 +923,9 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
 
-        val podcastInactiveSetting = podcast.autoArchiveInactive
-        val inactiveSetting = if (podcast.overrideGlobalArchive) podcastInactiveSetting else settings.autoArchiveInactive.value
+        val autoArchiveInactive = podcast.autoArchiveInactive ?: settings.autoArchiveInactive.value
 
-        val inactiveTime = inactiveSetting.timeSeconds * 1000L
+        val inactiveTime = autoArchiveInactive.timeSeconds * 1000L
         if (inactiveTime > 0) {
             val inactiveEpisodes = episodeDao.findInactiveEpisodes(podcast.uuid, Date(now.time - inactiveTime))
                 .filter { settings.autoArchiveIncludesStarred.value || !it.isStarred }

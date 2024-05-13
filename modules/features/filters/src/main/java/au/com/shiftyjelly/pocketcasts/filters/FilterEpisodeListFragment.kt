@@ -551,7 +551,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         val binding = binding ?: return
 
         val toolbar = binding.toolbar
-        val colors = ToolbarColors.User(color = color, theme = theme)
+        val colors = ToolbarColors.user(color = color, theme = theme)
         setupToolbarAndStatusBar(
             toolbar = toolbar,
             navigationIcon = BackArrow,

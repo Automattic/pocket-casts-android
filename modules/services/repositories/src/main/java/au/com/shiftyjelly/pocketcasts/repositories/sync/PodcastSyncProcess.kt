@@ -1148,13 +1148,17 @@ class PodcastSyncProcess(
                             value = boolValue { value = podcast.overrideGlobalArchive }
                             modifiedAt = podcast.overrideGlobalArchiveModified.toProtobufTimestampOrFallback()
                         }
-                        autoArchivePlayed = int32Setting {
-                            value = int32Value { value = podcast.autoArchiveAfterPlaying.serverId }
-                            modifiedAt = podcast.autoArchiveAfterPlayingModified.toProtobufTimestampOrFallback()
+                        podcast.autoArchiveAfterPlaying?.serverId?.let { serverId ->
+                            autoArchivePlayed = int32Setting {
+                                value = int32Value { value = serverId }
+                                modifiedAt = podcast.autoArchiveAfterPlayingModified.toProtobufTimestampOrFallback()
+                            }
                         }
-                        autoArchiveInactive = int32Setting {
-                            value = int32Value { value = podcast.autoArchiveInactive.serverId }
-                            modifiedAt = podcast.autoArchiveInactiveModified.toProtobufTimestampOrFallback()
+                        podcast.autoArchiveInactive?.serverId?.let { serverId ->
+                            autoArchiveInactive = int32Setting {
+                                value = int32Value { value = serverId }
+                                modifiedAt = podcast.autoArchiveInactiveModified.toProtobufTimestampOrFallback()
+                            }
                         }
                         autoArchiveEpisodeLimit = int32Setting {
                             value = int32Value { value = podcast.autoArchiveEpisodeLimit ?: 0 }
