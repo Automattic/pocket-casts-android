@@ -8,7 +8,9 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
@@ -29,13 +31,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -54,10 +59,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -95,6 +101,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     ): View = ComposeView(requireContext()).apply {
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
+                val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
                 PlaybackSettings(
                     settings = settings,
                     scrollToAutoPlay = arguments?.getBoolean(ARG_SCROLL_TO_AUTOPLAY) ?: false,
@@ -102,6 +109,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
                     },
+                    bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                 )
             }
         }
@@ -112,6 +120,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         settings: Settings,
         scrollToAutoPlay: Boolean,
         onBackClick: () -> Unit,
+        bottomInset: Dp,
     ) {
         LaunchedEffect(Unit) {
             analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_SHOWN)
@@ -135,28 +144,32 @@ class PlaybackSettingsFragment : BaseFragment() {
                 onNavigationClick = onBackClick,
                 bottomShadow = true,
             )
-            Column(
+            LazyColumn(
                 modifier = Modifier
-                    .background(MaterialTheme.theme.colors.primaryUi02)
-                    .verticalScroll(scrollState),
+                    .background(MaterialTheme.theme.colors.primaryUi02),
+                contentPadding = PaddingValues(bottom = bottomInset),
             ) {
-                SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {
-                    RowAction(
-                        saved = settings.streamingMode.flow.collectAsState().value,
-                        onSave = {
-                            analyticsTracker.track(
-                                AnalyticsEvent.SETTINGS_GENERAL_ROW_ACTION_CHANGED,
-                                mapOf(
-                                    "value" to when (it) {
-                                        true -> "play"
-                                        false -> "download"
-                                    },
-                                ),
-                            )
-                            settings.streamingMode.set(it, updateModifiedAt = true)
-                        },
-                    )
+                item {
+                    SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {
+                        RowAction(
+                            saved = settings.streamingMode.flow.collectAsState().value,
+                            onSave = {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.SETTINGS_GENERAL_ROW_ACTION_CHANGED,
+                                    mapOf(
+                                        "value" to when (it) {
+                                            true -> "play"
+                                            false -> "download"
+                                        },
+                                    ),
+                                )
+                                settings.streamingMode.set(it, updateModifiedAt = true)
+                            },
+                        )
+                    }
+                }
 
+                item {
                     UpNextSwipe(
                         saved = settings.upNextSwipe.flow.collectAsState().value,
                         onSave = {
@@ -172,7 +185,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                             settings.upNextSwipe.set(it, updateModifiedAt = true)
                         },
                     )
-
+                }
+                item {
                     PodcastEpisodeGrouping(
                         saved = settings.podcastGroupingDefault.flow.collectAsState().value,
                         onSave = {
@@ -192,7 +206,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                             showSetAllGroupingDialog(it)
                         },
                     )
-
+                }
+                item {
                     ShowArchived(
                         saved = settings.showArchivedDefault.flow.collectAsState().value,
                         onSave = {
@@ -209,7 +224,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                             showSetAllArchiveDialog(it)
                         },
                     )
-
+                }
+                item {
                     SettingRow(
                         primaryText = stringResource(LR.string.settings_media_notification_controls),
                         secondaryText = stringResource(LR.string.settings_customize_buttons_displayed_in_android_13_notification_and_android_auto),
@@ -219,22 +235,26 @@ class PlaybackSettingsFragment : BaseFragment() {
                     )
                 }
 
-                SettingSection(heading = stringResource(LR.string.settings_general_player)) {
-                    // Skip forward time
-                    SkipTime(
-                        primaryText = stringResource(LR.string.settings_skip_forward_time),
-                        saved = settings.skipForwardInSecs.flow
-                            .collectAsState()
-                            .value,
-                        onSave = {
-                            analyticsTracker.track(
-                                AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
-                                mapOf("value" to it),
-                            )
-                            settings.skipForwardInSecs.set(it, updateModifiedAt = true)
-                        },
-                    )
+                item {
+                    SettingSection(heading = stringResource(LR.string.settings_general_player)) {
+                        // Skip forward time
+                        SkipTime(
+                            primaryText = stringResource(LR.string.settings_skip_forward_time),
+                            saved = settings.skipForwardInSecs.flow
+                                .collectAsState()
+                                .value,
+                            onSave = {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
+                                    mapOf("value" to it),
+                                )
+                                settings.skipForwardInSecs.set(it, updateModifiedAt = true)
+                            },
+                        )
+                    }
+                }
 
+                item {
                     // Skip back time
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_back_time),
@@ -247,7 +267,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                             settings.skipBackInSecs.set(it, updateModifiedAt = true)
                         },
                     )
-
+                }
+                item {
                     KeepScreenAwake(
                         saved = settings.keepScreenAwake.flow.collectAsState().value,
                         onSave = {
@@ -258,7 +279,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                             settings.keepScreenAwake.set(it, updateModifiedAt = true)
                         },
                     )
-
+                }
+                item {
                     OpenPlayerAutomatically(
                         saved = settings.openPlayerAutomatically.flow.collectAsState().value,
                         onSave = {
@@ -269,7 +291,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                             settings.openPlayerAutomatically.set(it, updateModifiedAt = true)
                         },
                     )
-
+                }
+                item {
                     IntelligentPlaybackResumption(
                         saved = settings.intelligentPlaybackResumption.flow.collectAsState().value,
                         onSave = {
@@ -280,7 +303,8 @@ class PlaybackSettingsFragment : BaseFragment() {
                             settings.intelligentPlaybackResumption.set(it, updateModifiedAt = true)
                         },
                     )
-
+                }
+                item {
                     PlayUpNextOnTap(
                         saved = settings.tapOnUpNextShouldPlay.flow.collectAsState().value,
                         onSave = {
@@ -291,7 +315,9 @@ class PlaybackSettingsFragment : BaseFragment() {
                             settings.tapOnUpNextShouldPlay.set(it, updateModifiedAt = true)
                         },
                     )
+                }
 
+                item {
                     // The [scrollToAutoPlay] fragment argument handling depends on this item being last
                     // in the list. If it's position is changed, make sure you update the handling when
                     // we scroll to this item as well.
