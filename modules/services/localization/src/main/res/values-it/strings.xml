@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-23 11:54:03+0000
+Translation-Revision-Date: 2024-05-08 09:54:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">Timer di sospensione interrotto alla fine del capitolo.</string>
+    <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
+    <string name="player_sleep_in_one_chapter">Spegnimento tra 1 capitolo</string>
+    <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>
+    <string name="player_sleep_timer_in_chapter">Tra 1 capitolo</string>
+    <string name="player_sleep_timer_in_episode_plural">Tra %d episodi</string>
+    <string name="player_sleep_timer_in_episode">Tra 1 episodio</string>
+    <string name="settings_use_episode_artwork_customization_description">Seleziona se desideri vedere la grafica dell\'episodio in queste sezioni dell\'app</string>
+    <string name="settings_use_episode_artwork_customization_section">Personalizzazione</string>
+    <string name="settings_use_episode_artwork_title">Grafica dell\'episodio</string>
+    <string name="settings_use_episode_artwork_advanced">Impostazioni avanzate grafica dell\'episodio</string>
+    <string name="player_sleep_in_episodes">In sospensione in %d episodi</string>
+    <string name="player_sleep_in_one_episode">In sospensione in 1 episodio</string>
     <string name="player_sleep_timer_stopped_your_podcast">L\'autospegnimento ha interrotto il tuo podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Autospegnimento riavviato dopo un movimento del dispositivo</string>
     <string name="whats_new_new_widgets_message">Con due nuove dimensioni e un design aggiornato, la gestione dei podcast dalla schermata iniziale ora è molto più facile. Dai un\'occhiata.</string>
@@ -1453,7 +1466,6 @@ Language: it
     <string name="podcasts">Podcast</string>
     <string name="player_started_from">Avvio del podcast da %d secondi</string>
     <string name="player_skipped_last">Ultimi %d secondi saltati</string>
-    <string name="player_sleep_time_fired">L\'autospegnimento si è interrotto alla fine dell\'episodio.\nBuonanotte!</string>
     <string name="player_actions_show_as_delete_for_custom">Visualizzato come Elimina per episodi personalizzati</string>
     <string name="player_actions_hidden_for_custom">Nascosto per episodi personalizzati</string>
     <string name="player_rearrange_actions_hidden">Altre azioni</string>
@@ -1483,7 +1495,6 @@ Language: it
     <string name="player_sleep_cancel_timer">Annulla timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuti</string>
     <string name="player_sleep_60_minutes">60 minuti</string>
-    <string name="player_sleep_5_minutes">5 minuti</string>
     <string name="player_sleep_30_minutes">30 minuti</string>
     <string name="player_sleep_15_minutes">15 minuti</string>
     <string name="player_pip">Inserisci l\'immagine nell\'immagine</string>

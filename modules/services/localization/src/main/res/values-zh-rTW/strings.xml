@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-23 09:54:03+0000
+Translation-Revision-Date: 2024-05-08 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">睡眠計時器於章節結尾停止。</string>
+    <string name="player_sleep_in_chapters">在 %d 個章節後休眠</string>
+    <string name="player_sleep_in_one_chapter">在 1 個章節後休眠</string>
+    <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>
+    <string name="player_sleep_timer_in_chapter">1 個章節後</string>
+    <string name="player_sleep_timer_in_episode_plural">%d 集後</string>
+    <string name="player_sleep_timer_in_episode">1 集後</string>
+    <string name="settings_use_episode_artwork_customization_description">若想在應用程式的這些區段中查看單集封面圖片，請選取</string>
+    <string name="settings_use_episode_artwork_customization_section">自訂項目</string>
+    <string name="settings_use_episode_artwork_title">單集封面圖片</string>
+    <string name="settings_use_episode_artwork_advanced">進階單集封面圖片設定</string>
+    <string name="player_sleep_in_episodes">在 %d 集後休眠</string>
+    <string name="player_sleep_in_one_episode">在 1 集後休眠</string>
     <string name="player_sleep_timer_stopped_your_podcast">睡眠計時器停止播放 Podcast。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">裝置晃動後重新啟動睡眠計時器</string>
     <string name="whats_new_new_widgets_message">搭載兩種新尺寸和更新版設計，讓你從主畫面管理 Podcast 變得更加簡單。 不妨探索一下！</string>
@@ -1453,7 +1466,6 @@ Language: zh_TW
     <string name="podcasts">Podcast 節目</string>
     <string name="player_started_from">從第 %d 秒開始播放 Podcast</string>
     <string name="player_skipped_last">跳過最後 %d 秒</string>
-    <string name="player_sleep_time_fired">睡眠計時器已在單集結束時停止。\n祝好夢！</string>
     <string name="player_actions_show_as_delete_for_custom">對自訂單集顯示為刪除</string>
     <string name="player_actions_hidden_for_custom">對自訂單集隱藏</string>
     <string name="player_rearrange_actions_hidden">更多動作</string>
@@ -1483,7 +1495,6 @@ Language: zh_TW
     <string name="player_sleep_cancel_timer">取消計時器</string>
     <string name="player_sleep_add_5_minutes">+ 5 分鐘</string>
     <string name="player_sleep_60_minutes">60 分鐘</string>
-    <string name="player_sleep_5_minutes">5 分鐘</string>
     <string name="player_sleep_30_minutes">30 分鐘</string>
     <string name="player_sleep_15_minutes">15 分鐘</string>
     <string name="player_pip">進入子母畫面</string>

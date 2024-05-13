@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-23 09:54:03+0000
+Translation-Revision-Date: 2024-05-08 09:54:09+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">スリープタイマーがチャプターの最後で停止しました。</string>
+    <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
+    <string name="player_sleep_in_one_chapter">1個のチャプターでスリープ中</string>
+    <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>
+    <string name="player_sleep_timer_in_chapter">1個のチャプター</string>
+    <string name="player_sleep_timer_in_episode_plural">%d件のエピソード</string>
+    <string name="player_sleep_timer_in_episode">1件のエピソード</string>
+    <string name="settings_use_episode_artwork_customization_description">アプリのこれらのセクションでエピソードのアートワークを表示する場合に選択します</string>
+    <string name="settings_use_episode_artwork_customization_section">カスタマイズ</string>
+    <string name="settings_use_episode_artwork_title">エピソードのアートワーク</string>
+    <string name="settings_use_episode_artwork_advanced">エピソードのアートワークの詳細設定</string>
+    <string name="player_sleep_in_episodes">%dエピソードでスリープ</string>
+    <string name="player_sleep_in_one_episode">1エピソードでスリープ</string>
     <string name="player_sleep_timer_stopped_your_podcast">スリープタイマーにより、ポッドキャストが停止しました。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">端末を振った後、スリープタイマーが再開しました</string>
     <string name="whats_new_new_widgets_message">2つの新しいサイズが加わりデザインが一新されたことで、ホーム画面からのポッドキャストの管理がはるかに簡単になりました。 ぜひお試しください。</string>
@@ -1453,7 +1466,6 @@ Language: ja_JP
     <string name="podcasts">ポッドキャスト</string>
     <string name="player_started_from">%d秒からポッドキャストを開始中</string>
     <string name="player_skipped_last">最後の%d秒をスキップしました</string>
-    <string name="player_sleep_time_fired">スリープタイマーがエピソードの最後で停止しました。\nおやすみなさい。</string>
     <string name="player_actions_show_as_delete_for_custom">カスタムエピソードで削除と表示</string>
     <string name="player_actions_hidden_for_custom">カスタムエピソードで非表示</string>
     <string name="player_rearrange_actions_hidden">その他の操作</string>
@@ -1483,7 +1495,6 @@ Language: ja_JP
     <string name="player_sleep_cancel_timer">タイマーをキャンセル</string>
     <string name="player_sleep_add_5_minutes">+ 5分</string>
     <string name="player_sleep_60_minutes">60分</string>
-    <string name="player_sleep_5_minutes">5分</string>
     <string name="player_sleep_30_minutes">30分</string>
     <string name="player_sleep_15_minutes">15分</string>
     <string name="player_pip">ピクチャーインピクチャーに切り替え</string>

@@ -945,6 +945,10 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD)
     }
 
+    override fun getRefreshPodcastsBatchSize(): Long {
+        return getRemoteConfigLong(FirebaseConfig.REFRESH_PODCASTS_BATCH_SIZE)
+    }
+
     private fun getRemoteConfigLong(key: String): Long {
         val value = firebaseRemoteConfig.getLong(key)
         return if (value == 0L) (FirebaseConfig.defaults[key] as? Long ?: 0L) else value

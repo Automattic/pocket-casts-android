@@ -125,7 +125,8 @@ open class ServerManager @Inject constructor(
     }
 
     suspend fun refreshPodcastsSync(podcasts: List<Podcast>): Result<RefreshResponse?> {
-        val batcher = RefreshPodcastBatcher(batchSize = 200)
+        val batchSize = settings.getRefreshPodcastsBatchSize().coerceIn(100L, Int.MAX_VALUE.toLong()).toInt()
+        val batcher = RefreshPodcastBatcher(batchSize)
         return batcher.refreshPodcasts(podcasts) { parameters ->
             suspendCancellableCoroutine { continuation ->
                 val call = postToMainServer(

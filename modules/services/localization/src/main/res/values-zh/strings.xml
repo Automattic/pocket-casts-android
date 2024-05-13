@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-23 09:54:03+0000
+Translation-Revision-Date: 2024-05-08 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">睡眠定时器在章节结束时停止。</string>
+    <string name="player_sleep_in_chapters">%d 个章节后进入睡眠状态</string>
+    <string name="player_sleep_in_one_chapter">1 个章节后进入睡眠状态</string>
+    <string name="player_sleep_timer_in_chapter_plural">%d 个章节后</string>
+    <string name="player_sleep_timer_in_chapter">1 个章节后</string>
+    <string name="player_sleep_timer_in_episode_plural">%d 集后</string>
+    <string name="player_sleep_timer_in_episode">1 集后</string>
+    <string name="settings_use_episode_artwork_customization_description">选择是否要在应用程序的这些部分查看剧集插图</string>
+    <string name="settings_use_episode_artwork_customization_section">自定义</string>
+    <string name="settings_use_episode_artwork_title">剧集插图</string>
+    <string name="settings_use_episode_artwork_advanced">高级剧集插图设置</string>
+    <string name="player_sleep_in_episodes">%d 集后进入睡眠状态</string>
+    <string name="player_sleep_in_one_episode">1 集后进入睡眠状态</string>
     <string name="player_sleep_timer_stopped_your_podcast">睡眠计时器让您的播客停止了播放。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">摇晃设备后睡眠计时器重新启动</string>
     <string name="whats_new_new_widgets_message">我们新增两种尺寸，设计也进行了更新，让您可以更轻松地从主屏幕管理您的播客。 敬请查看！</string>
@@ -1453,7 +1466,6 @@ Language: zh_CN
     <string name="podcasts">播客</string>
     <string name="player_started_from">从 %d 秒开始制作播客</string>
     <string name="player_skipped_last">已跳过最后 %d 秒</string>
-    <string name="player_sleep_time_fired">睡眠计时器在您剧集结束时停止。\n夜晚！</string>
     <string name="player_actions_show_as_delete_for_custom">对自定义剧集显示为删除</string>
     <string name="player_actions_hidden_for_custom">对自定义剧集隐藏</string>
     <string name="player_rearrange_actions_hidden">更多操作</string>
@@ -1483,7 +1495,6 @@ Language: zh_CN
     <string name="player_sleep_cancel_timer">取消计时器</string>
     <string name="player_sleep_add_5_minutes">+5 分钟</string>
     <string name="player_sleep_60_minutes">60 分钟</string>
-    <string name="player_sleep_5_minutes">5 分钟</string>
     <string name="player_sleep_30_minutes">30 分钟</string>
     <string name="player_sleep_15_minutes">15 分钟</string>
     <string name="player_pip">输入画中画</string>
