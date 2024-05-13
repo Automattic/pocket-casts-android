@@ -17,8 +17,11 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -109,6 +112,14 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
 
         view.findViewById<Button>(VR.id.btnContactSupport).setOnClickListener {
             contactSupport()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    view?.updatePadding(bottom = it)
+                }
+            }
         }
 
         return view

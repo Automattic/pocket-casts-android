@@ -12,12 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -30,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -101,6 +105,7 @@ class BookmarksFragment : BaseFragment() {
                         .collectAsState(initial = null)
 
                     val episodeUuid = episodeUuid(listData)
+                    val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                     BookmarksPage(
                         episodeUuid = episodeUuid,
                         backgroundColor = backgroundColor(listData),
@@ -129,6 +134,11 @@ class BookmarksFragment : BaseFragment() {
                                 addFragment(SettingsFragment())
                                 addFragment(fragment)
                             }
+                        },
+                        bottomInset = if (sourceView == SourceView.PROFILE) {
+                            0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
+                        } else {
+                            28.dp
                         },
                     )
                 }

@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.request.Disposable
 import com.airbnb.lottie.LottieDrawable
@@ -55,8 +57,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     init {
         // open full screen player on click
-        binding.root.setOnClickListener { openPlayer() }
-        binding.root.setOnLongClickListener {
+        binding.miniPlayerCardView.setOnClickListener { openPlayer() }
+        binding.miniPlayerCardView.setOnLongClickListener {
             clickListener?.onLongClick()
             true
         }
@@ -67,6 +69,40 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.skipForward.setOnClickListener { skipForwardClicked() }
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
+
+        val elevation = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_elevation) else 0f
+        binding.miniPlayerCardView.elevation = elevation
+        val cornerRadius = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_corner_radius) else 0f
+        binding.miniPlayerCardView.radius = cornerRadius
+        val margin = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_margin).toInt() else 0
+        (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
+
+        val playBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.drawable.mini_player_play_background_32
+        } else {
+            R.drawable.mini_player_play_background_48
+        }
+        binding.miniPlayButton.background = ContextCompat.getDrawable(context, playBackground)
+        val playButtonLottieBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.raw.mini_player_play_button_32
+        } else {
+            R.raw.mini_player_play_button_48
+        }
+        binding.miniPlayButton.setAnimation(playButtonLottieBackground)
+
+        val skipButtonSize = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.dimen.mini_player_skip_button_size_56
+        } else {
+            R.dimen.mini_player_skip_button_size_68
+        }
+        with(binding.skipBack.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
+        with(binding.skipForward.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
 
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {

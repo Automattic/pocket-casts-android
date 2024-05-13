@@ -29,7 +29,7 @@ fun Toolbar.setup(
     onNavigationClick: (() -> Unit)? = null,
     activity: Activity?,
     theme: Theme,
-    toolbarColors: ToolbarColors? = ToolbarColors.Theme(theme = theme, context = context),
+    toolbarColors: ToolbarColors? = ToolbarColors.theme(theme = theme, context = context),
 ) {
     if (title != null) {
         setTitle(title)

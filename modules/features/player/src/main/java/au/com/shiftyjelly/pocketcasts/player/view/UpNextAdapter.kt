@@ -198,7 +198,6 @@ class UpNextAdapter(
             Timber.d("Playing state episode: ${playingState.episode.playedUpTo}")
             binding.chapterProgress.theme = theme
             binding.chapterProgress.progress = playingState.progressPercent
-            binding.chapterProgress.isVisible = playingState.progressPercent > 0
             binding.title.text = playingState.episode.title
             binding.downloaded.isVisible = playingState.episode.isDownloaded
             binding.info.setEpisodeTimeLeft(playingState.episode)
@@ -208,7 +207,7 @@ class UpNextAdapter(
                 showDuration = false,
                 context = binding.date.context,
             )
-            binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
+            binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryText01(theme))
 
             if (loadedUuid != playingState.episode.uuid) {
                 imageRequestFactory.create(playingState.episode, settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext)).loadInto(binding.image)

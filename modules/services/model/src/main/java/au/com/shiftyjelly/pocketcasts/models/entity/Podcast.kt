@@ -210,9 +210,7 @@ data class Podcast(
     var autoArchiveEpisodeLimit: Int?
         get() = rawAutoArchiveEpisodeLimit.takeIf { overrideGlobalArchive }
         set(value) {
-            if (value != null) {
-                rawAutoArchiveEpisodeLimit = value
-            }
+            rawAutoArchiveEpisodeLimit = value
         }
 
     enum class Licensing {
@@ -248,10 +246,12 @@ data class Podcast(
         }
     }
 
+    fun lightThemeTint() = if (tintColorForLightBg != 0 && tintColorForLightBg != DEFAULT_SERVER_LIGHT_TINT_COLOR) tintColorForLightBg else DEFAULT_LIGHT_TINT
+
+    fun darkThemeTint() = if (tintColorForDarkBg != 0 && tintColorForDarkBg != DEFAULT_SERVER_DARK_TINT_COLOR) tintColorForDarkBg else DEFAULT_DARK_TINT
+
     fun getTintColor(isDarkTheme: Boolean): Int {
-        val lightThemeColor = if (tintColorForLightBg != 0 && tintColorForLightBg != DEFAULT_SERVER_LIGHT_TINT_COLOR) tintColorForLightBg else DEFAULT_LIGHT_TINT
-        val darkThemeColor = if (tintColorForDarkBg != 0 && tintColorForDarkBg != DEFAULT_SERVER_DARK_TINT_COLOR) tintColorForDarkBg else DEFAULT_DARK_TINT
-        return if (isDarkTheme) darkThemeColor else lightThemeColor
+        return if (isDarkTheme) darkThemeTint() else lightThemeTint()
     }
 
     fun getPlayerTintColor(isDarkTheme: Boolean): Int {

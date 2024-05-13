@@ -7,7 +7,10 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -87,6 +90,14 @@ class NotificationsSettingsFragment :
         super.onViewCreated(view, savedInstanceState)
         view.findToolbar().setup(title = getString(LR.string.settings_title_notifications), navigationIcon = BackArrow, activity = activity, theme = theme)
         analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_SHOWN)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    view.updatePadding(bottom = it)
+                }
+            }
+        }
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

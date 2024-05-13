@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -233,6 +234,14 @@ class ProfileFragment : BaseFragment() {
 
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SHOWN)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    view.updatePadding(bottom = it)
+                }
+            }
         }
     }
 

@@ -68,11 +68,6 @@ class Support @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    val afterPlayingValues
-        get() = context.resources.getStringArray(R.array.settings_auto_archive_played_values)
-    val inactiveValues
-        get() = context.resources.getStringArray(R.array.settings_auto_archive_inactive_values)
-
     @Suppress("DEPRECATION")
     suspend fun shareLogs(subject: String, intro: String, emailSupport: Boolean, context: Context): Intent {
         val dialog = withContext(Dispatchers.Main) {
@@ -295,8 +290,8 @@ class Support @Inject constructor(
                     podcastsOutput.append("Custom auto archive: ").append(podcast.overrideGlobalArchive.toString()).append(eol)
                     if (podcast.overrideGlobalArchive) {
                         podcastsOutput.append("Episode limit: ").append(podcast.autoArchiveEpisodeLimit).append(eol)
-                        podcastsOutput.append("Archive after playing: ").append(podcast.autoArchiveAfterPlaying?.index?.let(afterPlayingValues::get)).append(eol)
-                        podcastsOutput.append("Archive inactive: ").append(podcast.autoArchiveInactive?.index?.let(inactiveValues::get)).append(eol)
+                        podcastsOutput.append("Archive after playing: ").append(podcast.autoArchiveAfterPlaying?.analyticsValue).append(eol)
+                        podcastsOutput.append("Archive inactive: ").append(podcast.autoArchiveInactive?.analyticsValue).append(eol)
                     }
                     podcastsOutput.append("Auto add to up next: ").append(autoAddToUpNextToString(podcast.autoAddToUpNext)).append(eol)
                     podcastsOutput.append(eol)
