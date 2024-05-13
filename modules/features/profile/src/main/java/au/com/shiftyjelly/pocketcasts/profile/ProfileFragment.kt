@@ -239,7 +239,7 @@ class ProfileFragment : BaseFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect {
-                    binding.nestedScrollView?.updatePadding(bottom = it)
+                    view.updatePadding(bottom = it)
                 }
             }
         }
