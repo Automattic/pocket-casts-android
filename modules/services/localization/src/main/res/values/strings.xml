@@ -1473,7 +1473,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <!-- Button title to upgrade to Patron. Don't translate "Patron" -->
     <string name="upgrade_to_patron">Upgrade to Patron</string>
     <string name="whats_new_new_widgets_title">New widgets</string>
-    <string name="whats_new_new_widgets_message">With two new sizes and an updated design, managing your podcasts from the home screen just got a whole lot easier. Please check them out!</string>
+    <string name="whats_new_new_widgets_message">We’ve just added three new widgets, so managing your podcasts from the home screen got a whole lot easier. Please check them out!</string>
 
     <!-- Errors -->
 
