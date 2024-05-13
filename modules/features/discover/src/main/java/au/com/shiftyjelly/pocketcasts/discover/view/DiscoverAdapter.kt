@@ -960,6 +960,8 @@ private class DiscoverRowDiffCallback : DiffUtil.ItemCallback<Any>() {
             old.source == new.source
         } else if (old is ChangeRegionRow && new is ChangeRegionRow) {
             true
+        } else if (old is RemainingPodcastsByCategoryRow && new is RemainingPodcastsByCategoryRow) {
+            true
         } else {
             old == new
         }
