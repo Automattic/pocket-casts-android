@@ -71,4 +71,8 @@ class PlayerWidgetManager @Inject constructor(
     }
 
     private suspend inline fun <reified T : GlanceAppWidget> glanceIds() = widgetManager.getGlanceIds(T::class.java)
+
+    companion object {
+        const val EPISODE_LIMIT = LargePlayerWidgetState.EPISODE_LIMIT
+    }
 }

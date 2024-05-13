@@ -20,11 +20,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun LargePlayer(state: LargePlayerWidgetState) {
-    val upNextEpisodes = state.upNextEpisodes
     val headerAndPaddingHeight = 160.dp
     val availableContentHeight = LocalSize.current.height - headerAndPaddingHeight
-    val fittingItemCount = ((availableContentHeight - 58.dp) / 66.dp).toInt().coerceAtLeast(0) + 1
-    val actualDisplayedItemCount = upNextEpisodes.size.coerceAtMost(fittingItemCount)
+    val fittingItemCount = (((availableContentHeight - 58.dp) / 66.dp).toInt().coerceAtLeast(0) + 1).coerceAtMost(LargePlayerWidgetState.QUEUE_LIMIT)
+    val upNextEpisodes = state.upNextEpisodes.take(fittingItemCount)
+    val actualDisplayedItemCount = upNextEpisodes.size
     val expectedContentHeight = contentHeight(fittingItemCount)
     val actualContentHeight = contentHeight(actualDisplayedItemCount)
 
