@@ -158,6 +158,7 @@
     <string name="report">Report</string>
     <string name="report_subtitle">Report inappropriate content</string>
     <string name="widget">Widget</string>
+    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
     <string name="small_player_widget_label">Small Player</string>
     <string name="medium_player_widget_label">Medium Player</string>
     <string name="large_player_widget_label">Large Player</string>
