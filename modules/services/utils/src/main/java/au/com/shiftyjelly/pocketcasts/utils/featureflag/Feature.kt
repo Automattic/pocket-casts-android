@@ -104,7 +104,7 @@ enum class Feature(
         title = "Mini player design",
         defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;
