@@ -17,6 +17,8 @@
         android:id="@+id/mainNestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity=""
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
