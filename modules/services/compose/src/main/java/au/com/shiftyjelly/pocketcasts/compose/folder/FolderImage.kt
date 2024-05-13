@@ -65,7 +65,7 @@ fun FolderImage(
     badgeType: BadgeType = BadgeType.OFF,
 ) {
     val cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
-    val elevation = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
+    val elevation = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 1.dp else 0.dp
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
     ) {
