@@ -1,5 +1,8 @@
 7.64
 -----
+*   New Features
+    *   Add three new widgets - small, medium, and large.
+        ([#2216](https://github.com/Automattic/pocket-casts-android/pull/2216))
 *   Updates:
     *   New design for the Podcasts grid layout
         ([#2165](https://github.com/Automattic/pocket-casts-android/pull/2165))
