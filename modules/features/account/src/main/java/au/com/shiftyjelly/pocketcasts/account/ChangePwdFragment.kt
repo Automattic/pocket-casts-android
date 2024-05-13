@@ -172,7 +172,7 @@ class ChangePwdFragment : BaseFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settings.bottomInset.collect { bottomInset ->
-                    binding.mainScrollView?.updatePadding(bottom = bottomInset)
+                    view.updatePadding(bottom = bottomInset)
                 }
             }
         }
