@@ -85,7 +85,7 @@ fun NewWidgetsHeader(
                     .fillMaxSize()
                     .padding(horizontal = 32.dp)
                     .phoneFrame(
-                        color = tintColor.copy(alpha = 0.8f),
+                        color = tintColor.copy(alpha = 0.3f),
                         strokeWidth = 8.dp,
                         cornerRadius = 16.dp,
                     ),
