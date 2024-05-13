@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -201,6 +203,17 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         binding?.layoutUsage?.isVisible = false
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect { bottomInset ->
+                    binding?.recyclerView?.updatePadding(bottom = bottomInset)
+                    binding?.fab?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        bottomMargin = bottomInset + resources.getDimensionPixelSize(R.dimen.files_fab_margin_bottom)
+                    }
+                }
+            }
+        }
 
         viewModel.accountUsage.observe(
             viewLifecycleOwner,

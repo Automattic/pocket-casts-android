@@ -5,6 +5,8 @@
         ([#2165](https://github.com/Automattic/pocket-casts-android/pull/2165))
     *   Adds new dedicated tab for up next
         ([#2213](https://github.com/Automattic/pocket-casts-android/pull/2213))
+    *   Mini player small design refresh
+        ([#2214](https://github.com/Automattic/pocket-casts-android/pull/2214))
 *   Bug Fixes
     *   Fix pull to refresh icon sometimes being stuck in a loading state
         ([#2164](https://github.com/Automattic/pocket-casts-android/pull/2164))

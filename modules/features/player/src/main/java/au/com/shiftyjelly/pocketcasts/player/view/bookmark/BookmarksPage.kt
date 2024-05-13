@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,6 +65,7 @@ fun BookmarksPage(
     onUpgradeClicked: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
     openFragment: (Fragment) -> Unit,
+    bottomInset: Dp,
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
@@ -85,6 +88,7 @@ fun BookmarksPage(
         onSearchTextChanged = { bookmarksViewModel.onSearchTextChanged(it) },
         onUpgradeClicked = onUpgradeClicked,
         openFragment = openFragment,
+        bottomInset = bottomInset,
     )
     LaunchedEffect(episodeUuid) {
         bookmarksViewModel.loadBookmarks(
@@ -120,6 +124,7 @@ private fun Content(
     onSearchTextChanged: (String) -> Unit,
     onUpgradeClicked: () -> Unit,
     openFragment: (Fragment) -> Unit,
+    bottomInset: Dp,
 ) {
     Box(
         modifier = Modifier
@@ -135,6 +140,7 @@ private fun Content(
                 onOptionsMenuClicked = onBookmarksOptionsMenuClicked,
                 onPlayClick = onPlayClick,
                 onSearchTextChanged = onSearchTextChanged,
+                bottomInset = bottomInset,
             )
 
             is UiState.Empty -> NoBookmarksView(
@@ -165,9 +171,11 @@ private fun BookmarksView(
     onOptionsMenuClicked: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
     onSearchTextChanged: (String) -> Unit,
+    bottomInset: Dp,
 ) {
     val focusRequester = remember { FocusRequester() }
     LazyColumn(
+        contentPadding = PaddingValues(bottom = bottomInset),
         modifier = Modifier
             .fillMaxSize(),
     ) {
@@ -278,6 +286,7 @@ private fun BookmarksPreview(
             onSearchTextChanged = {},
             onUpgradeClicked = {},
             openFragment = {},
+            bottomInset = 0.dp,
         )
     }
 }

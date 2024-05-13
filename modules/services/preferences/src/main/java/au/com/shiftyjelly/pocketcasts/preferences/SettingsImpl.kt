@@ -65,6 +65,7 @@ import kotlin.math.max
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
@@ -1421,5 +1422,13 @@ class SettingsImpl @Inject constructor(
 
     override fun requestThemeReconfiguration() {
         _themeReconfigurationEvents.tryEmit(Unit)
+    }
+
+    private val _bottomInset = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+    override val bottomInset: Flow<Int>
+        get() = _bottomInset.asSharedFlow()
+
+    override fun updateBottomInset(height: Int) {
+        _bottomInset.tryEmit(height)
     }
 }
