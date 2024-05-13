@@ -90,7 +90,7 @@ private val DefaultColors = ColorProviders(
         onPrimaryContainer = UndefinedColor,
         inversePrimary = UndefinedColor,
         secondary = Color(0xFFFFFFFF),
-        onSecondary = Color(0xFF404247),
+        onSecondary = Color(0xFF333438),
         secondaryContainer = Color(0xFF292B2E),
         onSecondaryContainer = Color(0xFFFFFFFF),
         // Used as a trick for different Pocket Casts logo colors

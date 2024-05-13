@@ -86,9 +86,9 @@ enum class Feature(
     UPNEXT_IN_TAB_BAR(
         key = "upnext_in_tab_bar",
         title = "Show Up Next in tab bar",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     PODCASTS_GRID_VIEW_DESIGN_CHANGES(
