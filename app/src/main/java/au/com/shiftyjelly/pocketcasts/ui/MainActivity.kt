@@ -944,18 +944,16 @@ class MainActivity :
     }
 
     override fun onMiniPlayerHidden() {
-        binding.mainFragment.updatePadding(
-            bottom = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt(),
-        )
-        binding.snackbarFragment.updatePadding(bottom = binding.mainFragment.paddingBottom)
+        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt()
+        binding.snackbarFragment.updatePadding(bottom = padding)
+        settings.updateBottomInset(0)
     }
 
     override fun onMiniPlayerVisible() {
-        binding.mainFragment.updatePadding(
-            bottom = resources.getDimension(MR.dimen.design_bottom_navigation_height)
-                .toInt() + resources.getDimension(R.dimen.miniPlayerHeight).toInt(),
-        )
-        binding.snackbarFragment.updatePadding(bottom = binding.mainFragment.paddingBottom)
+        val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt() + miniPlayerHeight
+        binding.snackbarFragment.updatePadding(bottom = padding)
+        settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {

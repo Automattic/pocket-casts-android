@@ -5,8 +5,6 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
-import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -27,10 +25,10 @@ internal fun LargePlayerQueue(
 ) {
     val lastIndex = queue.lastIndex
 
-    LazyColumn(
-        modifier = modifier.fillMaxWidth(),
+    Column(
+        modifier.fillMaxWidth(),
     ) {
-        itemsIndexed(queue, { _, episode -> episode.longId }) { index, episode ->
+        queue.forEachIndexed { index, episode ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = GlanceModifier

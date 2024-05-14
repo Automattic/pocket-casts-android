@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-22 13:54:02+0000
+Translation-Revision-Date: 2024-05-08 09:54:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">Vilolägestimern stoppades i slutet av kapitlet.</string>
+    <string name="player_sleep_in_chapters">Viloläge efter %d kapitel</string>
+    <string name="player_sleep_in_one_chapter">Viloläge efter 1 kapitel</string>
+    <string name="player_sleep_timer_in_chapter_plural">Efter %d kapitel</string>
+    <string name="player_sleep_timer_in_chapter">Efter 1 kapitel</string>
+    <string name="player_sleep_timer_in_episode_plural">Efter %d avsnitt</string>
+    <string name="player_sleep_timer_in_episode">Efter 1 avsnitt</string>
+    <string name="settings_use_episode_artwork_customization_description">Välj om du vill se avsnittsomslag i dessa sektioner av appen</string>
+    <string name="settings_use_episode_artwork_customization_section">Anpassning</string>
+    <string name="settings_use_episode_artwork_title">Avsnittsomslag</string>
+    <string name="settings_use_episode_artwork_advanced">Avancerade inställningar för avsnittsomslag</string>
+    <string name="player_sleep_in_episodes">Somna efter %d avsnitt</string>
+    <string name="player_sleep_in_one_episode">Somna efter 1 avsnitt</string>
     <string name="player_sleep_timer_stopped_your_podcast">Vilolägestimern stoppade din podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Vilolägestimern återstartad efter att enheten skakats</string>
     <string name="whats_new_new_widgets_message">Med två nya storlekar och uppdaterad design har det blivit mycket enklare att hantera dina podcasts från startskärmen. Kolla in dem!</string>
@@ -1453,7 +1466,6 @@ Language: sv_SE
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Starta podcast från %d sekunder</string>
     <string name="player_skipped_last">Hoppade över de sista %d sekunderna</string>
-    <string name="player_sleep_time_fired">Sömntimern stoppades i slutet av ditt avsnitt.\nGodnatt!</string>
     <string name="player_actions_show_as_delete_for_custom">Visas som ”Ta bort” för anpassade avsnitt</string>
     <string name="player_actions_hidden_for_custom">Dolda för anpassade avsnitt</string>
     <string name="player_rearrange_actions_hidden">Fler åtgärder</string>
@@ -1483,7 +1495,6 @@ Language: sv_SE
     <string name="player_sleep_cancel_timer">Avbryt timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuter</string>
     <string name="player_sleep_60_minutes">60 minuter</string>
-    <string name="player_sleep_5_minutes">5 minuter</string>
     <string name="player_sleep_30_minutes">30 minuter</string>
     <string name="player_sleep_15_minutes">15 minuter</string>
     <string name="player_pip">Aktivera bild-i-bild </string>

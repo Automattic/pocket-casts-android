@@ -4,4 +4,14 @@
     <dimen name="player_fragment_start_y">69dp</dimen>
     <dimen name="player_tab_text_size">14sp</dimen>
     <dimen name="player_tab_padding">6dp</dimen>
+    <dimen name="mini_player_elevation">0.5dp</dimen>
+    <dimen name="mini_player_corner_radius">12dp</dimen>
+    <dimen name="mini_player_artwork_elevation">1dp</dimen>
+    <dimen name="mini_player_artwork_corner_radius">4dp</dimen>
+    <dimen name="mini_player_artwork_size">44dp</dimen>
+    <dimen name="mini_player_margin">6dp</dimen>
+    <dimen name="mini_player_play_button_size_32">32dp</dimen>
+    <dimen name="mini_player_play_button_size_48">48dp</dimen>
+    <dimen name="mini_player_skip_button_size_68">68dp</dimen>
+    <dimen name="mini_player_skip_button_size_56">56dp</dimen>
 </resources>

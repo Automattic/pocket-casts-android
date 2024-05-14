@@ -102,6 +102,7 @@ class FolderAdapter(
                     gridWidthDp = gridWidthDp,
                     podcastsLayout = podcastsLayout,
                     onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) },
+                    podcastGridLayout = podcastsLayout,
                 )
             }
 
@@ -186,7 +187,7 @@ class FolderAdapter(
         val unplayedText: TextView = view.findViewById(R.id.unplayed_count)
         val unplayedBackground: ImageView? = view.findViewById(R.id.unplayed_background)
         val countTextMarginSmall: Int = 2.dpToPx(view.resources.displayMetrics)
-        val cardElevation: Float = 2.dpToPx(view.resources.displayMetrics).toFloat()
+        val cardElevation: Float = 1.dpToPx(view.resources.displayMetrics).toFloat()
         val cardCornerRadius: Float = 4.dpToPx(view.resources.displayMetrics).toFloat()
         val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
         val isListLayout: Boolean = podcastGridLayout == PodcastGridLayoutType.LIST_VIEW

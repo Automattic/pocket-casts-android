@@ -61,9 +61,6 @@ class UpNextEpisodeViewHolder(
     private val cardElevation: Float = 2.dpToPx(itemView.context.resources.displayMetrics).toFloat()
     private val elevatedBackground = ContextCompat.getColor(binding.root.context, R.color.elevatedBackground)
     private val selectedBackground = ContextCompat.getColor(binding.root.context, R.color.selectedBackground)
-    private val unselectedColor = itemView.context.getThemeColor(
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) UR.attr.primary_ui_04 else UR.attr.primary_ui_02,
-    )
 
     private var episodeInstance: BaseEpisode? = null
 
@@ -138,6 +135,7 @@ class UpNextEpisodeViewHolder(
         binding.checkbox.setOnClickListener { binding.itemContainer.performClick() }
 
         val selectedColor = context.getThemeColor(UR.attr.primary_ui_02_selected)
+        val unselectedColor = context.getThemeColor(UR.attr.primary_ui_01)
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             binding.itemContainer.setBackgroundColor(if (isMultiSelecting && isChecked) selectedColor else unselectedColor)
         }

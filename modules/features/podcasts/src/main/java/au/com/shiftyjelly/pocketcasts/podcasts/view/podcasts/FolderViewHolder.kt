@@ -27,6 +27,7 @@ class FolderViewHolder(
     val gridWidthDp: Int,
     val podcastsLayout: PodcastGridLayoutType,
     val onFolderClick: (Folder) -> Unit,
+    val podcastGridLayout: PodcastGridLayoutType,
 ) : RecyclerView.ViewHolder(composeView) {
 
     fun bind(folder: Folder, podcasts: List<Podcast>, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>) {
@@ -54,6 +55,7 @@ class FolderViewHolder(
                             podcastUuids = podcastUuids,
                             badgeCount = badgeCount,
                             badgeType = badgeType,
+                            podcastGridLayout = podcastGridLayout,
                             onClick = { onFolderClick(folder) },
                             modifier = Modifier.size(gridWidthDp.dp),
                         )
@@ -77,13 +79,14 @@ class FolderViewHolder(
 }
 
 @Composable
-private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: BadgeType, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: BadgeType, podcastGridLayout: PodcastGridLayoutType, modifier: Modifier = Modifier, onClick: () -> Unit) {
     FolderImage(
         name = name,
         color = color,
         podcastUuids = podcastUuids,
         badgeCount = badgeCount,
         badgeType = badgeType,
+        textSpacing = podcastGridLayout == PodcastGridLayoutType.LARGE_ARTWORK,
         modifier = modifier.clickable { onClick() },
     )
 }

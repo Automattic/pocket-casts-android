@@ -62,7 +62,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9120
+        const val WHATS_NEW_VERSION_CODE = 9121
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -393,6 +393,7 @@ interface Settings {
     fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
+    fun getRefreshPodcastsBatchSize(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
@@ -525,4 +526,7 @@ interface Settings {
     // system dark mode.
     val themeReconfigurationEvents: Flow<Unit>
     fun requestThemeReconfiguration()
+
+    val bottomInset: Flow<Int>
+    fun updateBottomInset(height: Int)
 }

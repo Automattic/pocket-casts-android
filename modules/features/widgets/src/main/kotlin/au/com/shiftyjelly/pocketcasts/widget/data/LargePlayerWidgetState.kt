@@ -47,11 +47,14 @@ internal data class LargePlayerWidgetState(
     }
 
     companion object {
+        const val EPISODE_LIMIT = 10
+        const val QUEUE_LIMIT = EPISODE_LIMIT - 1
+
         suspend fun getInitialState(context: Context): LargePlayerWidgetState {
             val upNextDao = context.widgetEntryPoint().upNextDao()
             val settings = context.widgetEntryPoint().settings()
             val playbackManager = context.widgetEntryPoint().playbackManager()
-            val queue = upNextDao.findUpNextEpisodes(limit = 10).map(PlayerWidgetEpisode::fromBaseEpisode)
+            val queue = upNextDao.findUpNextEpisodes(limit = EPISODE_LIMIT).map(PlayerWidgetEpisode::fromBaseEpisode)
             return LargePlayerWidgetState(
                 queue = queue,
                 isPlaying = playbackManager.isPlaying(),
