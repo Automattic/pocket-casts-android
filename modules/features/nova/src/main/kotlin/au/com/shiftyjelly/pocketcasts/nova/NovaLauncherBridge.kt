@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -46,13 +47,17 @@ class NovaLauncherBridge @Inject constructor(
     }
 
     private fun registerNovaLauncherSync() {
+        logInfo("Unregister Nova Launcher sync")
         processLifecycle.addObserver(novaLauncherObserver)
         NovaLauncherSyncWorker.enqueuePeriodicWork(context)
     }
 
     private fun unregisterNovaLauncherSync() {
+        logInfo("Register Nova Launcher sync")
         processLifecycle.removeObserver(novaLauncherObserver)
         NovaLauncherSyncWorker.cancelOneOffWork(context)
         NovaLauncherSyncWorker.cancelPeriodicWork(context)
     }
+
+    private fun logInfo(message: String) = LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
 }
