@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -399,4 +400,21 @@ abstract class PodcastDao {
         deleteAllTrendingPodcasts()
         insertAllTrendingPodcasts(podcasts)
     }
+
+    @Query(
+        """
+        SELECT 
+          podcasts.uuid AS id, 
+          podcasts.title AS title, 
+          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
+          (SELECT MIN(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
+          (SELECT MAX(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
+          (SELECT MAX(podcast_episodes.last_playback_interaction_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
+        FROM 
+          podcasts 
+        WHERE 
+          podcasts.subscribed IS NOT 0
+        """,
+    )
+    abstract suspend fun getNovaLauncherSubscribedPodcasts(): List<NovaLauncherSubscribedPodcast>
 }
