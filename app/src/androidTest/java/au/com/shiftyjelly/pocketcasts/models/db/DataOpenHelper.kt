@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import androidx.core.database.sqlite.transaction
 import java.util.Calendar
 import timber.log.Timber
 
@@ -460,18 +461,17 @@ class DataOpenHelper(
         cal.add(Calendar.MONTH, -1)
         try {
             database.use { db ->
-                db.beginTransaction()
-                db.rawQuery("SELECT uuid FROM podcast", arrayOf()).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        do {
-                            val uuid = cursor.getString(0)
-                            db.execSQL("UPDATE podcast SET added_date=? WHERE uuid=?", arrayOf<Any>(cal.timeInMillis, uuid))
-                            cal.add(Calendar.MINUTE, 1)
-                        } while (cursor.moveToNext())
+                db.transaction {
+                    db.rawQuery("SELECT uuid FROM podcast", arrayOf()).use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            do {
+                                val uuid = cursor.getString(0)
+                                db.execSQL("UPDATE podcast SET added_date=? WHERE uuid=?", arrayOf<Any>(cal.timeInMillis, uuid))
+                                cal.add(Calendar.MINUTE, 1)
+                            } while (cursor.moveToNext())
+                        }
                     }
-                    db.setTransactionSuccessful()
                 }
-                db.endTransaction()
             }
         } catch (exception: Exception) {
             Timber.e(exception, "Migrating database to version 2")
@@ -481,11 +481,10 @@ class DataOpenHelper(
     private fun updateLatestEpisodeFields(database: SQLiteDatabase) {
         try {
             database.use { db ->
-                db.beginTransaction()
-                db.execSQL("ALTER TABLE podcast ADD latest_episode_date INTEGER", arrayOf())
-                db.execSQL("UPDATE podcast SET latest_episode_uuid = NULL", arrayOf())
-                db.setTransactionSuccessful()
-                db.endTransaction()
+                db.transaction {
+                    db.execSQL("ALTER TABLE podcast ADD latest_episode_date INTEGER", arrayOf())
+                    db.execSQL("UPDATE podcast SET latest_episode_uuid = NULL", arrayOf())
+                }
             }
         } catch (exception: Exception) {
             Timber.e(exception, "Migrating database to version 2")
