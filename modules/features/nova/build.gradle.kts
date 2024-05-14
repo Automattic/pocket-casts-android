@@ -15,3 +15,8 @@ android {
         compose = false
     }
 }
+
+dependencies {
+    // AAR dependencies cannot be resolved with Version Catalogs https://github.com/gradle/gradle/issues/20074
+    implementation("io.branch.engage:conduit-source:0.2.3-pocketcasts.4@aar") { isTransitive = true }
+}
