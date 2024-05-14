@@ -29,7 +29,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -50,17 +53,17 @@ private val gradientTop = Color(0x00000000)
 private val gradientBottom = Color(0x33000000)
 private val topPodcastImageGradient = listOf(Color(0x00000000), Color(0x16000000))
 private val bottomPodcastImageGradient = listOf(Color(0x16000000), Color(0x33000000))
-private const val paddingBottomRatio = 120f / 1f
-private const val paddingImageRatio = 120f / 4f
-private const val imageSizeRatio = 120f / 44f
+private const val paddingImageRatio = 4f / 120f
+private const val imageSizeRatio = 44f / 120f
 
 @Composable
 fun FolderImage(
     name: String,
     color: Color,
     podcastUuids: List<String>,
+    textSpacing: Boolean,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 11.sp,
+    fontSize: TextUnit = 11.nonScaledSp,
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
 ) {
@@ -89,12 +92,12 @@ fun FolderImage(
                     )
                     .fillMaxSize(),
             ) {}
-            val podcastSize = (constraints.maxWidth.value / imageSizeRatio).dp
+            val podcastSize = (constraints.maxWidth.value * imageSizeRatio).dp
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                val imagePadding = (constraints.maxWidth.value / paddingImageRatio).dp
+                val imagePadding = (constraints.maxWidth.value * paddingImageRatio).dp
                 Spacer(modifier = Modifier.height(imagePadding))
                 Row(horizontalArrangement = Arrangement.Center) {
                     Column(horizontalAlignment = Alignment.End) {
@@ -130,7 +133,9 @@ fun FolderImage(
                     }
                 }
                 if (name.isNotBlank()) {
-                    Spacer(modifier = Modifier.height((constraints.maxWidth.value / paddingBottomRatio).dp))
+                    if (textSpacing) {
+                        Spacer(modifier = Modifier.height(imagePadding))
+                    }
                     Text(
                         text = name,
                         color = Color.White,
@@ -144,6 +149,13 @@ fun FolderImage(
                                 color = Color(0x33000000),
                                 offset = Offset(0f, 2f),
                                 blurRadius = 4f,
+                            ),
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false,
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.Both,
                             ),
                         ),
                     )
@@ -266,6 +278,7 @@ private fun FolderImagePreview() {
         podcastUuids = emptyList(),
         badgeCount = 1,
         badgeType = BadgeType.ALL_UNFINISHED,
+        textSpacing = true,
         modifier = Modifier.size(100.dp),
     )
 }

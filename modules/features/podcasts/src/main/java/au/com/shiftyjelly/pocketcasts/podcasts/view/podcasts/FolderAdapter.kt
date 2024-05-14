@@ -102,6 +102,7 @@ class FolderAdapter(
                     gridWidthDp = gridWidthDp,
                     podcastsLayout = podcastsLayout,
                     onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) },
+                    podcastGridLayout = podcastsLayout,
                 )
             }
 
