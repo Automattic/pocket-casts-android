@@ -76,6 +76,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.BOOKMARK_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PODCAST_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SOURCE_VIEW
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
 import au.com.shiftyjelly.pocketcasts.profile.SubCancelledFragment
 import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
@@ -1238,8 +1240,11 @@ class MainActivity :
                     viewModel.deleteBookmark(it)
                 }
                 notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
-            }
-            // new episode notification tapped
+            } else if (action == Settings.INTENT_OPEN_APP_PODCAST_UUID) {
+                intent.getStringExtra(PODCAST_UUID)?.let {
+                    openPodcastPage(it, intent.getStringExtra(SOURCE_VIEW))
+                }
+            } // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
                 // intents were being reused for notifications so we had to use the extra to pass action
                 val episodeUuid =
