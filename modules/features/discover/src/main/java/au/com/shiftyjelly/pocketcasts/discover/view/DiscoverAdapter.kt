@@ -962,6 +962,8 @@ private class DiscoverRowDiffCallback : DiffUtil.ItemCallback<Any>() {
             true
         } else if (old is RemainingPodcastsByCategoryRow && new is RemainingPodcastsByCategoryRow) {
             true
+        } else if (old is MostPopularPodcastsByCategoryRow && new is MostPopularPodcastsByCategoryRow) {
+            true
         } else {
             old == new
         }
