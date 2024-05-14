@@ -45,7 +45,7 @@ fun FolderListRow(
             .padding(horizontal = 16.dp)
             .then(if (onClick == null) Modifier else Modifier.clickable { onClick() }),
     ) {
-        FolderImageSmall(color = color, podcastUuids = podcastUuids)
+        FolderImageSmall(color = color, podcastUuids = podcastUuids, folderImageSize = 64.dp)
         Column(
             modifier = Modifier
                 .padding(start = 16.dp)
