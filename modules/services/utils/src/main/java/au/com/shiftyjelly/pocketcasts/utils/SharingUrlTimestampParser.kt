@@ -4,11 +4,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class SharingUrlTimestampParser {
-    fun parseTimestamp(t: String): Pair<Duration?, Duration?> {
+    companion object {
         val intervalPattern = Regex("""(\d*\.?\d*)?,?(\d*\.?\d*)?""") // t=10,20 or t=,20 or t=10
         val hmsPattern = Regex("""(?:(\d+)h)?(?:(\d+)m)?(?:(\d+(?:\.\d+)?)s)?""") // t=10h20m30s or t=10m30s or or 10m or t=10s
         val hhmmssFractionPattern = Regex("""(\d+):(\d{2}):(\d{2})(?:\.(\d+))?""") // t=10:20:30.456
-
+    }
+    fun parseTimestamp(t: String): Pair<Duration?, Duration?> {
         hmsPattern.matchEntire(t)?.let { match ->
             val hours = match.groups[1]?.value?.toInt() ?: 0
             val minutes = match.groups[2]?.value?.toInt() ?: 0
