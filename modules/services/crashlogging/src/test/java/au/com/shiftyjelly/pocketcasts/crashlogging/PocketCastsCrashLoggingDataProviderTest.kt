@@ -22,6 +22,7 @@ class PocketCastsCrashLoggingDataProviderTest {
             fakeObserveUser,
             FakeCrashReportPermissionCheck(),
             fakeBuildDataProvider,
+            localeProvider = { null },
         )
     }
 
