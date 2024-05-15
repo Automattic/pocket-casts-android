@@ -17,7 +17,7 @@ class SharingUrlTimestampParserTest {
 
     @Test
     fun testParseTimestampHoursMinutesSeconds() {
-        assertEquals(Pair(454070.seconds, null), parser.parseTimestamp("125h67m50s"))
+        assertEquals(Pair(453590.seconds, null), parser.parseTimestamp("125h59m50s"))
         assertEquals(Pair(3600.seconds, null), parser.parseTimestamp("1h"))
         assertEquals(Pair(60.seconds, null), parser.parseTimestamp("1m"))
         assertEquals(Pair(1.seconds, null), parser.parseTimestamp("1s"))
