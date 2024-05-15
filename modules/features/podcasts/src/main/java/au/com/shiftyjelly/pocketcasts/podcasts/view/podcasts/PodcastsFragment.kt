@@ -342,7 +342,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private fun adjustViewIfNeeded() {
         val context = activity ?: return
         val orientation = resources.configuration.orientation
-        val widthPx = UiUtil.getContentViewWidthPx(context)
+        val widthPx = UiUtil.getWindowWidthPx(context)
         if (orientation == lastOrientationRefreshed && lastWidthPx == widthPx) return
 
         // screen has rotated, redraw the grid to the right size
