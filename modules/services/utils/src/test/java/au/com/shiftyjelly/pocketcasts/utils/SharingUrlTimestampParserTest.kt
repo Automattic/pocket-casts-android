@@ -16,11 +16,18 @@ class SharingUrlTimestampParserTest {
     }
 
     @Test
-    fun testParseTimestamp_hms() {
+    fun testParseTimestampHoursMinutesSeconds() {
         assertEquals(Pair(454070.seconds, null), parser.parseTimestamp("125h67m50s"))
         assertEquals(Pair(3600.seconds, null), parser.parseTimestamp("1h"))
         assertEquals(Pair(60.seconds, null), parser.parseTimestamp("1m"))
         assertEquals(Pair(1.seconds, null), parser.parseTimestamp("1s"))
         assertEquals(Pair(3661.seconds, null), parser.parseTimestamp("1h1m1s"))
+    }
+
+    @Test
+    fun testParseTimestampHoursMinutesSecondsFraction() {
+        assertEquals(Pair(3723.seconds, null), parser.parseTimestamp("1:02:03"))
+        assertEquals(Pair(3728.seconds, null), parser.parseTimestamp("1:02:03.5000"))
+        assertEquals(Pair(120.seconds, null), parser.parseTimestamp("0:02:00"))
     }
 }
