@@ -22,6 +22,9 @@ class SharingUrlTimestampParserTest {
         assertEquals(Pair(60.seconds, null), parser.parseTimestamp("1m"))
         assertEquals(Pair(1.seconds, null), parser.parseTimestamp("1s"))
         assertEquals(Pair(3661.seconds, null), parser.parseTimestamp("1h1m1s"))
+        assertEquals(Pair(5400.seconds, null), parser.parseTimestamp("1h30m"))
+        assertEquals(Pair(3605.seconds, null), parser.parseTimestamp("1h5s"))
+        assertEquals(Pair(1805.seconds, null), parser.parseTimestamp("30m5s"))
     }
 
     @Test
