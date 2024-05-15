@@ -115,6 +115,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.SharingUrlTimestampParser
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -141,7 +143,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -1463,7 +1464,8 @@ class MainActivity :
         if (intent.data?.pathSegments?.size == 1) {
             sharePath = "$SOCIAL_SHARE_PATH$sharePath"
         }
-        val timestamp = intent.data?.getQueryParameter("t")?.toIntOrNull()
+        val parser = SharingUrlTimestampParser()
+        val timestamp = intent.data?.getQueryParameter("t")?.let { parser.parseTimestamp(it) }
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
             sharePath,
@@ -1490,7 +1492,7 @@ class MainActivity :
                             source = EpisodeViewSource.SHARE,
                             podcastUuid = podcastUuid,
                             forceDark = false,
-                            timestamp = timestamp?.seconds,
+                            timestamp = timestamp?.first, // Start time in seconds
                         )
                     } else {
                         openPodcastPage(podcastUuid)
