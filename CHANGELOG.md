@@ -1,6 +1,8 @@
 7.65
 -----
-
+*   Bug Fixes
+    *   Fix timestamp parameter handling in shared links
+        ([#2235](https://github.com/Automattic/pocket-casts-android/pull/2235))
 
 7.64
 -----
