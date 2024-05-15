@@ -30,12 +30,12 @@ class AppDatabaseTest {
         AppDatabase::class.java,
     )
 
-    private var dataOpenHelper: OldDataOpenHelper? = null
+    private var dataOpenHelper: DataOpenHelper? = null
 
     @Before
     fun setUp() {
         // Test migrations from old version of the database
-        dataOpenHelper = OldDataOpenHelper(InstrumentationRegistry.getInstrumentation().targetContext, TEST_DB).apply {
+        dataOpenHelper = DataOpenHelper(InstrumentationRegistry.getInstrumentation().targetContext, TEST_DB).apply {
             writableDatabase.use { database ->
                 dropAllTables(database)
                 dropAllIndexes(database)
@@ -176,7 +176,7 @@ class AppDatabaseTest {
         } ?: 0
     }
 
-    private fun insertTestData(database: OldDataOpenHelper?) {
+    private fun insertTestData(database: DataOpenHelper?) {
         database?.writableDatabase?.use {
             it.execSQL("INSERT INTO podcast (title) VALUES ('No UUID!');")
             it.execSQL("INSERT INTO podcast (uuid) VALUES ('e7a6f7d0-02f2-0133-1c51-059c869cc4eb');")

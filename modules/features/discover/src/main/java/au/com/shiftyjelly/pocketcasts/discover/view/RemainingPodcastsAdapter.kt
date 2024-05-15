@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 
-private val diff = object : DiffUtil.ItemCallback<DiscoverPodcast>() {
+val PODCASTS_FILTERED_DIFF = object : DiffUtil.ItemCallback<DiscoverPodcast>() {
     override fun areItemsTheSame(oldItem: DiscoverPodcast, newItem: DiscoverPodcast): Boolean {
         return oldItem.uuid == newItem.uuid
     }
@@ -20,7 +20,7 @@ private val diff = object : DiffUtil.ItemCallback<DiscoverPodcast>() {
 class RemainingPodcastsAdapter(
     val onPodcastClick: (DiscoverPodcast, String?) -> Unit,
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
-) : ListAdapter<DiscoverPodcast, RemainingPodcastsAdapter.PodcastViewHolder>(diff) {
+) : ListAdapter<DiscoverPodcast, RemainingPodcastsAdapter.PodcastViewHolder>(PODCASTS_FILTERED_DIFF) {
 
     inner class PodcastViewHolder(
         itemView: View,
