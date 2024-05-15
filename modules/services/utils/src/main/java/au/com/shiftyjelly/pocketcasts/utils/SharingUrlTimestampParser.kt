@@ -22,8 +22,8 @@ class SharingUrlTimestampParser {
             val hours = match.groups[1]?.value?.toLong() ?: 0
             val minutes = match.groups[2]?.value?.toLong() ?: 0
             val seconds = match.groups[3]?.value?.toLong() ?: 0
-            val fraction = match.groups[4]?.value?.toDouble() ?: 0.0
-            val totalSeconds = (hours * 3600) + (minutes * 60) + seconds + (fraction / 1000.0)
+            val fractionInMilliseconds = match.groups[4]?.value?.take(3)?.toDouble() ?: 0.0 // Extract first three digits
+            val totalSeconds = (hours * 3600) + (minutes * 60) + seconds + (fractionInMilliseconds / 1000.0)
             return Pair(totalSeconds.seconds, null)
         }
 

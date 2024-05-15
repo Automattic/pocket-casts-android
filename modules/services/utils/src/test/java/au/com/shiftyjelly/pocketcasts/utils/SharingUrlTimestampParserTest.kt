@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -30,7 +33,8 @@ class SharingUrlTimestampParserTest {
     @Test
     fun testParseTimestampHoursMinutesSecondsFraction() {
         assertEquals(Pair(3723.seconds, null), parser.parseTimestamp("1:02:03"))
-        assertEquals(Pair(3728.seconds, null), parser.parseTimestamp("1:02:03.5000"))
         assertEquals(Pair(120.seconds, null), parser.parseTimestamp("0:02:00"))
+        assertEquals(Pair(1500.milliseconds, null), parser.parseTimestamp("00:00:01.500000000"))
+        assertEquals(Pair(1.hours + 2.minutes + 3.seconds + 500.milliseconds, null), parser.parseTimestamp("1:02:03.5000"))
     }
 }
