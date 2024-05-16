@@ -557,12 +557,12 @@ abstract class EpisodeDao {
           -- Check that the episode is not played
           AND episode.playing_status IS 0
           -- Select only episodes that were released at most 2 weeks ago
-          AND episode.published_date / 1000 >= (UNIXEPOCH() - 1209600)
+          AND episode.published_date >= (:currentTime - 1209600000)
         ORDER BY
           episode.published_date DESC
         LIMIT
           500
         """,
     )
-    abstract suspend fun getNovaLauncherNewEpisodes(): List<NovaLauncherNewEpisode>
+    abstract suspend fun getNovaLauncherNewEpisodes(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherNewEpisode>
 }
