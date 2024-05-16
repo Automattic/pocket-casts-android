@@ -42,4 +42,12 @@ class SharingUrlTimestampParserTest {
     fun testParseTimestampMixedPatterns() {
         assertEquals(Pair(120.seconds, 2.minutes + 1.seconds + 5.milliseconds), parser.parseTimestamp("120,0:02:01.5"))
     }
+
+    @Test
+    fun testParseTimestampMinutesAndSecondsShouldNotBeGreaterThan60() {
+        assertEquals(Pair(0.seconds, 0.seconds), parser.parseTimestamp("0:60:00"))
+        assertEquals(Pair(0.seconds, 0.seconds), parser.parseTimestamp("0:00:60"))
+        assertEquals(Pair(0.seconds, 0.seconds), parser.parseTimestamp("00h60m00s"))
+        assertEquals(Pair(0.seconds, 0.seconds), parser.parseTimestamp("00h00m60s"))
+    }
 }
