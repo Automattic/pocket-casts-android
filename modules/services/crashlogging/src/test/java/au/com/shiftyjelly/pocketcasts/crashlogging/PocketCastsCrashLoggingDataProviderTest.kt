@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.crashlogging
 
+import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider.Companion.GLOBAL_TAG_APP_PLATFORM
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeBuildDataProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeCrashReportPermissionCheck
@@ -8,7 +9,9 @@ import com.automattic.android.tracks.crashlogging.CrashLoggingUser
 import com.automattic.android.tracks.crashlogging.ErrorSampling
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 
 class PocketCastsCrashLoggingDataProviderTest {
@@ -17,7 +20,8 @@ class PocketCastsCrashLoggingDataProviderTest {
     private val fakeBuildDataProvider = FakeBuildDataProvider()
     private val fakeObserveUser = FakeObserveUser()
 
-    private fun setUp() {
+    @Before
+    fun setUp() {
         sut = PocketCastsCrashLoggingDataProvider(
             fakeObserveUser,
             FakeCrashReportPermissionCheck(),
@@ -63,25 +67,19 @@ class PocketCastsCrashLoggingDataProviderTest {
     }
 
     @Test
-    fun `should provide user if available`() {
-        fakeObserveUser.user = User("mail")
-        setUp()
+    fun `should provide user if available`() = runTest {
+        sut.user.test {
+            assertEquals(null, expectMostRecentItem())
 
-        runBlocking {
-            assertEquals(
-                CrashLoggingUser(userID = null, email = "mail", username = null),
-                sut.user.last(),
-            )
+            fakeObserveUser.emitUser(User("mail"))
+            assertEquals(CrashLoggingUser(userID = null, email = "mail", username = null), expectMostRecentItem())
         }
     }
 
     @Test
-    fun `should provide null if user is unavailable`() {
-        fakeObserveUser.user = null
-        setUp()
-
-        runBlocking {
-            assertEquals(null, sut.user.last())
+    fun `should provide null if user is unavailable`() = runTest {
+        sut.user.test {
+            assertEquals(null, expectMostRecentItem())
         }
     }
 }
