@@ -1113,4 +1113,8 @@ class EpisodeManagerImpl @Inject constructor(
         episode.deselectedChaptersModified = Date()
         episodeDao.update(episode)
     }
+
+    override suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode> {
+        return episodeDao.getAllPodcastEpisodes(limit, offset)
+    }
 }

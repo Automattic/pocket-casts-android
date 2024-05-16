@@ -533,4 +533,7 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun getFailedDownloadsStatistics(): EpisodeDownloadFailureStatistics
+
+    @Query("SELECT * FROM podcast_episodes LIMIT :limit OFFSET :offset")
+    abstract suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode>
 }

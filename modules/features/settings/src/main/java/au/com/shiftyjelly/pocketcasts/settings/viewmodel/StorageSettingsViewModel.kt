@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
@@ -22,12 +23,15 @@ import java.io.File
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
+import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -81,6 +85,7 @@ class StorageSettingsViewModel
     private lateinit var permissionGranted: () -> Boolean
     private var permissionRequestedForPath: String? = null
     private var sdkVersion: Int = 0
+    private var fixDownloadsJob: Job? = null
 
     fun start(
         folderLocations: () -> List<FolderLocation>,
@@ -143,6 +148,9 @@ class StorageSettingsViewModel
                 )
             },
         ),
+        fixDownloadsState = State.FixDownloadsState(
+            isFixing = false,
+        ),
     )
 
     fun onFragmentResume() {
@@ -156,6 +164,48 @@ class StorageSettingsViewModel
             mutableSnackbarMessage.emit(LR.string.settings_storage_clear_cache)
         }
         analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE)
+    }
+
+    fun fixDownloadedFiles() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES)
+        fixDownloadsJob?.cancel()
+        fixDownloadsJob = viewModelScope.launch {
+            val episodeCount = episodeManager.countEpisodes()
+            mutableState.update { state ->
+                state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = true, episodeCount = episodeCount))
+            }
+
+            repeat(episodeCount / FIX_EPISODES_LIMIT + 1) { iteration ->
+                val offset = iteration * FIX_EPISODES_LIMIT
+                val episodes = episodeManager.getAllPodcastEpisodes(FIX_EPISODES_LIMIT, offset)
+                episodes.forEachIndexed { index, episode ->
+                    val fixCount = offset + index
+                    mutableState.update { state ->
+                        state.copy(fixDownloadsState = state.fixDownloadsState.copy(currentlyFixed = fixCount))
+                    }
+
+                    withContext(Dispatchers.IO) {
+                        val path = DownloadHelper.pathForEpisode(episode, fileStorage)?.takeIf {
+                            val file = File(it)
+                            file.exists() && file.isFile
+                        }
+                        if (path != null && path != episode.downloadedFilePath) {
+                            episodeManager.updateDownloadFilePath(episode, path, markAsDownloaded = true)
+                        }
+                    }
+                }
+            }
+            mutableState.update { state ->
+                state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = false))
+            }
+        }
+    }
+
+    fun cancelDownloadsFix() {
+        fixDownloadsJob?.cancel()
+        mutableState.update { state ->
+            state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = false))
+        }
     }
 
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
@@ -417,6 +467,7 @@ class StorageSettingsViewModel
         val storageFolderState: StorageFolderState,
         val backgroundRefreshState: BackgroundRefreshState,
         val storageDataWarningState: StorageDataWarningState,
+        val fixDownloadsState: FixDownloadsState,
     ) {
         data class DownloadedFilesState(
             val size: Long = 0L,
@@ -445,6 +496,12 @@ class StorageSettingsViewModel
             val isChecked: Boolean = false,
             val onCheckedChange: (Boolean) -> Unit,
         )
+
+        data class FixDownloadsState(
+            val isFixing: Boolean = false,
+            val episodeCount: Int = 0,
+            val currentlyFixed: Int = 0,
+        )
     }
 
     data class AlertDialogState(
@@ -452,4 +509,8 @@ class StorageSettingsViewModel
         val message: String? = null,
         val buttons: List<DialogButtonState>,
     )
+
+    private companion object {
+        const val FIX_EPISODES_LIMIT = 10_000
+    }
 }

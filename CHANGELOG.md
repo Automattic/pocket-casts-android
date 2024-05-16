@@ -1,6 +1,8 @@
 7.65
 -----
-
+*   New Features
+    *   Add a storage setting that attempts to fix missing downloads files.
+        ([#2244](https://github.com/Automattic/pocket-casts-android/pull/2244))
 
 7.64
 -----
