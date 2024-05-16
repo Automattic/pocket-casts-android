@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.automattic.tracks)
+    implementation(libs.tracks)
     implementation(project(":modules:services:utils"))
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:model"))

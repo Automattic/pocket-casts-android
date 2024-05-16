@@ -32,16 +32,10 @@ class NovaLauncherBridge @Inject constructor(
     }
 
     private fun refreshSyncRules() {
-        if (!FeatureFlag.isEnabled(Feature.NOVA_LAUNCHER)) {
-            unregisterNovaLauncherSync()
-            return
-        }
-        if (!context.isNovaLauncherInstalled) {
+        if (!FeatureFlag.isEnabled(Feature.NOVA_LAUNCHER) || !context.isNovaLauncherInstalled) {
             unregisterNovaLauncherSync()
             areSyncRulesActive.set(false)
-            return
-        }
-        if (context.isNovaLauncherInstalled && !areSyncRulesActive.getAndSet(true)) {
+        } else if (context.isNovaLauncherInstalled && !areSyncRulesActive.getAndSet(true)) {
             registerNovaLauncherSync()
         }
     }

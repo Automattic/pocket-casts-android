@@ -58,6 +58,7 @@ include(":modules:features:widgets")
 // services
 include(":modules:services:analytics")
 include(":modules:services:compose")
+include(":modules:services:crashlogging")
 include(":modules:services:images")
 include(":modules:services:localization")
 include(":modules:services:model")

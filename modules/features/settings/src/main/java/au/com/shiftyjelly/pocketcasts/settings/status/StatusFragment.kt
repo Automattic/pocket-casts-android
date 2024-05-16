@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -101,10 +99,8 @@ fun StatusPage(
 
 @Composable
 fun StatusPageContent(viewModel: StatusViewModel) {
-    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
-            .verticalScroll(scrollState)
             .padding(16.dp)
             .fillMaxWidth(),
     ) {

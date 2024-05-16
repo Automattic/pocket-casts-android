@@ -71,13 +71,15 @@ fun FolderImage(
     val elevation = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 1.dp else 0.dp
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
+        modifier = modifier,
     ) {
         val constraints = this
         Card(
             elevation = elevation,
             shape = RoundedCornerShape(cornerRadius),
             backgroundColor = color,
-            modifier = modifier
+            modifier = Modifier
+                .fillMaxSize()
                 .aspectRatio(1f),
         ) {
             Box(

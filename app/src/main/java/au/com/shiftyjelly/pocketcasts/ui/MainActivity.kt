@@ -117,7 +117,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -130,6 +129,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -217,6 +217,8 @@ class MainActivity :
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
+
+    @Inject lateinit var crashLogging: CrashLogging
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -1361,7 +1363,7 @@ class MainActivity :
             }
         } catch (e: Exception) {
             Timber.e(e)
-            SentryHelper.recordException(e)
+            crashLogging.sendReport(e)
         }
     }
 
