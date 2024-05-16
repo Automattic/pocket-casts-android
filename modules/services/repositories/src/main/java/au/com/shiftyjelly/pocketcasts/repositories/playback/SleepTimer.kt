@@ -32,6 +32,7 @@ class SleepTimer @Inject constructor(
         private const val NUMBER_OF_CHAPTERS_KEY = "number_of_chapters"
         private const val END_OF_EPISODE_VALUE = "end_of_episode"
         private const val END_OF_CHAPTER_VALUE = "end_of_chapter"
+        const val TAG: String = "SleepTimer"
     }
 
     private var sleepTimeMs: Long? = null
@@ -60,6 +61,7 @@ class SleepTimer @Inject constructor(
             timeInMillis = currentTimeMs
             add(Calendar.MINUTE, minutes)
         }
+        LogBuffer.i(TAG, "Added extra time: $minutes")
         createAlarm(time.timeInMillis)
     }
 
@@ -91,6 +93,7 @@ class SleepTimer @Inject constructor(
             } else if (shouldRestartSleepAfterTime(diffTime, timerState.isSleepTimerRunning)) {
                 lastSleepAfterTime?.let {
                     analyticsTracker.track(PLAYER_SLEEP_TIMER_RESTARTED, mapOf(TIME_KEY to it.inWholeSeconds))
+                    LogBuffer.i(TAG, "Was restarted with ${it.inWholeMinutes} minutes set")
                     sleepAfter(it, onRestartSleepAfterTime)
                 }
             }
@@ -98,6 +101,7 @@ class SleepTimer @Inject constructor(
     }
 
     fun setEndOfEpisodeUuid(uuid: String) {
+        LogBuffer.i(TAG, "Episode $uuid was marked as end of episode")
         lastEpisodeUuidAutomaticEnded = uuid
         lastTimeSleepTimeHasFinished = System.currentTimeMillis().milliseconds
         cancelAutomaticSleepAfterTimeRestart()
@@ -105,6 +109,7 @@ class SleepTimer @Inject constructor(
     }
 
     fun setEndOfChapter() {
+        LogBuffer.i(TAG, "End of chapter was reached")
         val time = System.currentTimeMillis().milliseconds
         lastSleepAfterEndOfChapterTime = time
         lastTimeSleepTimeHasFinished = time
@@ -137,6 +142,7 @@ class SleepTimer @Inject constructor(
             false
         } else {
             return try {
+                LogBuffer.i(TAG, "Starting...")
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMs, sleepIntent)
                 sleepTimeMs = timeMs
                 lastTimeSleepTimeHasFinished = timeMs.milliseconds
@@ -149,6 +155,7 @@ class SleepTimer @Inject constructor(
     }
 
     fun cancelTimer() {
+        LogBuffer.i(TAG, "Cleaning automatic sleep timer feature...")
         getAlarmManager().cancel(getSleepIntent())
         cancelSleepTime()
         cancelAutomaticSleepAfterTimeRestart()
@@ -164,6 +171,7 @@ class SleepTimer @Inject constructor(
 
         val timeLeft = sleepTimeMs - System.currentTimeMillis()
         if (timeLeft < 0) {
+            LogBuffer.i(TAG, "Cancelled because time is up")
             cancelSleepTime()
             return null
         }
