@@ -1,6 +1,24 @@
-7.64
+7.65
 -----
 
+
+7.64
+-----
+*   New Features
+    *   Add three new widgets - small, medium, and large.
+        ([#2216](https://github.com/Automattic/pocket-casts-android/pull/2216))
+*   Updates:
+    *   New design for the Podcasts grid layout
+        ([#2165](https://github.com/Automattic/pocket-casts-android/pull/2165))
+    *   Adds new dedicated tab for up next
+        ([#2213](https://github.com/Automattic/pocket-casts-android/pull/2213))
+    *   Mini player small design refresh
+        ([#2214](https://github.com/Automattic/pocket-casts-android/pull/2214))
+*   Bug Fixes
+    *   Fix pull to refresh icon sometimes being stuck in a loading state
+        ([#2164](https://github.com/Automattic/pocket-casts-android/pull/2164))
+    *   Fix cases where podcasts were ignoring 'Never archive' setting in some cases
+        ([#2194](https://github.com/Automattic/pocket-casts-android/pull/2194))
 
 7.63
 -----
@@ -9,10 +27,12 @@
         ([#2054](https://github.com/Automattic/pocket-casts-android/pull/2054))
     *   Sleep timer: Start fading out audio when sleep timer has 5 seconds left
         ([#2069](https://github.com/Automattic/pocket-casts-android/pull/2069))
-    *   Sleep timer: Set sleep time end of episode for multiple episodes
+    *   Sleep timer: Add the option to select the number of episodes
         ([#2097](https://github.com/Automattic/pocket-casts-android/pull/2097))
     *   Enable toggling episode artwork separately in different contexts
         ([#2112](https://github.com/Automattic/pocket-casts-android/pull/2112))
+    *   Sleep timer: Add the option to select the number of chapters
+        ([#2115](https://github.com/Automattic/pocket-casts-android/pull/2115))
 *   Updates:
     *   Improved updating podcast episode when subscribed to thousands podcasts. 
         ([#2082](https://github.com/Automattic/pocket-casts-android/pull/2082))

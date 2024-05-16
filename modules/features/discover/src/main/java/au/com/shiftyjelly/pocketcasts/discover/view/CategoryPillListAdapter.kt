@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.CategoryPillBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPillListAdapter.CategoryPillViewHolder
 import au.com.shiftyjelly.pocketcasts.localization.R.string.clear_all
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 
 val CATEGORY_PILL_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
@@ -29,7 +30,7 @@ val CATEGORY_PILL_DIFF = object : DiffUtil.ItemCallback<CategoryPill>() {
 class CategoryPillListAdapter(
     private val onCategoryClick: (CategoryPill, (List<CategoryPill>) -> Unit) -> Unit,
     private val onAllCategoriesClick: (() -> Unit, (List<CategoryPill>) -> Unit) -> Unit,
-    private val onClearCategoryClick: () -> Unit,
+    private val onClearCategoryClick: (DiscoverCategory?) -> Unit,
 ) : ListAdapter<CategoryPill, CategoryPillViewHolder>(CATEGORY_PILL_DIFF) {
 
     class CategoryPillViewHolder(
@@ -44,7 +45,7 @@ class CategoryPillListAdapter(
         }
 
         fun bind(category: CategoryPill, context: Context) {
-            if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
+            if (category.discoverCategory.id == ALL_CATEGORIES_ID) {
                 setUpAllCategoriesAndClear(context, category)
             } else {
                 setUpCategories(context, category)
@@ -61,6 +62,7 @@ class CategoryPillListAdapter(
                 binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
                 binding.categoryPill.background = getDrawable(context, R.drawable.category_pill_background)
             }
+            binding.categoryName.setCategoryColor(category.isSelected)
         }
 
         private fun setUpCategories(context: Context, category: CategoryPill) {
@@ -83,11 +85,14 @@ class CategoryPillListAdapter(
         val binding = CategoryPillBinding.inflate(inflater, parent, false)
         return CategoryPillViewHolder(binding) { position ->
             val category = getItem(position)
-            if (category.discoverCategory.id == DiscoverCategory.ALL_CATEGORIES_ID) {
+            if (category.discoverCategory.id == ALL_CATEGORIES_ID) {
                 if (category.isSelected) {
-                    onClearCategoryClick()
+                    val currentSelectedCategory = currentList.firstOrNull { it.discoverCategory.id != ALL_CATEGORIES_ID }
+                    onClearCategoryClick(currentSelectedCategory?.discoverCategory)
                 } else {
                     binding.categoryIcon.setImageResource(R.drawable.ic_arrow_up)
+                    binding.categoryName.setCategory(category.discoverCategory.name)
+                    binding.categoryName.setCategoryColor(isSelected = false)
                     onAllCategoriesClick(
                         onCategorySelectionCancel@{
                             binding.categoryName.setCategory(category.discoverCategory.name)
@@ -96,7 +101,8 @@ class CategoryPillListAdapter(
                         },
                         onCategorySelectionSuccess@{
                             binding.categoryIcon.setIcon(R.drawable.ic_arrow_down)
-                            updateCategoryStatus(position, isSelected = false)
+                            binding.categoryName.setCategory(category.discoverCategory.name)
+                            updateAllCategoryButton()
                             loadCategories(it)
                         },
                     )
@@ -116,8 +122,14 @@ class CategoryPillListAdapter(
         submitList(categoryPills)
     }
     private fun updateCategoryStatus(position: Int, isSelected: Boolean) {
-        getItem(position).isSelected = isSelected
-        notifyItemChanged(position)
+        if (getItem(position).isSelected != isSelected) { // This is to avoid UI flickering
+            getItem(position).isSelected = isSelected
+            notifyItemChanged(position)
+        }
+    }
+
+    private fun updateAllCategoryButton() {
+        updateCategoryStatus(0, isSelected = currentList.size == 2)
     }
 }
 private fun TextView.setCategory(category: String) {
@@ -127,7 +139,7 @@ private fun TextView.setCategory(category: String) {
 }
 private fun TextView.setCategoryColor(isSelected: Boolean) {
     if (isSelected) {
-        this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_ui_02_selected))
+        this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.secondary_ui_01))
     } else {
         this.setTextColor(context.getThemeColor(au.com.shiftyjelly.pocketcasts.ui.R.attr.primary_text_01))
     }

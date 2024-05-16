@@ -62,7 +62,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9120
+        const val WHATS_NEW_VERSION_CODE = 9121
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -106,6 +106,7 @@ interface Settings {
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
+        const val INTENT_OPEN_APP_PODCAST_UUID = "INTENT_OPEN_APP_PODCAST_UUID"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
         const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
         const val INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE = "INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE"
@@ -122,6 +123,10 @@ interface Settings {
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
 
         const val BOOKMARK_UUID = "bookmark_uuid"
+
+        const val PODCAST_UUID = "podcast_uuid"
+
+        const val SOURCE_VIEW = "source_view"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -352,10 +357,14 @@ interface Settings {
 
     fun setSleepTimerCustomMins(minutes: Int)
     fun setSleepEndOfEpisodes(episodes: Int)
+    fun setSleepEndOfChapters(chapters: Int)
     fun setlastSleepEndOfEpisodes(episodes: Int)
+    fun setlastSleepEndOfChapters(chapters: Int)
     fun getSleepTimerCustomMins(): Int
     fun getSleepEndOfEpisodes(): Int
+    fun getSleepEndOfChapters(): Int
     fun getlastSleepEndOfEpisodes(): Int
+    fun getlastSleepEndOfChapter(): Int
 
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
@@ -389,6 +398,7 @@ interface Settings {
     fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
+    fun getRefreshPodcastsBatchSize(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
@@ -454,7 +464,8 @@ interface Settings {
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
-    val endOfYearShowBadge2023: UserSetting<Boolean>
+    fun setEndOfYearShowBadge2023(value: Boolean)
+    fun getEndOfYearShowBadge2023(): Boolean
 
     fun setEndOfYearShowModal(value: Boolean)
     fun getEndOfYearShowModal(): Boolean
@@ -520,4 +531,7 @@ interface Settings {
     // system dark mode.
     val themeReconfigurationEvents: Flow<Unit>
     fun requestThemeReconfiguration()
+
+    val bottomInset: Flow<Int>
+    fun updateBottomInset(height: Int)
 }

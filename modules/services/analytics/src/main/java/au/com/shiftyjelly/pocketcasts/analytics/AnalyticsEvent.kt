@@ -249,6 +249,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SEEK("playback_seek"),
     PLAYBACK_EPISODE_AUTOPLAYED("playback_episode_autoplayed"),
     PLAYBACK_EPISODE_DURATION_CHANGED("playback_episode_duration_changed"),
+    PLAYBACK_FOREGROUND_SERVICE_ERROR("playback_foreground_service_error"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
@@ -279,8 +280,14 @@ enum class AnalyticsEvent(val key: String) {
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
+    DISCOVER_CATEGORIES_PICKER_PICK("discover_categories_picker_pick"),
+    DISCOVER_CATEGORIES_PILL_TAPPED("discover_categories_pill_tapped"),
+    DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED("discover_category_close_button_tapped"),
+    DISCOVER_CATEGORIES_PICKER_SHOWN("discover_categories_picker_shown"),
+    DISCOVER_CATEGORIES_PICKER_CLOSED("discover_categories_picker_closed"),
     DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
     DISCOVER_AD_CATEGORY_TAPPED("discover_ad_category_tapped"),
+    DISCOVER_AD_CATEGORY_SUBSCRIBED("discover_ad_category_subscribed"),
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),

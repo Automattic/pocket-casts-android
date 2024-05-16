@@ -41,7 +41,7 @@ internal fun LargePlayerHeader(
                 size = 116.dp,
             )
             Spacer(
-                modifier = GlanceModifier.width(12.dp),
+                modifier = GlanceModifier.width(8.dp),
             )
             Column(
                 verticalAlignment = Alignment.Vertical.Top,
@@ -63,7 +63,6 @@ internal fun LargePlayerHeader(
                 PlaybackControls(
                     isPlaying = state.isPlaying,
                     buttonHeight = 58.dp,
-                    iconPadding = 16.dp,
                     isClickable = episode != null,
                     modifier = GlanceModifier.defaultWeight(),
                 )

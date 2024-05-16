@@ -158,12 +158,19 @@
     <string name="report">Report</string>
     <string name="report_subtitle">Report inappropriate content</string>
     <string name="widget">Widget</string>
+    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
     <string name="small_player_widget_label">Small Player</string>
     <string name="medium_player_widget_label">Medium Player</string>
     <string name="large_player_widget_label">Large Player</string>
     <string name="widget_no_episode_playing">No episode playing</string>
     <string name="widget_nothing_in_up_next">Nothing in Up Next</string>
     <string name="widget_check_out_discover">Check out Discover for more</string>
+    <string name="widget_preview_episode_title">Episode title</string>
+    <string name="widget_preview_episode_in_up_next_title">Episode in Up Next</string>
+    <string name="widget_preview_time_left_1">25m left</string>
+    <string name="widget_preview_time_left_2">12m left</string>
+    <string name="widget_preview_time_left_3">55m left</string>
+    <string name="widget_preview_time_left_4">1h 36m left</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -183,6 +190,8 @@
     <string name="minutes_short_plural">%d mins</string>
     <string name="hours_singular">1 hour</string>
     <string name="hours_plural">%d hours</string>
+    <string name="hours_and_minutes">%d hours and %d minutes</string>
+    <string name="hour_and_minutes">1 hour and %d minutes</string>
     <string name="days_singular">1 day</string>
     <string name="days_plural">%d days</string>
     <string name="months_singular">1 month</string>
@@ -299,7 +308,6 @@
     <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
-    <string name="player_sleep_5_minutes">5 minutes</string>
     <string name="player_sleep_1_minute">1 minute</string>
     <string name="player_sleep_60_minutes">60 minutes</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
@@ -308,13 +316,17 @@
     <string name="player_sleep_custom_minus">Custom minus</string>
     <string name="player_sleep_custom_plus">Custom plus</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
-    <string name="player_sleep_end_of_episode_singular">End of 1 episode</string>
-    <string name="player_sleep_end_of_episode_plural">End of %d episodes</string>
+    <string name="player_sleep_timer_in_episode">In 1 episode</string>
+    <string name="player_sleep_timer_in_episode_plural">In %d episodes</string>
+    <string name="player_sleep_timer_in_chapter">In 1 chapter</string>
+    <string name="player_sleep_timer_in_chapter_plural">In %d chapters</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
     <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
     <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>
+up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
+    <string name="player_sleep_in_chapters">Sleeping in %d chapters</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Sleep timer restarted after device shake</string>
     <string name="player_sleep_timer_stopped_your_podcast">Sleep timer stopped your podcast.</string>
     <string name="player_star" translatable="false">@string/star</string>
@@ -338,6 +350,11 @@
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
     <string name="player_up_next_time_remaining">Total time remaining %s</string>
+    <string name="player_up_next_time_left" translatable="false">@string/time_left</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one" formatted="true">%1$d episode - %2$s left</item>
+        <item quantity="other" formatted="true">%1$d episodes - %2$s left</item>
+    </plurals>
     <string name="player_open_url_failed">Could not find a browser to open %s.</string>
     <string name="player_archive_title" translatable="false">@string/archive</string>
     <string name="player_archive_summary">Are you sure you want to archive this episode?</string>
@@ -349,7 +366,8 @@
     <string name="player_rearrange_actions_hidden">More actions</string>
     <string name="player_actions_hidden_for_custom">Hidden for custom episodes</string>
     <string name="player_actions_show_as_delete_for_custom">Shown as delete for custom episodes</string>
-    <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.\nNight night!</string>
+    <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.</string>
+    <string name="player_sleep_time_fired_end_of_chapter">Sleep timer stopped at the end of your chapter.</string>
     <string name="player_skipped_last">Skipped the last %d seconds</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>
@@ -1455,7 +1473,7 @@
     <!-- Button title to upgrade to Patron. Don't translate "Patron" -->
     <string name="upgrade_to_patron">Upgrade to Patron</string>
     <string name="whats_new_new_widgets_title">New widgets</string>
-    <string name="whats_new_new_widgets_message">With two new sizes and an updated design, managing your podcasts from the home screen just got a whole lot easier. Please check them out!</string>
+    <string name="whats_new_new_widgets_message">We’ve just added three new widgets, so managing your podcasts from the home screen got a whole lot easier. Please check them out!</string>
 
     <!-- Errors -->
 
@@ -1906,4 +1924,8 @@
 
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
+
+
+    <!-- Nova Launcher -->
+    <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
 </resources>

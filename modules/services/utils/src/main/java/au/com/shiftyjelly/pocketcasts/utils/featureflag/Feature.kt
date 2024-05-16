@@ -30,7 +30,7 @@ enum class Feature(
     SETTINGS_SYNC(
         key = "settings_sync",
         title = "Settings Sync",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -78,7 +78,7 @@ enum class Feature(
     CATEGORIES_REDESIGN(
         key = "CATEGORIES_REDESIGN",
         title = "Podcasts by category shown in discover view",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -86,6 +86,30 @@ enum class Feature(
     UPNEXT_IN_TAB_BAR(
         key = "upnext_in_tab_bar",
         title = "Show Up Next in tab bar",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    PODCASTS_GRID_VIEW_DESIGN_CHANGES(
+        key = "podcasts_grid_view_changes",
+        title = "Podcasts grid view design changes",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    MINI_PLAYER_DESIGN(
+        key = "mini_player_design",
+        title = "Mini player design",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    NOVA_LAUNCHER(
+        key = "nova_launcher",
+        title = "Integrate Pocket Casts with Nova Launcher",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,

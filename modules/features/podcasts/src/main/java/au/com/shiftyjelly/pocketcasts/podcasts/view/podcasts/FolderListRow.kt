@@ -18,8 +18,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImageSmall
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -41,7 +45,7 @@ fun FolderListRow(
             .padding(horizontal = 16.dp)
             .then(if (onClick == null) Modifier else Modifier.clickable { onClick() }),
     ) {
-        FolderImageSmall(color = color, podcastUuids = podcastUuids)
+        FolderImageSmall(color = color, podcastUuids = podcastUuids, folderImageSize = 64.dp)
         Column(
             modifier = Modifier
                 .padding(start = 16.dp)
@@ -71,11 +75,18 @@ fun FolderListRow(
             )
         }
         if (badgeType != BadgeType.OFF) {
-            Text(
-                text = if (badgeType != BadgeType.LATEST_EPISODE) badgeCount.toString() else "●",
-                fontSize = 14.sp,
-                color = if (badgeType == BadgeType.LATEST_EPISODE) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02,
-            )
+            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+                CountBadge(
+                    count = badgeCount,
+                    style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Big,
+                )
+            } else {
+                Text(
+                    text = if (badgeType != BadgeType.LATEST_EPISODE) badgeCount.toString() else "●",
+                    fontSize = 14.sp,
+                    color = if (badgeType == BadgeType.LATEST_EPISODE) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02,
+                )
+            }
         }
     }
 }

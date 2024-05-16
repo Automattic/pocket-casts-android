@@ -73,11 +73,26 @@ data class Podcast(
     @ColumnInfo(name = "exclude_from_auto_archive") var excludeFromAutoArchive: Boolean = false, // Not used anymore
     @ColumnInfo(name = "override_global_archive") var overrideGlobalArchive: Boolean = false,
     @ColumnInfo(name = "override_global_archive_modified") var overrideGlobalArchiveModified: Date? = null,
-    @ColumnInfo(name = "auto_archive_played_after") var autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
+    @Deprecated(
+        message = "This property doesn't account for global override. Use 'autoArchiveAfterPlaying' instead.",
+        level = DeprecationLevel.ERROR,
+        replaceWith = ReplaceWith(expression = "autoArchiveAfterPlaying"),
+    )
+    @ColumnInfo(name = "auto_archive_played_after") internal var rawAutoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
     @ColumnInfo(name = "auto_archive_played_after_modified") var autoArchiveAfterPlayingModified: Date? = null,
-    @ColumnInfo(name = "auto_archive_inactive_after") var autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Default,
+    @Deprecated(
+        message = "This property doesn't account for global override. Use 'autoArchiveInactive' instead.",
+        level = DeprecationLevel.ERROR,
+        replaceWith = ReplaceWith(expression = "autoArchiveInactive"),
+    )
+    @ColumnInfo(name = "auto_archive_inactive_after") internal var rawAutoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Default,
     @ColumnInfo(name = "auto_archive_inactive_after_modified") var autoArchiveInactiveModified: Date? = null,
-    @ColumnInfo(name = "auto_archive_episode_limit") var autoArchiveEpisodeLimit: Int? = null,
+    @Deprecated(
+        message = "This property doesn't account for global override. Use 'autoArchiveEpisodeLimit' instead.",
+        level = DeprecationLevel.ERROR,
+        replaceWith = ReplaceWith(expression = "autoArchiveEpisodeLimit"),
+    )
+    @ColumnInfo(name = "auto_archive_episode_limit") internal var rawAutoArchiveEpisodeLimit: Int? = null,
     @ColumnInfo(name = "auto_archive_episode_limit_modified") var autoArchiveEpisodeLimitModified: Date? = null,
     @ColumnInfo(name = "estimated_next_episode") var estimatedNextEpisode: Date? = null,
     @ColumnInfo(name = "episode_frequency") var episodeFrequency: String? = null,
@@ -173,6 +188,31 @@ data class Podcast(
             rawFolderUuid = value?.takeIf { it != Folder.homeFolderUuid }
         }
 
+    @Suppress("DEPRECATION_ERROR")
+    var autoArchiveAfterPlaying: AutoArchiveAfterPlaying?
+        get() = rawAutoArchiveAfterPlaying.takeIf { overrideGlobalArchive }
+        set(value) {
+            if (value != null) {
+                rawAutoArchiveAfterPlaying = value
+            }
+        }
+
+    @Suppress("DEPRECATION_ERROR")
+    var autoArchiveInactive: AutoArchiveInactive?
+        get() = rawAutoArchiveInactive.takeIf { overrideGlobalArchive }
+        set(value) {
+            if (value != null) {
+                rawAutoArchiveInactive = value
+            }
+        }
+
+    @Suppress("DEPRECATION_ERROR")
+    var autoArchiveEpisodeLimit: Int?
+        get() = rawAutoArchiveEpisodeLimit.takeIf { overrideGlobalArchive }
+        set(value) {
+            rawAutoArchiveEpisodeLimit = value
+        }
+
     enum class Licensing {
         KEEP_EPISODES, DELETE_EPISODES
     }
@@ -206,10 +246,12 @@ data class Podcast(
         }
     }
 
+    fun lightThemeTint() = if (tintColorForLightBg != 0 && tintColorForLightBg != DEFAULT_SERVER_LIGHT_TINT_COLOR) tintColorForLightBg else DEFAULT_LIGHT_TINT
+
+    fun darkThemeTint() = if (tintColorForDarkBg != 0 && tintColorForDarkBg != DEFAULT_SERVER_DARK_TINT_COLOR) tintColorForDarkBg else DEFAULT_DARK_TINT
+
     fun getTintColor(isDarkTheme: Boolean): Int {
-        val lightThemeColor = if (tintColorForLightBg != 0 && tintColorForLightBg != DEFAULT_SERVER_LIGHT_TINT_COLOR) tintColorForLightBg else DEFAULT_LIGHT_TINT
-        val darkThemeColor = if (tintColorForDarkBg != 0 && tintColorForDarkBg != DEFAULT_SERVER_DARK_TINT_COLOR) tintColorForDarkBg else DEFAULT_DARK_TINT
-        return if (isDarkTheme) darkThemeColor else lightThemeColor
+        return if (isDarkTheme) darkThemeTint() else lightThemeTint()
     }
 
     fun getPlayerTintColor(isDarkTheme: Boolean): Int {

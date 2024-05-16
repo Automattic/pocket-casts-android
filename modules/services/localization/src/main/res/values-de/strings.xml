@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-23 11:54:04+0000
+Translation-Revision-Date: 2024-05-08 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">Durch die Schlummerfunktion wurde die Wiedergabe am Ende deines Kapitels beendet.</string>
+    <string name="player_sleep_in_chapters">Schlummerfunktion wird nach %d Kapiteln aktiviert</string>
+    <string name="player_sleep_in_one_chapter">Schlummerfunktion wird nach 1 Kapitel aktiviert</string>
+    <string name="player_sleep_timer_in_chapter_plural">Nach %d Kapiteln</string>
+    <string name="player_sleep_timer_in_chapter">Nach 1 Kapitel</string>
+    <string name="player_sleep_timer_in_episode_plural">Nach %d Folgen</string>
+    <string name="player_sleep_timer_in_episode">Nach 1 Folge</string>
+    <string name="settings_use_episode_artwork_customization_description">Wähle aus, ob in diesen App-Bereichen das Cover der Folge angezeigt werden soll</string>
+    <string name="settings_use_episode_artwork_customization_section">Anpassung</string>
+    <string name="settings_use_episode_artwork_title">Cover der Folge</string>
+    <string name="settings_use_episode_artwork_advanced">Erweiterte Einstellungen zum Cover der Folge</string>
+    <string name="player_sleep_in_episodes">Schlummerfunktion startet nach %d Folgen</string>
+    <string name="player_sleep_in_one_episode">Schlummerfunktion startet nach 1 Folge</string>
     <string name="player_sleep_timer_stopped_your_podcast">Die Schlummerfunktion hat deinen Podcast angehalten.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Die Schlummerfunktion wurde nach dem Schütteln des Geräts neu gestartet</string>
     <string name="whats_new_new_widgets_message">Dank zwei neuer Größen und einem aktualisierten Design ist die Verwaltung deiner Podcasts von der Startseite aus nun viel einfacher. Schau dir die Neuheiten an!</string>
@@ -1453,7 +1466,6 @@ Language: de
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Podcast wird bei %d Sekunden gestartet</string>
     <string name="player_skipped_last">Die letzten %d Sekunden werden übersprungen</string>
-    <string name="player_sleep_time_fired">Durch die Schlummerfunktion wurde die Wiedergabe am Ende deiner Folge beendet.\nGute Nacht!</string>
     <string name="player_actions_show_as_delete_for_custom">Für eigene Folgen als gelöscht anzeigen</string>
     <string name="player_actions_hidden_for_custom">Für eigene Folgen verborgen</string>
     <string name="player_rearrange_actions_hidden">Weitere Aktionen</string>
@@ -1483,7 +1495,6 @@ Language: de
     <string name="player_sleep_cancel_timer">Schlummerfunktion beenden</string>
     <string name="player_sleep_add_5_minutes">+ 5 Minuten</string>
     <string name="player_sleep_60_minutes">60 Minuten</string>
-    <string name="player_sleep_5_minutes">5 Minuten</string>
     <string name="player_sleep_30_minutes">30 Minuten</string>
     <string name="player_sleep_15_minutes">15 Minuten</string>
     <string name="player_pip">Bild-in-Bild starten</string>

@@ -13,7 +13,6 @@ import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -26,23 +25,17 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
-import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import coil.request.Disposable
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
-import com.google.android.gms.cast.framework.CastButtonFactory
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@AndroidEntryPoint
 class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs), CoroutineScope {
 
@@ -62,13 +55,10 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     var clickListener: OnMiniPlayerClicked? = null
 
-    @Inject
-    lateinit var chromeCastAnalytics: ChromeCastAnalytics
-
     init {
         // open full screen player on click
-        binding.root.setOnClickListener { openPlayer() }
-        binding.root.setOnLongClickListener {
+        binding.miniPlayerCardView.setOnClickListener { openPlayer() }
+        binding.miniPlayerCardView.setOnLongClickListener {
             clickListener?.onLongClick()
             true
         }
@@ -79,12 +69,40 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.skipForward.setOnClickListener { skipForwardClicked() }
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
-        // cast button
-        CastButtonFactory.setUpMediaRouteButton(context, binding.mediaRouteButton)
-        binding.mediaRouteButton.setOnClickListener {
-            chromeCastAnalytics.trackChromeCastViewShown()
+
+        val elevation = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_elevation) else 0f
+        binding.miniPlayerCardView.elevation = elevation
+        val cornerRadius = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_corner_radius) else 0f
+        binding.miniPlayerCardView.radius = cornerRadius
+        val margin = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_margin).toInt() else 0
+        (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
+
+        val playBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.drawable.mini_player_play_background_32
+        } else {
+            R.drawable.mini_player_play_background_48
         }
-        binding.mediaRouteButton.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+        binding.miniPlayButton.background = ContextCompat.getDrawable(context, playBackground)
+        val playButtonLottieBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.raw.mini_player_play_button_32
+        } else {
+            R.raw.mini_player_play_button_48
+        }
+        binding.miniPlayButton.setAnimation(playButtonLottieBackground)
+
+        val skipButtonSize = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.dimen.mini_player_skip_button_size_56
+        } else {
+            R.dimen.mini_player_skip_button_size_68
+        }
+        with(binding.skipBack.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
+        with(binding.skipForward.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
 
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
@@ -123,15 +141,13 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun updateTintColor(tintColor: Int, theme: Theme) {
-        val iconTintColor = ThemeColor.podcastIcon03(theme.activeTheme, tintColor)
         val tintColorStateList: ColorStateList =
-            ColorStateList.valueOf(iconTintColor)
+            ColorStateList.valueOf(ThemeColor.podcastIcon03(theme.activeTheme, tintColor))
 
         binding.skipForward.imageTintList = tintColorStateList
         binding.miniPlayButton.backgroundTintList = tintColorStateList
         binding.skipBack.imageTintList = tintColorStateList
         binding.upNextButton.imageTintList = tintColorStateList
-        binding.mediaRouteButton.updateColor(iconTintColor)
 
         val colorStateList = ThemeColor.podcastUi02(theme.activeTheme, tintColor)
         binding.miniPlayerTint.setBackgroundColor(colorStateList)
@@ -168,10 +184,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         val upNextCount: Int = upNextState.queueSize()
         binding.countText.text = upNextCount.toString()
         binding.countText.isVisible = upNextCount > 0
-        binding.upNextButton.showIf(
-            !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR) ||
-                (upNextCount > 0),
-        )
 
         val drawableId = when {
             upNextCount == 0 -> R.drawable.mini_player_upnext

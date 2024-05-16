@@ -16,13 +16,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
-class PocketCastsCrashLoggingDataProvider @Inject constructor(
+internal class PocketCastsCrashLoggingDataProvider @Inject constructor(
     observeUser: ObserveUser,
     private val crashReportPermissionCheck: CrashReportPermissionCheck,
     buildDataProvider: BuildDataProvider,
     private val encryptedLogging: EncryptedLogging,
     private val applicationFilesDir: File,
     private val connectionStatusProvider: ConnectionStatusProvider,
+    localeProvider: LocaleProvider,
 ) : CrashLoggingDataProvider {
 
     override val applicationContextProvider: Flow<Map<String, String>> = flowOf(
@@ -35,9 +36,12 @@ class PocketCastsCrashLoggingDataProvider @Inject constructor(
 
     override val enableCrashLoggingLogs: Boolean = false
 
-    override val locale: Locale = Locale.getDefault()
+    override val locale: Locale? = localeProvider.provideLocale()
 
-    override val performanceMonitoringConfig = PerformanceMonitoringConfig.Disabled
+    override val performanceMonitoringConfig = PerformanceMonitoringConfig.Enabled(
+        sampleRate = 0.01,
+        profilesSampleRate = 0.01,
+    )
 
     override val releaseName = ReleaseName.SetByTracksLibrary
 

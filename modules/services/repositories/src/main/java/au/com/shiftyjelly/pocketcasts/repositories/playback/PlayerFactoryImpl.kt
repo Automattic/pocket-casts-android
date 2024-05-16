@@ -3,12 +3,14 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class PlayerFactoryImpl @Inject constructor(
     private val settings: Settings,
     private val statsManager: StatsManager,
+    private val crashLogging: CrashLogging,
     @ApplicationContext private val context: Context,
 ) : PlayerFactory {
 
@@ -20,6 +22,6 @@ class PlayerFactoryImpl @Inject constructor(
     }
 
     override fun createSimplePlayer(onPlayerEvent: (Player, PlayerEvent) -> Unit): Player {
-        return SimplePlayer(settings, statsManager, context, onPlayerEvent)
+        return SimplePlayer(settings, statsManager, context, crashLogging, onPlayerEvent)
     }
 }

@@ -76,6 +76,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.BOOKMARK_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PODCAST_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SOURCE_VIEW
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
 import au.com.shiftyjelly.pocketcasts.profile.SubCancelledFragment
 import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
@@ -110,7 +112,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.MainActivityViewModel.NavigationState
-import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -332,9 +333,7 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            binding.bottomNavigation.menu.removeItem(VR.id.navigation_profile)
-        } else {
+        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
             binding.bottomNavigation.menu.removeItem(VR.id.navigation_upnext)
         }
 
@@ -345,7 +344,7 @@ class MainActivity :
                     if (settings.getEndOfYearShowModal()) {
                         setupEndOfYearLaunchBottomSheet()
                     }
-                    if (settings.endOfYearShowBadge2023.value && !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    if (settings.getEndOfYearShowBadge2023()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                     }
                 }
@@ -357,6 +356,7 @@ class MainActivity :
             put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
             put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
+            put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
             if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
                 put(VR.id.navigation_upnext) {
                     FragmentInfo(
@@ -367,9 +367,6 @@ class MainActivity :
                         true,
                     )
                 }
-            }
-            if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
             }
         }
 
@@ -420,25 +417,20 @@ class MainActivity :
                 if (it is NavigatorAction.TabSwitched) {
                     val currentTab = navigator.currentTab()
                     if (settings.selectedTab() != currentTab) {
-                        popToRootFragmentIfNeeded(currentTab)
                         trackTabOpened(currentTab)
                         when (currentTab) {
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
                             VR.id.navigation_profile -> {
-                                if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                                    resetEoYBadgeIfNeeded()
-                                }
+                                resetEoYBadgeIfNeeded()
                                 FirebaseAnalyticsTracker.navigatedToProfile()
                             }
                         }
                     }
                     settings.setSelectedTab(currentTab)
                 } else if (it is NavigatorAction.NewFragmentAdded) {
-                    if (navigator.currentTab() == VR.id.navigation_profile &&
-                        !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
-                    ) {
+                    if (navigator.currentTab() == VR.id.navigation_profile) {
                         resetEoYBadgeIfNeeded()
                     }
                 }
@@ -455,21 +447,12 @@ class MainActivity :
         ThemeSettingObserver(this, theme, settings.themeReconfigurationEvents).observeThemeChanges()
     }
 
-    private fun popToRootFragmentIfNeeded(currentTab: Int) {
-        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) return
-        if (navigator.stackSize(currentTab) > 1 &&
-            navigator.currentFragment() is CloseOnTabSwitch
-        ) {
-            navigator.reset(currentTab, resetRootFragment = false)
-        }
-    }
-
     private fun resetEoYBadgeIfNeeded() {
         if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
-            settings.endOfYearShowBadge2023.value
+            settings.getEndOfYearShowBadge2023()
         ) {
             binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-            settings.endOfYearShowBadge2023.set(false, updateModifiedAt = false)
+            settings.setEndOfYearShowBadge2023(false)
         }
     }
 
@@ -602,12 +585,9 @@ class MainActivity :
             }
         }
 
-        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentOverBottomSheet)
-        if (fragment == null) {
-            if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
-                frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                return
-            }
+        if (frameBottomSheetBehavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
+            frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            return
         }
 
         if (navigator.isShowingModal()) {
@@ -966,18 +946,16 @@ class MainActivity :
     }
 
     override fun onMiniPlayerHidden() {
-        binding.mainFragment.updatePadding(
-            bottom = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt(),
-        )
-        binding.snackbarFragment.updatePadding(bottom = binding.mainFragment.paddingBottom)
+        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt()
+        binding.snackbarFragment.updatePadding(bottom = padding)
+        settings.updateBottomInset(0)
     }
 
     override fun onMiniPlayerVisible() {
-        binding.mainFragment.updatePadding(
-            bottom = resources.getDimension(MR.dimen.design_bottom_navigation_height)
-                .toInt() + resources.getDimension(R.dimen.miniPlayerHeight).toInt(),
-        )
-        binding.snackbarFragment.updatePadding(bottom = binding.mainFragment.paddingBottom)
+        val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
+        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt() + miniPlayerHeight
+        binding.snackbarFragment.updatePadding(bottom = padding)
+        settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
@@ -1151,15 +1129,8 @@ class MainActivity :
         playbackManager.skipForward(sourceView = SourceView.MINIPLAYER)
     }
 
-    override fun addFragment(fragment: Fragment, onTop: Boolean, overBottomSheet: Boolean) {
-        if (overBottomSheet) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentOverBottomSheet, fragment)
-                .addToBackStack(null)
-                .commitAllowingStateLoss()
-        } else {
-            navigator.addFragment(fragment, onTop = onTop)
-        }
+    override fun addFragment(fragment: Fragment, onTop: Boolean) {
+        navigator.addFragment(fragment, onTop = onTop)
     }
 
     override fun replaceFragment(fragment: Fragment) {
@@ -1271,8 +1242,11 @@ class MainActivity :
                     viewModel.deleteBookmark(it)
                 }
                 notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
-            }
-            // new episode notification tapped
+            } else if (action == Settings.INTENT_OPEN_APP_PODCAST_UUID) {
+                intent.getStringExtra(PODCAST_UUID)?.let {
+                    openPodcastPage(it, intent.getStringExtra(SOURCE_VIEW))
+                }
+            } // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
                 // intents were being reused for notifications so we had to use the extra to pass action
                 val episodeUuid =
@@ -1402,11 +1376,6 @@ class MainActivity :
         if (supportFragmentManager.fragments.find { it is CloudFilesFragment } == null) {
             addFragment(CloudFilesFragment())
         }
-    }
-
-    override fun openProfile() {
-        FirebaseAnalyticsTracker.navigatedToProfile()
-        showBottomSheet(ProfileFragment())
     }
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {
@@ -1583,11 +1552,7 @@ class MainActivity :
     }
 
     private fun showUpgradedFromPromoCode(description: String) {
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            openProfile()
-        } else {
-            openTab(VR.id.navigation_profile)
-        }
+        openTab(VR.id.navigation_profile)
         PromoCodeUpgradedFragment.newInstance(description)
             .show(supportFragmentManager, "upgraded_from_promocode")
     }

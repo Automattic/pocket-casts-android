@@ -142,6 +142,7 @@ private fun FolderPreview(layout: PodcastGridLayoutType, name: String, colorId: 
                     name = name,
                     color = backgroundColor,
                     podcastUuids = podcastUuids,
+                    textSpacing = true,
                     modifier = Modifier.size(gridImageWidthDp.dp),
                 )
             }

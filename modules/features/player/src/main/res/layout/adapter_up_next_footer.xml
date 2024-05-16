@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textColor="?attr/primary_text_02"
-            tools:text="23 min." />
+            tools:text="2 episodes - 23 min." />
 
 
         <com.google.android.material.button.MaterialButton

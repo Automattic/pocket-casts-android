@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -37,16 +39,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
-import au.com.shiftyjelly.pocketcasts.ui.helper.CloseOnTabSwitch
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -61,7 +60,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class CloudFilesFragment : BaseFragment(), CloseOnTabSwitch, Toolbar.OnMenuItemClickListener {
+class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var downloadManager: DownloadManager
 
     @Inject lateinit var playbackManager: PlaybackManager
@@ -175,15 +174,10 @@ class CloudFilesFragment : BaseFragment(), CloseOnTabSwitch, Toolbar.OnMenuItemC
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                ChromeCastButton.None
-            } else {
-                ChromeCastButton.Shown(chromeCastAnalytics)
-            },
+            chromeCastButton = Shown(chromeCastAnalytics),
             menu = R.menu.menu_cloudfiles,
         )
         binding?.toolbar?.setOnMenuItemClickListener(this)
-        binding?.toolbar?.menu?.findItem(R.id.media_route_menu_item)?.isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
 
         binding?.recyclerView?.let {
             it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)
@@ -209,6 +203,17 @@ class CloudFilesFragment : BaseFragment(), CloseOnTabSwitch, Toolbar.OnMenuItemC
         }
 
         binding?.layoutUsage?.isVisible = false
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect { bottomInset ->
+                    binding?.recyclerView?.updatePadding(bottom = bottomInset)
+                    binding?.fab?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        bottomMargin = bottomInset + resources.getDimensionPixelSize(R.dimen.files_fab_margin_bottom)
+                    }
+                }
+            }
+        }
 
         viewModel.accountUsage.observe(
             viewLifecycleOwner,

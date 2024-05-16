@@ -63,6 +63,7 @@ import kotlin.math.max
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
@@ -668,6 +669,14 @@ class SettingsImpl @Inject constructor(
         setInt("lastSleepEndOfEpisodes", episodes)
     }
 
+    override fun setlastSleepEndOfChapters(chapters: Int) {
+        setInt("lastSleepEndOfChapters", chapters)
+    }
+
+    override fun setSleepEndOfChapters(chapters: Int) {
+        setInt("sleepEndOfChapters", chapters)
+    }
+
     override fun getSleepTimerCustomMins(): Int {
         return getInt("sleepTimerCustomMins", 5)
     }
@@ -676,8 +685,16 @@ class SettingsImpl @Inject constructor(
         return getInt("sleepEndOfEpisodes", 1)
     }
 
+    override fun getSleepEndOfChapters(): Int {
+        return getInt("sleepEndOfChapters", 1)
+    }
+
     override fun getlastSleepEndOfEpisodes(): Int {
         return getInt("lastSleepEndOfEpisodes", 0)
+    }
+
+    override fun getlastSleepEndOfChapter(): Int {
+        return getInt("lastSleepEndOfChapters", 0)
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {
@@ -911,6 +928,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getSleepTimerDeviceShakeThreshold(): Long {
         return getRemoteConfigLong(FirebaseConfig.SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD)
+    }
+
+    override fun getRefreshPodcastsBatchSize(): Long {
+        return getRemoteConfigLong(FirebaseConfig.REFRESH_PODCASTS_BATCH_SIZE)
     }
 
     private fun getRemoteConfigLong(key: String): Long {
@@ -1212,11 +1233,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val endOfYearShowBadge2023 = UserSetting.BoolPref(
-        sharedPrefKey = END_OF_YEAR_SHOW_BADGE_2023_KEY,
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
+    override fun setEndOfYearShowBadge2023(value: Boolean) {
+        setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
+    }
+
+    override fun getEndOfYearShowBadge2023(): Boolean =
+        getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
 
     override fun setEndOfYearShowModal(value: Boolean) {
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
@@ -1384,5 +1406,13 @@ class SettingsImpl @Inject constructor(
 
     override fun requestThemeReconfiguration() {
         _themeReconfigurationEvents.tryEmit(Unit)
+    }
+
+    private val _bottomInset = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+    override val bottomInset: Flow<Int>
+        get() = _bottomInset.asSharedFlow()
+
+    override fun updateBottomInset(height: Int) {
+        _bottomInset.tryEmit(height)
     }
 }

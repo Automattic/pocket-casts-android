@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-23 09:54:03+0000
+Translation-Revision-Date: 2024-05-08 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">챕터 종료 시 절전 타이머가 중지되었습니다.</string>
+    <string name="player_sleep_in_chapters">%d개 챕터에서 중지됨</string>
+    <string name="player_sleep_in_one_chapter">1개 챕터에서 중지됨</string>
+    <string name="player_sleep_timer_in_chapter_plural">%d개 챕터에서</string>
+    <string name="player_sleep_timer_in_chapter">1개 챕터에서</string>
+    <string name="player_sleep_timer_in_episode_plural">%d개 에피소드에서</string>
+    <string name="player_sleep_timer_in_episode">1개 에피소드에서</string>
+    <string name="settings_use_episode_artwork_customization_description">앱의 해당 섹션에서 에피소드 아트워크를 보려면 선택하세요</string>
+    <string name="settings_use_episode_artwork_customization_section">사용자 정의</string>
+    <string name="settings_use_episode_artwork_title">에피소드 아트워크</string>
+    <string name="settings_use_episode_artwork_advanced">고급 에피소드 아트워크 설정</string>
+    <string name="player_sleep_in_episodes">%d개 에피소드에서 절전</string>
+    <string name="player_sleep_in_one_episode">1개 에피소드에서 절전</string>
     <string name="player_sleep_timer_stopped_your_podcast">절전 타이머로 인해 팟캐스트가 중단되었습니다.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">기기가 흔들려 절전 타이머가 재시작되었습니다</string>
     <string name="whats_new_new_widgets_message">새로운 크기가 두 가지 있고 디자인이 업데이트되어서 홈 화면에서 훨씬 쉽게 팟캐스트를 관리할 수 있습니다. 직접 확인해 보세요!</string>
@@ -1453,7 +1466,6 @@ Language: ko_KR
     <string name="podcasts">팟캐스트</string>
     <string name="player_started_from">%d초부터 팟캐스트 시작</string>
     <string name="player_skipped_last">마지막 %d초 건너뛰기</string>
-    <string name="player_sleep_time_fired">에피소드 종료 시 절전 타이머가 중지되었습니다.\n안녕히 주무세요!</string>
     <string name="player_actions_show_as_delete_for_custom">사용자 정의 에피소드의 경우 삭제로 표시됨</string>
     <string name="player_actions_hidden_for_custom">사용자 정의 에피소드의 경우 숨김</string>
     <string name="player_rearrange_actions_hidden">추가 작업</string>
@@ -1483,7 +1495,6 @@ Language: ko_KR
     <string name="player_sleep_cancel_timer">타이머 취소</string>
     <string name="player_sleep_add_5_minutes">+ 5분</string>
     <string name="player_sleep_60_minutes">60분</string>
-    <string name="player_sleep_5_minutes">5분</string>
     <string name="player_sleep_30_minutes">30분</string>
     <string name="player_sleep_15_minutes">15분</string>
     <string name="player_pip">화면 속 화면 입력</string>

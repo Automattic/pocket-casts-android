@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-04-23 09:54:03+0000
+Translation-Revision-Date: 2024-05-07 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="player_sleep_time_fired_end_of_chapter">Le minuteur de mise en veille s’est arrêté à la fin de votre chapitre.</string>
+    <string name="player_sleep_in_chapters">Mise en veille dans %d chapitres</string>
+    <string name="player_sleep_in_one_chapter">Mise en veille dans 1 chapitre</string>
+    <string name="player_sleep_timer_in_chapter_plural">Dans %d chapitres</string>
+    <string name="player_sleep_timer_in_chapter">Dans 1 chapitre</string>
+    <string name="player_sleep_timer_in_episode_plural">Dans %d épisodes</string>
+    <string name="player_sleep_timer_in_episode">Dans 1 épisode</string>
+    <string name="settings_use_episode_artwork_customization_description">Sélectionnez si vous désirez voir l’illustration de l’épisode dans ces sections de l’application</string>
+    <string name="settings_use_episode_artwork_customization_section">Personnalisation</string>
+    <string name="settings_use_episode_artwork_title">Illustration de l’épisode</string>
+    <string name="settings_use_episode_artwork_advanced">Réglages avancés de l’illustration de l’épisode</string>
+    <string name="player_sleep_in_episodes">Mise en veille dans %d épisodes</string>
+    <string name="player_sleep_in_one_episode">Mise en veille dans 1 épisode</string>
     <string name="player_sleep_timer_stopped_your_podcast">La mise en veille a arrêté votre podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">La mise en veille a été redémarrée après secousse de l’appareil</string>
     <string name="whats_new_new_widgets_message">Avec deux nouvelles tailles et un design mis à jour, il est désormais bien plus facile de gérer vos podcasts depuis l’écran d’accueil. Découvrez ces nouveautés !</string>
@@ -1453,7 +1466,6 @@ Language: fr
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Démarrage du podcast à partir de %d secondes</string>
     <string name="player_skipped_last">Les %d dernières secondes ont été ignorées</string>
-    <string name="player_sleep_time_fired">Le mise en veille s’est arrêté à la fin de votre épisode.\nBonne nuit !</string>
     <string name="player_actions_show_as_delete_for_custom">Fonctionne comme une suppression des épisodes personnalisés</string>
     <string name="player_actions_hidden_for_custom">Masqué pour les épisodes personnalisés</string>
     <string name="player_rearrange_actions_hidden">Plus d’actions</string>
@@ -1483,7 +1495,6 @@ Language: fr
     <string name="player_sleep_cancel_timer">Annuler la mise en veille</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
     <string name="player_sleep_60_minutes">60 minutes</string>
-    <string name="player_sleep_5_minutes">5 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_pip">Ouvrir Picture-in-picture</string>

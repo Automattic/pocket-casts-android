@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -48,12 +49,10 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -236,15 +235,10 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbar = toolbar,
             title = arguments?.getString(ARG_PLAYLIST_TITLE),
             menu = R.menu.menu_filter,
-            chromeCastButton = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                ChromeCastButton.None
-            } else {
-                ChromeCastButton.Shown(chromeCastAnalytics)
-            },
+            chromeCastButton = Shown(chromeCastAnalytics),
             navigationIcon = BackArrow,
             toolbarColors = null,
         )
-        binding.toolbar.menu.findItem(R.id.media_route_menu_item).isVisible = !FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)
 
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
@@ -300,6 +294,14 @@ class FilterEpisodeListFragment : BaseFragment() {
                 episodeListBookmarkViewModel.stateFlow.collect {
                     adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
                     adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding.recyclerView.updatePadding(bottom = it)
                 }
             }
         }
@@ -558,7 +560,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         val binding = binding ?: return
 
         val toolbar = binding.toolbar
-        val colors = ToolbarColors.User(color = color, theme = theme)
+        val colors = ToolbarColors.user(color = color, theme = theme)
         setupToolbarAndStatusBar(
             toolbar = toolbar,
             navigationIcon = BackArrow,

@@ -15,11 +15,6 @@ class ListRepository(private val listWebService: ListWebService, private val pla
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
-    fun getDiscoverFeedWithCategoriesAtTheTop(): Single<Discover> {
-        return listWebService.getDiscoverFeedWithCategoriesAtTheTop(platform)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-    }
 
     suspend fun getDiscoverFeedSuspend(): Discover {
         return listWebService.getDiscoverFeedSuspend(platform)

@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application />
+    <application>
+
+        <receiver
+            android:name="au.com.shiftyjelly.pocketcasts.widget.SmallPlayerWidgetReceiver"
+            android:exported="false"
+            android:label="@string/small_player_widget_label">
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/small_player_widget" />
+        </receiver>
+
+        <receiver
+            android:name="au.com.shiftyjelly.pocketcasts.widget.MediumPlayerWidgetReceiver"
+            android:exported="false"
+            android:label="@string/medium_player_widget_label">
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/medium_player_widget" />
+        </receiver>
+
+        <receiver
+            android:name="au.com.shiftyjelly.pocketcasts.widget.LargePlayerWidgetReceiver"
+            android:exported="false"
+            android:label="@string/large_player_widget_label">
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/large_player_widget" />
+        </receiver>
+
+    </application>
 
 </manifest>

@@ -60,7 +60,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
 
     // TODO: Refactor FragmentHostListener in to something more generic so it can be used
     // cleaner between automotive and main
-    override fun addFragment(fragment: Fragment, onTop: Boolean, overBottomSheet: Boolean) {
+    override fun addFragment(fragment: Fragment, onTop: Boolean) {
         addFragment(fragment)
     }
 
@@ -97,9 +97,6 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     }
 
     override fun closePodcastsToRoot() {
-    }
-
-    override fun openProfile() {
     }
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {
