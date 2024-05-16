@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.FolderItemDiffCallback
@@ -95,11 +94,9 @@ class FolderAdapter(
 
             FolderItem.Folder.viewTypeId -> {
                 val podcastsLayout = settings.podcastGridLayout.value
-                val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == PodcastGridLayoutType.SMALL_ARTWORK, context = context).pxToDp(parent.context).toInt()
                 FolderViewHolder(
                     composeView = ComposeView(parent.context),
                     theme = theme,
-                    gridWidthDp = gridWidthDp,
                     podcastsLayout = podcastsLayout,
                     onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) },
                     podcastGridLayout = podcastsLayout,

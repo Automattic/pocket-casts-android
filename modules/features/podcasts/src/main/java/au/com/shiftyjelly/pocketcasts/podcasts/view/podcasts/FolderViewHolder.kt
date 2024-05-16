@@ -2,13 +2,12 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
@@ -24,7 +23,6 @@ import kotlin.math.min
 class FolderViewHolder(
     val composeView: ComposeView,
     val theme: Theme,
-    val gridWidthDp: Int,
     val podcastsLayout: PodcastGridLayoutType,
     val onFolderClick: (Folder) -> Unit,
     val podcastGridLayout: PodcastGridLayoutType,
@@ -57,7 +55,7 @@ class FolderViewHolder(
                             badgeType = badgeType,
                             podcastGridLayout = podcastGridLayout,
                             onClick = { onFolderClick(folder) },
-                            modifier = Modifier.size(gridWidthDp.dp),
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                 }
