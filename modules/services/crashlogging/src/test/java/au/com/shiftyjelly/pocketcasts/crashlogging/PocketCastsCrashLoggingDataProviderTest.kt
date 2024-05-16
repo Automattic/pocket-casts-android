@@ -65,10 +65,9 @@ class PocketCastsCrashLoggingDataProviderTest {
 
     @Test
     fun `should provide user if available`() = runTest {
-        sut.user.test {
-            assertEquals(null, expectMostRecentItem())
+        fakeObserveUser.emitUser(User("mail"))
 
-            fakeObserveUser.emitUser(User("mail"))
+        sut.user.test {
             assertEquals(CrashLoggingUser(userID = null, email = "mail", username = null), expectMostRecentItem())
         }
     }
