@@ -7,7 +7,7 @@ class SharingUrlTimestampParser {
     companion object {
         val intervalPattern = Regex("""(\d*\.?\d*)?,?(\d*\.?\d*)?""")
         val hmsPattern = Regex("""(?:(\d+)h)?(?:(0?[0-5]?\d)m)?(?:(0?[0-5]?\d)s)?""")
-        val hhmmssFractionPattern = Regex("""(\d+):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])(?:\.(\d+))?""")
+        val hhmmssFractionPattern = Regex("""(?:(\d+):)?(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])(?:\.(\d+))?""")
     }
 
     fun parseTimestamp(timestamp: String): Pair<Duration?, Duration?> {
