@@ -26,6 +26,8 @@ android {
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
         buildConfigField "String", "GOOGLE_SIGN_IN_SERVER_CLIENT_ID", "\"${project.googleSignInServerClientId}\""
+        buildConfigField "String", "SENTRY_DSN", "\"${project.pocketcastsSentryDsn}\""
+        buildConfigField "String", "BUILD_PLATFORM", "\"${project.buildPlatform}\""
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
@@ -180,13 +182,11 @@ dependencies {
     implementation libs.bundles.protobuf
     implementation libs.bundles.retrofit
     implementation libs.bundles.rxjava
-    implementation libs.bundles.sentry
     implementation libs.bundles.work
 
     implementation platform(libs.compose.bom)
     androidTestImplementation platform(libs.compose.bom)
     implementation platform(libs.firebase.bom)
-    implementation platform(libs.sentry.bom)
 
     implementation libs.appcompat
     implementation libs.auth

@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -50,6 +50,7 @@ class DiscoverViewModel @Inject constructor(
     val playbackManager: PlaybackManager,
     val userManager: UserManager,
     val analyticsTracker: AnalyticsTrackerWrapper,
+    val crashLogging: CrashLogging,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val sourceView = SourceView.DISCOVER
@@ -167,7 +168,7 @@ class DiscoverViewModel @Inject constructor(
                 if (isInvalidSponsoredSource) {
                     val message = "Invalid sponsored source found."
                     Timber.e(message)
-                    SentryHelper.recordException(InvalidObjectException(message))
+                    crashLogging.sendReport(InvalidObjectException(message))
                 }
                 !isInvalidSponsoredSource
             }

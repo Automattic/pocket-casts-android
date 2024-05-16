@@ -60,11 +60,11 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -77,7 +77,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import io.sentry.Sentry
 import java.io.File
 import java.io.FileInputStream
 import java.util.Date
@@ -135,6 +134,7 @@ open class PlaybackManager @Inject constructor(
     bookmarkFeature: BookmarkFeatureControl,
     private val playbackManagerNetworkWatcherFactory: PlaybackManagerNetworkWatcher.Factory,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val crashLogging: CrashLogging,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -1197,16 +1197,14 @@ open class PlaybackManager @Inject constructor(
                 } else {
                     event.message
                 }
-                Sentry.withScope { scope ->
-                    episode?.let {
-                        scope.setTag("episodeUuid", it.uuid)
-                        scope.setTag("playedUpTo", it.playedUpTo.roundToInt().toString())
-                    }
-                    SentryHelper.recordException(
-                        message = "Illegal playback state encountered",
-                        throwable = event.error ?: IllegalStateException(event.message),
-                    )
-                }
+                crashLogging.sendReport(
+                    message = "Illegal playback state encountered",
+                    exception = event.error ?: IllegalStateException(event.message),
+                    tags = mapOf(
+                        "episodeUuid" to episode?.uuid.orEmpty(),
+                        "playedUpTo" to episode?.playedUpTo?.roundToInt().toString(),
+                    ),
+                )
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = LastChangeFrom.OnPlayerError.value))
             }
         }
@@ -1853,7 +1851,7 @@ open class PlaybackManager @Inject constructor(
                             },
                             onError = {
                                 Timber.e(it, "Error observing episode")
-                                Sentry.captureException(it)
+                                crashLogging.sendReport(it)
                             },
                         )
                 }
@@ -2035,13 +2033,13 @@ open class PlaybackManager @Inject constructor(
             } ?: run {
                 val message = "notificationPermissionChecker was null (this should never happen)"
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
-                Sentry.addBreadcrumb(message)
+                crashLogging.recordEvent(message)
                 manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
             }
         } catch (e: Exception) {
             val message = "Could not post notification ${e.message}"
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, message)
-            SentryHelper.recordException(message, e)
+            crashLogging.sendReport(e, message = message)
         }
     }
 
