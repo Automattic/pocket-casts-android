@@ -107,6 +107,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    NOVA_LAUNCHER(
+        key = "nova_launcher",
+        title = "Integrate Pocket Casts with Nova Launcher",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

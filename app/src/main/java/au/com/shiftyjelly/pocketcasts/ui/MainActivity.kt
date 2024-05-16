@@ -76,6 +76,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.BOOKMARK_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PODCAST_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SOURCE_VIEW
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
 import au.com.shiftyjelly.pocketcasts.profile.SubCancelledFragment
 import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
@@ -115,6 +117,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.SharingUrlTimestampParser
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -141,7 +144,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -1240,8 +1242,11 @@ class MainActivity :
                     viewModel.deleteBookmark(it)
                 }
                 notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
-            }
-            // new episode notification tapped
+            } else if (action == Settings.INTENT_OPEN_APP_PODCAST_UUID) {
+                intent.getStringExtra(PODCAST_UUID)?.let {
+                    openPodcastPage(it, intent.getStringExtra(SOURCE_VIEW))
+                }
+            } // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
                 // intents were being reused for notifications so we had to use the extra to pass action
                 val episodeUuid =
@@ -1463,7 +1468,8 @@ class MainActivity :
         if (intent.data?.pathSegments?.size == 1) {
             sharePath = "$SOCIAL_SHARE_PATH$sharePath"
         }
-        val timestamp = intent.data?.getQueryParameter("t")?.toIntOrNull()
+        val parser = SharingUrlTimestampParser()
+        val timestamp = intent.data?.getQueryParameter("t")?.let { parser.parseTimestamp(it) }
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
             sharePath,
@@ -1490,7 +1496,7 @@ class MainActivity :
                             source = EpisodeViewSource.SHARE,
                             podcastUuid = podcastUuid,
                             forceDark = false,
-                            timestamp = timestamp?.seconds,
+                            timestamp = timestamp?.first, // Start time in seconds
                         )
                     } else {
                         openPodcastPage(podcastUuid)

@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDraw
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelperImpl
+import au.com.shiftyjelly.pocketcasts.repositories.nova.NovaLauncherManager
+import au.com.shiftyjelly.pocketcasts.repositories.nova.NovaLauncherManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactoryImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -166,4 +168,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideCrashReportPermissionCheck(userSettingsCrashReportPermission: UserSettingsCrashReportPermission): CrashReportPermissionCheck
+
+    @Binds
+    abstract fun provideNovaLauncherManager(novaLauncherManagerImpl: NovaLauncherManagerImpl): NovaLauncherManager
 }
