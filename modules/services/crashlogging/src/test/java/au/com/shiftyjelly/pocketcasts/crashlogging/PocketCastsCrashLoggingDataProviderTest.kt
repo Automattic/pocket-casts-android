@@ -33,7 +33,6 @@ class PocketCastsCrashLoggingDataProviderTest {
     @Test
     fun `should provide specific error sampling for mobile platform`() {
         fakeBuildDataProvider.buildPlatform = "mobile"
-        setUp()
 
         assertEquals(
             ErrorSampling.Enabled(0.3),
@@ -47,7 +46,6 @@ class PocketCastsCrashLoggingDataProviderTest {
 
         notMobilePlatforms.forEach { build ->
             fakeBuildDataProvider.buildPlatform = build
-            setUp()
 
             assertEquals(ErrorSampling.Disabled, sut.errorSampling)
         }
@@ -56,7 +54,6 @@ class PocketCastsCrashLoggingDataProviderTest {
     @Test
     fun `should attach platform tag`() {
         fakeBuildDataProvider.buildPlatform = "mobile"
-        setUp()
 
         runBlocking {
             assertEquals(
