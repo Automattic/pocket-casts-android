@@ -18,7 +18,7 @@ class SharingUrlTimestampParser {
             return Pair(extractTimeFrom(startParsedTime)?.seconds, extractTimeFrom(endParsedTime)?.seconds)
         }
         val result = parseTime(timestamp)
-        return Pair((result.first ?: 0.0).seconds, (result.second ?: 0.0).seconds)
+        return Pair(result.first?.seconds, result.second?.seconds)
     }
 
     private fun parseTime(t: String): Pair<Double?, Double?> {
@@ -27,9 +27,6 @@ class SharingUrlTimestampParser {
             val minutes = match.groups[2]?.value?.toInt() ?: 0
             val seconds = match.groups[3]?.value?.toDouble() ?: 0.0
             val totalSeconds = ((hours * 3600) + (minutes * 60) + seconds)
-            if (totalSeconds == 0.0) {
-                return Pair(0.0, null)
-            }
             return Pair(totalSeconds, null)
         }
 
@@ -39,15 +36,12 @@ class SharingUrlTimestampParser {
             val seconds = match.groups[3]?.value?.toLong() ?: 0
             val fractionInMilliseconds = match.groups[4]?.value?.take(3)?.toDouble() ?: 0.0 // Extract first three digits
             val totalSeconds = (hours * 3600) + (minutes * 60) + seconds + (fractionInMilliseconds / 1000.0)
-            if (totalSeconds == 0.0) {
-                return Pair(0.0, null)
-            }
             return Pair(totalSeconds, null)
         }
 
         intervalPattern.find(t)?.let { match ->
-            val startTime = match.groups[1]?.value?.takeIf { it.isNotEmpty() }?.toDouble()?.toInt()
-            val endTime = match.groups[2]?.value?.takeIf { it.isNotEmpty() }?.toDouble()?.toInt()
+            val startTime = match.groups[1]?.value?.takeIf { it.isNotEmpty() }?.toDouble()?.toInt()?.takeIf { it != 0 }
+            val endTime = match.groups[2]?.value?.takeIf { it.isNotEmpty() }?.toDouble()?.toInt()?.takeIf { it != 0 }
             return Pair(startTime?.toDouble(), endTime?.toDouble())
         }
 
@@ -55,7 +49,7 @@ class SharingUrlTimestampParser {
     }
 
     private fun extractTimeFrom(startParsedTime: Pair<Double?, Double?>) = if (startParsedTime.first == null && startParsedTime.second == null) {
-        0.0
+        null
     } else if (startParsedTime.first != null) {
         startParsedTime.first
     } else {
