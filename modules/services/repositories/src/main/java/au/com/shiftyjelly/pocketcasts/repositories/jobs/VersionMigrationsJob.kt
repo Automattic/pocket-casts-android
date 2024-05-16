@@ -169,6 +169,10 @@ class VersionMigrationsJob : JobService() {
         if (previousVersionCode < 9230 && previousVersionCode != 9227) {
             migrateToGranularEpisodeArtworkSettings(applicationContext)
         }
+
+        if (previousVersionCode < 9235) {
+            enableDynamicColors()
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {
@@ -260,5 +264,9 @@ class VersionMigrationsJob : JobService() {
             val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
             settings.artworkConfiguration.set(ArtworkConfiguration((useEpisodeArtwork)), updateModifiedAt = true)
         }
+    }
+
+    private fun enableDynamicColors() {
+        settings.useDynamicColorsForWidget.set(true, updateModifiedAt = true)
     }
 }
