@@ -175,23 +175,17 @@ class StorageSettingsViewModel
                 state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = true, episodeCount = episodeCount))
             }
 
-            repeat(episodeCount / FIX_EPISODES_LIMIT + 1) { iteration ->
-                val offset = iteration * FIX_EPISODES_LIMIT
-                val episodes = episodeManager.getAllPodcastEpisodes(FIX_EPISODES_LIMIT, offset)
-                episodes.forEachIndexed { index, episode ->
-                    val fixCount = offset + index
-                    mutableState.update { state ->
-                        state.copy(fixDownloadsState = state.fixDownloadsState.copy(currentlyFixed = fixCount))
+            episodeManager.getAllPodcastEpisodes(pageLimit = FIX_EPISODES_LIMIT).collect { (episode, index) ->
+                mutableState.update { state ->
+                    state.copy(fixDownloadsState = state.fixDownloadsState.copy(currentlyFixed = index))
+                }
+                withContext(Dispatchers.IO) {
+                    val path = DownloadHelper.pathForEpisode(episode, fileStorage)?.takeIf {
+                        val file = File(it)
+                        file.exists() && file.isFile
                     }
-
-                    withContext(Dispatchers.IO) {
-                        val path = DownloadHelper.pathForEpisode(episode, fileStorage)?.takeIf {
-                            val file = File(it)
-                            file.exists() && file.isFile
-                        }
-                        if (path != null && path != episode.downloadedFilePath) {
-                            episodeManager.updateDownloadFilePath(episode, path, markAsDownloaded = true)
-                        }
+                    if (path != null && path != episode.downloadedFilePath) {
+                        episodeManager.updateDownloadFilePath(episode, path, markAsDownloaded = true)
                     }
                 }
             }
