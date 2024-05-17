@@ -34,6 +34,8 @@ import java.net.URL
 import java.util.Scanner
 import java.util.regex.Pattern
 import javax.xml.parsers.SAXParserFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -41,6 +43,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
@@ -167,6 +170,9 @@ class OpmlImportTask @AssistedInject constructor(
             trackProcessed(numberProcessed)
             return Result.success()
         } catch (t: Throwable) {
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_import_failed_message), Toast.LENGTH_LONG).show()
+            }
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
             trackFailure(reason = "unknown")
             return Result.failure()
@@ -180,7 +186,7 @@ class OpmlImportTask @AssistedInject constructor(
         )
     }
 
-    fun trackFailure(reason: String) {
+    private fun trackFailure(reason: String) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FAILED,
             mapOf("reason" to reason),
