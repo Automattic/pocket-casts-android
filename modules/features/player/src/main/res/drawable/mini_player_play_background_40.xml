@@ -5,6 +5,6 @@
     <solid android:color="#FF000000" />
 
     <size
-        android:width="@dimen/mini_player_play_button_size_32"
-        android:height="@dimen/mini_player_play_button_size_32" />
+        android:width="@dimen/mini_player_play_button_size_40"
+        android:height="@dimen/mini_player_play_button_size_40" />
 </shape>
