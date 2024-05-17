@@ -565,4 +565,7 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun getNovaLauncherNewEpisodes(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherNewEpisode>
+
+    @Query("SELECT * FROM podcast_episodes LIMIT :limit OFFSET :offset")
+    abstract suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode>
 }
