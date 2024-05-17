@@ -167,13 +167,15 @@ class StorageSettingsViewModel
     }
 
     fun fixDownloadedFiles() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES)
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_START)
         fixDownloadsJob?.cancel()
         fixDownloadsJob = viewModelScope.launch {
             val episodeCount = episodeManager.countEpisodes()
             mutableState.update { state ->
                 state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = true, episodeCount = episodeCount))
             }
+
+            var fixedCount = 0
 
             episodeManager.getAllPodcastEpisodes(pageLimit = FIX_EPISODES_LIMIT).collect { (episode, index) ->
                 mutableState.update { state ->
@@ -185,10 +187,12 @@ class StorageSettingsViewModel
                         file.exists() && file.isFile
                     }
                     if (path != null && path != episode.downloadedFilePath) {
+                        fixedCount++
                         episodeManager.updateDownloadFilePath(episode, path, markAsDownloaded = true)
                     }
                 }
             }
+            analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_END, mapOf("fixed_count" to fixedCount))
             mutableState.update { state ->
                 state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = false))
             }
