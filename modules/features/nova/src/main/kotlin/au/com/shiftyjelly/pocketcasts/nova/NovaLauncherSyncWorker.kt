@@ -46,17 +46,23 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
 
         return coroutineScope {
             val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts()) }
+            val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts()) }
             val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes()) }
 
             try {
                 val isUserDataSubmitted = launcherBridge.submitUserData(listOf(subscribedPodcasts.await())).isSuccess
-                val isRecommendationsSubmitted = launcherBridge.submitRecommendations(listOf(newEpisodes.await())).isSuccess
+                val isRecommendationsSubmitted = launcherBridge.submitRecommendations(listOf(trendingPodcasts.await(), newEpisodes.await())).isSuccess
 
                 val results = listOf(
                     SubmissionResult(
                         isUserDataSubmitted,
                         "Subscribed podcasts",
                         subscribedPodcasts.await().items.size,
+                    ),
+                    SubmissionResult(
+                        isRecommendationsSubmitted,
+                        "Trending podcasts",
+                        trendingPodcasts.await().items.size,
                     ),
                     SubmissionResult(
                         isRecommendationsSubmitted,
