@@ -1170,6 +1170,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_import_opml_title">Import OPML</string>
     <string name="settings_import_opml_toast">Importing podcasts&#x2026;</string>
     <string name="settings_import_opml_import_failed_message">Unable to import podcasts from the OPML file you specified.</string>
+    <string name="settings_import_opml_succeeded_message">OPML Import Succeeded.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>

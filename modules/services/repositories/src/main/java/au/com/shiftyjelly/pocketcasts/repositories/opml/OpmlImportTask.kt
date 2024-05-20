@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
+import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -168,10 +169,15 @@ class OpmlImportTask @AssistedInject constructor(
             }
             val numberProcessed = processFile(uri)
             trackProcessed(numberProcessed)
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_succeeded_message), Toast.LENGTH_LONG).show()
+            }
             return Result.success()
         } catch (t: Throwable) {
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_import_failed_message), Toast.LENGTH_LONG).show()
+            if (t is SAXParseException) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_import_failed_message), Toast.LENGTH_LONG).show()
+                }
             }
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
             trackFailure(reason = "unknown")
