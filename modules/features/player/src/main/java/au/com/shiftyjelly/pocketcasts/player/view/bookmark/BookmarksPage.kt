@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import java.util.Date
 import java.util.UUID
+import kotlinx.coroutines.flow.collectLatest
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -78,11 +79,6 @@ fun BookmarksPage(
         onRowLongPressed = onRowLongPressed,
         onBookmarksOptionsMenuClicked = { bookmarksViewModel.onOptionsMenuClicked() },
         onPlayClick = { bookmark ->
-            Toast.makeText(
-                context,
-                context.resources.getString(LR.string.playing_bookmark, bookmark.title),
-                Toast.LENGTH_SHORT,
-            ).show()
             bookmarksViewModel.play(bookmark)
         },
         onSearchTextChanged = { bookmarksViewModel.onSearchTextChanged(it) },
@@ -108,6 +104,13 @@ fun BookmarksPage(
                     NavigationState.ShareBookmark -> onShareBookmarkClick()
                     NavigationState.EditBookmark -> onEditBookmarkClick()
                 }
+            }
+    }
+    LaunchedEffect(context) {
+        bookmarksViewModel
+            .message
+            .collectLatest { message ->
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
     }
 }

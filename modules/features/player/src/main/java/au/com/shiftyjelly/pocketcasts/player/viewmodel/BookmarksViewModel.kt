@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,6 +54,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class BookmarksViewModel
@@ -68,6 +70,7 @@ class BookmarksViewModel
     private val bookmarkFeature: BookmarkFeatureControl,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val bookmarkSearchHandler: BookmarkSearchHandler,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -75,6 +78,9 @@ class BookmarksViewModel
 
     private val _showOptionsDialog = MutableSharedFlow<Int>()
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
+
+    private val _message = MutableSharedFlow<String>()
+    val message = _message.asSharedFlow()
 
     private var isFragmentActive: Boolean = true
 
@@ -315,7 +321,11 @@ class BookmarksViewModel
                 if (shouldLoadOrSwitchEpisode) {
                     playbackManager.playNowSync(it, sourceView = sourceView)
                 }
+            } ?: run {
+                _message.emit(context.getString(LR.string.episode_not_found))
+                return@launch
             }
+            _message.emit(context.getString(LR.string.playing_bookmark, bookmark.title))
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
             analyticsTracker.track(
                 AnalyticsEvent.BOOKMARK_PLAY_TAPPED,
