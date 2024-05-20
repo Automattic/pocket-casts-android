@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -535,6 +536,9 @@ abstract class EpisodeDao {
     )
     abstract suspend fun getFailedDownloadsStatistics(): EpisodeDownloadFailureStatistics
 
+    @Query("SELECT * FROM podcast_episodes LIMIT :limit OFFSET :offset")
+    abstract suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode>
+
     @Query(
         """
         SELECT
@@ -566,6 +570,30 @@ abstract class EpisodeDao {
     )
     abstract suspend fun getNovaLauncherNewEpisodes(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherNewEpisode>
 
-    @Query("SELECT * FROM podcast_episodes LIMIT :limit OFFSET :offset")
-    abstract suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode>
+    @Query(
+        """
+        SELECT
+          episode.uuid AS id,
+          episode.podcast_id AS podcast_id,
+          episode.title AS title,
+          episode.duration AS duration,
+          episode.played_up_to AS current_position,
+          episode.season AS season_number,
+          episode.number AS episode_number,
+          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
+          episode.published_date / 1000 AS release_timestamp,
+          episode.last_playback_interaction_date / 1000 AS last_used_timestamp
+        FROM
+          podcast_episodes AS episode
+        WHERE
+          episode.archived IS 0
+          -- Check that the episode is in progress
+          AND episode.playing_status IS 1
+        ORDER BY
+          episode.last_playback_interaction_date DESC
+        LIMIT
+          500
+        """,
+    )
+    abstract suspend fun getNovaLauncherInProgressEpisodes(): List<NovaLauncherInProgressEpisode>
 }
