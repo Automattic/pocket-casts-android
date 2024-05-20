@@ -1,3 +1,4 @@
+import com.android.tools.r8.internal.kt
 import com.automattic.android.measure.MeasureBuildsExtension
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
@@ -40,8 +41,7 @@ measureBuilds {
 
 spotless {
     kotlin {
-        target("**/*.kt")
-        targetExclude("$buildDir/**/*.kt", "bin/**/*.kt", "buildSrc/build/**/*.kt", "vendor/bundle/**/*.kt")
+        target("app/src/**/*.kt", "automotive/src/**/*.kt", "modules/src/**/*.kt", "wear/src/**/*.kt")
         ktlint("0.50.0")
     }
 }
