@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object PocketCastsShortcuts {
 
@@ -36,11 +35,10 @@ object PocketCastsShortcuts {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
             return
         }
+        val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return
 
-        coroutineScope.launch(Dispatchers.Main) {
-            val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return@launch
-
-            val topPlaylist = withContext(Dispatchers.Default) { playlistManager.findAll().firstOrNull() }
+        coroutineScope.launch(Dispatchers.Default) {
+            val topPlaylist = playlistManager.findAll().firstOrNull()
 
             if (topPlaylist == null) {
                 if (shortcutManager.dynamicShortcuts.size == 1) {
