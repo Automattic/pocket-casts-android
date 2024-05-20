@@ -41,8 +41,7 @@ measureBuilds {
 spotless {
     kotlin {
         target("**/*.kt")
-        targetExclude("$buildDir/**/*.kt")
-        targetExclude("bin/**/*.kt")
+        targetExclude("$buildDir/**/*.kt", "bin/**/*.kt", "buildSrc/build/**/*.kt", "vendor/bundle/**/*.kt")
         ktlint("0.50.0")
     }
 }
