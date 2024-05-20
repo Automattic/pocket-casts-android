@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import java.time.Duration
 import java.util.Date
 import org.junit.Assert.assertEquals
@@ -302,6 +303,7 @@ class PodcastSyncProcessTest {
         subscriptionManager = mock(),
         folderManager = mock(),
         syncManager = mock(),
+        crashLogging = FakeCrashLogging(),
     )
 
     private fun mockPodcast(

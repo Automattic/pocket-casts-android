@@ -39,7 +39,6 @@ android {
             applicationIdSuffix = ".debug"
 
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
-            manifestPlaceholders["sentryDsn"] = ""
         }
 
         named("debugProd") {
@@ -49,13 +48,6 @@ android {
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-            val pocketcastsSentryDsn: String by project
-            if (pocketcastsSentryDsn.isNotBlank()) {
-                manifestPlaceholders["sentryDsn"] = pocketcastsSentryDsn
-            }
-            else {
-                println("WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this.")
-            }
 
             if (!file("${project.rootDir}/sentry.properties").exists()) {
                 println("WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded.")
@@ -69,14 +61,6 @@ android {
             )
             isShrinkResources = true
         }
-    }
-}
-
-sentry {
-    includeProguardMapping = System.getenv()["CI"].toBoolean()
-            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
-    tracingInstrumentation {
-        features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.FILE_IO)
     }
 }
 
@@ -95,9 +79,12 @@ dependencies {
     implementation(project(":modules:features:shared"))
     implementation(project(":modules:features:taskerplugin"))
     implementation(project(":modules:features:widgets"))
+    implementation(project(":modules:features:nova"))
+
     // services
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))
+    implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:model"))
     implementation(project(":modules:services:preferences"))
@@ -107,4 +94,5 @@ dependencies {
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:views"))
     testImplementation(project(":modules:services:sharedtest"))
+    androidTestImplementation(project(":modules:services:sharedtest"))
 }

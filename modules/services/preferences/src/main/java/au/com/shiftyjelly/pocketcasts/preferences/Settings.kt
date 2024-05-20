@@ -106,6 +106,7 @@ interface Settings {
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
+        const val INTENT_OPEN_APP_PODCAST_UUID = "INTENT_OPEN_APP_PODCAST_UUID"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
         const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
         const val INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE = "INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE"
@@ -122,6 +123,10 @@ interface Settings {
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
 
         const val BOOKMARK_UUID = "bookmark_uuid"
+
+        const val PODCAST_UUID = "podcast_uuid"
+
+        const val SOURCE_VIEW = "source_view"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -264,8 +269,6 @@ interface Settings {
 
     fun getVersion(): String
     fun getVersionCode(): Int
-
-    fun getSentryDsn(): String
 
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>

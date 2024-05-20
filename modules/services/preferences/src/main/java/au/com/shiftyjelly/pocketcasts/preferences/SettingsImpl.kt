@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
@@ -124,20 +122,6 @@ class SettingsImpl @Inject constructor(
 
     override fun getVersionCode(): Int {
         return BuildConfig.VERSION_CODE
-    }
-
-    override fun getSentryDsn(): String {
-        return try {
-            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            }
-            applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
-        } catch (e: NameNotFoundException) {
-            ""
-        }
     }
 
     override val skipBackInSecs = UserSetting.SkipAmountPref(

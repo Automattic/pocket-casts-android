@@ -45,6 +45,7 @@ class DeveloperFragment : BaseFragment() {
                         onTriggerUpdateEpisodeDetails = viewModel::triggerUpdateEpisodeDetails,
                         onTriggerResetEoYModalProfileBadge = viewModel::resetEoYModalProfileBadge,
                         bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                        onSendCrash = viewModel::onSendCrash,
                     )
                 }
             }

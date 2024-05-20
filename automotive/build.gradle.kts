@@ -29,7 +29,6 @@ android {
             applicationIdSuffix = ".debug"
 
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
-            manifestPlaceholders["sentryDsn"] = ""
         }
 
         named("debugProd") {
@@ -39,13 +38,6 @@ android {
 
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-            val pocketcastsSentryDsn: String by project
-            if (pocketcastsSentryDsn.isNotBlank()) {
-                manifestPlaceholders["sentryDsn"] = pocketcastsSentryDsn
-            }
-            else {
-                println("WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this.")
-            }
 
             proguardFiles.addAll(
                 listOf(
@@ -72,6 +64,7 @@ dependencies {
     androidTestImplementation(libs.junit.ext)
     androidTestImplementation(libs.espresso.core)
 
+    implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:utils"))
@@ -88,11 +81,6 @@ dependencies {
     implementation(project(":modules:features:discover"))
     implementation(project(":modules:features:account"))
     implementation(project(":modules:features:shared"))
-}
-
-sentry {
-    includeProguardMapping = System.getenv()["CI"].toBoolean()
-            && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
 }
 
 apply(plugin = "com.google.gms.google-services")

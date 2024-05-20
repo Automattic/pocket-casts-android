@@ -1,6 +1,11 @@
 7.65
 -----
-
+*   New Features
+    *   Add a storage setting that attempts to fix missing downloads files.
+        ([#2244](https://github.com/Automattic/pocket-casts-android/pull/2244))
+*   Bug Fixes
+    *   Fix timestamp parameter handling in shared links
+        ([#2235](https://github.com/Automattic/pocket-casts-android/pull/2235))
 
 7.64
 -----

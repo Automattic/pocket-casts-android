@@ -43,8 +43,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import io.sentry.Sentry
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -58,6 +56,7 @@ fun DeveloperPage(
     onTriggerUpdateEpisodeDetails: () -> Unit,
     onTriggerResetEoYModalProfileBadge: () -> Unit,
     bottomInset: Dp,
+    onSendCrash: (String) -> Unit,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
     var crashMessage by remember { mutableStateOf("Test crash") }
@@ -80,7 +79,7 @@ fun DeveloperPage(
         }
         item {
             SendCrashSetting(
-                crashMessage = crashMessage,
+                onClick = { onSendCrash(crashMessage) },
                 onLongClick = { openCrashMessageDialog = true },
             )
         }
@@ -141,8 +140,8 @@ private fun ForceRefreshSetting(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun SendCrashSetting(
-    crashMessage: String,
     onLongClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingRow(
@@ -150,10 +149,7 @@ private fun SendCrashSetting(
         secondaryText = "Send an exception to Sentry",
         icon = rememberVectorPainter(Icons.Outlined.BugReport),
         modifier = modifier.combinedClickable(
-            onClick = {
-                Sentry.captureException(Exception(crashMessage))
-                Timber.d("Test crash message: \"$crashMessage\"")
-            },
+            onClick = onClick,
             onLongClick = onLongClick,
         ),
     )
@@ -293,6 +289,7 @@ private fun DeveloperPagePreview() {
         onTriggerUpdateEpisodeDetails = {},
         onTriggerResetEoYModalProfileBadge = {},
         bottomInset = 0.dp,
+        onSendCrash = {},
     )
 }
 

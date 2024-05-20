@@ -21,17 +21,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.Sentry
-import io.sentry.android.core.SentryAndroid
-import io.sentry.protocol.User
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -71,29 +67,19 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var downloadStatisticsReporter: DownloadStatisticsReporter
 
+    @Inject lateinit var crashLogging: CrashLogging
+
     override fun onCreate() {
         super.onCreate()
         RxJavaUncaughtExceptionHandling.setUp()
-        setupSentry()
+        setupCrashLogging()
         setupLogging()
         setupAnalytics()
         setupApp()
     }
 
-    private fun setupSentry() {
-        SentryAndroid.init(this) { options ->
-            options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
-            options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.WEAR.value)
-        }
-
-        // Link email to Sentry crash reports only if the user has opted in
-        if (settings.linkCrashReportsToUser.value) {
-            syncManager.getEmail()?.let { syncEmail ->
-                val user = User().apply { email = syncEmail }
-                Sentry.setUser(user)
-            }
-        }
-
+    private fun setupCrashLogging() {
+        crashLogging.initialize()
         // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
         FirebaseApp.initializeApp(this)
     }

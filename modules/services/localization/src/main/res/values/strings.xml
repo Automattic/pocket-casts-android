@@ -1277,6 +1277,10 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_storage_size_free">%s free</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_store_on">Store podcasts on</string>
+    <string name="settings_storage_fix_downloads">Fix downloads</string>
+    <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
+    <string name="settings_storage_fixing_downloads">Fixing downloads</string>
+    <string name="settings_storage_fixing_progress">Currently fixed: %1$d / %2$d</string>
     <string name="settings_subscribe_to_played">Subscribe to played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
@@ -1924,4 +1928,10 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
 
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
+
+
+    <!-- Nova Launcher -->
+    <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
+    <string name="nova_launcher_new_releases">New Releases</string>
+<string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
 </resources>
