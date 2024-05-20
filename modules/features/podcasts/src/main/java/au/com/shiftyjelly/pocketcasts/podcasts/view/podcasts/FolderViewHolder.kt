@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
@@ -27,6 +28,13 @@ class FolderViewHolder(
     val onFolderClick: (Folder) -> Unit,
     val podcastGridLayout: PodcastGridLayoutType,
 ) : RecyclerView.ViewHolder(composeView) {
+
+    init {
+        /* Setting non-default view composition strategy to temporarily fix flickering in folders:
+        https://github.com/Automattic/pocket-casts-android/issues/1661.
+        Folders, used for grouping, should be less in number, it should not cause performance issues. */
+        composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+    }
 
     fun bind(folder: Folder, podcasts: List<Podcast>, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>) {
         val badgeCount = calculateFolderBadge(podcasts, badgeType, podcastUuidToBadge)
