@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmark
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.BookmarkMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
@@ -110,7 +111,11 @@ fun BookmarksPage(
         bookmarksViewModel
             .message
             .collectLatest { message ->
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                val string = when (message) {
+                    is BookmarkMessage.BookmarkEpisodeNotFound -> context.getString(LR.string.episode_not_found)
+                    is BookmarkMessage.PlayingBookmark -> context.getString(LR.string.playing_bookmark, message.bookmarkTitle)
+                }
+                Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
             }
     }
 }

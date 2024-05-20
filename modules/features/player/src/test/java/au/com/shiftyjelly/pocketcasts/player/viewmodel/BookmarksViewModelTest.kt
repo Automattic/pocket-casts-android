@@ -126,7 +126,6 @@ class BookmarksViewModelTest {
             bookmarkFeature = bookmarkFeature,
             ioDispatcher = UnconfinedTestDispatcher(),
             bookmarkSearchHandler = bookmarkSearchHandler,
-            context = mock(),
         )
     }
 
