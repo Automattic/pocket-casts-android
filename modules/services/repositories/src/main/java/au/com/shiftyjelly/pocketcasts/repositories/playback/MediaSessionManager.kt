@@ -408,8 +408,11 @@ class MediaSessionManager(
             if (Util.isAutomotive(context)) nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
 
             // Send the bitmap, as some devices don't support URLs, such as a Tesla.
-            AutoConverter.getPodcastArtworkBitmap(episode, context, useEpisodeArtwork)?.let { bitmap ->
-                nowPlayingBuilder = nowPlayingBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+            // Don't do this for Wear OS or Automotive to reduce the amount memory used.
+            if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+                AutoConverter.getPodcastArtworkBitmap(episode, context, useEpisodeArtwork)?.let { bitmap ->
+                    nowPlayingBuilder = nowPlayingBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+                }
             }
             Timber.i("MediaSession metadata. With artwork.")
         }
