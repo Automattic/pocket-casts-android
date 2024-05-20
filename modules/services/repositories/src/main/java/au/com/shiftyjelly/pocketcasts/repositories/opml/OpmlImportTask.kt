@@ -222,7 +222,8 @@ class OpmlImportTask @AssistedInject constructor(
         val resolver = applicationContext.contentResolver
         try {
             resolver.openInputStream(uri)?.use { inputStream ->
-                urls = readOpmlUrlsSax(inputStream)
+                val modifiedInputStream = replaceInvalidXmlCharacter(inputStream)
+                urls = readOpmlUrlsSax(modifiedInputStream)
             }
         } catch (e: SAXException) {
             resolver.openInputStream(uri)?.use { inputStream ->
@@ -232,6 +233,27 @@ class OpmlImportTask @AssistedInject constructor(
 
         processUrls(urls)
         return urls.size
+    }
+    private fun replaceInvalidXmlCharacter(inputStream: InputStream): InputStream {
+        val content = inputStream.bufferedReader().use { it.readText() }
+
+        val indentedContent = content.replace("<outline", "\n<outline")
+
+        val modifiedContent = indentedContent
+            .replace("&", "&amp;")
+            .replace("’", "&apos;")
+
+        val quotRegex = """text="(.*?)" />""".toRegex()
+        val finalContent = quotRegex.replace(modifiedContent) { matchResult ->
+            val text = matchResult.groupValues[1]
+            val fixedText = text
+                .replace("\"", "&quot;")
+                .replace(">", "&gt;")
+                .replace("<", "&lt;")
+            """text="$fixedText" />"""
+        }
+
+        return finalContent.byteInputStream()
     }
 
     private suspend fun processUrls(urls: List<String>) {
