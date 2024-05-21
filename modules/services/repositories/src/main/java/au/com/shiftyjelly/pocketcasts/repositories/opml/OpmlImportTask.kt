@@ -257,7 +257,7 @@ class OpmlImportTask @AssistedInject constructor(
                 reader.lineSequence().forEach { line ->
                     val modifiedLine = line
                         .replace("<outline", "\n<outline")
-                        .replace("&", "&amp;")
+                        .replace("&(?!amp;|quot;|gt;|lt;)".toRegex(), "&amp;")
                         .replace("’", "&apos;")
 
                     val regex = """text="(.*?)" />""".toRegex()
