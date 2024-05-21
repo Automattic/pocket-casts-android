@@ -2128,10 +2128,14 @@ open class PlaybackManager @Inject constructor(
                 updateSleepTimerStatus(sleepTimeRunning = true)
             },
             onRestartSleepOnEpisodeEnd = {
-                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = settings.getlastSleepEndOfEpisodes())
+                val episodes = settings.getlastSleepEndOfEpisodes()
+                LogBuffer.i(SleepTimer.TAG, "Sleep timer was restarted with end of $episodes episodes set")
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
             },
             onRestartSleepOnChapterEnd = {
-                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = settings.getlastSleepEndOfChapter())
+                val chapter = settings.getlastSleepEndOfChapter()
+                LogBuffer.i(SleepTimer.TAG, "Sleep timer was restarted with end of $chapter chapter set")
+                updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapter)
             },
         )
 

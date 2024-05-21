@@ -609,24 +609,28 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun sleepTimerAfter(mins: Int) {
+        LogBuffer.i(SleepTimer.TAG, "Sleep after $mins minutes configured")
         sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
             playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
         }
     }
 
     fun sleepTimerAfterEpisode(episodes: Int = 1) {
+        LogBuffer.i(SleepTimer.TAG, "Sleep after $episodes episodes configured")
         settings.setlastSleepEndOfEpisodes(episodes)
         playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
         sleepTimer.cancelTimer()
     }
 
     fun sleepTimerAfterChapter(chapters: Int = 1) {
+        LogBuffer.i(SleepTimer.TAG, "Sleep after $chapters chapters configured")
         settings.setlastSleepEndOfChapters(chapters)
         playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapters)
         sleepTimer.cancelTimer()
     }
 
     fun cancelSleepTimer() {
+        LogBuffer.i(SleepTimer.TAG, "Cancelled sleep timer")
         playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
         sleepTimer.cancelTimer()
     }

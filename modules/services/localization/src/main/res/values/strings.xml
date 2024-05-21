@@ -40,6 +40,7 @@
     <string name="downloads">Downloads</string>
     <string name="edit">Edit</string>
     <string name="effects">Effects</string>
+    <string name="episode_not_found">Episode not found</string>
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
@@ -1936,4 +1937,5 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
     <string name="nova_launcher_new_releases">New Releases</string>
 <string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
+    <string name="nova_launcher_continue_listening">Continue listening</string>
 </resources>

@@ -9,10 +9,10 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.shortcutDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object PocketCastsShortcuts {
 
@@ -32,15 +32,15 @@ object PocketCastsShortcuts {
         force: Boolean,
         coroutineScope: CoroutineScope,
         context: Context,
+        source: Source,
     ) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
             return
         }
+        val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return
 
-        coroutineScope.launch(Dispatchers.Main) {
-            val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return@launch
-
-            val topPlaylist = withContext(Dispatchers.Default) { playlistManager.findAll().firstOrNull() }
+        coroutineScope.launch(Dispatchers.Default) {
+            val topPlaylist = playlistManager.findAll().firstOrNull()
 
             if (topPlaylist == null) {
                 if (shortcutManager.dynamicShortcuts.size == 1) {
@@ -48,6 +48,7 @@ object PocketCastsShortcuts {
                 }
                 return@launch
             }
+            LogBuffer.i(PocketCastsShortcuts::class.java.simpleName, "Shortcut update from ${source.value}, top filter title: ${topPlaylist.title}")
 
             if (shortcutManager.dynamicShortcuts.isEmpty() || force) {
                 val filterIntent = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return@launch
@@ -70,5 +71,12 @@ object PocketCastsShortcuts {
                 }
             }
         }
+    }
+
+    enum class Source(val value: String) {
+        REFRESH_APP("refresh_app"),
+        CREATE_PLAYLIST("create_playlist"),
+        SAVE_PLAYLISTS_ORDER("save_playlists_order"),
+        UPDATE_SHORTCUTS("update_shortcuts"),
     }
 }

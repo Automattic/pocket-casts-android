@@ -395,6 +395,7 @@ class MainActivity :
 
         val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
         binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
+        settings.updateBottomInset(if (showMiniPlayerImmediately) resources.getDimension(R.dimen.miniPlayerHeight).toInt() else 0)
 
         setupPlayerViews(showMiniPlayerImmediately)
 
@@ -552,6 +553,7 @@ class MainActivity :
             force = true,
             coroutineScope = applicationScope,
             context = this,
+            source = PocketCastsShortcuts.Source.REFRESH_APP,
         )
 
         subscriptionManager.refreshPurchases()

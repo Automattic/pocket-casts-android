@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -472,5 +473,242 @@ class EpisodeDaoTest {
             ),
         )
         assertEquals(expected, newEpisodes)
+    }
+
+    @Test
+    fun getInProgressEpisodesForNovaLauncher() = runTest {
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "id-1",
+                podcastUuid = "p-id-1",
+                title = "title-1",
+                duration = 100.12,
+                playedUpTo = 50.0,
+                season = 0,
+                number = 11,
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                publishedDate = Date(0),
+                lastPlaybackInteraction = 74211,
+            ),
+            PodcastEpisode(
+                uuid = "id-2",
+                podcastUuid = "p-id-1",
+                title = "title-2",
+                duration = 4120.0,
+                playedUpTo = 2021.24,
+                season = 7,
+                number = null,
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                publishedDate = Date(2000),
+                lastPlaybackInteraction = 0,
+            ),
+            PodcastEpisode(
+                uuid = "id-3",
+                podcastUuid = "p-id-2",
+                title = "title-3",
+                duration = 2330.0,
+                playedUpTo = 0.0,
+                season = null,
+                number = 399,
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                publishedDate = Date(3412),
+                lastPlaybackInteraction = null,
+            ),
+        )
+        episodeDao.insertAll(episodes)
+
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+
+        val expected = listOf(
+            NovaLauncherInProgressEpisode(
+                id = "id-1",
+                podcastId = "p-id-1",
+                title = "title-1",
+                duration = 100,
+                currentPosition = 50,
+                seasonNumber = 0,
+                episodeNumber = 11,
+                releaseTimestamp = 0,
+                lastUsedTimestamp = 74,
+            ),
+            NovaLauncherInProgressEpisode(
+                id = "id-2",
+                podcastId = "p-id-1",
+                title = "title-2",
+                duration = 4120,
+                currentPosition = 2021,
+                seasonNumber = 7,
+                episodeNumber = null,
+                releaseTimestamp = 2,
+                lastUsedTimestamp = 0,
+            ),
+            NovaLauncherInProgressEpisode(
+                id = "id-3",
+                podcastId = "p-id-2",
+                title = "title-3",
+                duration = 2330,
+                currentPosition = 0,
+                seasonNumber = null,
+                episodeNumber = 399,
+                releaseTimestamp = 3,
+                lastUsedTimestamp = null,
+            ),
+        )
+        assertEquals(expected, inProgressEpisodes)
+    }
+
+    @Test
+    fun getInProgressEpisodesForNovaLauncherSortedByInteractionDate() = runTest {
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "id-1",
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                publishedDate = Date(2000),
+                lastPlaybackInteraction = 1000,
+            ),
+            PodcastEpisode(
+                uuid = "id-2",
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                publishedDate = Date(3000),
+                lastPlaybackInteraction = null,
+            ),
+            PodcastEpisode(
+                uuid = "id-3",
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                publishedDate = Date(1000),
+                lastPlaybackInteraction = 3000,
+            ),
+        )
+        episodeDao.insertAll(episodes)
+
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+
+        val expected = listOf(
+            NovaLauncherInProgressEpisode(
+                id = "id-3",
+                podcastId = "",
+                title = "",
+                duration = 0,
+                currentPosition = 0,
+                seasonNumber = null,
+                episodeNumber = null,
+                releaseTimestamp = 1,
+                lastUsedTimestamp = 3,
+            ),
+            NovaLauncherInProgressEpisode(
+                id = "id-1",
+                podcastId = "",
+                title = "",
+                duration = 0,
+                currentPosition = 0,
+                seasonNumber = null,
+                episodeNumber = null,
+                releaseTimestamp = 2,
+                lastUsedTimestamp = 1,
+            ),
+            NovaLauncherInProgressEpisode(
+                id = "id-2",
+                podcastId = "",
+                title = "",
+                duration = 0,
+                currentPosition = 0,
+                seasonNumber = null,
+                episodeNumber = null,
+                releaseTimestamp = 3,
+                lastUsedTimestamp = null,
+            ),
+        )
+        assertEquals(expected, inProgressEpisodes)
+    }
+
+    @Test
+    fun limitNovaLauncherInProgressEpisodesTo500Episodes() = runTest {
+        val episodes = List(550) {
+            PodcastEpisode(
+                uuid = "id-$it",
+                publishedDate = Date(),
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+            )
+        }
+        episodeDao.insertAll(episodes)
+
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+
+        assertEquals(500, inProgressEpisodes.size)
+    }
+
+    @Test
+    fun ignoreInProgressEpisodesForNovaLauncherThatAreArchived() = runTest {
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "id-1",
+                isArchived = false,
+                publishedDate = Date(0),
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+            ),
+            PodcastEpisode(
+                uuid = "id-2",
+                isArchived = true,
+                publishedDate = Date(0),
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+            ),
+        )
+        episodeDao.insertAll(episodes)
+
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+
+        val expected = listOf(
+            NovaLauncherInProgressEpisode(
+                id = "id-1",
+                podcastId = "",
+                title = "",
+                duration = 0,
+                currentPosition = 0,
+                seasonNumber = null,
+                episodeNumber = null,
+                releaseTimestamp = 0,
+                lastUsedTimestamp = null,
+            ),
+        )
+        assertEquals(expected, inProgressEpisodes)
+    }
+
+    @Test
+    fun ignoreInProgressEpisodesForNovaLauncherThatAreNotInProgress() = runTest {
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "id-1",
+                publishedDate = Date(0),
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+            ),
+            PodcastEpisode(
+                uuid = "id-2",
+                publishedDate = Date(0),
+                playingStatus = EpisodePlayingStatus.NOT_PLAYED,
+            ),
+            PodcastEpisode(
+                uuid = "id-3",
+                publishedDate = Date(0),
+                playingStatus = EpisodePlayingStatus.COMPLETED,
+            ),
+        )
+        episodeDao.insertAll(episodes)
+
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+
+        val expected = listOf(
+            NovaLauncherInProgressEpisode(
+                id = "id-1",
+                podcastId = "",
+                title = "",
+                duration = 0,
+                currentPosition = 0,
+                seasonNumber = null,
+                episodeNumber = null,
+                releaseTimestamp = 0,
+                lastUsedTimestamp = null,
+            ),
+        )
+        assertEquals(expected, inProgressEpisodes)
     }
 }

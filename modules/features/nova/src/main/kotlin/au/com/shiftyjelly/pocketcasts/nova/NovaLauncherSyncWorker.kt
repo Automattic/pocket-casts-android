@@ -48,10 +48,11 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
             val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts()) }
             val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts()) }
             val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes()) }
+            val inProgressEpisodes = async { catalogFactory.inProgressEpisodes(manager.getInProgressEpisodes()) }
 
             try {
                 val isUserDataSubmitted = launcherBridge.submitUserData(listOf(subscribedPodcasts.await())).isSuccess
-                val isRecommendationsSubmitted = launcherBridge.submitRecommendations(listOf(trendingPodcasts.await(), newEpisodes.await())).isSuccess
+                val isRecommendationsSubmitted = launcherBridge.submitRecommendations(listOf(trendingPodcasts.await(), newEpisodes.await(), inProgressEpisodes.await())).isSuccess
 
                 val results = listOf(
                     SubmissionResult(
@@ -68,6 +69,11 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
                         isRecommendationsSubmitted,
                         "New episodes",
                         newEpisodes.await().items.size,
+                    ),
+                    SubmissionResult(
+                        isRecommendationsSubmitted,
+                        "In progress episodes",
+                        inProgressEpisodes.await().items.size,
                     ),
                 )
 

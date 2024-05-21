@@ -13,9 +13,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -194,19 +192,6 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settings.bottomInset.collect {
-                    if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-                        val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
-                        realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + it)
-                    } else {
-                        realBinding?.recyclerView?.updatePadding(bottom = it)
-                    }
-                }
-            }
-        }
-
         if (!viewModel.isFragmentChangingConfigurations) {
             folderUuid?.let { viewModel.trackFolderShown(it) } ?: viewModel.trackPodcastsListShown()
         }
@@ -368,6 +353,17 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         ) {
             adapter?.badgeType = badgeType
             realBinding?.recyclerView?.adapter = adapter
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            settings.bottomInset.collect {
+                if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+                    val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
+                    realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + it)
+                } else {
+                    realBinding?.recyclerView?.updatePadding(bottom = it)
+                }
+            }
         }
 
         realBinding?.recyclerView?.layoutManager = layoutManager

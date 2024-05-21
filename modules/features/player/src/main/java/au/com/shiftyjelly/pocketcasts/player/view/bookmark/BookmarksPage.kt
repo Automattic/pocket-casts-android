@@ -43,12 +43,14 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmark
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.NoBookmarksView
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.components.UpsellView
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.BookmarkMessage
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import java.util.Date
 import java.util.UUID
+import kotlinx.coroutines.flow.collectLatest
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -78,11 +80,6 @@ fun BookmarksPage(
         onRowLongPressed = onRowLongPressed,
         onBookmarksOptionsMenuClicked = { bookmarksViewModel.onOptionsMenuClicked() },
         onPlayClick = { bookmark ->
-            Toast.makeText(
-                context,
-                context.resources.getString(LR.string.playing_bookmark, bookmark.title),
-                Toast.LENGTH_SHORT,
-            ).show()
             bookmarksViewModel.play(bookmark)
         },
         onSearchTextChanged = { bookmarksViewModel.onSearchTextChanged(it) },
@@ -108,6 +105,17 @@ fun BookmarksPage(
                     NavigationState.ShareBookmark -> onShareBookmarkClick()
                     NavigationState.EditBookmark -> onEditBookmarkClick()
                 }
+            }
+    }
+    LaunchedEffect(context) {
+        bookmarksViewModel
+            .message
+            .collectLatest { message ->
+                val string = when (message) {
+                    is BookmarkMessage.BookmarkEpisodeNotFound -> context.getString(LR.string.episode_not_found)
+                    is BookmarkMessage.PlayingBookmark -> context.getString(LR.string.playing_bookmark, message.bookmarkTitle)
+                }
+                Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
             }
     }
 }
