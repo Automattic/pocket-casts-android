@@ -553,6 +553,7 @@ class MainActivity :
             force = true,
             coroutineScope = applicationScope,
             context = this,
+            source = PocketCastsShortcuts.Source.REFRESH_APP,
         )
 
         subscriptionManager.refreshPurchases()
