@@ -28,7 +28,14 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.io.StringReader
 import java.net.URL
 import java.util.Scanner
@@ -240,26 +247,36 @@ class OpmlImportTask @AssistedInject constructor(
         processUrls(urls)
         return urls.size
     }
+
     private fun replaceInvalidXmlCharacter(inputStream: InputStream): InputStream {
-        val content = inputStream.bufferedReader().use { it.readText() }
+        val tempFile = File.createTempFile("output", ".xml")
+        tempFile.deleteOnExit()
 
-        val indentedContent = content.replace("<outline", "\n<outline")
+        BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8)).use { reader ->
+            BufferedWriter(OutputStreamWriter(FileOutputStream(tempFile), Charsets.UTF_8)).use { writer ->
+                reader.lineSequence().forEach { line ->
+                    val modifiedLine = line
+                        .replace("<outline", "\n<outline")
+                        .replace("&", "&amp;")
+                        .replace("’", "&apos;")
 
-        val modifiedContent = indentedContent
-            .replace("&", "&amp;")
-            .replace("’", "&apos;")
+                    val regex = """text="(.*?)" />""".toRegex()
+                    val finalLine = regex.replace(modifiedLine) { matchResult ->
+                        val text = matchResult.groupValues[1]
+                        val fixedText = text
+                            .replace("\"", "&quot;")
+                            .replace(">", "&gt;")
+                            .replace("<", "&lt;")
+                        """text="$fixedText" />"""
+                    }
 
-        val quotRegex = """text="(.*?)" />""".toRegex()
-        val finalContent = quotRegex.replace(modifiedContent) { matchResult ->
-            val text = matchResult.groupValues[1]
-            val fixedText = text
-                .replace("\"", "&quot;")
-                .replace(">", "&gt;")
-                .replace("<", "&lt;")
-            """text="$fixedText" />"""
+                    writer.write(finalLine)
+                    writer.newLine()
+                }
+            }
         }
 
-        return finalContent.byteInputStream()
+        return FileInputStream(tempFile)
     }
 
     private suspend fun processUrls(urls: List<String>) {
