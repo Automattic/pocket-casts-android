@@ -93,6 +93,7 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_DETAILS_CANCEL_TAPPED("account_details_cancel_tapped"),
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
+    ACCOUNT_DETAILS_CHANGE_AVATAR("account_details_change_avatar"),
 
     /* Podcasts List */
     PODCASTS_LIST_SHOWN("podcasts_list_shown"),
