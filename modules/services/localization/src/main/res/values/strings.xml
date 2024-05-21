@@ -785,6 +785,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="profile_cancel_confirm_item_web_player">You will no longer be able to access Pocket&#160;Casts using your web browser, or desktop computer.</string>
     <string name="profile_cancel_confirm_stay_button_title">Actually, I want to stay</string>
     <string name="profile_cancel_confirm_cancel_button_title">Yes, cancel my subscription</string>
+    <string name="profile_change_avatar">Change avatar</string>
     <string name="profile_change_email_address">Change email address</string>
     <string name="profile_change_email_address_title">Change Email Address</string>
     <string name="profile_change_password">Change password</string>

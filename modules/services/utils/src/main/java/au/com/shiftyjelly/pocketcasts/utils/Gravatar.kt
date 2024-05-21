@@ -1,8 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
 import au.com.shiftyjelly.pocketcasts.utils.extensions.sha256
+import java.net.URLEncoder
 
 object Gravatar {
+
+    fun getGravatarChangeAvatarUrl(email: String): String =
+        "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars"
 
     /**
      * d=404: display no image if there is not one associated with the requested email hash
