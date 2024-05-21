@@ -28,7 +28,7 @@ class PocketCastsCrashLoggingDataProviderTest {
             fakeObserveUser,
             FakeCrashReportPermissionCheck(),
             fakeBuildDataProvider,
-            FakeEncryptedLogging,
+            FakeEncryptedLogging(),
             File.createTempFile("test", "test"),
             localeProvider = { null },
             connectionStatusProvider = { true },
