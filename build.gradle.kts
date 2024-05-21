@@ -41,15 +41,15 @@ measureBuilds {
 spotless {
     kotlin {
         target(
-            "app/src/**/*.kt",
-            "automotive/src/**/*.kt",
-            "modules/src/**/*.kt",
-            "wear/src/**/*.kt",
-            "build.gradle.kts",
             "app/build.gradle.kts",
+            "app/src/**/*.kt",
             "automotive/build.gradle.kts",
+            "automotive/src/**/*.kt",
+            "build.gradle.kts",
             "modules/**/build.gradle.kts",
+            "modules/**/src/**/*.kt",
             "wear/build.gradle.kts",
+            "wear/src/**/*.kt",
         )
         ktlint("0.50.0")
     }
