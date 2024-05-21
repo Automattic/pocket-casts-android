@@ -12,14 +12,14 @@ class SharingUrlTimestampParserTest {
     private val parser = SharingUrlTimestampParser()
 
     @Test
-    fun parseTimestampInterval() {
+    fun `parse timestamps using interval pattern`() {
         assertEquals(Pair(28.seconds, 60.seconds), parser.parseTimestamp("28,60"))
         assertEquals(Pair(0.seconds, 20.seconds), parser.parseTimestamp(",20"))
         assertEquals(Pair(10.seconds, null), parser.parseTimestamp("10"))
     }
 
     @Test
-    fun testParseTimestampHoursMinutesSeconds() {
+    fun `parse timestamps using hms pattern`() {
         assertEquals(Pair(453590.seconds, null), parser.parseTimestamp("125h59m50s"))
         assertEquals(Pair(3600.seconds, null), parser.parseTimestamp("1h"))
         assertEquals(Pair(60.seconds, null), parser.parseTimestamp("1m"))
@@ -31,7 +31,7 @@ class SharingUrlTimestampParserTest {
     }
 
     @Test
-    fun testParseTimestampHoursMinutesSecondsFraction() {
+    fun `parse timestamps using hhmmss pattern`() {
         assertEquals(Pair(3723.seconds, null), parser.parseTimestamp("1:02:03"))
         assertEquals(Pair(120.seconds, null), parser.parseTimestamp("0:02:00"))
         assertEquals(Pair(1500.milliseconds, null), parser.parseTimestamp("00:00:01.500000000"))
@@ -40,7 +40,7 @@ class SharingUrlTimestampParserTest {
     }
 
     @Test
-    fun testParseTimestampMixedPatterns() {
+    fun `parse timestamps using mixed patterns`() {
         assertEquals(Pair(120.seconds, 2.minutes + 1.seconds + 5.milliseconds), parser.parseTimestamp("120,0:02:01.5"))
         assertEquals(Pair(2.minutes + 1.seconds + 5.milliseconds, 120.seconds), parser.parseTimestamp("0:02:01.5,120"))
         assertEquals(Pair(1805.seconds, 120.seconds), parser.parseTimestamp("30m5s,120"))
@@ -50,7 +50,7 @@ class SharingUrlTimestampParserTest {
     }
 
     @Test
-    fun testParseTimestampMinutesAndSecondsShouldNotBeGreaterThan60() {
+    fun `do not allow for minutes and seconds to be greater than 59 in hms and hhmmss patterns`() {
         assertEquals(Pair(null, null), parser.parseTimestamp("0:60:00"))
         assertEquals(Pair(null, null), parser.parseTimestamp("0:00:60"))
         assertEquals(Pair(null, null), parser.parseTimestamp("00h60m00s"))
