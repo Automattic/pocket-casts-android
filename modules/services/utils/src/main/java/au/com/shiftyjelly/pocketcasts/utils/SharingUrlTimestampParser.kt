@@ -19,16 +19,12 @@ class SharingUrlTimestampParser {
             1 -> timestamp.toDuration() to null
             2 -> {
                 val (rawStart, rawEnd) = timestamp.split(",")
-                val start = if (rawStart.isBlank()) {
-                    Duration.ZERO
-                } else {
-                    rawStart.toDuration()
-                }
-                val end = rawEnd.toDuration()
+                val start = rawStart.toDuration()
+                val end = rawEnd.takeIf(String::isNotBlank)?.toDuration()
                 start to end
             }
             else -> null
-        }
+        }?.let { (first, second) -> if (first == null && second == null) null else first to second }
     }
 
     private fun String.toDuration(): Duration? {

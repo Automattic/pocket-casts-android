@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class SharingUrlTimestampParserTest {
@@ -50,10 +52,27 @@ class SharingUrlTimestampParserTest {
     }
 
     @Test
+    fun `parse empty timestamp`() {
+        assertEquals(Pair(Duration.ZERO, null), parser.parseTimestamp(""))
+    }
+
+    @Test
+    fun `parse empty timestamp parts`() {
+        assertEquals(Pair(Duration.ZERO, null), parser.parseTimestamp(","))
+    }
+
+    @Test
     fun `do not allow for minutes and seconds to be greater than 59 in hms and hhmmss patterns`() {
-        assertEquals(Pair(null, null), parser.parseTimestamp("0:60:00"))
-        assertEquals(Pair(null, null), parser.parseTimestamp("0:00:60"))
-        assertEquals(Pair(null, null), parser.parseTimestamp("00h60m00s"))
-        assertEquals(Pair(null, null), parser.parseTimestamp("00h00m60s"))
+        assertNull(parser.parseTimestamp("0:60:00"))
+        assertNull(parser.parseTimestamp("0:00:60"))
+        assertNull(parser.parseTimestamp("00h60m00s"))
+        assertNull(parser.parseTimestamp("00h00m60s"))
+    }
+
+    @Test
+    fun `do not parse non timestamp strings`() {
+        assertNull(parser.parseTimestamp("hello"))
+        assertNull(parser.parseTimestamp("12.123.31"))
+        assertNull(parser.parseTimestamp("12,54,11"))
     }
 }
