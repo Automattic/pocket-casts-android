@@ -8,7 +8,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.launch
 
 @Singleton
-class InitializeCrashLogging @Inject constructor(
+class InitializeRemoteLogging @Inject constructor(
     private val crashLogging: CrashLogging,
     private val encryptedLogging: EncryptedLogging,
     private val provideApplicationScope: ProvideApplicationScope,

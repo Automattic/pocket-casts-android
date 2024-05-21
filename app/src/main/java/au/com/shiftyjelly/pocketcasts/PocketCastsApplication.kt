@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeCrashLogging
+import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.nova.NovaLauncherBridge
@@ -117,7 +117,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var sleepTimerRestartWhenShakingDevice: SleepTimerRestartWhenShakingDevice
 
-    @Inject lateinit var initializeCrashLogging: InitializeCrashLogging
+    @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
     @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
 
@@ -160,7 +160,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             Thread.setDefaultUncaughtExceptionHandler(LogBufferUncaughtExceptionHandler(it))
         }
 
-        initializeCrashLogging()
+        initializeRemoteLogging()
 
         // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
         FirebaseApp.initializeApp(this)

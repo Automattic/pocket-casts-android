@@ -9,17 +9,17 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-internal class InitializeCrashLoggingTest {
+internal class InitializeRemoteLoggingTest {
 
     val crashLogging = FakeCrashLogging()
     val encryptedLogging = FakeEncryptedLogging()
     val testScope = TestScope()
 
-    private lateinit var sut: InitializeCrashLogging
+    private lateinit var sut: InitializeRemoteLogging
 
     @Before
     fun setUp() {
-        sut = InitializeCrashLogging(
+        sut = InitializeRemoteLogging(
             crashLogging,
             encryptedLogging,
         ) { testScope }

@@ -9,7 +9,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeCrashLogging
+import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -58,7 +58,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
-    @Inject lateinit var initializeCrashLogging: InitializeCrashLogging
+    @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -67,7 +67,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         RxJavaUncaughtExceptionHandling.setUp()
-        setupCrashLogging()
+        setupRemoteLogging()
         setupLogging()
         setupAnalytics()
         setupApp()
@@ -110,8 +110,8 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         Log.d(Settings.LOG_TAG_AUTO, "Terminate")
     }
 
-    private fun setupCrashLogging() {
-        initializeCrashLogging()
+    private fun setupRemoteLogging() {
+        initializeRemoteLogging()
     }
 
     private fun setupLogging() {
