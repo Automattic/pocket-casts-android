@@ -38,6 +38,13 @@ class AdvancedSettingsViewModel
                 }
             },
         ),
+        prioritizeSeekAccuracyState = State.PrioritizeSeekAccuracyState(
+            isChecked = settings.prioritizeSeekAccuracy.value,
+            onCheckedChange = {
+                settings.prioritizeSeekAccuracy.set(it, updateModifiedAt = false)
+                updatePrioritizeSeekAccuracyState()
+            },
+        ),
     )
 
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {
@@ -56,17 +63,31 @@ class AdvancedSettingsViewModel
         )
     }
 
+    private fun updatePrioritizeSeekAccuracyState() {
+        mutableState.value = mutableState.value.copy(
+            prioritizeSeekAccuracyState = mutableState.value.prioritizeSeekAccuracyState.copy(
+                isChecked = settings.prioritizeSeekAccuracy.value,
+            ),
+        )
+    }
+
     fun onShown() {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_SHOWN)
     }
 
     data class State(
         val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState,
+        val prioritizeSeekAccuracyState: PrioritizeSeekAccuracyState,
     ) {
 
         data class BackgroundSyncOnMeteredState(
             val isChecked: Boolean,
             val isEnabled: Boolean,
+            val onCheckedChange: (Boolean) -> Unit,
+        )
+
+        data class PrioritizeSeekAccuracyState(
+            val isChecked: Boolean,
             val onCheckedChange: (Boolean) -> Unit,
         )
     }
