@@ -54,6 +54,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -1112,5 +1113,20 @@ class EpisodeManagerImpl @Inject constructor(
         episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
         episode.deselectedChaptersModified = Date()
         episodeDao.update(episode)
+    }
+
+    override suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>> = flow {
+        var offset = 0
+        while (true) {
+            val episodes = episodeDao.getAllPodcastEpisodes(pageLimit, offset)
+            if (episodes.isNotEmpty()) {
+                episodes.forEachIndexed { index, episode ->
+                    emit(episode to (offset + index))
+                }
+                offset += pageLimit
+            } else {
+                break
+            }
+        }
     }
 }

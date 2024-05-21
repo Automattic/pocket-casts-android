@@ -763,7 +763,13 @@ class PodcastSyncProcess(
     private fun updateShortcuts(playlists: List<Playlist>): Completable {
         // if any playlists have changed update the launcher shortcuts
         if (playlists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(playlistManager, true, applicationScope, context)
+            PocketCastsShortcuts.update(
+                playlistManager = playlistManager,
+                force = true,
+                coroutineScope = applicationScope,
+                context = context,
+                source = PocketCastsShortcuts.Source.UPDATE_SHORTCUTS,
+            )
         }
         return Completable.complete()
     }

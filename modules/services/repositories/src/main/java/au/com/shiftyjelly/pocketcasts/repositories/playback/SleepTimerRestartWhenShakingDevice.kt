@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -75,7 +76,10 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
                 playbackManager.playSleepTimeTone()
             }
         }
-        time?.let { trackSleepTimeRestart(it) }
+        time?.let {
+            LogBuffer.i(SleepTimer.TAG, "Restarted with ${time.inWholeMinutes} minutes set after shaking device")
+            trackSleepTimeRestart(it)
+        }
     }
 
     private fun trackSleepTimeRestart(time: Duration) {

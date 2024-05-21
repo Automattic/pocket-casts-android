@@ -76,6 +76,9 @@ class BookmarksViewModel
     private val _showOptionsDialog = MutableSharedFlow<Int>()
     val showOptionsDialog = _showOptionsDialog.asSharedFlow()
 
+    private val _message = MutableSharedFlow<BookmarkMessage>()
+    val message = _message.asSharedFlow()
+
     private var isFragmentActive: Boolean = true
 
     private var sourceView: SourceView = SourceView.UNKNOWN
@@ -315,7 +318,11 @@ class BookmarksViewModel
                 if (shouldLoadOrSwitchEpisode) {
                     playbackManager.playNowSync(it, sourceView = sourceView)
                 }
+            } ?: run {
+                _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)
+                return@launch
             }
+            _message.emit(BookmarkMessage.PlayingBookmark(bookmark.title))
             playbackManager.seekToTimeMs(positionMs = bookmark.timeSecs * 1000)
             analyticsTracker.track(
                 AnalyticsEvent.BOOKMARK_PLAY_TAPPED,
@@ -409,5 +416,10 @@ class BookmarksViewModel
                     else -> MessageViewColors.Default
                 }
         }
+    }
+
+    sealed class BookmarkMessage {
+        data object BookmarkEpisodeNotFound : BookmarkMessage()
+        data class PlayingBookmark(val bookmarkTitle: String) : BookmarkMessage()
     }
 }

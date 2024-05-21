@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -417,4 +418,18 @@ abstract class PodcastDao {
         """,
     )
     abstract suspend fun getNovaLauncherSubscribedPodcasts(): List<NovaLauncherSubscribedPodcast>
+
+    @Query(
+        """
+        SELECT 
+          trending_podcast.uuid AS id, 
+          trending_podcast.title AS title 
+        FROM 
+          trending_podcasts as trending_podcast 
+          LEFT JOIN podcasts AS podcast ON podcast.uuid = trending_podcast.uuid 
+        WHERE 
+          IFNULL(podcast.subscribed, 0) IS 0
+        """,
+    )
+    abstract suspend fun getNovaLauncherTrendingPodcasts(): List<NovaLauncherTrendingPodcast>
 }

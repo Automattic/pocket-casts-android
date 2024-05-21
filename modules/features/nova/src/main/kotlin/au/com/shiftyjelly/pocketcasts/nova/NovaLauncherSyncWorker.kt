@@ -19,6 +19,8 @@ import dagger.assisted.AssistedInject
 import io.branch.engage.conduit.source.BranchDynamicData
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 @HiltWorker
 internal class NovaLauncherSyncWorker @AssistedInject constructor(
@@ -41,27 +43,49 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
         }
 
         val launcherBridge = BranchDynamicData.getOrInit(applicationContext)
-        val subscribedPodcasts = catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts())
 
-        return try {
-            val isUserDataSubmitted = launcherBridge.submitUserData(listOf(subscribedPodcasts)).isSuccess
+        return coroutineScope {
+            val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts()) }
+            val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts()) }
+            val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes()) }
+            val inProgressEpisodes = async { catalogFactory.inProgressEpisodes(manager.getInProgressEpisodes()) }
 
-            val results = listOf(
-                SubmissionResult(
-                    isUserDataSubmitted,
-                    "Subscribed podcasts",
-                    subscribedPodcasts.items.size,
-                ),
-            )
+            try {
+                val isUserDataSubmitted = launcherBridge.submitUserData(listOf(subscribedPodcasts.await())).isSuccess
+                val isRecommendationsSubmitted = launcherBridge.submitRecommendations(listOf(trendingPodcasts.await(), newEpisodes.await(), inProgressEpisodes.await())).isSuccess
 
-            val successes = results.filter(SubmissionResult::isSuccess)
-            val failures = results.filterNot(SubmissionResult::isSuccess)
+                val results = listOf(
+                    SubmissionResult(
+                        isUserDataSubmitted,
+                        "Subscribed podcasts",
+                        subscribedPodcasts.await().items.size,
+                    ),
+                    SubmissionResult(
+                        isRecommendationsSubmitted,
+                        "Trending podcasts",
+                        trendingPodcasts.await().items.size,
+                    ),
+                    SubmissionResult(
+                        isRecommendationsSubmitted,
+                        "New episodes",
+                        newEpisodes.await().items.size,
+                    ),
+                    SubmissionResult(
+                        isRecommendationsSubmitted,
+                        "In progress episodes",
+                        inProgressEpisodes.await().items.size,
+                    ),
+                )
 
-            logInfo("Nova Launcher sync complete. Success: $successes, Failure: $failures")
-            Result.success()
-        } catch (e: Throwable) {
-            logError("Nova Launcher sync failed", e)
-            Result.failure()
+                val successes = results.filter(SubmissionResult::isSuccess)
+                val failures = results.filterNot(SubmissionResult::isSuccess)
+
+                logInfo("Nova Launcher sync complete. Success: $successes, Failure: $failures")
+                Result.success()
+            } catch (e: Throwable) {
+                logError("Nova Launcher sync failed", e)
+                Result.failure()
+            }
         }
     }
 

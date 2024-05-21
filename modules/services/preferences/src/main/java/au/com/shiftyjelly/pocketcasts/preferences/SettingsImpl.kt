@@ -1387,7 +1387,7 @@ class SettingsImpl @Inject constructor(
     ) {
         override fun get(): Boolean {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                sharedPrefs.getBoolean(sharedPrefKey, false)
+                sharedPrefs.getBoolean(sharedPrefKey, true)
             } else {
                 false
             }

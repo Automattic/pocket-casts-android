@@ -78,13 +78,13 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
 
         val playBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
-            R.drawable.mini_player_play_background_32
+            R.drawable.mini_player_play_background_40
         } else {
             R.drawable.mini_player_play_background_48
         }
         binding.miniPlayButton.background = ContextCompat.getDrawable(context, playBackground)
         val playButtonLottieBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
-            R.raw.mini_player_play_button_32
+            R.raw.mini_player_play_button_40
         } else {
             R.raw.mini_player_play_button_48
         }
