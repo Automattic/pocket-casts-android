@@ -43,6 +43,10 @@ class AdvancedSettingsViewModel
             onCheckedChange = {
                 settings.prioritizeSeekAccuracy.set(it, updateModifiedAt = false)
                 updatePrioritizeSeekAccuracyState()
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_ADVANCED_PRIORITIZE_SEEK_ACCURACY,
+                    mapOf("enabled" to it),
+                )
             },
         ),
     )

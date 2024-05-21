@@ -552,6 +552,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Settings - Advanced */
     SETTINGS_ADVANCED_SHOWN("settings_advanced_shown"),
     SETTINGS_ADVANCED_SYNC_ON_METERED("settings_advanced_sync_on_metered"),
+    SETTINGS_ADVANCED_PRIORITIZE_SEEK_ACCURACY("settings_advanced_prioritize_seek_accuracy"),
 
     /* Search */
     SEARCH_SHOWN("search_shown"),
