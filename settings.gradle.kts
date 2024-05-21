@@ -33,7 +33,6 @@ dependencyResolutionManagement {
     }
 }
 
-
 include(":app")
 include(":automotive")
 include(":wear")

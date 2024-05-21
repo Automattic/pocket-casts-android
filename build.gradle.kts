@@ -38,20 +38,22 @@ measureBuilds {
     attachGradleScanId = false
 }
 
+val ktlintVersion = libs.versions.ktlint.get()
+
 spotless {
     kotlin {
         target(
-            "app/build.gradle.kts",
             "app/src/**/*.kt",
-            "automotive/build.gradle.kts",
             "automotive/src/**/*.kt",
-            "build.gradle.kts",
-            "modules/**/build.gradle.kts",
             "modules/**/src/**/*.kt",
-            "wear/build.gradle.kts",
             "wear/src/**/*.kt",
         )
-        ktlint("0.50.0")
+        ktlint(ktlintVersion)
+    }
+
+    kotlinGradle {
+        target("*.kts")
+        ktlint(ktlintVersion)
     }
 }
 
