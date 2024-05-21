@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix timestamp parameter handling in shared links
         ([#2235](https://github.com/Automattic/pocket-casts-android/pull/2235))
+    *   Improve intermediate caching of playing episode 
+        ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))
 
 7.64
 -----
