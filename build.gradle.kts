@@ -1,4 +1,3 @@
-import com.android.tools.r8.internal.kt
 import com.automattic.android.measure.MeasureBuildsExtension
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
@@ -41,15 +40,25 @@ measureBuilds {
 
 spotless {
     kotlin {
-        target("app/src/**/*.kt", "automotive/src/**/*.kt", "modules/src/**/*.kt", "wear/src/**/*.kt")
+        target(
+            "app/src/**/*.kt",
+            "automotive/src/**/*.kt",
+            "modules/src/**/*.kt",
+            "wear/src/**/*.kt",
+            "build.gradle.kts",
+            "app/build.gradle.kts",
+            "automotive/build.gradle.kts",
+            "modules/**/build.gradle.kts",
+            "wear/build.gradle.kts",
+        )
         ktlint("0.50.0")
     }
 }
 
 fun Project.configureSentry() {
     extensions.getByType(SentryPluginExtension::class.java).apply {
-        includeProguardMapping = System.getenv()["CI"].toBoolean()
-                && !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+        includeProguardMapping = System.getenv()["CI"].toBoolean() &&
+            !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
 
         tracingInstrumentation {
             features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP)

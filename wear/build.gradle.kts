@@ -1,6 +1,3 @@
-import io.sentry.android.gradle.extensions.InstrumentationFeature
-import java.util.EnumSet
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -42,8 +39,8 @@ android {
             proguardFiles.addAll(
                 listOf(
                     getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro")
-                )
+                    file("proguard-rules.pro"),
+                ),
             )
             isShrinkResources = true
         }
@@ -52,7 +49,7 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-        compose=  true
+        compose = true
     }
 
     kotlinOptions {
