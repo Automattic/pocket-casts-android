@@ -10,6 +10,8 @@
         ([#2254](https://github.com/Automattic/pocket-casts-android/pull/2254))
     *   Fix timestamp parameter handling in shared links
         ([#2235](https://github.com/Automattic/pocket-casts-android/pull/2235))
+    *   Fix the Google Podcasts OPML file import and include an error message if parsing fails.
+        ([#2260](https://github.com/Automattic/pocket-casts-android/pull/2260))
     *   Improve intermediate caching of playing episode 
         ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))
 
