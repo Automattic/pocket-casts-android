@@ -16,7 +16,6 @@ import timber.log.Timber
 
 @OptIn(UnstableApi::class)
 object ExoPlayerCacheUtil {
-    private const val MAX_DEVICE_CACHE_SIZE_BYTES = 50 * 1024 * 1024L
     private const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
     private var simpleCache: SimpleCache? = null
 
@@ -24,15 +23,17 @@ object ExoPlayerCacheUtil {
     @Synchronized
     fun getSimpleCache(
         context: Context,
+        cacheSizeInMB: Long,
         crashLogging: CrashLogging,
     ): SimpleCache? {
         if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) && simpleCache == null) {
             val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
+            val cacheSizeInBytes = cacheSizeInMB * 1024 * 1024L
             simpleCache = try {
                 if (BuildConfig.DEBUG) Timber.d("ExoPlayer cache initialized")
                 SimpleCache(
                     cacheDir,
-                    LeastRecentlyUsedCacheEvictor(MAX_DEVICE_CACHE_SIZE_BYTES),
+                    LeastRecentlyUsedCacheEvictor(cacheSizeInBytes),
                     StandaloneDatabaseProvider(context),
                 )
             } catch (e: Exception) {

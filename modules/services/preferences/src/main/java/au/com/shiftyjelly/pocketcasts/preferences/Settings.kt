@@ -137,6 +137,8 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_PODCAST("podcastImport"),
         NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR("signInError"),
         NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
+        NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS("fixDownloads"),
+        NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE("fixDownloadsComplete"),
     }
 
     enum class NotificationId(val value: Int) {
@@ -145,6 +147,8 @@ interface Settings {
         DOWNLOADING(21483648),
         SIGN_IN_ERROR(21483649),
         BOOKMARK(21483650),
+        FIX_DOWNLOADS(21483651),
+        FIX_DOWNLOADS_COMPLETE(21483652),
     }
 
     enum class UpNextAction(val serverId: Int) {
@@ -399,6 +403,7 @@ interface Settings {
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
+    fun getExoPlayerCacheSizeInMB(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 

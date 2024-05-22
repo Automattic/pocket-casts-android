@@ -282,7 +282,11 @@ class SimplePlayer(
             }
         } ?: return
 
-        val sourceFactory = ExoPlayerCacheUtil.getSimpleCache(context, crashLogging)?.let { cache ->
+        val sourceFactory = ExoPlayerCacheUtil.getSimpleCache(
+            context = context,
+            cacheSizeInMB = settings.getExoPlayerCacheSizeInMB(),
+            crashLogging = crashLogging,
+        )?.let { cache ->
             if (location is EpisodeLocation.Stream) {
                 CacheDataSource.Factory()
                     .setCache(cache)

@@ -100,5 +100,7 @@ project.apply {
         set("googleSignInServerClientId", secretProperties.getProperty("googleSignInServerClientId", ""))
         set("measureBuildsEnabled", secretProperties.getProperty("measureBuildsEnabled", ""))
         set("appsMetricsToken", secretProperties.getProperty("appsMetricsToken", ""))
+        set("encryptionKey", secretProperties.getProperty("encryption_key", ""))
+        set("appSecret", secretProperties.getProperty("app_secret", ""))
     }
 }

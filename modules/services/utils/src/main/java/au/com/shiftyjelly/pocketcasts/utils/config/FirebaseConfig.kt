@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.config
 
+import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 
 object FirebaseConfig {
@@ -12,6 +13,7 @@ object FirebaseConfig {
     const val SLUMBER_STUDIOS_YEARLY_PROMO_CODE = "slumber_studios_yearly_promo_code"
     const val SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD = "sleep_timer_device_shake_threshold"
     const val REFRESH_PODCASTS_BATCH_SIZE = "refresh_podcasts_batch_size"
+    const val EXOPLAYER_CACHE_SIZE_IN_MB = "exoplayer_cache_size_in_mb"
     val defaults = mapOf(
         PERIODIC_SAVE_TIME_MS to 60000L,
         PLAYER_RELEASE_TIME_OUT_MS to 500L,
@@ -20,6 +22,7 @@ object FirebaseConfig {
         CLOUD_STORAGE_LIMIT to 10L,
         SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD to 30L,
         REFRESH_PODCASTS_BATCH_SIZE to 200L,
+        EXOPLAYER_CACHE_SIZE_IN_MB to if (BuildConfig.DEBUG) 100L else 0L,
     ) + Feature.values()
         .filter { it.hasFirebaseRemoteFlag }
         .associate { it.key to it.defaultValue }
