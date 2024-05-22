@@ -1312,11 +1312,10 @@ open class PlaybackManager @Inject constructor(
 
         if (hadSleepAfterEpisode) {
             sleepEndOfEpisode(episode)
+            if (!isSleepAfterEpisodeEnabled()) return
         }
 
-        if (!isSleepAfterEpisodeEnabled()) {
-            cancelUpdateTimer()
-        }
+        cancelUpdateTimer()
         cancelBufferUpdateTimer()
 
         if (episode != null) {
