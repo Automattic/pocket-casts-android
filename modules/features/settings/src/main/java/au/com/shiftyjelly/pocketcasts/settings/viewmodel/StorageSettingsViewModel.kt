@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
+import au.com.shiftyjelly.pocketcasts.repositories.download.FixDownloadsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
@@ -23,15 +23,12 @@ import java.io.File
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
-import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -85,7 +82,6 @@ class StorageSettingsViewModel
     private lateinit var permissionGranted: () -> Boolean
     private var permissionRequestedForPath: String? = null
     private var sdkVersion: Int = 0
-    private var fixDownloadsJob: Job? = null
 
     fun start(
         folderLocations: () -> List<FolderLocation>,
@@ -148,9 +144,6 @@ class StorageSettingsViewModel
                 )
             },
         ),
-        fixDownloadsState = State.FixDownloadsState(
-            isFixing = false,
-        ),
     )
 
     fun onFragmentResume() {
@@ -167,42 +160,14 @@ class StorageSettingsViewModel
     }
 
     fun fixDownloadedFiles() {
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_START)
-        fixDownloadsJob?.cancel()
-        fixDownloadsJob = viewModelScope.launch {
-            val episodeCount = episodeManager.countEpisodes()
-            mutableState.update { state ->
-                state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = true, episodeCount = episodeCount))
-            }
-
-            var fixedCount = 0
-
-            episodeManager.getAllPodcastEpisodes(pageLimit = FIX_EPISODES_LIMIT).collect { (episode, index) ->
-                mutableState.update { state ->
-                    state.copy(fixDownloadsState = state.fixDownloadsState.copy(currentlyFixed = index))
-                }
-                withContext(Dispatchers.IO) {
-                    val path = DownloadHelper.pathForEpisode(episode, fileStorage)?.takeIf {
-                        val file = File(it)
-                        file.exists() && file.isFile
-                    }
-                    if (path != null && path != episode.downloadedFilePath) {
-                        fixedCount++
-                        episodeManager.updateDownloadFilePath(episode, path, markAsDownloaded = true)
-                    }
-                }
-            }
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_END, mapOf("fixed_count" to fixedCount))
-            mutableState.update { state ->
-                state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = false))
-            }
-        }
-    }
-
-    fun cancelDownloadsFix() {
-        fixDownloadsJob?.cancel()
-        mutableState.update { state ->
-            state.copy(fixDownloadsState = State.FixDownloadsState(isFixing = false))
+        FixDownloadsWorker.run(context)
+        viewModelScope.launch {
+            mutableAlertDialog.emit(
+                createAlertDialogState(
+                    title = context.getString(LR.string.settings_fix_downloads_started_message),
+                    showCancel = false,
+                ),
+            )
         }
     }
 
@@ -438,21 +403,26 @@ class StorageSettingsViewModel
     private fun createAlertDialogState(
         title: String,
         @StringRes message: Int? = null,
+        showCancel: Boolean = true,
     ) = AlertDialogState(
         title = title,
         message = message?.let { context.getString(message) },
-        buttons = listOf(
-            DialogButtonState(
-                text = context.getString(LR.string.cancel).uppercase(
-                    Locale.getDefault(),
+        buttons = buildList {
+            if (showCancel) {
+                add(
+                    DialogButtonState(
+                        text = context.getString(LR.string.cancel).uppercase(),
+                        onClick = {},
+                    ),
+                )
+            }
+            add(
+                DialogButtonState(
+                    text = context.getString(LR.string.ok),
+                    onClick = {},
                 ),
-                onClick = {},
-            ),
-            DialogButtonState(
-                text = context.getString(LR.string.ok),
-                onClick = {},
-            ),
-        ),
+            )
+        },
     )
 
     fun onShown() {
@@ -465,7 +435,6 @@ class StorageSettingsViewModel
         val storageFolderState: StorageFolderState,
         val backgroundRefreshState: BackgroundRefreshState,
         val storageDataWarningState: StorageDataWarningState,
-        val fixDownloadsState: FixDownloadsState,
     ) {
         data class DownloadedFilesState(
             val size: Long = 0L,
@@ -493,12 +462,6 @@ class StorageSettingsViewModel
         data class StorageDataWarningState(
             val isChecked: Boolean = false,
             val onCheckedChange: (Boolean) -> Unit,
-        )
-
-        data class FixDownloadsState(
-            val isFixing: Boolean = false,
-            val episodeCount: Int = 0,
-            val currentlyFixed: Int = 0,
         )
     }
 
