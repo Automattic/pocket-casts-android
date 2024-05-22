@@ -6,11 +6,15 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherRecentlyPlayedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
+import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.test.runTest
@@ -223,6 +227,155 @@ class PodcastDaoTest {
         val expected = listOf(
             NovaLauncherTrendingPodcast("id-2", "title-2"),
             NovaLauncherTrendingPodcast("id-3", "title-3"),
+        )
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun useCorrectReleaseTimestampsForNovaLauncherRecentlyPlayedPodcasts() = runTest {
+        val interactionDate1 = Date.from(Instant.now().minus(1, ChronoUnit.DAYS))
+        val interactionDate2 = Date.from(Instant.now().minus(2, ChronoUnit.DAYS))
+        val interactionDate3 = Date.from(Instant.now().minus(3, ChronoUnit.DAYS))
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        episodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
+        episodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(2000), podcastUuid = "id-1", lastPlaybackInteraction = null))
+        episodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(1000), podcastUuid = "id-1", lastPlaybackInteraction = 13000))
+
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
+        episodeDao.insert(PodcastEpisode(uuid = "id-4", publishedDate = Date(5000), podcastUuid = "id-2", lastPlaybackInteraction = 0))
+        episodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(4000), podcastUuid = "id-2", lastPlaybackInteraction = 20000))
+        episodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(3000), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
+
+        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
+        episodeDao.insert(PodcastEpisode(uuid = "id-7", publishedDate = Date(12000), podcastUuid = "id-3", lastPlaybackInteraction = interactionDate3.time))
+
+        val podcasts = podcastDao.getNovaLauncherRecentlyPlayedPodcasts()
+
+        val expected = listOf(
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-1",
+                title = "title-1",
+                initialReleaseTimestamp = 0,
+                latestReleaseTimestamp = 2,
+                lastUsedTimestamp = interactionDate1.timeSecs(),
+            ),
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-2",
+                title = "title-2",
+                initialReleaseTimestamp = 3,
+                latestReleaseTimestamp = 5,
+                lastUsedTimestamp = interactionDate2.timeSecs(),
+            ),
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-3",
+                title = "title-3",
+                initialReleaseTimestamp = 12,
+                latestReleaseTimestamp = 12,
+                lastUsedTimestamp = interactionDate3.timeSecs(),
+            ),
+        )
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun includeOnlyInteractedWithPodcastsForNovaLauncherRecentlyPlayedPodcasts() = runTest {
+        val interactionDate = Date()
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1"))
+        episodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate.time))
+
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2"))
+        episodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = null))
+
+        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3"))
+
+        val podcasts = podcastDao.getNovaLauncherRecentlyPlayedPodcasts()
+
+        val expected = listOf(
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-1",
+                title = "title-1",
+                initialReleaseTimestamp = 0,
+                latestReleaseTimestamp = 0,
+                lastUsedTimestamp = interactionDate.timeSecs(),
+            ),
+        )
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun getRecentlyPlayedPodcastsForNovaLauncherSortedByInteractionDate() = runTest {
+        val interactionDate1 = Date.from(Instant.now().minus(3, ChronoUnit.DAYS))
+        val interactionDate2 = Date.from(Instant.now().minus(1, ChronoUnit.DAYS))
+        val interactionDate3 = Date.from(Instant.now().minus(2, ChronoUnit.DAYS))
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1"))
+        episodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
+
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2"))
+        episodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
+
+        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3"))
+        episodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(0), podcastUuid = "id-3", lastPlaybackInteraction = interactionDate3.time))
+
+        val podcasts = podcastDao.getNovaLauncherRecentlyPlayedPodcasts()
+
+        val expected = listOf(
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-2",
+                title = "title-2",
+                initialReleaseTimestamp = 0,
+                latestReleaseTimestamp = 0,
+                lastUsedTimestamp = interactionDate2.timeSecs(),
+            ),
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-3",
+                title = "title-3",
+                initialReleaseTimestamp = 0,
+                latestReleaseTimestamp = 0,
+                lastUsedTimestamp = interactionDate3.timeSecs(),
+            ),
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-1",
+                title = "title-1",
+                initialReleaseTimestamp = 0,
+                latestReleaseTimestamp = 0,
+                lastUsedTimestamp = interactionDate1.timeSecs(),
+            ),
+        )
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun limitNovaLauncherRecentlyPlayedPodcastsTo200Podcasts() = runTest {
+        List(250) {
+            podcastDao.insert(Podcast(uuid = "id-$it"))
+            episodeDao.insert(PodcastEpisode(uuid = "id-$it", podcastUuid = "id-$it", publishedDate = Date(), lastPlaybackInteraction = Date().time))
+        }
+
+        val inProgressEpisodes = podcastDao.getNovaLauncherRecentlyPlayedPodcasts()
+
+        assertEquals(200, inProgressEpisodes.size)
+    }
+
+    @Test
+    fun ignoreRecentlyPlayedPodcastsForNovaLauncherThatAreAtLeast60DaysOld() = runTest {
+        val interactionDate1 = Date.from(Instant.now().minus(61, ChronoUnit.DAYS))
+        val interactionDate2 = Date.from(Instant.now().minus(59, ChronoUnit.DAYS))
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        episodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = interactionDate1.time))
+
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = false))
+        episodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(0), podcastUuid = "id-2", lastPlaybackInteraction = interactionDate2.time))
+
+        val podcasts = podcastDao.getNovaLauncherRecentlyPlayedPodcasts()
+
+        val expected = listOf(
+            NovaLauncherRecentlyPlayedPodcast(
+                id = "id-2",
+                title = "title-2",
+                initialReleaseTimestamp = 0,
+                latestReleaseTimestamp = 0,
+                lastUsedTimestamp = interactionDate2.timeSecs(),
+            ),
         )
         assertEquals(expected, podcasts)
     }
