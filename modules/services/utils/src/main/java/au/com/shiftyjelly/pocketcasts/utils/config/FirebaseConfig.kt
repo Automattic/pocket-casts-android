@@ -12,6 +12,7 @@ object FirebaseConfig {
     const val SLUMBER_STUDIOS_YEARLY_PROMO_CODE = "slumber_studios_yearly_promo_code"
     const val SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD = "sleep_timer_device_shake_threshold"
     const val REFRESH_PODCASTS_BATCH_SIZE = "refresh_podcasts_batch_size"
+    const val EXOPLAYER_CACHE_SIZE_IN_MB = "exoplayer_cache_size_in_mb"
     val defaults = mapOf(
         PERIODIC_SAVE_TIME_MS to 60000L,
         PLAYER_RELEASE_TIME_OUT_MS to 500L,
