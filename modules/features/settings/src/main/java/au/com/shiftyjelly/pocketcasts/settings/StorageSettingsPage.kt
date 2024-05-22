@@ -5,25 +5,16 @@ import android.os.StatFs
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -45,8 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -57,9 +45,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -133,13 +118,6 @@ fun StorageSettingsPage(
             .collect { message ->
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
-    }
-    if (state.fixDownloadsState.isFixing) {
-        FixingDownloadsDialog(
-            state.fixDownloadsState.currentlyFixed,
-            state.fixDownloadsState.episodeCount,
-            onDismiss = { viewModel.cancelDownloadsFix() },
-        )
     }
 }
 
@@ -414,63 +392,6 @@ private fun AlertDialogView(
     )
 }
 
-@Composable
-private fun FixingDownloadsDialog(
-    currentlyFixed: Int,
-    episodeCount: Int,
-    onDismiss: () -> Unit,
-) {
-    Dialog(
-        properties = DialogProperties(
-            dismissOnClickOutside = false,
-        ),
-        onDismissRequest = { onDismiss() },
-    ) {
-        Card(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .padding(vertical = 8.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start,
-            ) {
-                TextH30(
-                    text = stringResource(R.string.settings_storage_fixing_downloads),
-                    modifier = Modifier.padding(16.dp),
-                )
-                TextH50(
-                    text = stringResource(R.string.settings_storage_fixing_progress, currentlyFixed, episodeCount),
-                    modifier = Modifier.padding(16.dp),
-                )
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                ) {
-                    TextButton(
-                        onClick = { onDismiss() },
-                        modifier = Modifier.padding(end = 8.dp),
-                    ) {
-                        TextH40(
-                            text = stringResource(R.string.cancel).uppercase(),
-                            color = MaterialTheme.theme.colors.primaryInteractive01,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
 private fun mapToStringWithStorageSpace(
     option: String,
     path: String?,
@@ -514,9 +435,6 @@ private fun StorageSettingsPreview(
                 ),
                 storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
                     onCheckedChange = {},
-                ),
-                fixDownloadsState = StorageSettingsViewModel.State.FixDownloadsState(
-                    isFixing = false,
                 ),
             ),
             onBackPressed = {},
