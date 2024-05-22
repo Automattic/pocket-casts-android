@@ -4,9 +4,11 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider.Companion.GLOBAL_TAG_APP_PLATFORM
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeBuildDataProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeCrashReportPermissionCheck
+import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeEncryptedLogging
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeObserveUser
 import com.automattic.android.tracks.crashlogging.CrashLoggingUser
 import com.automattic.android.tracks.crashlogging.ErrorSampling
+import java.io.File
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -26,7 +28,10 @@ class PocketCastsCrashLoggingDataProviderTest {
             fakeObserveUser,
             FakeCrashReportPermissionCheck(),
             fakeBuildDataProvider,
+            FakeEncryptedLogging(),
+            File.createTempFile("test", "test"),
             localeProvider = { null },
+            connectionStatusProvider = { true },
         )
     }
 

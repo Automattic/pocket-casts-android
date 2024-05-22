@@ -10,12 +10,15 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.LocaleProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.android.tracks.crashlogging.CrashLoggingProvider
+import com.automattic.encryptedlogging.AutomatticEncryptedLogging
+import com.automattic.encryptedlogging.EncryptedLogging
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.File
 import javax.inject.Singleton
 
 @Module
@@ -27,10 +30,24 @@ abstract class CrashLoggingModule {
 
     companion object {
         @Provides
+        fun provideEncryptedLogging(@ApplicationContext context: Context): EncryptedLogging {
+            return AutomatticEncryptedLogging(
+                context,
+                encryptedLoggingKey = BuildConfig.ENCRYPTION_KEY,
+                clientSecret = BuildConfig.APP_SECRET,
+            )
+        }
+
+        @Provides
         fun provideBuildDataProvider(): BuildDataProvider {
             return object : BuildDataProvider {
                 override val buildPlatform: String = BuildConfig.BUILD_PLATFORM
             }
+        }
+
+        @Provides
+        fun provideApplicationFilesDir(@ApplicationContext application: Context): File {
+            return File(application.filesDir, "logs")
         }
 
         @Provides
