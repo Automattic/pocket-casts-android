@@ -260,14 +260,14 @@ class OpmlImportTask @AssistedInject constructor(
                         .replace("&(?!amp;|quot;|gt;|lt;)".toRegex(), "&amp;")
                         .replace("’", "&apos;")
 
-                    val regex = """text="(.*?)" />""".toRegex()
-                    val finalLine = regex.replace(modifiedLine) { matchResult ->
+                    val textRegex = """(?<=text=")(.*?)(?="\s*(?:/>|\s+xmlUrl|\s+type))""".toRegex()
+                    val finalLine = textRegex.replace(modifiedLine) { matchResult ->
                         val text = matchResult.groupValues[1]
                         val fixedText = text
                             .replace("\"", "&quot;")
                             .replace(">", "&gt;")
                             .replace("<", "&lt;")
-                        """text="$fixedText" />"""
+                        matchResult.value.replace(text, fixedText)
                     }
 
                     writer.write(finalLine)
