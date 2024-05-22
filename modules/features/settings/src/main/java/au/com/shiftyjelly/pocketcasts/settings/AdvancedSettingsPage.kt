@@ -92,6 +92,14 @@ fun AdvancedSettingsView(
                     SyncOnMeteredRow(state.backgroundSyncOnMeteredState)
                 }
             }
+            item {
+                SettingSection(
+                    heading = stringResource(LR.string.settings_storage_section_heading_seek_accuracy),
+                    indent = false,
+                ) {
+                    PrioritizeSeekAccuracydRow(state.prioritizeSeekAccuracyState)
+                }
+            }
         }
     }
 }
@@ -114,6 +122,24 @@ private fun SyncOnMeteredRow(
     )
 }
 
+@Composable
+private fun PrioritizeSeekAccuracydRow(
+    state: AdvancedSettingsViewModel.State.PrioritizeSeekAccuracyState,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_advanced_prioritize_seek_accuracy),
+        secondaryText = stringResource(LR.string.settings_advanced_prioritize_seek_accuracy_summary),
+        toggle = SettingRowToggle.Switch(state.isChecked),
+        indent = false,
+        modifier = modifier.toggleable(
+            value = state.isChecked,
+            role = Role.Switch,
+            onValueChange = { state.onCheckedChange(it) },
+        ),
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun AdvancedSettingsPreview(
@@ -125,6 +151,10 @@ private fun AdvancedSettingsPreview(
                 backgroundSyncOnMeteredState = AdvancedSettingsViewModel.State.BackgroundSyncOnMeteredState(
                     isChecked = true,
                     isEnabled = true,
+                    onCheckedChange = {},
+                ),
+                prioritizeSeekAccuracyState = AdvancedSettingsViewModel.State.PrioritizeSeekAccuracyState(
+                    isChecked = true,
                     onCheckedChange = {},
                 ),
             ),

@@ -1285,6 +1285,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_storage_move_podcasts">Moving podcasts&#x2026;</string>
     <string name="settings_storage_section_heading_usage">Usage</string>
     <string name="settings_storage_section_heading_mobile_data">Mobile Data</string>
+    <string name="settings_storage_section_heading_seek_accuracy">Seek Accuracy</string>
     <string name="settings_storage_size_free">%s free</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_store_on">Store podcasts on</string>
@@ -1479,6 +1480,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Prioritizing seek accuracy</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Prioritizing seek accuracy can significantly slow down seek responsiveness and cause Pocket Casts to consume more data.</string>
     <!-- Used in a button meaning that the user understood the message. -->
     <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->

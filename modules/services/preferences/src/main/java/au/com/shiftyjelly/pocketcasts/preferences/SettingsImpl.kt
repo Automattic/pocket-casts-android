@@ -188,6 +188,12 @@ class SettingsImpl @Inject constructor(
         toString = { it.clientId.toString() },
     )
 
+    override val prioritizeSeekAccuracy = UserSetting.BoolPref(
+        sharedPrefKey = "prioritizeSeekAccuracy",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun setSelectPodcastsSortType(sortType: PodcastsSortType) {
         sharedPreferences.edit().apply {
             putString(Settings.PREFERENCE_SELECT_PODCAST_LIBRARY_SORT, sortType.clientId.toString())

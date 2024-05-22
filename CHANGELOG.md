@@ -3,6 +3,8 @@
 *   New Features
     *   Add a storage setting that attempts to fix missing downloads files.
         ([#2244](https://github.com/Automattic/pocket-casts-android/pull/2244))
+    *   Add an advanced setting that prioritizes seek accuracy over speed during streaming.
+        ([#2265](https://github.com/Automattic/pocket-casts-android/pull/2265))
 *   Health
     *   Increase minimum SDK version to 24 ([#2262](https://github.com/Automattic/pocket-casts-android/pull/2262))
 *   Bug Fixes

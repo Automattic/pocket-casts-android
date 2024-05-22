@@ -433,6 +433,10 @@ class Support @Inject constructor(
                     Timber.e(e)
                 }
 
+                output.append("Advance Settings").append(eol).append("-------------------").append(eol).append(eol)
+                output.append("Prioritize seek accuracy? ").append(settings.prioritizeSeekAccuracy.value).append(eol)
+                output.append(eol)
+
                 output.append("Episode Issues").append(eol).append("--------------").append(eol).append(eol)
 
                 try {
