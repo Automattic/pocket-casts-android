@@ -403,6 +403,7 @@ interface Settings {
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
+    fun getExoPlayerCacheSizeInMB(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
