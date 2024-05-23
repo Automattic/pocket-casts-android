@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
@@ -20,9 +19,9 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColors
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -82,10 +81,14 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         view.isClickable = true
 
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        toolbar.title = getString(LR.string.podcast_playback_effects)
-        toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(theme.activeTheme))
 
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        toolbar.setup(
+            title = getString(LR.string.podcast_playback_effects),
+            navigationIcon = NavigationIcon.BackArrow,
+            activity = activity,
+            theme = theme,
+            toolbarColors = ToolbarColors.theme(theme = theme, context = toolbar.context),
+        )
 
         preferencePlaybackSpeed?.isVisible = false
         preferenceTrimSilence?.isVisible = false
@@ -97,7 +100,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
             val colors = ToolbarColors.podcast(podcast = podcast, theme = theme)
 
             updateTintColor(colors.iconColor)
-            toolbar.updateColors(toolbarColors = colors, navigationIcon = BackArrow)
+            toolbar.updateColors(toolbarColors = colors, navigationIcon = NavigationIcon.BackArrow)
             theme.updateWindowStatusBar(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(colors.backgroundColor, true), context = requireContext())
 
             preferenceCustomForPodcast?.isChecked = podcast.overrideGlobalEffects

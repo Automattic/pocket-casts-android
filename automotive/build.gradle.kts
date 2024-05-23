@@ -42,8 +42,8 @@ android {
             proguardFiles.addAll(
                 listOf(
                     getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro")
-                )
+                    file("proguard-rules.pro"),
+                ),
             )
             isShrinkResources = true
         }
@@ -54,7 +54,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     // Commented out the Automotive library as it clashes with the Material library and we don't use it. Duplicate value for resource attr/navigationIconTint.
-    //implementation "androidx.car:car:1.0.0-alpha7"
+    // implementation "androidx.car:car:1.0.0-alpha7"
     implementation(libs.appcompat)
     implementation(libs.core.ktx)
     implementation(libs.material)
