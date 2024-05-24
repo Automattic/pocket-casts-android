@@ -2115,6 +2115,7 @@ open class PlaybackManager @Inject constructor(
         player?.play(currentTimeMs)
 
         sleepTimer.restartSleepTimerIfApplies(
+            autoSleepTimerEnabled = settings.autoSleepTimerRestart.value,
             currentEpisodeUuid = episode.uuid,
             timerState = SleepTimer.SleepTimerState(
                 isSleepTimerRunning = playbackStateRelay.blockingFirst().isSleepTimerRunning,

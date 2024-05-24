@@ -75,12 +75,15 @@ class SleepTimer @Inject constructor(
     }
 
     fun restartSleepTimerIfApplies(
+        autoSleepTimerEnabled: Boolean,
         currentEpisodeUuid: String,
         timerState: SleepTimerState,
         onRestartSleepAfterTime: () -> Unit,
         onRestartSleepOnEpisodeEnd: () -> Unit,
         onRestartSleepOnChapterEnd: () -> Unit,
     ) {
+        if (!autoSleepTimerEnabled) return
+
         lastTimeSleepTimeHasFinished?.let { lastTimeHasFinished ->
             val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
 

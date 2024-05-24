@@ -500,6 +500,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED("settings_general_intelligent_playback_toggled"),
     SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED("settings_general_play_up_next_on_tap_toggled"),
     SETTINGS_GENERAL_SHAKE_TO_RESET_SLEEP_TIMER_TOGGLED("settings_general_shake_to_reset_sleep_timer_toggled"),
+    SETTINGS_GENERAL_AUTO_SLEEP_TIMER_RESTART_TOGGLED("settings_general_auto_sleep_timer_restart_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN("settings_general_media_notification_controls_shown"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),

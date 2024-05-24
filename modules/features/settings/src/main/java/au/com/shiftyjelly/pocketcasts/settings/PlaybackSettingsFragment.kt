@@ -290,6 +290,17 @@ class PlaybackSettingsFragment : BaseFragment() {
 
                 item {
                     SettingSection(heading = stringResource(LR.string.settings_general_sleep_timer)) {
+                        AutoSleepTimerRestart(
+                            saved = settings.autoSleepTimerRestart.flow.collectAsState().value,
+                            onSave = {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.SETTINGS_GENERAL_AUTO_SLEEP_TIMER_RESTART_TOGGLED,
+                                    mapOf("enabled" to it),
+                                )
+                                settings.autoSleepTimerRestart.set(it, updateModifiedAt = true)
+                            },
+                        )
+
                         ShakeToResetSleepTimer(
                             saved = settings.shakeToResetSleepTimer.flow.collectAsState().value,
                             onSave = {
@@ -554,6 +565,15 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset),
             secondaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        )
+
+    @Composable
+    private fun AutoSleepTimerRestart(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_sleep_timer_auto_restart),
+            secondaryText = stringResource(LR.string.settings_sleep_timer_auto_restart_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )
