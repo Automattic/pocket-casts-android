@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.Bundle
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -92,7 +93,7 @@ data class Podcast(
         level = DeprecationLevel.ERROR,
         replaceWith = ReplaceWith(expression = "autoArchiveEpisodeLimit"),
     )
-    @ColumnInfo(name = "auto_archive_episode_limit") internal var rawAutoArchiveEpisodeLimit: Int? = null,
+    @ColumnInfo(name = "auto_archive_episode_limit") internal var rawAutoArchiveEpisodeLimit: AutoArchiveLimit = AutoArchiveLimit.None,
     @ColumnInfo(name = "auto_archive_episode_limit_modified") var autoArchiveEpisodeLimitModified: Date? = null,
     @ColumnInfo(name = "estimated_next_episode") var estimatedNextEpisode: Date? = null,
     @ColumnInfo(name = "episode_frequency") var episodeFrequency: String? = null,
@@ -207,10 +208,12 @@ data class Podcast(
         }
 
     @Suppress("DEPRECATION_ERROR")
-    var autoArchiveEpisodeLimit: Int?
+    var autoArchiveEpisodeLimit: AutoArchiveLimit?
         get() = rawAutoArchiveEpisodeLimit.takeIf { overrideGlobalArchive }
         set(value) {
-            rawAutoArchiveEpisodeLimit = value
+            if (value != null) {
+                rawAutoArchiveEpisodeLimit = value
+            }
         }
 
     enum class Licensing {

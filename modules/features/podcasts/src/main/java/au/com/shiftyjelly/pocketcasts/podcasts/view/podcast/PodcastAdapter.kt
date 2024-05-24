@@ -486,7 +486,7 @@ class PodcastAdapter(
                     episodeCount = episodeCount,
                     archivedCount = archivedCount,
                     searchTerm = searchTerm,
-                    episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null,
+                    episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 ),
             )
             addAll(episodesPlusLimit)

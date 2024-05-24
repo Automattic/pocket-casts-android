@@ -15,7 +15,9 @@
     *   Fix the Google Podcasts OPML file import and include an error message if parsing fails.
         ([#2260](https://github.com/Automattic/pocket-casts-android/pull/2260))
     *   Improve intermediate caching of playing episode 
-        ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))
+        ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))    
+    *   Fix 'No limit' episode archive setting not being respected 
+        ([#2270](https://github.com/Automattic/pocket-casts-android/pull/2270))
 
 7.64
 -----

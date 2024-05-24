@@ -947,14 +947,12 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?) {
-        if (!podcast.overrideGlobalArchive) return
-
-        val episodeLimit = podcast.autoArchiveEpisodeLimit
+        val episodeLimit = podcast.autoArchiveEpisodeLimit?.value
 
         if (episodeLimit != null) {
             val allEpisodes = episodeDao.findByPodcastOrderPublishedDateDesc(podcast.uuid).filter { !it.excludeFromEpisodeLimit }
             if (allEpisodes.isNotEmpty() && episodeLimit < allEpisodes.size) {
-                val episodesToRemove = allEpisodes.subList(episodeLimit, allEpisodes.size)
+                val episodesToRemove = allEpisodes.drop(episodeLimit)
                     .filter { !it.isArchived }
                     .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
                     .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }

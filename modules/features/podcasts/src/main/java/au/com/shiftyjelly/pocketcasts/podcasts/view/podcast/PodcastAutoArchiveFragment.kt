@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.dialogs.RadioOptionsDialog
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
@@ -220,7 +221,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
 
     @Composable
     private fun EpisodeLimitSection(
-        limit: Int?,
+        limit: AutoArchiveLimit,
         modifier: Modifier = Modifier,
     ) {
         var openEpisodeLimitDialog by remember { mutableStateOf(false) }
@@ -231,7 +232,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
         ) {
             SettingRow(
                 primaryText = stringResource(LR.string.settings_auto_archive_episode_limit),
-                secondaryText = stringResource(EpisodeLimits[limit] ?: LR.string.settings_auto_archive_limit_none),
+                secondaryText = stringResource(limit.stringRes),
                 toggle = SettingRowToggle.None,
                 modifier = Modifier.clickable { openEpisodeLimitDialog = true },
             )
@@ -291,16 +292,16 @@ class PodcastAutoArchiveFragment : BaseFragment() {
 
     @Composable
     private fun EpisodeLimitDialog(
-        limit: Int?,
+        limit: AutoArchiveLimit,
         modifier: Modifier = Modifier,
-        onConfirm: (Int?) -> Unit,
+        onConfirm: (AutoArchiveLimit) -> Unit,
         onDismiss: () -> Unit,
     ) {
         RadioOptionsDialog(
             title = stringResource(LR.string.settings_auto_archive_episode_limit),
             selectedOption = limit,
-            allOptions = EpisodeLimits.keys.toList(),
-            optionName = { option -> stringResource(EpisodeLimits[option] ?: LR.string.settings_auto_archive_limit_none) },
+            allOptions = AutoArchiveLimit.entries,
+            optionName = { option -> stringResource(option.stringRes) },
             onSelectOption = onConfirm,
             onDismiss = onDismiss,
             modifier = modifier,
@@ -322,14 +323,6 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     companion object {
         private const val NEW_INSTANCE_ARGS = "PodcastAutoArchiveFragmentArg"
         private const val PODCAST_TINT_KEY = "PodcastTintKey"
-
-        private val EpisodeLimits = mapOf(
-            null to LR.string.settings_auto_archive_limit_none,
-            1 to LR.string.settings_auto_archive_limit_1,
-            2 to LR.string.settings_auto_archive_limit_2,
-            5 to LR.string.settings_auto_archive_limit_5,
-            10 to LR.string.settings_auto_archive_limit_10,
-        )
 
         fun newInstance(
             podcastUuid: String,
