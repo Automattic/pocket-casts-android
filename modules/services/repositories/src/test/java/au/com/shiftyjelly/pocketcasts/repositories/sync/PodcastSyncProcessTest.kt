@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -322,7 +323,7 @@ class PodcastSyncProcessTest {
         overrideGlobalArchive: Boolean = false,
         autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
         autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
-        autoArchiveEpisodeLimit: Int = 0,
+        autoArchiveEpisodeLimit: AutoArchiveLimit = AutoArchiveLimit.None,
         podcastGrouping: PodcastGrouping = PodcastGrouping.None,
         episodesSortType: EpisodesSortType = EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
     ) = mock<Podcast> {
