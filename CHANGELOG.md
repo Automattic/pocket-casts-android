@@ -5,6 +5,8 @@
         ([#2244](https://github.com/Automattic/pocket-casts-android/pull/2244))
     *   Add an advanced setting that prioritizes seek accuracy over speed during streaming.
         ([#2265](https://github.com/Automattic/pocket-casts-android/pull/2265))
+    *   Add sleep timer settings that controls the auto restart sleep timer and shake to restart sleep timer
+        ([#2273](https://github.com/Automattic/pocket-casts-android/pull/2273))
 *   Health
     *   Increase minimum SDK version to 24 ([#2262](https://github.com/Automattic/pocket-casts-android/pull/2262))
 *   Bug Fixes
