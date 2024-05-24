@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-08 11:54:03+0000
+Translation-Revision-Date: 2024-05-21 13:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Пытаться восстановить любые загруженные файлы в случае их отсутствия в приложении Pocket Casts.</string>
+    <string name="settings_storage_fix_downloads">Исправить загруженные файлы</string>
+    <string name="nova_launcher_new_releases">Новые выпуски</string>
+    <string name="nova_launcher_subscribed_podcasts">Подписки на подкасты</string>
+    <string name="whats_new_new_widgets_message">Мы добавили три новых виджета, так что управлять подкастами с главного экрана теперь будет гораздо проще. Попробуйте!</string>
+    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
+    <string name="widget_preview_time_left_4">Ещё 1 ч 36 мин</string>
+    <string name="widget_preview_time_left_3">Ещё 55 мин</string>
+    <string name="widget_preview_time_left_2">Ещё 12 мин</string>
+    <string name="widget_preview_time_left_1">Ещё 25 мин</string>
+    <string name="widget_preview_episode_in_up_next_title">Выпуск в Up Next</string>
+    <string name="widget_preview_episode_title">Название выпуска</string>
+    <string name="hour_and_minutes">1 ч %d мин</string>
+    <string name="hours_and_minutes">%d ч %d мин</string>
     <string name="player_sleep_time_fired_end_of_chapter">Таймер сна остановился в конце главы.</string>
     <string name="player_sleep_in_chapters">Переход в спящий режим через %d гл.</string>
     <string name="player_sleep_in_one_chapter">Переход в спящий режим через 1 главу</string>
@@ -21,7 +35,6 @@ Language: ru
     <string name="player_sleep_in_one_episode">Переход в режим ожидания через 1 выпуск</string>
     <string name="player_sleep_timer_stopped_your_podcast">Таймер сна остановил ваш подкаст.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Таймер сна перезагружен после встряхивания устройства</string>
-    <string name="whats_new_new_widgets_message">Два новых размера и обновлённый дизайн делают управление подкастами с главного экрана ещё проще. Попробуйте сами!</string>
     <string name="whats_new_new_widgets_title">Новые виджеты</string>
     <string name="widget_check_out_discover">Испытайте Discover и убедитесь сами</string>
     <string name="widget_nothing_in_up_next">Очередь пуста</string>
@@ -1466,6 +1479,7 @@ Language: ru
     <string name="podcasts">Подкасты</string>
     <string name="player_started_from">Начало подкаста через %d с.</string>
     <string name="player_skipped_last">Пропущены последние %d с.</string>
+    <string name="player_sleep_time_fired">Таймер сна остановился в конце вашего выпуска.</string>
     <string name="player_actions_show_as_delete_for_custom">Показать как удалённый для настраиваемых выпусков</string>
     <string name="player_actions_hidden_for_custom">Скрыто для настраиваемых выпусков</string>
     <string name="player_rearrange_actions_hidden">Другие действия</string>
@@ -1657,4 +1671,9 @@ Language: ru
     <string name="unarchive">Из архива</string>
     <string name="archive">Архив</string>
     <string name="add_to_up_next">Добавить в «Следующие»</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d выпуск — %2$s осталось</item>
+        <item quantity="few">%1$d вып. — %2$s осталось</item>
+        <item quantity="many">%1$d вып. — %2$s осталось</item>
+    </plurals>
 </resources>

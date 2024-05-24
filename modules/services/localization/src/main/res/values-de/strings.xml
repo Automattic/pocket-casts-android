@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-08 13:54:03+0000
+Translation-Revision-Date: 2024-05-21 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Versuche, alle heruntergeladenen Dateien wiederherzustellen, wenn sie in der Pocket Casts-App fehlen.</string>
+    <string name="settings_storage_fix_downloads">Downloads beheben</string>
+    <string name="nova_launcher_new_releases">Neue Veröffentlichungen</string>
+    <string name="nova_launcher_subscribed_podcasts">Abonnierte Podcasts</string>
+    <string name="whats_new_new_widgets_message">Wir haben gerade drei neue Widgets hinzugefügt. Die Verwaltung deiner Podcasts über den Startbildschirm ist jetzt also viel einfacher. Schau sie dir an!</string>
+    <string name="medium_player_classic_widget_label">Mittlerer Player (klassisch)</string>
+    <string name="widget_preview_time_left_4">1 Std. 36 Min. verbleibend</string>
+    <string name="widget_preview_time_left_3">55 Min. verbleibend</string>
+    <string name="widget_preview_time_left_2">12 Min. verbleibend</string>
+    <string name="widget_preview_time_left_1">25 Min. verbleibend</string>
+    <string name="widget_preview_episode_in_up_next_title">Folge in „Als Nächstes“</string>
+    <string name="widget_preview_episode_title">Titel der Folge</string>
+    <string name="hour_and_minutes">1 Stunde und %d Minuten</string>
+    <string name="hours_and_minutes">%d Stunden und %d Minuten</string>
     <string name="player_sleep_time_fired_end_of_chapter">Durch die Schlummerfunktion wurde die Wiedergabe am Ende deines Kapitels beendet.</string>
     <string name="player_sleep_in_chapters">Schlummerfunktion wird nach %d Kapiteln aktiviert</string>
     <string name="player_sleep_in_one_chapter">Schlummerfunktion wird nach 1 Kapitel aktiviert</string>
@@ -21,7 +35,6 @@ Language: de
     <string name="player_sleep_in_one_episode">Schlummerfunktion startet nach 1 Folge</string>
     <string name="player_sleep_timer_stopped_your_podcast">Die Schlummerfunktion hat deinen Podcast angehalten.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Die Schlummerfunktion wurde nach dem Schütteln des Geräts neu gestartet</string>
-    <string name="whats_new_new_widgets_message">Dank zwei neuer Größen und einem aktualisierten Design ist die Verwaltung deiner Podcasts von der Startseite aus nun viel einfacher. Schau dir die Neuheiten an!</string>
     <string name="whats_new_new_widgets_title">Neue Widgets</string>
     <string name="widget_check_out_discover">Unter „Entdecken“ erfährst du mehr</string>
     <string name="widget_nothing_in_up_next">Keine Inhalte in „Als Nächstes“</string>
@@ -1466,6 +1479,7 @@ Language: de
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Podcast wird bei %d Sekunden gestartet</string>
     <string name="player_skipped_last">Die letzten %d Sekunden werden übersprungen</string>
+    <string name="player_sleep_time_fired">Durch die Schlummerfunktion wurde die Wiedergabe am Ende deiner Folge beendet.</string>
     <string name="player_actions_show_as_delete_for_custom">Für eigene Folgen als gelöscht anzeigen</string>
     <string name="player_actions_hidden_for_custom">Für eigene Folgen verborgen</string>
     <string name="player_rearrange_actions_hidden">Weitere Aktionen</string>
@@ -1657,4 +1671,8 @@ Language: de
     <string name="unarchive">Wiederherstellen</string>
     <string name="archive">Archivieren</string>
     <string name="add_to_up_next">Zur Warteschlange hinzufügen</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d Folge - %2$s verbleibend</item>
+        <item quantity="other">%1$d Folgen - %2$s verbleibend</item>
+    </plurals>
 </resources>

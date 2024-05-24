@@ -34,6 +34,8 @@
         ([#2164](https://github.com/Automattic/pocket-casts-android/pull/2164))
     *   Fix cases where podcasts were ignoring 'Never archive' setting in some cases
         ([#2194](https://github.com/Automattic/pocket-casts-android/pull/2194))
+    *   Fix sleep timer end of episode was not keeping the last episode listened
+        ([#2269](https://github.com/Automattic/pocket-casts-android/pull/2269))
 
 7.63
 -----

@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-07 16:54:03+0000
+Translation-Revision-Date: 2024-05-21 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Doe een poging om gedownloade bestanden te herstellen als ze niet beschikbaar zijn in de Pocket Casts-app.</string>
+    <string name="settings_storage_fix_downloads">Downloads herstellen</string>
+    <string name="nova_launcher_new_releases">Nieuwe releases</string>
+    <string name="nova_launcher_subscribed_podcasts">Geen podcast-abonnementen</string>
+    <string name="whats_new_new_widgets_message">We hebben net drie nieuwe widgets toegevoegd zodat het beheren van je podcasts vanaf je homescreen eenvoudiger wordt. Probeer het eens uit!</string>
+    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
+    <string name="widget_preview_time_left_4">nog 1u 36m</string>
+    <string name="widget_preview_time_left_3">nog 55m</string>
+    <string name="widget_preview_time_left_2">nog 12m</string>
+    <string name="widget_preview_time_left_1">nog 25m</string>
+    <string name="widget_preview_episode_in_up_next_title">Aflevering in Hierna</string>
+    <string name="widget_preview_episode_title">Titel van aflevering</string>
+    <string name="hour_and_minutes">1 uur en %d minuten</string>
+    <string name="hours_and_minutes">%d uur %d minuten</string>
     <string name="player_sleep_time_fired_end_of_chapter">Slaaptimer is gestopt aan het einde van het hoofdstuk.</string>
     <string name="player_sleep_in_chapters">Slaapstand over %d hoofdstukken</string>
     <string name="player_sleep_in_one_chapter">Slaapstand over 1 hoofdstuk</string>
@@ -21,7 +35,6 @@ Language: nl
     <string name="player_sleep_in_one_episode">Slaapstand inschakelen na 1 aflevering</string>
     <string name="player_sleep_timer_stopped_your_podcast">De slaaptimer heeft je podcast gepauzeerd.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">De slaaptimer is opnieuw gestart omdat er met het apparaat is geschud</string>
-    <string name="whats_new_new_widgets_message">Met twee nieuwe maten en een bijgewerkt ontwerp is het beheren van je podcasts vanuit je startscherm ineens een stuk eenvoudiger geworden. Probeer het eens uit!</string>
     <string name="whats_new_new_widgets_title">Nieuwe widgets</string>
     <string name="widget_check_out_discover">Bekijk Ontdekken voor nog meer</string>
     <string name="widget_nothing_in_up_next">Niets in Hierna</string>
@@ -1466,6 +1479,7 @@ Language: nl
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Start de podcast vanaf %d seconden</string>
     <string name="player_skipped_last">Sla de laatste %d seconden over</string>
+    <string name="player_sleep_time_fired">Slaaptimer is gestopt aan het einde van de aflevering.</string>
     <string name="player_actions_show_as_delete_for_custom">Weergegeven als verwijderen voor aangepaste afleveringen</string>
     <string name="player_actions_hidden_for_custom">Verbergen voor aangepaste afleveringen</string>
     <string name="player_rearrange_actions_hidden">Meer acties</string>
@@ -1657,4 +1671,8 @@ Language: nl
     <string name="unarchive">Dearchiveren</string>
     <string name="archive">Archiveren</string>
     <string name="add_to_up_next">Toevoegen aan Hierna</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d aflevering - nog %2$s</item>
+        <item quantity="other">%1$d afleveringen - nog %2$s</item>
+    </plurals>
 </resources>
