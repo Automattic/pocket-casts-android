@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -73,6 +74,7 @@ fun StorageSettingsPage(
         onBackPressed = onBackPressed,
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
         onManageDownloadedFilesClick = onManageDownloadedFilesClick,
+        onFixDownloadsClick = { viewModel.fixDownloadedFiles() },
         bottomInset = bottomInset,
         modifier = modifier,
     )
@@ -125,6 +127,7 @@ fun StorageSettingsView(
     onBackPressed: () -> Unit,
     onClearDownloadCacheClick: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
+    onFixDownloadsClick: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
@@ -147,6 +150,7 @@ fun StorageSettingsView(
                         state = state.downloadedFilesState,
                         onClick = onManageDownloadedFilesClick,
                     )
+                    FixDownloads(onFixDownloadsClick)
                     ClearDownloadCacheRow(onClearDownloadCacheClick)
                     StorageChoiceRow(state.storageChoiceState)
                     StorageFolderRow(state.storageFolderState)
@@ -187,6 +191,20 @@ private fun ClearDownloadCacheRow(
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_clear_download_cache),
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(vertical = 6.dp),
+    )
+}
+
+@Composable
+private fun FixDownloads(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = stringResource(R.string.settings_storage_fix_downloads),
+        secondaryText = stringResource(R.string.settings_storage_fix_downloads_description),
         modifier = modifier
             .clickable { onClick() }
             .padding(vertical = 6.dp),
@@ -422,6 +440,7 @@ private fun StorageSettingsPreview(
             onBackPressed = {},
             onClearDownloadCacheClick = {},
             onManageDownloadedFilesClick = {},
+            onFixDownloadsClick = {},
             bottomInset = 0.dp,
         )
     }

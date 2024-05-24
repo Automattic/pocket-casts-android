@@ -208,6 +208,7 @@ class PodcastViewModel
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+        podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed = null
     }
 
     fun updatePodcast(existingPodcast: Podcast) {

@@ -1,6 +1,21 @@
 7.65
 -----
-
+*   New Features
+    *   Add a storage setting that attempts to fix missing downloads files.
+        ([#2244](https://github.com/Automattic/pocket-casts-android/pull/2244))
+    *   Add an advanced setting that prioritizes seek accuracy over speed during streaming.
+        ([#2265](https://github.com/Automattic/pocket-casts-android/pull/2265))
+*   Health
+    *   Increase minimum SDK version to 24 ([#2262](https://github.com/Automattic/pocket-casts-android/pull/2262))
+*   Bug Fixes
+    *   Fix Tesla podcast artwork not loading
+        ([#2254](https://github.com/Automattic/pocket-casts-android/pull/2254))
+    *   Fix timestamp parameter handling in shared links
+        ([#2235](https://github.com/Automattic/pocket-casts-android/pull/2235))
+    *   Fix the Google Podcasts OPML file import and include an error message if parsing fails.
+        ([#2260](https://github.com/Automattic/pocket-casts-android/pull/2260))
+    *   Improve intermediate caching of playing episode 
+        ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))
 
 7.64
 -----

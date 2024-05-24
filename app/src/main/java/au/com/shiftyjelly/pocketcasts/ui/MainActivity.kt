@@ -76,6 +76,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.BOOKMARK_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PODCAST_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SOURCE_VIEW
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
 import au.com.shiftyjelly.pocketcasts.profile.SubCancelledFragment
 import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
@@ -115,19 +117,21 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.SharingUrlTimestampParser
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
+import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -141,7 +145,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -215,6 +218,8 @@ class MainActivity :
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
+
+    @Inject lateinit var crashLogging: CrashLogging
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -549,6 +554,7 @@ class MainActivity :
             force = true,
             coroutineScope = applicationScope,
             context = this,
+            source = PocketCastsShortcuts.Source.REFRESH_APP,
         )
 
         subscriptionManager.refreshPurchases()
@@ -1239,8 +1245,11 @@ class MainActivity :
                     viewModel.deleteBookmark(it)
                 }
                 notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
-            }
-            // new episode notification tapped
+            } else if (action == Settings.INTENT_OPEN_APP_PODCAST_UUID) {
+                intent.getStringExtra(PODCAST_UUID)?.let {
+                    openPodcastPage(it, intent.getStringExtra(SOURCE_VIEW))
+                }
+            } // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
                 // intents were being reused for notifications so we had to use the extra to pass action
                 val episodeUuid =
@@ -1357,7 +1366,7 @@ class MainActivity :
             }
         } catch (e: Exception) {
             Timber.e(e)
-            SentryHelper.recordException(e)
+            crashLogging.sendReport(e)
         }
     }
 
@@ -1462,7 +1471,16 @@ class MainActivity :
         if (intent.data?.pathSegments?.size == 1) {
             sharePath = "$SOCIAL_SHARE_PATH$sharePath"
         }
-        val timestamp = intent.data?.getQueryParameter("t")?.toIntOrNull()
+        val parser = SharingUrlTimestampParser()
+        val timestamp = intent.data?.getQueryParameter("t")?.let { parser.parseTimestamp(it) }
+
+        // If a clip has both start and end we don't open it in the app.
+        // We do not have a capability of playing a section of an episode between some timestamps.
+        if (timestamp?.first != null && timestamp.second != null) {
+            WebViewActivity.show(this, getString(LR.string.clip_title), intent.data.toString())
+            return
+        }
+
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
             sharePath,
@@ -1489,7 +1507,7 @@ class MainActivity :
                             source = EpisodeViewSource.SHARE,
                             podcastUuid = podcastUuid,
                             forceDark = false,
-                            timestamp = timestamp?.seconds,
+                            timestamp = timestamp?.first, // Start time in seconds
                         )
                     } else {
                         openPodcastPage(podcastUuid)

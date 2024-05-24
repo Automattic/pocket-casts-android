@@ -542,6 +542,8 @@ enum class AnalyticsEvent(val key: String) {
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),
     SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE("settings_storage_clear_download_cache"),
+    SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_START("settings_storage_fix_downloaded_files_start"),
+    SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_END("settings_storage_fix_downloaded_files_end"),
     SETTINGS_STORAGE_LOCATION("settings_storage_location"),
     SETTINGS_STORAGE_SET_FOLDER_LOCATION("settings_storage_set_folder_location"),
     SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED("settings_storage_background_refresh_toggled"),
@@ -550,6 +552,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Settings - Advanced */
     SETTINGS_ADVANCED_SHOWN("settings_advanced_shown"),
     SETTINGS_ADVANCED_SYNC_ON_METERED("settings_advanced_sync_on_metered"),
+    SETTINGS_ADVANCED_PRIORITIZE_SEEK_ACCURACY("settings_advanced_prioritize_seek_accuracy"),
 
     /* Search */
     SEARCH_SHOWN("search_shown"),

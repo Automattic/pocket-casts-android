@@ -151,4 +151,6 @@ interface EpisodeManager {
 
     suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode)
     suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode)
+
+    suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>>
 }

@@ -40,6 +40,7 @@
     <string name="downloads">Downloads</string>
     <string name="edit">Edit</string>
     <string name="effects">Effects</string>
+    <string name="episode_not_found">Episode not found</string>
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
@@ -84,6 +85,7 @@
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
     <string name="select_all_above">Select all above</string>
+    <string name="stop">Stop</string>
     <string name="deselect_all_above">Deselect all above</string>
     <string name="deselect_all">Deselect all</string>
     <string name="deselect_all_below">Deselect all below</string>
@@ -151,6 +153,7 @@
     <string name="please_try_again">Please try again</string>
     <string name="next">Next</string>
     <string name="select_podcasts">Select podcasts</string>
+    <string name="clip_title">Clip</string>
     <string name="support">Support</string>
     <string name="go_to_top">Go to top</string>
     <string name="go_to_bottom">Go to bottom</string>
@@ -1169,6 +1172,14 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_import_opml_stop">Stop</string>
     <string name="settings_import_opml_title">Import OPML</string>
     <string name="settings_import_opml_toast">Importing podcasts&#x2026;</string>
+    <string name="settings_import_opml_import_failed_message">Unable to import podcasts from the OPML file you specified.</string>
+    <string name="settings_import_opml_succeeded_message">OPML Import Succeeded.</string>
+    <string name="settings_fix_downloads_title">Fixing downloads</string>
+    <string name="settings_fix_downloads_progress">%1$d of %2$d episodes</string>
+    <string name="settings_fix_downloads_stop">Stop</string>
+    <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
+    <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
+    <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -1274,9 +1285,12 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_storage_move_podcasts">Moving podcasts&#x2026;</string>
     <string name="settings_storage_section_heading_usage">Usage</string>
     <string name="settings_storage_section_heading_mobile_data">Mobile Data</string>
+    <string name="settings_storage_section_heading_seek_accuracy">Seek Accuracy</string>
     <string name="settings_storage_size_free">%s free</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_store_on">Store podcasts on</string>
+    <string name="settings_storage_fix_downloads">Fix downloads</string>
+    <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
     <string name="settings_subscribe_to_played">Subscribe to played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
@@ -1466,6 +1480,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Prioritizing seek accuracy</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Prioritizing seek accuracy can significantly slow down seek responsiveness and cause Pocket Casts to consume more data.</string>
     <!-- Used in a button meaning that the user understood the message. -->
     <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->
@@ -1816,6 +1832,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="notification_channel_description_podcast_import">Import podcast collections</string>
     <string name="notification_channel_description_sign_in_error">Shows when signed out in background and cannot auto re sign-in</string>
     <string name="notification_channel_description_bookmark">Shows when bookmark is added using headphones</string>
+    <string name="notification_channel_description_fix_downloads">Shows when downloads fix is triggered</string>
+    <string name="notification_channel_description_fix_downloads_complete">Shows when downloads fix is complete</string>
 
     <!-- Bookmarks -->
 
@@ -1924,4 +1942,12 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
 
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
+
+
+    <!-- Nova Launcher -->
+    <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
+    <string name="nova_launcher_recently_played">Recently Played</string>
+    <string name="nova_launcher_new_releases">New Releases</string>
+<string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
+    <string name="nova_launcher_continue_listening">Continue listening</string>
 </resources>

@@ -1,4 +1,8 @@
 import com.automattic.android.measure.MeasureBuildsExtension
+import io.sentry.android.gradle.extensions.InstrumentationFeature
+import io.sentry.android.gradle.extensions.SentryPluginExtension
+import java.util.EnumSet
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     // Gradle Plugins
@@ -34,11 +38,41 @@ measureBuilds {
     attachGradleScanId = false
 }
 
+val ktlintVersion = libs.versions.ktlint.get()
+
 spotless {
     kotlin {
-        target("**/*.kt")
-        targetExclude("$buildDir/**/*.kt")
-        targetExclude("bin/**/*.kt")
-        ktlint("0.50.0")
+        target(
+            "app/src/**/*.kt",
+            "automotive/src/**/*.kt",
+            "modules/**/src/**/*.kt",
+            "wear/src/**/*.kt",
+        )
+        ktlint(ktlintVersion)
+    }
+
+    kotlinGradle {
+        target("*.kts")
+        ktlint(ktlintVersion)
+    }
+}
+
+fun Project.configureSentry() {
+    extensions.getByType(SentryPluginExtension::class.java).apply {
+        includeProguardMapping = System.getenv()["CI"].toBoolean() &&
+            !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+
+        tracingInstrumentation {
+            features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP)
+        }
+        autoInstallation.enabled = false
+        includeDependenciesReport = false
+        ignoredBuildTypes = setOf("debug", "debugProd")
+    }
+}
+
+rootProject.subprojects {
+    plugins.withId(rootProject.libs.plugins.sentry.get().pluginId) {
+        configureSentry()
     }
 }

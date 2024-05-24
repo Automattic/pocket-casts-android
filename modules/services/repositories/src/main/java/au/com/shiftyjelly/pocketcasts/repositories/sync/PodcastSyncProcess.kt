@@ -38,12 +38,12 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.protobuf.Timestamp
 import com.google.protobuf.boolValue
 import com.google.protobuf.doubleValue
@@ -77,7 +77,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
-import io.sentry.Sentry
 import java.time.Instant
 import java.util.Date
 import kotlin.coroutines.CoroutineContext
@@ -108,6 +107,7 @@ class PodcastSyncProcess(
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
     var syncManager: SyncManager,
+    val crashLogging: CrashLogging,
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -152,7 +152,7 @@ class PodcastSyncProcess(
             )
         return syncUpNextObservable
             .doOnError { throwable ->
-                SentryHelper.recordException("Sync failed", throwable)
+                crashLogging.sendReport(throwable, message = "Sync failed")
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
             }
             .doOnComplete {
@@ -706,7 +706,7 @@ class PodcastSyncProcess(
             }
             records.put(record)
         } catch (e: JSONException) {
-            Sentry.captureException(e)
+            crashLogging.sendReport(e)
             Timber.e(e, "Unable to save bookmark")
         }
     }
@@ -763,7 +763,13 @@ class PodcastSyncProcess(
     private fun updateShortcuts(playlists: List<Playlist>): Completable {
         // if any playlists have changed update the launcher shortcuts
         if (playlists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(playlistManager, true, applicationScope, context)
+            PocketCastsShortcuts.update(
+                playlistManager = playlistManager,
+                force = true,
+                coroutineScope = applicationScope,
+                context = context,
+                source = PocketCastsShortcuts.Source.UPDATE_SHORTCUTS,
+            )
         }
         return Completable.complete()
     }

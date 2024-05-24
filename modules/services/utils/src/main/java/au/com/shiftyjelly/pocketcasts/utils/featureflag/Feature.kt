@@ -68,12 +68,12 @@ enum class Feature(
         hasDevToggle = true,
     ),
     CACHE_PLAYING_EPISODE(
-        key = "cache_playing_episode",
+        key = "cache_playing_episode_enabled",
         title = "Cache playing episode",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
-        hasDevToggle = false,
+        hasDevToggle = true,
     ),
     CATEGORIES_REDESIGN(
         key = "CATEGORIES_REDESIGN",
@@ -105,6 +105,14 @@ enum class Feature(
         defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    NOVA_LAUNCHER(
+        key = "nova_launcher",
+        title = "Integrate Pocket Casts with Nova Launcher",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     ;

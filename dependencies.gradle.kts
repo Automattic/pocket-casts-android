@@ -43,6 +43,13 @@ val getVersionName = {
         else -> versionName
     }
 }
+val getBuildPlatform = {
+    when {
+        isAutomotiveBuild -> "automotive"
+        isWearBuild -> "wear"
+        else -> "mobile"
+    }
+}
 
 project.apply {
     extra.apply {
@@ -51,9 +58,10 @@ project.apply {
 
         set("versionName", getVersionName())
         set("versionCode", getVersionCode())
+        set("buildPlatform", getBuildPlatform())
 
         // Android
-        set("minSdkVersion", 23)
+        set("minSdkVersion", 24)
         set("minSdkVersionWear", 26)
         set("targetSdkVersion", 33)
         set("compileSdkVersion", 34)
@@ -92,5 +100,7 @@ project.apply {
         set("googleSignInServerClientId", secretProperties.getProperty("googleSignInServerClientId", ""))
         set("measureBuildsEnabled", secretProperties.getProperty("measureBuildsEnabled", ""))
         set("appsMetricsToken", secretProperties.getProperty("appsMetricsToken", ""))
+        set("encryptionKey", secretProperties.getProperty("encryption_key", ""))
+        set("appSecret", secretProperties.getProperty("app_secret", ""))
     }
 }

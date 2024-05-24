@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
@@ -126,20 +124,6 @@ class SettingsImpl @Inject constructor(
         return BuildConfig.VERSION_CODE
     }
 
-    override fun getSentryDsn(): String {
-        return try {
-            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            }
-            applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
-        } catch (e: NameNotFoundException) {
-            ""
-        }
-    }
-
     override val skipBackInSecs = UserSetting.SkipAmountPref(
         sharedPrefKey = Settings.PREFERENCE_SKIP_BACKWARD,
         defaultValue = 10,
@@ -202,6 +186,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
         fromString = { PodcastsSortType.fromClientIdString(it) },
         toString = { it.clientId.toString() },
+    )
+
+    override val prioritizeSeekAccuracy = UserSetting.BoolPref(
+        sharedPrefKey = "prioritizeSeekAccuracy",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
     )
 
     override fun setSelectPodcastsSortType(sortType: PodcastsSortType) {
@@ -948,6 +938,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getRefreshPodcastsBatchSize(): Long {
         return getRemoteConfigLong(FirebaseConfig.REFRESH_PODCASTS_BATCH_SIZE)
+    }
+
+    override fun getExoPlayerCacheSizeInMB(): Long {
+        return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB)
     }
 
     private fun getRemoteConfigLong(key: String): Long {

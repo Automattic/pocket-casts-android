@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetails
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.CompositeDisposable
@@ -31,6 +32,7 @@ class DeveloperViewModel
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
+    private val crashLogging: CrashLogging,
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -155,5 +157,10 @@ class DeveloperViewModel
     fun resetEoYModalProfileBadge() {
         settings.setEndOfYearShowBadge2023(true)
         settings.setEndOfYearShowModal(true)
+    }
+
+    fun onSendCrash(crashMessage: String) {
+        crashLogging.sendReport(Exception(crashMessage))
+        Timber.d("Test crash message: \"$crashMessage\"")
     }
 }

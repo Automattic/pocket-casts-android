@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.executeBlocking
 import coil.imageLoader
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -89,6 +90,7 @@ class RefreshPodcastsThread(
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
+        fun crashLogging(): CrashLogging
     }
 
     @Volatile
@@ -251,6 +253,7 @@ class RefreshPodcastsThread(
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
+            crashLogging = entryPoint.crashLogging(),
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()

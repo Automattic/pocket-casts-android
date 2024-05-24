@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.di
 
 import androidx.work.WorkerFactory
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
+import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
+import au.com.shiftyjelly.pocketcasts.crashlogging.ObserveUser
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -16,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDraw
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelperImpl
+import au.com.shiftyjelly.pocketcasts.repositories.nova.NovaLauncherManager
+import au.com.shiftyjelly.pocketcasts.repositories.nova.NovaLauncherManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactoryImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -42,10 +46,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.user.ObserveTrackableUser
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManagerImpl
 import dagger.Binds
@@ -156,4 +162,13 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideChapterManager(chapterManagerImpl: ChapterManagerImpl): ChapterManager
+
+    @Binds
+    abstract fun provideObserveUser(observeTrackableUser: ObserveTrackableUser): ObserveUser
+
+    @Binds
+    abstract fun provideCrashReportPermissionCheck(userSettingsCrashReportPermission: UserSettingsCrashReportPermission): CrashReportPermissionCheck
+
+    @Binds
+    abstract fun provideNovaLauncherManager(novaLauncherManagerImpl: NovaLauncherManagerImpl): NovaLauncherManager
 }

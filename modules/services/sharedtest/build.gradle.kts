@@ -24,4 +24,5 @@ dependencies {
         exclude(group = "org.hamcrest")
     }
     implementation(project(":modules:services:utils"))
+    implementation(libs.crashlogging)
 }

@@ -106,6 +106,7 @@ interface Settings {
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
+        const val INTENT_OPEN_APP_PODCAST_UUID = "INTENT_OPEN_APP_PODCAST_UUID"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
         const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
         const val INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE = "INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE"
@@ -122,6 +123,10 @@ interface Settings {
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
 
         const val BOOKMARK_UUID = "bookmark_uuid"
+
+        const val PODCAST_UUID = "podcast_uuid"
+
+        const val SOURCE_VIEW = "source_view"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -132,6 +137,8 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_PODCAST("podcastImport"),
         NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR("signInError"),
         NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
+        NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS("fixDownloads"),
+        NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE("fixDownloadsComplete"),
     }
 
     enum class NotificationId(val value: Int) {
@@ -140,6 +147,8 @@ interface Settings {
         DOWNLOADING(21483648),
         SIGN_IN_ERROR(21483649),
         BOOKMARK(21483650),
+        FIX_DOWNLOADS(21483651),
+        FIX_DOWNLOADS_COMPLETE(21483652),
     }
 
     enum class UpNextAction(val serverId: Int) {
@@ -265,8 +274,6 @@ interface Settings {
     fun getVersion(): String
     fun getVersionCode(): Int
 
-    fun getSentryDsn(): String
-
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>
 
@@ -276,6 +283,7 @@ interface Settings {
     fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     val backgroundRefreshPodcasts: UserSetting<Boolean>
     val podcastsSortType: UserSetting<PodcastsSortType>
+    val prioritizeSeekAccuracy: UserSetting<Boolean>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
@@ -396,6 +404,7 @@ interface Settings {
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
+    fun getExoPlayerCacheSizeInMB(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
