@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-08 09:54:09+0000
+Translation-Revision-Date: 2024-05-21 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Pocket Casts アプリでダウンロード済みファイルが見つからない場合に復元を試みます。</string>
+    <string name="settings_storage_fix_downloads">ダウンロードを修正</string>
+    <string name="nova_launcher_new_releases">新規リリース</string>
+    <string name="nova_launcher_subscribed_podcasts">購読されたポッドキャスト</string>
+    <string name="whats_new_new_widgets_message">新しいウィジェットが3つ追加され、ホーム画面からポッドキャストを非常に簡単に管理できるようになりました。 ぜひお試しください。</string>
+    <string name="medium_player_classic_widget_label">中型プレーヤー (クラシック)</string>
+    <string name="widget_preview_time_left_4">残り1時間36分</string>
+    <string name="widget_preview_time_left_3">残り55分</string>
+    <string name="widget_preview_time_left_2">残り12分</string>
+    <string name="widget_preview_time_left_1">残り25分</string>
+    <string name="widget_preview_episode_in_up_next_title">次のエピソード</string>
+    <string name="widget_preview_episode_title">エピソードのタイトル</string>
+    <string name="hour_and_minutes">1時間%d分</string>
+    <string name="hours_and_minutes">%d時間%d分</string>
     <string name="player_sleep_time_fired_end_of_chapter">スリープタイマーがチャプターの最後で停止しました。</string>
     <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
     <string name="player_sleep_in_one_chapter">1個のチャプターでスリープ中</string>
@@ -21,7 +35,6 @@ Language: ja_JP
     <string name="player_sleep_in_one_episode">1エピソードでスリープ</string>
     <string name="player_sleep_timer_stopped_your_podcast">スリープタイマーにより、ポッドキャストが停止しました。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">端末を振った後、スリープタイマーが再開しました</string>
-    <string name="whats_new_new_widgets_message">2つの新しいサイズが加わりデザインが一新されたことで、ホーム画面からのポッドキャストの管理がはるかに簡単になりました。 ぜひお試しください。</string>
     <string name="whats_new_new_widgets_title">新しいウィジェット</string>
     <string name="widget_check_out_discover">Discover をチェックして他のエピソードを見つけましょう</string>
     <string name="widget_nothing_in_up_next">次のエピソードには何もありません</string>
@@ -1466,6 +1479,7 @@ Language: ja_JP
     <string name="podcasts">ポッドキャスト</string>
     <string name="player_started_from">%d秒からポッドキャストを開始中</string>
     <string name="player_skipped_last">最後の%d秒をスキップしました</string>
+    <string name="player_sleep_time_fired">スリープタイマーがエピソードの最後で停止しました。</string>
     <string name="player_actions_show_as_delete_for_custom">カスタムエピソードで削除と表示</string>
     <string name="player_actions_hidden_for_custom">カスタムエピソードで非表示</string>
     <string name="player_rearrange_actions_hidden">その他の操作</string>
@@ -1657,4 +1671,7 @@ Language: ja_JP
     <string name="unarchive">アーカイブを解除</string>
     <string name="archive">アーカイブ</string>
     <string name="add_to_up_next">次のエピソードに追加</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="other">%1$d件のエピソード - 残り%2$s</item>
+    </plurals>
 </resources>

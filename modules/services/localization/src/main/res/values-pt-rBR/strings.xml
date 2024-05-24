@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-07 20:54:07+0000
+Translation-Revision-Date: 2024-05-21 23:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Tente restaurar todos os arquivos baixados se eles estiverem faltando no aplicativo Pocket Casts.</string>
+    <string name="settings_storage_fix_downloads">Corrigir downloads</string>
+    <string name="nova_launcher_new_releases">Novos lançamentos</string>
+    <string name="nova_launcher_subscribed_podcasts">Podcasts assinados</string>
+    <string name="whats_new_new_widgets_message">Acabamos de adicionar três novos widgets. Gerenciar seus podcasts na tela inicial ficou muito mais fácil. Dê uma olhada!</string>
+    <string name="medium_player_classic_widget_label">Reprodutor médio (clássico)</string>
+    <string name="widget_preview_time_left_4">1h36 restante</string>
+    <string name="widget_preview_time_left_3">55min restantes</string>
+    <string name="widget_preview_time_left_2">12min restantes</string>
+    <string name="widget_preview_time_left_1">25min restantes</string>
+    <string name="widget_preview_episode_in_up_next_title">Episódio em Próximos</string>
+    <string name="widget_preview_episode_title">Título do episódio</string>
+    <string name="hour_and_minutes">1 hora e %d minutos</string>
+    <string name="hours_and_minutes">%d horas e %d minutos</string>
     <string name="player_sleep_time_fired_end_of_chapter">O temporizador parou no fim do seu capítulo.</string>
     <string name="player_sleep_in_chapters">Dormindo em %d capítulos</string>
     <string name="player_sleep_in_one_chapter">Dormindo em 1 capítulo</string>
@@ -21,7 +35,6 @@ Language: pt_BR
     <string name="player_sleep_in_one_episode">Dormindo em 1 episódio</string>
     <string name="player_sleep_timer_stopped_your_podcast">O temporizador interrompeu o podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">O temporizador reiniciou com o sacudir do dispositivo.</string>
-    <string name="whats_new_new_widgets_message">Com dois novos tamanhos e um design atualizado, gerenciar seus podcasts na tela inicial ficou ainda mais fácil. Dê uma olhada!</string>
     <string name="whats_new_new_widgets_title">Novos widgets</string>
     <string name="widget_check_out_discover">Confira \"Explorar\" para ver mais</string>
     <string name="widget_nothing_in_up_next">Nada na fila de Próximos</string>
@@ -1466,6 +1479,7 @@ Language: pt_BR
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Começar o podcast a partir de %d segundos</string>
     <string name="player_skipped_last">Pular os últimos %d segundos</string>
+    <string name="player_sleep_time_fired">O temporizador parou no fim do seu episódio.</string>
     <string name="player_actions_show_as_delete_for_custom">Exibido como excluído para episódios personalizados</string>
     <string name="player_actions_hidden_for_custom">Oculto para episódios personalizados</string>
     <string name="player_rearrange_actions_hidden">Mais ações</string>
@@ -1657,4 +1671,8 @@ Language: pt_BR
     <string name="unarchive">Desarquivar</string>
     <string name="archive">Arquivo</string>
     <string name="add_to_up_next">Adicionar aos Próximos</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d episódio - %2$s restante(s)</item>
+        <item quantity="other">%1$d episódios - %2$s restante(s)</item>
+    </plurals>
 </resources>

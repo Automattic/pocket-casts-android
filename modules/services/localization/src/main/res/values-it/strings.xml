@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-08 09:54:05+0000
+Translation-Revision-Date: 2024-05-21 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Prova a ripristinare i file scaricati se non sono presenti nell\'app Pocket Casts.</string>
+    <string name="settings_storage_fix_downloads">Correggi i download</string>
+    <string name="nova_launcher_new_releases">Nuove versioni</string>
+    <string name="nova_launcher_subscribed_podcasts">Iscrizione ai podcast</string>
+    <string name="whats_new_new_widgets_message">Abbiamo appena aggiunto tre nuovi widget, che semplificano molto la gestione dei tuoi podcast dalla schermata principale. Dai un\'occhiata.</string>
+    <string name="medium_player_classic_widget_label">Lettore multimediale (classico)</string>
+    <string name="widget_preview_time_left_4">1h 36m rimanenti</string>
+    <string name="widget_preview_time_left_3">55m rimanenti</string>
+    <string name="widget_preview_time_left_2">12m rimanenti</string>
+    <string name="widget_preview_time_left_1">25m rimanenti</string>
+    <string name="widget_preview_episode_in_up_next_title">Episodio in Successivo</string>
+    <string name="widget_preview_episode_title">Titolo episodio</string>
+    <string name="hour_and_minutes">1 ora e %d minuti</string>
+    <string name="hours_and_minutes">%d ore e %d minuti</string>
     <string name="player_sleep_time_fired_end_of_chapter">Timer di sospensione interrotto alla fine del capitolo.</string>
     <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
     <string name="player_sleep_in_one_chapter">Spegnimento tra 1 capitolo</string>
@@ -21,7 +35,6 @@ Language: it
     <string name="player_sleep_in_one_episode">In sospensione in 1 episodio</string>
     <string name="player_sleep_timer_stopped_your_podcast">L\'autospegnimento ha interrotto il tuo podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Autospegnimento riavviato dopo un movimento del dispositivo</string>
-    <string name="whats_new_new_widgets_message">Con due nuove dimensioni e un design aggiornato, la gestione dei podcast dalla schermata iniziale ora è molto più facile. Dai un\'occhiata.</string>
     <string name="whats_new_new_widgets_title">Nuovi widget</string>
     <string name="widget_check_out_discover">Visita Scopri per altro</string>
     <string name="widget_nothing_in_up_next">Nulla in Prossimo</string>
@@ -1466,6 +1479,7 @@ Language: it
     <string name="podcasts">Podcast</string>
     <string name="player_started_from">Avvio del podcast da %d secondi</string>
     <string name="player_skipped_last">Ultimi %d secondi saltati</string>
+    <string name="player_sleep_time_fired">Timer di sospensione interrotto alla fine dell\'episodio.</string>
     <string name="player_actions_show_as_delete_for_custom">Visualizzato come Elimina per episodi personalizzati</string>
     <string name="player_actions_hidden_for_custom">Nascosto per episodi personalizzati</string>
     <string name="player_rearrange_actions_hidden">Altre azioni</string>
@@ -1657,4 +1671,8 @@ Language: it
     <string name="unarchive">Annulla archiviazione</string>
     <string name="archive">Archivia</string>
     <string name="add_to_up_next">Aggiungi a Prossimo</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d episodio - %2$s rimanente</item>
+        <item quantity="other">%1$d episodi - %2$s rimanenti</item>
+    </plurals>
 </resources>

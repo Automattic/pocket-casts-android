@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-08 09:54:05+0000
+Translation-Revision-Date: 2024-05-21 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">다운로드한 파일이 Pocket Casts 앱에서 누락된 경우 복원을 시도해 보세요.</string>
+    <string name="settings_storage_fix_downloads">다운로드 문제 해결하기</string>
+    <string name="nova_launcher_new_releases">새 릴리스</string>
+    <string name="nova_launcher_subscribed_podcasts">구독한 팟캐스트</string>
+    <string name="whats_new_new_widgets_message">세 가지 새로운 위젯이 추가되어 홈 화면에서 팟캐스트를 훨씬 더 쉽게 관리할 수 있습니다. 직접 확인해 보세요!</string>
+    <string name="medium_player_classic_widget_label">중형 플레이어(클래식)</string>
+    <string name="widget_preview_time_left_4">1시간 36분 남음</string>
+    <string name="widget_preview_time_left_3">55분 남음</string>
+    <string name="widget_preview_time_left_2">12분 남음</string>
+    <string name="widget_preview_time_left_1">25분 남음</string>
+    <string name="widget_preview_episode_in_up_next_title">다음 에피소드</string>
+    <string name="widget_preview_episode_title">에피소드 제목</string>
+    <string name="hour_and_minutes">1시간 %d분</string>
+    <string name="hours_and_minutes">%d시간 %d분</string>
     <string name="player_sleep_time_fired_end_of_chapter">챕터 종료 시 절전 타이머가 중지되었습니다.</string>
     <string name="player_sleep_in_chapters">%d개 챕터에서 중지됨</string>
     <string name="player_sleep_in_one_chapter">1개 챕터에서 중지됨</string>
@@ -21,7 +35,6 @@ Language: ko_KR
     <string name="player_sleep_in_one_episode">1개 에피소드에서 절전</string>
     <string name="player_sleep_timer_stopped_your_podcast">절전 타이머로 인해 팟캐스트가 중단되었습니다.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">기기가 흔들려 절전 타이머가 재시작되었습니다</string>
-    <string name="whats_new_new_widgets_message">새로운 크기가 두 가지 있고 디자인이 업데이트되어서 홈 화면에서 훨씬 쉽게 팟캐스트를 관리할 수 있습니다. 직접 확인해 보세요!</string>
     <string name="whats_new_new_widgets_title">새로운 위젯</string>
     <string name="widget_check_out_discover">발견에서 자세히 알아보기</string>
     <string name="widget_nothing_in_up_next">다음 차례에 아무것도 없음</string>
@@ -1466,6 +1479,7 @@ Language: ko_KR
     <string name="podcasts">팟캐스트</string>
     <string name="player_started_from">%d초부터 팟캐스트 시작</string>
     <string name="player_skipped_last">마지막 %d초 건너뛰기</string>
+    <string name="player_sleep_time_fired">에피소드 종료 시 절전 타이머가 중지되었습니다.</string>
     <string name="player_actions_show_as_delete_for_custom">사용자 정의 에피소드의 경우 삭제로 표시됨</string>
     <string name="player_actions_hidden_for_custom">사용자 정의 에피소드의 경우 숨김</string>
     <string name="player_rearrange_actions_hidden">추가 작업</string>
@@ -1657,4 +1671,7 @@ Language: ko_KR
     <string name="unarchive">아카이빙 취소</string>
     <string name="archive">아카이빙</string>
     <string name="add_to_up_next">다음 차례에 추가</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="other">%1$d 에피소드 - %2$s 남음</item>
+    </plurals>
 </resources>
