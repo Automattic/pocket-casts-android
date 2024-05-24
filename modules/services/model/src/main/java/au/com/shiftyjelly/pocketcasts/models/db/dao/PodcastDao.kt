@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -389,7 +390,7 @@ abstract class PodcastDao {
     abstract suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive, modified: Date = Date())
 
     @Query("UPDATE podcasts SET auto_archive_episode_limit = :value, auto_archive_episode_limit_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
-    abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?, modified: Date = Date())
+    abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit, modified: Date = Date())
 
     @Query("DELETE FROM trending_podcasts")
     protected abstract suspend fun deleteAllTrendingPodcasts()

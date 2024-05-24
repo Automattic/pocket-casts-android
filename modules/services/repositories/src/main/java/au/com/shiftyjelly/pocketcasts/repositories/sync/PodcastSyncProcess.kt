@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -961,7 +962,7 @@ class PodcastSyncProcess(
             podcast.autoArchiveInactive = AutoArchiveInactive.fromIndex(it) ?: AutoArchiveInactive.Default
         }
         withSyncValue(podcast.autoArchiveEpisodeLimitModified, podcastSync.autoArchiveEpisodeLimitModified, podcastSync.autoArchiveEpisodeLimit) {
-            podcast.autoArchiveEpisodeLimit = it
+            podcast.autoArchiveEpisodeLimit = AutoArchiveLimit.fromServerId(it) ?: AutoArchiveLimit.None
         }
         withSyncValue(podcast.groupingModified, podcastSync.episodeGroupingModified, podcastSync.episodeGrouping) {
             podcast.grouping = PodcastGrouping.fromServerId(it) ?: PodcastGrouping.None
@@ -1167,7 +1168,7 @@ class PodcastSyncProcess(
                             }
                         }
                         autoArchiveEpisodeLimit = int32Setting {
-                            value = int32Value { value = podcast.autoArchiveEpisodeLimit ?: 0 }
+                            value = int32Value { value = podcast.autoArchiveEpisodeLimit?.serverId ?: AutoArchiveLimit.None.serverId }
                             modifiedAt = podcast.autoArchiveEpisodeLimitModified.toProtobufTimestampOrFallback()
                         }
                         episodeGrouping = int32Setting {

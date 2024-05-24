@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -808,7 +809,7 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateArchiveAfterInactive(uuid, value)
     }
 
-    override suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?) {
+    override suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit) {
         podcastDao.updateArchiveEpisodeLimit(uuid, value)
     }
 }

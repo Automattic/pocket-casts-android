@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.assisted.Assisted
@@ -34,7 +35,7 @@ class PodcastAutoArchiveViewModel @AssistedInject constructor(
             overrideAutoArchiveSettings = podcast.overrideGlobalArchive,
             archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: archiveAfterPlaying,
             archiveInactive = podcast.autoArchiveInactive ?: archiveInactive,
-            episodeLimit = podcast.autoArchiveEpisodeLimit,
+            episodeLimit = podcast.autoArchiveEpisodeLimit ?: AutoArchiveLimit.None,
             podcast = podcast,
         )
     }.shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
@@ -74,11 +75,11 @@ class PodcastAutoArchiveViewModel @AssistedInject constructor(
         }
     }
 
-    fun updateEpisodeLimit(value: Int?) {
+    fun updateEpisodeLimit(value: AutoArchiveLimit) {
         viewModelScope.launch {
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED,
-                mapOf("value" to (value?.toString() ?: "none")),
+                mapOf("value" to value.analyticsValue),
             )
             podcastManager.updateArchiveEpisodeLimit(podcastUuid, value)
         }
@@ -93,7 +94,7 @@ class PodcastAutoArchiveViewModel @AssistedInject constructor(
         val overrideAutoArchiveSettings: Boolean = false,
         val archiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
         val archiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
-        val episodeLimit: Int? = null,
+        val episodeLimit: AutoArchiveLimit = AutoArchiveLimit.None,
         val podcast: Podcast? = null,
     )
 }

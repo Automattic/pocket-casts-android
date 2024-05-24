@@ -675,7 +675,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
             val showArchivedWithSearch = episodeSearchResults.searchUuids != null || showArchived
             val filteredList =
                 if (showArchivedWithSearch) searchList else searchList.filter { !it.isArchived }
-            val episodeLimit = podcast.autoArchiveEpisodeLimit
+            val episodeLimit = podcast.autoArchiveEpisodeLimit?.value
             val episodeLimitIndex: Int?
             // if the episode limit is on, the following texting is shown the episode list 'Limited to x most recent episodes'
             if (episodeLimit != null && filteredList.isNotEmpty() && podcast.overrideGlobalArchive) {
@@ -708,7 +708,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 archivedCount = archivedCount,
                 searchTerm = episodeSearchResults.searchTerm,
                 searchBookmarkTerm = bookmarkSearchResults.searchTerm,
-                episodeLimit = podcast.autoArchiveEpisodeLimit,
+                episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 episodeLimitIndex = episodeLimitIndex,
             )
             state
