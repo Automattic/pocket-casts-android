@@ -1144,6 +1144,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_export_subscriptions">Export subscriptions</string>
     <string name="settings_general_defaults">Defaults</string>
     <string name="settings_general_player">Player</string>
+    <string name="settings_general_sleep_timer">Sleep Timer</string>
     <string name="settings_get_plus_and_more">Get Pocket Casts Plus to unlock this feature and more!</string>
     <string name="settings_headphone_controls_action_next">Next action</string>
     <string name="settings_headphone_controls_action_previous">Previous action</string>
@@ -1319,6 +1320,10 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_up_next_swipe_play_last" translatable="false">@string/play_last</string>
     <string name="settings_up_next_swipe_play_next" translatable="false">@string/play_next</string>
     <string name="settings_up_next_swipe_summary">When swiping from left to right on an episode, the default action will be %s.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Shake to restart Sleep Timer</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">If on, the sleep timer will restart when you shake your phone.</string>
+    <string name="settings_sleep_timer_auto_restart">Auto Restart Sleep Timer</string>
+    <string name="settings_sleep_timer_auto_restart_summary">If on, the sleep timer will restart automatically if you play an episode within 5 minutes after the last pause.</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
     <string name="settings_autoplay">Autoplay</string>

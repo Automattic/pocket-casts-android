@@ -1020,6 +1020,18 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val shakeToResetSleepTimer = UserSetting.BoolPref(
+        sharedPrefKey = "shake_to_reset_sleep_timer",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val autoSleepTimerRestart = UserSetting.BoolPref(
+        sharedPrefKey = "auto_sleep_timer_restart",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val mediaControlItems = UserSetting.PrefListFromString<MediaNotificationControls>(
         sharedPrefKey = "media_notification_controls_action",
         sharedPrefs = sharedPreferences,

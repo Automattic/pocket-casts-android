@@ -289,6 +289,32 @@ class PlaybackSettingsFragment : BaseFragment() {
                 }
 
                 item {
+                    SettingSection(heading = stringResource(LR.string.settings_general_sleep_timer)) {
+                        AutoSleepTimerRestart(
+                            saved = settings.autoSleepTimerRestart.flow.collectAsState().value,
+                            onSave = {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.SETTINGS_GENERAL_AUTO_SLEEP_TIMER_RESTART_TOGGLED,
+                                    mapOf("enabled" to it),
+                                )
+                                settings.autoSleepTimerRestart.set(it, updateModifiedAt = true)
+                            },
+                        )
+
+                        ShakeToResetSleepTimer(
+                            saved = settings.shakeToResetSleepTimer.flow.collectAsState().value,
+                            onSave = {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.SETTINGS_GENERAL_SHAKE_TO_RESET_SLEEP_TIMER_TOGGLED,
+                                    mapOf("enabled" to it),
+                                )
+                                settings.shakeToResetSleepTimer.set(it, updateModifiedAt = true)
+                            },
+                        )
+                    }
+                }
+
+                item {
                     // The [scrollToAutoPlay] fragment argument handling depends on this item being last
                     // in the list. If it's position is changed, make sure you update the handling when
                     // we scroll to this item as well.
@@ -530,6 +556,24 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_up_next_tap),
             secondaryText = stringResource(LR.string.settings_up_next_tap_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        )
+
+    @Composable
+    private fun ShakeToResetSleepTimer(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset),
+            secondaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        )
+
+    @Composable
+    private fun AutoSleepTimerRestart(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_sleep_timer_auto_restart),
+            secondaryText = stringResource(LR.string.settings_sleep_timer_auto_restart_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )

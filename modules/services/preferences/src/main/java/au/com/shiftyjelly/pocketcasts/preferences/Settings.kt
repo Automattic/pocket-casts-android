@@ -446,6 +446,8 @@ interface Settings {
     val autoPlayNextEpisodeOnEmpty: UserSetting<Boolean>
     val showArchivedDefault: UserSetting<Boolean>
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
+    val shakeToResetSleepTimer: UserSetting<Boolean>
+    val autoSleepTimerRestart: UserSetting<Boolean>
     fun setMultiSelectItems(items: List<Int>)
     fun setLastPauseTime(date: Date)
     fun getLastPauseTime(): Date?
