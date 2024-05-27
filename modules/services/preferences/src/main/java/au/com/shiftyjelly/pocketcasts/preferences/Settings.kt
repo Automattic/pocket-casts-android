@@ -127,6 +127,8 @@ interface Settings {
         const val PODCAST_UUID = "podcast_uuid"
 
         const val SOURCE_VIEW = "source_view"
+
+        const val AUTOMOTIVE_UPDATE_CURRENT_PLAYING_ON_SYNC = "automotive_update_current_playing_on_sync"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -540,4 +542,6 @@ interface Settings {
 
     val bottomInset: Flow<Int>
     fun updateBottomInset(height: Int)
+
+    val overrideCurrentPlayingOnSync: UserSetting<Boolean>
 }

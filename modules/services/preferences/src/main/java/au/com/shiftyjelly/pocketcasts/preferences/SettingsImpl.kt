@@ -1425,4 +1425,10 @@ class SettingsImpl @Inject constructor(
     override fun updateBottomInset(height: Int) {
         _bottomInset.tryEmit(height)
     }
+
+    override val overrideCurrentPlayingOnSync = UserSetting.BoolPref(
+        sharedPrefKey = "overrideCurrentPlayingOnSync",
+        defaultValue = Util.isAutomotive(context),
+        sharedPrefs = sharedPreferences,
+    )
 }

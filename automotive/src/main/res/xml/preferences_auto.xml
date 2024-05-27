@@ -34,14 +34,24 @@
         android:selectAllOnFocus="true"
         android:summary="@string/settings_skip_back_time_summary"
         android:title="@string/settings_skip_back_time" />
-    <Preference
-        android:key="refresh_now"
-        android:title="@string/profile_refresh_now"
-        android:summary=""
-        android:persistent="false" />
-    <Preference
-        android:key="about"
-        android:title="@string/settings_title_about"
-        android:summary=""
-        android:persistent="false" />
+
+    <PreferenceCategory android:title="@string/refresh">
+        <Preference
+            android:key="refresh_now"
+            android:title="@string/profile_refresh_now"
+            android:summary=""
+            android:persistent="false" />
+        <SwitchPreference
+            android:key="overrideCurrentPlayingOnSync"
+            android:title="@string/settings_override_current_playing_on_sync"
+            android:summary="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_title_about">
+        <Preference
+            android:key="about"
+            android:title="@string/settings_title_about"
+            android:summary=""
+            android:persistent="false" />
+    </PreferenceCategory>
 </PreferenceScreen>

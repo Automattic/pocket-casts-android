@@ -40,6 +40,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var preferenceSkipForward: EditTextPreference
     private lateinit var preferenceSkipBackward: EditTextPreference
     private lateinit var preferenceRefreshNow: Preference
+    private lateinit var preferenceOverrideCurrentPlayingOnSync: SwitchPreference
     private lateinit var about: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -51,6 +52,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceRefreshNow = findPreference("refresh_now")!!
         preferenceSkipForward = findPreference(Settings.PREFERENCE_SKIP_FORWARD)!!
         preferenceSkipBackward = findPreference(Settings.PREFERENCE_SKIP_BACKWARD)!!
+        preferenceOverrideCurrentPlayingOnSync = findPreference("overrideCurrentPlayingOnSync")!!
         about = findPreference("about")!!
 
         setupAutoPlay()
@@ -58,6 +60,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         setupAutoShowPlayed()
         setupSkipForward()
         setupSkipBackward()
+        setupOverrideCurrentPlayingOnSync()
         setupRefreshNow()
         setupAbout()
     }
@@ -127,6 +130,16 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
                 preferenceSkipBackward.text = it.toString()
                 preferenceSkipBackward.summary = resources.getStringPluralSeconds(settings.skipBackInSecs.value)
             }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun setupOverrideCurrentPlayingOnSync() {
+        preferenceOverrideCurrentPlayingOnSync.setOnPreferenceChangeListener { _, newValue ->
+            settings.overrideCurrentPlayingOnSync.set(newValue as Boolean, updateModifiedAt = false)
+            true
+        }
+        settings.overrideCurrentPlayingOnSync.flow
+            .onEach { preferenceOverrideCurrentPlayingOnSync.isChecked = it }
             .launchIn(lifecycleScope)
     }
 

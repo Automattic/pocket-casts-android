@@ -74,6 +74,7 @@
     <string name="play_on">Play on&#8230;</string>
     <string name="played">Played</string>
     <string name="podcast_and_episode">Podcast &amp; Episode</string>
+    <string name="refresh">Refresh</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="removed">Removed</string>
@@ -1223,6 +1224,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_open_player_automatically">Open player automatically</string>
     <string name="settings_open_player_automatically_summary">If on, the full-screen player will open when you start playing a podcast episode.</string>
     <string name="settings_other_media_actions">Other media actions</string>
+    <string name="settings_override_current_playing_on_sync">Override current playing on sync</string>
     <string name="settings_playback_resumption">Intelligent playback resumption</string>
     <string name="settings_playback_resumption_summary">If on, Pocket Casts will go back a little in episodes you resume so you can catch up more comfortably.</string>
     <string name="settings_podcast_artwork">Podcast Artwork</string>

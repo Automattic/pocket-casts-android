@@ -999,7 +999,10 @@ class PodcastSyncProcess(
             val playingEpisodeUuid = playbackManager.getCurrentEpisode()?.uuid
             val episodeInPlayer = playingEpisodeUuid != null && episode.uuid == playingEpisodeUuid
             val isPlaying = playbackManager.isPlaying()
-            val isEpisodePlaying = episodeInPlayer && isPlaying
+            var shouldMarkCurrentPlayingEpisodeUnsynced = episodeInPlayer && isPlaying
+            if (Util.isAutomotive(context) && settings.overrideCurrentPlayingOnSync.value) {
+                shouldMarkCurrentPlayingEpisodeUnsynced = false
+            }
 
             sync.starred?.let {
                 episode.isStarred = it
@@ -1016,7 +1019,7 @@ class PodcastSyncProcess(
             sync.isArchived?.let { newIsArchive ->
                 if (episode.isArchived == newIsArchive) return@let
 
-                if (isEpisodePlaying) {
+                if (shouldMarkCurrentPlayingEpisodeUnsynced) {
                     // if we're playing this episode, marked the archive status as unsynced because the server might have a different one to us now
                     episode.archivedModified = System.currentTimeMillis()
                 } else {
@@ -1033,7 +1036,7 @@ class PodcastSyncProcess(
             sync.playingStatus?.let { newPlayingStatus ->
                 if (episode.playingStatus == newPlayingStatus) return@let
 
-                if (isEpisodePlaying) {
+                if (shouldMarkCurrentPlayingEpisodeUnsynced) {
                     // if we're playing this episode, marked the status as unsynced because the server might have a different one to us now
                     episode.playingStatusModified = System.currentTimeMillis()
                 } else {
@@ -1046,7 +1049,7 @@ class PodcastSyncProcess(
             }
 
             sync.playedUpTo?.let { playedUpTo ->
-                if (playedUpTo < 0 || isEpisodePlaying) {
+                if (playedUpTo < 0 || shouldMarkCurrentPlayingEpisodeUnsynced) {
                     return@let
                 }
 
