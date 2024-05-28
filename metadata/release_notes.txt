@@ -1,16 +1,21 @@
 *   New Features
-    *   Add three new widgets - small, medium, and large.
-        ([#2216](https://github.com/Automattic/pocket-casts-android/pull/2216))
-*   Updates:
-    *   New design for the Podcasts grid layout
-        ([#2165](https://github.com/Automattic/pocket-casts-android/pull/2165))
-    *   Adds new dedicated tab for up next
-        ([#2213](https://github.com/Automattic/pocket-casts-android/pull/2213))
-    *   Mini player small design refresh
-        ([#2214](https://github.com/Automattic/pocket-casts-android/pull/2214))
+    *   Add a storage setting that attempts to fix missing downloads files.
+        ([#2244](https://github.com/Automattic/pocket-casts-android/pull/2244))
+    *   Add an advanced setting that prioritizes seek accuracy over speed during streaming.
+        ([#2265](https://github.com/Automattic/pocket-casts-android/pull/2265))
+    *   Add sleep timer settings that controls the auto restart sleep timer and shake to restart sleep timer
+        ([#2273](https://github.com/Automattic/pocket-casts-android/pull/2273))
+*   Health
+    *   Increase minimum SDK version to 24 ([#2262](https://github.com/Automattic/pocket-casts-android/pull/2262))
 *   Bug Fixes
-    *   Fix pull to refresh icon sometimes being stuck in a loading state
-        ([#2164](https://github.com/Automattic/pocket-casts-android/pull/2164))
-    *   Fix cases where podcasts were ignoring 'Never archive' setting in some cases
-        ([#2194](https://github.com/Automattic/pocket-casts-android/pull/2194))
+    *   Fix Tesla podcast artwork not loading
+        ([#2254](https://github.com/Automattic/pocket-casts-android/pull/2254))
+    *   Fix timestamp parameter handling in shared links
+        ([#2235](https://github.com/Automattic/pocket-casts-android/pull/2235))
+    *   Fix the Google Podcasts OPML file import and include an error message if parsing fails.
+        ([#2260](https://github.com/Automattic/pocket-casts-android/pull/2260))
+    *   Improve intermediate caching of playing episode 
+        ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))    
+    *   Fix 'No limit' episode archive setting not being respected 
+        ([#2270](https://github.com/Automattic/pocket-casts-android/pull/2270))
 
