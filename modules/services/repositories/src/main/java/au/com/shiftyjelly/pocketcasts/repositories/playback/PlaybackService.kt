@@ -383,11 +383,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to media session") // Log things like Android Auto or Assistant connecting
             if (Util.isAutomotive(applicationContext) && !settings.automotiveConnectedToMediaSession()) {
-                Timer().schedule(object : TimerTask() {
-                    override fun run() {
-                        settings.setAutomotiveConnectedToMediaSession(true)
-                    }
-                }, 1000)
+                Timer().schedule(
+                    object : TimerTask() {
+                        override fun run() {
+                            settings.setAutomotiveConnectedToMediaSession(true)
+                        }
+                    },
+                    1000,
+                )
             }
         }
 
