@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.ui.R.attr.contrast_02
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -71,7 +72,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                 }
             }
             holder.btnSubscribe.setOnClickListener {
-                holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
+                holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = contrast_02, colorUnsubscribed = contrast_02)
                 onPodcastSubscribe(podcast, null) // no analytics for carousel
 
                 if (podcast.listId != null) {
