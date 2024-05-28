@@ -7,29 +7,30 @@ import androidx.media3.common.audio.AudioProcessorChain
 import androidx.media3.common.audio.SonicAudioProcessor
 import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.microseconds
 import timber.log.Timber
 
 @OptIn(UnstableApi::class)
-class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) :
-    AudioProcessorChain {
+class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) : AudioProcessorChain {
     private val lowProcessor = ShiftyTrimSilenceProcessor(
-        this::onSkippedFrames,
-        416000,
-        291000,
+        416000.microseconds,
+        291000.microseconds,
         ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
+        ::onSkippedFrames,
     )
     private val mediumProcessor =
         ShiftyTrimSilenceProcessor(
-            this::onSkippedFrames,
-            300000,
-            225000,
+            300000.microseconds,
+            225000.microseconds,
             ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
+            ::onSkippedFrames,
         )
     private val highProcessor = ShiftyTrimSilenceProcessor(
-        this::onSkippedFrames,
-        83000,
-        0,
+        83000.microseconds,
+        0.microseconds,
         ShiftyTrimSilenceProcessor.DEFAULT_SILENCE_THRESHOLD_LEVEL,
+        ::onSkippedFrames,
     )
     private val sonicAudioProcessor = SonicAudioProcessor()
 
@@ -49,11 +50,11 @@ class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) :
 
     override fun applySkipSilenceEnabled(skipSilenceEnabled: Boolean): Boolean {
         for (audioProcessor in audioProcessors) {
-            (audioProcessor as? ShiftyTrimSilenceProcessor)?.setEnabled(false)
+            (audioProcessor as? ShiftyTrimSilenceProcessor)?.enabled = false
         }
         if (trimMode != TrimMode.OFF) {
             val index = trimMode.ordinal - 1
-            (audioProcessors[index] as ShiftyTrimSilenceProcessor).setEnabled(true)
+            (audioProcessors[index] as ShiftyTrimSilenceProcessor).enabled = true
         }
         return trimMode != TrimMode.OFF
     }
@@ -70,9 +71,9 @@ class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) :
         this.trimMode = trimMode
     }
 
-    private fun onSkippedFrames(durationUs: Long) {
-        if (durationUs == 0L) return
-        Timber.d("Skipped ${durationUs / 1000}ms")
-        customAudio.addSilenceSkippedTime(durationUs)
+    private fun onSkippedFrames(duration: Duration) {
+        if (duration == Duration.ZERO) return
+        Timber.d("Skipped ${duration.inWholeMilliseconds}ms")
+        customAudio.addSilenceSkippedTime(duration.inWholeMicroseconds)
     }
 }
