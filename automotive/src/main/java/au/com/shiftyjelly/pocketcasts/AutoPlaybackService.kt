@@ -57,6 +57,8 @@ class AutoPlaybackService : PlaybackService() {
 
     override fun onCreate() {
         super.onCreate()
+        settings.setAutomotiveConnectedToMediaSession(false)
+
         RefreshPodcastsTask.runNow(this, applicationScope)
 
         Log.d(Settings.LOG_TAG_AUTO, "Auto playback service created")

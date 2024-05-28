@@ -52,6 +52,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import java.util.Timer
+import java.util.TimerTask
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -380,6 +382,13 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
         if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to media session") // Log things like Android Auto or Assistant connecting
+            if (Util.isAutomotive(applicationContext) && !settings.automotiveConnectedToMediaSession()) {
+                Timer().schedule(object : TimerTask() {
+                    override fun run() {
+                        settings.setAutomotiveConnectedToMediaSession(true)
+                    }
+                }, 1000)
+            }
         }
 
         return if (browserRootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) == true) { // Browser root hints is nullable even though it's not declared as such, come on Google
