@@ -1,6 +1,8 @@
 7.66
 -----
-
+*   Bug Fixes
+    *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
+        ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
 
 7.65
 -----
