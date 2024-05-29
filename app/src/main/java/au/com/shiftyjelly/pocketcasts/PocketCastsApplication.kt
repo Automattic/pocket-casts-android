@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.app.Application
-import android.os.Build
 import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
@@ -123,9 +122,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
 
     override fun onCreate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Timber.i("Hello world!")
-        }
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()
