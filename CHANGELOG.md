@@ -1,6 +1,10 @@
 7.66
 -----
-
+*   Bug Fixes
+    *   Fix: Search Term Persists When Navigating to Different Podcast Page
+        ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
+    *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
+        ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
 
 7.65
 -----
