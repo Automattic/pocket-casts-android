@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -210,7 +211,7 @@ class FolderAdapter(
                 unplayedText.hide()
                 unplayedCountBadgeView?.let {
                     it.setBadgeContent(displayBadgeCount, badgeType)
-                    it.show()
+                    it.showIf(displayBadgeCount > 0)
                 }
                 podcastCardView?.elevation = cardElevation
                 podcastCardView?.radius = cardCornerRadius
