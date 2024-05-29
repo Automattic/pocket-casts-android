@@ -329,11 +329,12 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         // If we aren't showing another error we can show the episode limit warning
-                        if (!state.episode.isArchived && !binding.errorLayout.isVisible && state.episode.excludeFromEpisodeLimit && state.podcast.autoArchiveEpisodeLimit != null) {
+                        val autoArchiveLimit = state.podcast.autoArchiveEpisodeLimit?.value
+                        if (!state.episode.isArchived && !binding.errorLayout.isVisible && state.episode.excludeFromEpisodeLimit && autoArchiveLimit != null) {
                             binding.errorLayout.isVisible = true
                             binding.lblErrorDetail.isVisible = true
                             binding.lblError.setText(LR.string.podcast_episode_manually_unarchived)
-                            binding.lblErrorDetail.text = getString(LR.string.podcast_episode_manually_unarchived_summary, state.podcast.autoArchiveEpisodeLimit)
+                            binding.lblErrorDetail.text = getString(LR.string.podcast_episode_manually_unarchived_summary, autoArchiveLimit)
                             binding.imgError.setImageResource(IR.drawable.ic_archive)
                         }
 
