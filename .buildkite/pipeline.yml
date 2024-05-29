@@ -31,7 +31,7 @@ steps:
       - label: 'Lint'
         command: |
           echo "--- 🧹 Linting"
-          ./gradlew lint
+          ./gradlew lintDebug
         plugins: *common_plugins
         artifact_paths:
           - "**/build/reports/lint-results*.*"
