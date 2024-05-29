@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
+        <location
+            file="$GRADLE_USER_HOME/caches/transforms-3/e02c82fc04458c4a3fac73d2cfdcf943/transformed/runtime-release/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="InvalidPackage"
+        message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
+        <location
+            file="$GRADLE_USER_HOME/caches/transforms-3/61f2ace0377fec944d0761aa7634924b/transformed/jna-5.13.0/jars/classes.jar"/>
+    </issue>
+
+    <issue
+        id="InvalidPackage"
+        message="Invalid package reference in library; not included in Android: `javax.script`. Referenced from `org.apache.commons.text.lookup.ScriptStringLookup`.">
+        <location
+            file="$GRADLE_USER_HOME/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.10.0/3363381aef8cef2dbc1023b3e3a9433b08b64e01/commons-text-1.10.0.jar"/>
+    </issue>
+
+    <issue
+        id="KotlinNullnessAnnotation"
+        message="Do not use `@NonNull` in Kotlin; the nullability is already implied by the Kotlin type `BufferedSink` **not** ending with `?`"
+        errorLine1="    override fun writeTo(@NonNull sink: BufferedSink) {"
+        errorLine2="                         ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/sync/ProgressRequestBody.kt"
+            line="45"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="KotlinNullnessAnnotation"
+        message="Do not use `@NonNull` in Kotlin; the nullability is already implied by the Kotlin type `Buffer` **not** ending with `?`"
+        errorLine1="        override fun write(@NonNull source: Buffer, byteCount: Long) {"
+        errorLine2="                           ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/sync/ProgressRequestBody.kt"
+            line="56"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `post` of class `ServerManager` requires synthetic accessor"
+        errorLine1="                            Handler(Looper.getMainLooper()).post { post(serverUrl, servicePath, parameters, async, nextPollCount, callback) }"
+        errorLine2="                                                                   ~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
+            line="256"
+            column="68"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `post` of class `ServerManager` requires synthetic accessor"
+        errorLine1="                            post(serverUrl, servicePath, parameters, async, nextPollCount, callback)"
+        errorLine2="                            ~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
+            line="258"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    val server = retrofit.create(StaticServer::class.java)"
+        errorLine2="        ~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/cdn/StaticServerManagerImpl.kt"
+            line="13"
+            column="9"/>
+    </issue>
+
+</issues>

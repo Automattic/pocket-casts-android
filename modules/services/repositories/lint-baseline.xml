@@ -1,0 +1,1051 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
+        <location
+            file="$GRADLE_USER_HOME/caches/transforms-3/e02c82fc04458c4a3fac73d2cfdcf943/transformed/runtime-release/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="        notificationManager.notify(notificationId, notification)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlayerNotificationManager.kt"
+            line="20"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="            manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
+            line="555"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="            manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
+            line="645"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="        NotificationManagerCompat.from(context)"
+        errorLine2="        ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/TokenErrorNotification.kt"
+            line="38"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="CheckResult"
+        message="The result of `subscribeBy` is not used"
+        errorLine1="        source"
+        errorLine2="        ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/SubscribeManager.kt"
+            line="60"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="CheckResult"
+        message="The result of `subscribeBy` is not used"
+        errorLine1="        syncManager.deleteFromServer(userEpisode)"
+        errorLine2="        ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/UserEpisodeManager.kt"
+            line="507"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ImplicitSamInstance"
+        message="Implicit new `SkippedListener` instance being passed to method which ends up checking instance equality; this can lead to subtle bugs"
+        errorLine1="        this::onSkippedFrames,"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyAudioProcessorChain.kt"
+            line="16"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ImplicitSamInstance"
+        message="Implicit new `SkippedListener` instance being passed to method which ends up checking instance equality; this can lead to subtle bugs"
+        errorLine1="            this::onSkippedFrames,"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyAudioProcessorChain.kt"
+            line="23"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ImplicitSamInstance"
+        message="Implicit new `SkippedListener` instance being passed to method which ends up checking instance equality; this can lead to subtle bugs"
+        errorLine1="        this::onSkippedFrames,"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyAudioProcessorChain.kt"
+            line="29"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="InvalidPackage"
+        message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
+        <location
+            file="$GRADLE_USER_HOME/caches/transforms-3/61f2ace0377fec944d0761aa7634924b/transformed/jna-5.13.0/jars/classes.jar"/>
+    </issue>
+
+    <issue
+        id="InvalidPackage"
+        message="Invalid package reference in library; not included in Android: `javax.script`. Referenced from `org.apache.commons.text.lookup.ScriptStringLookup`.">
+        <location
+            file="$GRADLE_USER_HOME/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.10.0/3363381aef8cef2dbc1023b3e3a9433b08b64e01/commons-text-1.10.0.jar"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
+        message="Consider adding a `&lt;queries>` declaration to your manifest when calling this \&#xA;method; see https://g.co/dev/packagevisibility for details"
+        errorLine1="                val launcherApps = context.packageManager.queryIntentActivities(mainIntent, 0)"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/support/Support.kt"
+            line="342"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="SpecifyForegroundServiceType"
+        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
+        errorLine1="            ForegroundInfo("
+        errorLine2="            ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
+            line="201"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SpecifyForegroundServiceType"
+        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
+        errorLine1="            ForegroundInfo(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/FixDownloadsWorker.kt"
+            line="74"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SpecifyForegroundServiceType"
+        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
+        errorLine1="            ForegroundInfo("
+        errorLine2="            ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
+            line="289"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SpecifyJobSchedulerIdRange"
+        message="Specify a valid range of job id&apos;s for `WorkManager` to use.">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/UpdateEpisodeDetailsJob.kt"/>
+    </issue>
+
+    <issue
+        id="SwitchIntDef"
+        message="Switch statement on an `int` with known associated constant missing case `PlaybackStateCompat.STATE_CONNECTING`, `PlaybackStateCompat.STATE_FAST_FORWARDING`, `PlaybackStateCompat.STATE_REWINDING`, `PlaybackStateCompat.STATE_SKIPPING_TO_NEXT`, `PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS`, `PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM`"
+        errorLine1="            when (state) {"
+        errorLine2="            ~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt"
+            line="268"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SwitchIntDef"
+        message="Switch statement on an `int` with known associated constant missing case `Player.STATE_IDLE`"
+        errorLine1="                when (playbackState) {"
+        errorLine2="                ~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/SimplePlayer.kt"
+            line="235"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UseAppTint"
+        message="Must use `app:tint` instead of `android:tint`"
+        errorLine1="            android:tint=&quot;?attr/colorOnPrimaryContainer&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="24"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseAppTint"
+        message="Must use `app:tint` instead of `android:tint`"
+        errorLine1="                    android:tint=&quot;?attr/colorOnPrimaryContainer&quot; />"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="78"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseAppTint"
+        message="Must use `app:tint` instead of `android:tint`"
+        errorLine1="                        android:tint=&quot;?attr/colorOnPrimaryContainer&quot; />"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="100"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="UseAppTint"
+        message="Must use `app:tint` instead of `android:tint`"
+        errorLine1="                        android:tint=&quot;?attr/colorOnPrimaryContainer&quot; />"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="117"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="UseAppTint"
+        message="Must use `app:tint` instead of `android:tint`"
+        errorLine1="                    android:tint=&quot;?attr/colorOnPrimaryContainer&quot; />"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="147"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="LogNotTimber"
+        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
+        errorLine1="        Log.d(&quot;AUTO_IMAGE&quot;, &quot;Content uri received: ${uri.lastPathSegment}&quot;)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/AlbumArtContentProvider.kt"
+            line="26"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="LogNotTimber"
+        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
+        errorLine1="            Log.e(&quot;AutoConverter&quot;, &quot;Could not load image in automotive $e&quot;)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/AutoConverter.kt"
+            line="177"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="LogNotTimber"
+        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
+        errorLine1="            Log.e(TAG, &quot;Could not read allowed callers from XML.&quot;, xmlException)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/PackageValidator.kt"
+            line="245"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="LogNotTimber"
+        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
+        errorLine1="            Log.e(TAG, &quot;Could not read allowed callers from XML.&quot;, ioException)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/PackageValidator.kt"
+            line="247"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="LogNotTimber"
+        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
+        errorLine1="            Log.e(TAG, &quot;No such algorithm: $noSuchAlgorithmException&quot;)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/PackageValidator.kt"
+            line="310"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="LogNotTimber"
+        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
+        errorLine1="        Log.d(Settings.LOG_TAG_AUTO, &quot;Init playback state&quot;)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackManager.kt"
+            line="185"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ExportedContentProvider"
+        message="Exported content providers can provide access to potentially sensitive data"
+        errorLine1="        &lt;provider"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="8"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 24"
+        errorLine1="                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt"
+            line="247"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 24"
+        errorLine1="            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
+            line="516"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="LogConditional"
+        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
+        errorLine1="        Log.d(&quot;AUTO_IMAGE&quot;, &quot;Content uri received: ${uri.lastPathSegment}&quot;)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/AlbumArtContentProvider.kt"
+            line="26"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="DisableBaselineAlignment"
+        message="Set `android:baselineAligned=&quot;false&quot;` on this element for better performance"
+        errorLine1="        &lt;LinearLayout"
+        errorLine2="         ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="45"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/widget_background` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@drawable/widget_background&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget_default_theme.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@drawable/widget_background` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@drawable/widget_background&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget_dynamic_colors_theme.xml"
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `buildAndShowNotification` of class `BookmarkHelperKt` requires synthetic accessor"
+        errorLine1="            buildAndShowNotification(context, bookmark.uuid)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/bookmark/BookmarkHelper.kt"
+            line="73"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `setMetadataFromRemote` of class `CastPlayer` requires synthetic accessor"
+        errorLine1="            setMetadataFromRemote()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/CastPlayer.kt"
+            line="382"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `updatePlaybackState` of class `CastPlayer` requires synthetic accessor"
+        errorLine1="                updatePlaybackState()"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/CastPlayer.kt"
+            line="384"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `updatePlaybackState` of class `CastPlayer` requires synthetic accessor"
+        errorLine1="            updatePlaybackState()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/CastPlayer.kt"
+            line="389"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `blockingEnqueue` of class `DownloadEpisodeTaskKt` requires synthetic accessor"
+        errorLine1="                response = call.blockingEnqueue()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
+            line="326"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `blockingEnqueue` of class `DownloadEpisodeTaskKt` requires synthetic accessor"
+        errorLine1="                response = call.blockingEnqueue()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
+            line="345"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `isStandardDeviceType` of class `FocusManager` requires synthetic accessor"
+        errorLine1="                        if (isStandardDeviceType(device)) {"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/FocusManager.kt"
+            line="179"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `deviceTypeToString` of class `FocusManager` requires synthetic accessor"
+        errorLine1="                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, &quot;Audio device added: %s, %s&quot;, device.productName, deviceTypeToString(device.type))"
+        errorLine2="                                                                                                              ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/FocusManager.kt"
+            line="182"
+            column="111"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `isStandardDeviceType` of class `FocusManager` requires synthetic accessor"
+        errorLine1="                        if (isStandardDeviceType(device)) {"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/FocusManager.kt"
+            line="188"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `deviceTypeToString` of class `FocusManager` requires synthetic accessor"
+        errorLine1="                        LogBuffer.i(LogBuffer.TAG_PLAYBACK, &quot;Audio device removed: %s, %s&quot;, device.productName, deviceTypeToString(device.type))"
+        errorLine2="                                                                                                                ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/FocusManager.kt"
+            line="191"
+            column="113"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `logEvent` of class `MediaSessionCallback` requires synthetic accessor"
+        errorLine1="                                logEvent(&quot;play from headset hook&quot;, inSessionCallback = false)"
+        errorLine2="                                ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="558"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `performPlayFromSearchRx` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="            playFromSearchDisposable = performPlayFromSearchRx(query)"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="625"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `starEpisode` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="                starEpisode()"
+        errorLine2="                ~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="650"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `unstarEpisode` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="                unstarEpisode()"
+        errorLine2="                ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="652"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `markAsPlayed` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="                APP_ACTION_MARK_AS_PLAYED -> markAsPlayed()"
+        errorLine2="                                             ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="681"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `starEpisode` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="                APP_ACTION_STAR -> starEpisode()"
+        errorLine2="                                   ~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="682"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `unstarEpisode` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="                APP_ACTION_UNSTAR -> unstarEpisode()"
+        errorLine2="                                     ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="683"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `changePlaybackSpeed` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="                APP_ACTION_CHANGE_SPEED -> changePlaybackSpeed()"
+        errorLine2="                                           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="684"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `archive` of class `MediaSessionManager` requires synthetic accessor"
+        errorLine1="                APP_ACTION_ARCHIVE -> archive()"
+        errorLine2="                                      ~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/MediaSessionManager.kt"
+            line="685"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `collectPollUuids` of class `OpmlImportTaskKt` requires synthetic accessor"
+        errorLine1="        var pollUuids = urls.chunked(100)"
+        errorLine2="                        ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
+            line="251"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `subscribeToPodcasts` of class `OpmlImportTaskKt` requires synthetic accessor"
+        errorLine1="        var pollUuids = urls.chunked(100)"
+        errorLine2="                        ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
+            line="251"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `collectPollUuids` of class `OpmlImportTaskKt` requires synthetic accessor"
+        errorLine1="            pollUuids = pollUuids.chunked(100)"
+        errorLine2="                        ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
+            line="263"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `subscribeToPodcasts` of class `OpmlImportTaskKt` requires synthetic accessor"
+        errorLine1="            pollUuids = pollUuids.chunked(100)"
+        errorLine2="                        ^">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
+            line="263"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `toRecord` of class `Companion` requires synthetic accessor"
+        errorLine1="                val folderRecords = folderManager.findFoldersToSync().map { toRecord(it) }"
+        errorLine2="                                                                            ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
+            line="218"
+            column="77"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `toRecord` of class `Companion` requires synthetic accessor"
+        errorLine1="                val playlistRecords = playlistManager.findPlaylistsToSync().map { toRecord(it) }"
+        errorLine2="                                                                                  ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
+            line="221"
+            column="83"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getAddToUpNextLocalSettingModified` of class `PodcastSyncProcessKt` requires synthetic accessor"
+        errorLine1="        withSyncValue(podcast.autoAddToUpNextModified, podcastSync.addToUpNextLocalSettingModified, podcastSync.addToUpNextLocalSetting) {"
+        errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
+            line="937"
+            column="68"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getAddToUpNextLocalSetting` of class `PodcastSyncProcessKt` requires synthetic accessor"
+        errorLine1="        withSyncValue(podcast.autoAddToUpNextModified, podcastSync.addToUpNextLocalSettingModified, podcastSync.addToUpNextLocalSetting) {"
+        errorLine2="                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
+            line="937"
+            column="113"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getAddToUpNextSyncSetting` of class `PodcastSyncProcessKt` requires synthetic accessor"
+        errorLine1="                            value = boolValue { value = podcast.addToUpNextSyncSetting }"
+        errorLine2="                                                                ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
+            line="1123"
+            column="65"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getAddToUpNextPositionSyncSetting` of class `PodcastSyncProcessKt` requires synthetic accessor"
+        errorLine1="                            value = int32Value { value = podcast.addToUpNextPositionSyncSetting }"
+        errorLine2="                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
+            line="1131"
+            column="66"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `noRatings` of class `Companion` requires synthetic accessor"
+        errorLine1="            .map { it.firstOrNull() ?: noRatings(podcastUuid) }"
+        errorLine2="                                       ~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/ratings/RatingsManagerImpl.kt"
+            line="23"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getNotificationAction` of class `RefreshPodcastsThreadKt` requires synthetic accessor"
+        errorLine1="                    val playIntent = buildNotificationIntent(intentId, action.notificationAction, episode, notificationTag, context)"
+        errorLine2="                                                                              ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
+            line="489"
+            column="79"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `toStatus` of class `SubscriptionManagerImplKt` requires synthetic accessor"
+        errorLine1="                it.toStatus()"
+        errorLine2="                ~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/subscription/SubscriptionManagerImpl.kt"
+            line="118"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `toStatus` of class `SubscriptionManagerImplKt` requires synthetic accessor"
+        errorLine1="        val newStatus = response.toStatus()"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/subscription/SubscriptionManagerImpl.kt"
+            line="291"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getSubscriptionReplacementMode` of class `SubscriptionManagerImplKt` requires synthetic accessor"
+        errorLine1="                val replacementMode = getSubscriptionReplacementMode("
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/subscription/SubscriptionManagerImpl.kt"
+            line="352"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `toServerPost` of class `UserEpisodeManagerKt` requires synthetic accessor"
+        errorLine1="        val response = syncManager.postFiles(files.toServerPost()).blockingGet()"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/UserEpisodeManager.kt"
+            line="291"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `toServerPost` of class `UserEpisodeManagerKt` requires synthetic accessor"
+        errorLine1="                syncManager.postFiles(episodesToSync.toServerPost()).blockingGet()"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/UserEpisodeManager.kt"
+            line="301"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="                &lt;TextView"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="61"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="SelectableText"
+        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
+        errorLine1="                &lt;TextView"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="130"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="18"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="34"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                &lt;ImageView"
+        errorLine2="                 ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="73"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="94"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                    &lt;ImageView"
+        errorLine2="                     ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="112"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="                &lt;ImageView"
+        errorLine2="                 ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="142"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="KeyboardInaccessibleWidget"
+        message="&apos;clickable&apos; attribute found, please also add &apos;focusable&apos;"
+        errorLine1="                android:clickable=&quot;true&quot;>"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="128"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
+        errorLine1="                    android:paddingLeft=&quot;2dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="68"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
+        errorLine1="                    android:paddingRight=&quot;2dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="138"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;2dp&quot;` to better support right-to-left layouts"
+        errorLine1="                    android:paddingLeft=&quot;2dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="68"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;2dp&quot;` to better support right-to-left layouts"
+        errorLine1="                    android:paddingRight=&quot;2dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/widget.xml"
+            line="138"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlEnabled"
+        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
+        <location
+            file="src/main/AndroidManifest.xml"/>
+    </issue>
+
+    <issue
+        id="LambdaLast"
+        message="Functional interface parameters (such as parameter 1, &quot;onSkippedListener&quot;, in au.com.shiftyjelly.pocketcasts.repositories.playback.ShiftyTrimSilenceProcessor.ShiftyTrimSilenceProcessor) should be last to improve Kotlin interoperability; see https://kotlinlang.org/docs/reference/java-interop.html#sam-conversions"
+        errorLine1="            long minimumSilenceDurationUs, long paddingSilenceUs, short silenceThresholdLevel) {"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyTrimSilenceProcessor.java"
+            line="109"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(Boolean or Boolean?)>)"
+        errorLine1="    override val isConnectedObservable = BehaviorRelay.create&lt;Boolean>().apply { accept(false) }"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/chromecast/CastManagerImpl.kt"
+            line="29"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(List&lt;UserEpisode> or List&lt;UserEpisode>?)>)"
+        errorLine1="    val sortedCloudFiles = settings.cloudSortOrder.flow.flatMapLatest { userEpisodeManager.observeUserEpisodesSorted(it).asFlow() }"
+        errorLine2="        ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/file/CloudFilesManager.kt"
+            line="15"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(PlaybackState or PlaybackState?)>)"
+        errorLine1="    val playbackStateLive = playbackStateRelay"
+        errorLine2="        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackManager.kt"
+            line="188"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://developer.android.com/kotlin/interop#nullability_annotations"
+        errorLine1="    public ShiftyTrimSilenceProcessor(SkippedListener onSkippedListener) {"
+        errorLine2="                                      ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyTrimSilenceProcessor.java"
+            line="90"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://developer.android.com/kotlin/interop#nullability_annotations"
+        errorLine1="    public ShiftyTrimSilenceProcessor(SkippedListener onSkippedListener,"
+        errorLine2="                                      ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyTrimSilenceProcessor.java"
+            line="108"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://developer.android.com/kotlin/interop#nullability_annotations"
+        errorLine1="    public AudioFormat onConfigure(AudioFormat inputAudioFormat)"
+        errorLine2="           ~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyTrimSilenceProcessor.java"
+            line="141"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://developer.android.com/kotlin/interop#nullability_annotations"
+        errorLine1="    public AudioFormat onConfigure(AudioFormat inputAudioFormat)"
+        errorLine2="                                   ~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyTrimSilenceProcessor.java"
+            line="141"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://developer.android.com/kotlin/interop#nullability_annotations"
+        errorLine1="    public void queueInput(ByteBuffer inputBuffer) {"
+        errorLine2="                           ~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/ShiftyTrimSilenceProcessor.java"
+            line="155"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(Boolean or Boolean?)>)"
+        errorLine1="    override val isLoggedInObservable = BehaviorRelay.create&lt;Boolean>().apply {"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/SyncManagerImpl.kt"
+            line="73"
+            column="18"/>
+    </issue>
+
+</issues>
