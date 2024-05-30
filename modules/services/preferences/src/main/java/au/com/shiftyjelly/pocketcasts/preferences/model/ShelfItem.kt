@@ -66,6 +66,13 @@ enum class ShelfItem(
         iconId = { IR.drawable.ic_bookmark },
         analyticsValue = "add_bookmark",
     ),
+    Download(
+        id = "download",
+        titleId = { LR.string.download },
+        iconId = { IR.drawable.ic_download },
+        showIf = { it is PodcastEpisode && !it.isDownloaded },
+        analyticsValue = "download",
+    ),
     Archive(
         id = "archive",
         titleId = { if (it is UserEpisode) LR.string.delete else LR.string.archive },

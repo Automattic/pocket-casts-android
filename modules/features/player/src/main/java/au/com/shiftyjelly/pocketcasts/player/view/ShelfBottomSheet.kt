@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.localization.R.string.episode_queued_for_download
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -175,6 +177,10 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
             ShelfItem.Report -> {
                 openUrl(settings.getReportViolationUrl())
+            }
+            ShelfItem.Download -> {
+                Toast.makeText(context, episode_queued_for_download, Toast.LENGTH_LONG).show()
+                playerViewModel.downloadCurrentlyPlaying()
             }
         }
         analyticsTracker.track(

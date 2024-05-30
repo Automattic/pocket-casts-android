@@ -228,6 +228,7 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="episode_queued_for_download">Episode queued for download</string>
     <string name="download_queued_singular">1 episode queued for download</string>
     <string name="download_queued_plural">%1$d episodes queued for download</string>
 
