@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -81,6 +83,7 @@ import io.reactivex.schedulers.Schedulers
 import java.time.Instant
 import java.util.Date
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -109,6 +112,7 @@ class PodcastSyncProcess(
     var folderManager: FolderManager,
     var syncManager: SyncManager,
     val crashLogging: CrashLogging,
+    val analyticsTracker: AnalyticsTrackerWrapper,
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -1057,6 +1061,16 @@ class PodcastSyncProcess(
                     episode.playedUpTo = playedUpTo
                     episode.playedUpToModified = null
                     if (episodeInPlayer) {
+                        val diffSeconds = (playedUpTo - currentUpTo).roundToInt()
+                        analyticsTracker.track(
+                            AnalyticsEvent.PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC,
+                            mapOf(
+                                "position_change" to diffSeconds,
+                                "is_downloaded" to episode.isDownloaded,
+                                "episode_uuid" to episode.uuid,
+                                "podcast_uuid" to episode.podcastOrSubstituteUuid,
+                            ),
+                        )
                         playbackManager.seekIfPlayingToTimeMs(episode.uuid, (playedUpTo * 1000).toInt())
                     }
                 }
