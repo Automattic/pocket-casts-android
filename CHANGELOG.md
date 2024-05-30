@@ -28,6 +28,8 @@
         ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))    
     *   Fix 'No limit' episode archive setting not being respected 
         ([#2270](https://github.com/Automattic/pocket-casts-android/pull/2270))
+    *   Fix badges visibility on the Podcasts tab
+        ([#2284](https://github.com/Automattic/pocket-casts-android/pull/2284))
 
 7.64
 -----
