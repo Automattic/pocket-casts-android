@@ -1062,15 +1062,17 @@ class PodcastSyncProcess(
                     episode.playedUpToModified = null
                     if (episodeInPlayer) {
                         val diffSeconds = (playedUpTo - currentUpTo).roundToInt()
-                        analyticsTracker.track(
-                            AnalyticsEvent.PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC,
-                            mapOf(
-                                "position_change" to diffSeconds,
-                                "is_downloaded" to episode.isDownloaded,
-                                "episode_uuid" to episode.uuid,
-                                "podcast_uuid" to episode.podcastOrSubstituteUuid,
-                            ),
-                        )
+                        if (diffSeconds < 0) {
+                            analyticsTracker.track(
+                                AnalyticsEvent.PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC,
+                                mapOf(
+                                    "position_change" to diffSeconds,
+                                    "is_downloaded" to episode.isDownloaded,
+                                    "episode_uuid" to episode.uuid,
+                                    "podcast_uuid" to episode.podcastOrSubstituteUuid,
+                                ),
+                            )
+                        }
                         playbackManager.seekIfPlayingToTimeMs(episode.uuid, (playedUpTo * 1000).toInt())
                     }
                 }
