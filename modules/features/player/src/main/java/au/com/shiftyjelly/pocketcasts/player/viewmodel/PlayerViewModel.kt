@@ -512,18 +512,27 @@ class PlayerViewModel @Inject constructor(
     fun downloadCurrentlyPlaying() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
         if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
-            launch {
-                episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
-                episodeAnalytics.trackEvent(
-                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-                    source = source,
-                    uuid = episode.uuid,
-                )
-            }
+            deleteEpisodeFile(episode)
         } else {
             launch {
                 DownloadHelper.manuallyDownloadEpisodeNow(episode, "Player shelf", downloadManager, episodeManager)
             }
+        }
+    }
+
+    fun removeDownload() {
+        val episode = playbackManager.upNextQueue.currentEpisode ?: return
+        deleteEpisodeFile(episode)
+    }
+
+    private fun deleteEpisodeFile(episode: BaseEpisode) {
+        launch {
+            episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
+            episodeAnalytics.trackEvent(
+                event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+                source = source,
+                uuid = episode.uuid,
+            )
         }
     }
 

@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R.string.episode_queued_for_download
+import au.com.shiftyjelly.pocketcasts.localization.R.string.episode_was_removed
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -181,6 +182,10 @@ class ShelfBottomSheet : BaseDialogFragment() {
             ShelfItem.Download -> {
                 Toast.makeText(context, episode_queued_for_download, Toast.LENGTH_LONG).show()
                 playerViewModel.downloadCurrentlyPlaying()
+            }
+            ShelfItem.RemoveDownloaded -> {
+                playerViewModel.removeDownload()
+                Toast.makeText(context, episode_was_removed, Toast.LENGTH_LONG).show()
             }
         }
         analyticsTracker.track(

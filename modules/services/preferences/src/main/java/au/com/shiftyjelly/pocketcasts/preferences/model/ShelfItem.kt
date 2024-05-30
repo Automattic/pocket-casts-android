@@ -73,6 +73,13 @@ enum class ShelfItem(
         showIf = { it is PodcastEpisode && !it.isDownloaded },
         analyticsValue = "download",
     ),
+    RemoveDownloaded(
+        id = "Downloaded",
+        titleId = { LR.string.remove_downloaded_file },
+        iconId = { IR.drawable.ic_download },
+        showIf = { it is PodcastEpisode && it.isDownloaded },
+        analyticsValue = "Downloaded",
+    ),
     Archive(
         id = "archive",
         titleId = { if (it is UserEpisode) LR.string.delete else LR.string.archive },
