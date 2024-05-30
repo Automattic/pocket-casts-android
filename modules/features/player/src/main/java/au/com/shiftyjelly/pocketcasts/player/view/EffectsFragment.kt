@@ -235,6 +235,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
                 when (effects.playbackSpeed) {
                     1.0 -> changePlaybackSpeed(effects, podcast, 1.5)
                     1.5 -> changePlaybackSpeed(effects, podcast, 2.0)
+                    2.0 -> changePlaybackSpeed(effects, podcast, 2.5)
+                    2.5 -> changePlaybackSpeed(effects, podcast, 3.0)
+                    3.0 -> changePlaybackSpeed(effects, podcast, 3.5)
+                    3.5 -> changePlaybackSpeed(effects, podcast, 4.0)
                     else -> changePlaybackSpeed(effects, podcast, 1.0)
                 }
             }
