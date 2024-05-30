@@ -1053,7 +1053,7 @@ class PodcastSyncProcess(
 
                 // don't update if times are very close
                 val currentUpTo = episode.playedUpTo
-                if (playedUpTo < currentUpTo - 2 || playedUpTo > currentUpTo + 2) {
+                if (playedUpTo < currentUpTo - 5 || playedUpTo > currentUpTo + 2) {
                     episode.playedUpTo = playedUpTo
                     episode.playedUpToModified = null
                     if (episodeInPlayer) {
