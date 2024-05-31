@@ -1063,6 +1063,7 @@ class PodcastSyncProcess(
                     if (episodeInPlayer) {
                         val diffSeconds = (playedUpTo - currentUpTo).roundToInt()
                         if (diffSeconds < 0) {
+                            // Track if the position is skipping back on sync while the player is in paused state. This is to help debug the playback jumping issue.
                             analyticsTracker.track(
                                 AnalyticsEvent.PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC,
                                 mapOf(
