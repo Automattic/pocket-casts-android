@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
@@ -144,15 +145,19 @@ class ShelfBottomSheet : BaseDialogFragment() {
             ShelfItem.Effects -> {
                 EffectsFragment().show(parentFragmentManager, "effects")
             }
+
             ShelfItem.Sleep -> {
                 SleepFragment().show(parentFragmentManager, "sleep")
             }
+
             ShelfItem.Star -> {
                 playerViewModel.starToggle()
             }
+
             ShelfItem.Share -> {
                 ShareFragment().show(parentFragmentManager, "sleep")
             }
+
             ShelfItem.Podcast -> {
                 (activity as FragmentHostListener).closePlayer()
                 val podcast = playerViewModel.podcast
@@ -162,27 +167,40 @@ class ShelfBottomSheet : BaseDialogFragment() {
                     (activity as? FragmentHostListener)?.openCloudFiles()
                 }
             }
+
             ShelfItem.Cast -> {
                 binding?.mediaRouteButton?.performClick()
             }
+
             ShelfItem.Played -> {
                 context?.let {
                     playerViewModel.markCurrentlyPlayingAsPlayed(it)?.show(parentFragmentManager, "mark_as_played")
                 }
             }
+
             ShelfItem.Archive -> {
                 playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
             }
+
             ShelfItem.Bookmark -> {
                 (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick(OnboardingUpgradeSource.OVERFLOW_MENU)
             }
+
             ShelfItem.Report -> {
                 openUrl(settings.getReportViolationUrl())
             }
+
             ShelfItem.Download -> {
-                Toast.makeText(context, episode_queued_for_download, Toast.LENGTH_LONG).show()
-                playerViewModel.downloadCurrentlyPlaying()
+                Toast.makeText(context, episode_queued_for_download, Toast.LENGTH_SHORT).show()
+                launch {
+                    playerViewModel.downloadCurrentlyPlaying()
+                }
             }
+
+            ShelfItem.Downloading -> {
+                // do nothing
+            }
+
             ShelfItem.RemoveDownloaded -> {
                 playerViewModel.removeDownload()
                 Toast.makeText(context, episode_was_removed, Toast.LENGTH_LONG).show()
