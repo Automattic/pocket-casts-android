@@ -176,7 +176,7 @@ class FolderAdapter(
         val theme: Theme,
     ) : RecyclerView.ViewHolder(view), PodcastTouchCallback.ItemTouchHelperViewHolder {
 
-        val button: View = view.findViewById(R.id.button)
+        val button: View? = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)
         val podcastCardView = view.findViewById<CardView>(R.id.podcast_card_view)
         val podcastBackground: View? = view.findViewById(R.id.header_background)
@@ -192,7 +192,7 @@ class FolderAdapter(
         val unplayedCountBadgeView = view.findViewById<ComposeView>(R.id.badge_view)
 
         fun bind(podcast: Podcast, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
-            button.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
+            button?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastCardView?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
             podcastTitle.show()
@@ -233,7 +233,9 @@ class FolderAdapter(
             }
 
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
-            button.contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
+            val contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
+            button?.contentDescription = contentDescription
+            podcastCardView?.contentDescription = contentDescription
 
             imageRequestFactory
                 .create(podcast, onSuccess = { if (!isListLayout) podcastTitle.hide() })
