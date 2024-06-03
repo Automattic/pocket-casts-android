@@ -604,6 +604,12 @@ class MediaSessionManager(
         }
 
         override fun onPlay() {
+            if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
+                // https://developer.android.com/docs/quality-guidelines/car-app-quality#media-autoplay
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
+                return
+            }
+
             logEvent("play")
             enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
         }
