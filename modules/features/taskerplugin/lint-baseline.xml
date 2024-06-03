@@ -33,15 +33,4 @@
             column="37"/>
     </issue>
 
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.joaomgcd:taskerpluginlibrary than 0.4.6 is available: 0.4.10"
-        errorLine1="    implementation(&quot;com.joaomgcd:taskerpluginlibrary:0.4.6&quot;)"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle.kts"
-            line="31"
-            column="21"/>
-    </issue>
-
 </issues>
