@@ -50,7 +50,7 @@ class AutomotiveLicensesFragment : Fragment() {
                 val libs = Libs.Builder().withContext(context).build()
                 // without displaying the artifact id the libraries seem to appear twice
                 libs.copy(
-                    libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList()
+                    libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList(),
                 )
             },
             onLibraryClick = { library ->
