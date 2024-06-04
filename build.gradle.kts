@@ -1,7 +1,9 @@
-import com.automattic.android.measure.MeasureBuildsExtension
+import com.automattic.android.measure.reporters.InternalA8cCiReporter
+import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import java.util.EnumSet
+import kotlinx.coroutines.runBlocking
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
@@ -32,9 +34,18 @@ apply(from = rootProject.file("dependencies.gradle.kts"))
 apply(from = "scripts/git-hooks/install.gradle")
 
 measureBuilds {
-    enable = project.extra.get("measureBuildsEnabled")?.toString().toBoolean()
-    automatticProject = MeasureBuildsExtension.AutomatticProject.PocketCasts
-    authToken = project.extra.get("appsMetricsToken")?.toString()
+    enable = project.extra.properties.get("measureBuildsEnabled")?.toString().toBoolean()
+    onBuildMetricsReadyListener {
+        val report = this@onBuildMetricsReadyListener
+        SlowSlowTasksMetricsReporter.report(report)
+        runBlocking {
+            InternalA8cCiReporter.report(
+                report,
+                projectName = "pocketcasts",
+                project.extra.get("appsMetricsToken").toString()
+            )
+        }
+    }
     attachGradleScanId = false
 }
 
