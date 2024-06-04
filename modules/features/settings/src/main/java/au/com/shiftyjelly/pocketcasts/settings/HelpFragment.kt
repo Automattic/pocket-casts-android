@@ -79,6 +79,14 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         )
         toolbar.setOnMenuItemClickListener(this)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.uiState.collect { state ->
+                    loadingView?.isVisible = state.isLoading
+                }
+            }
+        }
+
         FirebaseAnalyticsTracker.userGuideOpened()
     }
 
