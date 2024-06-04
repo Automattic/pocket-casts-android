@@ -166,6 +166,7 @@ class PodcastSyncProcessTest {
                 folderManager = folderManager,
                 syncManager = syncManager,
                 crashLogging = FakeCrashLogging(),
+                analyticsTracker = mock(),
             )
 
             val response = MockResponse()

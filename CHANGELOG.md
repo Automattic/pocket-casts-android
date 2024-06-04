@@ -30,6 +30,8 @@
         ([#2270](https://github.com/Automattic/pocket-casts-android/pull/2270))
     *   Fix badges visibility on the Podcasts tab
         ([#2284](https://github.com/Automattic/pocket-casts-android/pull/2284))
+    *   Fix podcast title talkback on the Podcasts tab
+        ([#2297](https://github.com/Automattic/pocket-casts-android/pull/2297))
 
 7.64
 -----

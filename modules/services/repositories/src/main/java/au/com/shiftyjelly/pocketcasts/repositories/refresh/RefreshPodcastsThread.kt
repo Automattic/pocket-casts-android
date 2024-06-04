@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -91,6 +92,7 @@ class RefreshPodcastsThread(
         fun userManager(): UserManager
         fun syncManager(): SyncManager
         fun crashLogging(): CrashLogging
+        fun analyticsTracker(): AnalyticsTrackerWrapper
     }
 
     @Volatile
@@ -254,6 +256,7 @@ class RefreshPodcastsThread(
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
             crashLogging = entryPoint.crashLogging(),
+            analyticsTracker = entryPoint.analyticsTracker(),
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()
