@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
-
-    <issue
-        id="ObsoleteLintCustomCheck"
-        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
-        <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/2bc2338a9b12546133c3957d31509f53/transformed/runtime-release/jars/lint.jar"/>
-    </issue>
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
         id="MissingSuperCall"
@@ -31,10 +24,32 @@
     </issue>
 
     <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="        speedLabel?.text = String.format(&quot;%.1fx&quot;, speed)"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/components/PlaybackSpeedPreference.kt"
+            line="43"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="        speedLabel?.text = String.format(&quot;%.1fx&quot;, speed)"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/components/PlaybackSpeedPreference.kt"
+            line="43"
+            column="28"/>
+    </issue>
+
+    <issue
         id="InvalidPackage"
         message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
         <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/a5c0a6fe0233ae59f2dafd8082c122a9/transformed/jna-5.13.0/jars/classes.jar"/>
+            file="$GRADLE_USER_HOME/caches/8.8/transforms/273fefd989fedbefd68dbb6fb093f195/transformed/jna-5.13.0/jars/classes.jar"/>
     </issue>
 
     <issue
@@ -537,6 +552,39 @@
             file="src/main/res/layout/activity_blank_fragment.xml"
             line="1"
             column="1"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    var progress by remember { mutableStateOf(0f) }"
+        errorLine2="                               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/share/ShareListCreateBuildingPage.kt"
+            line="60"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    var touchX by remember { mutableStateOf(0f) }"
+        errorLine2="                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/components/ratings/SwipeableStars.kt"
+            line="61"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="                    var right by remember { mutableStateOf(0f) }"
+        errorLine2="                                            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/components/ratings/SwipeableStars.kt"
+            line="142"
+            column="45"/>
     </issue>
 
     <issue
@@ -2159,62 +2207,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="        val lblTitle = itemView.findViewById&lt;TextView>(R.id.lblTitle)"
-        errorLine2="            ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastAdapter.kt"
-            line="691"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="        val lblTitle = itemView.findViewById&lt;TextView>(R.id.lblTitle)"
-        errorLine2="            ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastAdapter.kt"
-            line="695"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="        val lblBody = itemView.findViewById&lt;TextView>(R.id.lblBody)"
-        errorLine2="            ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastAdapter.kt"
-            line="696"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="        val btnShowArchived = itemView.findViewById&lt;View>(R.id.btnShowArchived)"
-        errorLine2="            ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastAdapter.kt"
-            line="697"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="        val lblTitle = itemView.findViewById&lt;TextView>(R.id.lblTitle)"
-        errorLine2="            ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastAdapter.kt"
-            line="701"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState or SignInState?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState..SignInState?)>)"
         errorLine1="    val signInState = userManager.getSignInState().toLiveData()"
         errorLine2="        ~~~~~~~~~~~">
         <location
@@ -2225,7 +2218,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(Boolean or Boolean?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(Boolean..Boolean?)>)"
         errorLine1="    val castConnected = castManager.isConnectedObservable"
         errorLine2="        ~~~~~~~~~~~~~">
         <location
@@ -2236,7 +2229,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(Pair&lt;PodcastGridLayoutType, BadgeType> or Pair&lt;PodcastGridLayoutType, BadgeType>?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(Pair&lt;PodcastGridLayoutType, BadgeType>..Pair&lt;PodcastGridLayoutType, BadgeType>?)>)"
         errorLine1="    val layoutChangedLiveData = settings.podcastGridLayout.flow"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -2247,7 +2240,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(String or String?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(String..String?)>)"
         errorLine1="    protected val searchQueryRelay = BehaviorRelay.create&lt;String>()"
         errorLine2="                  ~~~~~~~~~~~~~~~~">
         <location
@@ -2258,7 +2251,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(List&lt;String> or List&lt;String>?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(List&lt;String>..List&lt;String>?)>)"
         errorLine1="    val subscribedUuids ="
         errorLine2="        ~~~~~~~~~~~~~~~">
         <location
@@ -2269,7 +2262,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(Float or Float?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(Float..Float?)>)"
         errorLine1="    var uploadConsumer = BehaviorRelay.create&lt;Float>()"
         errorLine2="        ~~~~~~~~~~~~~~">
         <location
