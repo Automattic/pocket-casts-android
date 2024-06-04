@@ -42,7 +42,7 @@ measureBuilds {
             InternalA8cCiReporter.report(
                 report,
                 projectName = "pocketcasts",
-                project.extra.get("appsMetricsToken").toString()
+                project.extra.get("appsMetricsToken").toString(),
             )
         }
     }
