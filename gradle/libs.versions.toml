@@ -18,7 +18,7 @@
 [versions]
 aboutlibraries = "10.5.0"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
-android-application = "8.2.2"
+android-application = "8.4.1"
 billing = "6.0.1"
 coil = "2.5.0"
 compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -246,7 +246,7 @@ cardview = "androidx.cardview:cardview:1.0.0"
 cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 core-ktx = "androidx.core:core-ktx:1.10.1"
-desugar-jdk = "com.android.tools:desugar_jdk_libs:1.1.5"
+desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
 device-names = "com.jaredrummler:android-device-names:2.1.0"
 encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
