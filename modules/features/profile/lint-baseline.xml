@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
-
-    <issue
-        id="ObsoleteLintCustomCheck"
-        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
-        <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/e02c82fc04458c4a3fac73d2cfdcf943/transformed/runtime-release/jars/lint.jar"/>
-    </issue>
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
         id="MissingSuperCall"
@@ -23,7 +16,7 @@
         id="InvalidPackage"
         message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
         <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/61f2ace0377fec944d0761aa7634924b/transformed/jna-5.13.0/jars/classes.jar"/>
+            file="$GRADLE_USER_HOME/caches/8.8/transforms/f73d5eb1bd027b49f5996832bedd0aa6/transformed/jna-5.13.0/jars/classes.jar"/>
     </issue>
 
     <issue
@@ -1306,7 +1299,7 @@
         id="SetTextI18n"
         message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
         errorLine1="            binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + &quot; &quot; + endDate"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/SubCancelledFragment.kt"
             line="50"
@@ -1317,7 +1310,7 @@
         id="SetTextI18n"
         message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
         errorLine1="            binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + &quot; &quot; + endDate"
-        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/SubCancelledFragment.kt"
             line="50"
@@ -1498,7 +1491,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState or SignInState?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState..SignInState?)>)"
         errorLine1="    val signInState = userManager.getSignInState().toLiveData()"
         errorLine2="        ~~~~~~~~~~~">
         <location
@@ -1509,7 +1502,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState or SignInState?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState..SignInState?)>)"
         errorLine1="    var signInState = userManager.getSignInState().toLiveData()"
         errorLine2="        ~~~~~~~~~~~">
         <location
@@ -1520,7 +1513,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(Optional&lt;FileAccount> or Optional&lt;FileAccount>?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(Optional&lt;FileAccount>..Optional&lt;FileAccount>?)>)"
         errorLine1="    val accountUsage = userEpisodeManager.observeAccountUsage().toLiveData()"
         errorLine2="        ~~~~~~~~~~~~">
         <location
@@ -1531,7 +1524,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState or SignInState?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState..SignInState?)>)"
         errorLine1="    val signInState = userManager.getSignInState().toLiveData()"
         errorLine2="        ~~~~~~~~~~~">
         <location
@@ -1542,7 +1535,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(List&lt;UserEpisode> or List&lt;UserEpisode>?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(List&lt;UserEpisode>..List&lt;UserEpisode>?)>)"
         errorLine1="    val cloudFilesList = cloudFilesManager.sortedCloudFiles"
         errorLine2="        ~~~~~~~~~~~~~~">
         <location

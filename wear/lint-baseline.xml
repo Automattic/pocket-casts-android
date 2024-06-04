@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
-        id="ObsoleteLintCustomCheck"
-        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                        text = String.format(&quot;%.1fx&quot;, state.playbackEffects.playbackSpeed),"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/e02c82fc04458c4a3fac73d2cfdcf943/transformed/runtime-release/jars/lint.jar"/>
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/EffectsScreen.kt"
+            line="171"
+            column="32"/>
     </issue>
 
     <issue
         id="InvalidPackage"
         message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
         <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/61f2ace0377fec944d0761aa7634924b/transformed/jna-5.13.0/jars/classes.jar"/>
+            file="$GRADLE_USER_HOME/caches/8.8/transforms/f73d5eb1bd027b49f5996832bedd0aa6/transformed/jna-5.13.0/jars/classes.jar"/>
     </issue>
 
     <issue
@@ -20,6 +24,176 @@
         message="Invalid package reference in library; not included in Android: `javax.script`. Referenced from `org.apache.commons.text.lookup.ScriptStringLookup`.">
         <location
             file="$GRADLE_USER_HOME/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.10.0/3363381aef8cef2dbc1023b3e3a9433b08b64e01/commons-text-1.10.0.jar"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="    icon: @Composable () -> Unit = {"
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/ErrorScreen.kt"
+            line="29"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="    icon: @Composable () -> Unit = {"
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/NotificationScreen.kt"
+            line="34"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="    firstPageContent: @Composable () -> Unit,"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/NowPlayingPager.kt"
+            line="44"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="    progress: @Composable () -> Unit = {},"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/horologist/PlayPauseButtonStyled.kt"
+            line="39"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="    icon: (@Composable BoxScope.() -> Unit)? = null,"
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/WatchListChip.kt"
+            line="48"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterNaming"
+        message="Composable lambda parameter should be named `content`"
+        errorLine1="    icon: (@Composable BoxScope.() -> Unit)? = null,"
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/WatchListChip.kt"
+            line="66"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterPosition"
+        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
+        errorLine1="    signInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/authentication/LoginWithGoogleScreen.kt"
+            line="20"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterPosition"
+        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
+        errorLine1="    icon: (@Composable BoxScope.() -> Unit)? = null,"
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/WatchListChip.kt"
+            line="48"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableLambdaParameterPosition"
+        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
+        errorLine1="    icon: (@Composable BoxScope.() -> Unit)? = null,"
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/WatchListChip.kt"
+            line="66"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="    fun handle("
+        errorLine2="        ~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/ScrollToTop.kt"
+            line="14"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions with a return type should start with a lowercase letter"
+        errorLine1="private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animatable&lt;Float, AnimationVector1D> {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/settings/SettingsScreen.kt"
+            line="194"
+            column="13"/>
     </issue>
 
     <issue
@@ -45,14 +219,25 @@
     </issue>
 
     <issue
-        id="StaticFieldLeak"
-        message="This field leaks a context object"
-        errorLine1="    @ApplicationContext private val context: Context,"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var lastCharIndex by remember { mutableStateOf(0) }"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/WearMainActivityViewModel.kt"
-            line="41"
-            column="5"/>
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/ExpandableText.kt"
+            line="39"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    private val actual = mutableStateOf(initial)"
+        errorLine2="                         ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/horologist/ProgressStateHolderStyled.kt"
+            line="31"
+            column="26"/>
     </issue>
 
     <issue
@@ -68,7 +253,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(List&lt;UserEpisode> or List&lt;UserEpisode>?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(List&lt;UserEpisode>..List&lt;UserEpisode>?)>)"
         errorLine1="    val userEpisodes = userEpisodeManager"
         errorLine2="        ~~~~~~~~~~~~">
         <location
@@ -79,7 +264,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (StateFlow&lt;(Any or Any?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (StateFlow&lt;(Any..Any?)>)"
         errorLine1="    val uiState = playlistManager.observeByUuidAsList(filterUuid)"
         errorLine2="        ~~~~~~~">
         <location
