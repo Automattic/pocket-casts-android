@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
+        <location
+            file="$GRADLE_USER_HOME/caches/transforms-3/2bc2338a9b12546133c3957d31509f53/transformed/runtime-release/jars/lint.jar"/>
+    </issue>
 
     <issue
         id="InvalidPackage"
         message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
         <location
-            file="$GRADLE_USER_HOME/caches/8.8/transforms/f73d5eb1bd027b49f5996832bedd0aa6/transformed/jna-5.13.0/jars/classes.jar"/>
+            file="$GRADLE_USER_HOME/caches/transforms-3/a5c0a6fe0233ae59f2dafd8082c122a9/transformed/jna-5.13.0/jars/classes.jar"/>
     </issue>
 
     <issue
@@ -13,160 +20,6 @@
         message="Invalid package reference in library; not included in Android: `javax.script`. Referenced from `org.apache.commons.text.lookup.ScriptStringLookup`.">
         <location
             file="$GRADLE_USER_HOME/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.10.0/3363381aef8cef2dbc1023b3e3a9433b08b64e01/commons-text-1.10.0.jar"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    leadingIcon: @Composable (() -> Unit)? = null,"
-        errorLine2="    ~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/buttons/BaseRowButton.kt"
-            line="41"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    actions: @Composable RowScope.() -> Unit = {},"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/bars/BottomSheetAppBar.kt"
-            line="19"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    placeholder: @Composable (() -> Unit) = {},"
-        errorLine2="    ~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/images/GravatarProfileImage.kt"
-            line="13"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    placeholder: @Composable (() -> Unit) = {},"
-        errorLine2="    ~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/images/ProfileImage.kt"
-            line="18"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    rowItems: @Composable () -> Unit,"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/ScrollingRow.kt"
-            line="31"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    rowItems: @Composable () -> Unit,"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/ScrollingRow.kt"
-            line="78"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    additionalContent: @Composable () -> Unit = {},"
-        errorLine2="    ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/Settings.kt"
-            line="158"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    actions: @Composable RowScope.() -> Unit = {},"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/bars/ThemedTopAppBar.kt"
-            line="43"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterPosition"
-        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
-        errorLine1="    leadingIcon: @Composable (() -> Unit)? = null,"
-        errorLine2="    ~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/buttons/BaseRowButton.kt"
-            line="41"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterPosition"
-        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
-        errorLine1="    actions: @Composable RowScope.() -> Unit = {},"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/bars/BottomSheetAppBar.kt"
-            line="19"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterPosition"
-        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
-        errorLine1="    optionName: @Composable (T) -> String,"
-        errorLine2="    ~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/dialogs/RadioOptionsDialog.kt"
-            line="39"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterPosition"
-        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
-        errorLine1="    rowItems: @Composable () -> Unit,"
-        errorLine2="    ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/ScrollingRow.kt"
-            line="78"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterPosition"
-        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
-        errorLine1="    actions: @Composable RowScope.() -> Unit = {},"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/bars/ThemedTopAppBar.kt"
-            line="43"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableNaming"
-        message="Composable functions with a return type should start with a lowercase letter"
-        errorLine1="fun UpsellButtonTitle("
-        errorLine2="    ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/buttons/UpsellButtonTitle.kt"
-            line="11"
-            column="5"/>
     </issue>
 
     <issue
@@ -244,61 +97,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/podcast/PodcastSubscribeImage.kt"
             line="66"
             column="7"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
-        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
-        errorLine1="    var pagerHeight by remember { mutableStateOf(0) }"
-        errorLine2="                                  ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/HorizontalPagerWrapper.kt"
-            line="57"
-            column="35"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
-        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
-        errorLine1="            var pageHeight by remember { mutableStateOf(0) }"
-        errorLine2="                                         ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/HorizontalPagerWrapper.kt"
-            line="64"
-            column="42"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
-        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
-        errorLine1="    var flashAlphaTarget by remember { mutableStateOf(0f) }"
-        errorLine2="                                       ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/Settings.kt"
-            line="160"
-            column="40"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
-        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
-        errorLine1="    var selectedIndex by remember { mutableStateOf(defaultSelectedItemIndex) }"
-        errorLine2="                                    ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/StyledToggle.kt"
-            line="32"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
-        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
-        errorLine1="    var selectedImageId by remember { mutableStateOf(options.first { it.isOn() }.imageId) }"
-        errorLine2="                                      ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/buttons/ToggleButtonGroup.kt"
-            line="49"
-            column="39"/>
     </issue>
 
     <issue

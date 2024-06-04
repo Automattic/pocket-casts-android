@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
+        <location
+            file="$GRADLE_USER_HOME/caches/transforms-3/2bc2338a9b12546133c3957d31509f53/transformed/runtime-release/jars/lint.jar"/>
+    </issue>
 
     <issue
         id="MissingPermission"
         message="Missing permissions required by ConnectivityManager.getActiveNetwork: android.permission.ACCESS_NETWORK_STATE"
         errorLine1="            val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return ServiceStatus.Failed(userMessage = null, log = &quot;Unable to get network capabilities&quot;)"
-        errorLine2="                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/status/ServiceStatusChecker.kt"
             line="72"
-            column="75"/>
+            column="52"/>
     </issue>
 
     <issue
@@ -24,21 +31,10 @@
     </issue>
 
     <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
-        errorLine1="                log.append(String.format(&quot;Received response for %s in %.1fms%n%s&quot;, response.request.url, (endTime - startTime) / 1e6, response.headers))"
-        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/status/ServiceStatusChecker.kt"
-            line="45"
-            column="28"/>
-    </issue>
-
-    <issue
         id="InvalidPackage"
         message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
         <location
-            file="$GRADLE_USER_HOME/caches/8.8/transforms/f73d5eb1bd027b49f5996832bedd0aa6/transformed/jna-5.13.0/jars/classes.jar"/>
+            file="$GRADLE_USER_HOME/caches/transforms-3/a5c0a6fe0233ae59f2dafd8082c122a9/transformed/jna-5.13.0/jars/classes.jar"/>
     </issue>
 
     <issue
@@ -112,28 +108,6 @@
             file="src/main/res/drawable/pocketcasts_logo.xml"
             line="2"
             column="20"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterNaming"
-        message="Composable lambda parameter should be named `content`"
-        errorLine1="    header: @Composable () -> Unit,"
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/whatsnew/WhatsNewPage.kt"
-            line="86"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposableLambdaParameterPosition"
-        message="Composable lambda parameter should be the last parameter so it can be used as a trailing lambda"
-        errorLine1="    header: @Composable () -> Unit,"
-        errorLine2="    ~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/whatsnew/WhatsNewPage.kt"
-            line="86"
-            column="5"/>
     </issue>
 
     <issue
@@ -225,14 +199,47 @@
     </issue>
 
     <issue
-        id="StringFormatTrivial"
-        message="This formatting string is trivial. Rather than using `String.format` to create your String, it will be more performant to concatenate your arguments with `+`. "
-        errorLine1="                log.append(String.format(&quot;Sending request %s on %s%n%s&quot;, request.url, chain.connection(), request.headers))"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="StaticFieldLeak"
+        message="This field leaks a context object"
+        errorLine1="    @ApplicationContext private val context: Context,"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/status/ServiceStatusChecker.kt"
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/viewmodel/AdvancedSettingsViewModel.kt"
+            line="20"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="This field leaks a context object"
+        errorLine1="    @ApplicationContext private val context: Context,"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/viewmodel/AutoArchiveFragmentViewModel.kt"
+            line="18"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="This field leaks a context object"
+        errorLine1="    @ApplicationContext private val context: Context,"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/developer/DeveloperViewModel.kt"
+            line="34"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="This field leaks a context object"
+        errorLine1="    @ApplicationContext private val context: Context,"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/viewmodel/StorageSettingsViewModel.kt"
             line="42"
-            column="43"/>
+            column="5"/>
     </issue>
 
     <issue
@@ -919,7 +926,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(AutoAddSettingsState..AutoAddSettingsState?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(AutoAddSettingsState or AutoAddSettingsState?)>)"
         errorLine1="    val autoAddPodcasts ="
         errorLine2="        ~~~~~~~~~~~~~~~">
         <location

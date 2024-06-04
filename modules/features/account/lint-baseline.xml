@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
+        <location
+            file="$GRADLE_USER_HOME/caches/transforms-3/2bc2338a9b12546133c3957d31509f53/transformed/runtime-release/jars/lint.jar"/>
+    </issue>
 
     <issue
         id="MissingSuperCall"
@@ -27,7 +34,7 @@
         id="InvalidPackage"
         message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
         <location
-            file="$GRADLE_USER_HOME/caches/8.8/transforms/f73d5eb1bd027b49f5996832bedd0aa6/transformed/jna-5.13.0/jars/classes.jar"/>
+            file="$GRADLE_USER_HOME/caches/transforms-3/a5c0a6fe0233ae59f2dafd8082c122a9/transformed/jna-5.13.0/jars/classes.jar"/>
     </issue>
 
     <issue
@@ -159,6 +166,17 @@
     </issue>
 
     <issue
+        id="StaticFieldLeak"
+        message="This field leaks a context object"
+        errorLine1="    @ApplicationContext private val context: Context,"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/account/viewmodel/GoogleSignInButtonViewModel.kt"
+            line="37"
+            column="5"/>
+    </issue>
+
+    <issue
         id="VectorPath"
         message="Very long vector path (922 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="    &lt;path android:fillType=&quot;evenOdd&quot; android:pathData=&quot;M111.352,71.991C110.912,68.162 113.652,64.72 117.447,64.284C121.243,63.848 124.691,66.58 125.13,70.409C125.57,74.238 122.83,77.68 119.035,78.116C115.239,78.552 111.791,75.82 111.352,71.991ZM116.535,56.336C108.332,57.278 102.463,64.703 103.404,72.903C103.871,76.97 105.926,80.471 108.88,82.853C107.788,83.753 106.786,84.771 105.894,85.897C102.57,90.094 101.047,95.441 101.658,100.763C101.91,102.957 103.893,104.532 106.088,104.28C108.283,104.029 109.858,102.045 109.606,99.85C109.236,96.631 110.158,93.398 112.165,90.864C114.172,88.331 117.099,86.703 120.302,86.335C123.505,85.967 126.725,86.89 129.254,88.903C131.783,90.917 133.413,93.856 133.783,97.076C134.034,99.271 136.018,100.845 138.212,100.594C140.407,100.342 141.982,98.358 141.73,96.164C141.12,90.842 138.425,85.979 134.237,82.644C132.987,81.65 131.635,80.815 130.212,80.15C132.409,77.201 133.53,73.438 133.078,69.497C132.137,61.297 124.739,55.395 116.535,56.336Z&quot;>"
@@ -233,17 +251,6 @@
             file="src/main/res/drawable/ic_terms.xml"
             line="56"
             column="25"/>
-    </issue>
-
-    <issue
-        id="AutoboxingStateCreation"
-        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
-        errorLine1="            var offerBadgeTextLength by remember { mutableStateOf(MAX_OFFER_BADGE_TEXT_LENGTH) }"
-        errorLine2="                                                   ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/account/onboarding/upgrade/OnboardingUpgradeFeaturesPage.kt"
-            line="317"
-            column="52"/>
     </issue>
 
     <issue
@@ -1457,7 +1464,7 @@
 
     <issue
         id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState..SignInState?)>)"
+        message="Should explicitly declare type here since implicit type does not specify nullness (LiveData&lt;(SignInState or SignInState?)>)"
         errorLine1="    val signInState = userManager.getSignInState().toLiveData()"
         errorLine2="        ~~~~~~~~~~~">
         <location

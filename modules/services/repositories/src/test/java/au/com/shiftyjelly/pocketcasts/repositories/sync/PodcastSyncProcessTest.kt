@@ -305,6 +305,7 @@ class PodcastSyncProcessTest {
         folderManager = mock(),
         syncManager = mock(),
         crashLogging = FakeCrashLogging(),
+        analyticsTracker = mock(),
     )
 
     private fun mockPodcast(
