@@ -1426,6 +1426,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_notification_default_sound">Default sound</string>
     <string name="settings_import_title">Import subscriptions</string>
     <string name="settings_export_database">Export database</string>
+    <string name="settings_export_database_failed">Database export failed</string>
     <string name="settings_status_page">Status Page</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_watch_logs">Watch logs</string>

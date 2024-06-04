@@ -125,7 +125,13 @@ class OpmlExporter(
                                 if (sendAsEmail) {
                                     sendIntentEmail(opmlFile)
                                 } else {
-                                    sendIntentFile(opmlFile)
+                                    IntentUtil.sendIntent(
+                                        context = context,
+                                        file = opmlFile,
+                                        intentType = "text/xml",
+                                        errorMessage = context.getString(LR.string.settings_opml_export_failed),
+                                        errorTitle = context.getString(LR.string.settings_no_file_browser_title),
+                                    )
                                 }
                             }
                         } catch (e: Exception) {
@@ -144,23 +150,6 @@ class OpmlExporter(
             AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FAILED,
             mapOf("reason" to reason),
         )
-    }
-
-    private fun sendIntentFile(file: File) {
-        try {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/xml"
-            val uri = FileUtil.createUriWithReadPermissions(fragment.requireActivity(), file, intent)
-            intent.putExtra(Intent.EXTRA_STREAM, uri)
-            try {
-                context.startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                Timber.e(e)
-                UiUtil.displayAlertError(context, context.getString(LR.string.settings_no_file_browser_title), context.getString(LR.string.settings_no_file_browser), null)
-            }
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
     }
 
     private fun sendIntentEmail(file: File) {
