@@ -16,7 +16,7 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "10.5.0"
+aboutlibraries = "11.2.1"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
 android-application = "8.2.2"
 billing = "6.0.1"
@@ -59,7 +59,7 @@ java = "17"
 
 [libraries]
 # About Libraries
-aboutLibraries-compose = "com.mikepenz:aboutlibraries-compose:10.5.0"
+aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
 
 # Billing
@@ -423,7 +423,7 @@ work = [
 ]
 
 [plugins]
-aboutlibraries = "com.mikepenz.aboutlibraries.plugin:10.4.0"
+aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 android-application = { id = "com.android.application", version.ref = "android-application" }
 android-library = { id = "com.android.library", version.ref = "android-application" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

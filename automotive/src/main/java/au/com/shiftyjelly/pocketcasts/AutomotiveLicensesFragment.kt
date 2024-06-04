@@ -20,6 +20,7 @@ import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.util.withContext
+import kotlinx.collections.immutable.toImmutableList
 
 class AutomotiveLicensesFragment : Fragment() {
 
@@ -48,7 +49,9 @@ class AutomotiveLicensesFragment : Fragment() {
             librariesBlock = { context ->
                 val libs = Libs.Builder().withContext(context).build()
                 // without displaying the artifact id the libraries seem to appear twice
-                libs.copy(libs.libraries.distinctBy { "${it.name}##${it.author}" })
+                libs.copy(
+                    libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList(),
+                )
             },
             onLibraryClick = { library ->
                 val website = library.website ?: return@LibrariesContainer
