@@ -2,20 +2,6 @@
 <issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
-        id="InvalidPackage"
-        message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
-        <location
-            file="$GRADLE_USER_HOME/caches/8.8/transforms/273fefd989fedbefd68dbb6fb093f195/transformed/jna-5.13.0/jars/classes.jar"/>
-    </issue>
-
-    <issue
-        id="InvalidPackage"
-        message="Invalid package reference in library; not included in Android: `javax.script`. Referenced from `org.apache.commons.text.lookup.ScriptStringLookup`.">
-        <location
-            file="$GRADLE_USER_HOME/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.10.0/3363381aef8cef2dbc1023b3e3a9433b08b64e01/commons-text-1.10.0.jar"/>
-    </issue>
-
-    <issue
         id="UnusedAttribute"
         message="Attribute `textFontWeight` is only used in API level 28 and higher (current min is 24)"
         errorLine1="        android:textFontWeight=&quot;700&quot;"
