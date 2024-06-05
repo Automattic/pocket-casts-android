@@ -751,7 +751,7 @@
         id="ConvertToWebp"
         message="One or more images in this project can be converted to the WebP format which typically results in smaller file sizes, even for lossless conversion">
         <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
+            file="src/main/res/drawable-xxhdpi/appicon_patron_dark.png"/>
     </issue>
 
     <issue
@@ -793,13 +793,13 @@
         id="IconDipSize"
         message="The image `appicon_patron_dark.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/appicon_patron_dark.png: 124x124 dp (186x186 px), drawable-mdpi/appicon_patron_dark.png: 124x124 dp (124x124 px), drawable-xhdpi/appicon_patron_dark.png: 124x124 dp (248x248 px), drawable-xxhdpi/appicon_patron_dark.png: 165x165 dp (496x496 px), drawable-xxxhdpi/appicon_patron_dark.png: 124x124 dp (496x496 px)">
         <location
-            file="src/main/res/drawable-xhdpi/appicon_patron_dark.png"/>
+            file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
         <location
             file="src/main/res/drawable-hdpi/appicon_patron_dark.png"/>
         <location
             file="src/main/res/drawable-mdpi/appicon_patron_dark.png"/>
         <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
+            file="src/main/res/drawable-xhdpi/appicon_patron_dark.png"/>
         <location
             file="src/main/res/drawable-xxhdpi/appicon_patron_dark.png"/>
     </issue>
@@ -808,11 +808,11 @@
         id="IconDipSize"
         message="The image `appicon_patron_glow.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/appicon_patron_glow.png: 124x124 dp (186x186 px), drawable-mdpi/appicon_patron_glow.png: 124x124 dp (124x124 px), drawable-xhdpi/appicon_patron_glow.png: 187x187 dp (373x373 px), drawable-xxhdpi/appicon_patron_glow.png: 165x165 dp (496x496 px), drawable-xxxhdpi/appicon_patron_glow.png: 124x124 dp (496x496 px)">
         <location
+            file="src/main/res/drawable-hdpi/appicon_patron_glow.png"/>
+        <location
             file="src/main/res/drawable-xxxhdpi/appicon_patron_glow.png"/>
         <location
             file="src/main/res/drawable-mdpi/appicon_patron_glow.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/appicon_patron_glow.png"/>
         <location
             file="src/main/res/drawable-xxhdpi/appicon_patron_glow.png"/>
         <location

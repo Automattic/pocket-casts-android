@@ -15,7 +15,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="138"
+            line="148"
             column="31"/>
     </issue>
 
@@ -26,7 +26,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="177"
+            line="187"
             column="31"/>
     </issue>
 
@@ -37,7 +37,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="178"
+            line="188"
             column="38"/>
     </issue>
 
@@ -48,7 +48,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="184"
+            line="194"
             column="31"/>
     </issue>
 
@@ -59,7 +59,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="185"
+            line="195"
             column="38"/>
     </issue>
 
@@ -70,7 +70,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="200"
+            line="210"
             column="31"/>
     </issue>
 
@@ -81,7 +81,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="201"
+            line="211"
             column="38"/>
     </issue>
 
@@ -92,28 +92,6 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="207"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getColumnNames` of class `Companion` requires synthetic accessor"
-        errorLine1="            val podcastColumnNames = getColumnNames(database, &quot;podcasts&quot;)"
-        errorLine2="                                     ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="208"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `addMigration` of class `Companion` requires synthetic accessor"
-        errorLine1="        val MIGRATION_50_51 = addMigration(50, 51) { database ->"
-        errorLine2="                              ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
             line="217"
             column="31"/>
     </issue>
@@ -121,7 +99,7 @@
     <issue
         id="SyntheticAccessor"
         message="Access to `private` method `getColumnNames` of class `Companion` requires synthetic accessor"
-        errorLine1="            val episodeColumnNames = getColumnNames(database, &quot;episodes&quot;)"
+        errorLine1="            val podcastColumnNames = getColumnNames(database, &quot;podcasts&quot;)"
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
@@ -132,11 +110,33 @@
     <issue
         id="SyntheticAccessor"
         message="Access to `private` method `addMigration` of class `Companion` requires synthetic accessor"
+        errorLine1="        val MIGRATION_50_51 = addMigration(50, 51) { database ->"
+        errorLine2="                              ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
+            line="227"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getColumnNames` of class `Companion` requires synthetic accessor"
+        errorLine1="            val episodeColumnNames = getColumnNames(database, &quot;episodes&quot;)"
+        errorLine2="                                     ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
+            line="228"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `addMigration` of class `Companion` requires synthetic accessor"
         errorLine1="        val MIGRATION_51_52 = addMigration(51, 52) { database ->"
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="224"
+            line="234"
             column="31"/>
     </issue>
 
@@ -147,7 +147,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="225"
+            line="235"
             column="38"/>
     </issue>
 
@@ -158,7 +158,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="237"
+            line="247"
             column="31"/>
     </issue>
 
@@ -169,7 +169,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="238"
+            line="248"
             column="38"/>
     </issue>
 
@@ -180,7 +180,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="244"
+            line="254"
             column="31"/>
     </issue>
 
@@ -191,7 +191,7 @@
         errorLine2="                                      ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="245"
+            line="255"
             column="39"/>
     </issue>
 
@@ -202,7 +202,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="251"
+            line="261"
             column="31"/>
     </issue>
 
@@ -213,7 +213,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="252"
+            line="262"
             column="38"/>
     </issue>
 
@@ -224,7 +224,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="258"
+            line="268"
             column="31"/>
     </issue>
 
@@ -235,7 +235,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="259"
+            line="269"
             column="38"/>
     </issue>
 
@@ -246,7 +246,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="265"
+            line="275"
             column="31"/>
     </issue>
 
@@ -257,7 +257,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="266"
+            line="276"
             column="38"/>
     </issue>
 
@@ -268,7 +268,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="272"
+            line="282"
             column="31"/>
     </issue>
 
@@ -279,7 +279,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="273"
+            line="283"
             column="38"/>
     </issue>
 
@@ -290,7 +290,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="279"
+            line="289"
             column="31"/>
     </issue>
 
@@ -301,7 +301,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="285"
+            line="295"
             column="31"/>
     </issue>
 
@@ -312,7 +312,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="286"
+            line="296"
             column="38"/>
     </issue>
 
@@ -323,7 +323,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="292"
+            line="302"
             column="31"/>
     </issue>
 
@@ -334,7 +334,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="293"
+            line="303"
             column="38"/>
     </issue>
 
@@ -345,7 +345,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="299"
+            line="309"
             column="31"/>
     </issue>
 
@@ -356,7 +356,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="300"
+            line="310"
             column="38"/>
     </issue>
 
@@ -367,7 +367,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="306"
+            line="316"
             column="31"/>
     </issue>
 
@@ -378,7 +378,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="307"
+            line="317"
             column="38"/>
     </issue>
 
@@ -389,7 +389,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="313"
+            line="323"
             column="31"/>
     </issue>
 
@@ -400,7 +400,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="314"
+            line="324"
             column="37"/>
     </issue>
 
@@ -411,7 +411,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="326"
+            line="336"
             column="31"/>
     </issue>
 
@@ -422,7 +422,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="327"
+            line="337"
             column="38"/>
     </issue>
 
@@ -433,7 +433,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="333"
+            line="343"
             column="31"/>
     </issue>
 
@@ -444,7 +444,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="334"
+            line="344"
             column="38"/>
     </issue>
 
@@ -452,28 +452,6 @@
         id="SyntheticAccessor"
         message="Access to `private` method `addMigration` of class `Companion` requires synthetic accessor"
         errorLine1="        val MIGRATION_66_67 = addMigration(66, 67) { database ->"
-        errorLine2="                              ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="349"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getColumnNames` of class `Companion` requires synthetic accessor"
-        errorLine1="            val podcastColumnNames = getColumnNames(database, &quot;podcasts&quot;)"
-        errorLine2="                                     ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="350"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `addMigration` of class `Companion` requires synthetic accessor"
-        errorLine1="        val MIGRATION_67_68 = addMigration(67, 68) { database ->"
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
@@ -495,11 +473,33 @@
     <issue
         id="SyntheticAccessor"
         message="Access to `private` method `addMigration` of class `Companion` requires synthetic accessor"
+        errorLine1="        val MIGRATION_67_68 = addMigration(67, 68) { database ->"
+        errorLine2="                              ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
+            line="369"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `getColumnNames` of class `Companion` requires synthetic accessor"
+        errorLine1="            val podcastColumnNames = getColumnNames(database, &quot;podcasts&quot;)"
+        errorLine2="                                     ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
+            line="370"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="SyntheticAccessor"
+        message="Access to `private` method `addMigration` of class `Companion` requires synthetic accessor"
         errorLine1="        val MIGRATION_68_69 = addMigration(68, 69) { database ->"
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="366"
+            line="376"
             column="31"/>
     </issue>
 
@@ -510,7 +510,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="367"
+            line="377"
             column="37"/>
     </issue>
 
@@ -521,7 +521,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="373"
+            line="383"
             column="31"/>
     </issue>
 
@@ -532,7 +532,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="378"
+            line="388"
             column="31"/>
     </issue>
 
@@ -543,7 +543,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="379"
+            line="389"
             column="38"/>
     </issue>
 
@@ -554,7 +554,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="385"
+            line="395"
             column="31"/>
     </issue>
 
@@ -565,7 +565,7 @@
         errorLine2="                                     ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="401"
+            line="411"
             column="38"/>
     </issue>
 
@@ -576,7 +576,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="407"
+            line="417"
             column="31"/>
     </issue>
 
@@ -587,7 +587,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="420"
+            line="430"
             column="31"/>
     </issue>
 
@@ -598,7 +598,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="449"
+            line="459"
             column="31"/>
     </issue>
 
@@ -609,7 +609,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="462"
+            line="472"
             column="31"/>
     </issue>
 
@@ -620,7 +620,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="466"
+            line="476"
             column="31"/>
     </issue>
 
@@ -631,7 +631,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="488"
+            line="498"
             column="31"/>
     </issue>
 
@@ -642,7 +642,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="512"
+            line="522"
             column="31"/>
     </issue>
 
@@ -653,7 +653,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="521"
+            line="531"
             column="31"/>
     </issue>
 
@@ -664,7 +664,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="536"
+            line="546"
             column="31"/>
     </issue>
 
@@ -675,7 +675,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="575"
+            line="585"
             column="31"/>
     </issue>
 
@@ -686,7 +686,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="584"
+            line="594"
             column="31"/>
     </issue>
 
@@ -697,7 +697,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="617"
+            line="627"
             column="31"/>
     </issue>
 
@@ -708,7 +708,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="626"
+            line="636"
             column="31"/>
     </issue>
 
@@ -719,7 +719,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="641"
+            line="651"
             column="31"/>
     </issue>
 
@@ -730,7 +730,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="650"
+            line="660"
             column="31"/>
     </issue>
 
@@ -741,7 +741,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="665"
+            line="675"
             column="31"/>
     </issue>
 
@@ -752,7 +752,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="680"
+            line="690"
             column="31"/>
     </issue>
 
@@ -763,7 +763,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="697"
+            line="707"
             column="31"/>
     </issue>
 
@@ -774,7 +774,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="707"
+            line="717"
             column="31"/>
     </issue>
 
@@ -785,7 +785,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="716"
+            line="726"
             column="31"/>
     </issue>
 
@@ -796,7 +796,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/models/db/AppDatabase.kt"
-            line="727"
+            line="737"
             column="31"/>
     </issue>
 

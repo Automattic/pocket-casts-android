@@ -26,7 +26,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="555"
+            line="558"
             column="13"/>
     </issue>
 
@@ -37,7 +37,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="645"
+            line="648"
             column="13"/>
     </issue>
 
@@ -311,7 +311,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="516"
+            line="519"
             column="17"/>
     </issue>
 
@@ -619,7 +619,7 @@
         errorLine2="                                                                            ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
-            line="218"
+            line="222"
             column="77"/>
     </issue>
 
@@ -630,7 +630,7 @@
         errorLine2="                                                                                  ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
-            line="221"
+            line="225"
             column="83"/>
     </issue>
 
@@ -641,7 +641,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
-            line="937"
+            line="941"
             column="68"/>
     </issue>
 
@@ -652,7 +652,7 @@
         errorLine2="                                                                                                                ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
-            line="937"
+            line="941"
             column="113"/>
     </issue>
 
@@ -663,7 +663,7 @@
         errorLine2="                                                                ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
-            line="1123"
+            line="1140"
             column="65"/>
     </issue>
 
@@ -674,7 +674,7 @@
         errorLine2="                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/PodcastSyncProcess.kt"
-            line="1131"
+            line="1148"
             column="66"/>
     </issue>
 
@@ -696,7 +696,7 @@
         errorLine2="                                                                              ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="489"
+            line="492"
             column="79"/>
     </issue>
 

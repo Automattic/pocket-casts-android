@@ -1379,7 +1379,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1669"
+            line="1671"
             column="5"/>
     </issue>
 
@@ -1390,7 +1390,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1670"
+            line="1672"
             column="5"/>
     </issue>
 
@@ -1401,7 +1401,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1674"
+            line="1676"
             column="5"/>
     </issue>
 
@@ -1412,7 +1412,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1676"
+            line="1678"
             column="5"/>
     </issue>
 
@@ -1423,7 +1423,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1677"
+            line="1679"
             column="5"/>
     </issue>
 
@@ -1434,7 +1434,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1681"
+            line="1683"
             column="5"/>
     </issue>
 
@@ -1445,7 +1445,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1685"
+            line="1687"
             column="5"/>
     </issue>
 
@@ -1456,7 +1456,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1738"
+            line="1740"
             column="5"/>
     </issue>
 
@@ -1467,7 +1467,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1849"
+            line="1851"
             column="5"/>
     </issue>
 
@@ -1478,7 +1478,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1853"
+            line="1855"
             column="5"/>
     </issue>
 
@@ -1489,7 +1489,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1855"
+            line="1857"
             column="5"/>
     </issue>
 
@@ -1909,7 +1909,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1866"
+            line="1868"
             column="5"
             message="Duplicates value in `change_title`"/>
     </issue>
@@ -2344,7 +2344,7 @@
             message="Duplicates value in `create_account` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1769"
+            line="1771"
             column="5"
             message="Duplicates value in `create_account`"/>
     </issue>
@@ -2584,7 +2584,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1751"
+            line="1753"
             column="5"
             message="Duplicates value in `log_in`"/>
     </issue>
@@ -2930,7 +2930,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1610"
+            line="1612"
             column="5"
             message="Duplicates value in `play_episode` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -4796,7 +4796,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1449"
+            line="1451"
             column="5"
             message="Duplicates value in `support`"/>
     </issue>
@@ -5009,7 +5009,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1914"
+            line="1916"
             column="5"
             message="Duplicates value in `widget_preview_episode_title` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -7191,7 +7191,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1535"
+            line="1537"
             column="5"
             message="Duplicates value in `search_show_all` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -8976,7 +8976,7 @@
             message="Duplicates value in `player_up_next_clear_queue_button`"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1919"
+            line="1921"
             column="5"
             message="Duplicates value in `player_up_next_clear_queue_button`"/>
     </issue>
@@ -11552,7 +11552,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1935"
+            line="1937"
             column="5"
             message="Duplicates value in `podcasts_sort_by_date_added` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -16537,7 +16537,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1955"
+            line="1957"
             column="5"
             message="Duplicates value in `filters_title_new_releases`"/>
     </issue>
@@ -16840,7 +16840,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1920"
+            line="1922"
             column="5"
             message="Duplicates value in `profile_clear_all` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -18588,12 +18588,12 @@
             message="Duplicates value in `profile_create_privacy_policy_title`"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1470"
+            line="1472"
             column="5"
             message="Duplicates value in `profile_create_privacy_policy_title`"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1800"
+            line="1802"
             column="5"
             message="Duplicates value in `profile_create_privacy_policy_title` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -24007,7 +24007,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1495"
+            line="1497"
             column="5"
             message="Duplicates value in `profile_upgrade_to_patron`"/>
     </issue>
@@ -25207,7 +25207,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1794"
+            line="1796"
             column="5"
             message="Duplicates value in `plus_themes_icons_body` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -30557,7 +30557,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1606"
+            line="1608"
             column="5"
             message="Duplicates value in `settings_auto_up_next_top`"/>
     </issue>
@@ -33481,11 +33481,11 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1532"
+            line="1534"
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1612"
+            line="1614"
             column="5"
             message="Duplicates value in `discover_row_sponsored` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -34066,11 +34066,11 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1655"
+            line="1657"
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1750"
+            line="1752"
             column="5"
             message="Duplicates value in `end_of_year_launch_modal_secondary_button_title` (case varies, but you can use `android:inputType` or `android:capitalize` in the presentation)"/>
     </issue>
@@ -38788,7 +38788,7 @@
         errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1452"
+            line="1454"
             column="48"/>
     </issue>
 
@@ -38799,7 +38799,7 @@
         errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1455"
+            line="1457"
             column="62"/>
     </issue>
 
@@ -38975,7 +38975,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1512"
+            line="1514"
             column="45"/>
     </issue>
 
@@ -39140,7 +39140,7 @@
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1625"
+            line="1627"
             column="58"/>
     </issue>
 
@@ -39151,7 +39151,7 @@
         errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1630"
+            line="1632"
             column="46"/>
     </issue>
 
@@ -39184,7 +39184,7 @@
         errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1637"
+            line="1639"
             column="54"/>
     </issue>
 
@@ -39228,7 +39228,7 @@
         errorLine2="                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1699"
+            line="1701"
             column="63"/>
     </issue>
 
@@ -39239,7 +39239,7 @@
         errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1808"
+            line="1810"
             column="57"/>
     </issue>
 
@@ -39250,7 +39250,7 @@
         errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1809"
+            line="1811"
             column="62"/>
     </issue>
 
@@ -39261,7 +39261,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1870"
+            line="1872"
             column="55"/>
     </issue>
 
@@ -39272,7 +39272,7 @@
         errorLine2="                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1908"
+            line="1910"
             column="51"/>
     </issue>
 
@@ -39283,7 +39283,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1910"
+            line="1912"
             column="43"/>
     </issue>
 
@@ -39294,7 +39294,7 @@
         errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1913"
+            line="1915"
             column="43"/>
     </issue>
 
@@ -39305,7 +39305,7 @@
         errorLine2="                              ~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1918"
+            line="1920"
             column="31"/>
     </issue>
 
@@ -39316,7 +39316,7 @@
         errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1941"
+            line="1943"
             column="42"/>
     </issue>
 
@@ -39327,7 +39327,7 @@
         errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1944"
+            line="1946"
             column="59"/>
     </issue>
 

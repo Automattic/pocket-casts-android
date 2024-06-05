@@ -425,7 +425,7 @@
         errorLine2="                                                                   ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/HelpFragment.kt"
-            line="171"
+            line="186"
             column="68"/>
     </issue>
 
@@ -436,7 +436,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/HelpFragment.kt"
-            line="173"
+            line="188"
             column="21"/>
     </issue>
 

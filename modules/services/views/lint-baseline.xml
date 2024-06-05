@@ -442,23 +442,12 @@
 
     <issue
         id="SyntheticAccessor"
-        message="Access to `private` method `sendIntentFile` of class `OpmlExporter` requires synthetic accessor"
-        errorLine1="                                    sendIntentFile(opmlFile)"
-        errorLine2="                                    ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/OpmlExporter.kt"
-            line="128"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
         message="Access to `private` method `trackFailure` of class `OpmlExporter` requires synthetic accessor"
         errorLine1="                            trackFailure(reason = &quot;unknown&quot;)"
         errorLine2="                            ~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/OpmlExporter.kt"
-            line="132"
+            line="138"
             column="29"/>
     </issue>
 
