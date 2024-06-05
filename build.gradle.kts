@@ -40,9 +40,9 @@ measureBuilds {
         SlowSlowTasksMetricsReporter.report(report)
         runBlocking {
             InternalA8cCiReporter.report(
-                report,
+                metricsReport = report,
                 projectName = "pocketcasts",
-                project.extra.get("appsMetricsToken").toString(),
+                authToken = project.extra.get("appsMetricsToken").toString(),
             )
         }
     }
