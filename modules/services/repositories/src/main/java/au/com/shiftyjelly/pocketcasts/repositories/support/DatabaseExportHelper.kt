@@ -29,7 +29,6 @@ class DatabaseExportHelper @Inject constructor(
     suspend fun getExportFile(
         exportFolderFile: File = File(context.filesDir, EXPORT_FOLDER_NAME),
     ): File? = withContext(Dispatchers.IO) {
-
         val exportFolder = prepareExportFolder(exportFolderFile) ?: return@withContext null
 
         try {
