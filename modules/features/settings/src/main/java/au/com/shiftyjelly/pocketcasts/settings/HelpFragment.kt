@@ -139,6 +139,10 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
                 true
             }
 
+            R.id.menu_export_database -> {
+                true
+            }
+
             else -> false
         }
 
