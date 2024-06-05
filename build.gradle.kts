@@ -38,13 +38,11 @@ measureBuilds {
     onBuildMetricsReadyListener {
         val report = this@onBuildMetricsReadyListener
         SlowSlowTasksMetricsReporter.report(report)
-        runBlocking {
-            InternalA8cCiReporter.report(
-                metricsReport = report,
-                projectName = "pocketcasts",
-                authToken = project.extra.get("appsMetricsToken").toString(),
-            )
-        }
+        InternalA8cCiReporter.reportBlocking(
+            metricsReport = report,
+            projectName = "pocketcasts",
+            authToken = project.extra.get("appsMetricsToken").toString(),
+        )
     }
     attachGradleScanId = false
 }
