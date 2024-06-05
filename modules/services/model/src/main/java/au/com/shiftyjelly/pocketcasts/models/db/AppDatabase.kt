@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import java.io.File
 import java.util.Arrays
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -118,6 +119,15 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastRatingsDao(): PodcastRatingsDao
     abstract fun bookmarkDao(): BookmarkDao
     abstract fun chapterDao(): ChapterDao
+
+    fun databaseFiles() =
+        openHelper.readableDatabase.path?.let {
+            listOf(
+                File(it),
+                File("$it-wal"),
+                File("$it-shm"),
+            )
+        }
 
     companion object {
         // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
