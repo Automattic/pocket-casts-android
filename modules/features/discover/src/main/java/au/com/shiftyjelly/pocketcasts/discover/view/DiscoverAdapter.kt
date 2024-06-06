@@ -119,7 +119,7 @@ internal class DiscoverAdapter(
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
-        fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?)
+        fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean = false)
         fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?)
         fun onPodcastListClicked(list: NetworkLoadableList)
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
