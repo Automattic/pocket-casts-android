@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -56,6 +57,7 @@ class ChaptersViewModelTest {
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
+    private val tracker = mock<AnalyticsTrackerWrapper>()
     private val settings = mock<Settings>()
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
@@ -91,6 +93,8 @@ class ChaptersViewModelTest {
         val userSetting = mock<UserSetting<SubscriptionStatus?>>()
         whenever(userSetting.flow).thenReturn(subscriptionStatusFlow)
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
+        whenever(tracker.getSendUsageStats()).thenReturn(false)
+
         FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
 
         chaptersViewModel = ChaptersViewModel(
@@ -99,6 +103,7 @@ class ChaptersViewModelTest {
             playbackManager,
             episodeManager,
             settings,
+            tracker,
             testDispatcher,
         )
     }
@@ -260,6 +265,7 @@ class ChaptersViewModelTest {
             playbackManager,
             episodeManager,
             settings,
+            tracker,
             testDispatcher,
         )
 
