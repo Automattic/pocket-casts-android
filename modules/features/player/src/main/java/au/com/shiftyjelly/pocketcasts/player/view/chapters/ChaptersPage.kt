@@ -8,12 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -29,21 +26,21 @@ fun ChaptersPage(
     onSkipChaptersClick: (Boolean) -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
-    backgroundColor: Color,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         state = lazyListState,
         modifier = modifier
-            .background(backgroundColor)
+            .background(LocalChaptersTheme.current.background)
             .fillMaxSize()
             .padding(top = if (showHeader) 0.dp else 16.dp),
     ) {
+        val selectedCount = chapters.count { it.chapter.selected }
         if (showHeader) {
             item {
                 ChaptersHeader(
                     totalChaptersCount = totalChaptersCount,
-                    hiddenChaptersCount = totalChaptersCount - chapters.filter { it.chapter.selected }.size,
+                    hiddenChaptersCount = totalChaptersCount - selectedCount,
                     onSkipChaptersClick = onSkipChaptersClick,
                     isTogglingChapters = isTogglingChapters,
                     showSubscriptionIcon = showSubscriptionIcon,
@@ -54,6 +51,7 @@ fun ChaptersPage(
             ChapterRow(
                 state = state,
                 isTogglingChapters = isTogglingChapters,
+                selectedCount = selectedCount,
                 onSelectionChange = onSelectionChange,
                 onClick = { onChapterClick(state.chapter, state is ChaptersViewModel.ChapterState.Playing) },
                 onUrlClick = { onUrlClick(state.chapter.url.toString()) },
@@ -61,7 +59,7 @@ fun ChaptersPage(
             )
             if (index < chapters.lastIndex) {
                 Divider(
-                    color = MaterialTheme.theme.colors.playerContrast06,
+                    color = LocalChaptersTheme.current.divider,
                     thickness = 1.dp,
                     modifier = Modifier.padding(horizontal = 20.dp),
                 )
