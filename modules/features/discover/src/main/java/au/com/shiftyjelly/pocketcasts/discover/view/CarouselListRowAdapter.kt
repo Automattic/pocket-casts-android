@@ -53,6 +53,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
 
             holder.setTaglineText(tagLineText)
             holder.itemView.setOnClickListener {
+                val isFeatured = podcast.isSponsored || podcast.listId == null
                 onPodcastClicked(podcast, podcast.listId) // no analytics for carousel
 
                 if (podcast.listId != null) {
@@ -62,7 +63,8 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                         AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
                         AnalyticsProp.sponsoredPodcastTapped(listId, podcast.uuid),
                     )
-                } else {
+                }
+                if (isFeatured) {
                     FirebaseAnalyticsTracker.openedFeaturedPodcast()
                     analyticsTracker.track(
                         AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED,
