@@ -16,8 +16,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.jakewharton.rxrelay2.BehaviorRelay
 import java.util.Date
@@ -33,8 +31,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -88,57 +84,6 @@ class ChaptersViewModelTest {
             Chapter("2", 101.milliseconds, 200.milliseconds, selected = false),
         ),
     )
-
-    @Test
-    fun `given unselected chapter contains playback pos, then skip to next selected chapter`() = runTest {
-        val chapters = initChapters()
-        initViewModel()
-
-        chaptersViewModel.buildChaptersWithState(chapters, 150)
-
-        verify(playbackManager).skipToNextSelectedOrLastChapter()
-    }
-
-    @Test
-    fun `given selected chapter contains playback pos, then do not skip to next selected chapter`() = runTest {
-        val chapters = initChapters()
-        initViewModel()
-
-        chaptersViewModel.buildChaptersWithState(chapters, 50)
-
-        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
-    }
-
-    @Test
-    fun `given user seeking playback pos, then do not skip to next selected chapter`() = runTest {
-        val chapters = initChapters()
-        initViewModel()
-
-        chaptersViewModel.buildChaptersWithState(chapters, 150, lastChangeFrom = PlaybackManager.LastChangeFrom.OnUserSeeking.value)
-
-        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
-    }
-
-    @Test
-    fun `given seek complete, then do not skip to next selected chapter`() = runTest {
-        val chapters = initChapters()
-        initViewModel()
-
-        chaptersViewModel.buildChaptersWithState(chapters, 150, lastChangeFrom = PlaybackManager.LastChangeFrom.OnSeekComplete.value)
-
-        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
-    }
-
-    @Test
-    fun `given feature flag off, then chapter is not skipped`() = runTest {
-        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
-        val chapters = initChapters()
-        initViewModel()
-
-        chaptersViewModel.buildChaptersWithState(chapters, 150)
-
-        verify(playbackManager, never()).skipToNextSelectedOrLastChapter()
-    }
 
     @Test
     fun `given user not entitled to feature, when user taps skip chapters, then upsell starts`() = runTest {

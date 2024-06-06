@@ -94,9 +94,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
@@ -1565,10 +1567,23 @@ open class PlaybackManager @Inject constructor(
             .launchIn(this)
     }
 
+    @Volatile
+    private var observeChaptersSkipping: Job? = null
+
     private fun onChaptersAvailable(chapters: Chapters) {
         playbackStateRelay.blockingFirst().let { playbackState ->
             playbackStateRelay.accept(playbackState.copy(chapters = chapters))
         }
+        observeChaptersSkipping?.cancel()
+        observeChaptersSkipping = playbackStateRelay.asFlow()
+            .map { it.positionMs.milliseconds }
+            .onEach { position ->
+                val currentChapter = chapters.getList().firstOrNull { position in it }
+                if (currentChapter?.selected == false) {
+                    skipToNextSelectedOrLastChapter()
+                }
+            }
+            .launchIn(this)
     }
 
     override fun onFocusGain(shouldResume: Boolean) {

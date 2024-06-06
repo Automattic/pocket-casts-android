@@ -59,7 +59,6 @@ class ChaptersViewModel @Inject constructor(
         val canSkipChapters: Boolean = false,
         val podcast: Podcast? = null,
         val episodeUuid: String? = null,
-        val isSkippingToNextChapter: Boolean = false,
         val showHeader: Boolean = false,
     ) {
         val showSubscriptionIcon
@@ -129,7 +128,6 @@ class ChaptersViewModel @Inject constructor(
         val chapters = buildChaptersWithState(
             chapters = playbackState.chapters,
             playbackPositionMs = playbackState.positionMs,
-            lastChangeFrom = playbackState.lastChangeFrom,
         )
         val currentUserTier = (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.tier?.toUserTier() ?: UserTier.Free
         val lastUserTier = _uiState.value.userTier
@@ -149,7 +147,6 @@ class ChaptersViewModel @Inject constructor(
             canSkipChapters = canSkipChapters,
             podcast = playbackState.podcast,
             episodeUuid = playbackState.episodeUuid,
-            isSkippingToNextChapter = _uiState.value.isSkippingToNextChapter,
             showHeader = (playbackManager.getCurrentEpisode()?.let { it is PodcastEpisode } ?: false) &&
                 FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS),
         )
@@ -159,7 +156,6 @@ class ChaptersViewModel @Inject constructor(
     fun buildChaptersWithState(
         chapters: Chapters,
         playbackPositionMs: Int,
-        lastChangeFrom: String? = null,
     ): List<ChapterState> {
         val chapterStates = mutableListOf<ChapterState>()
         var currentChapter: Chapter? = null
@@ -171,20 +167,9 @@ class ChaptersViewModel @Inject constructor(
                 if (chapter.selected || !FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
                     // the chapter currently playing
                     currentChapter = chapter
-                    _uiState.value = _uiState.value.copy(isSkippingToNextChapter = false)
                     val progress = chapter.calculateProgress(playbackPositionMs.milliseconds)
                     ChapterState.Playing(chapter = chapter, progress = progress)
                 } else {
-                    if (!listOf(
-                            PlaybackManager.LastChangeFrom.OnUserSeeking.value,
-                            PlaybackManager.LastChangeFrom.OnSeekComplete.value,
-                        ).contains(lastChangeFrom)
-                    ) {
-                        if (!_uiState.value.isSkippingToNextChapter) {
-                            _uiState.value = _uiState.value.copy(isSkippingToNextChapter = true)
-                            playbackManager.skipToNextSelectedOrLastChapter()
-                        }
-                    }
                     ChapterState.NotPlayed(chapter)
                 }
             } else {
