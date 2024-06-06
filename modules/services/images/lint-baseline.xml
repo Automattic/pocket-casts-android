@@ -741,13 +741,6 @@
     </issue>
 
     <issue
-        id="ConvertToWebp"
-        message="One or more images in this project can be converted to the WebP format which typically results in smaller file sizes, even for lossless conversion">
-        <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
-    </issue>
-
-    <issue
         id="IconLauncherShape"
         message="Launcher icon used as round icon did not have a circular shape">
         <location
