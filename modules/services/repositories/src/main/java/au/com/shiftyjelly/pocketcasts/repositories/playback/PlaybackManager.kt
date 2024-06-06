@@ -987,45 +987,6 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun toggleChapter(select: Boolean, chapter: Chapter) {
-        launch {
-            getCurrentEpisode()?.let { episode ->
-                when (episode) {
-                    is PodcastEpisode -> {
-                        if (select) {
-                            episodeManager.selectChapterIndexForEpisode(chapter.index, episode)
-                        } else {
-                            episodeManager.deselectChapterIndexForEpisode(chapter.index, episode)
-                        }
-                    }
-                    is UserEpisode -> {
-                        if (select) {
-                            userEpisodeManager.selectChapterIndexForEpisode(chapter.index, episode)
-                        } else {
-                            userEpisodeManager.deselectChapterIndexForEpisode(chapter.index, episode)
-                        }
-                    }
-                }
-            }
-            playbackStateRelay.blockingFirst().let { playbackState ->
-                val updatedItems = playbackState.chapters.getList().map {
-                    if (it.index == chapter.index) {
-                        it.copy(selected = select)
-                    } else {
-                        it
-                    }
-                }
-
-                playbackStateRelay.accept(
-                    playbackState.copy(
-                        chapters = playbackState.chapters.copy(items = updatedItems),
-                        lastChangeFrom = LastChangeFrom.OnChapterSelectionToggled.value,
-                    ),
-                )
-            }
-        }
-    }
-
     fun clearUpNextAsync() {
         launch {
             upNextQueue.clearUpNext()

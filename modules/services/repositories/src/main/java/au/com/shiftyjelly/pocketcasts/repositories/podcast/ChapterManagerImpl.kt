@@ -23,6 +23,10 @@ class ChapterManagerImpl @Inject constructor(
         chapterDao.replaceAllChapters(episodeUuid, chapters)
     }
 
+    override suspend fun selectChapter(episodeUuid: String, chapterIndex: Int, select: Boolean) {
+        chapterDao.selectChapter(episodeUuid, chapterIndex, select)
+    }
+
     override fun observerChaptersForEpisode(episodeUuid: String) = combine(
         episodeManager.observeEpisodeByUuid(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
         chapterDao.observerChaptersForEpisode(episodeUuid),

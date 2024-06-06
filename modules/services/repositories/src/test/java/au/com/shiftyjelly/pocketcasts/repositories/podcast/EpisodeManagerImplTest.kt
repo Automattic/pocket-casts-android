@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
-import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.util.Date
@@ -20,7 +19,6 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturnConsecutively
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
@@ -55,33 +53,6 @@ class EpisodeManagerImplTest {
             ioDispatcher = mock(),
             episodeAnalytics = mock(),
         )
-    }
-
-    @Test
-    fun `select chapter removes element`() = runTest {
-        whenever(episode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
-
-        episodeManagerImpl.selectChapterIndexForEpisode(1, episode)
-
-        verify(episode).deselectedChapters = ChapterIndices(listOf(2, 3))
-    }
-
-    @Test
-    fun `deselect chapter adds element`() = runTest {
-        whenever(episode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2)))
-
-        episodeManagerImpl.deselectChapterIndexForEpisode(3, episode)
-
-        verify(episode).deselectedChapters = ChapterIndices(listOf(1, 2, 3))
-    }
-
-    @Test
-    fun `deselect chapter is not added twice`() = runTest {
-        whenever(episode.deselectedChapters).thenReturn(ChapterIndices(listOf(1, 2, 3)))
-
-        episodeManagerImpl.deselectChapterIndexForEpisode(3, episode)
-
-        verify(episodeDao, never()).update(any())
     }
 
     @Test
