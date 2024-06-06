@@ -1,5 +1,9 @@
 7.66
 -----
+
+*   New Features
+    *   Adds an option to export the database and preferences from the Help & Feedback view
+        ([#2309](https://github.com/Automattic/pocket-casts-android/pull/2309))
 *   Bug Fixes
     *   Fix: Search Term Persists When Navigating to Different Podcast Page
         ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
