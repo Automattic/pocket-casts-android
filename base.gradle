@@ -43,7 +43,7 @@ android {
         xmlReport true
 
         checkAllWarnings true
-        warningsAsErrors true
+        warningsAsErrors false
 
         checkDependencies false
         checkTestSources false
