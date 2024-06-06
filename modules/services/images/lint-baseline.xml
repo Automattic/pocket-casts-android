@@ -752,6 +752,8 @@
         message="One or more images in this project can be converted to the WebP format which typically results in smaller file sizes, even for lossless conversion">
         <location
             file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
+        <location
+            file="src/main/res/drawable-xxhdpi/appicon_patron_dark.png"/>
     </issue>
 
     <issue
