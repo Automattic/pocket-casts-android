@@ -10,7 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.core.net.toUri
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
@@ -71,6 +74,7 @@ class ChaptersFragment : BaseFragment() {
                         onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
                         onSelectionChange = viewModel::selectChapter,
                         onUrlClick = ::openChapterUrl,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
 
                     LaunchedEffect(Unit) {
