@@ -73,6 +73,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                 }
             }
             holder.btnSubscribe.setOnClickListener {
+                val isFeatured = podcast.isSponsored || podcast.listId == null
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
                 onPodcastSubscribe(podcast, null) // no analytics for carousel
 
@@ -83,7 +84,8 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                         AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
                         AnalyticsProp.sponsoredPodcastSubscribed(listId, podcast.uuid),
                     )
-                } else {
+                }
+                if (isFeatured) {
                     FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, AnalyticsProp.featuredPodcastSubscribed(podcast.uuid))
                 }
