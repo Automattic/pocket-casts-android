@@ -81,7 +81,6 @@ Language: ja_JP
     <string name="whats_new_got_it_button">OK</string>
     <string name="skip_chapters_patron_prompt">Pocket Casts Patron でチャプターの事前選択やその他の機能を利用</string>
     <string name="skip_chapters_plus_prompt">Pocket Casts Plus でチャプターの事前選択やその他の機能を利用</string>
-    <string name="select_one_chapter_message">チャプターを少なくとも1つ選択してください</string>
     <string name="number_of_chapters_summary_singular">1個のチャプター • %d個が非表示</string>
     <string name="number_of_chapters_summary_plural">%1$d個のチャプター • %2$d個が非表示</string>
     <string name="single_chapter">1個のチャプター</string>

@@ -81,7 +81,6 @@ Language: zh_TW
     <string name="whats_new_got_it_button">知道了</string>
     <string name="skip_chapters_patron_prompt">訂閱 Pocket Casts Patron，就能預先選取章節並享有更多功能</string>
     <string name="skip_chapters_plus_prompt">訂閱 Pocket Casts Plus，就能預先選取章節並享有更多功能</string>
-    <string name="select_one_chapter_message">請選取至少一章</string>
     <string name="number_of_chapters_summary_singular">1 個章節 • %d 個章節已隱藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 個章節 • %2$d 個章節已隱藏</string>
     <string name="single_chapter">1 個章節</string>

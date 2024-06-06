@@ -18,6 +18,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -25,6 +27,9 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersFragment
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Episode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment.EpisodeFragmentArgs
@@ -37,7 +42,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlin.time.Duration
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -132,6 +139,13 @@ class EpisodeContainerFragment :
 
     private val viewModel: EpisodeContainerFragmentViewModel by viewModels()
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
+    private val chaptersViewModel by viewModels<ChaptersViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<ChaptersViewModel.Factory> { factory ->
+                factory.create(Episode(episodeUUID))
+            }
+        },
+    )
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (!forceDarkTheme || theme.isDarkTheme) {
@@ -221,12 +235,20 @@ class EpisodeContainerFragment :
                 super.onPageSelected(position)
                 btnFav.isVisible = adapter.isDetailsTab(position)
                 btnShare.isVisible = adapter.isDetailsTab(position)
-                viewModel.onPageSelected(position)
+                viewModel.onPageSelected(adapter.pageKey(position))
             }
         })
 
         if (episodeViewSource == EpisodeViewSource.NOTIFICATION_BOOKMARK) {
             openBookmarks()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                chaptersViewModel.uiState.collect {
+                    adapter.update(addChapters = it.chaptersCount > 0)
+                }
+            }
         }
     }
 
@@ -274,14 +296,35 @@ class EpisodeContainerFragment :
         val indexOfBookmarks: Int
             get() = sections.indexOf(Section.Bookmarks)
 
-        private sealed class Section(@StringRes val titleRes: Int) {
-            data object Details : Section(LR.string.details)
-            data object Bookmarks : Section(LR.string.bookmarks)
+        private sealed class Section(@StringRes val titleRes: Int, val analyticsValue: String) {
+            data object Details : Section(LR.string.details, "details")
+            data object Chapters : Section(LR.string.chapters, "chapters")
+            data object Bookmarks : Section(LR.string.bookmarks, "bookmarks")
         }
 
-        private var sections = mutableListOf<Section>(Section.Details).apply {
-            add(Section.Bookmarks)
-        }.toList()
+        private var sections = listOf(
+            Section.Details,
+            Section.Bookmarks,
+        )
+
+        fun update(addChapters: Boolean) {
+            val currentSections = sections
+            val newSections = buildList {
+                add(Section.Details)
+                if (addChapters) {
+                    add(Section.Chapters)
+                }
+                add(Section.Bookmarks)
+            }
+            if (currentSections != newSections) {
+                sections = newSections
+                if (addChapters) {
+                    notifyItemInserted(1)
+                } else {
+                    notifyItemRemoved(1)
+                }
+            }
+        }
 
         override fun getItemId(position: Int): Long {
             return sections[position].hashCode().toLong()
@@ -307,11 +350,13 @@ class EpisodeContainerFragment :
                     fromListUuid = fromListUuid,
                     forceDark = forceDarkTheme,
                 )
-
                 Section.Bookmarks -> BookmarksFragment.newInstance(
                     sourceView = SourceView.EPISODE_DETAILS,
                     episodeUuid = requireNotNull(episodeUUID),
                     forceDarkTheme = forceDarkTheme,
+                )
+                Section.Chapters -> ChaptersFragment.forEpisode(
+                    episodeUuid = requireNotNull(episodeUUID),
                 )
             }
         }
@@ -320,6 +365,8 @@ class EpisodeContainerFragment :
         fun pageTitle(position: Int): Int {
             return sections[position].titleRes
         }
+
+        fun pageKey(position: Int) = sections[position].analyticsValue
 
         fun isDetailsTab(position: Int) = sections[position] is Section.Details
     }

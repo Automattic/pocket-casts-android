@@ -92,6 +92,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -190,6 +191,7 @@ open class PlaybackManager @Inject constructor(
     val playbackStateLive: LiveData<PlaybackState> = playbackStateRelay
         .toFlowable(BackpressureStrategy.LATEST)
         .toLiveData()
+    val playbackStateFlow: Flow<PlaybackState> = playbackStateRelay.asFlow()
 
     private var updateCount = 0
     private var resettingPlayer = false

@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
-        errorLine1="        return if (hours > 0) String.format(hoursFormat, hours, min - hours * 60, sec) else String.format(noHoursFormat, min, sec)"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/localization/helper/TimeHelper.kt"
-            line="162"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
-        errorLine1="        return if (hours > 0) String.format(hoursFormat, hours, min - hours * 60, sec) else String.format(noHoursFormat, min, sec)"
-        errorLine2="                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/localization/helper/TimeHelper.kt"
-            line="162"
-            column="93"/>
-    </issue>
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
     <issue
         id="MissingDefaultResource"
@@ -52,7 +30,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr-rCA/strings.xml"
-            line="69"
+            line="68"
             column="5"/>
     </issue>
 
@@ -63,7 +41,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="69"
+            line="68"
             column="5"/>
     </issue>
 
@@ -74,7 +52,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="69"
+            line="68"
             column="5"/>
     </issue>
 
@@ -85,7 +63,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es-rMX/strings.xml"
-            line="1674"
+            line="1673"
             column="5"/>
     </issue>
 
@@ -96,7 +74,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="1674"
+            line="1673"
             column="5"/>
     </issue>
 
@@ -107,7 +85,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr-rCA/strings.xml"
-            line="1674"
+            line="1673"
             column="5"/>
     </issue>
 
@@ -118,7 +96,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="1674"
+            line="1673"
             column="5"/>
     </issue>
 
@@ -129,7 +107,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="1674"
+            line="1673"
             column="5"/>
     </issue>
 
@@ -140,7 +118,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt-rBR/strings.xml"
-            line="1674"
+            line="1673"
             column="5"/>
     </issue>
 
@@ -151,7 +129,7 @@
         errorLine2="                                                              ^">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="335"
+            line="334"
             column="63"/>
     </issue>
 
@@ -162,7 +140,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/res/values-es-rMX/strings.xml"
-            line="1581"
+            line="1580"
             column="35"/>
     </issue>
 
@@ -173,7 +151,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="1581"
+            line="1580"
             column="35"/>
     </issue>
 
@@ -657,7 +635,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="402"
+            line="401"
             column="5"/>
     </issue>
 
@@ -668,7 +646,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="426"
+            line="425"
             column="5"/>
     </issue>
 
@@ -690,7 +668,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="446"
+            line="445"
             column="5"/>
     </issue>
 
@@ -712,7 +690,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="477"
+            line="476"
             column="5"/>
     </issue>
 
@@ -723,7 +701,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="500"
+            line="499"
             column="5"/>
     </issue>
 
@@ -734,7 +712,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="501"
+            line="500"
             column="5"/>
     </issue>
 
@@ -745,7 +723,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="503"
+            line="502"
             column="5"/>
     </issue>
 
@@ -756,7 +734,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="530"
+            line="529"
             column="5"/>
     </issue>
 
@@ -767,7 +745,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="545"
+            line="544"
             column="5"/>
     </issue>
 
@@ -778,7 +756,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="564"
+            line="563"
             column="5"/>
     </issue>
 
@@ -789,7 +767,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="587"
+            line="586"
             column="5"/>
     </issue>
 
@@ -800,7 +778,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="622"
+            line="621"
             column="5"/>
     </issue>
 
@@ -811,7 +789,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="650"
+            line="649"
             column="5"/>
     </issue>
 
@@ -822,7 +800,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="674"
+            line="673"
             column="5"/>
     </issue>
 
@@ -833,7 +811,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="715"
+            line="714"
             column="5"/>
     </issue>
 
@@ -855,7 +833,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="780"
+            line="779"
             column="5"/>
     </issue>
 
@@ -866,7 +844,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="782"
+            line="781"
             column="5"/>
     </issue>
 
@@ -932,7 +910,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1172"
+            line="1171"
             column="5"/>
     </issue>
 
@@ -943,7 +921,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1179"
+            line="1178"
             column="5"/>
     </issue>
 
@@ -965,7 +943,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1183"
+            line="1182"
             column="5"/>
     </issue>
 
@@ -987,7 +965,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1241"
+            line="1240"
             column="5"/>
     </issue>
 
@@ -1031,7 +1009,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1276"
+            line="1275"
             column="5"/>
     </issue>
 
@@ -1394,7 +1372,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1671"
+            line="1668"
             column="5"/>
     </issue>
 
@@ -1405,7 +1383,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1672"
+            line="1669"
             column="5"/>
     </issue>
 
@@ -1416,7 +1394,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1676"
+            line="1673"
             column="5"/>
     </issue>
 
@@ -1427,7 +1405,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1678"
+            line="1675"
             column="5"/>
     </issue>
 
@@ -1438,7 +1416,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1679"
+            line="1676"
             column="5"/>
     </issue>
 
@@ -1449,7 +1427,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1683"
+            line="1680"
             column="5"/>
     </issue>
 
@@ -1460,7 +1438,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1687"
+            line="1684"
             column="5"/>
     </issue>
 
@@ -1471,7 +1449,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1740"
+            line="1737"
             column="5"/>
     </issue>
 
@@ -1482,7 +1460,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1851"
+            line="1848"
             column="5"/>
     </issue>
 
@@ -1493,7 +1471,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1855"
+            line="1852"
             column="5"/>
     </issue>
 
@@ -1504,264 +1482,200 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1857"
+            line="1854"
             column="5"/>
     </issue>
 
     <issue
         id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `half_price_first_year`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;half_price_first_year&quot;>初年度は50% オフ&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ja/strings.xml"
-            line="69"
-            column="5"/>
+        message="Inconsistent number of arguments in formatting string `half_price_first_year`; found both 1 here and 0 in values-zh-rTW/strings.xml"
+        errorLine1="    &lt;string name=&quot;half_price_first_year&quot;>50% off your first year&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1070"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `half_price_first_year`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;half_price_first_year&quot;>첫해 50% 할인&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ko/strings.xml"
-            line="69"
+            line="1069"
             column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1070"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `half_price_first_year`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;half_price_first_year&quot;>Скидка 50 % на первый год&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="69"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1070"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `half_price_first_year`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;half_price_first_year&quot;>首年享五折優惠&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-zh-rTW/strings.xml"
-            line="69"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1070"
+            line="68"
             column="5"
-            message="Conflicting number of arguments (1) here"/>
+            message="Conflicting number of arguments (0) here"/>
     </issue>
 
     <issue
         id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `half_price_first_year`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;half_price_first_year&quot;>首年享 5 折优惠&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh/strings.xml"
-            line="69"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1070"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_searches`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_searches&quot;>خلال هذه الفترة، تم إجراء %1$ من عمليات بحث غوغل. بازينجا.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="669"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1369"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_air_balloon`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_air_balloon&quot;>خلال هذه الفترة، يمكنك التجول حول العالم %1$ من المرات في منطاد هواء.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="670"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1368"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_laces`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_laces&quot;>خلال هذه الفترة، يمكنك ربط %1$ من أربطة الحذاء. ربما.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="671"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1367"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_air_biscuits`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_air_biscuits&quot;>خلال هذه الفترة، أطلقت %1$ أوقية من الغازات. الإجمالي!&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="672"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1366"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_tweets`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_tweets&quot;>خلال هذه الفترة، تم نشر %1$ من التغريدات. توت! توت!&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="673"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1365"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_emails`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_emails&quot;>خلال هذه الفترة، تم إرسال %1$ من رسائل البريد الإلكتروني.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="674"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1364"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_sneezed`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_sneezed&quot;>خلال هذه الفترة، عطس رائد فضاء %1$ من المرات. آتشو!&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="675"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1363"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_skin`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_skin&quot;>خلال هذه الفترة، قمت بتغيير %1$ من خلايا الجلد. أوف؟&lt;/string>"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_babies`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_babies&quot;>During which time %1$,.0f babies were born. Wahhh!&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/values-ar/strings.xml"
-            line="676"
-            column="5"/>
-        <location
             file="src/main/res/values/strings.xml"
-            line="1362"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_lightning`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_lightning&quot;>خلال هذه الفترة، ضرب البرق %1$ من المرات. بووم.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="677"
+            line="1358"
             column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1361"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_blinked`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_blinked&quot;>خلال هذه الفترة، رمشت %1$ من المرات. مرحبًا!&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ar/strings.xml"
-            line="678"
-            column="5"/>
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1360"
-            column="5"
-            message="Conflicting number of arguments (1) here"/>
-    </issue>
-
-    <issue
-        id="StringFormatCount"
-        message="Inconsistent number of arguments in formatting string `settings_stats_funny_babies`; found both 0 here and 1 in values/strings.xml"
-        errorLine1="    &lt;string name=&quot;settings_stats_funny_babies&quot;>خلال هذه الفترة، تمت ولادة %1$ من الأطفال الرضع. يا إلهي!&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ar/strings.xml"
             line="679"
-            column="5"/>
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_blinked`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_blinked&quot;>During which time you blinked %1$,.0f times. Heyooo!&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
             line="1359"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="678"
             column="5"
-            message="Conflicting number of arguments (1) here"/>
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_lightning`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_lightning&quot;>During which time lightning struck %1$,.0f times. Boom.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1360"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="677"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_skin`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_skin&quot;>During which time you shed %1$,.0f skin cells. Ew?&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1361"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="676"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_sneezed`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_sneezed&quot;>During which time an astronaut sneezed %1$,.0f times. Achoo!&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1362"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="675"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_emails`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_emails&quot;>During which time %1$,.0f emails were sent.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1363"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="674"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_tweets`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_tweets&quot;>During which time %1$,.0f tweets were tooted. Toot! Toot!&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1364"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="673"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_air_biscuits`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_air_biscuits&quot;>During which time you released %1$,.0f oz of air biscuits. Gross!&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1365"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="672"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_laces`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_laces&quot;>During which time you could have tied %1$,.0f shoe laces. Maybe.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1366"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="671"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_air_balloon`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_air_balloon&quot;>During which time you could have gone around the world %1$,.0f times in an air balloon.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1367"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="670"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
+    </issue>
+
+    <issue
+        id="StringFormatCount"
+        message="Inconsistent number of arguments in formatting string `settings_stats_funny_searches`; found both 1 here and 0 in values-ar/strings.xml"
+        errorLine1="    &lt;string name=&quot;settings_stats_funny_searches&quot;>During which time %1$,.0f Google searches were performed. Bazinga.&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1368"
+            column="5"/>
+        <location
+            file="src/main/res/values-ar/strings.xml"
+            line="669"
+            column="5"
+            message="Conflicting number of arguments (0) here"/>
     </issue>
 
     <issue

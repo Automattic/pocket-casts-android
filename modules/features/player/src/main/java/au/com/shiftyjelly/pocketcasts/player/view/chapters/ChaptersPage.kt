@@ -21,7 +21,7 @@ fun ChaptersPage(
     showHeader: Boolean,
     totalChaptersCount: Int,
     onSelectionChange: (Boolean, Chapter) -> Unit,
-    onChapterClick: (Chapter, Boolean) -> Unit,
+    onChapterClick: (Chapter) -> Unit,
     onUrlClick: (String) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
     isTogglingChapters: Boolean,
@@ -53,7 +53,7 @@ fun ChaptersPage(
                 isTogglingChapters = isTogglingChapters,
                 selectedCount = selectedCount,
                 onSelectionChange = onSelectionChange,
-                onClick = { onChapterClick(state.chapter, state is ChaptersViewModel.ChapterState.Playing) },
+                onClick = { onChapterClick(state.chapter) },
                 onUrlClick = { onUrlClick(state.chapter.url.toString()) },
                 modifier = Modifier.animateItemPlacement(),
             )
