@@ -166,13 +166,6 @@
     </issue>
 
     <issue
-        id="ConvertToWebp"
-        message="One or more images in this project can be converted to the WebP format which typically results in smaller file sizes, even for lossless conversion">
-        <location
-            file="src/main/res/drawable/widget_player_large_preview.png"/>
-    </issue>
-
-    <issue
         id="IconLocation"
         message="Found bitmap drawable `res/drawable/widget_player_large_preview.png` in densityless folder">
         <location

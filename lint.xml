@@ -19,4 +19,7 @@
     <issue id="InvalidPackage" severity="ignore"/>
     <issue id="ObsoleteLintCustomCheck" severity="ignore"/>
 
+    <!-- This issue causes nondeterministic results when generating baseline files -->
+    <issue id="ConvertToWebp" severity="ignore"/>
+
 </lint>
