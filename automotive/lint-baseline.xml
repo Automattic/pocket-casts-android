@@ -13,17 +13,6 @@
     </issue>
 
     <issue
-        id="UnsupportedChromeOsHardware"
-        message="Expecting `android:required=&quot;false&quot;` for this hardware feature that may not be supported by all Chrome OS devices"
-        errorLine1="        android:required=&quot;true&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="7"
-            column="9"/>
-    </issue>
-
-    <issue
         id="ExportedService"
         message="Exported service does not require permission"
         errorLine1="        &lt;service"
@@ -32,105 +21,6 @@
             file="src/main/AndroidManifest.xml"
             line="40"
             column="10"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="        Log.d(Settings.LOG_TAG_AUTO, &quot;onLoadChildren. Loading section $parentId&quot;)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutoPlaybackService.kt"
-            line="76"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="            Log.d(Settings.LOG_TAG_AUTO, &quot;onLoadChildren. Running in background $parentId&quot;)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutoPlaybackService.kt"
-            line="78"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="                Log.d(Settings.LOG_TAG_AUTO, &quot;onLoadChildren. Sending results $parentId&quot;)"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutoPlaybackService.kt"
-            line="99"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="                Log.d(Settings.LOG_TAG_AUTO, &quot;onLoadChildren. Results sent $parentId&quot;)"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutoPlaybackService.kt"
-            line="101"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="            Log.d(Settings.LOG_TAG_AUTO, &quot;Filters ${it.title}&quot;)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutoPlaybackService.kt"
-            line="128"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="                Log.d(Settings.LOG_TAG_AUTO, &quot;Loading discover feed ${discoverItem.source}&quot;)"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutoPlaybackService.kt"
-            line="180"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.d(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="                Log.d(Settings.LOG_TAG_AUTO, &quot;Mapping $title to media item&quot;)"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutoPlaybackService.kt"
-            line="185"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.i(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="        Log.i(Settings.LOG_TAG_AUTO, &quot;App started. ${settings.getVersion()} (${settings.getVersionCode()})&quot;)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutomotiveApplication.kt"
-            line="85"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="LogConditional"
-        message="The log call Log.i(...) should be conditional: surround with `if (Log.isLoggable(...))` or `if (BuildConfig.DEBUG) { ... }`"
-        errorLine1="        Log.i(Settings.LOG_TAG_AUTO, &quot;Play services $playServices&quot;)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutomotiveApplication.kt"
-            line="98"
-            column="9"/>
     </issue>
 
     <issue
@@ -211,17 +101,6 @@
     </issue>
 
     <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `AboutPage` of class `AutomotiveAboutFragmentKt` requires synthetic accessor"
-        errorLine1="                    AboutPage("
-        errorLine2="                    ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/AutomotiveAboutFragment.kt"
-            line="53"
-            column="21"/>
-    </issue>
-
-    <issue
         id="UnusedIds"
         message="The resource `R.id.carHeader` appears to be unused"
         errorLine1="        android:id=&quot;@+id/carHeader&quot;"
@@ -241,28 +120,6 @@
             file="src/main/res/xml/preferences_auto.xml"
             line="21"
             column="9"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/layout_preference_car.xml"
-            line="32"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/layout_preference_car.xml"
-            line="40"
-            column="10"/>
     </issue>
 
 </issues>

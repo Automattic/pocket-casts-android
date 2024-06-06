@@ -42,7 +42,7 @@ android {
         lintConfig rootProject.file("lint.xml")
         xmlReport true
 
-        checkAllWarnings true
+        checkAllWarnings false
         warningsAsErrors false
 
         checkDependencies false

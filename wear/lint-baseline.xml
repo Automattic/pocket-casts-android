@@ -45,26 +45,4 @@
             column="9"/>
     </issue>
 
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(List&lt;UserEpisode> or List&lt;UserEpisode>?)>)"
-        errorLine1="    val userEpisodes = userEpisodeManager"
-        errorLine2="        ~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/FilesViewModel.kt"
-            line="16"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (StateFlow&lt;(Any or Any?)>)"
-        errorLine1="    val uiState = playlistManager.observeByUuidAsList(filterUuid)"
-        errorLine2="        ~~~~~~~">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/filter/FilterViewModel.kt"
-            line="43"
-            column="9"/>
-    </issue>
-
 </issues>

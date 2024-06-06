@@ -24,28 +24,6 @@
     </issue>
 
     <issue
-        id="NoOp"
-        message="This reference is unused: DisposeOnViewTreeLifecycleDestroyed"
-        errorLine1="            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/search/SearchFragment.kt"
-            line="224"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="NoOp"
-        message="This reference is unused: DisposeOnViewTreeLifecycleDestroyed"
-        errorLine1="            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/search/SearchFragment.kt"
-            line="245"
-            column="37"/>
-    </issue>
-
-    <issue
         id="UnusedBoxWithConstraintsScope"
         message="BoxWithConstraints scope is not used"
         errorLine1="        ) {"
@@ -54,39 +32,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/search/component/SearchFolderItem.kt"
             line="54"
             column="11"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getViewModel` of class `SearchFragment` requires synthetic accessor"
-        errorLine1="                viewModel.updateSearchQuery(query, immediate = true)"
-        errorLine2="                ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/search/SearchFragment.kt"
-            line="198"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getViewModel` of class `SearchFragment` requires synthetic accessor"
-        errorLine1="                    if ((viewModel.state.value as? SearchState.Results)?.podcasts?.isNotEmpty() == true) {"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/search/SearchFragment.kt"
-            line="209"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getViewModel` of class `SearchFragment` requires synthetic accessor"
-        errorLine1="                viewModel.updateSearchQuery(query)"
-        errorLine2="                ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/search/SearchFragment.kt"
-            line="214"
-            column="17"/>
     </issue>
 
 </issues>

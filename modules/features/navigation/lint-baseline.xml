@@ -1,26 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    internal val fragmentTransactionPublisher = UnicastWorkSubject.create&lt;CommandWithRunnable>()"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/navigation/BottomNavigator.kt"
-            line="39"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    internal val bottomnavViewSetSelectedItemObservable = UnicastWorkSubject.create&lt;Int>()"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/navigation/BottomNavigator.kt"
-            line="40"
-            column="18"/>
-    </issue>
-
 </issues>

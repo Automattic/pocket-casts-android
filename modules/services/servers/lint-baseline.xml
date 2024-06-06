@@ -23,37 +23,4 @@
             column="28"/>
     </issue>
 
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `post` of class `ServerManager` requires synthetic accessor"
-        errorLine1="                            Handler(Looper.getMainLooper()).post { post(serverUrl, servicePath, parameters, async, nextPollCount, callback) }"
-        errorLine2="                                                                   ~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
-            line="256"
-            column="68"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `post` of class `ServerManager` requires synthetic accessor"
-        errorLine1="                            post(serverUrl, servicePath, parameters, async, nextPollCount, callback)"
-        errorLine2="                            ~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
-            line="258"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    val server = retrofit.create(StaticServer::class.java)"
-        errorLine2="        ~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/cdn/StaticServerManagerImpl.kt"
-            line="13"
-            column="9"/>
-    </issue>
-
 </issues>

@@ -112,116 +112,6 @@
     </issue>
 
     <issue
-        id="AppLinksAutoVerify"
-        message="This host does not support app links to your app. Checks the Digital Asset Links JSON file: http://itunes.apple.com/.well-known/assetlinks.json"
-        errorLine1="                        android:host=&quot;itunes.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="193"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="This host does not support app links to your app. Checks the Digital Asset Links JSON file: https://itunes.apple.com/.well-known/assetlinks.json"
-        errorLine1="                        android:host=&quot;itunes.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="193"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="http://podcasts.apple.com/.well-known/assetlinks.json has incorrect JSON syntax"
-        errorLine1="                        android:host=&quot;podcasts.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="201"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="https://podcasts.apple.com/.well-known/assetlinks.json has incorrect JSON syntax"
-        errorLine1="                        android:host=&quot;podcasts.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="201"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file http://subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="241"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file https://subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="241"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file http://www.subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;www.subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="242"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file https://www.subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;www.subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="242"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Unknown host: http://*. Check if the host exists, and check your network connection"
-        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="225"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Unknown host: https://*. Check if the host exists, and check your network connection"
-        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="225"
-            column="23"/>
-    </issue>
-
-    <issue
         id="IntentFilterUniqueDataAttributes"
         message="Consider splitting data tag into multiple tags with individual attributes to avoid confusion"
         errorLine1="                &lt;data"
@@ -436,50 +326,6 @@
     </issue>
 
     <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `removeBottomSheetFragment` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                        removeBottomSheetFragment(it)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="903"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getViewModel` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)"
-        errorLine2="                                                          ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="908"
-            column="59"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getViewModel` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)"
-        errorLine2="                                                                                  ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="908"
-            column="83"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `updateNavAndStatusColors` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="908"
-            column="21"/>
-    </issue>
-
-    <issue
         id="KeyboardInaccessibleWidget"
         message="&apos;clickable&apos; attribute found, please also add &apos;focusable&apos;"
         errorLine1="            android:clickable=&quot;true&quot;"
@@ -488,17 +334,6 @@
             file="src/main/res/layout/activity_main.xml"
             line="61"
             column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(PlaybackState or PlaybackState?)>)"
-        errorLine1="    val playbackState = playbackStateRx.asFlow()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivityViewModel.kt"
-            line="99"
-            column="9"/>
     </issue>
 
 </issues>
