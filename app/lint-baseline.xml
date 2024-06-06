@@ -2,13 +2,6 @@
 <issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
     <issue
-        id="ObsoleteLintCustomCheck"
-        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
-        <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/0825c99c4ad570a76187f4ee9e0e35ba/transformed/runtime-release/jars/lint.jar"/>
-    </issue>
-
-    <issue
         id="ScopedStorage"
         message="WRITE_EXTERNAL_STORAGE is deprecated (and is not granted) when targeting Android 13+. If you need to write to shared storage, use the `MediaStore.createWriteRequest` intent."
         errorLine1="    &lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;/>"
@@ -50,20 +43,6 @@
             file="src/androidTest/java/au/com/shiftyjelly/pocketcasts/models/db/PodcastManagerTest.kt"
             line="119"
             column="9"/>
-    </issue>
-
-    <issue
-        id="InvalidPackage"
-        message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
-        <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/8a698d223778a3c578fa1f504041662a/transformed/jna-5.13.0/jars/classes.jar"/>
-    </issue>
-
-    <issue
-        id="InvalidPackage"
-        message="Invalid package reference in library; not included in Android: `javax.script`. Referenced from `org.apache.commons.text.lookup.ScriptStringLookup`.">
-        <location
-            file="$GRADLE_USER_HOME/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.10.0/3363381aef8cef2dbc1023b3e3a9433b08b64e01/commons-text-1.10.0.jar"/>
     </issue>
 
     <issue
@@ -130,116 +109,6 @@
             file="src/debug/res/xml/shortcuts.xml"
             line="20"
             column="117"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="This host does not support app links to your app. Checks the Digital Asset Links JSON file: http://itunes.apple.com/.well-known/assetlinks.json"
-        errorLine1="                        android:host=&quot;itunes.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="193"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="This host does not support app links to your app. Checks the Digital Asset Links JSON file: https://itunes.apple.com/.well-known/assetlinks.json"
-        errorLine1="                        android:host=&quot;itunes.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="193"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="http://podcasts.apple.com/.well-known/assetlinks.json has incorrect JSON syntax"
-        errorLine1="                        android:host=&quot;podcasts.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="201"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="https://podcasts.apple.com/.well-known/assetlinks.json has incorrect JSON syntax"
-        errorLine1="                        android:host=&quot;podcasts.apple.com&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="201"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file http://subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="241"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file https://subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="241"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file http://www.subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;www.subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="242"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Digital Asset Links JSON file https://www.subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
-        errorLine1="                &lt;data android:host=&quot;www.subscribeonandroid.com&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="242"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Unknown host: http://*. Check if the host exists, and check your network connection"
-        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="225"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Unknown host: https://*. Check if the host exists, and check your network connection"
-        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="225"
-            column="23"/>
     </issue>
 
     <issue
@@ -457,50 +326,6 @@
     </issue>
 
     <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `removeBottomSheetFragment` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                        removeBottomSheetFragment(it)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="903"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getViewModel` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)"
-        errorLine2="                                                          ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="908"
-            column="59"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getViewModel` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)"
-        errorLine2="                                                                                  ~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="908"
-            column="83"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `updateNavAndStatusColors` of class `MainActivity` requires synthetic accessor"
-        errorLine1="                    updateNavAndStatusColors(playerOpen = viewModel.isPlayerOpen, viewModel.lastPlaybackState?.podcast)"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="908"
-            column="21"/>
-    </issue>
-
-    <issue
         id="KeyboardInaccessibleWidget"
         message="&apos;clickable&apos; attribute found, please also add &apos;focusable&apos;"
         errorLine1="            android:clickable=&quot;true&quot;"
@@ -509,17 +334,6 @@
             file="src/main/res/layout/activity_main.xml"
             line="61"
             column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (Flow&lt;(PlaybackState or PlaybackState?)>)"
-        errorLine1="    val playbackState = playbackStateRx.asFlow()"
-        errorLine2="        ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivityViewModel.kt"
-            line="99"
-            column="9"/>
     </issue>
 
 </issues>
