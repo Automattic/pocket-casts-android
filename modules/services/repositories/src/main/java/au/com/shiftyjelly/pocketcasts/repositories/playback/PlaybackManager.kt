@@ -7,11 +7,11 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -184,10 +184,10 @@ open class PlaybackManager @Inject constructor(
     val playbackStateRelay: Relay<PlaybackState> by lazy {
         val relay = BehaviorRelay.create<PlaybackState>().toSerialized()
         relay.accept(PlaybackState(lastChangeFrom = LastChangeFrom.OnInit.value))
-        Log.d(Settings.LOG_TAG_AUTO, "Init playback state")
+        Timber.d(Settings.LOG_TAG_AUTO, "Init playback state")
         return@lazy relay
     }
-    val playbackStateLive = playbackStateRelay
+    val playbackStateLive: LiveData<PlaybackState> = playbackStateRelay
         .toFlowable(BackpressureStrategy.LATEST)
         .toLiveData()
 
