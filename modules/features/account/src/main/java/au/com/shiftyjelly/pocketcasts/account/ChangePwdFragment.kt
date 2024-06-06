@@ -155,6 +155,8 @@ class ChangePwdFragment : BaseFragment() {
                 is ChangePasswordState.Success -> {
                     progress.isVisible = false
 
+                    doneViewModel.setChangedPasswordState(detail = getString(LR.string.profile_password_changed_successful))
+
                     doneViewModel.updateTitle(getString(LR.string.profile_password_changed))
                     doneViewModel.updateDetail(getString(LR.string.profile_password_changed_successful))
                     doneViewModel.updateImage(R.drawable.ic_password_changed)
