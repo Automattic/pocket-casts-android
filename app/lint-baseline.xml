@@ -157,28 +157,6 @@
 
     <issue
         id="AppLinksAutoVerify"
-        message="Unknown host: http://*. Check if the host exists, and check your network connection"
-        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="225"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
-        message="Unknown host: https://*. Check if the host exists, and check your network connection"
-        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
-        errorLine2="                      ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="225"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="AppLinksAutoVerify"
         message="Digital Asset Links JSON file http://subscribeonandroid.com/.well-known/assetlinks.json is not found on the host"
         errorLine1="                &lt;data android:host=&quot;subscribeonandroid.com&quot;/>"
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -218,6 +196,28 @@
         <location
             file="src/main/AndroidManifest.xml"
             line="242"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="AppLinksAutoVerify"
+        message="Unknown host: http://*. Check if the host exists, and check your network connection"
+        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
+        errorLine2="                      ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="225"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="AppLinksAutoVerify"
+        message="Unknown host: https://*. Check if the host exists, and check your network connection"
+        errorLine1="                &lt;data android:host=&quot;*&quot;/>"
+        errorLine2="                      ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="225"
             column="23"/>
     </issue>
 
