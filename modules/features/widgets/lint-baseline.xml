@@ -145,27 +145,6 @@
     </issue>
 
     <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/widget_player_large_preview.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/widget_player_large_preview.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/widget_player_medium_preview.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/widget_player_medium_preview.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/widget_player_small_preview.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/widget_player_small_preview.png"/>
-    </issue>
-
-    <issue
         id="SelectableText"
         message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
         errorLine1="&lt;TextView"
