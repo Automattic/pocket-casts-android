@@ -3,7 +3,6 @@ import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import java.util.EnumSet
-import kotlinx.coroutines.runBlocking
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
