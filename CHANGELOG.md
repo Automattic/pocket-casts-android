@@ -1,5 +1,8 @@
 7.66
 -----
+*   Health
+    *   Increase target SDK version to 34 
+        ([#2279](https://github.com/Automattic/pocket-casts-android/pull/2279))
 *   Bug Fixes
     *   Fix: Search Term Persists When Navigating to Different Podcast Page
         ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
