@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
     <issue
         id="ApplySharedPref"
@@ -32,39 +32,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
             line="474"
             column="34"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(PodcastsSortType..PodcastsSortType?)>)"
-        errorLine1="    override val selectPodcastSortTypeObservable = BehaviorRelay.create&lt;PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
-            line="91"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(List&lt;Int>..List&lt;Int>?)>)"
-        errorLine1="    override val multiSelectItemsObservable = BehaviorRelay.create&lt;List&lt;Int>>().apply { accept(getMultiSelectItems()) }"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
-            line="92"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(RefreshState..RefreshState?)>)"
-        errorLine1="    override val refreshStateObservable = BehaviorRelay.create&lt;RefreshState>().apply {"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
-            line="108"
-            column="18"/>
     </issue>
 
 </issues>

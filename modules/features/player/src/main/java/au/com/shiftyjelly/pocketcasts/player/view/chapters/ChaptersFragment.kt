@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +48,6 @@ class ChaptersFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val chaptersViewModel: ChaptersViewModel by activityViewModels()
-    private var lazyListState: LazyListState? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,62 +55,63 @@ class ChaptersFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
+            val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
+
             AppTheme(Theme.ThemeType.DARK) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                ChaptersThemeForPlayer(theme, uiState.podcast) {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 
-                val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
-                val lazyListState = rememberLazyListState()
-                this@ChaptersFragment.lazyListState = lazyListState
-                val context = LocalContext.current
-                val currentView = LocalView.current
+                    val lazyListState = rememberLazyListState()
+                    val context = LocalContext.current
+                    val currentView = LocalView.current
 
-                val scrollToChapter by chaptersViewModel.scrollToChapterState.collectAsState()
-                LaunchedEffect(scrollToChapter) {
-                    scrollToChapter?.let {
-                        delay(250)
-                        lazyListState.animateScrollToItem(it.index - 1)
+                    val scrollToChapter by chaptersViewModel.scrollToChapterState.collectAsState()
+                    LaunchedEffect(scrollToChapter) {
+                        scrollToChapter?.let {
+                            delay(250)
+                            lazyListState.animateScrollToItem(it.index - 1)
 
-                        // Need to clear this so that if the user taps on the same chapter a second time we
-                        // still get the scrollTo behavior.
-                        chaptersViewModel.setScrollToChapter(null)
+                            // Need to clear this so that if the user taps on the same chapter a second time we
+                            // still get the scrollTo behavior.
+                            chaptersViewModel.setScrollToChapter(null)
+                        }
                     }
-                }
 
-                LaunchedEffect(Unit) {
-                    chaptersViewModel
-                        .navigationState
-                        .collectLatest { event ->
-                            when (event) {
-                                is NavigationState.StartUpsell -> startUpsell()
+                    LaunchedEffect(Unit) {
+                        chaptersViewModel
+                            .navigationState
+                            .collectLatest { event ->
+                                when (event) {
+                                    is NavigationState.StartUpsell -> startUpsell()
+                                }
                             }
-                        }
-                }
+                    }
 
-                LaunchedEffect(Unit) {
-                    chaptersViewModel
-                        .snackbarMessage
-                        .collectLatest { message ->
-                            Snackbar.make(currentView, context.getString(message), Snackbar.LENGTH_SHORT)
-                                .setBackgroundTint(ThemeColor.playerContrast01(Theme.ThemeType.DARK))
-                                .setTextColor(ThemeColor.playerBackground01(Theme.ThemeType.DARK, theme.playerBackgroundColor(uiState.podcast)))
-                                .show()
-                        }
-                }
+                    LaunchedEffect(Unit) {
+                        chaptersViewModel
+                            .snackbarMessage
+                            .collectLatest { message ->
+                                Snackbar.make(currentView, context.getString(message), Snackbar.LENGTH_SHORT)
+                                    .setBackgroundTint(ThemeColor.playerContrast01(Theme.ThemeType.DARK))
+                                    .setTextColor(ThemeColor.playerBackground01(Theme.ThemeType.DARK, theme.playerBackgroundColor(uiState.podcast)))
+                                    .show()
+                            }
+                    }
 
-                Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
-                    ChaptersPage(
-                        lazyListState = lazyListState,
-                        chapters = uiState.displayChapters,
-                        showHeader = uiState.showHeader,
-                        totalChaptersCount = uiState.totalChaptersCount,
-                        onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
-                        onChapterClick = ::onChapterClick,
-                        onUrlClick = ::onUrlClick,
-                        onSkipChaptersClick = { chaptersViewModel.onSkipChaptersClick(it) },
-                        isTogglingChapters = uiState.isTogglingChapters,
-                        showSubscriptionIcon = uiState.showSubscriptionIcon,
-                        backgroundColor = uiState.backgroundColor,
-                    )
+                    Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
+                        ChaptersPage(
+                            lazyListState = lazyListState,
+                            chapters = uiState.displayChapters,
+                            showHeader = uiState.showHeader,
+                            totalChaptersCount = uiState.totalChaptersCount,
+                            onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
+                            onChapterClick = ::onChapterClick,
+                            onUrlClick = ::onUrlClick,
+                            onSkipChaptersClick = { chaptersViewModel.onSkipChaptersClick(it) },
+                            isTogglingChapters = uiState.isTogglingChapters,
+                            showSubscriptionIcon = uiState.showSubscriptionIcon,
+                        )
+                    }
                 }
             }
         }

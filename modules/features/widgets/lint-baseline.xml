@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+
+    <issue
+        id="AnnotateVersionCheck"
+        message="This method should be annotated with `@ChecksSdkIntAtLeast(api=Build.VERSION_CODES.S)`"
+        errorLine1="internal val isSystemCornerRadiusSupported get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/widget/ui/RounderCornerBox.kt"
+            line="45"
+            column="14"/>
+    </issue>
 
     <issue
         id="UnusedAttribute"
@@ -131,210 +142,6 @@
             file="src/main/res/layout/widget_player_small_preview.xml"
             line="7"
             column="5"/>
-    </issue>
-
-    <issue
-        id="ConvertToWebp"
-        message="One or more images in this project can be converted to the WebP format which typically results in smaller file sizes, even for lossless conversion">
-        <location
-            file="src/main/res/drawable/widget_player_large_preview.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/widget_player_large_preview.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/widget_player_large_preview.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/widget_player_medium_preview.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/widget_player_medium_preview.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/widget_player_small_preview.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/widget_player_small_preview.png"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_dynamic_oneline_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_dynamic_oneline_transparent.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_dynamic_twolines_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_dynamic_twolines_transparent.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_nondynamic_oneline_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_nondynamic_oneline_transparent.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_nondynamic_twolines_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_bold_nondynamic_twolines_transparent.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_dynamic_oneline_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_dynamic_oneline_transparent.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_dynamic_twolines_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_dynamic_twolines_transparent.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_nondynamic_oneline_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_nondynamic_oneline_transparent.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_nondynamic_twolines_opaque.xml"
-            line="2"
-            column="2"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="&lt;TextView"
-        errorLine2=" ~~~~~~~~">
-        <location
-            file="src/main/res/layout/non_scaling_text_regular_nondynamic_twolines_transparent.xml"
-            line="2"
-            column="2"/>
     </issue>
 
     <issue

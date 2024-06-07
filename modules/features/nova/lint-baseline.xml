@@ -1,48 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `refreshSyncRules` of class `NovaLauncherBridge` requires synthetic accessor"
-        errorLine1="        override fun onStart(owner: LifecycleOwner) = refreshSyncRules()"
-        errorLine2="                                                      ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/nova/NovaLauncherBridge.kt"
-            line="24"
-            column="55"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `refreshSyncRules` of class `NovaLauncherBridge` requires synthetic accessor"
-        errorLine1="        override fun onStop(owner: LifecycleOwner) = refreshSyncRules()"
-        errorLine2="                                                     ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/nova/NovaLauncherBridge.kt"
-            line="25"
-            column="54"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `logInfo` of class `Companion` requires synthetic accessor"
-        errorLine1="    private fun logInfo(message: String) = logInfo(id, name, message)"
-        errorLine2="                                           ~~~~~~~">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/nova/NovaLauncherSyncWorker.kt"
-            line="99"
-            column="44"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `logError` of class `Companion` requires synthetic accessor"
-        errorLine1="    private fun logError(message: String, throwable: Throwable? = null) = logError(id, name, message, throwable)"
-        errorLine2="                                                                          ~~~~~~~~">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/nova/NovaLauncherSyncWorker.kt"
-            line="101"
-            column="75"/>
-    </issue>
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
 </issues>

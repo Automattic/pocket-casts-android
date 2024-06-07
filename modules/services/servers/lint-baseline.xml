@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
-        errorLine1="                val responseDebug = String.format(&quot;Post response %d %s&quot;, response.code, call.request().url)"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
-            line="223"
-            column="37"/>
-    </issue>
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
     <issue
         id="KotlinNullnessAnnotation"
@@ -32,39 +21,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/sync/ProgressRequestBody.kt"
             line="56"
             column="28"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `post` of class `ServerManager` requires synthetic accessor"
-        errorLine1="                            Handler(Looper.getMainLooper()).post { post(serverUrl, servicePath, parameters, async, nextPollCount, callback) }"
-        errorLine2="                                                                   ~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
-            line="256"
-            column="68"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `post` of class `ServerManager` requires synthetic accessor"
-        errorLine1="                            post(serverUrl, servicePath, parameters, async, nextPollCount, callback)"
-        errorLine2="                            ~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
-            line="258"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    val server = retrofit.create(StaticServer::class.java)"
-        errorLine2="        ~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/cdn/StaticServerManagerImpl.kt"
-            line="13"
-            column="9"/>
     </issue>
 
 </issues>

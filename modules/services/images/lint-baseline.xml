@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
     <issue
         id="VectorRaster"
@@ -741,15 +741,6 @@
     </issue>
 
     <issue
-        id="ConvertToWebp"
-        message="One or more images in this project can be converted to the WebP format which typically results in smaller file sizes, even for lossless conversion">
-        <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
-        <location
-            file="src/main/res/drawable-xxhdpi/appicon_patron_dark.png"/>
-    </issue>
-
-    <issue
         id="IconLauncherShape"
         message="Launcher icon used as round icon did not have a circular shape">
         <location
@@ -782,54 +773,6 @@
         message="Launcher icon used as round icon did not have a circular shape">
         <location
             file="src/main/res/mipmap-xxxhdpi/ic_launcher_patron_round.png"/>
-    </issue>
-
-    <issue
-        id="IconDipSize"
-        message="The image `appicon_patron_dark.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/appicon_patron_dark.png: 124x124 dp (186x186 px), drawable-mdpi/appicon_patron_dark.png: 124x124 dp (124x124 px), drawable-xhdpi/appicon_patron_dark.png: 124x124 dp (248x248 px), drawable-xxhdpi/appicon_patron_dark.png: 165x165 dp (496x496 px), drawable-xxxhdpi/appicon_patron_dark.png: 124x124 dp (496x496 px)">
-        <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
-        <location
-            file="src/main/res/drawable-xhdpi/appicon_patron_dark.png"/>
-        <location
-            file="src/main/res/drawable-mdpi/appicon_patron_dark.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/appicon_patron_dark.png"/>
-        <location
-            file="src/main/res/drawable-xxhdpi/appicon_patron_dark.png"/>
-    </issue>
-
-    <issue
-        id="IconDipSize"
-        message="The image `appicon_patron_glow.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/appicon_patron_glow.png: 124x124 dp (186x186 px), drawable-mdpi/appicon_patron_glow.png: 124x124 dp (124x124 px), drawable-xhdpi/appicon_patron_glow.png: 187x187 dp (373x373 px), drawable-xxhdpi/appicon_patron_glow.png: 165x165 dp (496x496 px), drawable-xxxhdpi/appicon_patron_glow.png: 124x124 dp (496x496 px)">
-        <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_glow.png"/>
-        <location
-            file="src/main/res/drawable-mdpi/appicon_patron_glow.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/appicon_patron_glow.png"/>
-        <location
-            file="src/main/res/drawable-xxhdpi/appicon_patron_glow.png"/>
-        <location
-            file="src/main/res/drawable-xhdpi/appicon_patron_glow.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `appicon_patron_dark.png` icon has identical contents in the following configuration folders: drawable-xxhdpi, drawable-xxxhdpi">
-        <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_dark.png"/>
-        <location
-            file="src/main/res/drawable-xxhdpi/appicon_patron_dark.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `appicon_patron_glow.png` icon has identical contents in the following configuration folders: drawable-xxhdpi, drawable-xxxhdpi">
-        <location
-            file="src/main/res/drawable-xxxhdpi/appicon_patron_glow.png"/>
-        <location
-            file="src/main/res/drawable-xxhdpi/appicon_patron_glow.png"/>
     </issue>
 
     <issue

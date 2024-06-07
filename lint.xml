@@ -17,4 +17,9 @@
     <!--  Lint baseline will reference record for this issue with absolute path,
     which includes prone-to-change Gradle cache key -->
     <issue id="InvalidPackage" severity="ignore"/>
+    <issue id="ObsoleteLintCustomCheck" severity="ignore"/>
+
+    <!-- This issue causes nondeterministic results when generating baseline files -->
+    <issue id="ConvertToWebp" severity="ignore"/>
+
 </lint>
