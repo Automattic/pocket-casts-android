@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
         id="MissingPermission"
         message="Missing permissions required by ConnectivityManager.getActiveNetwork: android.permission.ACCESS_NETWORK_STATE"
         errorLine1="            val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork) ?: return ServiceStatus.Failed(userMessage = null, log = &quot;Unable to get network capabilities&quot;)"
-        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine2="                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/status/ServiceStatusChecker.kt"
             line="72"
-            column="52"/>
+            column="75"/>
     </issue>
 
     <issue
@@ -21,6 +21,17 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/status/ServiceStatusChecker.kt"
             line="72"
             column="32"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                log.append(String.format(&quot;Received response for %s in %.1fms%n%s&quot;, response.request.url, (endTime - startTime) / 1e6, response.headers))"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/status/ServiceStatusChecker.kt"
+            line="45"
+            column="28"/>
     </issue>
 
     <issue
@@ -175,50 +186,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/MediaNotificationControlsFragment.kt"
             line="315"
             column="13"/>
-    </issue>
-
-    <issue
-        id="StaticFieldLeak"
-        message="This field leaks a context object"
-        errorLine1="    @ApplicationContext private val context: Context,"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/viewmodel/AdvancedSettingsViewModel.kt"
-            line="20"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="StaticFieldLeak"
-        message="This field leaks a context object"
-        errorLine1="    @ApplicationContext private val context: Context,"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/viewmodel/AutoArchiveFragmentViewModel.kt"
-            line="18"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="StaticFieldLeak"
-        message="This field leaks a context object"
-        errorLine1="    @ApplicationContext private val context: Context,"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/developer/DeveloperViewModel.kt"
-            line="34"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="StaticFieldLeak"
-        message="This field leaks a context object"
-        errorLine1="    @ApplicationContext private val context: Context,"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/viewmodel/StorageSettingsViewModel.kt"
-            line="42"
-            column="5"/>
     </issue>
 
     <issue

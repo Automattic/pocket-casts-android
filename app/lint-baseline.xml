@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
         id="ScopedStorage"
@@ -256,7 +256,7 @@
 
     <issue
         id="UnsafeIntentLaunch"
-        message="This intent could be coming from an untrusted source. It is later launched by \&#xA;an unprotected component au.com.shiftyjelly.pocketcasts.ui.MainActivity. You could either make the component au.com.shiftyjelly.pocketcasts.ui.MainActivity \&#xA;protected; or sanitize this intent using androidx.core.content.IntentSanitizer."
+        message="This intent could be coming from an untrusted source. It is later launched by an unprotected component au.com.shiftyjelly.pocketcasts.ui.MainActivity. You could either make the component au.com.shiftyjelly.pocketcasts.ui.MainActivity protected; or sanitize this intent using androidx.core.content.IntentSanitizer."
         errorLine1="    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {"
         errorLine2="                                                                     ~~~~~~~~~~~~~">
         <location

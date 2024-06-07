@@ -1,5 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                        text = String.format(&quot;%.1fx&quot;, state.playbackEffects.playbackSpeed),"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/EffectsScreen.kt"
+            line="171"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="    fun handle("
+        errorLine2="        ~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/ScrollToTop.kt"
+            line="14"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions with a return type should start with a lowercase letter"
+        errorLine1="private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animatable&lt;Float, AnimationVector1D> {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/settings/SettingsScreen.kt"
+            line="194"
+            column="13"/>
+    </issue>
 
     <issue
         id="ModifierParameter"
@@ -24,14 +106,25 @@
     </issue>
 
     <issue
-        id="StaticFieldLeak"
-        message="This field leaks a context object"
-        errorLine1="    @ApplicationContext private val context: Context,"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var lastCharIndex by remember { mutableStateOf(0) }"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
         <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/WearMainActivityViewModel.kt"
-            line="41"
-            column="5"/>
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/ExpandableText.kt"
+            line="39"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    private val actual = mutableStateOf(initial)"
+        errorLine2="                         ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/horologist/ProgressStateHolderStyled.kt"
+            line="31"
+            column="26"/>
     </issue>
 
     <issue
