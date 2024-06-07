@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -22,6 +23,7 @@ class NowPlayingChipViewModel @Inject constructor(
     episodeManager: EpisodeManager,
     playbackManager: PlaybackManager,
     podcastManager: PodcastManager,
+    settings: Settings,
 ) : ViewModel() {
 
     data class State(
@@ -31,6 +33,8 @@ class NowPlayingChipViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
+
+    val artworkConfiguration = settings.artworkConfiguration.flow
 
     init {
         viewModelScope.launch {

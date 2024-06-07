@@ -65,7 +65,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                             )
                         }
                     }
-                    updateState(subscriptions)
+                    val filteredOffer = Subscription.filterOffers(subscriptions)
+                    updateState(filteredOffer)
                 }
         }
     }
@@ -77,6 +78,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
 
         val showPatronOnly = source == OnboardingUpgradeSource.ACCOUNT_DETAILS || showPatronOnly == true
+        val fromLogin = source == OnboardingUpgradeSource.LOGIN
         val updatedSubscriptions =
             if (showPatronOnly) {
                 subscriptions.filter { it.tier == Subscription.SubscriptionTier.PATRON }
@@ -86,8 +88,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             subscriptions = updatedSubscriptions,
-            tier = if (showPatronOnly) Subscription.SubscriptionTier.PATRON else lastSelectedTier,
-            frequency = lastSelectedFrequency,
+            tier = if (showPatronOnly) Subscription.SubscriptionTier.PATRON else { if (fromLogin) lastSelectedTier else null },
+            frequency = if (fromLogin) lastSelectedFrequency else null,
         )
 
         val showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS

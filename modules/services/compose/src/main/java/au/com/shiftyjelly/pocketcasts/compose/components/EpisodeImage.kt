@@ -1,30 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 
 @Composable
 fun EpisodeImage(
     episode: BaseEpisode,
+    useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    when (episode) {
-        is PodcastEpisode -> {
-            PodcastImage(
-                uuid = episode.podcastUuid,
-                dropShadow = false,
-                modifier = modifier,
-            )
-        }
-        is UserEpisode -> {
-            UserEpisodeImage(
-                episode = episode,
-                contentDescription = null,
-                modifier = modifier,
-            )
-        }
+    val context = LocalContext.current
+
+    val imageRequest = remember(episode.uuid, useEpisodeArtwork) {
+        PocketCastsImageRequestFactory(context).themed().create(episode, useEpisodeArtwork)
     }
+
+    CoilImage(
+        imageRequest = imageRequest,
+        title = "",
+        showTitle = false,
+        modifier = modifier.fillMaxSize(),
+    )
 }

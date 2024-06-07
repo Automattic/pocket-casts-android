@@ -20,8 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -50,6 +50,7 @@ class UserManagerImpl @Inject constructor(
     val userEpisodeManager: UserEpisodeManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val crashLogging: CrashLogging,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -68,7 +69,7 @@ class UserManagerImpl @Inject constructor(
                     signOut(playbackManager, wasInitiatedByUser = false)
                 }
             } catch (t: Throwable) {
-                SentryHelper.recordException("Account monitoring crash.", t)
+                crashLogging.sendReport(t, message = "Account monitoring crash.")
             }
         }
 
@@ -113,7 +114,7 @@ class UserManagerImpl @Inject constructor(
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
                 }
 
-                settings.marketingOptIn.set(false, needsSync = false)
+                settings.marketingOptIn.set(false, updateModifiedAt = false)
                 settings.setEndOfYearShowModal(true)
 
                 analyticsTracker.track(

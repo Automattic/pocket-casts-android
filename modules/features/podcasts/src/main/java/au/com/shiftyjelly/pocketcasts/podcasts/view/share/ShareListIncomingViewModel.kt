@@ -40,7 +40,7 @@ class ShareListIncomingViewModel
 
     fun loadShareUrl(url: String) {
         share.postValue(ShareState.Loading)
-        val id = listServerManager.extractShareListIdFromWebUrl(url) ?: return
+        val id = listServerManager.extractShareListIdFromWebUrl(url)
         viewModelScope.launch {
             try {
                 val list = listServerManager.openPodcastList(id)

@@ -12,8 +12,10 @@ import android.util.Pair
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -26,7 +28,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -41,17 +43,22 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServerResponseException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import coil.executeBlocking
+import coil.imageLoader
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.Date
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -84,12 +91,14 @@ class RefreshPodcastsThread(
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
+        fun crashLogging(): CrashLogging
+        fun analyticsTracker(): AnalyticsTrackerWrapper
     }
 
     @Volatile
     private var taskHasBeenCancelled = false
 
-    fun isAllowedToRun(runNow: Boolean = false): Boolean {
+    private fun isAllowedToRun(runNow: Boolean = false): Boolean {
         val now = System.currentTimeMillis()
         return now > lastRefreshAllowedTime + if (runNow) THROTTLE_RUN_NOW_MS else THROTTLE_PERIODIC_MS
     }
@@ -125,6 +134,7 @@ class RefreshPodcastsThread(
                 } catch (e: InterruptedException) {
                 }
 
+                dispatchCurrentRefreshedState()
                 return ListenableWorker.Result.success()
             }
             lastRefreshAllowedTime = System.currentTimeMillis()
@@ -161,30 +171,20 @@ class RefreshPodcastsThread(
         val serverManager = entryPoint.serverManager()
         val podcasts = podcastManager.findSubscribed()
         val startTime = SystemClock.elapsedRealtime()
-        serverManager.refreshPodcastsSync(
-            podcasts,
-            object : ServerCallback<RefreshResponse> {
-                override fun dataReturned(result: RefreshResponse?) {
-                    val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
-                    processRefreshResponse(result)
-                }
+        runBlocking { serverManager.refreshPodcastsSync(podcasts) }
+            .onSuccess { response ->
+                val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
+                processRefreshResponse(response)
+            }
+            .onFailure { throwable ->
+                val serverError = throwable as? ServerResponseException
+                val message = "Not refreshing as server call failed errorCode: ${serverError?.errorCode} serverMessage: ${serverError?.serverMessage ?: ""}"
 
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?,
-                ) {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
-                    if (throwable != null) {
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
-                    }
-                    refreshFailedOrCancelled("Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
-                }
-            },
-        )
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
+                refreshFailedOrCancelled(message)
+            }
     }
 
     private fun processRefreshResponse(result: RefreshResponse?) {
@@ -255,6 +255,8 @@ class RefreshPodcastsThread(
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
+            crashLogging = entryPoint.crashLogging(),
+            analyticsTracker = entryPoint.analyticsTracker(),
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()
@@ -275,6 +277,11 @@ class RefreshPodcastsThread(
 
     private fun refreshFailedOrCancelled(message: String) {
         getEntryPoint().settings().setRefreshState(RefreshState.Failed(message))
+    }
+
+    private fun dispatchCurrentRefreshedState() {
+        val settings = getEntryPoint().settings()
+        settings.setRefreshState(settings.getLastSuccessRefreshState() ?: RefreshState.Never)
     }
 
     private fun updatePodcasts(result: RefreshResponse?): List<String> {
@@ -371,8 +378,8 @@ class RefreshPodcastsThread(
 
         private const val GROUP_NEW_EPISODES = "group_new_episodes"
 
-        private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15000 // 15 seconds
-        private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5L * 60L * 1000L // 5 minutes
+        private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
+        private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
         private var lastRefreshAllowedTime: Long = -10000
 
         fun clearLastRefreshTime() {
@@ -436,7 +443,7 @@ class RefreshPodcastsThread(
 
                 for (i in notificationsEpisodeAndPodcast.indices) {
                     val episodePodcast = notificationsEpisodeAndPodcast[i]
-                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, podcastManager, notificationHelper, settings, context)
+                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, notificationHelper, settings, context)
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -450,7 +457,6 @@ class RefreshPodcastsThread(
             episodeIndex: Int,
             intentId: Int,
             isGroupNotification: Boolean,
-            podcastManager: PodcastManager,
             notificationHelper: NotificationHelper,
             settings: Settings,
             context: Context,
@@ -530,7 +536,7 @@ class RefreshPodcastsThread(
             }
             builder.extend(wearableExtender)
 
-            val bitmap = getPodcastNotificationBitmap(podcast.uuid, podcastManager, context)
+            val bitmap = getEpisodeNotificationBitmap(episode, settings, context)
             if (bitmap != null) {
                 builder.setLargeIcon(bitmap)
             }
@@ -648,7 +654,8 @@ class RefreshPodcastsThread(
             }
             val podcast = podcastManager.findPodcastByUuid(uuid) ?: return null
 
-            return PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).getBitmap(podcast, 400)
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = 400).create(podcast)
+            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
         }
 
         private fun getPodcastNotificationBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {
@@ -660,7 +667,16 @@ class RefreshPodcastsThread(
             val resources = context.resources
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
 
-            return PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).getBitmap(podcast, width)
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(podcast)
+            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
+        }
+
+        private fun getEpisodeNotificationBitmap(episode: PodcastEpisode, settings: Settings, context: Context): Bitmap? {
+            val resources = context.resources
+            val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
+
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.artworkConfiguration.value.useEpisodeArtwork)
+            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
         }
 
         private fun formatNotificationLine(podcastName: String?, episodeName: String?, context: Context): CharSequence {

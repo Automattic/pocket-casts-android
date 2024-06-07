@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -38,6 +39,8 @@ import io.reactivex.schedulers.Schedulers
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,7 +75,13 @@ class EpisodeFragmentViewModel @Inject constructor(
     var episode: PodcastEpisode? = null
     var isFragmentChangingConfigurations: Boolean = false
 
-    fun setup(episodeUuid: String, podcastUuid: String?, forceDark: Boolean) {
+    fun setup(
+        episodeUuid: String,
+        podcastUuid: String?,
+        forceDark: Boolean,
+        timestamp: Duration?,
+    ) {
+        var playAtTimestamp = timestamp != null
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
             .filter { it.episodeUuid == episodeUuid }
@@ -120,7 +129,16 @@ class EpisodeFragmentViewModel @Inject constructor(
                     zipper,
                 )
             }
-            .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
+            .doOnNext {
+                if (it is EpisodeFragmentState.Loaded) {
+                    timestamp?.let { timestamp ->
+                        if (!playAtTimestamp) return@let
+                        playAtTimestamp(it.episode, timestamp)
+                        playAtTimestamp = false
+                    }
+                    episode = it.episode
+                }
+            }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -280,6 +298,20 @@ class EpisodeFragmentViewModel @Inject constructor(
         }
 
         return false
+    }
+
+    private fun playAtTimestamp(
+        episode: BaseEpisode,
+        timestamp: Duration,
+    ) {
+        viewModelScope.launch {
+            val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
+                playbackManager.getCurrentEpisode()?.uuid != episode.uuid
+            if (shouldLoadOrSwitchEpisode) {
+                playbackManager.playNowSync(episode, sourceView = source)
+            }
+            playbackManager.seekToTimeMs(positionMs = timestamp.toInt(DurationUnit.MILLISECONDS))
+        }
     }
 
     fun starClicked() {

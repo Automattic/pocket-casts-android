@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.Icons
@@ -67,7 +66,9 @@ sealed class SettingRowToggle {
 fun SettingSection(
     modifier: Modifier = Modifier,
     heading: String? = null,
+    subHeading: String? = null,
     indent: Boolean = true,
+    showDivider: Boolean = true,
     content: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier) {
@@ -86,9 +87,24 @@ fun SettingSection(
                     ),
                 )
             }
+            if (subHeading != null) {
+                TextP50(
+                    text = subHeading,
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.padding(
+                        start = if (indent) indentedStartPadding else horizontalPadding,
+                        end = horizontalPadding,
+                        top = if (heading == null) verticalPadding else 0.dp,
+                        bottom = verticalPadding,
+                    ),
+                )
+            }
             content()
         }
-        HorizontalDivider()
+        if (showDivider) {
+            HorizontalDivider()
+        }
     }
 }
 
@@ -251,6 +267,29 @@ fun SettingRow(
     }
 }
 
+@Composable
+fun SettingInfoRow(
+    text: String,
+    modifier: Modifier = Modifier,
+    indent: Boolean = true,
+) {
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = modifier
+            .padding(
+                start = if (indent) indentedStartPadding else horizontalPadding,
+                end = horizontalPadding,
+                top = verticalPadding,
+                bottom = verticalPadding,
+            ),
+    ) {
+        TextP50(
+            text = text,
+            color = MaterialTheme.theme.colors.primaryText01,
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun SettingSectionPreview(
@@ -387,5 +426,16 @@ fun SettingSectionDarkPreview() {
         SettingSection(heading = "Section heading") {
             SettingRow(primaryText = "Setting row")
         }
+    }
+}
+
+@ShowkaseComposable(name = "SettingInfoRow", group = "Setting")
+@Preview(name = "Info")
+@Composable
+fun SettingInfoRowPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingInfoRow(
+            text = "The quick brown fox jumps over the lazy dog",
+        )
     }
 }

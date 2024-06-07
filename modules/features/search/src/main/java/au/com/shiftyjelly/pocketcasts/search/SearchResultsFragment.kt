@@ -122,7 +122,7 @@ class SearchResultsFragment : BaseFragment() {
             },
         )
         searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
-        listener?.onSearchPodcastClick(podcast.uuid)
+        listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH_RESULTS)
     }
 
     private fun onBackClick() {

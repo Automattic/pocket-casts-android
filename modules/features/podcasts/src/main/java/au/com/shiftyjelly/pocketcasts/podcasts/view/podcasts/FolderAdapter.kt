@@ -9,10 +9,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -20,18 +30,21 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.FolderItemDiffCallback
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -45,7 +58,7 @@ class FolderAdapter(
 
     var badgeType = BadgeType.OFF
 
-    private val imageLoader: PodcastImageLoaderThemed = PodcastImageLoaderThemed(context)
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, placeholderType = PlaceholderType.None).themed()
     private var podcastUuidToBadge: Map<String, Int> = emptyMap()
 
     init {
@@ -68,22 +81,29 @@ class FolderAdapter(
             FolderItem.Podcast.viewTypeId -> {
                 val isLayoutListView = settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW
                 val layoutId = if (isLayoutListView) R.layout.adapter_podcast_list else R.layout.adapter_podcast_grid
-                imageLoader.radiusPx = if (isLayoutListView) 4.dpToPx(context) else 0
                 val view = parent.inflate(layoutId, attachToThis = false)
                 val podcastGridLayout = settings.podcastGridLayout.value
-                PodcastViewHolder(view, imageLoader, podcastGridLayout, theme)
+                PodcastViewHolder(
+                    view,
+                    imageRequestFactory.copy(
+                        cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4 else 0,
+                    ),
+                    podcastGridLayout,
+                    theme,
+                )
             }
+
             FolderItem.Folder.viewTypeId -> {
                 val podcastsLayout = settings.podcastGridLayout.value
-                val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == PodcastGridLayoutType.SMALL_ARTWORK, context = context).pxToDp(parent.context).toInt()
                 FolderViewHolder(
                     composeView = ComposeView(parent.context),
                     theme = theme,
-                    gridWidthDp = gridWidthDp,
                     podcastsLayout = podcastsLayout,
                     onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) },
+                    podcastGridLayout = podcastsLayout,
                 )
             }
+
             else -> throw Exception("Unknown view type $viewType")
         }
     }
@@ -151,62 +171,109 @@ class FolderAdapter(
 
     class PodcastViewHolder(
         val view: View,
-        private val imageLoader: PodcastImageLoader,
+        private val imageRequestFactory: PocketCastsImageRequestFactory,
         podcastGridLayout: PodcastGridLayoutType,
         val theme: Theme,
     ) : RecyclerView.ViewHolder(view), PodcastTouchCallback.ItemTouchHelperViewHolder {
 
-        val button: View = view.findViewById(R.id.button)
+        val button: View? = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)
+        val podcastCardView = view.findViewById<CardView>(R.id.podcast_card_view)
         val podcastBackground: View? = view.findViewById(R.id.header_background)
         val podcastTitle: TextView = view.findViewById(R.id.library_podcast_title)
         val author: TextView? = view.findViewById(R.id.podcast_author)
         val unplayedText: TextView = view.findViewById(R.id.unplayed_count)
         val unplayedBackground: ImageView? = view.findViewById(R.id.unplayed_background)
         val countTextMarginSmall: Int = 2.dpToPx(view.resources.displayMetrics)
+        val cardElevation: Float = 1.dpToPx(view.resources.displayMetrics).toFloat()
+        val cardCornerRadius: Float = 4.dpToPx(view.resources.displayMetrics).toFloat()
         val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
         val isListLayout: Boolean = podcastGridLayout == PodcastGridLayoutType.LIST_VIEW
+        val unplayedCountBadgeView = view.findViewById<ComposeView>(R.id.badge_view)
 
         fun bind(podcast: Podcast, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
-            button.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
+            button?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
+            podcastCardView?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
             podcastTitle.show()
             author?.text = podcast.author
+            if (!isListLayout) {
+                UiUtil.setBackgroundColor(podcastTitle, ColorManager.getBackgroundColor(podcast))
+            }
             val unplayedEpisodeCount = podcastUuidToBadge[podcast.uuid] ?: 0
             val badgeCount = when (badgeType) {
                 BadgeType.OFF -> 0
                 BadgeType.ALL_UNFINISHED -> unplayedEpisodeCount
                 BadgeType.LATEST_EPISODE -> min(1, unplayedEpisodeCount)
             }
-            setTextViewCount(unplayedBackground, unplayedText, badgeCount, badgeType)
-
-            if (!isListLayout) {
-                UiUtil.setBackgroundColor(podcastTitle, ColorManager.getBackgroundColor(podcast))
-                unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.contrast_01))
+            val displayBadgeCount = if (badgeCount > 99) 99 else badgeCount
+            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+                unplayedText.hide()
+                unplayedCountBadgeView?.let {
+                    it.setBadgeContent(displayBadgeCount, badgeType)
+                    it.showIf(displayBadgeCount > 0)
+                }
+                podcastCardView?.elevation = cardElevation
+                podcastCardView?.radius = cardCornerRadius
             } else {
-                if (badgeType == BadgeType.LATEST_EPISODE) {
-                    unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.support_05))
+                unplayedText.show()
+                setTextViewCount(unplayedBackground, unplayedText, displayBadgeCount, badgeType)
+
+                if (!isListLayout) {
+                    unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.contrast_01))
+                    podcastCardView?.elevation = 0f
+                    podcastCardView?.radius = 0f
                 } else {
-                    unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.primary_text_02))
+                    if (badgeType == BadgeType.LATEST_EPISODE) {
+                        unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.support_05))
+                    } else {
+                        unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.primary_text_02))
+                    }
                 }
             }
 
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
-            button.contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
+            val contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
+            button?.contentDescription = contentDescription
+            podcastCardView?.contentDescription = contentDescription
 
-            imageLoader.loadCoil(podcast.uuid, placeholder = false) { if (!isListLayout) podcastTitle.hide() }.into(podcastThumbnail)
+            imageRequestFactory
+                .create(podcast, onSuccess = { if (!isListLayout) podcastTitle.hide() })
+                .loadInto(podcastThumbnail)
+        }
+
+        private fun ComposeView.setBadgeContent(
+            count: Int,
+            badgeType: BadgeType,
+        ) {
+            setContent {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+                AppTheme(theme.activeTheme) {
+                    CountBadge(
+                        count = count,
+                        style = when {
+                            (badgeType == BadgeType.LATEST_EPISODE) -> CountBadgeStyle.Small
+                            isListLayout -> CountBadgeStyle.Big
+                            else -> CountBadgeStyle.Medium
+                        },
+                        modifier = if (isListLayout) {
+                            Modifier
+                        } else {
+                            Modifier
+                                .wrapContentSize(align = Alignment.TopEnd)
+                                .offset(x = 6.dp, y = (-6).dp)
+                        },
+                    )
+                }
+            }
         }
 
         @Suppress("NAME_SHADOWING")
         private fun setTextViewCount(image: ImageView?, text: TextView, count: Int, badgeType: BadgeType) {
-            var count = count
             if (count == 0) {
                 text.hide()
                 image?.hide()
             } else {
-                if (count > 99) {
-                    count = 99
-                }
                 text.show()
                 image?.show()
                 if (!isListLayout) {

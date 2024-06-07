@@ -82,7 +82,7 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
                     return false
                 }
                 val parsedUri = Uri.parse(url)
-                return if (parsedUri != null && !uriIsInternal(parsedUri)) {
+                return if (parsedUri != null) {
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.data = Uri.parse(url)
                     try {
@@ -113,11 +113,6 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
             @Suppress("DEPRECATION")
             super.onBackPressed()
         }
-    }
-
-    private fun uriIsInternal(url: Uri): Boolean {
-        val host = url.host ?: return false
-        return INTERNAL_HOSTS.count { host.endsWith(it) } > 0
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

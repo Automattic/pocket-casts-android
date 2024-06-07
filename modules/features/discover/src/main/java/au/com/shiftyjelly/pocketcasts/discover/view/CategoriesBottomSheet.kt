@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,14 +8,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R.layout
-import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 class CategoriesBottomSheet(
-    private val categories: List<DiscoverCategory>,
-    private val onCategoryClick: (NetworkLoadableList) -> Unit,
+    private val categories: List<CategoryPill>,
+    private val onCategoryClick: (CategoryPill) -> Unit,
+    private val onCategorySelectionCancel: () -> Unit,
 ) : BaseDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,12 +35,20 @@ class CategoriesBottomSheet(
             dismiss()
         }
         recyclerView.adapter = adapter
-        adapter.submitList(categories)
+
+        val sortedCategories = categories.map {
+            it.copy(discoverCategory = it.discoverCategory.copy(name = it.discoverCategory.name.tryToLocalise(resources)))
+        }.sortedBy { it.discoverCategory.name }
+
+        adapter.submitList(sortedCategories)
 
         val behavior = BottomSheetBehavior.from(view.parent as View)
         val windowHeight = resources.displayMetrics.heightPixels
         val halfHeight = windowHeight / 2
         behavior.peekHeight = halfHeight
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+    override fun onCancel(dialog: DialogInterface) {
+        this.onCategorySelectionCancel.invoke()
     }
 }

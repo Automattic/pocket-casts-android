@@ -3,10 +3,9 @@ package au.com.shiftyjelly.pocketcasts.preferences
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.util.Base64
+import androidx.core.content.edit
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
@@ -25,11 +24,13 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneActionUserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getString
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
@@ -61,6 +63,7 @@ import kotlin.math.max
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
@@ -119,20 +122,6 @@ class SettingsImpl @Inject constructor(
 
     override fun getVersionCode(): Int {
         return BuildConfig.VERSION_CODE
-    }
-
-    override fun getSentryDsn(): String {
-        return try {
-            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            }
-            applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
-        } catch (e: NameNotFoundException) {
-            ""
-        }
     }
 
     override val skipBackInSecs = UserSetting.SkipAmountPref(
@@ -197,6 +186,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
         fromString = { PodcastsSortType.fromClientIdString(it) },
         toString = { it.clientId.toString() },
+    )
+
+    override val prioritizeSeekAccuracy = UserSetting.BoolPref(
+        sharedPrefKey = "prioritizeSeekAccuracy",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
     )
 
     override fun setSelectPodcastsSortType(sortType: PodcastsSortType) {
@@ -463,10 +458,10 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun clearPlusPreferences() {
-        deleteCloudFileAfterPlaying.set(false, needsSync = false)
-        cloudAutoUpload.set(false, needsSync = false)
-        cloudAutoDownload.set(false, needsSync = false)
-        cloudDownloadOnlyOnWifi.set(false, needsSync = false)
+        deleteCloudFileAfterPlaying.set(false, updateModifiedAt = false)
+        cloudAutoUpload.set(false, updateModifiedAt = false)
+        cloudAutoDownload.set(false, updateModifiedAt = false)
+        cloudDownloadOnlyOnWifi.set(false, updateModifiedAt = false)
         setCancelledAcknowledged(false)
     }
 
@@ -538,17 +533,28 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val useEmbeddedArtwork = UserSetting.BoolPref(
-        sharedPrefKey = "useEmbeddedArtwork",
-        defaultValue = false,
+    override val artworkConfiguration = object : UserSetting<ArtworkConfiguration>(
+        sharedPrefKey = "artworkConfiguration",
         sharedPrefs = sharedPreferences,
-    )
+    ) {
+        override fun get(): ArtworkConfiguration {
+            return sharedPreferences.getString(sharedPrefKey)?.split(",")?.let { stringValues ->
+                val isEnabled = stringValues.getOrNull(0)?.toBooleanStrictOrNull() ?: return@let null
+                val elements = stringValues.drop(1).mapNotNullTo(mutableSetOf(), ArtworkConfiguration.Element::fromKey)
+                ArtworkConfiguration(isEnabled, elements)
+            } ?: ArtworkConfiguration(false)
+        }
 
-    override val useRssArtwork = UserSetting.BoolPref(
-        sharedPrefKey = "useRssArtwork",
-        defaultValue = true,
-        sharedPrefs = sharedPreferences,
-    )
+        override fun persist(value: ArtworkConfiguration, commit: Boolean) {
+            val stringValue = buildList {
+                add(value.useEpisodeArtwork.toString())
+                addAll(value.enabledElements.map(ArtworkConfiguration.Element::key))
+            }.joinToString(",")
+            sharedPrefs.edit(commit) {
+                putString(sharedPrefKey, stringValue)
+            }
+        }
+    }
 
     override val globalPlaybackEffects = object : UserSetting<PlaybackEffects>(
         sharedPrefKey = "globalPlaybackEffects",
@@ -561,9 +567,9 @@ class SettingsImpl @Inject constructor(
         }
 
         override fun persist(value: PlaybackEffects, commit: Boolean) {
-            globalPlaybackSpeed.set(value.playbackSpeed, needsSync = false)
-            globalAudioEffectRemoveSilence.set(value.trimMode, needsSync = false)
-            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted, needsSync = false)
+            globalPlaybackSpeed.set(value.playbackSpeed, updateModifiedAt = false)
+            globalAudioEffectRemoveSilence.set(value.trimMode, updateModifiedAt = false)
+            globalAudioEffectVolumeBoost.set(value.isVolumeBoosted, updateModifiedAt = false)
         }
     }
 
@@ -661,8 +667,40 @@ class SettingsImpl @Inject constructor(
         setInt("sleepTimerCustomMins", minutes)
     }
 
+    override fun setSleepEndOfEpisodes(episodes: Int) {
+        setInt("sleepEndOfEpisodes", episodes)
+    }
+
+    override fun setlastSleepEndOfEpisodes(episodes: Int) {
+        setInt("lastSleepEndOfEpisodes", episodes)
+    }
+
+    override fun setlastSleepEndOfChapters(chapters: Int) {
+        setInt("lastSleepEndOfChapters", chapters)
+    }
+
+    override fun setSleepEndOfChapters(chapters: Int) {
+        setInt("sleepEndOfChapters", chapters)
+    }
+
     override fun getSleepTimerCustomMins(): Int {
         return getInt("sleepTimerCustomMins", 5)
+    }
+
+    override fun getSleepEndOfEpisodes(): Int {
+        return getInt("sleepEndOfEpisodes", 1)
+    }
+
+    override fun getSleepEndOfChapters(): Int {
+        return getInt("sleepEndOfChapters", 1)
+    }
+
+    override fun getlastSleepEndOfEpisodes(): Int {
+        return getInt("lastSleepEndOfEpisodes", 0)
+    }
+
+    override fun getlastSleepEndOfChapter(): Int {
+        return getInt("lastSleepEndOfChapters", 0)
     }
 
     override fun setShowPlayedEpisodes(show: Boolean) {
@@ -894,6 +932,18 @@ class SettingsImpl @Inject constructor(
         return firebaseRemoteConfig.getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
     }
 
+    override fun getSleepTimerDeviceShakeThreshold(): Long {
+        return getRemoteConfigLong(FirebaseConfig.SLEEP_TIMER_DEVICE_SHAKE_THRESHOLD)
+    }
+
+    override fun getRefreshPodcastsBatchSize(): Long {
+        return getRemoteConfigLong(FirebaseConfig.REFRESH_PODCASTS_BATCH_SIZE)
+    }
+
+    override fun getExoPlayerCacheSizeInMB(): Long {
+        return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB)
+    }
+
     private fun getRemoteConfigLong(key: String): Long {
         val value = firebaseRemoteConfig.getLong(key)
         return if (value == 0L) (FirebaseConfig.defaults[key] as? Long ?: 0L) else value
@@ -967,6 +1017,18 @@ class SettingsImpl @Inject constructor(
     override val showArchivedDefault = UserSetting.BoolPref(
         sharedPrefKey = "default_show_archived",
         defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val shakeToResetSleepTimer = UserSetting.BoolPref(
+        sharedPrefKey = "shake_to_reset_sleep_timer",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val autoSleepTimerRestart = UserSetting.BoolPref(
+        sharedPrefKey = "auto_sleep_timer_restart",
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 
@@ -1320,6 +1382,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val profileBookmarksSortType = BookmarksSortTypeForProfile.UserSettingPref(
+        sharedPrefKey = Settings.PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PROFILE,
+        defaultValue = BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun addReviewRequestedDate() {
         val dates = getReviewRequestedDates().toMutableList()
         dates.add(Date().toString())
@@ -1335,11 +1403,24 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val useDynamicColorsForWidget: UserSetting<Boolean> = UserSetting.BoolPref(
+    override val useDynamicColorsForWidget: UserSetting<Boolean> = object : UserSetting<Boolean>(
         sharedPrefKey = "useDynamicColorsForWidget",
-        defaultValue = false,
         sharedPrefs = sharedPreferences,
-    )
+    ) {
+        override fun get(): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                sharedPrefs.getBoolean(sharedPrefKey, true)
+            } else {
+                false
+            }
+        }
+
+        override fun persist(value: Boolean, commit: Boolean) {
+            sharedPrefs.edit(commit) {
+                putBoolean(sharedPrefKey, value)
+            }
+        }
+    }
 
     private val _themeReconfigurationEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_LATEST)
     override val themeReconfigurationEvents: Flow<Unit>
@@ -1347,5 +1428,23 @@ class SettingsImpl @Inject constructor(
 
     override fun requestThemeReconfiguration() {
         _themeReconfigurationEvents.tryEmit(Unit)
+    }
+
+    private val _bottomInset = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+    override val bottomInset: Flow<Int>
+        get() = _bottomInset.asSharedFlow()
+
+    override fun updateBottomInset(height: Int) {
+        _bottomInset.tryEmit(height)
+    }
+
+    override fun automotiveConnectedToMediaSession(): Boolean {
+        return sharedPreferences.getBoolean(Settings.AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION, false)
+    }
+
+    override fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean) {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(Settings.AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION, isLoaded)
+        editor.apply()
     }
 }

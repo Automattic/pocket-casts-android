@@ -13,12 +13,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -158,6 +160,19 @@ class VersionMigrationsJob : JobService() {
         if (previousVersionCode < 6362) {
             upgradeTrimSilenceMode()
         }
+
+        if (previousVersionCode < 9209) {
+            consolidateEmbeddedArtworkSettings(applicationContext)
+        }
+
+        // Exclude 7.63-rc-3 (9227) from the migration as it was already migrated.
+        if (previousVersionCode < 9230 && previousVersionCode != 9227) {
+            migrateToGranularEpisodeArtworkSettings(applicationContext)
+        }
+
+        if (previousVersionCode < 9235) {
+            enableDynamicColors()
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {
@@ -186,11 +201,11 @@ class VersionMigrationsJob : JobService() {
     private fun performV7Migration() {
         // We want v6 users to keep defaulting to download, new users should get the new stream default
         val currentStreamingPreference = if (settings.contains(Settings.PREFERENCE_GLOBAL_STREAMING_MODE)) settings.streamingMode.value else false
-        settings.streamingMode.set(currentStreamingPreference, needsSync = false)
+        settings.streamingMode.set(currentStreamingPreference, updateModifiedAt = false)
     }
 
     private fun addUpNextAutoDownload() {
-        settings.autoDownloadUpNext.set(!settings.streamingMode.value, needsSync = false)
+        settings.autoDownloadUpNext.set(!settings.streamingMode.value, updateModifiedAt = false)
     }
 
     private fun deletePodcastImages() {
@@ -234,5 +249,24 @@ class VersionMigrationsJob : JobService() {
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not migrate trimsilence mode on podcasts")
         }
+    }
+
+    private fun consolidateEmbeddedArtworkSettings(context: Context) {
+        if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+            val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
+            val useFileArtwork = settings.getBooleanForKey("useEmbeddedArtwork", false)
+            settings.setBooleanForKey("useEpisodeArtwork", useEpisodeArtwork || useFileArtwork)
+        }
+    }
+
+    private fun migrateToGranularEpisodeArtworkSettings(context: Context) {
+        if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+            val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
+            settings.artworkConfiguration.set(ArtworkConfiguration((useEpisodeArtwork)), updateModifiedAt = true)
+        }
+    }
+
+    private fun enableDynamicColors() {
+        settings.useDynamicColorsForWidget.set(true, updateModifiedAt = true)
     }
 }

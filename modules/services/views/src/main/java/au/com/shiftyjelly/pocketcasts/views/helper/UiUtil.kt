@@ -1,18 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.Context
-import android.content.res.Configuration
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.R
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object UiUtil {
-
-    private const val MINIMUM_DIMENSION_DP_FOR_NAVIGATION_DRAWER = 600
 
     fun hideKeyboard(view: View) {
         val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -83,14 +83,13 @@ object UiUtil {
 
     fun getGridColumnCount(smallArtwork: Boolean, context: Context?): Int {
         context ?: return 1
-        val contentViewWidthDp = getContentViewWidthDp(context)
-        val isDrawerHidden = isNavigationDrawerHidden(context)
-        return getGridColumnCount(contentViewWidthDp, context.resources.configuration.inPortrait(), isDrawerHidden, smallArtwork)
+        val contentViewWidthDp = getWindowWidthDp(context)
+        return getGridColumnCount(contentViewWidthDp, context.resources.configuration.inPortrait(), smallArtwork)
     }
 
     fun getDiscoverGridColumnCount(context: Context?): Int {
         context ?: return 2
-        val contentViewWidthDp = getContentViewWidthDp(context)
+        val contentViewWidthDp = getWindowWidthDp(context)
         val inPortrait = context.resources.configuration.inPortrait()
         return if (inPortrait) {
             when {
@@ -110,7 +109,7 @@ object UiUtil {
     fun getDiscoverGridImageWidthPx(context: Context): Int {
         val columns = getDiscoverGridColumnCount(context)
         val padding = (columns + 1) * (16f * context.resources.displayMetrics.density)
-        return ((getContentViewWidthPx(context) - padding) / columns).toInt()
+        return ((getWindowWidthPx(context) - padding) / columns).toInt()
     }
 
     fun getWindowWidthPx(context: Context): Int {
@@ -118,37 +117,14 @@ object UiUtil {
     }
 
     fun getWindowWidthDp(context: Context): Int {
-        val displayMetrics = context.resources.displayMetrics
-        return (displayMetrics.widthPixels * displayMetrics.density).toInt()
-    }
-
-    fun getWindowHeightPx(context: Context): Int {
-        return context.resources.displayMetrics.heightPixels
-    }
-
-    fun getWindowHeightDp(context: Context): Int {
-        val displayMetrics = context.resources.displayMetrics
-        return (displayMetrics.heightPixels * displayMetrics.density).toInt()
-    }
-
-    fun getContentViewWidthPx(context: Context): Int {
-        var windowWidthPx = getWindowWidthPx(context)
-        val drawerHidden = isNavigationDrawerHidden(context)
-        if (!drawerHidden) {
-            windowWidthPx -= getNavigationDrawerWidthPx(context)
-        }
-        return windowWidthPx
-    }
-
-    fun getContentViewWidthDp(context: Context): Int {
-        return (getContentViewWidthPx(context) / getDensity(context)).toInt()
+        return (getWindowWidthPx(context) / getDensity(context)).toInt()
     }
 
     fun getDensity(context: Context): Float {
         return context.resources.displayMetrics.density
     }
 
-    private fun getGridColumnCount(contentViewWidthDp: Int, portrait: Boolean, isNavigationDrawerHidden: Boolean, smallArtwork: Boolean): Int {
+    private fun getGridColumnCount(contentViewWidthDp: Int, portrait: Boolean, smallArtwork: Boolean): Int {
         val num: Int
 
         if (portrait) {
@@ -160,15 +136,7 @@ object UiUtil {
                 num = if (smallArtwork) 6 else 5
             }
         } else {
-            if (isNavigationDrawerHidden) {
-                num = if (smallArtwork) 6 else 5
-            } else {
-                if (contentViewWidthDp > 700) {
-                    num = if (smallArtwork) 7 else 6
-                } else {
-                    num = if (smallArtwork) 6 else 5
-                }
-            }
+            num = if (smallArtwork) 6 else 5
         }
 
         return num
@@ -176,36 +144,17 @@ object UiUtil {
 
     fun getGridImageWidthPx(smallArtwork: Boolean, context: Context): Int {
         val columnCount = getGridColumnCount(smallArtwork, context)
-        val contentWidthPx = getContentViewWidthPx(context)
-        return (contentWidthPx.toFloat() / columnCount).toInt()
-    }
-
-    fun isNavigationDrawerHidden(context: Context): Boolean {
-        val config = context.resources.configuration
-        val displayMetrics = context.resources.displayMetrics
-        val width = (displayMetrics.widthPixels / displayMetrics.density).toInt()
-        val height = (displayMetrics.heightPixels / displayMetrics.density).toInt()
-        return width < MINIMUM_DIMENSION_DP_FOR_NAVIGATION_DRAWER || height < MINIMUM_DIMENSION_DP_FOR_NAVIGATION_DRAWER || config.orientation == Configuration.ORIENTATION_PORTRAIT
-    }
-
-    fun getNavigationDrawerWidthPx(context: Context): Int {
-        return getNavigationDrawerWidthPx(getWindowWidthPx(context), getDensity(context))
-    }
-
-    private fun getNavigationDrawerWidthPx(windowWidthPx: Int, density: Float): Int {
-        val windowWidthDp = (windowWidthPx / density).toInt()
-
-        val defaultDrawerWidthDp = 330
-        val defaultDrawerWidthPx = (defaultDrawerWidthDp * density).toInt()
-
-        // thin screen use most of the screen
-        if (windowWidthDp < 350) {
-            return (windowWidthPx * 0.9f).toInt()
-        } else if (windowWidthDp < 370) {
-            return (windowWidthPx * 0.85f).toInt()
+        val contentWidthPx = getWindowWidthPx(context)
+        val spacingWidth = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
+            // add the spacing between the columns and the padding on the sides of the grid
+            val resources = context.resources
+            val gridItemPadding = resources.getDimensionPixelSize(R.dimen.grid_item_padding)
+            val gridOuterPadding = resources.getDimensionPixelSize(R.dimen.grid_outer_padding)
+            ((columnCount - 1) * gridItemPadding) + (2 * gridOuterPadding)
+        } else {
+            0
         }
-
-        return defaultDrawerWidthPx
+        return ((contentWidthPx.toFloat() - spacingWidth) / columnCount).toInt()
     }
 
     fun displayDialogNoEmailApp(context: Context) {

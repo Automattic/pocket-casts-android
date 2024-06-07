@@ -1,19 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-27 13:54:03+0000
+Translation-Revision-Date: 2024-05-21 13:54:02+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">若有任何已下載的檔案在 Pocket Casts 應用程式中遺失，請嘗試還原這些檔案。</string>
+    <string name="settings_storage_fix_downloads">修正下載問題</string>
+    <string name="nova_launcher_new_releases">新發佈內容</string>
+    <string name="nova_launcher_subscribed_podcasts">已訂閱的 Podcast</string>
+    <string name="whats_new_new_widgets_message">我們新增了三個全新小工具，讓你從主畫面管理 Podcast 時更加輕鬆。 不妨探索一下！</string>
+    <string name="medium_player_classic_widget_label">中型播放器 (傳統)</string>
+    <string name="widget_preview_time_left_4">剩餘 1 小時 36 分鐘</string>
+    <string name="widget_preview_time_left_3">剩餘 55 分鐘</string>
+    <string name="widget_preview_time_left_2">剩餘 12 分鐘</string>
+    <string name="widget_preview_time_left_1">剩餘 25 分鐘</string>
+    <string name="widget_preview_episode_in_up_next_title">「接下來播放」的單集</string>
+    <string name="widget_preview_episode_title">單集標題</string>
+    <string name="hour_and_minutes">1 小時 %d 分鐘</string>
+    <string name="hours_and_minutes">%d 小時 %d 分鐘</string>
+    <string name="player_sleep_time_fired_end_of_chapter">睡眠計時器於章節結尾停止。</string>
+    <string name="player_sleep_in_chapters">在 %d 個章節後休眠</string>
+    <string name="player_sleep_in_one_chapter">在 1 個章節後休眠</string>
+    <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>
+    <string name="player_sleep_timer_in_chapter">1 個章節後</string>
+    <string name="player_sleep_timer_in_episode_plural">%d 集後</string>
+    <string name="player_sleep_timer_in_episode">1 集後</string>
+    <string name="settings_use_episode_artwork_customization_description">若想在應用程式的這些區段中查看單集封面圖片，請選取</string>
+    <string name="settings_use_episode_artwork_customization_section">自訂項目</string>
+    <string name="settings_use_episode_artwork_title">單集封面圖片</string>
+    <string name="settings_use_episode_artwork_advanced">進階單集封面圖片設定</string>
+    <string name="player_sleep_in_episodes">在 %d 集後休眠</string>
+    <string name="player_sleep_in_one_episode">在 1 集後休眠</string>
+    <string name="player_sleep_timer_stopped_your_podcast">睡眠計時器停止播放 Podcast。</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">裝置晃動後重新啟動睡眠計時器</string>
+    <string name="whats_new_new_widgets_title">全新小工具</string>
+    <string name="widget_check_out_discover">查看「探索」深入更多內容</string>
+    <string name="widget_nothing_in_up_next">「接下來播放」沒有內容</string>
+    <string name="widget_no_episode_playing">沒有正在播放的單集</string>
+    <string name="large_player_widget_label">大型播放器</string>
+    <string name="medium_player_widget_label">中型播放器</string>
+    <string name="small_player_widget_label">小型播放器</string>
+    <string name="clear_search">清除搜尋</string>
+    <string name="bookmarks_search_results_not_found">找不到符合搜尋內容的書籤。</string>
+    <string name="podcast_and_episode">Podcast 與節目</string>
+    <string name="skip_chapters">預先選取的章節</string>
+    <string name="settings_use_episode_artwork_details">有些節目會針對特定單集推出自訂封面圖片。 若啟用此選項，Pocket Casts 就會顯示這些封面圖片，而非節目的封面圖片。</string>
+    <string name="settings_use_episode_artwork">使用單集封面圖片</string>
+    <string name="episode_sort_title_z_a">標題 (Z-A)</string>
+    <string name="episode_sort_title_a_z">標題 (A-Z)</string>
+    <string name="discover_most_popular_in">在「%s」最受歡迎</string>
+    <string name="discover_select_categories">請選取類別</string>
+    <string name="discover_all_categories">所有類別</string>
+    <string name="upgrade_to_patron">升級至 Patron</string>
+    <string name="upgrade_to_plus">升級至 Plus</string>
+    <string name="whats_new_got_it_button">知道了</string>
+    <string name="skip_chapters_patron_prompt">訂閱 Pocket Casts Patron，就能預先選取章節並享有更多功能</string>
+    <string name="skip_chapters_plus_prompt">訂閱 Pocket Casts Plus，就能預先選取章節並享有更多功能</string>
+    <string name="select_one_chapter_message">請選取至少一章</string>
     <string name="number_of_chapters_summary_singular">1 個章節 • %d 個章節已隱藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 個章節 • %2$d 個章節已隱藏</string>
     <string name="single_chapter">1 個章節</string>
     <string name="number_of_chapters">%d 個章節</string>
-    <string name="skip_chapters">略過章節</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 年份的 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 獨家內容</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">兌換代碼</string>
-    <string name="whats_new_slumber_studios_title">大膽作夢</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">首年訂閱後</string>
     <string name="onboarding_plus_recurring_after_intro_offer">於 %s定期付款</string>
     <string name="half_price_first_year">首年享五折優惠</string>
@@ -59,13 +109,10 @@ Language: zh_TW
     <string name="eoy_story_top_podcasts_title">你也是這些節目的忠實粉絲！</string>
     <string name="end_of_year_story_top_podcast_title">%1$s 是你在 2023 年最常收聽的節目</string>
     <string name="end_of_year_share_story">分享這個故事</string>
-    <string name="whats_new_bookmarks_enable_now_button">立即啟用</string>
     <string name="podcast_log_in_to_rate">評分前請先登入</string>
     <string name="podcast_submit_rating_no_internet">找不到網際網路連線。 若要提交評分，請先連線至網際網路。</string>
     <string name="podcast_rate">為 %s 評分</string>
     <string name="submit">提交</string>
-    <string name="whats_new_bookmarks_try_now_button">立即試試</string>
-    <string name="whats_new_bookmarks_title">書籤登場！</string>
     <string name="bookmarks_upsell_instructions_early_access">利用 Pocket Casts Patron 搶先體驗此功能，還能儲存所愛單集的時間戳記。 即將開放 Plus 訂閱者使用。</string>
     <string name="bookmarks_upsell_instructions">利用 Pocket Casts Plus 儲存你所愛單集的時間戳記，並解鎖其他許多功能。</string>
     <string name="error_loading_show_notes">找不到此單集的節目說明。</string>
@@ -898,7 +945,6 @@ Language: zh_TW
     <string name="settings_export_send_email">傳送電子郵件</string>
     <string name="settings_export_save_file_summary">將 OPML 檔案匯出到你的儲存空間。</string>
     <string name="settings_export_save_file">儲存檔案</string>
-    <string name="settings_embedded_artwork_details">在播放器中顯示下載檔案的封面 (如有)，而不使用節目的封面。</string>
     <string name="settings_developer">開發人員</string>
     <string name="settings_close_upgrade_offer">關閉升級方案</string>
     <string name="settings_choose_podcasts">選擇 Podcast</string>
@@ -1433,7 +1479,7 @@ Language: zh_TW
     <string name="podcasts">Podcast 節目</string>
     <string name="player_started_from">從第 %d 秒開始播放 Podcast</string>
     <string name="player_skipped_last">跳過最後 %d 秒</string>
-    <string name="player_sleep_time_fired">睡眠計時器已在單集結束時停止。\n祝好夢！</string>
+    <string name="player_sleep_time_fired">睡眠計時器已在單集結束時停止。</string>
     <string name="player_actions_show_as_delete_for_custom">對自訂單集顯示為刪除</string>
     <string name="player_actions_hidden_for_custom">對自訂單集隱藏</string>
     <string name="player_rearrange_actions_hidden">更多動作</string>
@@ -1455,7 +1501,6 @@ Language: zh_TW
     <string name="player_time_saved_detail">使用此功能總共為你省下 %s。</string>
     <string name="player_tab_playing_wide">正在播放</string>
     <string name="player_tab_playing">播放中</string>
-    <string name="player_sleep_when_episode_ends">單集結束時睡眠</string>
     <string name="player_sleep_timer">睡眠計時器</string>
     <string name="player_sleep_timer_title">睡眠計時器</string>
     <string name="player_sleep_end_of_episode">單集結束</string>
@@ -1464,7 +1509,6 @@ Language: zh_TW
     <string name="player_sleep_cancel_timer">取消計時器</string>
     <string name="player_sleep_add_5_minutes">+ 5 分鐘</string>
     <string name="player_sleep_60_minutes">60 分鐘</string>
-    <string name="player_sleep_5_minutes">5 分鐘</string>
     <string name="player_sleep_30_minutes">30 分鐘</string>
     <string name="player_sleep_15_minutes">15 分鐘</string>
     <string name="player_pip">進入子母畫面</string>
@@ -1627,4 +1671,7 @@ Language: zh_TW
     <string name="unarchive">取消封存</string>
     <string name="archive">封存</string>
     <string name="add_to_up_next">新增到「接下來播放」</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="other">%1$d 集單集 - 剩餘 %2$s</item>
+    </plurals>
 </resources>

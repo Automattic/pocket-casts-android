@@ -21,12 +21,13 @@ import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.playIfTrue
-import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.setSeekBarState
-import au.com.shiftyjelly.pocketcasts.player.binding.ViewExtensions.showIfPresent
+import au.com.shiftyjelly.pocketcasts.player.binding.playIfTrue
+import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
+import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
@@ -35,32 +36,24 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
-import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
-import au.com.shiftyjelly.pocketcasts.utils.images.RoundedCornersTransformation
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.toCircle
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import coil.load
-import coil.request.Disposable
-import coil.request.ErrorResult
-import coil.request.ImageRequest
-import coil.size.Scale
-import coil.size.Size
+import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -69,13 +62,10 @@ import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Headers.Companion.headersOf
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
@@ -94,7 +84,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     @Inject lateinit var bookmarkFeature: BookmarkFeatureControl
 
-    lateinit var imageLoader: PodcastImageLoaderThemed
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: AdapterPlayerHeaderBinding? = null
     private val sourceView = SourceView.PLAYER
@@ -118,9 +108,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         val binding = binding ?: return
 
-        imageLoader = PodcastImageLoaderThemed(view.context)
-        imageLoader.radiusPx = 8.dpToPx(view.context)
-        imageLoader.shouldScale = false
+        imageRequestFactory = PocketCastsImageRequestFactory(view.context, cornerRadius = 8).themed().copy(isDarkTheme = true)
 
         binding.skipBack.setOnClickListener {
             onSkipBack()
@@ -224,34 +212,22 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
             binding.episodeTitle.setTextColor(playerContrast1)
 
-            if (headerViewModel.embeddedArtwork == PlayerViewModel.Artwork.None && headerViewModel.podcastUuid != null) {
-                loadArtwork(headerViewModel.podcastUuid, binding.artwork)
-            } else {
-                loadEpisodeArtwork(headerViewModel.embeddedArtwork, binding.artwork)?.let { disposable ->
-                    launch {
-                        // If episode artwork fails to load, then load podcast artwork
-                        val result = disposable.job.await()
-                        if (result is ErrorResult && headerViewModel.podcastUuid != null) {
-                            loadArtwork(headerViewModel.podcastUuid, binding.artwork)
-                        }
-                    }
-                }
+            headerViewModel.episode?.let { episode ->
+                loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
             }
 
-            binding.podcastTitle?.let { podcastTitle ->
-                podcastTitle.setOnClickListener {
-                    val podcastUuid = headerViewModel.podcastUuid ?: return@setOnClickListener
-                    analyticsTracker.track(
-                        AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
-                        mapOf(
-                            AnalyticsProp.Key.EPISODE_UUID to headerViewModel.episodeUuid,
-                            AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
-                        ),
-                    )
-                    (activity as? FragmentHostListener)?.let { listener ->
-                        listener.closePlayer()
-                        listener.openPodcastPage(podcastUuid)
-                    }
+            binding.podcastTitle.setOnClickListener {
+                val podcastUuid = headerViewModel.podcastUuid ?: return@setOnClickListener
+                analyticsTracker.track(
+                    AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
+                    mapOf(
+                        AnalyticsProp.Key.EPISODE_UUID to headerViewModel.episodeUuid,
+                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
+                    ),
+                )
+                (activity as? FragmentHostListener)?.let { listener ->
+                    listener.closePlayer()
+                    listener.openPodcastPage(podcastUuid, sourceView.analyticsValue)
                 }
             }
 
@@ -318,9 +294,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.chapterUrl.showIfPresent(headerViewModel.chapter?.url)
             binding.chapterUrlFront?.showIfPresent(headerViewModel.chapter?.url)
             binding.videoView.isVisible = headerViewModel.isVideoVisible()
-            binding.episodeTitle.text = headerViewModel.episodeTitle
-            binding.podcastTitle?.text = headerViewModel.podcastTitle
-            binding.podcastTitle?.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
+            binding.episodeTitle.text = headerViewModel.title
+            binding.podcastTitle.text = headerViewModel.podcastTitle
+            binding.podcastTitle.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
             binding.chapterSummary.text = headerViewModel.chapterSummary
             binding.chapterSummary.isVisible = headerViewModel.isChaptersPresent
             binding.previousChapter.alpha = if (headerViewModel.isFirstChapter) 0.5f else 1f
@@ -387,51 +363,32 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         return ThemeColor.playerHighlight01(viewModel.theme, viewModel.iconTintColor)
     }
 
-    private var lastLoadedUuid: String? = null
-    private fun loadArtwork(podcastUuid: String, imageView: ImageView) {
-        if (lastLoadedUuid == podcastUuid) return
-        imageLoader.largePlaceholder().onlyDarkTheme().loadPodcastUuid(podcastUuid).into(imageView)
-        lastLoadedUuid = podcastUuid
-        lastLoadedEmbedded = null
-    }
+    private var lastLoadedBaseEpisodeId: String? = null
+    private var lastUseEpisodeArtwork: Boolean? = null
+    private var lastLoadedChapterPath: String? = null
 
-    private var lastLoadedEmbedded: PlayerViewModel.Artwork? = null
-    private fun loadEpisodeArtwork(
-        embeddedArtwork: PlayerViewModel.Artwork,
+    private fun loadArtwork(
+        baseEpisode: BaseEpisode,
+        useEpisodeArtwork: Boolean,
         imageView: ImageView,
-    ): Disposable? {
-        if (embeddedArtwork == PlayerViewModel.Artwork.None || lastLoadedEmbedded == embeddedArtwork) return null
-
-        var disposable: Disposable? = null
-
-        if (embeddedArtwork is PlayerViewModel.Artwork.Url || embeddedArtwork is PlayerViewModel.Artwork.Path) {
-            imageView.imageTintList = null
-
-            val imageBuilder: ImageRequest.Builder.() -> Unit = {
-                error(IR.drawable.defaultartwork_dark)
-                headers(headersOf("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER))
-                scale(Scale.FIT)
-                transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
-            }
-
-            if (embeddedArtwork is PlayerViewModel.Artwork.Path) {
-                disposable = imageView.load(data = File(embeddedArtwork.path), builder = imageBuilder)
-            } else if (embeddedArtwork is PlayerViewModel.Artwork.Url) {
-                disposable = imageView.load(data = embeddedArtwork.url, builder = imageBuilder)
-            }
-
-            lastLoadedEmbedded = embeddedArtwork
-            lastLoadedUuid = null
+    ) {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
+            return
         }
-        return disposable
+
+        lastLoadedBaseEpisodeId = baseEpisode.uuid
+        lastUseEpisodeArtwork = useEpisodeArtwork
+        imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }
 
     private fun loadChapterArtwork(chapter: Chapter?, imageView: ImageView) {
-        chapter?.imagePath?.let {
-            imageView.load(File(it)) {
-                size(Size.ORIGINAL)
-                transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
-            }
+        if (lastLoadedChapterPath == chapter?.imagePath) {
+            return
+        }
+
+        lastLoadedChapterPath = chapter?.imagePath
+        chapter?.imagePath?.let { pathOrUrl ->
+            imageRequestFactory.createForFileOrUrl(pathOrUrl).loadInto(imageView)
         } ?: run {
             imageView.setImageDrawable(null)
         }
@@ -496,7 +453,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val podcast = viewModel.podcast
         (activity as FragmentHostListener).closePlayer()
         if (podcast != null) {
-            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid)
+            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid, sourceView.analyticsValue)
         } else {
             (activity as? FragmentHostListener)?.openCloudFiles()
         }

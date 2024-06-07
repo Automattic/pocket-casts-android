@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.servers.adapters.InstantAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
@@ -45,6 +46,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.protobuf.ProtoConverterFactory
+import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -152,10 +154,14 @@ class ServersModule {
     }
 
     @Provides
-    internal fun provideOkHttpClientBuilder(@SyncServerCache cache: Cache): OkHttpClient.Builder {
+    internal fun provideOkHttpClientBuilder(
+        @SyncServerCache cache: Cache,
+        @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
+    ): OkHttpClient.Builder {
         var builder = OkHttpClient.Builder()
-            .addNetworkInterceptor(INTERCEPTOR_CACHE_MODIFIER)
-            .addNetworkInterceptor(INTERCEPTOR_USER_AGENT)
+            .addInterceptor(INTERCEPTOR_CACHE_MODIFIER)
+            .addInterceptor(INTERCEPTOR_USER_AGENT)
+            .addInterceptor(crashLoggingInterceptor)
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -222,19 +228,27 @@ class ServersModule {
     @Provides
     @ShowNotesCache
     @Singleton
-    internal fun provideOkHttpShowNotesCache(@ApplicationContext context: Context): OkHttpClient {
-        return getShowNotesClient(context)
+    internal fun provideOkHttpShowNotesCache(
+        @ApplicationContext context: Context,
+        @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
+    ): OkHttpClient {
+        return getShowNotesClient(context).newBuilder()
+            .addInterceptor(crashLoggingInterceptor)
+            .build()
     }
 
     @Provides
     @NoCacheOkHttpClientBuilder
     @Singleton
-    internal fun provideOkHttpClientNoCacheBuilder(): OkHttpClient.Builder {
+    internal fun provideOkHttpClientNoCacheBuilder(
+        @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
+    ): OkHttpClient.Builder {
         val dispatcher = Dispatcher()
         dispatcher.maxRequestsPerHost = 5
         var builder = OkHttpClient.Builder()
             .dispatcher(dispatcher)
-            .addNetworkInterceptor(INTERCEPTOR_USER_AGENT)
+            .addInterceptor(INTERCEPTOR_USER_AGENT)
+            .addInterceptor(crashLoggingInterceptor)
             .connectTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -350,6 +364,10 @@ class ServersModule {
     internal fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
         return AccountManager.get(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideCacheServer(@PodcastCacheServerRetrofit retrofit: Retrofit): PodcastCacheServer = retrofit.create()
 }
 
 @Qualifier
@@ -415,3 +433,7 @@ annotation class NoCacheOkHttpClientBuilder
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class TokenInterceptor
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class CrashLoggingInterceptor // preferably, should be the last in interceptor chain

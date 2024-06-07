@@ -128,10 +128,11 @@ class PodcastsViewModel
 
     private fun buildHomeFolderItems(podcasts: List<Podcast>, folders: List<FolderItem>, podcastSortType: PodcastsSortType): List<FolderItem> {
         if (podcastSortType == PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST) {
+            val folderUuids = folders.mapTo(mutableSetOf()) { it.uuid }
             val items = mutableListOf<FolderItem>()
-            val uuidToFolder = folders.associateBy({ it.uuid }, { it }).toMutableMap()
+            val uuidToFolder = folders.associateByTo(mutableMapOf(), FolderItem::uuid)
             for (podcast in podcasts) {
-                if (podcast.folderUuid == null) {
+                if (podcast.folderUuid == null || !folderUuids.contains(podcast.folderUuid)) {
                     items.add(FolderItem.Podcast(podcast))
                 } else {
                     // add the folder in the position of the podcast with the latest release date
@@ -244,7 +245,7 @@ class PodcastsViewModel
 
         val folder = folder
         if (folder == null) {
-            settings.podcastsSortType.set(PodcastsSortType.DRAG_DROP, needsSync = true)
+            settings.podcastsSortType.set(PodcastsSortType.DRAG_DROP, updateModifiedAt = true)
         } else {
             folderManager.updateSortType(folderUuid = folder.uuid, podcastsSortType = PodcastsSortType.DRAG_DROP)
         }

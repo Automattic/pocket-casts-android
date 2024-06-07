@@ -171,7 +171,7 @@ private fun ComposableTaskerInputFieldPreview() {
             TaskerInputFieldState.Content(
                 MutableStateFlow("some value"),
                 R.string.archive,
-                RD.drawable.widget_play,
+                RD.drawable.ic_widget_play,
                 MutableStateFlow(true),
                 {},
                 listOf("%test"),

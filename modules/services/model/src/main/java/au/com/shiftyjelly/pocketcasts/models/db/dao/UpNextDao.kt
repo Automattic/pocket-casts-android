@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kotlinx.coroutines.flow.map
 
 @Dao
 abstract class UpNextDao {
@@ -126,11 +127,19 @@ abstract class UpNextDao {
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT 1")
     abstract fun findCurrentUpNextEpisode(): UpNextEpisode?
 
-    @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC LIMIT 1")
-    abstract fun findCurrentEpisode(): PodcastEpisode?
+    @Query("SELECT episodeUuid FROM up_next_episodes ORDER BY position ASC LIMIT :limit")
+    protected abstract fun findUpNextEpisodeIds(limit: Int): List<String>
 
-    @Query("SELECT user_episodes.* FROM up_next_episodes JOIN user_episodes ON user_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC LIMIT 1")
-    abstract fun findCurrentUserEpisode(): UserEpisode?
+    @Query("SELECT * FROM podcast_episodes WHERE uuid = :id")
+    protected abstract suspend fun findPodcastEpisode(id: String): PodcastEpisode?
+
+    @Query("SELECT * FROM user_episodes WHERE uuid = :id")
+    protected abstract suspend fun findUserEpisode(id: String): UserEpisode?
+
+    @Transaction
+    open suspend fun findUpNextEpisodes(limit: Int): List<BaseEpisode> {
+        return findUpNextEpisodeIds(limit).mapNotNull { findPodcastEpisode(it) ?: findUserEpisode(it) }
+    }
 
     @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
     abstract fun findEpisodes(): List<PodcastEpisode>

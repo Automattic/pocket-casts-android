@@ -13,11 +13,13 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
@@ -44,7 +46,6 @@ interface Settings {
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
         const val WP_COM_API_URL = "https://public-api.wordpress.com"
-        const val SLUMBER_STUDIOS_PROMO_URL = "https://slumberstudios.com/pocketcasts"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
@@ -54,14 +55,14 @@ interface Settings {
         const val INFO_LEARN_MORE_URL = "https://www.pocketcasts.com/plus/"
         const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
         const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"
-        const val INFO_CANCEL_URL = "https://support.pocketcasts.com/article/subscription-info/"
+        const val INFO_CANCEL_URL = "https://support.pocketcasts.com/knowledge-base/how-to-cancel-a-subscription/"
         const val INFO_FAQ_URL = "https://support.pocketcasts.com/android/?device=android"
 
         const val USER_AGENT_POCKETCASTS_SERVER = "Pocket Casts/Android/" + BuildConfig.VERSION_NAME
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9119
+        const val WHATS_NEW_VERSION_CODE = 9121
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -93,6 +94,7 @@ interface Settings {
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_EPISODE = "bookmarksSortTypeForEpisode"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST = "bookmarksSortTypeForPodcast"
+        const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PROFILE = "bookmarksSortTypeForProfile"
 
         val SUPPORTED_LANGUAGE_CODES = arrayOf("us", "se", "jp", "gb", "fr", "es", "de", "ca", "au", "it", "ru", "br", "no", "be", "cn", "dk", "sw", "ch", "ie", "pl", "kr", "nl")
 
@@ -104,6 +106,7 @@ interface Settings {
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
+        const val INTENT_OPEN_APP_PODCAST_UUID = "INTENT_OPEN_APP_PODCAST_UUID"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
         const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
         const val INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE = "INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE"
@@ -120,6 +123,12 @@ interface Settings {
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
 
         const val BOOKMARK_UUID = "bookmark_uuid"
+
+        const val PODCAST_UUID = "podcast_uuid"
+
+        const val SOURCE_VIEW = "source_view"
+
+        const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -130,6 +139,8 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_PODCAST("podcastImport"),
         NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR("signInError"),
         NOTIFICATION_CHANNEL_ID_BOOKMARK("bookmark"),
+        NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS("fixDownloads"),
+        NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE("fixDownloadsComplete"),
     }
 
     enum class NotificationId(val value: Int) {
@@ -138,6 +149,8 @@ interface Settings {
         DOWNLOADING(21483648),
         SIGN_IN_ERROR(21483649),
         BOOKMARK(21483650),
+        FIX_DOWNLOADS(21483651),
+        FIX_DOWNLOADS_COMPLETE(21483652),
     }
 
     enum class UpNextAction(val serverId: Int) {
@@ -263,8 +276,6 @@ interface Settings {
     fun getVersion(): String
     fun getVersionCode(): Int
 
-    fun getSentryDsn(): String
-
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>
 
@@ -274,6 +285,7 @@ interface Settings {
     fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     val backgroundRefreshPodcasts: UserSetting<Boolean>
     val podcastsSortType: UserSetting<PodcastsSortType>
+    val prioritizeSeekAccuracy: UserSetting<Boolean>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
@@ -328,8 +340,7 @@ interface Settings {
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
     val autoDownloadUpNext: UserSetting<Boolean>
 
-    val useEmbeddedArtwork: UserSetting<Boolean>
-    val useRssArtwork: UserSetting<Boolean>
+    val artworkConfiguration: UserSetting<ArtworkConfiguration>
 
     val globalPlaybackEffects: UserSetting<PlaybackEffects>
 
@@ -352,7 +363,15 @@ interface Settings {
     fun getClearHistoryTime(): Long
 
     fun setSleepTimerCustomMins(minutes: Int)
+    fun setSleepEndOfEpisodes(episodes: Int)
+    fun setSleepEndOfChapters(chapters: Int)
+    fun setlastSleepEndOfEpisodes(episodes: Int)
+    fun setlastSleepEndOfChapters(chapters: Int)
     fun getSleepTimerCustomMins(): Int
+    fun getSleepEndOfEpisodes(): Int
+    fun getSleepEndOfChapters(): Int
+    fun getlastSleepEndOfEpisodes(): Int
+    fun getlastSleepEndOfChapter(): Int
 
     fun setShowPlayedEpisodes(show: Boolean)
     fun showPlayedEpisodes(): Boolean
@@ -385,6 +404,10 @@ interface Settings {
     fun getEpisodeSearchDebounceMs(): Long
     fun getReportViolationUrl(): String
     fun getSlumberStudiosPromoCode(): String
+    fun getSleepTimerDeviceShakeThreshold(): Long
+    fun getRefreshPodcastsBatchSize(): Long
+    fun getExoPlayerCacheSizeInMB(): Long
+
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 
     val marketingOptIn: UserSetting<Boolean>
@@ -425,6 +448,8 @@ interface Settings {
     val autoPlayNextEpisodeOnEmpty: UserSetting<Boolean>
     val showArchivedDefault: UserSetting<Boolean>
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
+    val shakeToResetSleepTimer: UserSetting<Boolean>
+    val autoSleepTimerRestart: UserSetting<Boolean>
     fun setMultiSelectItems(items: List<Int>)
     fun setLastPauseTime(date: Date)
     fun getLastPauseTime(): Date?
@@ -498,6 +523,7 @@ interface Settings {
     val episodeBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val playerBookmarksSortType: UserSetting<BookmarksSortTypeDefault>
     val podcastBookmarksSortType: UserSetting<BookmarksSortTypeForPodcast>
+    val profileBookmarksSortType: UserSetting<BookmarksSortTypeForProfile>
 
     fun addReviewRequestedDate()
     fun getReviewRequestedDates(): List<String>
@@ -515,4 +541,10 @@ interface Settings {
     // system dark mode.
     val themeReconfigurationEvents: Flow<Unit>
     fun requestThemeReconfiguration()
+
+    val bottomInset: Flow<Int>
+    fun updateBottomInset(height: Int)
+
+    fun automotiveConnectedToMediaSession(): Boolean
+    fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
 }

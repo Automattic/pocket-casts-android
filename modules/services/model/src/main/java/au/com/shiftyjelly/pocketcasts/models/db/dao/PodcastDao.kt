@@ -8,9 +8,14 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherRecentlyPlayedPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -385,5 +390,70 @@ abstract class PodcastDao {
     abstract suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive, modified: Date = Date())
 
     @Query("UPDATE podcasts SET auto_archive_episode_limit = :value, auto_archive_episode_limit_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
-    abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?, modified: Date = Date())
+    abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit, modified: Date = Date())
+
+    @Query("DELETE FROM trending_podcasts")
+    protected abstract suspend fun deleteAllTrendingPodcasts()
+
+    @Insert(onConflict = REPLACE)
+    protected abstract suspend fun insertAllTrendingPodcasts(podcasts: List<TrendingPodcast>)
+
+    @Transaction
+    open suspend fun replaceAllTrendingPodcasts(podcasts: List<TrendingPodcast>) {
+        deleteAllTrendingPodcasts()
+        insertAllTrendingPodcasts(podcasts)
+    }
+
+    @Query(
+        """
+        SELECT 
+          podcasts.uuid AS id, 
+          podcasts.title AS title, 
+          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
+          (SELECT MIN(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
+          (SELECT MAX(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
+          (SELECT MAX(podcast_episodes.last_playback_interaction_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
+        FROM 
+          podcasts 
+        WHERE 
+          podcasts.subscribed IS NOT 0
+        """,
+    )
+    abstract suspend fun getNovaLauncherSubscribedPodcasts(): List<NovaLauncherSubscribedPodcast>
+
+    @Query(
+        """
+        SELECT 
+          trending_podcast.uuid AS id, 
+          trending_podcast.title AS title 
+        FROM 
+          trending_podcasts as trending_podcast 
+          LEFT JOIN podcasts AS podcast ON podcast.uuid = trending_podcast.uuid 
+        WHERE 
+          IFNULL(podcast.subscribed, 0) IS 0
+        """,
+    )
+    abstract suspend fun getNovaLauncherTrendingPodcasts(): List<NovaLauncherTrendingPodcast>
+
+    @Query(
+        """
+        SELECT 
+          podcasts.uuid AS id, 
+          podcasts.title AS title, 
+          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
+          (SELECT MIN(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
+          (SELECT MAX(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
+          (SELECT MAX(podcast_episodes.last_playback_interaction_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
+        FROM 
+          podcasts
+        WHERE
+        -- Select only episodes that were used at most 2 months ago
+          last_used_timestamp * 1000 >= (:currentTime - 5184000000)
+        ORDER BY
+          last_used_timestamp DESC
+        LIMIT
+          200
+        """,
+    )
+    abstract suspend fun getNovaLauncherRecentlyPlayedPodcasts(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherRecentlyPlayedPodcast>
 }

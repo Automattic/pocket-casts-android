@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Alignment
@@ -40,6 +41,7 @@ fun UpNextScreen(
     columnState: ScalingLazyColumnState,
 ) {
     val queueState by viewModel.upNextQueue.subscribeAsState(initial = null)
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     when (queueState) {
         null -> { /* Show nothing while loading */ }
@@ -63,6 +65,7 @@ fun UpNextScreen(
                         items(list) { episode ->
                             EpisodeChip(
                                 episode = episode,
+                                useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
                                 useUpNextIcon = false,
                                 onClick = {
                                     navigateToEpisode(episode.uuid)

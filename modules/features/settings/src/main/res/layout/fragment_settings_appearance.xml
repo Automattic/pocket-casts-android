@@ -20,10 +20,12 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/primary_ui_04"
         android:fillViewport="true"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -202,104 +204,71 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblShowArtwork" />
 
             <View
-                android:id="@+id/btnUseRssArtwork"
+                android:id="@+id/btnUseEpisodeArtwork"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:importantForAccessibility="no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/lblUseRssArtwork"
-                app:layout_constraintBottom_toBottomOf="@+id/lblUseRssArtworkDetails"/>
+                app:layout_constraintTop_toTopOf="@+id/lblUseEpisodeArtwork"
+                app:layout_constraintBottom_toBottomOf="@+id/lblUseEpisodeArtworkDetails"/>
 
             <TextView
-                android:id="@+id/lblUseRssArtwork"
+                android:id="@+id/lblUseEpisodeArtwork"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/settings_use_episode_podcast_artwork"
+                android:text="@string/settings_use_episode_artwork"
                 android:textAppearance="@style/H40"
                 android:textColor="?attr/primary_text_01"
                 android:importantForAccessibility="no"
-                app:layout_constraintEnd_toStartOf="@+id/swtUseRssArtwork"
+                app:layout_constraintEnd_toStartOf="@+id/swtUseEpisodeArtwork"
                 app:layout_constraintStart_toStartOf="@+id/lblPodcastArtwork"
                 app:layout_constraintTop_toBottomOf="@+id/lblShowArtworkDetails" />
 
             <Switch
-                android:id="@+id/swtUseRssArtwork"
+                android:id="@+id/swtUseEpisodeArtwork"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="24dp"
-                android:contentDescription="@string/settings_use_episode_podcast_artwork"
+                android:contentDescription="@string/settings_use_episode_artwork"
+                android:saveEnabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/lblUseRssArtwork" />
+                app:layout_constraintTop_toTopOf="@+id/lblUseEpisodeArtwork" />
 
             <TextView
-                android:id="@+id/lblUseRssArtworkDetails"
+                android:id="@+id/lblUseEpisodeArtworkDetails"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:paddingBottom="8dp"
-                android:text="@string/settings_episode_artwork_details"
+                android:text="@string/settings_use_episode_artwork_details"
                 android:textAppearance="@style/H40"
                 android:textColor="?attr/primary_text_02"
-                app:layout_constraintEnd_toStartOf="@+id/swtUseRssArtwork"
+                app:layout_constraintEnd_toStartOf="@+id/swtUseEpisodeArtwork"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/lblUseRssArtwork"
-                app:layout_constraintTop_toBottomOf="@+id/lblUseRssArtwork" />
-
-            <View
-                android:id="@+id/btnUseEmbeddedArtwork"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:importantForAccessibility="no"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/lblUseEmbeddedArtwork"
-                app:layout_constraintBottom_toBottomOf="@+id/lblUseEmbeddedArtworkDetails"/>
+                app:layout_constraintStart_toStartOf="@+id/lblUseEpisodeArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/lblUseEpisodeArtwork" />
 
             <TextView
-                android:id="@+id/lblUseEmbeddedArtwork"
+                android:id="@+id/lblEpisodeArtworkConfiguration"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/settings_use_embedded_podcast_artwork"
+                android:text="@string/settings_use_episode_artwork_advanced"
                 android:textAppearance="@style/H40"
                 android:textColor="?attr/primary_text_01"
-                android:importantForAccessibility="no"
-                app:layout_constraintEnd_toStartOf="@+id/swtUseEmbeddedArtwork"
-                app:layout_constraintStart_toStartOf="@+id/lblPodcastArtwork"
-                app:layout_constraintTop_toBottomOf="@+id/lblUseRssArtworkDetails" />
-
-            <Switch
-                android:id="@+id/swtUseEmbeddedArtwork"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="24dp"
-                android:contentDescription="@string/settings_use_embedded_podcast_artwork"
+                android:paddingStart="72dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/lblUseEmbeddedArtwork" />
-
-            <TextView
-                android:id="@+id/lblUseEmbeddedArtworkDetails"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:paddingBottom="8dp"
-                android:text="@string/settings_embedded_artwork_details"
-                android:textAppearance="@style/H40"
-                android:textColor="?attr/primary_text_02"
-                app:layout_constraintEnd_toStartOf="@+id/swtUseEmbeddedArtwork"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/lblUseEmbeddedArtwork"
-                app:layout_constraintTop_toBottomOf="@+id/lblUseEmbeddedArtwork" />
+                app:layout_constraintTop_toBottomOf="@+id/lblUseEpisodeArtworkDetails" />
 
             <TextView
                 android:id="@+id/lblRefreshAllPodcastArtwork"
@@ -315,7 +284,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lblUseEmbeddedArtworkDetails" />
+                app:layout_constraintTop_toBottomOf="@+id/lblEpisodeArtworkConfiguration" />
 
             <View
                 android:id="@+id/dividerViewUpNext"

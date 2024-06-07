@@ -1,19 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-26 19:54:03+0000
+Translation-Revision-Date: 2024-05-21 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Prova a ripristinare i file scaricati se non sono presenti nell\'app Pocket Casts.</string>
+    <string name="settings_storage_fix_downloads">Correggi i download</string>
+    <string name="nova_launcher_new_releases">Nuove versioni</string>
+    <string name="nova_launcher_subscribed_podcasts">Iscrizione ai podcast</string>
+    <string name="whats_new_new_widgets_message">Abbiamo appena aggiunto tre nuovi widget, che semplificano molto la gestione dei tuoi podcast dalla schermata principale. Dai un\'occhiata.</string>
+    <string name="medium_player_classic_widget_label">Lettore multimediale (classico)</string>
+    <string name="widget_preview_time_left_4">1h 36m rimanenti</string>
+    <string name="widget_preview_time_left_3">55m rimanenti</string>
+    <string name="widget_preview_time_left_2">12m rimanenti</string>
+    <string name="widget_preview_time_left_1">25m rimanenti</string>
+    <string name="widget_preview_episode_in_up_next_title">Episodio in Successivo</string>
+    <string name="widget_preview_episode_title">Titolo episodio</string>
+    <string name="hour_and_minutes">1 ora e %d minuti</string>
+    <string name="hours_and_minutes">%d ore e %d minuti</string>
+    <string name="player_sleep_time_fired_end_of_chapter">Timer di sospensione interrotto alla fine del capitolo.</string>
+    <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
+    <string name="player_sleep_in_one_chapter">Spegnimento tra 1 capitolo</string>
+    <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>
+    <string name="player_sleep_timer_in_chapter">Tra 1 capitolo</string>
+    <string name="player_sleep_timer_in_episode_plural">Tra %d episodi</string>
+    <string name="player_sleep_timer_in_episode">Tra 1 episodio</string>
+    <string name="settings_use_episode_artwork_customization_description">Seleziona se desideri vedere la grafica dell\'episodio in queste sezioni dell\'app</string>
+    <string name="settings_use_episode_artwork_customization_section">Personalizzazione</string>
+    <string name="settings_use_episode_artwork_title">Grafica dell\'episodio</string>
+    <string name="settings_use_episode_artwork_advanced">Impostazioni avanzate grafica dell\'episodio</string>
+    <string name="player_sleep_in_episodes">In sospensione in %d episodi</string>
+    <string name="player_sleep_in_one_episode">In sospensione in 1 episodio</string>
+    <string name="player_sleep_timer_stopped_your_podcast">L\'autospegnimento ha interrotto il tuo podcast.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Autospegnimento riavviato dopo un movimento del dispositivo</string>
+    <string name="whats_new_new_widgets_title">Nuovi widget</string>
+    <string name="widget_check_out_discover">Visita Scopri per altro</string>
+    <string name="widget_nothing_in_up_next">Nulla in Prossimo</string>
+    <string name="widget_no_episode_playing">Nessun episodio in riproduzione</string>
+    <string name="large_player_widget_label">Player grande</string>
+    <string name="medium_player_widget_label">Player medio</string>
+    <string name="small_player_widget_label">Player piccolo</string>
+    <string name="clear_search">Cancella la ricerca</string>
+    <string name="bookmarks_search_results_not_found">Non abbiamo trovato alcun segnalibro per la ricerca.</string>
+    <string name="podcast_and_episode">Podcast ed episodio</string>
+    <string name="skip_chapters">Preseleziona i capitoli</string>
+    <string name="settings_use_episode_artwork_details">Alcuni programmi hanno grafiche personalizzate per certi episodi. Abilita questa opzione e Pocket Casts le mostrerà al posto della grafica del programma.</string>
+    <string name="settings_use_episode_artwork">Usa la grafica dell\'episodio</string>
+    <string name="episode_sort_title_z_a">Titolo (Z-A)</string>
+    <string name="episode_sort_title_a_z">Titolo (A-Z)</string>
+    <string name="discover_most_popular_in">Più popolare in %s</string>
+    <string name="discover_select_categories">Seleziona una categoria</string>
+    <string name="discover_all_categories">Tutte le categorie</string>
+    <string name="upgrade_to_patron">Esegui l\'aggiornamento a Patron</string>
+    <string name="upgrade_to_plus">Esegui l\'aggiornamento a Plus</string>
+    <string name="whats_new_got_it_button">Fatto</string>
+    <string name="skip_chapters_patron_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Plus</string>
+    <string name="select_one_chapter_message">Seleziona almeno un capitolo</string>
     <string name="number_of_chapters_summary_singular">1 capitolo • %d nascosto</string>
     <string name="number_of_chapters_summary_plural">%1$d capitoli • %2$d nascosto</string>
     <string name="single_chapter">1 capitolo</string>
     <string name="number_of_chapters">%d capitoli</string>
-    <string name="skip_chapters">Salta capitoli</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 anno di contenuti esclusivi &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Riscatta il tuo codice</string>
-    <string name="whats_new_slumber_studios_title">Sogna in grande</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">dopo il tuo primo anno</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Pagamento ricorrente il %s</string>
     <string name="half_price_first_year">Sconto del 50% sul primo anno</string>
@@ -59,13 +109,10 @@ Language: it
     <string name="eoy_story_top_podcasts_title">Anche tu eri grande in questi programmi.</string>
     <string name="end_of_year_story_top_podcast_title">%1$s è stato il podcast che hai ascoltato di più nel 2023</string>
     <string name="end_of_year_share_story">Condividi questa storia</string>
-    <string name="whats_new_bookmarks_enable_now_button">Attiva ora</string>
     <string name="podcast_log_in_to_rate">Devi accedere per lasciare una valutazione</string>
     <string name="podcast_submit_rating_no_internet">Nessuna connessione a Internet trovata. Connettiti a Internet per inviare una valutazione.</string>
     <string name="podcast_rate">Valuta %s</string>
     <string name="submit">Invia</string>
-    <string name="whats_new_bookmarks_try_now_button">Prova ora</string>
-    <string name="whats_new_bookmarks_title">I segnalibri sono disponibili.</string>
     <string name="bookmarks_upsell_instructions_early_access">Ottieni l\'accesso anticipato a questa funzionalità con Pocket Casts Patron e salva le date e le ore dei tuoi episodi preferiti. Presto disponibile per gli abbonati a Plus.</string>
     <string name="bookmarks_upsell_instructions">Salva le date e le ore dei tuoi episodi preferiti e sblocca molte altre funzionalità con Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Impossibile trovare le note di show per questo episodio.</string>
@@ -898,7 +945,6 @@ Language: it
     <string name="settings_export_send_email">Invia e-mail</string>
     <string name="settings_export_save_file_summary">Esporta il file OPML nel tuo spazio di archiviazione.</string>
     <string name="settings_export_save_file">Salva il file</string>
-    <string name="settings_embedded_artwork_details">Mostra l\'illustrazione legata al file scaricato (se esiste) nel lettore invece dell\'illustrazione del podcast.</string>
     <string name="settings_developer">Sviluppatore</string>
     <string name="settings_close_upgrade_offer">chiudi l\'offerta di aggiornamento</string>
     <string name="settings_choose_podcasts">Scegli i podcast</string>
@@ -1433,7 +1479,7 @@ Language: it
     <string name="podcasts">Podcast</string>
     <string name="player_started_from">Avvio del podcast da %d secondi</string>
     <string name="player_skipped_last">Ultimi %d secondi saltati</string>
-    <string name="player_sleep_time_fired">L\'autospegnimento si è interrotto alla fine dell\'episodio.\nBuonanotte!</string>
+    <string name="player_sleep_time_fired">Timer di sospensione interrotto alla fine dell\'episodio.</string>
     <string name="player_actions_show_as_delete_for_custom">Visualizzato come Elimina per episodi personalizzati</string>
     <string name="player_actions_hidden_for_custom">Nascosto per episodi personalizzati</string>
     <string name="player_rearrange_actions_hidden">Altre azioni</string>
@@ -1455,7 +1501,6 @@ Language: it
     <string name="player_time_saved_detail">In totale hai risparmiato %s utilizzando questa funzionalità.</string>
     <string name="player_tab_playing_wide">Riproduzione in corso</string>
     <string name="player_tab_playing">Riproduzione</string>
-    <string name="player_sleep_when_episode_ends">In sospensione fino alla fine dell\'episodio</string>
     <string name="player_sleep_timer">Autospegnimento</string>
     <string name="player_sleep_timer_title">Autospegnimento</string>
     <string name="player_sleep_end_of_episode">Fine dell\'episodio</string>
@@ -1464,7 +1509,6 @@ Language: it
     <string name="player_sleep_cancel_timer">Annulla timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuti</string>
     <string name="player_sleep_60_minutes">60 minuti</string>
-    <string name="player_sleep_5_minutes">5 minuti</string>
     <string name="player_sleep_30_minutes">30 minuti</string>
     <string name="player_sleep_15_minutes">15 minuti</string>
     <string name="player_pip">Inserisci l\'immagine nell\'immagine</string>
@@ -1627,4 +1671,8 @@ Language: it
     <string name="unarchive">Annulla archiviazione</string>
     <string name="archive">Archivia</string>
     <string name="add_to_up_next">Aggiungi a Prossimo</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d episodio - %2$s rimanente</item>
+        <item quantity="other">%1$d episodi - %2$s rimanenti</item>
+    </plurals>
 </resources>

@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
@@ -17,6 +16,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:model"))

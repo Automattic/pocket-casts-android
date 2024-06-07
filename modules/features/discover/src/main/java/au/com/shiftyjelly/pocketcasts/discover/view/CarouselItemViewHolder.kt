@@ -11,9 +11,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import com.google.android.material.chip.Chip
@@ -29,7 +30,7 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
     private val lblRanking: TextView = itemView.findViewById(R.id.lblRank)
     val btnSubscribe: ImageButton = itemView.findViewById(R.id.btnSubscribe)
 
-    private val imageLoader = PodcastImageLoaderThemed(itemView.context)
+    private val imageRequestFactory = PocketCastsImageRequestFactory(itemView.context).themed()
 
     private fun reset() {
         setBackingGradient(0)
@@ -59,7 +60,7 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
         set(value) {
             field = value
             if (value != null) {
-                imageLoader.loadPodcastUuid(value.uuid).into(imageView)
+                imageRequestFactory.createForPodcast(value.uuid).loadInto(imageView)
                 lblTitle.text = value.title
                 lblTitle.setTextColor(ThemeColor.contrast01(theme.activeTheme))
                 lblSubtitle.text = value.author

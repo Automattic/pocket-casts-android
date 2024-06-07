@@ -9,7 +9,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.nova.NovaLauncherBridge
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -18,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -30,28 +34,32 @@ import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
+import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
 import coil.Coil
 import coil.ImageLoader
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.Sentry
-import io.sentry.android.core.SentryAndroid
-import io.sentry.protocol.User
 import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -103,6 +111,16 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
+    @Inject lateinit var playerWidgetManager: PlayerWidgetManager
+
+    @Inject lateinit var upNextDao: UpNextDao
+
+    @Inject lateinit var sleepTimerRestartWhenShakingDevice: SleepTimerRestartWhenShakingDevice
+
+    @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
+
+    @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
+
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
@@ -124,7 +142,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         RxJavaUncaughtExceptionHandling.setUp()
-        setupSentry()
+        setupCrashLogging()
         setupLogging()
         setupAnalytics()
         setupApp()
@@ -137,24 +155,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         downloadStatisticsReporter.setup()
     }
 
-    private fun setupSentry() {
+    private fun setupCrashLogging() {
         Thread.getDefaultUncaughtExceptionHandler()?.let {
             Thread.setDefaultUncaughtExceptionHandler(LogBufferUncaughtExceptionHandler(it))
         }
 
-        SentryAndroid.init(this) { options ->
-            options.dsn = if (settings.sendCrashReports.value) settings.getSentryDsn() else ""
-            options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.MOBILE.value)
-            options.sampleRate = 0.3
-        }
-
-        // Link email to Sentry crash reports only if the user has opted in
-        if (settings.linkCrashReportsToUser.value) {
-            syncManager.getEmail()?.let { syncEmail ->
-                val user = User().apply { email = syncEmail }
-                Sentry.setUser(user)
-            }
-        }
+        initializeRemoteLogging()
 
         // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
         FirebaseApp.initializeApp(this)
@@ -249,6 +255,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                 statsManager.initStatsEngine()
 
                 subscriptionManager.connectToGooglePlay(this@PocketCastsApplication)
+
+                sleepTimerRestartWhenShakingDevice.init() // Begin detecting when the device has been shaken to restart the sleep timer.
             }
         }
 
@@ -257,14 +265,42 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userEpisodeManager.monitorUploads(applicationContext)
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
+        novaLauncherBridge.monitorNovaLauncherIntegration()
 
-        applicationScope.launch {
-            settings.useDynamicColorsForWidget.flow.collectLatest {
-                widgetManager.updateWidgetFromSettings(playbackManager)
-            }
-        }
+        settings.useDynamicColorsForWidget.flow
+            .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
+            .launchIn(applicationScope)
+        settings.artworkConfiguration.flow
+            .onEach { widgetManager.updateWidgetEpisodeArtwork(playbackManager) }
+            .launchIn(applicationScope)
+        keepPlayerWidgetsUpdated()
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
+    }
+
+    private fun keepPlayerWidgetsUpdated() {
+        settings.artworkConfiguration.flow
+            .onEach { playerWidgetManager.updateUseEpisodeArtwork(it.useEpisodeArtwork) }
+            .launchIn(applicationScope)
+        settings.useDynamicColorsForWidget.flow
+            .onEach(playerWidgetManager::updateUseDynamicColors)
+            .launchIn(applicationScope)
+        playbackManager.playbackStateRelay.asFlow()
+            .map { state -> state.isPlaying }
+            .distinctUntilChanged()
+            .onEach(playerWidgetManager::updateIsPlaying)
+            .launchIn(applicationScope)
+        val queueFlow = flow {
+            while (true) {
+                emit(upNextDao.findUpNextEpisodes(limit = PlayerWidgetManager.EPISODE_LIMIT))
+                // Emit every second to update playback durations
+                delay(1.seconds)
+            }
+        }
+        queueFlow
+            .distinctUntilChangedBy { queue -> queue.map { it.uuid to it.playedUpToMs } }
+            .onEach(playerWidgetManager::updateQueue)
+            .launchIn(applicationScope)
     }
 
     @Suppress("DEPRECATION")

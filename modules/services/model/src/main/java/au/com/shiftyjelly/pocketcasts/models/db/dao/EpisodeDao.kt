@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -41,6 +43,9 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
 
+    @Query("SELECT * FROM podcast_episodes WHERE uuid IN (:episodeUuids)")
+    abstract suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode>
+
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
 
@@ -62,16 +67,76 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE playing_status = :episodePlayingStatus AND archived = :archived AND podcast_id = :podcastUuid")
     abstract fun findByEpisodePlayingAndArchiveStatus(podcastUuid: String, episodePlayingStatus: EpisodePlayingStatus, archived: Boolean): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) ASC
+    """,
+    )
     abstract fun findByPodcastOrderTitleAsc(podcastUuid: String): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) ASC
+    """,
+    )
     abstract suspend fun findByPodcastOrderTitleAscSuspend(podcastUuid: String): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) DESC
+    """,
+    )
     abstract fun findByPodcastOrderTitleDesc(podcastUuid: String): List<PodcastEpisode>
 
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) DESC
+    """,
+    )
     abstract suspend fun findByPodcastOrderTitleDescSuspend(podcastUuid: String): List<PodcastEpisode>
 
     @Transaction
@@ -122,11 +187,41 @@ abstract class EpisodeDao {
     abstract fun findNotificationEpisodes(date: Date, playingStatus: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal): List<PodcastEpisode>
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) ASC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) ASC
+    """,
+    )
     abstract fun observeByPodcastOrderTitleAsc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY UPPER(title) DESC")
+    @Query(
+        """
+        SELECT
+          *
+        FROM
+          podcast_episodes
+        WHERE
+          podcast_id = :podcastUuid
+        ORDER BY (CASE
+          WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
+          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
+          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
+          ELSE UPPER(title)
+        END) DESC
+    """,
+    )
     abstract fun observeByPodcastOrderTitleDesc(podcastUuid: String): Flowable<List<PodcastEpisode>>
 
     @Transaction
@@ -440,4 +535,65 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun getFailedDownloadsStatistics(): EpisodeDownloadFailureStatistics
+
+    @Query("SELECT * FROM podcast_episodes LIMIT :limit OFFSET :offset")
+    abstract suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode>
+
+    @Query(
+        """
+        SELECT
+          episode.uuid AS id,
+          episode.podcast_id AS podcast_id,
+          episode.title AS title,
+          episode.duration AS duration,
+          episode.played_up_to AS current_position,
+          episode.season AS season_number,
+          episode.number AS episode_number,
+          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
+          episode.published_date / 1000 AS release_timestamp,
+          episode.last_playback_interaction_date / 1000 AS last_used_timestamp
+        FROM
+          podcast_episodes AS episode
+          JOIN podcasts AS podcast ON podcast.uuid IS episode.podcast_id
+        WHERE
+          episode.archived IS 0
+          AND podcast.subscribed IS 1
+          -- Check that the episode is not played
+          AND episode.playing_status IS 0
+          -- Select only episodes that were released at most 2 weeks ago
+          AND episode.published_date >= (:currentTime - 1209600000)
+        ORDER BY
+          episode.published_date DESC
+        LIMIT
+          500
+        """,
+    )
+    abstract suspend fun getNovaLauncherNewEpisodes(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherNewEpisode>
+
+    @Query(
+        """
+        SELECT
+          episode.uuid AS id,
+          episode.podcast_id AS podcast_id,
+          episode.title AS title,
+          episode.duration AS duration,
+          episode.played_up_to AS current_position,
+          episode.season AS season_number,
+          episode.number AS episode_number,
+          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
+          episode.published_date / 1000 AS release_timestamp,
+          episode.last_playback_interaction_date / 1000 AS last_used_timestamp
+        FROM
+          podcast_episodes AS episode
+        WHERE
+          episode.archived IS 0
+          -- Check that the episode is in progress
+          AND episode.playing_status IS 1
+        ORDER BY
+          episode.last_playback_interaction_date DESC
+        LIMIT
+          500
+        """,
+    )
+    abstract suspend fun getNovaLauncherInProgressEpisodes(): List<NovaLauncherInProgressEpisode>
 }

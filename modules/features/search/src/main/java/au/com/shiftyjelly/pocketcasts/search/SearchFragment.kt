@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -54,7 +55,7 @@ class SearchFragment : BaseFragment() {
 
     interface Listener {
         fun onSearchEpisodeClick(episodeUuid: String, podcastUuid: String, source: EpisodeViewSource)
-        fun onSearchPodcastClick(podcastUuid: String)
+        fun onSearchPodcastClick(podcastUuid: String, source: SourceView)
         fun onSearchFolderClick(folderUuid: String)
     }
 
@@ -104,11 +105,18 @@ class SearchFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
         viewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setSource(source)
-        binding.floating = floating
+        binding.floatingLayout.updatePadding(
+            top = if (floating) {
+                binding.floatingLayout.context.resources.getDimensionPixelSize(
+                    R.dimen.search_box_floating_top,
+                )
+            } else {
+                0
+            },
+        )
 
         this.binding = binding
 
@@ -133,7 +141,7 @@ class SearchFragment : BaseFragment() {
                 source = EpisodeViewSource.SEARCH_HISTORY,
             )
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
-            is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
+            is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
             is SearchHistoryEntry.SearchTerm -> {
                 binding?.let {
                     it.searchView.setQuery(entry.term, true)
@@ -278,7 +286,7 @@ class SearchFragment : BaseFragment() {
             },
         )
         searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
-        listener?.onSearchPodcastClick(podcast.uuid)
+        listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 

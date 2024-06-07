@@ -13,18 +13,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.jakewharton.rxrelay2.BehaviorRelay
-import io.reactivex.Observable
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -55,22 +51,10 @@ class ChaptersViewModelTest {
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Mock
-    private lateinit var episodeManager: EpisodeManager
-
-    @Mock
-    private lateinit var podcastManager: PodcastManager
-
-    @Mock
     private lateinit var playbackManager: PlaybackManager
 
     @Mock
-    private lateinit var theme: Theme
-
-    @Mock
     private lateinit var settings: Settings
-
-    @Mock
-    private lateinit var upNextQueue: UpNextQueue
 
     private val freeSubscriptionStatus = SubscriptionStatus.Free()
 
@@ -88,16 +72,16 @@ class ChaptersViewModelTest {
 
     private val chaptersTwoSelectedOneUnselected = Chapters(
         listOf(
-            Chapter("1", 0, 100, selected = true),
-            Chapter("2", 101, 200, selected = false),
-            Chapter("3", 201, 300, selected = true),
+            Chapter("1", 0.milliseconds, 100.milliseconds, selected = true),
+            Chapter("2", 101.milliseconds, 200.milliseconds, selected = false),
+            Chapter("3", 201.milliseconds, 300.milliseconds, selected = true),
         ),
     )
 
     private val chaptersOneSelectedOneUnselected = Chapters(
         listOf(
-            Chapter("1", 0, 100, selected = true),
-            Chapter("2", 101, 200, selected = false),
+            Chapter("1", 0.milliseconds, 100.milliseconds, selected = true),
+            Chapter("2", 101.milliseconds, 200.milliseconds, selected = false),
         ),
     )
 
@@ -218,10 +202,6 @@ class ChaptersViewModelTest {
     ) {
         whenever(playbackManager.playbackStateRelay)
             .thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized().apply { accept(PlaybackState(chapters = chapters)) })
-        whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
-            .thenReturn(Observable.just(UpNextQueue.State.Empty))
-        whenever(playbackManager.upNextQueue)
-            .thenReturn(upNextQueue)
         whenever(settings.userTier)
             .thenReturn(UserTier.Free)
 
@@ -230,10 +210,7 @@ class ChaptersViewModelTest {
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         chaptersViewModel = ChaptersViewModel(
-            episodeManager = episodeManager,
-            podcastManager = podcastManager,
             playbackManager = playbackManager,
-            theme = theme,
             settings = settings,
             analyticsTracker = mock(),
         )

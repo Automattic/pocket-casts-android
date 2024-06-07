@@ -4,8 +4,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    <application
-        android:usesCleartextTraffic="true">
+    <application android:usesCleartextTraffic="true">
         <provider
             android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider"
             android:authorities="${applicationId}.media.library.provider"
@@ -13,7 +12,7 @@
 
         <!-- The widget can't move from the core package or it gets deleted when the new APK is installed -->
         <receiver android:name="au.com.shiftyjelly.pocketcasts.core.ui.widget.PodcastWidget"
-            android:label="Pocket Casts"
+            android:label="@string/medium_player_classic_widget_label"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -27,7 +26,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget"/>
         </receiver>
-
     </application>
 
 </manifest>

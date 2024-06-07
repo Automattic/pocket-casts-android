@@ -2,7 +2,8 @@
     android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/primary_ui_01">
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <View
         android:id="@+id/header_background"
@@ -11,26 +12,34 @@
         android:layout_gravity="center"
         android:transitionName="header_background" />
 
-    <TextView
-        android:id="@+id/library_podcast_title"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/podcast_card_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp"
-        android:gravity="center"
-        android:maxLines="4"
-        android:textColor="#B3FFFFFF"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
+        <TextView
+            android:id="@+id/library_podcast_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:gravity="center"
+            android:maxLines="4"
+            android:textColor="#B3FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/podcast_artwork"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:transitionName="podcast_artwork"
-        android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/podcast_artwork"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:transitionName="podcast_artwork"
+            android:importantForAccessibility="no" />
+    </androidx.cardview.widget.CardView>
 
     <ImageView
         android:id="@+id/unplayed_background"
@@ -52,13 +61,11 @@
         android:importantForAccessibility="no"
         android:textSize="12dp"/>
 
-    <View
-        android:id="@+id/button"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/badge_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:attr/selectableItemBackground"
-        android:foreground="@drawable/focus_border_white"
-        android:clickable="true"
-        android:focusable="true" />
+        android:layout_height="wrap_content"
+        android:translationZ ="2dp"
+        android:visibility="gone"/>
 
 </au.com.shiftyjelly.pocketcasts.views.component.SquareLayout>

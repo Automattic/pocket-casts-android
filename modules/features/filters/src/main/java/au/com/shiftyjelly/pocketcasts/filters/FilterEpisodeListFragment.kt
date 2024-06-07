@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,18 +33,19 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getStringForDuration
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -107,7 +109,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     @Inject lateinit var bookmarkManager: BookmarkManager
-    private lateinit var imageLoader: PodcastImageLoader
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
 
     private val adapter: EpisodeListAdapter by lazy {
         EpisodeListAdapter(
@@ -118,7 +120,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             settings = settings,
             onRowClick = this::onRowClick,
             playButtonListener = playButtonListener,
-            imageLoader = imageLoader,
+            imageRequestFactory = imageRequestFactory,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -129,6 +131,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
             ),
+            artworkContext = Element.Filters,
         )
     }
 
@@ -148,9 +151,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        imageLoader = PodcastImageLoaderThemed(context).apply {
-            radiusPx = 4.dpToPx(context)
-        }.smallPlaceholder()
+        imageRequestFactory = PocketCastsImageRequestFactory(context).themed().smallSize()
 
         playButtonListener.source = SourceView.FILTERS
     }
@@ -189,7 +190,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         recyclerView.adapter = adapter
         listSavedState?.let { recyclerView.layoutManager?.onRestoreInstanceState(it) }
         setShowFilterOptions(showingFilterOptionsBeforeModal)
-        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), needsSync = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), updateModifiedAt = false)
     }
 
     override fun onDestroyView() {
@@ -293,6 +294,14 @@ class FilterEpisodeListFragment : BaseFragment() {
                 episodeListBookmarkViewModel.stateFlow.collect {
                     adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
                     adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding.recyclerView.updatePadding(bottom = it)
                 }
             }
         }
@@ -551,7 +560,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         val binding = binding ?: return
 
         val toolbar = binding.toolbar
-        val colors = ToolbarColors.User(color = color, theme = theme)
+        val colors = ToolbarColors.user(color = color, theme = theme)
         setupToolbarAndStatusBar(
             toolbar = toolbar,
             navigationIcon = BackArrow,

@@ -16,6 +16,7 @@ enum class AnalyticsEvent(val key: String) {
     BOOKMARK_PLAY_TAPPED("bookmark_play_tapped"),
     BOOKMARKS_SORT_BY_CHANGED("bookmarks_sort_by_changed"),
     BOOKMARK_DELETED("bookmark_deleted"),
+    PROFILE_BOOKMARKS_SHOWN("profile_bookmarks_shown"),
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
@@ -106,6 +107,7 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Tab bar items */
     PODCASTS_TAB_OPENED("podcasts_tab_opened"),
+    UP_NEXT_TAB_OPENED("up_next_tab_opened"),
     FILTERS_TAB_OPENED("filters_tab_opened"),
     DISCOVER_TAB_OPENED("discover_tab_opened"),
     PROFILE_TAB_OPENED("profile_tab_opened"),
@@ -247,6 +249,8 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SEEK("playback_seek"),
     PLAYBACK_EPISODE_AUTOPLAYED("playback_episode_autoplayed"),
     PLAYBACK_EPISODE_DURATION_CHANGED("playback_episode_duration_changed"),
+    PLAYBACK_FOREGROUND_SERVICE_ERROR("playback_foreground_service_error"),
+    PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC("playback_episode_position_changed_on_sync"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
@@ -277,7 +281,14 @@ enum class AnalyticsEvent(val key: String) {
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
+    DISCOVER_CATEGORIES_PICKER_PICK("discover_categories_picker_pick"),
+    DISCOVER_CATEGORIES_PILL_TAPPED("discover_categories_pill_tapped"),
+    DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED("discover_category_close_button_tapped"),
+    DISCOVER_CATEGORIES_PICKER_SHOWN("discover_categories_picker_shown"),
+    DISCOVER_CATEGORIES_PICKER_CLOSED("discover_categories_picker_closed"),
     DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
+    DISCOVER_AD_CATEGORY_TAPPED("discover_ad_category_tapped"),
+    DISCOVER_AD_CATEGORY_SUBSCRIBED("discover_ad_category_subscribed"),
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
@@ -321,6 +332,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_ENABLED("player_sleep_timer_enabled"),
     PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
     PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
+    PLAYER_SLEEP_TIMER_RESTARTED("player_sleep_timer_restarted"),
 
     /* Player - Playback effects */
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
@@ -438,7 +450,6 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_THEME_CHANGED("settings_appearance_theme_changed"),
     SETTINGS_APPEARANCE_APP_ICON_CHANGED("settings_appearance_app_icon_changed"),
     SETTINGS_APPEARANCE_REFRESH_ALL_ARTWORK_TAPPED("settings_appearance_refresh_all_artwork_tapped"),
-    SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED("settings_appearance_use_embedded_artwork_toggled"),
     SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED("settings_appearance_use_episode_artwork_toggled"),
     SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED("settings_appearance_show_artwork_on_lock_screen_toggled"),
     SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED("settings_appearance_use_dark_up_next_toggled"),
@@ -489,6 +500,8 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED("settings_general_open_player_automatically_toggled"),
     SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED("settings_general_intelligent_playback_toggled"),
     SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED("settings_general_play_up_next_on_tap_toggled"),
+    SETTINGS_GENERAL_SHAKE_TO_RESET_SLEEP_TIMER_TOGGLED("settings_general_shake_to_reset_sleep_timer_toggled"),
+    SETTINGS_GENERAL_AUTO_SLEEP_TIMER_RESTART_TOGGLED("settings_general_auto_sleep_timer_restart_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN("settings_general_media_notification_controls_shown"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
@@ -532,6 +545,8 @@ enum class AnalyticsEvent(val key: String) {
     /* Settings - Storage & Data Use */
     SETTINGS_STORAGE_SHOWN("settings_storage_shown"),
     SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE("settings_storage_clear_download_cache"),
+    SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_START("settings_storage_fix_downloaded_files_start"),
+    SETTINGS_STORAGE_FIX_DOWNLOADED_FILES_END("settings_storage_fix_downloaded_files_end"),
     SETTINGS_STORAGE_LOCATION("settings_storage_location"),
     SETTINGS_STORAGE_SET_FOLDER_LOCATION("settings_storage_set_folder_location"),
     SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED("settings_storage_background_refresh_toggled"),
@@ -540,6 +555,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Settings - Advanced */
     SETTINGS_ADVANCED_SHOWN("settings_advanced_shown"),
     SETTINGS_ADVANCED_SYNC_ON_METERED("settings_advanced_sync_on_metered"),
+    SETTINGS_ADVANCED_PRIORITIZE_SEEK_ACCURACY("settings_advanced_prioritize_seek_accuracy"),
 
     /* Search */
     SEARCH_SHOWN("search_shown"),
@@ -594,4 +610,8 @@ enum class AnalyticsEvent(val key: String) {
     DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
     DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
     PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped"),
+
+    /* Widgets */
+    WIDGET_INSTALLED("widget_installed"),
+    WIDGET_UNINSTALLED("widget_uninstalled"),
 }

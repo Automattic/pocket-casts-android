@@ -25,8 +25,9 @@ import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import coil.compose.rememberAsyncImagePainter
@@ -46,6 +47,7 @@ fun NowPlayingChip(
 
     val state by viewModel.state.collectAsState()
     val playbackState = state.playbackState
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     val upNextQueue = state.upNextQueue
     val podcast = (upNextQueue as? UpNextQueue.State.Loaded)?.podcast
@@ -55,6 +57,7 @@ fun NowPlayingChip(
         podcast = podcast,
         episode = episode,
         isPlaying = playbackState?.isPlaying == true,
+        useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
         onClick = onClick,
     )
 }
@@ -64,6 +67,7 @@ private fun Content(
     podcast: Podcast?,
     episode: BaseEpisode?,
     isPlaying: Boolean,
+    useEpisodeArtwork: Boolean,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -83,9 +87,9 @@ private fun Content(
         },
         secondaryLabel = episode?.title,
         colors = ChipDefaults.imageBackgroundChipColors(
-            backgroundImagePainter = if (podcast != null) {
-                val imageRequest = remember(podcast.uuid) {
-                    PodcastImageLoaderThemed(context).loadCoil(podcastUuid = podcast.uuid).build()
+            backgroundImagePainter = if (episode != null) {
+                val imageRequest = remember(episode.uuid, useEpisodeArtwork) {
+                    PocketCastsImageRequestFactory(context).themed().create(episode, useEpisodeArtwork)
                 }
                 rememberAsyncImagePainter(
                     model = imageRequest,
@@ -94,9 +98,8 @@ private fun Content(
             } else {
                 nothingPainter
             },
-            backgroundImageScrimBrush =
-            // only want a scrim if there is a podcast background
-            if (podcast != null) {
+            // only want a scrim if there is a episode background
+            backgroundImageScrimBrush = if (episode != null) {
                 Brush.linearGradient(
                     colors = listOf(
                         MaterialTheme.colors.surface,
@@ -110,7 +113,9 @@ private fun Content(
             secondaryContentColor = MaterialTheme.colors.onSecondary,
         ),
         onClick = onClick,
-        modifier = Modifier.height(ChipDefaults.Height).fillMaxWidth(), // This is needed for the backgroundImagePainter to work
+        modifier = Modifier
+            .height(ChipDefaults.Height)
+            .fillMaxWidth(), // This is needed for the backgroundImagePainter to work
     )
 }
 
@@ -156,6 +161,7 @@ private fun Preview() {
                 uuid = "57853d71-30ac-4477-af73-e8fe2b1d4dda",
                 publishedDate = Date(),
             ),
+            useEpisodeArtwork = false,
             isPlaying = false,
             onClick = {},
         )

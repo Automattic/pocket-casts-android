@@ -24,16 +24,21 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBind
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.ViewDataBindings.setEpisodeTimeLeft
+import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
@@ -45,8 +50,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class UpNextAdapter(
     context: Context,
-    val
-    imageLoader: PodcastImageLoader,
     val episodeManager: EpisodeManager,
     val listener: UpNextListener,
     val multiSelectHelper: MultiSelectEpisodesHelper,
@@ -55,8 +58,13 @@ class UpNextAdapter(
     private val upNextSource: UpNextSource,
     private val settings: Settings,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
+    private val playbackManager: PlaybackManager,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
+    private val imageRequestFactory = PocketCastsImageRequestFactory(
+        context,
+        cornerRadius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) 4 else 3,
+    ).themed()
 
     var isPlaying: Boolean = false
         set(value) {
@@ -77,9 +85,10 @@ class UpNextAdapter(
                 binding = AdapterUpNextBinding.inflate(inflater, parent, false),
                 listener = listener,
                 dateFormatter = dateFormatter,
-                imageLoader = imageLoader,
+                imageRequestFactory = imageRequestFactory,
                 episodeManager = episodeManager,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+                settings = settings,
             )
             R.layout.adapter_up_next_footer -> HeaderViewHolder(AdapterUpNextFooterBinding.inflate(inflater, parent, false))
             R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
@@ -156,14 +165,27 @@ class UpNextAdapter(
                 btnClear.isEnabled = header.episodeCount > 0
                 emptyUpNextContainer.isVisible = header.episodeCount == 0
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
-                lblUpNextTime.text = root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                btnClear.isVisible = playbackManager.getCurrentEpisode() != null
+                lblUpNextTime.isVisible = playbackManager.getCurrentEpisode() != null
+                lblUpNextTime.text = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
+                    if (header.episodeCount == 0) {
+                        root.resources.getString(LR.string.player_up_next_time_left, time)
+                    } else {
+                        root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
+                    }
+                } else {
+                    root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                }
+
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
         }
     }
 
     inner class PlayingViewHolder(val binding: AdapterUpNextPlayingBinding) : RecyclerView.ViewHolder(binding.root) {
-        var loadedUuid: String? = null
+        private var loadedUuid: String? = null
+        private val cardCornerRadius: Float = 4.dpToPx(itemView.context.resources.displayMetrics).toFloat()
+        private val cardElevation: Float = 2.dpToPx(itemView.context.resources.displayMetrics).toFloat()
 
         init {
             binding.root.setOnClickListener {
@@ -176,7 +198,6 @@ class UpNextAdapter(
             Timber.d("Playing state episode: ${playingState.episode.playedUpTo}")
             binding.chapterProgress.theme = theme
             binding.chapterProgress.progress = playingState.progressPercent
-            binding.chapterProgress.isVisible = playingState.progressPercent > 0
             binding.title.text = playingState.episode.title
             binding.downloaded.isVisible = playingState.episode.isDownloaded
             binding.info.setEpisodeTimeLeft(playingState.episode)
@@ -186,11 +207,10 @@ class UpNextAdapter(
                 showDuration = false,
                 context = binding.date.context,
             )
-            binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryInteractive01(theme))
+            binding.reorder.imageTintList = ColorStateList.valueOf(ThemeColor.primaryText01(theme))
 
             if (loadedUuid != playingState.episode.uuid) {
-                imageLoader.radiusPx = 3.dpToPx(itemView.context)
-                imageLoader.load(playingState.episode).into(binding.image)
+                imageRequestFactory.create(playingState.episode, settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext)).loadInto(binding.image)
                 loadedUuid = playingState.episode.uuid
             }
 
@@ -198,6 +218,9 @@ class UpNextAdapter(
                 isVisible = isPlaying
                 applyColorFilter(ThemeColor.primaryText01(theme))
             }
+
+            binding.imageCardView.radius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardCornerRadius else 0f
+            binding.imageCardView.elevation = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardElevation else 0f
         }
     }
 

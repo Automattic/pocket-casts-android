@@ -15,4 +15,5 @@ sealed class PlayerEvent {
     class SeekComplete(val positionMs: Int) : PlayerEvent()
     class MetadataAvailable(val metaData: EpisodeFileMetadata) : PlayerEvent()
     class RemoteMetadataNotMatched(val remoteEpisodeUuid: String) : PlayerEvent()
+    class EpisodeChanged(val episodeUuid: String) : PlayerEvent()
 }

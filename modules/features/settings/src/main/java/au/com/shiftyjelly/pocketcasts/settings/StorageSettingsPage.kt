@@ -6,13 +6,13 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -48,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -62,6 +64,7 @@ fun StorageSettingsPage(
     viewModel: StorageSettingsViewModel,
     onBackPressed: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
+    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
     val state: StorageSettingsViewModel.State by viewModel.state.collectAsState()
@@ -71,6 +74,8 @@ fun StorageSettingsPage(
         onBackPressed = onBackPressed,
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
         onManageDownloadedFilesClick = onManageDownloadedFilesClick,
+        onFixDownloadsClick = { viewModel.fixDownloadedFiles() },
+        bottomInset = bottomInset,
         modifier = modifier,
     )
     var showProgressDialog by remember { mutableStateOf(false) }
@@ -122,6 +127,8 @@ fun StorageSettingsView(
     onBackPressed: () -> Unit,
     onClearDownloadCacheClick: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
+    onFixDownloadsClick: () -> Unit,
+    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -131,24 +138,29 @@ fun StorageSettingsView(
             onNavigationClick = { onBackPressed() },
         )
 
-        Column(
+        LazyColumn(
             modifier
                 .background(MaterialTheme.theme.colors.primaryUi02)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState()),
+                .fillMaxHeight(),
+            contentPadding = PaddingValues(bottom = bottomInset),
         ) {
-            SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_usage)) {
-                DownloadedFilesRow(
-                    state = state.downloadedFilesState,
-                    onClick = onManageDownloadedFilesClick,
-                )
-                ClearDownloadCacheRow(onClearDownloadCacheClick)
-                StorageChoiceRow(state.storageChoiceState)
-                StorageFolderRow(state.storageFolderState)
+            item {
+                SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_usage)) {
+                    DownloadedFilesRow(
+                        state = state.downloadedFilesState,
+                        onClick = onManageDownloadedFilesClick,
+                    )
+                    FixDownloads(onFixDownloadsClick)
+                    ClearDownloadCacheRow(onClearDownloadCacheClick)
+                    StorageChoiceRow(state.storageChoiceState)
+                    StorageFolderRow(state.storageFolderState)
+                }
             }
-            SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
-                BackgroundRefreshRow(state.backgroundRefreshState)
-                StorageDataWarningRow(state.storageDataWarningState)
+            item {
+                SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
+                    BackgroundRefreshRow(state.backgroundRefreshState)
+                    StorageDataWarningRow(state.storageDataWarningState)
+                }
             }
         }
     }
@@ -179,6 +191,20 @@ private fun ClearDownloadCacheRow(
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_clear_download_cache),
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(vertical = 6.dp),
+    )
+}
+
+@Composable
+private fun FixDownloads(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = stringResource(R.string.settings_storage_fix_downloads),
+        secondaryText = stringResource(R.string.settings_storage_fix_downloads_description),
         modifier = modifier
             .clickable { onClick() }
             .padding(vertical = 6.dp),
@@ -414,6 +440,8 @@ private fun StorageSettingsPreview(
             onBackPressed = {},
             onClearDownloadCacheClick = {},
             onManageDownloadedFilesClick = {},
+            onFixDownloadsClick = {},
+            bottomInset = 0.dp,
         )
     }
 }

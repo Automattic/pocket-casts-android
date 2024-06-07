@@ -68,11 +68,6 @@ class Support @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    val afterPlayingValues
-        get() = context.resources.getStringArray(R.array.settings_auto_archive_played_values)
-    val inactiveValues
-        get() = context.resources.getStringArray(R.array.settings_auto_archive_inactive_values)
-
     @Suppress("DEPRECATION")
     suspend fun shareLogs(subject: String, intro: String, emailSupport: Boolean, context: Context): Intent {
         val dialog = withContext(Dispatchers.Main) {
@@ -295,8 +290,8 @@ class Support @Inject constructor(
                     podcastsOutput.append("Custom auto archive: ").append(podcast.overrideGlobalArchive.toString()).append(eol)
                     if (podcast.overrideGlobalArchive) {
                         podcastsOutput.append("Episode limit: ").append(podcast.autoArchiveEpisodeLimit).append(eol)
-                        podcastsOutput.append("Archive after playing: ").append(afterPlayingValues[podcast.autoArchiveAfterPlaying.index]).append(eol)
-                        podcastsOutput.append("Archive inactive: ").append(inactiveValues[podcast.autoArchiveInactive.index]).append(eol)
+                        podcastsOutput.append("Archive after playing: ").append(podcast.autoArchiveAfterPlaying?.analyticsValue).append(eol)
+                        podcastsOutput.append("Archive inactive: ").append(podcast.autoArchiveInactive?.analyticsValue).append(eol)
                     }
                     podcastsOutput.append("Auto add to up next: ").append(autoAddToUpNextToString(podcast.autoAddToUpNext)).append(eol)
                     podcastsOutput.append(eol)
@@ -437,6 +432,10 @@ class Support @Inject constructor(
                 } catch (e: Exception) {
                     Timber.e(e)
                 }
+
+                output.append("Advance Settings").append(eol).append("-------------------").append(eol).append(eol)
+                output.append("Prioritize seek accuracy? ").append(settings.prioritizeSeekAccuracy.value).append(eol)
+                output.append(eol)
 
                 output.append("Episode Issues").append(eol).append("--------------").append(eol).append(eol)
 

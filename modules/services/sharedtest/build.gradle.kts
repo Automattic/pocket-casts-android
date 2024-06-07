@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
@@ -25,4 +24,5 @@ dependencies {
         exclude(group = "org.hamcrest")
     }
     implementation(project(":modules:services:utils"))
+    implementation(libs.crashlogging)
 }

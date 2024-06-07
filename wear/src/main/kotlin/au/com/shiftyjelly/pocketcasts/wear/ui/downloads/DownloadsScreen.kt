@@ -8,6 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
@@ -27,14 +28,16 @@ fun DownloadsScreen(
 ) {
     val viewModel = hiltViewModel<DownloadsScreenViewModel>()
     val state by viewModel.stateFlow.collectAsState()
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
-    Content(columnState, state, onItemClick)
+    Content(columnState, state, artworkConfiguration.useEpisodeArtwork(Element.Downloads), onItemClick)
 }
 
 @Composable
 private fun Content(
     columnState: ScalingLazyColumnState,
     episodes: List<PodcastEpisode>?,
+    useEpisodeArtwork: Boolean,
     onItemClick: (PodcastEpisode) -> Unit,
 ) {
     ScalingLazyColumn(
@@ -54,6 +57,7 @@ private fun Content(
             items(episodes) { episode ->
                 EpisodeChip(
                     episode = episode,
+                    useEpisodeArtwork = useEpisodeArtwork,
                     onClick = { onItemClick(episode) },
                 )
             }
@@ -71,6 +75,7 @@ private fun DownloadsScreenPreview() {
     WearAppTheme {
         Content(
             columnState = ScalingLazyColumnState(),
+            useEpisodeArtwork = false,
             onItemClick = {},
             episodes = listOf(
                 PodcastEpisode(

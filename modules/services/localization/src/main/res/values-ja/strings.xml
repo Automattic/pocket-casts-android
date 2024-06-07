@@ -1,19 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-28 09:54:03+0000
+Translation-Revision-Date: 2024-05-21 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">Pocket Casts アプリでダウンロード済みファイルが見つからない場合に復元を試みます。</string>
+    <string name="settings_storage_fix_downloads">ダウンロードを修正</string>
+    <string name="nova_launcher_new_releases">新規リリース</string>
+    <string name="nova_launcher_subscribed_podcasts">購読されたポッドキャスト</string>
+    <string name="whats_new_new_widgets_message">新しいウィジェットが3つ追加され、ホーム画面からポッドキャストを非常に簡単に管理できるようになりました。 ぜひお試しください。</string>
+    <string name="medium_player_classic_widget_label">中型プレーヤー (クラシック)</string>
+    <string name="widget_preview_time_left_4">残り1時間36分</string>
+    <string name="widget_preview_time_left_3">残り55分</string>
+    <string name="widget_preview_time_left_2">残り12分</string>
+    <string name="widget_preview_time_left_1">残り25分</string>
+    <string name="widget_preview_episode_in_up_next_title">次のエピソード</string>
+    <string name="widget_preview_episode_title">エピソードのタイトル</string>
+    <string name="hour_and_minutes">1時間%d分</string>
+    <string name="hours_and_minutes">%d時間%d分</string>
+    <string name="player_sleep_time_fired_end_of_chapter">スリープタイマーがチャプターの最後で停止しました。</string>
+    <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
+    <string name="player_sleep_in_one_chapter">1個のチャプターでスリープ中</string>
+    <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>
+    <string name="player_sleep_timer_in_chapter">1個のチャプター</string>
+    <string name="player_sleep_timer_in_episode_plural">%d件のエピソード</string>
+    <string name="player_sleep_timer_in_episode">1件のエピソード</string>
+    <string name="settings_use_episode_artwork_customization_description">アプリのこれらのセクションでエピソードのアートワークを表示する場合に選択します</string>
+    <string name="settings_use_episode_artwork_customization_section">カスタマイズ</string>
+    <string name="settings_use_episode_artwork_title">エピソードのアートワーク</string>
+    <string name="settings_use_episode_artwork_advanced">エピソードのアートワークの詳細設定</string>
+    <string name="player_sleep_in_episodes">%dエピソードでスリープ</string>
+    <string name="player_sleep_in_one_episode">1エピソードでスリープ</string>
+    <string name="player_sleep_timer_stopped_your_podcast">スリープタイマーにより、ポッドキャストが停止しました。</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">端末を振った後、スリープタイマーが再開しました</string>
+    <string name="whats_new_new_widgets_title">新しいウィジェット</string>
+    <string name="widget_check_out_discover">Discover をチェックして他のエピソードを見つけましょう</string>
+    <string name="widget_nothing_in_up_next">次のエピソードには何もありません</string>
+    <string name="widget_no_episode_playing">再生中のエピソードはありません</string>
+    <string name="large_player_widget_label">大型プレーヤー</string>
+    <string name="medium_player_widget_label">中型プレーヤー</string>
+    <string name="small_player_widget_label">小型プレーヤー</string>
+    <string name="clear_search">検索をクリア</string>
+    <string name="bookmarks_search_results_not_found">その検索に該当するブックマークは見つかりませんでした。</string>
+    <string name="podcast_and_episode">ポッドキャストとエピソード</string>
+    <string name="skip_chapters">チャプターを事前に選択</string>
+    <string name="settings_use_episode_artwork_details">一部の番組には特定のエピソードにカスタムのアートワークがあります。 このオプションを有効化すると、Pocket Casts は番組のアートワークではなく、そのカスタムのアートワークを表示します。</string>
+    <string name="settings_use_episode_artwork">エピソードのアートワークを使用</string>
+    <string name="episode_sort_title_z_a">タイトル (アルファベット降順)</string>
+    <string name="episode_sort_title_a_z">タイトル (アルファベット昇順)</string>
+    <string name="discover_most_popular_in">%sの人気上位 </string>
+    <string name="discover_select_categories">カテゴリーを選択</string>
+    <string name="discover_all_categories">カテゴリー一覧</string>
+    <string name="upgrade_to_patron">Patron にアップグレード</string>
+    <string name="upgrade_to_plus">Plus にアップグレード</string>
+    <string name="whats_new_got_it_button">OK</string>
+    <string name="skip_chapters_patron_prompt">Pocket Casts Patron でチャプターの事前選択やその他の機能を利用</string>
+    <string name="skip_chapters_plus_prompt">Pocket Casts Plus でチャプターの事前選択やその他の機能を利用</string>
+    <string name="select_one_chapter_message">チャプターを少なくとも1つ選択してください</string>
     <string name="number_of_chapters_summary_singular">1個のチャプター • %d個が非表示</string>
     <string name="number_of_chapters_summary_plural">%1$d個のチャプター • %2$d個が非表示</string>
     <string name="single_chapter">1個のチャプター</string>
     <string name="number_of_chapters">%d個のチャプター</string>
-    <string name="skip_chapters">チャプターをスキップ</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; の限定コンテンツを1年間聴取可能</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">コードを引き換える</string>
-    <string name="whats_new_slumber_studios_title">次年度以降の</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">夢は大きく</string>
     <string name="onboarding_plus_recurring_after_intro_offer">%s に定期支払い</string>
     <string name="half_price_first_year">初年度は50% オフ</string>
@@ -59,13 +109,10 @@ Language: ja_JP
     <string name="eoy_story_top_podcasts_title">そしてこれらのショーも大変気に入っていただけました !</string>
     <string name="end_of_year_story_top_podcast_title">%1$s が2023年で最も視聴されたショーでした</string>
     <string name="end_of_year_share_story">このストーリーを共有</string>
-    <string name="whats_new_bookmarks_enable_now_button">すぐに有効化</string>
     <string name="podcast_log_in_to_rate">評価を残すにはログインする必要があります</string>
     <string name="podcast_submit_rating_no_internet">インターネット接続が見つかりません。 評価を送信するにはインターネットに接続してください。</string>
     <string name="podcast_rate">%s を評価する</string>
     <string name="submit">送信</string>
-    <string name="whats_new_bookmarks_try_now_button">今すぐ試す</string>
-    <string name="whats_new_bookmarks_title">ブックマークはこちら !</string>
     <string name="bookmarks_upsell_instructions_early_access">お早めに Pocket Casts Patron でこの機能にアクセスすると、お気に入りのエピソードのタイムスタンプを保存できます。 まもなく Plus にご登録の皆さまもご利用いただけるようになります。</string>
     <string name="bookmarks_upsell_instructions">Pocket Casts Plus でお気に入りのエピソードのタイムスタンプを保存し、その他多くの機能のロックを解除します。</string>
     <string name="error_loading_show_notes">このエピソードのショーノートが見つかりません。</string>
@@ -898,7 +945,6 @@ Language: ja_JP
     <string name="settings_export_send_email">メールを送信</string>
     <string name="settings_export_save_file_summary">OPML ファイルをストレージにエクスポートします。</string>
     <string name="settings_export_save_file">ファイルを保存</string>
-    <string name="settings_embedded_artwork_details">番組のアートワークを使用する代わりに、プレーヤーのダウンロードファイルからのアートワークを表示します (存在する場合)。</string>
     <string name="settings_developer">開発者</string>
     <string name="settings_close_upgrade_offer">アップグレードのオファーを閉じる</string>
     <string name="settings_choose_podcasts">ポッドキャストを選択</string>
@@ -1433,7 +1479,7 @@ Language: ja_JP
     <string name="podcasts">ポッドキャスト</string>
     <string name="player_started_from">%d秒からポッドキャストを開始中</string>
     <string name="player_skipped_last">最後の%d秒をスキップしました</string>
-    <string name="player_sleep_time_fired">スリープタイマーがエピソードの最後で停止しました。\nおやすみなさい。</string>
+    <string name="player_sleep_time_fired">スリープタイマーがエピソードの最後で停止しました。</string>
     <string name="player_actions_show_as_delete_for_custom">カスタムエピソードで削除と表示</string>
     <string name="player_actions_hidden_for_custom">カスタムエピソードで非表示</string>
     <string name="player_rearrange_actions_hidden">その他の操作</string>
@@ -1455,7 +1501,6 @@ Language: ja_JP
     <string name="player_time_saved_detail">この機能を使用して合計%s 節約しました。</string>
     <string name="player_tab_playing_wide">再生中</string>
     <string name="player_tab_playing">再生中</string>
-    <string name="player_sleep_when_episode_ends">エピソード終了時は就寝中</string>
     <string name="player_sleep_timer">スリープタイマー</string>
     <string name="player_sleep_timer_title">スリープタイマー</string>
     <string name="player_sleep_end_of_episode">エピソード終了時</string>
@@ -1464,7 +1509,6 @@ Language: ja_JP
     <string name="player_sleep_cancel_timer">タイマーをキャンセル</string>
     <string name="player_sleep_add_5_minutes">+ 5分</string>
     <string name="player_sleep_60_minutes">60分</string>
-    <string name="player_sleep_5_minutes">5分</string>
     <string name="player_sleep_30_minutes">30分</string>
     <string name="player_sleep_15_minutes">15分</string>
     <string name="player_pip">ピクチャーインピクチャーに切り替え</string>
@@ -1627,4 +1671,7 @@ Language: ja_JP
     <string name="unarchive">アーカイブを解除</string>
     <string name="archive">アーカイブ</string>
     <string name="add_to_up_next">次のエピソードに追加</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="other">%1$d件のエピソード - 残り%2$s</item>
+    </plurals>
 </resources>

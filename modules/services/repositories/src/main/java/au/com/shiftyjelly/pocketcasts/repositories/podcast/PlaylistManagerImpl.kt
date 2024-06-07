@@ -206,6 +206,7 @@ class PlaylistManagerImpl @Inject constructor(
                 force = true,
                 coroutineScope = applicationScope,
                 context = context,
+                source = PocketCastsShortcuts.Source.CREATE_PLAYLIST,
             )
         }
         return id
@@ -311,6 +312,7 @@ class PlaylistManagerImpl @Inject constructor(
                 force = true,
                 coroutineScope = applicationScope,
                 context = context,
+                source = PocketCastsShortcuts.Source.SAVE_PLAYLISTS_ORDER,
             )
         }
     }

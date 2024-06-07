@@ -1,19 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-02-27 09:54:03+0000
+Translation-Revision-Date: 2024-05-21 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_storage_fix_downloads_description">다운로드한 파일이 Pocket Casts 앱에서 누락된 경우 복원을 시도해 보세요.</string>
+    <string name="settings_storage_fix_downloads">다운로드 문제 해결하기</string>
+    <string name="nova_launcher_new_releases">새 릴리스</string>
+    <string name="nova_launcher_subscribed_podcasts">구독한 팟캐스트</string>
+    <string name="whats_new_new_widgets_message">세 가지 새로운 위젯이 추가되어 홈 화면에서 팟캐스트를 훨씬 더 쉽게 관리할 수 있습니다. 직접 확인해 보세요!</string>
+    <string name="medium_player_classic_widget_label">중형 플레이어(클래식)</string>
+    <string name="widget_preview_time_left_4">1시간 36분 남음</string>
+    <string name="widget_preview_time_left_3">55분 남음</string>
+    <string name="widget_preview_time_left_2">12분 남음</string>
+    <string name="widget_preview_time_left_1">25분 남음</string>
+    <string name="widget_preview_episode_in_up_next_title">다음 에피소드</string>
+    <string name="widget_preview_episode_title">에피소드 제목</string>
+    <string name="hour_and_minutes">1시간 %d분</string>
+    <string name="hours_and_minutes">%d시간 %d분</string>
+    <string name="player_sleep_time_fired_end_of_chapter">챕터 종료 시 절전 타이머가 중지되었습니다.</string>
+    <string name="player_sleep_in_chapters">%d개 챕터에서 중지됨</string>
+    <string name="player_sleep_in_one_chapter">1개 챕터에서 중지됨</string>
+    <string name="player_sleep_timer_in_chapter_plural">%d개 챕터에서</string>
+    <string name="player_sleep_timer_in_chapter">1개 챕터에서</string>
+    <string name="player_sleep_timer_in_episode_plural">%d개 에피소드에서</string>
+    <string name="player_sleep_timer_in_episode">1개 에피소드에서</string>
+    <string name="settings_use_episode_artwork_customization_description">앱의 해당 섹션에서 에피소드 아트워크를 보려면 선택하세요</string>
+    <string name="settings_use_episode_artwork_customization_section">사용자 정의</string>
+    <string name="settings_use_episode_artwork_title">에피소드 아트워크</string>
+    <string name="settings_use_episode_artwork_advanced">고급 에피소드 아트워크 설정</string>
+    <string name="player_sleep_in_episodes">%d개 에피소드에서 절전</string>
+    <string name="player_sleep_in_one_episode">1개 에피소드에서 절전</string>
+    <string name="player_sleep_timer_stopped_your_podcast">절전 타이머로 인해 팟캐스트가 중단되었습니다.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">기기가 흔들려 절전 타이머가 재시작되었습니다</string>
+    <string name="whats_new_new_widgets_title">새로운 위젯</string>
+    <string name="widget_check_out_discover">발견에서 자세히 알아보기</string>
+    <string name="widget_nothing_in_up_next">다음 차례에 아무것도 없음</string>
+    <string name="widget_no_episode_playing">재생 중인 에피소드 없음</string>
+    <string name="large_player_widget_label">대형 플레이어</string>
+    <string name="medium_player_widget_label">중형 플레이어</string>
+    <string name="small_player_widget_label">소형 플레이어</string>
+    <string name="clear_search">검색 지우기</string>
+    <string name="bookmarks_search_results_not_found">해당 검색에 대한 북마크를 찾을 수 없습니다.</string>
+    <string name="podcast_and_episode">팟캐스트 &amp; 에피소드</string>
+    <string name="skip_chapters">챕터 미리 선택</string>
+    <string name="settings_use_episode_artwork_details">일부 프로그램에는 특정 에피소드에 대한 사용자 정의 아트워크가 있습니다. 이 옵션을 활성화하면 프로그램의 아트워크 대신에 이 아트워크가 Pocket Casts를 통해 표시됩니다.</string>
+    <string name="settings_use_episode_artwork">에피소드 아트워크 사용</string>
+    <string name="episode_sort_title_z_a">제목(Z-A)</string>
+    <string name="episode_sort_title_a_z">제목(A-Z)</string>
+    <string name="discover_most_popular_in">%s에서 가장 인기있는</string>
+    <string name="discover_select_categories">카테고리 선택</string>
+    <string name="discover_all_categories">모든 카테고리</string>
+    <string name="upgrade_to_patron">Patron으로 업그레이드</string>
+    <string name="upgrade_to_plus">Plus로 업그레이드</string>
+    <string name="whats_new_got_it_button">알겠습니다.</string>
+    <string name="skip_chapters_patron_prompt">Pocket Casts Patron으로 챕터 미리 선택 등</string>
+    <string name="skip_chapters_plus_prompt">Pocket Casts Plus로 챕터 미리 선택 등</string>
+    <string name="select_one_chapter_message">챕터를 하나 이상 선택하세요.</string>
     <string name="number_of_chapters_summary_singular">1개 챕터 • %d개 숨김</string>
     <string name="number_of_chapters_summary_plural">%1$d개 챕터 • %2$d개 숨김</string>
     <string name="single_chapter">1개 챕터</string>
     <string name="number_of_chapters">%d개 챕터</string>
-    <string name="skip_chapters">챕터 건너뛰기</string>
     <string name="onboarding_plus_feature_slumber_studios_title">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;의 1년 독점 콘텐츠</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">코드 사용</string>
-    <string name="whats_new_slumber_studios_title">큰 꿈 꾸기</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">첫해 이후</string>
     <string name="onboarding_plus_recurring_after_intro_offer">반복 결제: %s</string>
     <string name="half_price_first_year">첫해 50% 할인</string>
@@ -59,13 +109,10 @@ Language: ko_KR
     <string name="eoy_story_top_podcasts_title">이런 프로그램도 많이 청취하셨습니다!</string>
     <string name="end_of_year_story_top_podcast_title">2023년 가장 많이 청취한 프로그램은 %1$s였습니다.</string>
     <string name="end_of_year_share_story">이 스토리 공유</string>
-    <string name="whats_new_bookmarks_enable_now_button">지금 활성화</string>
     <string name="podcast_log_in_to_rate">평가를 남기려면 로그인 필요</string>
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>
     <string name="podcast_rate">%s 평가</string>
     <string name="submit">제출</string>
-    <string name="whats_new_bookmarks_try_now_button">지금 시도</string>
-    <string name="whats_new_bookmarks_title">북마크는 여기 있습니다!</string>
     <string name="bookmarks_upsell_instructions_early_access">Pocket Casts Patron으로 이 기능을 미리 이용해 보고 좋아하는 에피소드의 타임스탬프를 저장하세요. 곧 Plus 구독자가 이용할 수 있습니다.</string>
     <string name="bookmarks_upsell_instructions">Pocket Casts Plus로 좋아하는 에피소드의 타임스탬프를 저장하고 다양한 기능을 이용해보세요.</string>
     <string name="error_loading_show_notes">이 에피소드의 프로그램 메모를 찾을 수 없습니다.</string>
@@ -898,7 +945,6 @@ Language: ko_KR
     <string name="settings_export_send_email">이메일 보내기</string>
     <string name="settings_export_save_file_summary">저장 공간으로 OPML 파일을 내보냅니다.</string>
     <string name="settings_export_save_file">파일 저장</string>
-    <string name="settings_embedded_artwork_details">프로그램의 아트워크를 사용하지 않고 다운로드한 파일(있는 경우)의 아트워크를 플레이어에서 보여줍니다.</string>
     <string name="settings_developer">개발자</string>
     <string name="settings_close_upgrade_offer">업그레이드 제안 닫기</string>
     <string name="settings_choose_podcasts">팟캐스트 선택</string>
@@ -1433,7 +1479,7 @@ Language: ko_KR
     <string name="podcasts">팟캐스트</string>
     <string name="player_started_from">%d초부터 팟캐스트 시작</string>
     <string name="player_skipped_last">마지막 %d초 건너뛰기</string>
-    <string name="player_sleep_time_fired">에피소드 종료 시 절전 타이머가 중지되었습니다.\n안녕히 주무세요!</string>
+    <string name="player_sleep_time_fired">에피소드 종료 시 절전 타이머가 중지되었습니다.</string>
     <string name="player_actions_show_as_delete_for_custom">사용자 정의 에피소드의 경우 삭제로 표시됨</string>
     <string name="player_actions_hidden_for_custom">사용자 정의 에피소드의 경우 숨김</string>
     <string name="player_rearrange_actions_hidden">추가 작업</string>
@@ -1455,7 +1501,6 @@ Language: ko_KR
     <string name="player_time_saved_detail">이 기능을 사용하여 절약한 합계는 %s입니다.</string>
     <string name="player_tab_playing_wide">지금 재생 중</string>
     <string name="player_tab_playing">재생 중</string>
-    <string name="player_sleep_when_episode_ends">에피소드 종료 시 절전 유지</string>
     <string name="player_sleep_timer">절전 타이머</string>
     <string name="player_sleep_timer_title">절전 타이머</string>
     <string name="player_sleep_end_of_episode">에피소드 종료</string>
@@ -1464,7 +1509,6 @@ Language: ko_KR
     <string name="player_sleep_cancel_timer">타이머 취소</string>
     <string name="player_sleep_add_5_minutes">+ 5분</string>
     <string name="player_sleep_60_minutes">60분</string>
-    <string name="player_sleep_5_minutes">5분</string>
     <string name="player_sleep_30_minutes">30분</string>
     <string name="player_sleep_15_minutes">15분</string>
     <string name="player_pip">화면 속 화면 입력</string>
@@ -1627,4 +1671,7 @@ Language: ko_KR
     <string name="unarchive">아카이빙 취소</string>
     <string name="archive">아카이빙</string>
     <string name="add_to_up_next">다음 차례에 추가</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="other">%1$d 에피소드 - %2$s 남음</item>
+    </plurals>
 </resources>

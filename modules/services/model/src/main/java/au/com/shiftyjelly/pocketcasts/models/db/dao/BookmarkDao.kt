@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ProfileBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import kotlinx.coroutines.flow.Flow
@@ -95,6 +96,67 @@ abstract class BookmarkDao {
     abstract fun findBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
 
     @Query(
+        """SELECT *
+            FROM bookmarks
+            WHERE deleted = :deleted
+            ORDER BY 
+            CASE WHEN :isAsc = 1 THEN created_at END ASC, 
+            CASE WHEN :isAsc = 0 THEN created_at END DESC""",
+    )
+    abstract fun findAllBookmarksOrderByCreatedAtFlow(
+        isAsc: Boolean,
+        deleted: Boolean = false,
+    ): Flow<List<Bookmark>>
+
+    // Sorts the array by podcast name, episodes release date, and the bookmarks timestamp
+    @Query(
+        """SELECT 
+              bookmarks.*, 
+              podcasts.title as podcastTitle,
+              CASE 
+                WHEN podcast_episodes.title IS NULL 
+                THEN user_episodes.title 
+                ELSE podcast_episodes.title 
+              END as episodeTitle,
+              CASE 
+                WHEN podcast_episodes.published_date IS NULL 
+                THEN user_episodes.published_date 
+                ELSE podcast_episodes.published_date 
+              END as publishedDate
+            FROM 
+              bookmarks 
+              LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid
+              LEFT JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
+              LEFT JOIN podcasts ON bookmarks.podcast_uuid = podcasts.uuid 
+            WHERE 
+              deleted = :deleted 
+            ORDER BY
+              CASE WHEN podcasts.title is NULL THEN 1 ELSE 0 end, /* prioritizes podcast episodes with title */
+              CASE WHEN episodeTitle is NULL THEN 1 ELSE 0 END, /* prioritizes episodes with title */
+              (CASE WHEN podcasts.title is NOT NULL THEN /* sort by podcast title if podcast title is not null */
+                (CASE
+                      WHEN UPPER(podcasts.title) LIKE 'THE %' THEN SUBSTR(UPPER(podcasts.title), 5)
+                      WHEN UPPER(podcasts.title) LIKE 'A %' THEN SUBSTR(UPPER(podcasts.title), 3)
+                      WHEN UPPER(podcasts.title) LIKE 'AN %' THEN SUBSTR(UPPER(podcasts.title), 4)
+                      ELSE UPPER(podcasts.title)
+                END) 
+              ELSE /* sort by episode title if podcast title is null */
+                (CASE
+                      WHEN UPPER(episodeTitle) LIKE 'THE %' THEN SUBSTR(UPPER(episodeTitle), 5)
+                      WHEN UPPER(episodeTitle) LIKE 'A %' THEN SUBSTR(UPPER(episodeTitle), 3)
+                      WHEN UPPER(episodeTitle) LIKE 'AN %' THEN SUBSTR(UPPER(episodeTitle), 4)
+                      ELSE UPPER(episodeTitle)
+                  END) 
+              END) ASC,
+              publishedDate DESC,
+              bookmarks.time ASC
+        """,
+    )
+    abstract fun findAllBookmarksByOrderPodcastAndEpisodeFlow(
+        deleted: Boolean = false,
+    ): Flow<List<ProfileBookmark>>
+
+    @Query(
         """SELECT bookmarks.*
             FROM bookmarks
             LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
@@ -104,6 +166,25 @@ abstract class BookmarkDao {
     )
     abstract suspend fun searchInPodcastByTitle(
         podcastUuid: String,
+        title: String,
+        deleted: Boolean = false,
+    ): List<Bookmark>
+
+    @Query(
+        """
+        SELECT 
+          bookmarks.* 
+        FROM 
+          bookmarks 
+          LEFT JOIN podcast_episodes ON bookmarks.episode_uuid = podcast_episodes.uuid 
+        WHERE 
+          (
+            UPPER(bookmarks.title) LIKE UPPER(:title) 
+            OR UPPER(podcast_episodes.title) LIKE UPPER(:title)
+          ) 
+          AND deleted = :deleted""",
+    )
+    abstract suspend fun searchByBookmarkOrEpisodeTitle(
         title: String,
         deleted: Boolean = false,
     ): List<Bookmark>

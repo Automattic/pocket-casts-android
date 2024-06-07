@@ -1,4 +1,6 @@
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="72dp"
@@ -16,10 +18,10 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/widget_nothingloaded"
             android:layout_gravity="center"
             android:alpha="0.4"
-            android:tint="?attr/colorOnPrimaryContainer"/>
+            android:src="@drawable/widget_old_nothing_loaded"
+            android:tint="?attr/colorOnPrimaryContainer" />
 
     </FrameLayout>
 
@@ -33,19 +35,19 @@
             android:id="@+id/widget_artwork"
             android:layout_width="72dp"
             android:layout_height="72dp"
-            android:adjustViewBounds="true"
             android:layout_gravity="start"
-            android:padding="8dp"
-            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:clickable="true"
             android:focusable="true"
-            android:clickable="true" />
+            android:padding="8dp"
+            android:scaleType="fitXY" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="64dp"
             android:orientation="horizontal"
-            android:weightSum="3" >
+            android:weightSum="3">
 
             <FrameLayout
                 android:id="@+id/widget_skip_back"
@@ -53,27 +55,27 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:focusable="true"
-                android:clickable="true" >
+                android:clickable="true"
+                android:focusable="true">
 
                 <TextView
                     android:id="@+id/widget_skip_back_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:fontFamily="sans-serif-medium"
                     android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:includeFontPadding="false"
                     android:paddingLeft="2dp"
                     android:paddingTop="4dp"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:textSize="12sp" />
 
                 <ImageView
-                    android:src="@drawable/widget_skipbackwards"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:tint="?attr/colorOnPrimaryContainer"/>
+                    android:src="@drawable/widget_old_skip_backward"
+                    android:tint="?attr/colorOnPrimaryContainer" />
 
             </FrameLayout>
 
@@ -86,16 +88,16 @@
                     android:id="@+id/widget_play_button"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/play_episode"
-                    android:background="?android:attr/selectableItemBackground">
+                    android:background="?android:attr/selectableItemBackground"
+                    android:contentDescription="@string/play_episode">
 
                     <ImageView
-                        android:src="@drawable/ic_play"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:padding="16dp"
-                        android:tint="?attr/colorOnPrimaryContainer"/>
+                        android:src="@drawable/widget_old_play"
+                        android:tint="?attr/colorOnPrimaryContainer" />
 
                 </FrameLayout>
 
@@ -103,16 +105,16 @@
                     android:id="@+id/widget_pause_button"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:contentDescription="@string/pause_episode"
                     android:background="?android:attr/selectableItemBackground"
+                    android:contentDescription="@string/pause_episode"
                     android:visibility="gone">
 
                     <ImageView
-                        android:src="@drawable/widget_pause"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:tint="?attr/colorOnPrimaryContainer"/>
+                        android:src="@drawable/widget_old_pause"
+                        android:tint="?attr/colorOnPrimaryContainer" />
 
                 </FrameLayout>
             </FrameLayout>
@@ -123,26 +125,26 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:clickable="true" >
+                android:clickable="true">
 
                 <TextView
                     android:id="@+id/widget_skip_forward_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:fontFamily="sans-serif-medium"
-                    android:paddingRight="2dp"
                     android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:includeFontPadding="false"
                     android:paddingTop="4dp"
+                    android:paddingRight="2dp"
                     android:textColor="?attr/colorOnPrimaryContainer"
                     android:textSize="12sp" />
 
                 <ImageView
-                    android:src="@drawable/widget_skipforwards"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:tint="?attr/colorOnPrimaryContainer"/>
+                    android:src="@drawable/widget_old_skip_forward"
+                    android:tint="?attr/colorOnPrimaryContainer" />
 
             </FrameLayout>
 

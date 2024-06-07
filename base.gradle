@@ -26,6 +26,10 @@ android {
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
         buildConfigField "String", "GOOGLE_SIGN_IN_SERVER_CLIENT_ID", "\"${project.googleSignInServerClientId}\""
+        buildConfigField "String", "SENTRY_DSN", "\"${project.pocketcastsSentryDsn}\""
+        buildConfigField "String", "BUILD_PLATFORM", "\"${project.buildPlatform}\""
+        buildConfigField "String", "ENCRYPTION_KEY", "\"${project.encryptionKey}\""
+        buildConfigField "String", "APP_SECRET", "\"${project.appSecret}\""
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
@@ -33,9 +37,21 @@ android {
     }
 
     lint {
-        abortOnError false
-        disable "AppCompatResource", "ContentDescription", "DiffUtilEquals"
+        baseline project.file("lint-baseline.xml")
+
+        lintConfig rootProject.file("lint.xml")
         xmlReport true
+
+        checkAllWarnings false
+        warningsAsErrors false
+
+        checkDependencies false
+        checkTestSources false
+        checkGeneratedSources false
+
+        // There's no point in slowing down assembling of release builds
+        // since we execute lint explicitly on CI in a separate action
+        checkReleaseBuilds = false
     }
 
     compileOptions {
@@ -84,8 +100,15 @@ android {
         arg("skipPrivatePreviews", "true")
     }
 
-    if (project.canSignRelease) {
-        signingConfigs {
+    signingConfigs {
+        debug {
+            storeFile file("${rootDir.path}/debug.keystore")
+            storePassword "debugkey"
+            keyAlias "debugkey"
+            keyPassword "debugkey"
+        }
+
+        if (project.canSignRelease) {
             release {
                 storeFile = project.storeFile
                 storePassword = project.storePassword
@@ -110,6 +133,8 @@ android {
             buildConfigField "String", "WEB_BASE_HOST", "\"pocket-casts-main-development.mystagingwebsite.com\""
             buildConfigField "String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\""
             buildConfigField "String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\""
+
+            signingConfig signingConfigs.debug
         }
 
         debugProd {
@@ -127,6 +152,8 @@ android {
             buildConfigField "String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD
             buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
             buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
+
+            signingConfig signingConfigs.debug
         }
 
         release {
@@ -169,13 +196,11 @@ dependencies {
     implementation libs.bundles.protobuf
     implementation libs.bundles.retrofit
     implementation libs.bundles.rxjava
-    implementation libs.bundles.sentry
     implementation libs.bundles.work
 
     implementation platform(libs.compose.bom)
     androidTestImplementation platform(libs.compose.bom)
     implementation platform(libs.firebase.bom)
-    implementation platform(libs.sentry.bom)
 
     implementation libs.appcompat
     implementation libs.auth
@@ -217,9 +242,8 @@ dependencies {
     ksp libs.moshi.kotlin.codegen
     ksp libs.glide.compiler
     ksp libs.showkase.processor
-    // Dagger doesn't support KSP yet https://github.com/google/dagger/issues/2349
-    kapt libs.hilt.compiler
-    kapt libs.dagger.hilt.compiler
+    ksp libs.hilt.compiler
+    ksp libs.dagger.hilt.compiler
 
     debugImplementation libs.compose.ui.test.manifest
     debugImplementation libs.compose.ui.tooling

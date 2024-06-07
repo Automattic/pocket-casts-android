@@ -46,7 +46,7 @@ internal class SmallListRowAdapter(
         val rows = listOf(binding.row0, binding.row1, binding.row2, binding.row3)
     }
 
-    var fromListId: String? = null
+    private var fromListId: String? = null
 
     fun submitPodcastList(list: List<DiscoverPodcast>, commitCallback: Runnable?) {
         submitList(list.chunked(SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE), commitCallback)
@@ -93,5 +93,8 @@ internal class SmallListRowAdapter(
                 podcastRow.isClickable = false
             }
         }
+    }
+    fun setFromListId(value: String) {
+        this.fromListId = value
     }
 }

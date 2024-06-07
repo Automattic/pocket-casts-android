@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.nextBooleanOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextDoubleOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrDefault
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrNull
+import au.com.shiftyjelly.pocketcasts.servers.extensions.nextLongOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextStringOrNull
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.FromJson
@@ -106,6 +107,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
                 "playing_status" -> episode.playingStatus = readPlayingStatus(reader)
                 "is_deleted" -> episode.isArchived = reader.nextBooleanOrNull()
                 "deselected_chapters" -> episode.deselectedChapters = readDeselectedChapters(reader)
+                "deselected_chapters_modified" -> episode.deselectedChaptersModified = readDeselectedChaptersModified(reader)
                 else -> reader.skipValue()
             }
         }
@@ -132,6 +134,10 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
         return ChapterIndices.fromString(reader.nextString())
     }
 
+    private fun readDeselectedChaptersModified(reader: JsonReader): Long? {
+        return reader.nextLongOrNull()
+    }
+
     private fun readPodcast(reader: JsonReader, response: SyncUpdateResponse) {
         val podcast = SyncUpdateResponse.PodcastSync()
         reader.beginObject()
@@ -142,10 +148,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
                 "auto_start_from" -> podcast.startFromSecs = reader.nextIntOrNull()
                 "episodes_sort_order" -> podcast.episodesSortOrder = reader.nextIntOrNull()
                 "auto_skip_last" -> podcast.skipLastSecs = reader.nextIntOrNull()
-                "folder_uuid" -> {
-                    val folderUuid = reader.nextStringOrNull()
-                    podcast.folderUuid = if (folderUuid == null || folderUuid == Folder.homeFolderUuid) null else folderUuid
-                }
+                "folder_uuid" -> podcast.folderUuid = reader.nextStringOrNull()
                 "sort_position" -> podcast.sortPosition = reader.nextIntOrNull()
                 "date_added" -> podcast.dateAdded = reader.nextStringOrNull()?.parseIsoDate()
                 else -> reader.skipValue()

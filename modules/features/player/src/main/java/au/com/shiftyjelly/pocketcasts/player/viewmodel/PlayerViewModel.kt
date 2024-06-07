@@ -24,12 +24,12 @@ import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -61,10 +60,11 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
@@ -78,7 +78,6 @@ class PlayerViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
-    private val userManager: UserManager,
     private val downloadManager: DownloadManager,
     private val podcastManager: PodcastManager,
     private val bookmarkManager: BookmarkManager,
@@ -94,24 +93,14 @@ class PlayerViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    sealed class Artwork {
-        data class Url(val url: String) : Artwork()
-        data class Path(val path: String) : Artwork()
-        object None : Artwork()
-    }
-
     data class PodcastEffectsPair(val podcast: Podcast, val effects: PlaybackEffects)
     data class PlayerHeader(
         val positionMs: Int = 0,
         val durationMs: Int = -1,
         val isPlaying: Boolean = false,
         val isPrepared: Boolean = false,
-        val podcastUuid: String? = "",
-        val episodeUuid: String = "",
-        val episodeTitle: String = "",
+        val episode: BaseEpisode? = null,
         val podcastTitle: String? = null,
-        val isVideo: Boolean = false,
-        val isStarred: Boolean = false,
         val isPlaybackRemote: Boolean = false,
         val chapters: Chapters = Chapters(),
         val backgroundColor: Int = 0xFF000000.toInt(),
@@ -121,20 +110,24 @@ class PlayerViewModel @Inject constructor(
         val isSleepRunning: Boolean = false,
         val isEffectsOn: Boolean = false,
         val isBuffering: Boolean = false,
-        val downloadStatus: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED,
         val bufferedUpToMs: Int = 0,
-        val embeddedArtwork: Artwork = Artwork.None,
-        val isUserEpisode: Boolean = false,
         val theme: Theme.ThemeType = Theme.ThemeType.DARK,
+        val useEpisodeArtwork: Boolean = false,
     ) {
+        val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
+        val episodeUuid = episode?.uuid.orEmpty()
+        val episodeTitle = episode?.title.orEmpty()
+        val isVideo = episode?.isVideo == true
+        val isStarred = (episode as? PodcastEpisode)?.isStarred == true
+        val isUserEpisode = episode is UserEpisode
 
         val isChaptersPresent: Boolean = !chapters.isEmpty
-        val chapter: Chapter? = chapters.getChapter(positionMs)
-        val chapterProgress: Float = chapter?.calculateProgress(positionMs) ?: 0f
-        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs) ?: ""
-        val chapterSummary: String = chapters.getChapterSummary(positionMs)
-        val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs)
-        val isLastChapter: Boolean = chapters.isLastChapter(positionMs)
+        val chapter: Chapter? = chapters.getChapter(positionMs.milliseconds)
+        val chapterProgress: Float = chapter?.calculateProgress(positionMs.milliseconds) ?: 0f
+        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs.milliseconds) ?: ""
+        val chapterSummary: String = chapters.getChapterSummary(positionMs.milliseconds)
+        val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs.milliseconds)
+        val isLastChapter: Boolean = chapters.isLastChapter(positionMs.milliseconds)
         val isChapterImagePresent = chapter?.isImagePresent ?: false
         val title = chapter?.title ?: episodeTitle
 
@@ -151,7 +144,6 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    data class ChaptersHeader(val expanded: Boolean)
     data class UpNextSummary(val episodeCount: Int, val totalTimeSecs: Double)
 
     data class ListData(
@@ -164,8 +156,6 @@ class PlayerViewModel @Inject constructor(
         var upNextSummary: UpNextSummary,
     )
     private val source = SourceView.PLAYER
-    private val _showPlayerFlow = MutableSharedFlow<Unit>()
-    val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
     var upNextExpanded = settings.getBooleanForKey(Settings.PREFERENCE_UPNEXT_EXPANDED, true)
     var chaptersExpanded = settings.getBooleanForKey(Settings.PREFERENCE_CHAPTERS_EXPANDED, true)
@@ -188,7 +178,7 @@ class PlayerViewModel @Inject constructor(
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.globalPlaybackEffects.flow.asObservable(coroutineContext),
-        settings.useRssArtwork.flow.asObservable(coroutineContext),
+        settings.artworkConfiguration.flow.asObservable(coroutineContext),
         this::mergeListData,
     )
         .distinctUntilChanged()
@@ -280,12 +270,21 @@ class PlayerViewModel @Inject constructor(
     var podcast: Podcast? = null
 
     val isSleepRunning = MutableLiveData<Boolean>().apply { postValue(false) }
-    val isSleepAtEndOfEpisode = MutableLiveData<Boolean>().apply { postValue(false) }
+    val isSleepAtEndOfEpisodeOrChapter = MutableLiveData<Boolean>().apply { postValue(false) }
     val sleepTimeLeftText = MutableLiveData<String>()
     val sleepCustomTimeText = MutableLiveData<String>().apply {
         postValue(calcCustomTimeText())
     }
-    var sleepCustomTimeMins: Int = 5
+    val sleepEndOfEpisodesText = MutableLiveData<String>().apply {
+        postValue(calcEndOfEpisodeText())
+    }
+    val sleepEndOfChaptersText = MutableLiveData<String>().apply {
+        postValue(calcEndOfChapterText())
+    }
+    val sleepingInText = MutableLiveData<String>().apply {
+        postValue(calcSleepingInEpisodesText())
+    }
+    var sleepCustomTimeInMinutes: Int = 5
         set(value) {
             field = value.coerceIn(1, 240)
             settings.setSleepTimerCustomMins(field)
@@ -295,6 +294,30 @@ class PlayerViewModel @Inject constructor(
         get() {
             return settings.getSleepTimerCustomMins()
         }
+
+    fun setSleepEndOfChapters(chapters: Int = 1, shouldCallUpdateTimer: Boolean = true) {
+        val newValue = chapters.coerceIn(1, 240)
+        settings.setSleepEndOfChapters(newValue)
+        sleepEndOfChaptersText.postValue(calcEndOfChapterText())
+        sleepingInText.postValue(calcSleepingInChaptersText())
+        if (shouldCallUpdateTimer) {
+            updateSleepTimer()
+        }
+    }
+
+    fun getSleepEndOfChapters(): Int = settings.getSleepEndOfChapters()
+
+    fun setSleepEndOfEpisodes(episodes: Int = 1, shouldCallUpdateTimer: Boolean = true) {
+        val newValue = episodes.coerceIn(1, 240)
+        settings.setSleepEndOfEpisodes(newValue)
+        sleepEndOfEpisodesText.postValue(calcEndOfEpisodeText())
+        sleepingInText.postValue(calcSleepingInEpisodesText())
+        if (shouldCallUpdateTimer) {
+            updateSleepTimer()
+        }
+    }
+
+    fun getSleepEndOfEpisodes(): Int = settings.getSleepEndOfEpisodes()
 
     init {
         updateSleepTimer()
@@ -315,7 +338,7 @@ class PlayerViewModel @Inject constructor(
             }
     }
 
-    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, useRssArtwork: Boolean): ListData {
+    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, artworkConfiguration: ArtworkConfiguration): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -323,20 +346,6 @@ class PlayerViewModel @Inject constructor(
         this.podcast = podcast
 
         val effects = if (podcast?.overrideGlobalEffects == true) podcast.playbackEffects else globalPlaybackEffects
-
-        val showNotesImageUrl = (episode as? PodcastEpisode)?.imageUrl
-        val embeddedPath = playbackState.embeddedArtworkPath
-
-        val embeddedArtwork: Artwork = if (showNotesImageUrl != null && useRssArtwork) {
-            Artwork.Url(showNotesImageUrl)
-        } else if (embeddedPath != null) {
-            Artwork.Path(embeddedPath)
-        } else if (episode is UserEpisode) {
-            val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)
-            if (artworkUrl.startsWith("/")) Artwork.Path(artworkUrl) else Artwork.Url(artworkUrl)
-        } else {
-            Artwork.None
-        }
 
         val podcastHeader: PlayerHeader
         if (episode == null) {
@@ -351,30 +360,24 @@ class PlayerViewModel @Inject constructor(
                 durationMs = playbackState.durationMs,
                 isPlaying = playbackState.isPlaying,
                 isPrepared = playbackState.isPrepared,
-                isVideo = episode.isVideo,
-                isStarred = (episode is PodcastEpisode && episode.isStarred),
+                episode = episode,
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
                 iconTintColor = iconTintColor,
-                podcastUuid = podcast?.uuid,
-                episodeUuid = episode.uuid,
-                episodeTitle = episode.title,
                 podcastTitle = if (playbackState.chapters.isEmpty) podcast?.title else null,
                 skipBackwardInSecs = skipBackwardInSecs,
                 skipForwardInSecs = skipForwardInSecs,
                 isSleepRunning = playbackState.isSleepTimerRunning,
                 isEffectsOn = !effects.usingDefaultValues,
                 isBuffering = playbackState.isBuffering,
-                downloadStatus = episode.episodeStatus,
                 bufferedUpToMs = playbackState.bufferedMs,
-                embeddedArtwork = embeddedArtwork,
-                isUserEpisode = episode is UserEpisode,
                 theme = theme.activeTheme,
+                useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
             )
         }
         val chapters = playbackState.chapters
-        val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs)
+        val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
 
         var episodeCount = 0
         var totalTime = 0.0
@@ -534,16 +537,69 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun calcCustomTimeText(): String {
-        return context.resources.getString(LR.string.minutes_plural, sleepCustomTimeMins)
+        val hours = sleepCustomTimeInMinutes / 60
+        val minutes = sleepCustomTimeInMinutes % 60
+
+        return if (hours == 1 && minutes == 0) {
+            context.resources.getString(LR.string.hours_singular)
+        } else if (hours == 1 && minutes > 0) {
+            context.resources.getString(LR.string.hour_and_minutes, minutes)
+        } else if (hours > 1 && minutes == 0) {
+            context.resources.getString(LR.string.hours_plural, hours)
+        } else if (hours > 0) {
+            context.resources.getString(LR.string.hours_and_minutes, hours, minutes)
+        } else if (hours == 0 && minutes == 1) {
+            context.resources.getString(LR.string.minutes_singular)
+        } else {
+            context.resources.getString(LR.string.minutes_plural, sleepCustomTimeInMinutes)
+        }
+    }
+
+    private fun calcEndOfEpisodeText(): String {
+        return if (getSleepEndOfEpisodes() == 1) {
+            context.resources.getString(LR.string.player_sleep_timer_in_episode)
+        } else {
+            context.resources.getString(LR.string.player_sleep_timer_in_episode_plural, getSleepEndOfEpisodes())
+        }
+    }
+
+    private fun calcEndOfChapterText(): String {
+        return if (getSleepEndOfChapters() == 1) {
+            context.resources.getString(LR.string.player_sleep_timer_in_chapter)
+        } else {
+            context.resources.getString(LR.string.player_sleep_timer_in_chapter_plural, getSleepEndOfChapters())
+        }
+    }
+
+    private fun calcSleepingInEpisodesText(): String {
+        return if (getSleepEndOfEpisodes() == 1) {
+            context.resources.getString(LR.string.player_sleep_in_one_episode)
+        } else {
+            context.resources.getString(LR.string.player_sleep_in_episodes, getSleepEndOfEpisodes())
+        }
+    }
+
+    private fun calcSleepingInChaptersText(): String {
+        return if (getSleepEndOfChapters() == 1) {
+            context.resources.getString(LR.string.player_sleep_in_one_chapter)
+        } else {
+            context.resources.getString(LR.string.player_sleep_in_chapters, getSleepEndOfChapters())
+        }
     }
 
     fun updateSleepTimer() {
         val timeLeft = sleepTimer.timeLeftInSecs()
-        if ((sleepTimer.isRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.sleepAfterEpisode) {
-            isSleepAtEndOfEpisode.postValue(playbackManager.sleepAfterEpisode)
+        if ((sleepTimer.isSleepAfterTimerRunning && timeLeft != null && timeLeft.toInt() > 0) || playbackManager.isSleepAfterEpisodeEnabled()) {
+            isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterEpisodeEnabled())
             sleepTimeLeftText.postValue(if (timeLeft != null && timeLeft > 0) Util.formattedSeconds(timeLeft.toDouble()) else "")
+            setSleepEndOfEpisodes(playbackManager.episodesUntilSleep, shouldCallUpdateTimer = false)
+            sleepingInText.postValue(calcSleepingInEpisodesText())
+        } else if (playbackManager.isSleepAfterChapterEnabled()) {
+            isSleepAtEndOfEpisodeOrChapter.postValue(playbackManager.isSleepAfterChapterEnabled())
+            setSleepEndOfChapters(playbackManager.chaptersUntilSleep, shouldCallUpdateTimer = false)
+            sleepingInText.postValue(calcSleepingInChaptersText())
         } else {
-            isSleepAtEndOfEpisode.postValue(false)
+            isSleepAtEndOfEpisodeOrChapter.postValue(false)
             playbackManager.updateSleepTimerStatus(false)
         }
     }
@@ -553,18 +609,29 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun sleepTimerAfter(mins: Int) {
-        sleepTimer.sleepAfter(mins = mins) {
-            playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = false)
+        LogBuffer.i(SleepTimer.TAG, "Sleep after $mins minutes configured")
+        sleepTimer.sleepAfter(duration = mins.toDuration(DurationUnit.MINUTES)) {
+            playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
         }
     }
 
-    fun sleepTimerAfterEpisode() {
-        playbackManager.updateSleepTimerStatus(running = true, sleepAfterEpisode = true)
+    fun sleepTimerAfterEpisode(episodes: Int = 1) {
+        LogBuffer.i(SleepTimer.TAG, "Sleep after $episodes episodes configured")
+        settings.setlastSleepEndOfEpisodes(episodes)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterEpisodes = episodes)
+        sleepTimer.cancelTimer()
+    }
+
+    fun sleepTimerAfterChapter(chapters: Int = 1) {
+        LogBuffer.i(SleepTimer.TAG, "Sleep after $chapters chapters configured")
+        settings.setlastSleepEndOfChapters(chapters)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = true, sleepAfterChapters = chapters)
         sleepTimer.cancelTimer()
     }
 
     fun cancelSleepTimer() {
-        playbackManager.updateSleepTimerStatus(running = false)
+        LogBuffer.i(SleepTimer.TAG, "Cancelled sleep timer")
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
         sleepTimer.cancelTimer()
     }
 
@@ -592,7 +659,7 @@ class PlayerViewModel @Inject constructor(
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {
-                settings.globalPlaybackEffects.set(effects, needsSync = true)
+                settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
             }
             playbackManager.updatePlayerEffects(effects)
         }
@@ -613,7 +680,8 @@ class PlayerViewModel @Inject constructor(
             analyticsTracker = analyticsTracker,
             context = context,
         )
-        dialog.setForceDarkTheme(true)
+        val forceDarkTheme = settings.useDarkUpNextTheme.value && upNextSource != UpNextSource.UP_NEXT_TAB
+        dialog.setForceDarkTheme(forceDarkTheme)
         return dialog
     }
 

@@ -1,11 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,8 +19,8 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPod
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterAutoAddPodcastBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterHeaderBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterOptionRowBinding
@@ -23,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterPlainTextRowBi
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentAutoAddSettingsBinding
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoAddSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -33,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSourc
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -67,7 +72,7 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
         val topAdapter = AutoAddTopAdapter()
         val headerRow = AutoAddTopSections.Header(getString(LR.string.settings_auto_up_next_podcasts))
 
-        val autoAddAdapter = AutoAddPodcastAdapter(PodcastImageLoaderThemed(view.context)) {
+        val autoAddAdapter = AutoAddPodcastAdapter(view.context) {
             OptionsDialog()
                 .setTitle(getString(LR.string.settings_auto_up_next_add_to))
                 .addCheckedOption(
@@ -142,6 +147,14 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
             topAdapter.submitList(topSections)
 
             autoAddAdapter.submitList(podcasts)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding.recyclerView.updatePadding(bottom = it)
+                }
+            }
         }
     }
 
@@ -268,7 +281,12 @@ class AutoAddTopAdapter : ListAdapter<AutoAddTopSections, RecyclerView.ViewHolde
     }
 }
 
-class AutoAddPodcastAdapter(val imageLoader: PodcastImageLoader, val onClick: (Podcast) -> Unit) : ListAdapter<Podcast, AutoAddPodcastAdapter.ViewHolder>(PodcastAutoAddDiff) {
+class AutoAddPodcastAdapter(
+    val context: Context,
+    val onClick: (Podcast) -> Unit,
+) : ListAdapter<Podcast, AutoAddPodcastAdapter.ViewHolder>(PodcastAutoAddDiff) {
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context)
+
     class ViewHolder(val binding: AdapterAutoAddPodcastBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -280,7 +298,7 @@ class AutoAddPodcastAdapter(val imageLoader: PodcastImageLoader, val onClick: (P
         val podcast = getItem(position)
 
         holder.binding.apply {
-            imageLoader.load(podcast).into(imageView)
+            imageRequestFactory.create(podcast).loadInto(imageView)
             lblTitle.text = podcast.title
             val resources = holder.itemView.resources
             lblSubtitle.text = when (podcast.autoAddToUpNext) {

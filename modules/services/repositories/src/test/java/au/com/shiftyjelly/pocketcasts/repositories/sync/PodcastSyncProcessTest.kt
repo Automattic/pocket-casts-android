@@ -6,12 +6,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import java.time.Duration
 import java.util.Date
 import org.junit.Assert.assertEquals
@@ -302,6 +304,8 @@ class PodcastSyncProcessTest {
         subscriptionManager = mock(),
         folderManager = mock(),
         syncManager = mock(),
+        crashLogging = FakeCrashLogging(),
+        analyticsTracker = mock(),
     )
 
     private fun mockPodcast(
@@ -320,7 +324,7 @@ class PodcastSyncProcessTest {
         overrideGlobalArchive: Boolean = false,
         autoArchiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
         autoArchiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
-        autoArchiveEpisodeLimit: Int = 0,
+        autoArchiveEpisodeLimit: AutoArchiveLimit = AutoArchiveLimit.None,
         podcastGrouping: PodcastGrouping = PodcastGrouping.None,
         episodesSortType: EpisodesSortType = EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC,
     ) = mock<Podcast> {

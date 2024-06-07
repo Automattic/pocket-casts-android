@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
-import androidx.core.os.bundleOf
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContainerBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment.EpisodeFragmentArgs
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -36,6 +37,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.time.Duration
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -45,12 +47,7 @@ class EpisodeContainerFragment :
     BaseDialogFragment(),
     EpisodeFragment.EpisodeLoadedListener {
     companion object {
-        const val ARG_EPISODE_UUID = "episodeUUID"
-        const val ARG_EPISODE_VIEW_SOURCE = "episode_view_source"
-        const val ARG_OVERRIDE_PODCAST_LINK = "override_podcast_link"
-        const val ARG_PODCAST_UUID = "podcastUUID"
-        const val ARG_FROMLIST_UUID = "fromListUUID"
-        const val ARG_FORCE_DARK = "forceDark"
+        private const val NEW_INSTANCE_ARG = "EpisodeContainerFragmentArg"
 
         fun newInstance(
             episode: PodcastEpisode,
@@ -74,16 +71,25 @@ class EpisodeContainerFragment :
             podcastUuid: String? = null,
             fromListUuid: String? = null,
             forceDark: Boolean = false,
+            timestamp: Duration? = null,
         ) = EpisodeContainerFragment().apply {
-            arguments = bundleOf(
-                ARG_EPISODE_UUID to episodeUuid,
-                ARG_EPISODE_VIEW_SOURCE to source.value,
-                ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
-                ARG_PODCAST_UUID to podcastUuid,
-                ARG_FROMLIST_UUID to fromListUuid,
-                ARG_FORCE_DARK to forceDark,
-            )
+            arguments = Bundle().apply {
+                putParcelable(
+                    NEW_INSTANCE_ARG,
+                    EpisodeFragmentArgs(
+                        episodeUuid = episodeUuid,
+                        source = source,
+                        overridePodcastLink = overridePodcastLink,
+                        podcastUuid = podcastUuid,
+                        fromListUuid = fromListUuid,
+                        forceDark = forceDark,
+                        timestamp = timestamp,
+                    ),
+                )
+            }
         }
+        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? =
+            bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
     override val statusBarColor: StatusBarColor
@@ -95,23 +101,29 @@ class EpisodeContainerFragment :
 
     var binding: FragmentEpisodeContainerBinding? = null
 
-    private val episodeUUID: String?
-        get() = arguments?.getString(ARG_EPISODE_UUID)
+    private val args: EpisodeFragmentArgs
+        get() = extractArgs(arguments) ?: throw IllegalStateException("${this::class.java.simpleName} is missing arguments. It must be created with newInstance function")
+
+    private val episodeUUID: String
+        get() = args.episodeUuid
+
+    private val timestamp: Duration?
+        get() = args.timestamp
 
     private val episodeViewSource: EpisodeViewSource
-        get() = EpisodeViewSource.fromString(arguments?.getString(ARG_EPISODE_VIEW_SOURCE))
+        get() = args.source
 
     private val overridePodcastLink: Boolean
-        get() = arguments?.getBoolean(ARG_OVERRIDE_PODCAST_LINK) ?: false
+        get() = args.overridePodcastLink
 
     val podcastUuid: String?
-        get() = arguments?.getString(ARG_PODCAST_UUID)
+        get() = args.podcastUuid
 
     val fromListUuid: String?
-        get() = arguments?.getString(ARG_FROMLIST_UUID)
+        get() = args.fromListUuid
 
     private val forceDarkTheme: Boolean
-        get() = arguments?.getBoolean(ARG_FORCE_DARK) ?: false
+        get() = args.forceDark
 
     val activeTheme: Theme.ThemeType
         get() = if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
@@ -185,6 +197,7 @@ class EpisodeContainerFragment :
             fragmentManager = childFragmentManager,
             lifecycle = viewLifecycleOwner.lifecycle,
             episodeUUID = episodeUUID,
+            timestamp = timestamp,
             episodeViewSource = episodeViewSource,
             overridePodcastLink = overridePodcastLink,
             podcastUuid = podcastUuid,
@@ -251,6 +264,7 @@ class EpisodeContainerFragment :
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle,
         private val episodeUUID: String?,
+        private val timestamp: Duration?,
         private val episodeViewSource: EpisodeViewSource,
         private val overridePodcastLink: Boolean,
         private val podcastUuid: String?,
@@ -286,6 +300,7 @@ class EpisodeContainerFragment :
             return when (sections[position]) {
                 Section.Details -> EpisodeFragment.newInstance(
                     episodeUuid = requireNotNull(episodeUUID),
+                    timestamp = timestamp,
                     source = episodeViewSource,
                     overridePodcastLink = overridePodcastLink,
                     podcastUuid = podcastUuid,

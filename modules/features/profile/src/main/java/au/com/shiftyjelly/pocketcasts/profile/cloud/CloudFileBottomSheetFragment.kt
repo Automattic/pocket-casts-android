@@ -31,15 +31,15 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Co
 import au.com.shiftyjelly.pocketcasts.profile.databinding.BottomSheetCloudFileBinding
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -90,7 +90,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     @Inject lateinit var bookmarkManager: BookmarkManager
 
-    var podcastImageLoader: PodcastImageLoader? = null
+    private var pocketCastsImageRequestFactory: PocketCastsImageRequestFactory? = null
     private val viewModel: CloudBottomSheetViewModel by viewModels()
     private var binding: BottomSheetCloudFileBinding? = null
 
@@ -308,8 +308,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                         dialog?.dismiss()
                     }
                 }
-
-                podcastImageLoader?.load(userEpisode = episode, thumbnail = true)?.into(binding.imgFile)
+                pocketCastsImageRequestFactory?.create(episode, useEpisodeArtwork = false)?.loadInto(binding.imgFile)
             },
         )
 
@@ -340,12 +339,12 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        podcastImageLoader = PodcastImageLoaderThemed(context)
+        pocketCastsImageRequestFactory = PocketCastsImageRequestFactory(context).themed().smallSize()
     }
 
     override fun onDetach() {
         super.onDetach()
-        podcastImageLoader = null
+        pocketCastsImageRequestFactory = null
     }
 
     fun download(episode: UserEpisode, isOnWifi: Boolean) {
