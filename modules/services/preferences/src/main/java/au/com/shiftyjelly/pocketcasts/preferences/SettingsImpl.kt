@@ -1441,4 +1441,14 @@ class SettingsImpl @Inject constructor(
     override fun updateBottomInset(height: Int) {
         _bottomInset.tryEmit(height)
     }
+
+    override fun automotiveConnectedToMediaSession(): Boolean {
+        return sharedPreferences.getBoolean(Settings.AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION, false)
+    }
+
+    override fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean) {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(Settings.AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION, isLoaded)
+        editor.apply()
+    }
 }

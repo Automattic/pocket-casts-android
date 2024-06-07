@@ -1057,6 +1057,7 @@ class PodcastSyncProcess(
 
                 // don't update if times are very close
                 val currentUpTo = episode.playedUpTo
+
                 val negativeSeekThresholdSecs = settings.getPlaybackEpisodePositionChangedOnSyncThresholdSecs()
                 if (playedUpTo < currentUpTo - negativeSeekThresholdSecs || playedUpTo > currentUpTo + 2) {
                     episode.playedUpTo = playedUpTo

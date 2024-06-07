@@ -232,8 +232,13 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             binding.btnClear.id -> viewModel.clearPodcastEffects(podcast)
             binding.lblSpeed.id -> {
                 when (effects.playbackSpeed) {
-                    1.0 -> changePlaybackSpeed(effects, podcast, 1.5)
-                    1.5 -> changePlaybackSpeed(effects, podcast, 2.0)
+                    in 0.0..<1.05 -> changePlaybackSpeed(effects, podcast, 1.5)
+                    in 1.05..<1.55 -> changePlaybackSpeed(effects, podcast, 2.0)
+                    in 1.55..<2.05 -> changePlaybackSpeed(effects, podcast, 2.5)
+                    in 2.05..<2.55 -> changePlaybackSpeed(effects, podcast, 3.0)
+                    in 2.55..<3.05 -> changePlaybackSpeed(effects, podcast, 3.5)
+                    in 3.05..<3.55 -> changePlaybackSpeed(effects, podcast, 4.0)
+                    in 3.55..<4.05 -> changePlaybackSpeed(effects, podcast, 1.5)
                     else -> changePlaybackSpeed(effects, podcast, 1.0)
                 }
             }
