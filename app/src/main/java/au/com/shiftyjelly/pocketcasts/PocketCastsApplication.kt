@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -121,6 +122,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
 
+    @Inject lateinit var databaseExportHelper: DatabaseExportHelper
+
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
@@ -146,6 +149,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         setupLogging()
         setupAnalytics()
         setupApp()
+        cleanupDatabaseExportFileIfExists()
     }
 
     private fun setupAnalytics() {
@@ -306,6 +310,16 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Suppress("DEPRECATION")
     private fun findExternalStorageDirectory(): File {
         return Environment.getExternalStorageDirectory()
+    }
+
+    private fun cleanupDatabaseExportFileIfExists() {
+        applicationScope.launch(Dispatchers.IO) {
+            val email = File(applicationContext.filesDir, "email")
+            val zipFile = File(email, "${DatabaseExportHelper.EXPORT_FOLDER_NAME}.zip")
+            if (zipFile.exists()) {
+                databaseExportHelper.cleanup(zipFile)
+            }
+        }
     }
 
     override fun onTerminate() {

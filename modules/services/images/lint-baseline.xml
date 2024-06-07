@@ -784,7 +784,7 @@
 
     <issue
         id="IconDensities"
-        message="Missing the following drawables in `drawable-mdpi`: auto_0_5.png, auto_0_6.png, auto_0_7.png, auto_0_8.png, auto_0_9.png... (73 more)">
+        message="Missing the following drawables in `drawable-mdpi`: auto_0_5.png, auto_0_6.png, auto_0_7.png, auto_0_8.png, auto_0_9.png... (93 more)">
         <location
             file="src/main/res/drawable-mdpi"/>
     </issue>

@@ -1,5 +1,8 @@
 7.66
 -----
+*   New Features
+    *   Adds an option to export the database and preferences from the Help & Feedback view
+        ([#2309](https://github.com/Automattic/pocket-casts-android/pull/2309))
 *   Health
     *   Increase target SDK version to 34 
         ([#2279](https://github.com/Automattic/pocket-casts-android/pull/2279))

@@ -9,10 +9,13 @@ import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import java.io.File
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.util.Arrays
 import java.util.regex.Matcher
+import timber.log.Timber
 
 object IntentUtil {
 
@@ -251,5 +254,28 @@ object IntentUtil {
             uri = Uri.parse("http://$url")
         }
         return Intent(Intent.ACTION_VIEW, uri)
+    }
+
+    fun sendIntent(
+        context: Context,
+        file: File,
+        intentType: String,
+        errorMessage: String,
+        errorTitle: String? = null,
+    ) {
+        try {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = intentType
+            val uri = FileUtil.createUriWithReadPermissions(context, file, intent)
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            try {
+                context.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Timber.e(e)
+                UiUtil.displayAlertError(context, errorTitle ?: context.getString(R.string.error), errorMessage, null)
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 }
