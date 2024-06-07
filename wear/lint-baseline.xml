@@ -19,7 +19,7 @@
         errorLine2="         ~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="66"
+            line="67"
             column="10"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="        ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="42"
+            line="43"
             column="9"/>
     </issue>
 

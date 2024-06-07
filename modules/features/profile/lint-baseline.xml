@@ -909,7 +909,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Redundant attribute `paddingLeft`; already defining `paddingStart` with `targetSdkVersion` 33"
+        message="Redundant attribute `paddingLeft`; already defining `paddingStart` with `targetSdkVersion` 34"
         errorLine1="            android:paddingLeft=&quot;0dp&quot;"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~">
         <location
@@ -920,7 +920,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Redundant attribute `paddingRight`; already defining `paddingEnd` with `targetSdkVersion` 33"
+        message="Redundant attribute `paddingRight`; already defining `paddingEnd` with `targetSdkVersion` 34"
         errorLine1="            android:paddingRight=&quot;20dp&quot;"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
         <location
