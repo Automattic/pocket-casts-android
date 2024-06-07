@@ -2,13 +2,6 @@
 <issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
 
     <issue
-        id="ObsoleteLintCustomCheck"
-        message="Library lint checks reference invalid APIs; these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`androidx.compose.runtime.lint.RuntimeIssueRegistry`)&#xA;which contains some references to invalid API:&#xA;org.jetbrains.kotlin.analysis.api.session.KtAnalysisSessionProvider: org.jetbrains.kotlin.analysis.api.lifetime.KtLifetimeTokenFactory getTokenFactory()&#xA;(Referenced from androidx/compose/runtime/lint/AutoboxingStateCreationDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`AutoboxingStateValueProperty`&#xA;`AutoboxingStateCreation`&#xA;`CoroutineCreationDuringComposition`&#xA;`FlowOperatorInvokedInComposition`&#xA;`ComposableLambdaParameterNaming`&#xA;`ComposableLambdaParameterPosition`&#xA;`ComposableNaming`&#xA;`StateFlowValueCalledInComposition`&#xA;`CompositionLocalNaming`&#xA;`MutableCollectionMutableState`&#xA;`ProduceStateDoesNotAssignValue`&#xA;`RememberReturnType`&#xA;`OpaqueUnitKey`&#xA;`UnrememberedMutableState`&#xA;&#xA;To use this lint check, upgrade to a more recent version&#xA;of the library.">
-        <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/2bc2338a9b12546133c3957d31509f53/transformed/runtime-release/jars/lint.jar"/>
-    </issue>
-
-    <issue
         id="SuspiciousImport"
         message="Don&apos;t include `android.R` here; use a fully qualified name for each usage instead"
         errorLine1="import android.R"
@@ -28,20 +21,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/Activity.kt"
             line="15"
             column="22"/>
-    </issue>
-
-    <issue
-        id="InvalidPackage"
-        message="Invalid package reference in library; not included in Android: `java.awt`. Referenced from `com.sun.jna.Native.AWT`.">
-        <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/a5c0a6fe0233ae59f2dafd8082c122a9/transformed/jna-5.13.0/jars/classes.jar"/>
-    </issue>
-
-    <issue
-        id="InvalidPackage"
-        message="Invalid package reference in library; not included in Android: `javax.script`. Referenced from `org.apache.commons.text.lookup.ScriptStringLookup`.">
-        <location
-            file="$GRADLE_USER_HOME/caches/modules-2/files-2.1/org.apache.commons/commons-text/1.10.0/3363381aef8cef2dbc1023b3e3a9433b08b64e01/commons-text-1.10.0.jar"/>
     </issue>
 
     <issue
@@ -342,395 +321,10 @@
     </issue>
 
     <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `Page` of class `BatteryRestrictionsSettingsFragmentKt` requires synthetic accessor"
-        errorLine1="                    Page("
-        errorLine2="                    ~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/fragments/BatteryRestrictionsSettingsFragment.kt"
-            line="99"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `hitTest` of class `Companion` requires synthetic accessor"
-        errorLine1="                                    hitTest("
-        errorLine2="                                    ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/MultiSwipeHelper.kt"
-            line="213"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `hitTest` of class `Companion` requires synthetic accessor"
-        errorLine1="            if (hitTest(selectedView, x, y, mSelectedStartX + mDx, mSelectedStartY + mDy)) {"
-        errorLine2="                ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/MultiSwipeHelper.kt"
-            line="954"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `hitTest` of class `Companion` requires synthetic accessor"
-        errorLine1="            if (hitTest(view, x, y, anim.mX, anim.mY)) {"
-        errorLine2="                ~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/MultiSwipeHelper.kt"
-            line="961"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `findMaxElevation` of class `Companion` requires synthetic accessor"
-        errorLine1="                    val newElevation = 1f + findMaxElevation(recyclerView, view)"
-        errorLine2="                                            ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/MultiSwipeHelper.kt"
-            line="2605"
-            column="45"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `calculateNext` of class `NumericStepper` requires synthetic accessor"
-        errorLine1="                this@NumericStepper.value = calculateNext(incrementing)"
-        errorLine2="                                            ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/component/NumericStepper.kt"
-            line="156"
-            column="45"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `trackFailure` of class `OpmlExporter` requires synthetic accessor"
-        errorLine1="                        trackFailure(reason = &quot;server_call_failure&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/OpmlExporter.kt"
-            line="114"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `exportOpml` of class `OpmlExporter` requires synthetic accessor"
-        errorLine1="                            opmlFile = if (result == null) null else exportOpml(uuidToTitle, result, context)"
-        errorLine2="                                                                     ~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/OpmlExporter.kt"
-            line="120"
-            column="70"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `sendIntentEmail` of class `OpmlExporter` requires synthetic accessor"
-        errorLine1="                                    sendIntentEmail(opmlFile)"
-        errorLine2="                                    ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/OpmlExporter.kt"
-            line="126"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `trackFailure` of class `OpmlExporter` requires synthetic accessor"
-        errorLine1="                            trackFailure(reason = &quot;unknown&quot;)"
-        errorLine2="                            ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/OpmlExporter.kt"
-            line="138"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `extractArgs` of class `Companion` requires synthetic accessor"
-        errorLine1="        val args = extractArgs(arguments)"
-        errorLine2="                   ~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/fragments/PodcastSelectFragment.kt"
-            line="103"
-            column="20"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getExtraUrl` of class `WebViewActivity` requires synthetic accessor"
-        errorLine1="                if (extraUrl == url) {"
-        errorLine2="                    ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/activity/WebViewActivity.kt"
-            line="81"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="SyntheticAccessor"
-        message="Access to `private` method `getExtraUrl` of class `WebViewActivity` requires synthetic accessor"
-        errorLine1="                if (extraUrl == url) {"
-        errorLine2="                    ~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/activity/WebViewActivity.kt"
-            line="81"
-            column="21"/>
-    </issue>
-
-    <issue
         id="IconMissingDensityFolder"
         message="Missing density variation folders in `src/main/res`: drawable-mdpi, drawable-xhdpi, drawable-xxhdpi">
         <location
             file="src/main/res"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/adapter_multiselect_item.xml"
-            line="23"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/adapter_multiselect_title.xml"
-            line="6"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="31"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="50"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_confirmation.xml"
-            line="24"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_confirmation.xml"
-            line="33"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_filter_select.xml"
-            line="27"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_multiselect_bottom_sheet.xml"
-            line="16"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/layout_numeric_stepper.xml"
-            line="9"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/list_incoming_footer.xml"
-            line="7"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/list_incoming_header.xml"
-            line="7"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/list_incoming_header.xml"
-            line="19"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/settings_fragment_podcast_select.xml"
-            line="27"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/settings_row_filter.xml"
-            line="22"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/settings_row_podcast.xml"
-            line="33"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/settings_row_podcast.xml"
-            line="41"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/tour_step_view.xml"
-            line="8"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/tour_step_view.xml"
-            line="28"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/tour_step_view.xml"
-            line="43"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_download_banner.xml"
-            line="17"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_download_banner.xml"
-            line="31"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="SelectableText"
-        message="Consider making the text value selectable by specifying `android:textIsSelectable=&quot;true&quot;`"
-        errorLine1="    &lt;TextView"
-        errorLine2="     ~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_file_status_icons.xml"
-            line="62"
-            column="6"/>
     </issue>
 
     <issue
@@ -890,7 +484,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="69"
+            line="68"
             column="6"/>
     </issue>
 
@@ -1028,20 +622,20 @@
 
     <issue
         id="RtlHardcoded"
-        message="Redundant attribute `layout_marginLeft`; already defining `layout_marginStart` with `targetSdkVersion` 33"
-        errorLine1="        android:layout_marginLeft=&quot;16dp&quot;"
+        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="23"
+            line="46"
             column="9"/>
     </issue>
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
             line="47"
@@ -1050,20 +644,20 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="48"
+            line="65"
             column="9"/>
     </issue>
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
             line="66"
@@ -1072,23 +666,12 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="67"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
         errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="83"
+            line="82"
             column="9"/>
     </issue>
 
@@ -1144,17 +727,6 @@
         <location
             file="src/main/res/layout/settings_row_podcast.xml"
             line="52"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness (BehaviorRelay&lt;(Float or Float?)>)"
-        errorLine1="    var uploadConsumer = BehaviorRelay.create&lt;Float>()"
-        errorLine2="        ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/component/FileStatusIconsView.kt"
-            line="53"
             column="9"/>
     </issue>
 

@@ -20,7 +20,7 @@ class DoubleTest {
 
     @Test
     fun `roundedSpeed respects upper boundary`() {
-        assertEquals(3.0, 5.0.roundedSpeed())
+        assertEquals(5.0, 7.0.roundedSpeed())
     }
 
     @Test
@@ -35,6 +35,6 @@ class DoubleTest {
 
     @Test
     fun `roundedSpeed adjusts above upper boundary`() {
-        assertEquals(3.0, 3.5.roundedSpeed())
+        assertEquals(5.0, 5.5.roundedSpeed())
     }
 }
