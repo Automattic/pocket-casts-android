@@ -1,6 +1,8 @@
 7.66
 -----
 *   Bug Fixes
+    *   Fix: Search Term Persists When Navigating to Different Podcast Page
+        ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
     *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
         ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
 
@@ -26,6 +28,10 @@
         ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))    
     *   Fix 'No limit' episode archive setting not being respected 
         ([#2270](https://github.com/Automattic/pocket-casts-android/pull/2270))
+    *   Fix badges visibility on the Podcasts tab
+        ([#2284](https://github.com/Automattic/pocket-casts-android/pull/2284))
+    *   Fix podcast title talkback on the Podcasts tab
+        ([#2297](https://github.com/Automattic/pocket-casts-android/pull/2297))
 
 7.64
 -----

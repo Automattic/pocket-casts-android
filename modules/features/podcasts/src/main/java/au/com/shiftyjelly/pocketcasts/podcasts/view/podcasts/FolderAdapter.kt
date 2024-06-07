@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -175,7 +176,7 @@ class FolderAdapter(
         val theme: Theme,
     ) : RecyclerView.ViewHolder(view), PodcastTouchCallback.ItemTouchHelperViewHolder {
 
-        val button: View = view.findViewById(R.id.button)
+        val button: View? = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)
         val podcastCardView = view.findViewById<CardView>(R.id.podcast_card_view)
         val podcastBackground: View? = view.findViewById(R.id.header_background)
@@ -191,7 +192,7 @@ class FolderAdapter(
         val unplayedCountBadgeView = view.findViewById<ComposeView>(R.id.badge_view)
 
         fun bind(podcast: Podcast, badgeType: BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
-            button.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
+            button?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastCardView?.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
             podcastTitle.text = podcast.title
             podcastTitle.show()
@@ -210,7 +211,7 @@ class FolderAdapter(
                 unplayedText.hide()
                 unplayedCountBadgeView?.let {
                     it.setBadgeContent(displayBadgeCount, badgeType)
-                    it.show()
+                    it.showIf(displayBadgeCount > 0)
                 }
                 podcastCardView?.elevation = cardElevation
                 podcastCardView?.radius = cardCornerRadius
@@ -232,7 +233,9 @@ class FolderAdapter(
             }
 
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
-            button.contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
+            val contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
+            button?.contentDescription = contentDescription
+            podcastCardView?.contentDescription = contentDescription
 
             imageRequestFactory
                 .create(podcast, onSuccess = { if (!isListLayout) podcastTitle.hide() })

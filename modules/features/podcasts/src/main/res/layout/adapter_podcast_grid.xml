@@ -68,13 +68,4 @@
         android:translationZ ="2dp"
         android:visibility="gone"/>
 
-    <View
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:attr/selectableItemBackground"
-        android:foreground="@drawable/focus_border_white"
-        android:clickable="true"
-        android:focusable="true"/>
-
 </au.com.shiftyjelly.pocketcasts.views.component.SquareLayout>

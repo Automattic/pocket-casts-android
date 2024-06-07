@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
 import androidx.annotation.VisibleForTesting
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -15,10 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
@@ -44,12 +39,8 @@ import kotlinx.coroutines.rx2.asFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
-class ChaptersViewModel
-@Inject constructor(
-    episodeManager: EpisodeManager,
-    podcastManager: PodcastManager,
+class ChaptersViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
-    private val theme: Theme,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel(), CoroutineScope {
@@ -61,7 +52,6 @@ class ChaptersViewModel
         val allChapters: List<ChapterState> = emptyList(),
         val displayChapters: List<ChapterState> = emptyList(),
         val totalChaptersCount: Int = 0,
-        val backgroundColor: Color,
         val isTogglingChapters: Boolean = false,
         val userTier: UserTier = UserTier.Free,
         val canSkipChapters: Boolean = false,
@@ -90,12 +80,9 @@ class ChaptersViewModel
 
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
         .observeOn(Schedulers.io())
-    private val upNextStateObservable: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
-        .observeOn(Schedulers.io())
 
     private val _uiState = MutableStateFlow(
         UiState(
-            backgroundColor = Color(theme.playerBackgroundColor(null)),
             userTier = settings.userTier,
             canSkipChapters = canSkipChapters(settings.userTier),
         ),
@@ -114,7 +101,6 @@ class ChaptersViewModel
     init {
         viewModelScope.launch {
             combine(
-                upNextStateObservable.asFlow(),
                 playbackStateObservable.asFlow(),
                 settings.cachedSubscriptionStatus.flow,
                 this@ChaptersViewModel::combineUiState,
@@ -134,13 +120,9 @@ class ChaptersViewModel
     }
 
     private fun combineUiState(
-        upNextState: UpNextQueue.State,
         playbackState: PlaybackState,
         cachedSubscriptionStatus: SubscriptionStatus?,
     ): UiState {
-        val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
-        val backgroundColor = theme.playerBackgroundColor(podcast)
-
         val chapters = buildChaptersWithState(
             chapters = playbackState.chapters,
             playbackPositionMs = playbackState.positionMs,
@@ -159,7 +141,6 @@ class ChaptersViewModel
                 userTier = currentUserTier,
             ),
             totalChaptersCount = chapters.size,
-            backgroundColor = Color(backgroundColor),
             isTogglingChapters = isTogglingChapters,
             userTier = currentUserTier,
             canSkipChapters = canSkipChapters,
