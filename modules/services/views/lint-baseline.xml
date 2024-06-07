@@ -484,7 +484,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="69"
+            line="68"
             column="6"/>
     </issue>
 
@@ -622,20 +622,20 @@
 
     <issue
         id="RtlHardcoded"
-        message="Redundant attribute `layout_marginLeft`; already defining `layout_marginStart` with `targetSdkVersion` 33"
-        errorLine1="        android:layout_marginLeft=&quot;16dp&quot;"
+        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="23"
+            line="46"
             column="9"/>
     </issue>
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
             line="47"
@@ -644,20 +644,20 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="48"
+            line="65"
             column="9"/>
     </issue>
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
+        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
             line="66"
@@ -666,23 +666,12 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;61dp&quot;` to better support right-to-left layouts"
-        errorLine1="        android:layout_marginRight=&quot;61dp&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="67"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;88dp&quot;` to better support right-to-left layouts"
         errorLine1="        android:layout_marginLeft=&quot;88dp&quot;"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/discover_podcast_adapter.xml"
-            line="83"
+            line="82"
             column="9"/>
     </issue>
 
