@@ -33,6 +33,7 @@ class DatabaseExportHelper @Inject constructor(
 
         try {
             val email = File(context.filesDir, "email")
+            email.mkdirs()
             val outputZipFile = File(email, "$EXPORT_FOLDER_NAME.zip")
 
             val zipFile = zip(exportFolder, outputZipFile)
