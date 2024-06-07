@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionIconForTier
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -50,7 +48,7 @@ fun ChaptersHeader(
         onClick = { onSkipChaptersClick(!isTogglingChapters) },
     )
     Divider(
-        color = MaterialTheme.theme.colors.playerContrast06,
+        color = LocalChaptersTheme.current.divider,
         thickness = 1.dp,
     )
 }
@@ -80,7 +78,7 @@ private fun HeaderRow(
                 text = text,
                 modifier = Modifier
                     .padding(vertical = 16.dp),
-                color = MaterialTheme.theme.colors.playerContrast02,
+                color = LocalChaptersTheme.current.headerTitle,
             )
         }
 
@@ -113,7 +111,7 @@ private fun TextButton(
         TextH50(
             text = text,
             textAlign = TextAlign.End,
-            color = MaterialTheme.theme.colors.playerContrast01,
+            color = LocalChaptersTheme.current.headerToggle,
         )
 
         if (showSubscriptionIcon) {
@@ -146,40 +144,90 @@ data class TextToggle(
     val text: String,
 )
 
-@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Default - DARK")
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Light")
+@Preview(name = "Light")
+@Composable
+fun ChaptersHeaderLightPreview() = ChaptersHeaderPreview(Theme.ThemeType.LIGHT)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun ChaptersHeaderPreview() {
-    AppThemeWithBackground(Theme.ThemeType.DARK) {
-        Column {
-            ChaptersHeader(
-                totalChaptersCount = 5,
-                hiddenChaptersCount = 2,
-                onSkipChaptersClick = {},
-                isTogglingChapters = false,
-                showSubscriptionIcon = true,
-            )
-            ChaptersHeader(
-                totalChaptersCount = 5,
-                hiddenChaptersCount = 0,
-                onSkipChaptersClick = {},
-                isTogglingChapters = false,
-                showSubscriptionIcon = true,
-            )
-            ChaptersHeader(
-                totalChaptersCount = 5,
-                hiddenChaptersCount = 2,
-                onSkipChaptersClick = {},
-                isTogglingChapters = true,
-                showSubscriptionIcon = false,
-            )
-            ChaptersHeader(
-                totalChaptersCount = 1,
-                hiddenChaptersCount = 0,
-                onSkipChaptersClick = {},
-                isTogglingChapters = true,
-                showSubscriptionIcon = false,
-            )
+fun ChaptersHeaderDarkPreview() = ChaptersHeaderPreview(Theme.ThemeType.DARK)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Rose")
+@Preview(name = "Rose")
+@Composable
+fun ChaptersHeaderRosePreview() = ChaptersHeaderPreview(Theme.ThemeType.ROSE)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Indigo")
+@Preview(name = "Indigo")
+@Composable
+fun ChaptersHeaderIndigoPreview() = ChaptersHeaderPreview(Theme.ThemeType.INDIGO)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "ExtraDark")
+@Preview(name = "ExtraDark")
+@Composable
+fun ChaptersHeaderExtraDarkPreview() = ChaptersHeaderPreview(Theme.ThemeType.EXTRA_DARK)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "DarkContrast")
+@Preview(name = "DarkContrast")
+@Composable
+fun ChaptersHeaderDarkContrastPreview() = ChaptersHeaderPreview(Theme.ThemeType.DARK_CONTRAST)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "LightContrast")
+@Preview(name = "LightContrast")
+@Composable
+fun ChaptersHeaderLightContrastPreview() = ChaptersHeaderPreview(Theme.ThemeType.LIGHT_CONTRAST)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Electric")
+@Preview(name = "Electric")
+@Composable
+fun ChaptersHeaderElectricPreview() = ChaptersHeaderPreview(Theme.ThemeType.ELECTRIC)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Classic")
+@Preview(name = "Classic")
+@Composable
+fun ChaptersHeaderClassicPreview() = ChaptersHeaderPreview(Theme.ThemeType.CLASSIC_LIGHT)
+
+@ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Radioactive")
+@Preview(name = "Radioactive")
+@Composable
+fun ChaptersHeaderRadioactivePreview() = ChaptersHeaderPreview(Theme.ThemeType.RADIOACTIVE)
+
+@Composable
+private fun ChaptersHeaderPreview(theme: Theme.ThemeType) {
+    AppThemeWithBackground(theme) {
+        ChaptersTheme {
+            Column {
+                ChaptersHeader(
+                    totalChaptersCount = 5,
+                    hiddenChaptersCount = 2,
+                    onSkipChaptersClick = {},
+                    isTogglingChapters = false,
+                    showSubscriptionIcon = true,
+                )
+                ChaptersHeader(
+                    totalChaptersCount = 5,
+                    hiddenChaptersCount = 0,
+                    onSkipChaptersClick = {},
+                    isTogglingChapters = false,
+                    showSubscriptionIcon = true,
+                )
+                ChaptersHeader(
+                    totalChaptersCount = 5,
+                    hiddenChaptersCount = 2,
+                    onSkipChaptersClick = {},
+                    isTogglingChapters = true,
+                    showSubscriptionIcon = false,
+                )
+                ChaptersHeader(
+                    totalChaptersCount = 1,
+                    hiddenChaptersCount = 0,
+                    onSkipChaptersClick = {},
+                    isTogglingChapters = true,
+                    showSubscriptionIcon = false,
+                )
+            }
         }
     }
 }
