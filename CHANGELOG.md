@@ -5,6 +5,9 @@
         ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
     *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
         ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
+*   Updates:
+    *   Playback speed can now be changed up to 5x.
+        ([#1645](https://github.com/Automattic/pocket-casts-android/pull/1645))
 
 7.65
 -----
