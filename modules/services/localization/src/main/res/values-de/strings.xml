@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-21 13:54:03+0000
+Translation-Revision-Date: 2024-06-04 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_sleep_timer_auto_restart_summary">Wenn die Schlummerfunktion aktiviert ist, wird sie automatisch neu gestartet, wenn du innerhalb von fünf Minuten nach der letzten Pause eine Folge abspielst.</string>
+    <string name="settings_sleep_timer_auto_restart">Schlummerfunktion automatisch neu starten</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">Wenn die Schlummerfunktion aktiviert ist, wird sie neu gestartet, wenn du dein Handy schüttelst.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Schütteln, um Schlummerfunktion neu zu starten</string>
+    <string name="settings_general_sleep_timer">Schlummerfunktion</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Durch die Priorisierung der Suchgenauigkeit kann die Reaktionsfähigkeit der Suche erheblich verlangsamt werden, was bei Pocket Casts zu einem höheren Datenverbrauch führen kann.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Suchgenauigkeit priorisieren</string>
+    <string name="settings_storage_section_heading_seek_accuracy">Suchgenauigkeit</string>
+    <string name="settings_import_opml_succeeded_message">OPML-Import erfolgreich</string>
+    <string name="settings_import_opml_import_failed_message">Aus der angegebenen OPML-Datei konnten keine Podcasts importiert werden.</string>
+    <string name="nova_launcher_recently_played">Zuletzt abgespielt</string>
+    <string name="notification_channel_description_fix_downloads_complete">Wird beim Abschluss der Downloadfehler-Behebung angezeigt</string>
+    <string name="notification_channel_description_fix_downloads">Wird beim Auslösen der Downloadfehler-Behebung angezeigt</string>
+    <string name="settings_fix_downloads_complete_message">%d Downloadfehler behoben</string>
+    <string name="settings_fix_downloads_complete_title">Downloadfehler-Behebung abgeschlossen</string>
+    <string name="settings_fix_downloads_started_message">Downloadfehler-Behebung beginnt in Kürze. Benachrichtigungen prüfen, um Fortschrittinfos zu erhalten.</string>
+    <string name="settings_fix_downloads_stop">Anhalten</string>
+    <string name="settings_fix_downloads_progress">%1$d von %2$d Folgen</string>
+    <string name="settings_fix_downloads_title">Downloadfehler werden behoben</string>
+    <string name="clip_title">Clip</string>
+    <string name="stop">Anhalten</string>
+    <string name="nova_launcher_continue_listening">Weiter anhören</string>
+    <string name="episode_not_found">Folge nicht gefunden</string>
     <string name="settings_storage_fix_downloads_description">Versuche, alle heruntergeladenen Dateien wiederherzustellen, wenn sie in der Pocket Casts-App fehlen.</string>
     <string name="settings_storage_fix_downloads">Downloads beheben</string>
     <string name="nova_launcher_new_releases">Neue Veröffentlichungen</string>

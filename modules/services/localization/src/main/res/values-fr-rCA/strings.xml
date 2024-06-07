@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-21 11:54:03+0000
+Translation-Revision-Date: 2024-06-04 09:54:05+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_sleep_timer_auto_restart_summary">Si cette fonction est activée, la mise en veille redémarrera automatiquement si vous écoutez un épisode dans les 5 minutes suivant la dernière pause.</string>
+    <string name="settings_sleep_timer_auto_restart">Redémarrer automatiquement la mise en veille</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">Si cette fonction est activée, la mise en veille redémarrera si vous secouez votre téléphone.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Secouer pour redémarrer la mise en veille</string>
+    <string name="settings_general_sleep_timer">Mise en veille</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Privilégier la précision de la recherche peut ralentir considérablement la réactivité de la fonction de recherche et accroître la quantité de données consommées par Pocket Casts.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Privilégier la précision de la recherche</string>
+    <string name="settings_storage_section_heading_seek_accuracy">Précision de la recherche</string>
+    <string name="settings_import_opml_succeeded_message">Importation OPML réussie.</string>
+    <string name="settings_import_opml_import_failed_message">Impossible d’importer des podcasts à partir du fichier OPML indiqué.</string>
+    <string name="nova_launcher_recently_played">Lectures récentes</string>
+    <string name="notification_channel_description_fix_downloads_complete">Indique que la réparation des téléchargements est terminée</string>
+    <string name="notification_channel_description_fix_downloads">Indique que la réparation des téléchargements est lancée</string>
+    <string name="settings_fix_downloads_complete_message">%d téléchargements réparés</string>
+    <string name="settings_fix_downloads_complete_title">Réparation des téléchargements terminée</string>
+    <string name="settings_fix_downloads_started_message">La réparation des téléchargements commencera sous peu. Consultez vos notifications pour en connaître la progression.</string>
+    <string name="settings_fix_downloads_stop">Arrêter</string>
+    <string name="settings_fix_downloads_progress">%1$d sur %2$d épisodes</string>
+    <string name="settings_fix_downloads_title">Réparation des téléchargements</string>
+    <string name="clip_title">Clip</string>
+    <string name="stop">Arrêter</string>
+    <string name="nova_launcher_continue_listening">Continuer d’écouter</string>
+    <string name="episode_not_found">Épisode introuvable</string>
     <string name="settings_storage_fix_downloads_description">Tentative de rétablissement des fichiers téléchargés s’ils sont absents de l’application Pocket Casts.</string>
     <string name="settings_storage_fix_downloads">Réparer les téléchargements</string>
     <string name="nova_launcher_new_releases">Nouveautés</string>

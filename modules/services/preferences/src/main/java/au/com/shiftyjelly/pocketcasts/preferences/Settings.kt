@@ -407,6 +407,7 @@ interface Settings {
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
     fun getExoPlayerCacheSizeInMB(): Long
+    fun getPlaybackEpisodePositionChangedOnSyncThresholdSecs(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>
 

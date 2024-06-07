@@ -18,9 +18,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -55,10 +56,11 @@ fun CountBadge(
         val textColor = MaterialTheme.theme.colors.primaryInteractive02
         when (style) {
             is CountBadgeStyle.Small -> return
-            is CountBadgeStyle.Medium -> TextH70(
+            is CountBadgeStyle.Medium -> TextH60(
                 text = text,
                 color = textColor,
-                fontWeight = FontWeight.W600,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.W700,
                 disableScale = true,
                 modifier = Modifier.padding(horizontal = 8.dp),
             )
@@ -105,7 +107,7 @@ sealed class CountBadgeStyle {
     }
 
     data object Medium : CountBadgeStyle() {
-        override val size = 16.dp
+        override val size = 19.dp
         override val borderWidth = 3.dp
     }
 

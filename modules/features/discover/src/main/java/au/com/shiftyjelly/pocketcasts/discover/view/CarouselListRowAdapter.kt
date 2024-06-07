@@ -7,11 +7,9 @@ import androidx.recyclerview.widget.ListAdapter
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
-import au.com.shiftyjelly.pocketcasts.ui.R.attr.contrast_02
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -35,7 +33,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
     }
 }
 
-internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit), private val analyticsTracker: AnalyticsTrackerWrapper) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
+internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, val onPodcastClicked: ((DiscoverPodcast, String?, Boolean) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit), private val analyticsTracker: AnalyticsTrackerWrapper) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_carousel, parent, false)
         return CarouselItemViewHolder(theme, view)
@@ -54,7 +52,8 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
 
             holder.setTaglineText(tagLineText)
             holder.itemView.setOnClickListener {
-                onPodcastClicked(podcast, podcast.listId) // no analytics for carousel
+                val isFeatured = podcast.isSponsored || podcast.listId == null
+                onPodcastClicked(podcast, podcast.listId, isFeatured)
 
                 if (podcast.listId != null) {
                     val listId = podcast.listId as String
@@ -63,7 +62,8 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                         AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
                         AnalyticsProp.sponsoredPodcastTapped(listId, podcast.uuid),
                     )
-                } else {
+                }
+                if (isFeatured) {
                     FirebaseAnalyticsTracker.openedFeaturedPodcast()
                     analyticsTracker.track(
                         AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED,
@@ -72,8 +72,9 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                 }
             }
             holder.btnSubscribe.setOnClickListener {
-                holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = contrast_02, colorUnsubscribed = contrast_02)
-                onPodcastSubscribe(podcast, null) // no analytics for carousel
+                val isFeatured = podcast.isSponsored || podcast.listId == null
+                holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
+                onPodcastSubscribe(podcast, null)
 
                 if (podcast.listId != null) {
                     val listId = podcast.listId as String
@@ -82,11 +83,11 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                         AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
                         AnalyticsProp.sponsoredPodcastSubscribed(listId, podcast.uuid),
                     )
-                } else {
+                }
+                if (isFeatured) {
                     FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, AnalyticsProp.featuredPodcastSubscribed(podcast.uuid))
                 }
-                analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, AnalyticsProp.podcastSubscribed(SourceView.DISCOVER, podcast.uuid))
             }
         } else {
             holder.podcast = null
@@ -104,8 +105,6 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
             fun sponsoredPodcastSubscribed(listId: String, uuid: String) = mapOf(LIST_ID_KEY to listId, PODCAST_UUID_KEY to uuid)
             fun featuredPodcastTapped(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
             fun featuredPodcastSubscribed(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
-            fun podcastSubscribed(source: SourceView, uuid: String) =
-                mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
         }
     }
 }

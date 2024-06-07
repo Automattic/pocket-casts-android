@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-21 09:54:03+0000
+Translation-Revision-Date: 2024-06-04 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_sleep_timer_auto_restart_summary">이 기능을 켜면 마지막 일시 중지 후 5분 이내에 에피소드를 재생하는 경우 절전 타이머가 자동으로 재시작됩니다.</string>
+    <string name="settings_sleep_timer_auto_restart">절전 타이머 자동 재시작</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">이 기능을 켜면 휴대폰을 흔들 때 절전 타이머가 재시작됩니다.</string>
+    <string name="settings_sleep_timer_shake_to_reset">흔들어서 절전 타이머 재시작</string>
+    <string name="settings_general_sleep_timer">절전 타이머</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">검색 정확도를 우선시하면 검색 응답 속도가 크게 느려지고 Pocket Casts에서 더 많은 데이터를 사용합니다.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">검색 정확도 우선</string>
+    <string name="settings_storage_section_heading_seek_accuracy">검색 정확도</string>
+    <string name="settings_import_opml_succeeded_message">OPML 가져오기에 성공했습니다.</string>
+    <string name="settings_import_opml_import_failed_message">지정하신 OPML 파일에서 팟캐스트를 가져올 수 없습니다.</string>
+    <string name="nova_launcher_recently_played">최근 재생됨</string>
+    <string name="notification_channel_description_fix_downloads_complete">다운로드 문제 해결이 완료되면 표시</string>
+    <string name="notification_channel_description_fix_downloads">다운로드 문제 해결이 트리거되면 표시</string>
+    <string name="settings_fix_downloads_complete_message">문제가 해결된 다운로드 %d건</string>
+    <string name="settings_fix_downloads_complete_title">다운로드 문제 해결 완료</string>
+    <string name="settings_fix_downloads_started_message">잠시 후에 다운로드 문제 해결이 시작됩니다. 진행 상황에 대한 알림을 확인하세요.</string>
+    <string name="settings_fix_downloads_stop">중지</string>
+    <string name="settings_fix_downloads_progress">에피소드 %1$d/%2$d개</string>
+    <string name="settings_fix_downloads_title">다운로드 문제 해결</string>
+    <string name="clip_title">클립</string>
+    <string name="stop">중지</string>
+    <string name="nova_launcher_continue_listening">계속 듣기</string>
+    <string name="episode_not_found">에피소드를 찾을 수 없음</string>
     <string name="settings_storage_fix_downloads_description">다운로드한 파일이 Pocket Casts 앱에서 누락된 경우 복원을 시도해 보세요.</string>
     <string name="settings_storage_fix_downloads">다운로드 문제 해결하기</string>
     <string name="nova_launcher_new_releases">새 릴리스</string>

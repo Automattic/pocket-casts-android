@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-21 13:54:02+0000
+Translation-Revision-Date: 2024-06-04 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_sleep_timer_auto_restart_summary">在睡眠計時器開啟的狀態下，若你在最後暫停的 5 分鐘內播放一集單集，計時器就會自動重新啟動。</string>
+    <string name="settings_sleep_timer_auto_restart">自動重新啟動睡眠計時器</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">在睡眠計時器開啟的狀態下，搖動手機會重新啟動計時器。</string>
+    <string name="settings_sleep_timer_shake_to_reset">搖動以重新啟動睡眠計時器</string>
+    <string name="settings_general_sleep_timer">睡眠計時器</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">若將搜尋精確度設為優先，會大幅降低搜尋靈敏度，導致 Pocket Casts 消耗更多資料。</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">將搜尋精確度設為優先</string>
+    <string name="settings_storage_section_heading_seek_accuracy">搜尋精確度</string>
+    <string name="settings_import_opml_succeeded_message">已成功匯入 OPML。</string>
+    <string name="settings_import_opml_import_failed_message">無法從你指定的 OPML 檔案匯入 Podcast。</string>
+    <string name="nova_launcher_recently_played">最近播放</string>
+    <string name="notification_channel_description_fix_downloads_complete">將於下載問題修正完畢後顯示</string>
+    <string name="notification_channel_description_fix_downloads">將於下載問題修正觸發時顯示</string>
+    <string name="settings_fix_downloads_complete_message">已修正 %d 個下載問題</string>
+    <string name="settings_fix_downloads_complete_title">下載問題修正完畢</string>
+    <string name="settings_fix_downloads_started_message">將立即開始下載問題修正。 查看進度通知。</string>
+    <string name="settings_fix_downloads_stop">停止</string>
+    <string name="settings_fix_downloads_progress">第 %1$d 集內容，共 %2$d 集</string>
+    <string name="settings_fix_downloads_title">下載問題修正</string>
+    <string name="clip_title">短片</string>
+    <string name="stop">停止</string>
+    <string name="nova_launcher_continue_listening">繼續收聽</string>
+    <string name="episode_not_found">找不到單集</string>
     <string name="settings_storage_fix_downloads_description">若有任何已下載的檔案在 Pocket Casts 應用程式中遺失，請嘗試還原這些檔案。</string>
     <string name="settings_storage_fix_downloads">修正下載問題</string>
     <string name="nova_launcher_new_releases">新發佈內容</string>
