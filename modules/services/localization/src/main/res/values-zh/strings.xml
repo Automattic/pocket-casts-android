@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-21 09:54:03+0000
+Translation-Revision-Date: 2024-06-04 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_sleep_timer_auto_restart_summary">如果打开，则如果您在最后一次暂停后的 5 分钟内播放了剧集，睡眠计时器将自动重启。</string>
+    <string name="settings_sleep_timer_auto_restart">自动重启睡眠计时器</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">如果打开，则当您摇晃手机时，睡眠计时器将重启。</string>
+    <string name="settings_sleep_timer_shake_to_reset">摇晃重启睡眠计时器</string>
+    <string name="settings_general_sleep_timer">睡眠计时器</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">提高搜索准确性的优先级会大幅降低搜索响应速度，并增加 Pocket Casts 的数据消耗量。</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">提高搜索准确性的优先级</string>
+    <string name="settings_storage_section_heading_seek_accuracy">搜索准确性</string>
+    <string name="settings_import_opml_succeeded_message">OPML 导入成功。</string>
+    <string name="settings_import_opml_import_failed_message">无法从您指定的 OPML 文件导入播客。</string>
+    <string name="nova_launcher_recently_played">最近播放</string>
+    <string name="notification_channel_description_fix_downloads_complete">在下载项修复完成时显示</string>
+    <string name="notification_channel_description_fix_downloads">在下载项修复触发时显示</string>
+    <string name="settings_fix_downloads_complete_message">已修复 %d 个下载项</string>
+    <string name="settings_fix_downloads_complete_title">下载项修复完成</string>
+    <string name="settings_fix_downloads_started_message">下载项修复将很快开始。 查看进度通知。</string>
+    <string name="settings_fix_downloads_stop">停止</string>
+    <string name="settings_fix_downloads_progress">第 %1$d 集，共 %2$d 集</string>
+    <string name="settings_fix_downloads_title">正在修复下载项</string>
+    <string name="clip_title">片段</string>
+    <string name="stop">停止</string>
+    <string name="nova_launcher_continue_listening">继续收听</string>
+    <string name="episode_not_found">未找到剧集</string>
     <string name="settings_storage_fix_downloads_description">如果 Pocket Casts 应用程序中缺少任何已下载的文件，请尝试恢复这些文件。</string>
     <string name="settings_storage_fix_downloads">修复下载程序</string>
     <string name="nova_launcher_new_releases">新发布</string>

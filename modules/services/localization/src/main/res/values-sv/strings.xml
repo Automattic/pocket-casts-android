@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-21 11:54:03+0000
+Translation-Revision-Date: 2024-06-04 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_sleep_timer_auto_restart_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om automatiskt om du spelar upp ett avsnitt inom 5 minuter efter den senaste pausen.</string>
+    <string name="settings_sleep_timer_auto_restart">Starta om sömntimern automatiskt</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om när du skakar din telefon.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Skaka för att starta om sömntimern</string>
+    <string name="settings_general_sleep_timer">Sömntimer</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Att prioritera sökprecision kan bromsa svarstiden för sökningar avsevärt och göra att Pocket Casts konsumerar mer data.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Prioritera sökprecision</string>
+    <string name="settings_storage_section_heading_seek_accuracy">Sökprecision</string>
+    <string name="settings_import_opml_succeeded_message">OPML-importen har genomförts.</string>
+    <string name="settings_import_opml_import_failed_message">Det gick inte att importera podcasts från den angivna OPML-filen.</string>
+    <string name="nova_launcher_recently_played">Senast spelade</string>
+    <string name="notification_channel_description_fix_downloads_complete">Visas när åtgärdandet av nedladdningar har slutförts</string>
+    <string name="notification_channel_description_fix_downloads">Visas när åtgärdandet av nedladdningar utlöses</string>
+    <string name="settings_fix_downloads_complete_message">%d nedladdningar har åtgärdats</string>
+    <string name="settings_fix_downloads_complete_title">Åtgärdandet av nedladdningar har slutförts</string>
+    <string name="settings_fix_downloads_started_message">Åtgärdandet av nedladdningar startar snart. Se notiser för förlopp.</string>
+    <string name="settings_fix_downloads_stop">Stoppa</string>
+    <string name="settings_fix_downloads_progress">%1$d av %2$d avsnitt</string>
+    <string name="settings_fix_downloads_title">Åtgärdar nedladdningar</string>
+    <string name="clip_title">Klipp</string>
+    <string name="stop">Stoppa</string>
+    <string name="nova_launcher_continue_listening">Fortsätt lyssna</string>
+    <string name="episode_not_found">Avsnittet hittades inte</string>
     <string name="settings_storage_fix_downloads_description">Försök återställa nedladdade filer om de saknas i Pocket Casts-appen.</string>
     <string name="settings_storage_fix_downloads">Åtgärda nedladdningar</string>
     <string name="nova_launcher_new_releases">Nya släpp</string>
@@ -1007,7 +1030,7 @@ Language: sv_SE
     <string name="plus_upgrade_to_pocket_casts_plus">Uppgradera till Pocket Casts Plus</string>
     <string name="plus_trial_finished_locked">Åtkomst till Pocket Casts Plus-funktioner kommer att låsas</string>
     <string name="plus_trial_finished_files_removed">Filer uppladdade till ditt konto kommer att tas bort efter en vecka</string>
-    <string name="plus_trial_finished_detail">Din kostnadsfria provperiod har nått sitt slut. Ditt konto har nu nedgraderats till ett gratiskonto.</string>
+    <string name="plus_trial_finished_detail">Din gratis provperiod har nått sitt slut. Ditt konto har nu nedgraderats till gratis.</string>
     <string name="plus_trial_finished_continue">Du kan uppgradera ditt konto när som helst för att fortsätta använda Pocket Casts Plus</string>
     <string name="plus_trial_finished">Pocket Casts Plus-provperioden har löpt ut</string>
     <string name="plus_themes_icons_body">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>

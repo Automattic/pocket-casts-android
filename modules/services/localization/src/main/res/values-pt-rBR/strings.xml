@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-05-21 23:54:03+0000
+Translation-Revision-Date: 2024-06-03 14:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="settings_sleep_timer_auto_restart_summary">Quando ativado, o temporizador será reiniciado automaticamente se você reproduzir um episódio dentro de cinco minutos após a última pausa.</string>
+    <string name="settings_sleep_timer_auto_restart">Reiniciar temporizador automaticamente</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">Se ativado, o temporizador será reiniciado quando você balançar seu celular.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Balançar para reiniciar o temporizador</string>
+    <string name="settings_general_sleep_timer">Temporizador</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Priorizar a precisão da busca pode diminuir significativamente a capacidade de resposta da busca e fazer com que o Pocket Casts consuma mais dados.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Priorizar a precisão da busca</string>
+    <string name="settings_storage_section_heading_seek_accuracy">Precisão da busca</string>
+    <string name="settings_import_opml_succeeded_message">Importação de OPML bem-sucedida.</string>
+    <string name="settings_import_opml_import_failed_message">Não é possível importar podcasts do arquivo OPML que você especificou.</string>
+    <string name="nova_launcher_recently_played">Reproduzido recentemente</string>
+    <string name="notification_channel_description_fix_downloads_complete">Mostra quando a correção dos downloads está concluída</string>
+    <string name="notification_channel_description_fix_downloads">Mostra quando a correção dos downloads está acionada</string>
+    <string name="settings_fix_downloads_complete_message">Correção de %d downloads</string>
+    <string name="settings_fix_downloads_complete_title">Correção de downloads concluída</string>
+    <string name="settings_fix_downloads_started_message">A correção de downloads começará em breve. Verifique as notificações para acompanhar o progresso.</string>
+    <string name="settings_fix_downloads_stop">Parar</string>
+    <string name="settings_fix_downloads_progress">%1$d de %2$d episódios</string>
+    <string name="settings_fix_downloads_title">Corrigindo downloads</string>
+    <string name="clip_title">Clipe</string>
+    <string name="stop">Parar</string>
+    <string name="nova_launcher_continue_listening">Continue escutando</string>
+    <string name="episode_not_found">Episódio não encontrado</string>
     <string name="settings_storage_fix_downloads_description">Tente restaurar todos os arquivos baixados se eles estiverem faltando no aplicativo Pocket Casts.</string>
     <string name="settings_storage_fix_downloads">Corrigir downloads</string>
     <string name="nova_launcher_new_releases">Novos lançamentos</string>
