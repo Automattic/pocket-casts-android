@@ -37,6 +37,7 @@ android {
         }
 
         named("release") {
+            isMinifyEnabled = true
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
             proguardFiles.addAll(

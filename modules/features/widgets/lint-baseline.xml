@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
-
-    <issue
-        id="AnnotateVersionCheck"
-        message="This method should be annotated with `@ChecksSdkIntAtLeast(api=Build.VERSION_CODES.S)`"
-        errorLine1="internal val isSystemCornerRadiusSupported get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S"
-        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/widget/ui/RounderCornerBox.kt"
-            line="45"
-            column="14"/>
-    </issue>
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
         id="UnusedAttribute"

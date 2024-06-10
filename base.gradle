@@ -157,7 +157,7 @@ android {
         }
 
         release {
-            minifyEnabled true
+            minifyEnabled false
             debuggable false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "$rootProject.rootDir.absolutePath/app/proguard-rules.pro"
 
