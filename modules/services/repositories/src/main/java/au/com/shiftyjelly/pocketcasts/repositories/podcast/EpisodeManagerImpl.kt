@@ -837,7 +837,9 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
         if (addedEpisodes.isNotEmpty()) {
-            episodeDao.insertAll(addedEpisodes)
+            addedEpisodes.chunked(250).forEach { chunkedEpisodes ->
+                episodeDao.insertAll(chunkedEpisodes)
+            }
         }
 
         if (episodes.isNotEmpty()) {
