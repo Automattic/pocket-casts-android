@@ -6,6 +6,8 @@
 *   Health
     *   Increase target SDK version to 34 
         ([#2279](https://github.com/Automattic/pocket-casts-android/pull/2279))
+    *   Optimize writing large no. of podcast episodes into DB
+        ([#2324](https://github.com/Automattic/pocket-casts-android/pull/2324))
 *   Bug Fixes
     *   Fix: Search Term Persists When Navigating to Different Podcast Page
         ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
