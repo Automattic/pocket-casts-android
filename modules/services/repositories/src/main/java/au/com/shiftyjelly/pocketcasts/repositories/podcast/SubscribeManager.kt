@@ -197,10 +197,10 @@ class SubscribeManager @Inject constructor(
     private fun subscribeInsertEpisodes(podcast: Podcast): Completable {
         // insert the episodes
         return Completable.fromAction {
-                podcast.episodes.chunked(250).forEach { episodes ->
-                    episodeDao.insertAll(episodes)
-                }
+            podcast.episodes.chunked(250).forEach { episodes ->
+                episodeDao.insertAll(episodes)
             }
+        }
             // make sure the podcast has the latest episode uuid
             .andThen(updateLatestEpisodeUuid(podcast.uuid))
     }
