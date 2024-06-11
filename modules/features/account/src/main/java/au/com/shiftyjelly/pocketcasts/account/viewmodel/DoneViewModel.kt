@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
-import au.com.shiftyjelly.pocketcasts.account.R.drawable.ic_email_address_changed
-import au.com.shiftyjelly.pocketcasts.account.R.drawable.ic_password_changed
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.R
@@ -11,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import au.com.shiftyjelly.pocketcasts.account.R as LR
 
 @HiltViewModel
 class DoneViewModel @Inject constructor(
@@ -41,12 +40,12 @@ class DoneViewModel @Inject constructor(
         data class SuccessFullChangedEmail(
             val detail: String = "",
             val titleResourceId: Int = R.string.profile_email_address_changed,
-            val imageResourceId: Int = ic_email_address_changed,
+            val imageResourceId: Int = LR.drawable.ic_email_address_changed,
         ) : State()
         data class SuccessFullChangedPassword(
             val detail: String = "",
             val titleResourceId: Int = R.string.profile_password_changed,
-            val imageResourceId: Int = ic_password_changed,
+            val imageResourceId: Int = LR.drawable.ic_password_changed,
         ) : State()
     }
 
