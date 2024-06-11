@@ -10,6 +10,7 @@
     <!-- We don't want failures due to outdated dependnecies  -->
     <issue id="GradleDependency" severity="ignore"/>
     <issue id="NewerVersionAvailable" severity="ignore"/>
+    <issue id="AndroidGradlePluginVersion" severity="ignore"/>
 
     <!-- Translations are handled during the release process  -->
     <issue id="MissingTranslation" severity="ignore"/>
