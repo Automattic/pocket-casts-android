@@ -7,11 +7,11 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -94,9 +94,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
@@ -182,10 +184,10 @@ open class PlaybackManager @Inject constructor(
     val playbackStateRelay: Relay<PlaybackState> by lazy {
         val relay = BehaviorRelay.create<PlaybackState>().toSerialized()
         relay.accept(PlaybackState(lastChangeFrom = LastChangeFrom.OnInit.value))
-        Log.d(Settings.LOG_TAG_AUTO, "Init playback state")
+        Timber.d(Settings.LOG_TAG_AUTO, "Init playback state")
         return@lazy relay
     }
-    val playbackStateLive = playbackStateRelay
+    val playbackStateLive: LiveData<PlaybackState> = playbackStateRelay
         .toFlowable(BackpressureStrategy.LATEST)
         .toLiveData()
 
@@ -1565,10 +1567,23 @@ open class PlaybackManager @Inject constructor(
             .launchIn(this)
     }
 
+    @Volatile
+    private var observeChaptersSkipping: Job? = null
+
     private fun onChaptersAvailable(chapters: Chapters) {
         playbackStateRelay.blockingFirst().let { playbackState ->
             playbackStateRelay.accept(playbackState.copy(chapters = chapters))
         }
+        observeChaptersSkipping?.cancel()
+        observeChaptersSkipping = playbackStateRelay.asFlow()
+            .map { it.positionMs.milliseconds }
+            .onEach { position ->
+                val currentChapter = chapters.getList().firstOrNull { position in it }
+                if (currentChapter?.selected == false) {
+                    skipToNextSelectedOrLastChapter()
+                }
+            }
+            .launchIn(this)
     }
 
     override fun onFocusGain(shouldResume: Boolean) {

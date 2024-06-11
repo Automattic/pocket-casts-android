@@ -405,17 +405,6 @@
     </issue>
 
     <issue
-        id="LogNotTimber"
-        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
-        errorLine1="        Log.d(Settings.LOG_TAG_AUTO, &quot;Init playback state&quot;)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackManager.kt"
-            line="185"
-            column="9"/>
-    </issue>
-
-    <issue
         id="ExportedContentProvider"
         message="Exported content providers can provide access to potentially sensitive data"
         errorLine1="        &lt;provider"
