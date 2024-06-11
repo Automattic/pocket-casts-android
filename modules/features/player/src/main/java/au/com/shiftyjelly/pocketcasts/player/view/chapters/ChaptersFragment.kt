@@ -1,55 +1,56 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import androidx.core.net.toUri
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
-import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.NavigationState
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Episode
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Player
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ChaptersFragment : BaseFragment() {
+    private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private val mode get() = args.episodeId?.let(::Episode) ?: Player
 
-    private val chaptersViewModel: ChaptersViewModel by activityViewModels()
-    private var lazyListState: LazyListState? = null
+    private val viewModel by viewModels<ChaptersViewModel>(
+        ownerProducer = { requireParentFragment() },
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<ChaptersViewModel.Factory> { factory ->
+                factory.create(mode)
+            }
+        },
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,82 +58,61 @@ class ChaptersFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
-            AppTheme(Theme.ThemeType.DARK) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            val state by viewModel.uiState.collectAsState()
 
-                val uiState by chaptersViewModel.uiState.collectAsStateWithLifecycle()
-                val lazyListState = rememberLazyListState()
-                this@ChaptersFragment.lazyListState = lazyListState
-                val context = LocalContext.current
-                val currentView = LocalView.current
+            AppThemeWithBackground(mode.themeType) {
+                ChaptersTheme(state.podcast) {
+                    val lazyListState = rememberLazyListState()
 
-                val scrollToChapter by chaptersViewModel.scrollToChapterState.collectAsState()
-                LaunchedEffect(scrollToChapter) {
-                    scrollToChapter?.let {
-                        delay(250)
-                        lazyListState.animateScrollToItem(it.index - 1)
-
-                        // Need to clear this so that if the user taps on the same chapter a second time we
-                        // still get the scrollTo behavior.
-                        chaptersViewModel.setScrollToChapter(null)
-                    }
-                }
-
-                LaunchedEffect(Unit) {
-                    chaptersViewModel
-                        .navigationState
-                        .collectLatest { event ->
-                            when (event) {
-                                is NavigationState.StartUpsell -> startUpsell()
-                            }
-                        }
-                }
-
-                LaunchedEffect(Unit) {
-                    chaptersViewModel
-                        .snackbarMessage
-                        .collectLatest { message ->
-                            Snackbar.make(currentView, context.getString(message), Snackbar.LENGTH_SHORT)
-                                .setBackgroundTint(ThemeColor.playerContrast01(Theme.ThemeType.DARK))
-                                .setTextColor(ThemeColor.playerBackground01(Theme.ThemeType.DARK, theme.playerBackgroundColor(uiState.podcast)))
-                                .show()
-                        }
-                }
-
-                Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
                     ChaptersPage(
                         lazyListState = lazyListState,
-                        chapters = uiState.displayChapters,
-                        showHeader = uiState.showHeader,
-                        totalChaptersCount = uiState.totalChaptersCount,
-                        onSelectionChange = { selected, chapter -> chaptersViewModel.onSelectionChange(selected, chapter) },
-                        onChapterClick = ::onChapterClick,
-                        onUrlClick = ::onUrlClick,
-                        onSkipChaptersClick = { chaptersViewModel.onSkipChaptersClick(it) },
-                        isTogglingChapters = uiState.isTogglingChapters,
-                        showSubscriptionIcon = uiState.showSubscriptionIcon,
-                        backgroundColor = uiState.backgroundColor,
+                        chapters = state.chapters,
+                        showHeader = state.showHeader,
+                        totalChaptersCount = state.chaptersCount,
+                        isTogglingChapters = state.isTogglingChapters,
+                        showSubscriptionIcon = state.showSubscriptionIcon,
+                        onChapterClick = viewModel::playChapter,
+                        onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
+                        onSelectionChange = viewModel::selectChapter,
+                        onUrlClick = ::openChapterUrl,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
+
+                    LaunchedEffect(Unit) {
+                        viewModel.scrollToChapter.collect {
+                            delay(250)
+                            lazyListState.animateScrollToItem(it.index - 1)
+                        }
+                    }
+
+                    LaunchedEffect(Unit) {
+                        viewModel.showPlayer.collect {
+                            showPlayer()
+                        }
+                    }
+
+                    LaunchedEffect(Unit) {
+                        viewModel.showUpsell.collect {
+                            showUpsell()
+                        }
+                    }
                 }
             }
         }
     }
 
-    private fun onChapterClick(chapter: Chapter, isPlaying: Boolean) {
-        analyticsTracker.track(AnalyticsEvent.PLAYER_CHAPTER_SELECTED)
-        if (isPlaying) {
-            showPlayer()
-        } else {
-            chaptersViewModel.skipToChapter(chapter)
+    @Composable
+    private fun ChaptersTheme(podcast: Podcast?, content: @Composable () -> Unit) {
+        when (mode) {
+            is Episode -> ChaptersTheme(content)
+            is Player -> ChaptersThemeForPlayer(theme, podcast, content)
         }
     }
 
-    private fun onUrlClick(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse(url)
+    private fun openChapterUrl(url: String) {
         try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
+            startActivity(Intent(Intent.ACTION_VIEW).setData(url.toUri()))
+        } catch (_: Throwable) {
             UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, url), null)
         }
     }
@@ -141,13 +121,34 @@ class ChaptersFragment : BaseFragment() {
         (parentFragment as? PlayerContainerFragment)?.openPlayer()
     }
 
-    private fun startUpsell() {
+    private fun showUpsell() {
         val source = OnboardingUpgradeSource.SKIP_CHAPTERS
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
-            showPatronOnly = Feature.DESELECT_CHAPTERS.tier == FeatureTier.Patron ||
-                Feature.DESELECT_CHAPTERS.isCurrentlyExclusiveToPatron(),
+            showPatronOnly = Feature.DESELECT_CHAPTERS.tier == FeatureTier.Patron || Feature.DESELECT_CHAPTERS.isCurrentlyExclusiveToPatron(),
         )
-        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private val ChaptersViewModel.Mode.themeType get() = when (this) {
+        is Player -> Theme.ThemeType.DARK
+        is Episode -> theme.activeTheme
+    }
+
+    @Parcelize
+    private class Args(
+        val episodeId: String?,
+    ) : Parcelable
+
+    companion object {
+        private const val NEW_INSTANCE_ARG = "ChaptersFragment2Arg"
+
+        fun forEpisode(episodeUuid: String) = ChaptersFragment().apply {
+            arguments = bundleOf(NEW_INSTANCE_ARG to Args(episodeUuid))
+        }
+
+        fun forPlayer() = ChaptersFragment().apply {
+            arguments = bundleOf(NEW_INSTANCE_ARG to Args(episodeId = null))
+        }
     }
 }

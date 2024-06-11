@@ -5,6 +5,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter as Chapter
@@ -46,4 +52,34 @@ abstract class ChapterDao {
     protected abstract fun _observerChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>
 
     fun observerChaptersForEpisode(episodeUuid: String) = _observerChaptersForEpisode(episodeUuid).distinctUntilChanged()
+
+    @Transaction
+    open suspend fun selectChapter(episodeUuid: String, chapterIndex: Int, select: Boolean, modifiedAt: Date = Date()) {
+        val episode = findPodcastEpisode(episodeUuid) ?: findUserEpisode(episodeUuid) ?: return
+        val deselectedChapters = episode.deselectedChapters
+        episode.deselectedChapters = when {
+            select && chapterIndex in deselectedChapters -> ChapterIndices((deselectedChapters - chapterIndex).distinct())
+            !select && chapterIndex !in deselectedChapters -> ChapterIndices((deselectedChapters + chapterIndex).distinct())
+            else -> return
+        }
+        episode.deselectedChaptersModified = modifiedAt
+        update(episode)
+    }
+
+    @Query("SELECT * FROM podcast_episodes WHERE uuid IS :episodeUuid")
+    protected abstract suspend fun findPodcastEpisode(episodeUuid: String): PodcastEpisode?
+
+    @Query("SELECT * FROM user_episodes WHERE uuid IS :episodeUuid")
+    protected abstract suspend fun findUserEpisode(episodeUuid: String): UserEpisode?
+
+    private suspend fun update(episode: BaseEpisode) = when (episode) {
+        is PodcastEpisode -> updatePodcastEpisode(episode)
+        is UserEpisode -> updateUserEpisode(episode)
+    }
+
+    @Update
+    protected abstract suspend fun updatePodcastEpisode(episode: PodcastEpisode)
+
+    @Update
+    protected abstract suspend fun updateUserEpisode(episode: UserEpisode)
 }

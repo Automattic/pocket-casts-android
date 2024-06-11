@@ -10,5 +10,11 @@ interface ChapterManager {
         chapters: List<Chapter>,
     )
 
+    suspend fun selectChapter(
+        episodeUuid: String,
+        chapterIndex: Int,
+        select: Boolean,
+    )
+
     fun observerChaptersForEpisode(episodeUuid: String): Flow<Chapters>
 }

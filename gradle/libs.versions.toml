@@ -16,9 +16,9 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "10.5.0"
+aboutlibraries = "11.2.1"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
-android-application = "8.2.2"
+android-application = "8.4.1"
 billing = "6.0.1"
 coil = "2.5.0"
 compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -59,7 +59,7 @@ java = "17"
 
 [libraries]
 # About Libraries
-aboutLibraries-compose = "com.mikepenz:aboutlibraries-compose:10.5.0"
+aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
 
 # Billing
@@ -241,12 +241,12 @@ auth = "com.google.android.gms:play-services-auth:20.4.0"
 barista = "com.adevinta.android:barista:4.2.0"
 browser = "androidx.browser:browser:1.4.0"
 browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
-car = "androidx.car.app:app:1.2.0"
+car = "androidx.car.app:app:1.4.0-rc02"
 cardview = "androidx.cardview:cardview:1.0.0"
 cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 core-ktx = "androidx.core:core-ktx:1.10.1"
-desugar-jdk = "com.android.tools:desugar_jdk_libs:1.1.5"
+desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
 device-names = "com.jaredrummler:android-device-names:2.1.0"
 encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
@@ -423,7 +423,7 @@ work = [
 ]
 
 [plugins]
-aboutlibraries = "com.mikepenz.aboutlibraries.plugin:10.4.0"
+aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 android-application = { id = "com.android.application", version.ref = "android-application" }
 android-library = { id = "com.android.library", version.ref = "android-application" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
@@ -432,7 +432,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-measure-builds = "com.automattic.android.measure-builds:2.0.3"
+measure-builds = "com.automattic.android.measure-builds:3.0.0"
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 spotless = "com.diffplug.spotless:6.23.3"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }

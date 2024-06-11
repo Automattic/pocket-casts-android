@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -837,7 +836,9 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
         if (addedEpisodes.isNotEmpty()) {
-            episodeDao.insertAll(addedEpisodes)
+            addedEpisodes.chunked(250).forEach { chunkedEpisodes ->
+                episodeDao.insertAll(chunkedEpisodes)
+            }
         }
 
         if (episodes.isNotEmpty()) {
@@ -1096,22 +1097,6 @@ class EpisodeManagerImpl @Inject constructor(
 
             return@withContext newDownloadUrl ?: episode.downloadUrl
         }
-
-    override suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
-        val deselectedChapterIndices = episode.deselectedChapters
-        if (!deselectedChapterIndices.contains(chapterIndex)) return
-        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices - chapterIndex)
-        episode.deselectedChaptersModified = Date()
-        episodeDao.update(episode)
-    }
-
-    override suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
-        val deselectedChapterIndices = episode.deselectedChapters
-        if (deselectedChapterIndices.contains(chapterIndex)) return
-        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
-        episode.deselectedChaptersModified = Date()
-        episodeDao.update(episode)
-    }
 
     override suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>> = flow {
         var offset = 0

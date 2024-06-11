@@ -37,9 +37,21 @@ android {
     }
 
     lint {
-        abortOnError false
-        disable "AppCompatResource", "ContentDescription", "DiffUtilEquals"
+        baseline project.file("lint-baseline.xml")
+
+        lintConfig rootProject.file("lint.xml")
         xmlReport true
+
+        checkAllWarnings false
+        warningsAsErrors false
+
+        checkDependencies false
+        checkTestSources false
+        checkGeneratedSources false
+
+        // There's no point in slowing down assembling of release builds
+        // since we execute lint explicitly on CI in a separate action
+        checkReleaseBuilds = false
     }
 
     compileOptions {
@@ -145,7 +157,7 @@ android {
         }
 
         release {
-            minifyEnabled true
+            minifyEnabled false
             debuggable false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "$rootProject.rootDir.absolutePath/app/proguard-rules.pro"
 

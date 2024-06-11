@@ -1,6 +1,25 @@
 7.66
 -----
-
+*   New Features
+    *   Adds an option to export the database and preferences from the Help & Feedback view
+        ([#2309](https://github.com/Automattic/pocket-casts-android/pull/2309))
+    *   Chapters tab is now accessible from episode details.
+        ([#2318](https://github.com/Automattic/pocket-casts-android/pull/2318))
+*   Health
+    *   Increase target SDK version to 34 
+        ([#2279](https://github.com/Automattic/pocket-casts-android/pull/2279))
+    *   Optimize writing large no. of podcast episodes into DB
+        ([#2324](https://github.com/Automattic/pocket-casts-android/pull/2324))
+*   Bug Fixes
+    *   Fix: Search Term Persists When Navigating to Different Podcast Page
+        ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
+    *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
+        ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
+    *   Fix: Flickering when double-tapping an item in the tab bar
+        ([#2326](https://github.com/Automattic/pocket-casts-android/pull/2326))    
+*   Updates:
+    *   Playback speed can now be changed up to 5x.
+        ([#1645](https://github.com/Automattic/pocket-casts-android/pull/1645))
 
 7.65
 -----
@@ -26,6 +45,8 @@
         ([#2270](https://github.com/Automattic/pocket-casts-android/pull/2270))
     *   Fix badges visibility on the Podcasts tab
         ([#2284](https://github.com/Automattic/pocket-casts-android/pull/2284))
+    *   Fix podcast title talkback on the Podcasts tab
+        ([#2297](https://github.com/Automattic/pocket-casts-android/pull/2297))
 
 7.64
 -----

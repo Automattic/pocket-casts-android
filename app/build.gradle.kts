@@ -44,6 +44,7 @@ android {
         }
 
         named("release") {
+            isMinifyEnabled = true
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
             if (!file("${project.rootDir}/sentry.properties").exists()) {
