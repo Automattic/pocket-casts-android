@@ -83,7 +83,7 @@ enum class ShelfItem(
     RemoveDownloaded(
         id = "remove_downloaded",
         titleId = { LR.string.remove_downloaded_file },
-        iconId = { IR.drawable.ic_download },
+        iconId = { IR.drawable.ic_downloaded },
         showIf = { it is PodcastEpisode && it.isDownloaded },
         analyticsValue = "remove_downloaded_file",
     ),
