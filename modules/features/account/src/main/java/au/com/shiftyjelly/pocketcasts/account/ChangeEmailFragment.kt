@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ChangeEmailFragment : BaseFragment() {
@@ -58,9 +57,9 @@ class ChangeEmailFragment : BaseFragment() {
                         clearServerError = viewModel::clearServerError,
                         onSuccess = {
                             val second = viewModel.email.value ?: ""
-                            doneViewModel.updateTitle(getString(LR.string.profile_email_address_changed))
-                            doneViewModel.updateDetail(second)
-                            doneViewModel.updateImage(R.drawable.ic_email_address_changed)
+
+                            doneViewModel.setChangedEmailState(detail = second)
+
                             doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
 
                             val activity = requireActivity()
