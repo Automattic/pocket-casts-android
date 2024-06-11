@@ -44,7 +44,7 @@ class DoneViewModel @Inject constructor(
             val imageResourceId: Int = ic_email_address_changed,
         ) : State()
         data class SuccessFullChangedPassword(
-            var detail: String = "",
+            val detail: String = "",
             val tittleResourceId: Int = R.string.profile_password_changed,
             val imageResourceId: Int = ic_password_changed,
         ) : State()
