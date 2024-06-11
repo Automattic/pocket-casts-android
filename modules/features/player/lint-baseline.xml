@@ -169,17 +169,6 @@
     <issue
         id="NotifyDataSetChanged"
         message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
-        errorLine1="                if (updated) adapter.notifyDataSetChanged()"
-        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/PlayerContainerFragment.kt"
-            line="177"
-            column="30"/>
-    </issue>
-
-    <issue
-        id="NotifyDataSetChanged"
-        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
         errorLine1="            notifyDataSetChanged()"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
         <location

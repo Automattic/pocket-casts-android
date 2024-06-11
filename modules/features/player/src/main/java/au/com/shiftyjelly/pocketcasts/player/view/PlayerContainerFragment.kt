@@ -16,6 +16,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -28,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainer
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Player
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -43,7 +46,9 @@ import au.com.shiftyjelly.pocketcasts.views.tour.TourViewTag
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -60,7 +65,13 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     private lateinit var adapter: ViewPagerAdapter
     private val viewModel: PlayerViewModel by activityViewModels()
-    private val chaptersViewModel: ChaptersViewModel by activityViewModels()
+    private val chaptersViewModel by viewModels<ChaptersViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<ChaptersViewModel.Factory> { factory ->
+                factory.create(Player)
+            }
+        },
+    )
     private var binding: FragmentPlayerContainerBinding? = null
 
     val overrideTheme: Theme.ThemeType
@@ -169,22 +180,15 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             }
         })
 
-        viewModel.listDataLive.observe(viewLifecycleOwner) {
-            val hasChapters = !it.chapters.isEmpty
-            val hasNotes = !it.podcastHeader.isUserEpisode
-            if (::adapter.isInitialized) {
-                val updated = adapter.update(hasNotes, hasChapters)
-                if (updated) adapter.notifyDataSetChanged()
-            } else {
-                adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
-                adapter.update(hasNotes, hasChapters)
-                viewPager.adapter = adapter
-                viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
-                TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
-                    tab.setText(adapter.pageTitle(position))
-                }.attach()
-            }
+        adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+        viewPager.adapter = adapter
+        viewPager.getChildAt(0).isNestedScrollingEnabled = false // HACK to fix bottom sheet drag, https://issuetracker.google.com/issues/135517665
+        TabLayoutMediator(binding.tabLayout, viewPager, true) { tab, position ->
+            tab.setText(adapter.pageTitle(position))
+        }.attach()
 
+        viewModel.listDataLive.observe(viewLifecycleOwner) {
+            adapter.updateNotes(addNotes = !it.podcastHeader.isUserEpisode)
             val upNextCount = it.upNextEpisodes.size
             val drawableId = when {
                 upNextCount == 0 -> R.drawable.mini_player_upnext
@@ -201,6 +205,14 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             }
 
             view.setBackgroundColor(it.podcastHeader.backgroundColor)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                chaptersViewModel.uiState.collect {
+                    adapter.updateChapters(addChapters = it.chaptersCount > 0)
+                }
+            }
         }
 
         binding.btnClosePlayer.setOnClickListener { (activity as? FragmentHostListener)?.closePlayer() }
@@ -279,7 +291,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         binding?.viewPager?.currentItem = index
 
         // tapping on the chapter title on the now playing screen should scroll to that chapter when the fragment is available
-        chaptersViewModel.setScrollToChapter(chapter)
+        chaptersViewModel.scrollToChapter(chapter)
     }
 
     fun updateUpNextVisibility(show: Boolean) {
@@ -321,10 +333,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
 private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
     private sealed class Section(@StringRes val titleRes: Int) {
-        object Player : Section(VR.string.player_tab_playing)
-        object Notes : Section(LR.string.player_tab_notes)
-        object Bookmarks : Section(LR.string.player_tab_bookmarks)
-        object Chapters : Section(LR.string.player_tab_chapters)
+        data object Player : Section(VR.string.player_tab_playing)
+        data object Notes : Section(LR.string.player_tab_notes)
+        data object Bookmarks : Section(LR.string.player_tab_bookmarks)
+        data object Chapters : Section(LR.string.player_tab_chapters)
     }
 
     private var sections = listOf(Section.Player, Section.Bookmarks)
@@ -338,26 +350,57 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     val indexOfBookmarks: Int
         get() = sections.indexOf(Section.Bookmarks)
 
-    fun update(hasNotes: Boolean, hasChapters: Boolean): Boolean {
-        val hadNotes = sections.contains(Section.Notes)
-        val hadChapters = sections.contains(Section.Chapters)
+    fun updateNotes(addNotes: Boolean) {
+        val currentSections = sections
+        val hasChapters = sections.contains(Section.Chapters)
 
-        val newSections = mutableListOf<Section>()
-        newSections.add(Section.Player)
+        val newSections = buildList {
+            add(Section.Player)
+            if (addNotes) {
+                add(Section.Notes)
+            }
 
-        if (hasNotes) {
-            newSections.add(Section.Notes)
+            if (hasChapters) {
+                add(Section.Chapters)
+            }
+            add(Section.Bookmarks)
         }
 
-        if (hasChapters) {
-            newSections.add(Section.Chapters)
+        if (currentSections != newSections) {
+            sections = newSections
+            if (addNotes) {
+                notifyItemInserted(1)
+            } else {
+                notifyItemRemoved(1)
+            }
+        }
+    }
+
+    fun updateChapters(addChapters: Boolean) {
+        val currentSections = sections
+        val hasNotes = sections.contains(Section.Notes)
+
+        val newSections = buildList {
+            add(Section.Player)
+            if (hasNotes) {
+                add(Section.Notes)
+            }
+
+            if (addChapters) {
+                add(Section.Chapters)
+            }
+            add(Section.Bookmarks)
         }
 
-        newSections.add(Section.Bookmarks)
-
-        this.sections = newSections
-
-        return hadNotes != hasNotes || hadChapters != hasChapters
+        if (currentSections != newSections) {
+            sections = newSections
+            val position = if (hasNotes) 2 else 1
+            if (addChapters) {
+                notifyItemInserted(position)
+            } else {
+                notifyItemRemoved(position)
+            }
+        }
     }
 
     override fun getItemId(position: Int): Long {
@@ -377,7 +420,7 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
             is Section.Player -> PlayerHeaderFragment()
             is Section.Notes -> NotesFragment()
             is Section.Bookmarks -> BookmarksFragment.newInstance(SourceView.PLAYER)
-            is Section.Chapters -> ChaptersFragment()
+            is Section.Chapters -> ChaptersFragment.forPlayer()
         }
     }
 

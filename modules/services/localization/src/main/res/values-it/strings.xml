@@ -81,7 +81,6 @@ Language: it
     <string name="whats_new_got_it_button">Fatto</string>
     <string name="skip_chapters_patron_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Plus</string>
-    <string name="select_one_chapter_message">Seleziona almeno un capitolo</string>
     <string name="number_of_chapters_summary_singular">1 capitolo • %d nascosto</string>
     <string name="number_of_chapters_summary_plural">%1$d capitoli • %2$d nascosto</string>
     <string name="single_chapter">1 capitolo</string>

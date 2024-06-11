@@ -816,7 +816,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/adapter_episode.xml"
-            line="188"
+            line="189"
             column="14"/>
     </issue>
 
