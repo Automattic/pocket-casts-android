@@ -110,12 +110,14 @@ class DownloadEpisodeTask @AssistedInject constructor(
         const val OUTPUT_ERROR_MESSAGE = "error_message"
         const val OUTPUT_EPISODE_UUID = "episode_uuid"
         const val OUTPUT_CANCELLED = "cancelled"
+        const val FIRE_TOAST = "fire_toast"
     }
 
     private lateinit var episode: BaseEpisode
     private val episodeUUID: String? = inputData.getString(INPUT_EPISODE_UUID)
     private val pathToSaveTo: String? = inputData.getString(INPUT_PATH_TO_SAVE_TO)
     private val tempDownloadPath: String? = inputData.getString(INPUT_TEMP_PATH)
+    private val fireToast: Boolean = inputData.getBoolean(FIRE_TOAST, false)
 
     private var bytesDownloadedSoFar: Long = 0
     private var bytesRemaining: Long = 0
@@ -169,6 +171,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     }
                 }
 
+                if (fireToast) {
+                    LogBuffer.i("@@@@", "Downloaded episode")
+                }
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Downloaded episode ${episode.title} ${episode.uuid}")
 
                 Result.success(outputData)
