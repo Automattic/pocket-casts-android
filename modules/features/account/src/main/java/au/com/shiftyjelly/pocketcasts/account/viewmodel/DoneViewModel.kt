@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -39,13 +41,13 @@ class DoneViewModel @Inject constructor(
         data object Empty : State()
         data class SuccessFullChangedEmail(
             val detail: String = "",
-            val titleResourceId: Int = R.string.profile_email_address_changed,
-            val imageResourceId: Int = LR.drawable.ic_email_address_changed,
+            @StringRes val titleResourceId: Int = R.string.profile_email_address_changed,
+            @DrawableRes val imageResourceId: Int = LR.drawable.ic_email_address_changed,
         ) : State()
         data class SuccessFullChangedPassword(
             val detail: String = "",
-            val titleResourceId: Int = R.string.profile_password_changed,
-            val imageResourceId: Int = LR.drawable.ic_password_changed,
+            @StringRes val titleResourceId: Int = R.string.profile_password_changed,
+            @DrawableRes val imageResourceId: Int = LR.drawable.ic_password_changed,
         ) : State()
     }
 
