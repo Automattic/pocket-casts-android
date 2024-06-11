@@ -247,6 +247,7 @@
     <string name="download_warning_on_wifi_summary">Downloading this episode will use data.</string>
     <string name="download_warning_on_wifi_button">Download now</string>
     <string name="download_warning_on_wifi_later" translatable="false">@string/queue_for_later</string>
+    <string name="download_completed_for_episode">Download completed for %1$s</string>
 
     <string name="profile_cloud_upload_warning_title_on_wifi" translatable="false">@string/youre_not_on_wifi</string>
     <string name="profile_cloud_upload_warning_title_metered_wifi" translatable="false">@string/youre_on_metered_wifi</string>

@@ -8,10 +8,11 @@ import android.os.Build
 import android.system.ErrnoException
 import android.system.OsConstants
 import android.util.Log
+import android.widget.Toast
 import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -56,8 +57,10 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -78,7 +81,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
     var userEpisodeManager: UserEpisodeManager,
     @DownloadCallFactory private val callFactory: Call.Factory,
     @DownloadRequestBuilder private val requestBuilderProvider: Provider<Request.Builder>,
-) : Worker(context, params) {
+) : CoroutineWorker(context, params) {
 
     companion object {
         private const val MAX_RETRIES = 5
@@ -125,7 +128,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
     private val timeSource = TimeSource.Monotonic
     private val startTimestamp = timeSource.markNow()
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         if (isStopped) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Cancelling execution of $episodeUUID download because we are already stopped")
             return Result.failure(failureData())
@@ -172,7 +175,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 }
 
                 if (fireToast) {
-                    LogBuffer.i("@@@@", "Downloaded episode")
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, context.getString(LR.string.download_completed_for_episode, episode.title), Toast.LENGTH_SHORT).show()
+                    }
                 }
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Downloaded episode ${episode.title} ${episode.uuid}")
 
