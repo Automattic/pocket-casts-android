@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-04 09:54:05+0000
+Translation-Revision-Date: 2024-06-10 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_export_database_failed">Échec de l’exportation de la base de données</string>
+    <string name="settings_export_database">Exporter la base de données</string>
     <string name="settings_sleep_timer_auto_restart_summary">Si cette fonction est activée, la mise en veille redémarrera automatiquement si vous écoutez un épisode dans les 5 minutes suivant la dernière pause.</string>
     <string name="settings_sleep_timer_auto_restart">Redémarrer automatiquement la mise en veille</string>
     <string name="settings_sleep_timer_shake_to_reset_summary">Si cette fonction est activée, la mise en veille redémarrera si vous secouez votre téléphone.</string>
@@ -81,7 +83,6 @@ Language: fr
     <string name="whats_new_got_it_button">J’ai compris</string>
     <string name="skip_chapters_patron_prompt">Présélectionner des chapitres et plus encore avec Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Présélectionner des chapitres et plus encore avec Pocket Casts Plus</string>
-    <string name="select_one_chapter_message">Veuillez sélectionner au moins un chapitre</string>
     <string name="number_of_chapters_summary_singular">1 chapitre • %d masqué</string>
     <string name="number_of_chapters_summary_plural">%1$d chapitres • %2$d masqués</string>
     <string name="single_chapter">1 chapitre</string>

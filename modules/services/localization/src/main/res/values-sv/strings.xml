@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-04 13:54:03+0000
+Translation-Revision-Date: 2024-06-10 16:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_export_database_failed">Export av databas misslyckades</string>
+    <string name="settings_export_database">Exportera databas</string>
     <string name="settings_sleep_timer_auto_restart_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om automatiskt om du spelar upp ett avsnitt inom 5 minuter efter den senaste pausen.</string>
     <string name="settings_sleep_timer_auto_restart">Starta om sömntimern automatiskt</string>
     <string name="settings_sleep_timer_shake_to_reset_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om när du skakar din telefon.</string>
@@ -81,7 +83,6 @@ Language: sv_SE
     <string name="whats_new_got_it_button">Uppfattat</string>
     <string name="skip_chapters_patron_prompt">Välj kapitel och mer i förväg med Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Välj kapitel och mer i förväg med Pocket Casts Plus</string>
-    <string name="select_one_chapter_message">Välj minst ett kapitel</string>
     <string name="number_of_chapters_summary_singular">1 kapitel • %d dolda</string>
     <string name="number_of_chapters_summary_plural">%1$d kapitel • %2$d dolda</string>
     <string name="single_chapter">1 kapitel</string>

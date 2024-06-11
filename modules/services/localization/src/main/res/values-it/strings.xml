@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-04 09:54:03+0000
+Translation-Revision-Date: 2024-06-10 16:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="settings_export_database_failed">Esportazione del database fallita</string>
+    <string name="settings_export_database">Esporta il database</string>
     <string name="settings_sleep_timer_auto_restart_summary">Quando è attivato, l\'autospegnimento si riavvia automaticamente se riproduci un episodio entro 5 minuti dall\'ultima pausa.</string>
     <string name="settings_sleep_timer_auto_restart">Riavvia automaticamente l\'autospegnimento</string>
     <string name="settings_sleep_timer_shake_to_reset_summary">Quando è attivato, l\'autospegnimento si riavvia quando scuoti il telefono.</string>
@@ -81,7 +83,6 @@ Language: it
     <string name="whats_new_got_it_button">Fatto</string>
     <string name="skip_chapters_patron_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Preseleziona capitoli e altro ancora con Pocket Casts Plus</string>
-    <string name="select_one_chapter_message">Seleziona almeno un capitolo</string>
     <string name="number_of_chapters_summary_singular">1 capitolo • %d nascosto</string>
     <string name="number_of_chapters_summary_plural">%1$d capitoli • %2$d nascosto</string>
     <string name="single_chapter">1 capitolo</string>

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-04 09:54:05+0000
+Translation-Revision-Date: 2024-06-11 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_export_database_failed">数据库导出失败</string>
+    <string name="settings_export_database">导出数据库</string>
     <string name="settings_sleep_timer_auto_restart_summary">如果打开，则如果您在最后一次暂停后的 5 分钟内播放了剧集，睡眠计时器将自动重启。</string>
     <string name="settings_sleep_timer_auto_restart">自动重启睡眠计时器</string>
     <string name="settings_sleep_timer_shake_to_reset_summary">如果打开，则当您摇晃手机时，睡眠计时器将重启。</string>
@@ -81,7 +83,6 @@ Language: zh_CN
     <string name="whats_new_got_it_button">知道了</string>
     <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受预选章节等更多功能</string>
     <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受预选章节等更多功能</string>
-    <string name="select_one_chapter_message">请至少选择一个章节</string>
     <string name="number_of_chapters_summary_singular">1 个章节 • %d 已隐藏</string>
     <string name="number_of_chapters_summary_plural">%1$d 个章节 • %2$d 已隐藏</string>
     <string name="single_chapter">1 个章节</string>
