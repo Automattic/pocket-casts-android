@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -49,6 +50,9 @@ class ChaptersViewModelTest {
 
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
+
+    @Mock
+    private lateinit var chapterManager: ChapterManager
 
     @Mock
     private lateinit var playbackManager: PlaybackManager
@@ -210,6 +214,7 @@ class ChaptersViewModelTest {
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
 
         chaptersViewModel = ChaptersViewModel(
+            chapterManager = chapterManager,
             playbackManager = playbackManager,
             settings = settings,
             analyticsTracker = mock(),

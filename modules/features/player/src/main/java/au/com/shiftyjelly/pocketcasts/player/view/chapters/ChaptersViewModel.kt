@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
@@ -40,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ChaptersViewModel @Inject constructor(
+    private val chapterManager: ChapterManager,
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
@@ -56,6 +58,7 @@ class ChaptersViewModel @Inject constructor(
         val userTier: UserTier = UserTier.Free,
         val canSkipChapters: Boolean = false,
         val podcast: Podcast? = null,
+        val episodeUuid: String? = null,
         val isSkippingToNextChapter: Boolean = false,
         val showHeader: Boolean = false,
     ) {
@@ -145,6 +148,7 @@ class ChaptersViewModel @Inject constructor(
             userTier = currentUserTier,
             canSkipChapters = canSkipChapters,
             podcast = playbackState.podcast,
+            episodeUuid = playbackState.episodeUuid,
             isSkippingToNextChapter = _uiState.value.isSkippingToNextChapter,
             showHeader = (playbackManager.getCurrentEpisode()?.let { it is PodcastEpisode } ?: false) &&
                 FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS),
@@ -193,14 +197,19 @@ class ChaptersViewModel @Inject constructor(
     }
 
     fun onSelectionChange(selected: Boolean, chapter: Chapter) {
-        val selectedChapters = _uiState.value.allChapters.filter { it.chapter.selected }
+        val uiState = _uiState.value
+        val selectedChapters = uiState.allChapters.filter { it.chapter.selected }
         if (!selected && selectedChapters.size == 1) {
             viewModelScope.launch {
                 _snackbarMessage.emit(LR.string.select_one_chapter_message)
             }
         } else {
-            playbackManager.toggleChapter(selected, chapter)
-            trackChapterSelectionToggled(selected)
+            uiState.episodeUuid?.let { id ->
+                viewModelScope.launch {
+                    chapterManager.selectChapter(id, chapter.index, selected)
+                    trackChapterSelectionToggled(selected)
+                }
+            }
         }
     }
 
