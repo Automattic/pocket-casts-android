@@ -89,8 +89,8 @@ fun ChangeDonePage(
 
             val primaryText = when (state) {
                 is DoneViewModel.State.Empty -> null
-                is DoneViewModel.State.SuccessFullChangedEmail -> stringResource(id = (state as DoneViewModel.State.SuccessFullChangedEmail).tittleResourceId)
-                is DoneViewModel.State.SuccessFullChangedPassword -> stringResource(id = (state as DoneViewModel.State.SuccessFullChangedPassword).tittleResourceId)
+                is DoneViewModel.State.SuccessFullChangedEmail -> stringResource(id = (state as DoneViewModel.State.SuccessFullChangedEmail).titleResourceId)
+                is DoneViewModel.State.SuccessFullChangedPassword -> stringResource(id = (state as DoneViewModel.State.SuccessFullChangedPassword).titleResourceId)
             }
 
             primaryText?.let {

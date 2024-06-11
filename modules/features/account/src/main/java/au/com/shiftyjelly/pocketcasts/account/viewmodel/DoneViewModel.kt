@@ -40,12 +40,12 @@ class DoneViewModel @Inject constructor(
         data object Empty : State()
         data class SuccessFullChangedEmail(
             val detail: String = "",
-            val tittleResourceId: Int = R.string.profile_email_address_changed,
+            val titleResourceId: Int = R.string.profile_email_address_changed,
             val imageResourceId: Int = ic_email_address_changed,
         ) : State()
         data class SuccessFullChangedPassword(
             val detail: String = "",
-            val tittleResourceId: Int = R.string.profile_password_changed,
+            val titleResourceId: Int = R.string.profile_password_changed,
             val imageResourceId: Int = ic_password_changed,
         ) : State()
     }
