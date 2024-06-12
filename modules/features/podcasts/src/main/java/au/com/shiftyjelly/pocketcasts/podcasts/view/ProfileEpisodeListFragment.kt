@@ -414,7 +414,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             .setTitle(resources.getString(LR.string.profile_clear_listening_history_title))
             .setSummary(resources.getString(LR.string.profile_clear_cannot_be_undone))
             .setButtonType(ConfirmationDialog.ButtonType.Danger(resources.getString(LR.string.profile_clear_all)))
-            .setOnConfirm { viewModel.clearAllEpisodeHistory() }
+            .setOnConfirm {
+                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_CLEAR_HISTORY_BUTTON_TAPPED)
+                viewModel.clearAllEpisodeHistory()
+            }
         dialog.show(parentFragmentManager, "clear_history")
     }
 
