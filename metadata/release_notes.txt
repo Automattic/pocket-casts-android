@@ -1,21 +1,21 @@
 *   New Features
-    *   Add a storage setting that attempts to fix missing downloads files.
-        ([#2244](https://github.com/Automattic/pocket-casts-android/pull/2244))
-    *   Add an advanced setting that prioritizes seek accuracy over speed during streaming.
-        ([#2265](https://github.com/Automattic/pocket-casts-android/pull/2265))
-    *   Add sleep timer settings that controls the auto restart sleep timer and shake to restart sleep timer
-        ([#2273](https://github.com/Automattic/pocket-casts-android/pull/2273))
+    *   Adds an option to export the database and preferences from the Help & Feedback view
+        ([#2309](https://github.com/Automattic/pocket-casts-android/pull/2309))
+    *   Chapters tab is now accessible from episode details.
+        ([#2318](https://github.com/Automattic/pocket-casts-android/pull/2318))
 *   Health
-    *   Increase minimum SDK version to 24 ([#2262](https://github.com/Automattic/pocket-casts-android/pull/2262))
+    *   Increase target SDK version to 34 
+        ([#2279](https://github.com/Automattic/pocket-casts-android/pull/2279))
+    *   Optimize writing large no. of podcast episodes into DB
+        ([#2324](https://github.com/Automattic/pocket-casts-android/pull/2324))
 *   Bug Fixes
-    *   Fix Tesla podcast artwork not loading
-        ([#2254](https://github.com/Automattic/pocket-casts-android/pull/2254))
-    *   Fix timestamp parameter handling in shared links
-        ([#2235](https://github.com/Automattic/pocket-casts-android/pull/2235))
-    *   Fix the Google Podcasts OPML file import and include an error message if parsing fails.
-        ([#2260](https://github.com/Automattic/pocket-casts-android/pull/2260))
-    *   Improve intermediate caching of playing episode 
-        ([#2242](https://github.com/Automattic/pocket-casts-android/pull/2242))    
-    *   Fix 'No limit' episode archive setting not being respected 
-        ([#2270](https://github.com/Automattic/pocket-casts-android/pull/2270))
+    *   Fix: Search Term Persists When Navigating to Different Podcast Page
+        ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
+    *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
+        ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
+    *   Fix: Flickering when double-tapping an item in the tab bar
+        ([#2326](https://github.com/Automattic/pocket-casts-android/pull/2326))    
+*   Updates:
+    *   Playback speed can now be changed up to 5x.
+        ([#1645](https://github.com/Automattic/pocket-casts-android/pull/1645))
 
