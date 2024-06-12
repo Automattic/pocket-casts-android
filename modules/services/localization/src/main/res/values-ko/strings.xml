@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-04 09:54:05+0000
+Translation-Revision-Date: 2024-06-11 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_export_database_failed">데이터베이스 내보내기 실패</string>
+    <string name="settings_export_database">데이터베이스 내보내기</string>
     <string name="settings_sleep_timer_auto_restart_summary">이 기능을 켜면 마지막 일시 중지 후 5분 이내에 에피소드를 재생하는 경우 절전 타이머가 자동으로 재시작됩니다.</string>
     <string name="settings_sleep_timer_auto_restart">절전 타이머 자동 재시작</string>
     <string name="settings_sleep_timer_shake_to_reset_summary">이 기능을 켜면 휴대폰을 흔들 때 절전 타이머가 재시작됩니다.</string>

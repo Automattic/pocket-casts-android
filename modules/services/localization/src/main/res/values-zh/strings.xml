@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-04 09:54:05+0000
+Translation-Revision-Date: 2024-06-11 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_export_database_failed">数据库导出失败</string>
+    <string name="settings_export_database">导出数据库</string>
     <string name="settings_sleep_timer_auto_restart_summary">如果打开，则如果您在最后一次暂停后的 5 分钟内播放了剧集，睡眠计时器将自动重启。</string>
     <string name="settings_sleep_timer_auto_restart">自动重启睡眠计时器</string>
     <string name="settings_sleep_timer_shake_to_reset_summary">如果打开，则当您摇晃手机时，睡眠计时器将重启。</string>

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-04 09:54:03+0000
+Translation-Revision-Date: 2024-06-10 16:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="settings_export_database_failed">Esportazione del database fallita</string>
+    <string name="settings_export_database">Esporta il database</string>
     <string name="settings_sleep_timer_auto_restart_summary">Quando è attivato, l\'autospegnimento si riavvia automaticamente se riproduci un episodio entro 5 minuti dall\'ultima pausa.</string>
     <string name="settings_sleep_timer_auto_restart">Riavvia automaticamente l\'autospegnimento</string>
     <string name="settings_sleep_timer_shake_to_reset_summary">Quando è attivato, l\'autospegnimento si riavvia quando scuoti il telefono.</string>
