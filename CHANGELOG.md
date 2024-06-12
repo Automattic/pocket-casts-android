@@ -9,6 +9,8 @@
         ([#2309](https://github.com/Automattic/pocket-casts-android/pull/2309))
     *   Chapters tab is now accessible from episode details.
         ([#2318](https://github.com/Automattic/pocket-casts-android/pull/2318))
+    *   Adds download episode action button to shelf list in Now Playing
+        ([#2325](https://github.com/Automattic/pocket-casts-android/pull/2325))
 *   Health
     *   Increase target SDK version to 34 
         ([#2279](https://github.com/Automattic/pocket-casts-android/pull/2279))

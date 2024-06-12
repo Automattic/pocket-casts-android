@@ -9,6 +9,7 @@
     <string name="empty" translatable="false" />
 
     <string name="account">Account</string>
+    <string name="remove_downloaded_file">Remove downloaded file</string>
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_bookmark_title">Add Bookmark</string>
     <string name="bookmark_added">Bookmark \"%s\" added</string>
@@ -228,6 +229,8 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="episode_was_removed">Episode was removed</string>
+    <string name="episode_queued_for_download">Episode queued for download</string>
     <string name="download_queued_singular">1 episode queued for download</string>
     <string name="download_queued_plural">%1$d episodes queued for download</string>
 
@@ -244,6 +247,7 @@
     <string name="download_warning_on_wifi_summary">Downloading this episode will use data.</string>
     <string name="download_warning_on_wifi_button">Download now</string>
     <string name="download_warning_on_wifi_later" translatable="false">@string/queue_for_later</string>
+    <string name="download_completed_for_episode">Download completed for %1$s</string>
 
     <string name="profile_cloud_upload_warning_title_on_wifi" translatable="false">@string/youre_not_on_wifi</string>
     <string name="profile_cloud_upload_warning_title_metered_wifi" translatable="false">@string/youre_on_metered_wifi</string>
