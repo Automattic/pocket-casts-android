@@ -16,6 +16,7 @@ fun LoginScreen(
     columnState: ScalingLazyColumnState,
     onLoginWithGoogleClick: () -> Unit,
     onLoginWithPhoneClick: () -> Unit,
+    onLoginWithEmailClick: () -> Unit,
 ) {
     val viewModel = hiltViewModel<LoginViewModel>()
 
@@ -46,6 +47,18 @@ fun LoginScreen(
                 onClick = {
                     viewModel.onPhoneLoginClicked()
                     onLoginWithPhoneClick()
+                },
+            )
+        }
+
+        item {
+            Chip(
+                labelId = LR.string.log_in_with_email,
+                colors = ChipDefaults.secondaryChipColors(),
+                icon = DrawableResPaintable(IR.drawable.ic_email_white_24dp),
+                onClick = {
+                    viewModel.onEmailLoginClicked()
+                    onLoginWithEmailClick()
                 },
             )
         }
