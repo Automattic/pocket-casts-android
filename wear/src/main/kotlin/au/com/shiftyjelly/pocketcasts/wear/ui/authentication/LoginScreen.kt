@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.ChipDefaults
+import au.com.shiftyjelly.pocketcasts.compose.BuildConfig
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
@@ -51,16 +52,18 @@ fun LoginScreen(
             )
         }
 
-        item {
-            Chip(
-                labelId = LR.string.log_in_with_email,
-                colors = ChipDefaults.secondaryChipColors(),
-                icon = DrawableResPaintable(IR.drawable.ic_email_white_24dp),
-                onClick = {
-                    viewModel.onEmailLoginClicked()
-                    onLoginWithEmailClick()
-                },
-            )
+        if (BuildConfig.DEBUG) {
+            item {
+                Chip(
+                    labelId = LR.string.log_in_with_email,
+                    colors = ChipDefaults.secondaryChipColors(),
+                    icon = DrawableResPaintable(IR.drawable.ic_email_white_24dp),
+                    onClick = {
+                        viewModel.onEmailLoginClicked()
+                        onLoginWithEmailClick()
+                    },
+                )
+            }
         }
     }
 }
