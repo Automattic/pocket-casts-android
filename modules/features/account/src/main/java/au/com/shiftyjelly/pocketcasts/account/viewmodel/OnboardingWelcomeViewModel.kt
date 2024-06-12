@@ -22,6 +22,7 @@ class OnboardingWelcomeViewModel @Inject constructor(
 
     fun updateNewsletter(isChecked: Boolean) {
         _stateFlow.update { it.copy(newsletter = isChecked) }
+        persistNewsletterSelection()
     }
 
     private fun persistNewsletterSelection() {
