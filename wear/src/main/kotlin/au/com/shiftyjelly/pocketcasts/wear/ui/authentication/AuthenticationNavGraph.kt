@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import androidx.compose.runtime.Composable
@@ -45,7 +46,7 @@ fun NavGraphBuilder.authenticationNavGraph(
         scrollable(AuthenticationNavRoutes.loginWithEmail) {
             it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
             LoginWithEmailScreen(
-                onSignInSuccess = onEmailSignInSuccess
+                onSignInSuccess = onEmailSignInSuccess,
             )
         }
 

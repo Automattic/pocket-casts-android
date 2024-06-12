@@ -35,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun LoginWithEmailScreen(
     onSignInSuccess: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<SignInViewModel>()
     val signInState by viewModel.signInState.observeAsState()
     val email by viewModel.email.observeAsState()
@@ -45,7 +44,8 @@ fun LoginWithEmailScreen(
 
     when (signInState) {
         null,
-        SignInState.Empty -> {
+        SignInState.Empty,
+        -> {
             loading = false
 
             if (email.isNullOrBlank()) {
@@ -83,7 +83,7 @@ fun LoginWithEmailScreen(
             val message = currentState?.message
                 ?: stringResource(
                     currentState?.errors?.last()?.message
-                        ?: LR.string.error_login_failed
+                        ?: LR.string.error_login_failed,
                 )
             ErrorScreen(message)
         }
@@ -128,7 +128,7 @@ private fun launchRemoteInput(
                 setEmojisAllowed(false)
                 setInputActionType(EditorInfo.IME_ACTION_DONE)
             }
-            .build()
+            .build(),
     )
 
     val intent: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
