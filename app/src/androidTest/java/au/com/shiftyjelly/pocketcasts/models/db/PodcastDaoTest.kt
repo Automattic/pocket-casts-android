@@ -310,7 +310,7 @@ class PodcastDaoTest {
         }
         podcastDao.replaceAllTrendingPodcasts(trendingPodcasts)
 
-        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts()
+        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts(limit = 100)
 
         val expected = List(65) {
             NovaLauncherTrendingPodcast("id-$it", "title-$it")
@@ -319,7 +319,19 @@ class PodcastDaoTest {
     }
 
     @Test
-    fun doNotIncludeTrendingPodcastsThatAreTrendingForNovaLauncher() = runTest {
+    fun limitTrendingPodcastsForNovaLauncher() = runTest {
+        val trendingPodcasts = List(65) {
+            TrendingPodcast("id-$it", "title-$it")
+        }
+        podcastDao.replaceAllTrendingPodcasts(trendingPodcasts)
+
+        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts(limit = 5)
+
+        assertEquals(5, podcasts.size)
+    }
+
+    @Test
+    fun doNotIncludeTrendingPodcastsThatAreSubscribedForNovaLauncher() = runTest {
         val trendingPodcasts = listOf(
             TrendingPodcast("id-1", "title-1"),
             TrendingPodcast("id-2", "title-2"),
@@ -329,7 +341,7 @@ class PodcastDaoTest {
         podcastDao.insert(Podcast("id-1", isSubscribed = true))
         podcastDao.insert(Podcast("id-2", isSubscribed = false))
 
-        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts()
+        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts(limit = 100)
 
         val expected = listOf(
             NovaLauncherTrendingPodcast("id-2", "title-2"),

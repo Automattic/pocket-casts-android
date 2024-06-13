@@ -583,6 +583,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.SEARCH,
             SourceView.SEARCH_RESULTS,
             SourceView.NOVA_LAUNCHER_SUBSCRIBED_PODCASTS,
+            SourceView.NOVA_LAUNCHER_TRENDING_PODCASTS,
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
