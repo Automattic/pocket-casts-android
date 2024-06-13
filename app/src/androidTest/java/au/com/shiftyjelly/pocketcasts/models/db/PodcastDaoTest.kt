@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.timeSecs
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -121,26 +122,27 @@ class PodcastDaoTest {
     @Test
     fun useCorrectReleaseTimestampsForNovaLauncherSubscribedPodcasts() = runTest {
         podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
-        episodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = 10000))
-        episodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(2000), podcastUuid = "id-1", lastPlaybackInteraction = null))
-        episodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(1000), podcastUuid = "id-1", lastPlaybackInteraction = 13000))
+        episodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = 10))
+        episodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(2), podcastUuid = "id-1", lastPlaybackInteraction = null))
+        episodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(1), podcastUuid = "id-1", lastPlaybackInteraction = 13))
 
         podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true))
-        episodeDao.insert(PodcastEpisode(uuid = "id-4", publishedDate = Date(5000), podcastUuid = "id-2", lastPlaybackInteraction = 0))
-        episodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(4000), podcastUuid = "id-2", lastPlaybackInteraction = 20000))
-        episodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(3000), podcastUuid = "id-2", lastPlaybackInteraction = 25000))
+        episodeDao.insert(PodcastEpisode(uuid = "id-4", publishedDate = Date(5), podcastUuid = "id-2", lastPlaybackInteraction = 0))
+        episodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(4), podcastUuid = "id-2", lastPlaybackInteraction = 20))
+        episodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(3), podcastUuid = "id-2", lastPlaybackInteraction = 25))
 
         podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
-        episodeDao.insert(PodcastEpisode(uuid = "id-7", publishedDate = Date(12000), podcastUuid = "id-3", lastPlaybackInteraction = 0))
+        episodeDao.insert(PodcastEpisode(uuid = "id-7", publishedDate = Date(12), podcastUuid = "id-3", lastPlaybackInteraction = 0))
 
         podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
 
-        val podcasts = podcastDao.getNovaLauncherSubscribedPodcasts()
+        val podcasts = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
         val expected = listOf(
             NovaLauncherSubscribedPodcast(
                 id = "id-1",
                 title = "title-1",
+                categories = "",
                 initialReleaseTimestamp = 0,
                 latestReleaseTimestamp = 2,
                 lastUsedTimestamp = 13,
@@ -148,6 +150,7 @@ class PodcastDaoTest {
             NovaLauncherSubscribedPodcast(
                 id = "id-2",
                 title = "title-2",
+                categories = "",
                 initialReleaseTimestamp = 3,
                 latestReleaseTimestamp = 5,
                 lastUsedTimestamp = 25,
@@ -155,6 +158,7 @@ class PodcastDaoTest {
             NovaLauncherSubscribedPodcast(
                 id = "id-3",
                 title = "title-3",
+                categories = "",
                 initialReleaseTimestamp = 12,
                 latestReleaseTimestamp = 12,
                 lastUsedTimestamp = 0,
@@ -162,6 +166,7 @@ class PodcastDaoTest {
             NovaLauncherSubscribedPodcast(
                 id = "id-4",
                 title = "title-4",
+                categories = "",
                 initialReleaseTimestamp = null,
                 latestReleaseTimestamp = null,
                 lastUsedTimestamp = null,
@@ -182,18 +187,120 @@ class PodcastDaoTest {
         episodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(0), podcastUuid = "id-2"))
         episodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(0), podcastUuid = "id-2"))
 
-        val podcasts = podcastDao.getNovaLauncherSubscribedPodcasts()
+        val podcasts = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
         val expected = listOf(
             NovaLauncherSubscribedPodcast(
                 id = "id-1",
                 title = "title-1",
+                categories = "",
                 initialReleaseTimestamp = 0,
                 latestReleaseTimestamp = 0,
                 lastUsedTimestamp = null,
             ),
         )
         assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun includeCategoriesForNovaLauncherSubscribedPodcasts() = runTest {
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, podcastCategory = "category-1"))
+
+        val podcasts = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
+
+        val expected = listOf(
+            NovaLauncherSubscribedPodcast(
+                id = "id-1",
+                title = "title-1",
+                categories = "category-1",
+                initialReleaseTimestamp = null,
+                latestReleaseTimestamp = null,
+                lastUsedTimestamp = null,
+            ),
+        )
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun sortNovaLauncherSubscribedPodcastsByAddedDate() = runTest {
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, addedDate = Date(3)))
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true, addedDate = Date(4)))
+        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true, addedDate = Date(2)))
+        podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, addedDate = Date(1)))
+        podcastDao.insert(Podcast(uuid = "id-5", title = "title-5", isSubscribed = true, addedDate = null))
+
+        val podcastIds = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST, limit = 100).map { it.id }
+
+        assertEquals(listOf("id-4", "id-3", "id-1", "id-2", "id-5"), podcastIds)
+    }
+
+    @Test
+    fun sortNovaLauncherSubscribedPodcastsByTitle() = runTest {
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-4", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-3", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-3", title = "title-1", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-4", title = "title-2", isSubscribed = true))
+
+        val podcastIds = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
+
+        assertEquals(listOf("id-3", "id-4", "id-2", "id-1"), podcastIds)
+    }
+
+    @Test
+    fun sortingNovaLauncherSubscribedPodcastsByTitleOmitsEnglishArticles() = runTest {
+        podcastDao.insert(Podcast(uuid = "id-1", title = "The 1", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-2", title = "An 2", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-3", title = "A 3", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-4", title = "4", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-5", title = "the 5", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-6", title = "an 6", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-7", title = "a 7", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-8", title = "8", isSubscribed = true))
+
+        val podcastIds = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
+
+        assertEquals(listOf("id-1", "id-2", "id-3", "id-4", "id-5", "id-6", "id-7", "id-8"), podcastIds)
+    }
+
+    @Test
+    fun sortNovaLauncherSubscribedPodcastsByLatestReleaseTimestamp() = runTest {
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        episodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1"))
+
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true))
+        episodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(100), podcastUuid = "id-2"))
+
+        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true))
+
+        podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
+        episodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(200), podcastUuid = "id-4"))
+
+        val podcastIds = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST, limit = 100).map { it.id }
+
+        assertEquals(listOf("id-4", "id-2", "id-1", "id-3"), podcastIds)
+    }
+
+    @Test
+    fun sortNovaLauncherSubscribedPodcastsByCustomSortOrder() = runTest {
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, sortPosition = 3))
+        podcastDao.insert(Podcast(uuid = "id-2", title = "title-2", isSubscribed = true, sortPosition = 1))
+        podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true, sortPosition = 2))
+        podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, sortPosition = 4))
+
+        val podcastIds = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.DRAG_DROP, limit = 100).map { it.id }
+
+        assertEquals(listOf("id-2", "id-3", "id-1", "id-4"), podcastIds)
+    }
+
+    @Test
+    fun limitNovaLauncherSubscribedPodcasts() = runTest {
+        List(250) {
+            podcastDao.insert(Podcast(uuid = "id-$it", isSubscribed = true))
+        }
+
+        val podcasts = podcastDao.getNovaLauncherSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 60)
+
+        assertEquals(60, podcasts.size)
     }
 
     @Test

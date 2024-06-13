@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcas
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 
 interface NovaLauncherManager {
-    suspend fun getSubscribedPodcasts(): List<NovaLauncherSubscribedPodcast>
+    suspend fun getSubscribedPodcasts(limit: Int): List<NovaLauncherSubscribedPodcast>
     suspend fun getRecentlyPlayedPodcasts(): List<NovaLauncherRecentlyPlayedPodcast>
     suspend fun getTrendingPodcasts(): List<NovaLauncherTrendingPodcast>
     suspend fun getNewEpisodes(): List<NovaLauncherNewEpisode>
