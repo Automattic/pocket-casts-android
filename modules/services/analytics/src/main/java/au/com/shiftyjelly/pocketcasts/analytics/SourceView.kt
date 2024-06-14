@@ -23,6 +23,7 @@ enum class SourceView(val analyticsValue: String) {
     MULTI_SELECT("multi_select"),
     NOTIFICATION("notification"),
     NOTIFICATION_BOOKMARK("notification_bookmark"),
+    NOVA_LAUNCHER_RECENTLY_PLAYED("nova_launcher_recently_played"),
     NOVA_LAUNCHER_SUBSCRIBED_PODCASTS("nova_launcher_subscribed_podcasts"),
     NOVA_LAUNCHER_TRENDING_PODCASTS("nova_launcher_trending_podcasts"),
     ONBOARDING_RECOMMENDATIONS("onboarding_recommendations"),

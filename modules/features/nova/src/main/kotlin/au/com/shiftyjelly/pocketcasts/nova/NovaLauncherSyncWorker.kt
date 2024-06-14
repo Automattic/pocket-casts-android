@@ -46,12 +46,14 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
         return coroutineScope {
             try {
                 val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts(limit = 200)) }
+                val recentlyPlayedPodcasts = async { catalogFactory.recentlyPlayedPodcasts(manager.getRecentlyPlayedPodcasts(limit = 200)) }
                 val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts(limit = 25)) }
                 val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes(limit = 25)) }
                 val inProgressEpisodes = async { catalogFactory.inProgressEpisodes(manager.getInProgressEpisodes(limit = 25)) }
 
                 val catalogSubmission = CatalogSubmission()
                     .setUserLibrary(listOf(subscribedPodcasts.await()))
+                    .setUsageHistory(listOf(recentlyPlayedPodcasts.await()))
                     .setTrending(listOf(trendingPodcasts.await()))
                     .setUserLibraryNew(listOf(newEpisodes.await()))
                     .setContinue(listOf(inProgressEpisodes.await()))
@@ -60,6 +62,7 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
 
                 val results = listOf(
                     SubmissionResult("Subscribed podcasts", subscribedPodcasts.await().size),
+                    SubmissionResult("Recently played podcasts", recentlyPlayedPodcasts.await().size),
                     SubmissionResult("Trending podcasts", trendingPodcasts.await().size),
                     SubmissionResult("New episodes", newEpisodes.await().size),
                     SubmissionResult("In progress episodes", inProgressEpisodes.await().size),
