@@ -76,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.BOOKMARK_UUID
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SOURCE_VIEW
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
@@ -1248,6 +1249,15 @@ class MainActivity :
             } else if (action == Settings.INTENT_OPEN_APP_PODCAST_UUID) {
                 intent.getStringExtra(PODCAST_UUID)?.let {
                     openPodcastPage(it, intent.getStringExtra(SOURCE_VIEW))
+                }
+            } else if (action == Settings.INTENT_OPEN_APP_EPISODE_UUID) {
+                intent.getStringExtra(EPISODE_UUID)?.let {
+                    openEpisodeDialog(
+                        episodeUuid = it,
+                        source = EpisodeViewSource.fromString(intent.getStringExtra(SOURCE_VIEW)),
+                        podcastUuid = intent.getStringExtra(PODCAST_UUID),
+                        forceDark = false,
+                    )
                 }
             } // new episode notification tapped
             else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {

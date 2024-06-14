@@ -126,6 +126,8 @@ interface Settings {
 
         const val PODCAST_UUID = "podcast_uuid"
 
+        const val EPISODE_UUID = "episode_uuid"
+
         const val SOURCE_VIEW = "source_view"
 
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"

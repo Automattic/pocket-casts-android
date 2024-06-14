@@ -13,6 +13,6 @@ class NovaLauncherManagerImpl @Inject constructor(
     override suspend fun getSubscribedPodcasts(limit: Int) = podcastDao.getNovaLauncherSubscribedPodcasts(settings.podcastsSortType.value, limit)
     override suspend fun getRecentlyPlayedPodcasts() = podcastDao.getNovaLauncherRecentlyPlayedPodcasts()
     override suspend fun getTrendingPodcasts(limit: Int) = podcastDao.getNovaLauncherTrendingPodcasts(limit)
-    override suspend fun getNewEpisodes() = episodeDao.getNovaLauncherNewEpisodes()
+    override suspend fun getNewEpisodes(limit: Int) = episodeDao.getNovaLauncherNewEpisodes(limit)
     override suspend fun getInProgressEpisodes() = episodeDao.getNovaLauncherInProgressEpisodes()
 }
