@@ -131,6 +131,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    GRAVATAR_PROFILE(
+        key = "display_gravatar_profile",
+        title = "Show Gravatar profile in account screen",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
