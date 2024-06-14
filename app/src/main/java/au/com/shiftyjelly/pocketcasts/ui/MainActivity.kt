@@ -949,12 +949,14 @@ class MainActivity :
         return binding.snackbarFragment
     }
 
+    @SuppressLint("PrivateResource")
     override fun onMiniPlayerHidden() {
         val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt()
         binding.snackbarFragment.updatePadding(bottom = padding)
         settings.updateBottomInset(0)
     }
 
+    @SuppressLint("PrivateResource")
     override fun onMiniPlayerVisible() {
         val miniPlayerHeight = resources.getDimension(R.dimen.miniPlayerHeight).toInt()
         val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt() + miniPlayerHeight

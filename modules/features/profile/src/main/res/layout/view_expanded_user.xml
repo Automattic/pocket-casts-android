@@ -18,6 +18,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/gravatarProfileCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgProfilePicture"
+        android:visibility="gone"/>
+
     <TextView
         android:id="@+id/lblUserEmail"
         android:layout_width="wrap_content"
@@ -27,7 +36,7 @@
         android:textColor="?attr/primary_text_01"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgProfilePicture"
+        app:layout_constraintTop_toBottomOf="@+id/gravatarProfileCard"
         tools:text="Setup Account" />
 
     <androidx.compose.ui.platform.ComposeView

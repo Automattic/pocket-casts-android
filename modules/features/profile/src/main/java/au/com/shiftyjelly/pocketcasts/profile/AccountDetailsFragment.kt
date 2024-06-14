@@ -116,7 +116,10 @@ class AccountDetailsFragment : BaseFragment() {
         )
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
-            binding.userView.signedInState = signInState
+            binding.userView.apply {
+                this.appTheme = theme
+                this.signedInState = signInState
+            }
         }
 
         viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->

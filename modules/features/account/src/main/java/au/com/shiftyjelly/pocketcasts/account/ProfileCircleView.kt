@@ -17,6 +17,7 @@ import androidx.core.graphics.toRect
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import coil.imageLoader
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.target.Target
 import coil.transform.CircleCropTransformation
@@ -170,6 +171,9 @@ class ProfileCircleView @JvmOverloads constructor(
             .data(uri)
             .size(size)
             .transformations(CircleCropTransformation())
+            .memoryCachePolicy(CachePolicy.DISABLED) // TODO: review this to see if it's necessary or how to improve it
+            .diskCachePolicy(CachePolicy.DISABLED)
+//          .networkCachePolicy(CachePolicy.DISABLED)
             .target(target)
         context.imageLoader.enqueue(request.build())
     }
