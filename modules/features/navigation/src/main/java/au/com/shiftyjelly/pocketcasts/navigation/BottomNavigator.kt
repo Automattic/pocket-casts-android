@@ -90,7 +90,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
                 if (resetRootFragmentSubject.hasObservers() && tabstackAndFragmentManagerInSync) {
                     resetRootFragmentSubject.onNext(currentFragment!!)
                 } else {
-                    reset(tab, false)
+                    reset(tab, true)
                 }
             } else {
                 reset(tab, false)
