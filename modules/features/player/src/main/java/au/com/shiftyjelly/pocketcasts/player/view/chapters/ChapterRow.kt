@@ -102,7 +102,7 @@ fun ChapterRow(
                 Spacer(Modifier.width(8.dp))
             }
             TextH50(
-                text = chapter.index.toString(),
+                text = (chapter.index + 1).toString(),
                 color = textColor,
                 modifier = Modifier
                     .padding(horizontal = 12.dp),

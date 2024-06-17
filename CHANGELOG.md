@@ -1,6 +1,8 @@
 7.67
 -----
-
+*   Bug Fixes
+    *   Fix deselected chapters not synced correctly between different platforms
+        ([#2357](https://github.com/Automattic/pocket-casts-android/pull/2357))
 
 7.66
 -----
