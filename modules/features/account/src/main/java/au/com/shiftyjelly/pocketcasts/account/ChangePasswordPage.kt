@@ -166,6 +166,7 @@ fun ChangePasswordPage(
                     onClick = onFormSubmit,
                     isLoading = state is ChangePasswordState.Loading,
                     enabled = !invalidPasswordCurrent && !invalidPasswordNew && !invalidPasswordConfirm,
+                    includePadding = false,
                 )
             }
         }
