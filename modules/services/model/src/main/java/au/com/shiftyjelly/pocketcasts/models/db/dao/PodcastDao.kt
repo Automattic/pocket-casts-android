@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -409,17 +410,36 @@ abstract class PodcastDao {
         SELECT 
           podcasts.uuid AS id, 
           podcasts.title AS title, 
-          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
-          (SELECT MIN(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
-          (SELECT MAX(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
-          (SELECT MAX(podcast_episodes.last_playback_interaction_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
+          podcasts.podcast_category AS podcast_category,
+          (SELECT MIN(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
+          (SELECT MAX(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
+          (SELECT MAX(podcast_episodes.last_playback_interaction_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
         FROM 
           podcasts 
         WHERE 
           podcasts.subscribed IS NOT 0
+        ORDER BY
+          -- Order by oldest to newest date added
+          CASE WHEN :sortOrder IS 0 THEN IFNULL(podcasts.added_date, 9223372036854775807) END ASC,
+          -- Order by A-Z podcast title
+          CASE WHEN :sortOrder IS 1 THEN (CASE
+            WHEN UPPER(podcasts.title) LIKE 'THE %' THEN SUBSTR(UPPER(podcasts.title), 5)
+            WHEN UPPER(podcasts.title) LIKE 'A %' THEN SUBSTR(UPPER(podcasts.title), 3)
+            WHEN UPPER(podcasts.title) LIKE 'AN %' THEN SUBSTR(UPPER(podcasts.title), 4)
+            ELSE UPPER(podcasts.title)
+          END) END ASC,
+          -- Order by newest to oldest episode
+          CASE WHEN :sortOrder IS 2 THEN (SELECT IFNULL(MAX(podcast_episodes.published_date), 0) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) END DESC,
+          -- Order by drag and drop position
+          CASE WHEN :sortOrder IS 3 THEN IFNULL(podcasts.sort_order, 9223372036854775807) END ASC
+        LIMIT
+          :limit
         """,
     )
-    abstract suspend fun getNovaLauncherSubscribedPodcasts(): List<NovaLauncherSubscribedPodcast>
+    abstract suspend fun getNovaLauncherSubscribedPodcasts(
+        sortOrder: PodcastsSortType,
+        limit: Int,
+    ): List<NovaLauncherSubscribedPodcast>
 
     @Query(
         """

@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 
 object DownloadHelper {
 
-    fun manuallyDownloadEpisodeNow(episode: BaseEpisode, from: String, downloadManager: DownloadManager, episodeManager: EpisodeManager) {
+    fun manuallyDownloadEpisodeNow(episode: BaseEpisode, from: String, downloadManager: DownloadManager, episodeManager: EpisodeManager, fireToast: Boolean = false) {
         if (episode.isDownloaded) {
             return
         }
@@ -19,7 +19,7 @@ object DownloadHelper {
         runBlocking {
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED)
         }
-        downloadManager.addEpisodeToQueue(episode, from, true)
+        downloadManager.addEpisodeToQueue(episode, from, fireEvent = true, fireToast = fireToast)
     }
 
     fun addAutoDownloadedEpisodeToQueue(episode: BaseEpisode, from: String, downloadManager: DownloadManager, episodeManager: EpisodeManager) {
@@ -33,7 +33,7 @@ object DownloadHelper {
         runBlocking {
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED)
         }
-        downloadManager.addEpisodeToQueue(episode, from, true)
+        downloadManager.addEpisodeToQueue(episode, from, fireEvent = true, fireToast = false)
     }
 
     fun removeEpisodeFromQueue(episode: BaseEpisode, from: String, downloadManager: DownloadManager) {

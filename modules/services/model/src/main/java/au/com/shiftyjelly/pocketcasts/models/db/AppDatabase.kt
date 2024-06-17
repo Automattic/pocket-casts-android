@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.content.contentValuesOf
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteColumn
+import androidx.room.OnConflictStrategy
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -45,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
@@ -59,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import java.io.File
 import java.util.Arrays
+import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Database(
@@ -78,7 +82,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         DbChapter::class,
         TrendingPodcast::class,
     ],
-    version = 95,
+    version = 96,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -738,7 +742,6 @@ abstract class AppDatabase : RoomDatabase() {
             with(database) {
                 beginTransaction()
                 try {
-                    setTransactionSuccessful()
                     execSQL("UPDATE podcasts SET auto_archive_episode_limit = 0 WHERE auto_archive_episode_limit IS NULL")
                     execSQL("CREATE TABLE podcasts_temp (uuid TEXT NOT NULL PRIMARY KEY, added_date INTEGER, thumbnail_url TEXT, title TEXT NOT NULL, podcast_url TEXT, podcast_description TEXT NOT NULL, podcast_category TEXT NOT NULL, podcast_language TEXT NOT NULL, media_type TEXT, latest_episode_uuid TEXT, author TEXT NOT NULL, sort_order INTEGER NOT NULL, episodes_sort_order INTEGER NOT NULL, episodes_sort_order_modified INTEGER, latest_episode_date INTEGER, episodes_to_keep INTEGER NOT NULL, override_global_settings INTEGER NOT NULL, override_global_effects INTEGER NOT NULL, override_global_effects_modified INTEGER, start_from INTEGER NOT NULL, start_from_modified INTEGER, playback_speed REAL NOT NULL, playback_speed_modified INTEGER, volume_boosted INTEGER NOT NULL, volume_boosted_modified INTEGER, is_folder INTEGER NOT NULL, subscribed INTEGER NOT NULL, show_notifications INTEGER NOT NULL, show_notifications_modified INTEGER, auto_download_status INTEGER NOT NULL, auto_add_to_up_next INTEGER NOT NULL, auto_add_to_up_next_modified INTEGER, most_popular_color INTEGER NOT NULL, primary_color INTEGER NOT NULL, secondary_color INTEGER NOT NULL, light_overlay_color INTEGER NOT NULL, fab_for_light_bg INTEGER NOT NULL, link_for_dark_bg INTEGER NOT NULL, link_for_light_bg INTEGER NOT NULL, color_version INTEGER NOT NULL, color_last_downloaded INTEGER NOT NULL, sync_status INTEGER NOT NULL, exclude_from_auto_archive INTEGER NOT NULL, override_global_archive INTEGER NOT NULL, override_global_archive_modified INTEGER, auto_archive_played_after INTEGER NOT NULL, auto_archive_played_after_modified INTEGER, auto_archive_inactive_after INTEGER NOT NULL, auto_archive_inactive_after_modified INTEGER, auto_archive_episode_limit INTEGER NOT NULL, auto_archive_episode_limit_modified INTEGER, estimated_next_episode INTEGER, episode_frequency TEXT, `grouping` INTEGER NOT NULL, grouping_modified INTEGER, skip_last INTEGER NOT NULL, skip_last_modified INTEGER, show_archived INTEGER NOT NULL, show_archived_modified INTEGER, trim_silence_level INTEGER NOT NULL, trim_silence_level_modified INTEGER, refresh_available INTEGER NOT NULL, folder_uuid TEXT, licensing INTEGER NOT NULL, isPaid INTEGER NOT NULL, bundleuuid TEXT, bundlebundleUrl TEXT, bundlepaymentUrl TEXT, bundledescription TEXT, bundlepodcastUuid TEXT, bundlepaidType TEXT)")
                     execSQL(
@@ -750,6 +753,49 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     execSQL("DROP TABLE podcasts")
                     execSQL("ALTER TABLE podcasts_temp RENAME TO podcasts")
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
+        val MIGRATION_95_96 = addMigration(95, 96) { database ->
+            val now = DateTypeConverter().toLong(Date())
+            val chaptersConverter = ChapterIndicesConverter()
+
+            with(database) {
+                beginTransaction()
+                try {
+                    val podcastEpisodes = mutableMapOf<String, ChapterIndices>()
+                    database.query("SELECT uuid, deselected_chapters FROM podcast_episodes WHERE IFNULL(deselected_chapters, '') IS NOT ''").use { cursor ->
+                        while (cursor.moveToNext()) {
+                            podcastEpisodes.put(cursor.getString(0), chaptersConverter.fromString(cursor.getString(1)).decrement())
+                        }
+                    }
+                    podcastEpisodes.forEach { episodeId, chapters ->
+                        val contentValues = ContentValues(2).apply {
+                            put("deselected_chapters", chaptersConverter.toString(chapters))
+                            put("deselected_chapters_modified", now)
+                        }
+                        database.update("podcast_episodes", OnConflictStrategy.REPLACE, contentValues, "uuid IS ?", arrayOf(episodeId))
+                    }
+
+                    val userEpisodes = mutableMapOf<String, ChapterIndices>()
+                    database.query("SELECT uuid, deselected_chapters FROM user_episodes WHERE IFNULL(deselected_chapters, '') IS NOT ''").use { cursor ->
+                        while (cursor.moveToNext()) {
+                            userEpisodes.put(cursor.getString(0), chaptersConverter.fromString(cursor.getString(1)).decrement())
+                        }
+                    }
+                    userEpisodes.forEach { episodeId, chapters ->
+                        val contentValues = ContentValues(2).apply {
+                            put("deselected_chapters", chaptersConverter.toString(chapters))
+                            put("deselected_chapters_modified", now)
+                        }
+                        database.update("user_episodes", OnConflictStrategy.REPLACE, contentValues, "uuid IS ?", arrayOf(episodeId))
+                    }
+
+                    setTransactionSuccessful()
                 } finally {
                     endTransaction()
                 }
@@ -1141,6 +1187,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_92_93,
                 MIGRATION_93_94,
                 MIGRATION_94_95,
+                MIGRATION_95_96,
             )
         }
 
@@ -1185,5 +1232,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
             return result
         }
+
+        private fun ChapterIndices.decrement() = ChapterIndices(map { it - 1 })
     }
 }
