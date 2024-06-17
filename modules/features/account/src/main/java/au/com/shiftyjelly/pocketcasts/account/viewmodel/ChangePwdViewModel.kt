@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -14,25 +16,26 @@ class ChangePwdViewModel
     private val syncManager: SyncManager,
 ) : AccountViewModel() {
 
-    val pwdCurrent = MutableLiveData<String>().apply { postValue("") }
-    val pwdNew = MutableLiveData<String>().apply { postValue("") }
-    val pwdConfirm = MutableLiveData<String>().apply { postValue("") }
+    val passwordCurrent = MutableLiveData<String>().apply { postValue("") }
+    val passwordNew = MutableLiveData<String>().apply { postValue("") }
+    val passwordConfirm = MutableLiveData<String>().apply { postValue("") }
 
-    val changePasswordState = MutableLiveData<ChangePasswordState>().apply { value = ChangePasswordState.Empty }
+    private val changePasswordState = MutableStateFlow<ChangePasswordState>(ChangePasswordState.Empty)
+    val state: StateFlow<ChangePasswordState> = changePasswordState
 
     private fun pwdCurrentValid(): Boolean {
-        return isPasswordValid(pwdCurrent.value)
+        return isPasswordValid(passwordCurrent.value)
     }
 
     private fun pwdNewValid(): Boolean {
-        return isPasswordValid(pwdNew.value)
+        return isPasswordValid(passwordNew.value)
     }
 
     private fun pwdConfirmValid(): Boolean {
-        val pwd0 = pwdNew.value ?: ""
-        val pwd1 = pwdConfirm.value ?: ""
+        val pwd0 = passwordNew.value ?: ""
+        val pwd1 = passwordConfirm.value ?: ""
         val isNewAndConfirmMatch = (pwd0.isNotEmpty() && pwd0 == pwd1)
-        return isPasswordValid(pwdConfirm.value) && (isNewAndConfirmMatch)
+        return isPasswordValid(passwordConfirm.value) && (isNewAndConfirmMatch)
     }
 
     private fun errorUpdate(error: ChangePasswordError, add: Boolean, message: String?) {
@@ -47,26 +50,26 @@ class ChangePwdViewModel
         if (errors.isNotEmpty()) {
             changePasswordState.value = ChangePasswordState.Failure(errors, message)
         } else {
-            changePasswordState.postValue(ChangePasswordState.Empty)
+            changePasswordState.value = ChangePasswordState.Empty
         }
     }
 
     fun updatePwdCurrent(value: String) {
-        pwdCurrent.value = value
+        passwordCurrent.value = value
         val invalid = !pwdCurrentValid()
         errorUpdate(ChangePasswordError.INVALID_PASSWORD_CURRENT, invalid, null)
     }
 
     fun updatePwdNew(value: String) {
-        pwdNew.value = value
+        passwordNew.value = value
         val invalid = !pwdNewValid()
         errorUpdate(ChangePasswordError.INVALID_PASSWORD_NEW, invalid, null)
-        val password = pwdConfirm.value ?: ""
+        val password = passwordConfirm.value ?: ""
         updatePwdConfirm(password)
     }
 
     fun updatePwdConfirm(value: String) {
-        pwdConfirm.value = value
+        passwordConfirm.value = value
         val invalid = !pwdConfirmValid()
         errorUpdate(ChangePasswordError.INVALID_PASSWORD_CONFIRM, invalid, null)
     }
@@ -83,14 +86,14 @@ class ChangePwdViewModel
     }
 
     fun changePassword() {
-        val pwdCurrentString = pwdCurrent.value ?: ""
-        val pwdNewString = pwdNew.value ?: ""
-        val pwdConfirmString = pwdConfirm.value ?: ""
+        val pwdCurrentString = passwordCurrent.value ?: ""
+        val pwdNewString = passwordNew.value ?: ""
+        val pwdConfirmString = passwordConfirm.value ?: ""
         if (pwdCurrentString.isEmpty() || pwdNewString.isEmpty() || pwdConfirmString.isEmpty()) {
             return
         }
 
-        changePasswordState.postValue(ChangePasswordState.Loading)
+        changePasswordState.value = ChangePasswordState.Loading
 
         viewModelScope.launch {
             try {
@@ -98,10 +101,10 @@ class ChangePwdViewModel
                     newPassword = pwdNewString,
                     oldPassword = pwdCurrentString,
                 )
-                changePasswordState.postValue(ChangePasswordState.Success("OK"))
+                changePasswordState.value = ChangePasswordState.Success("OK")
             } catch (ex: Exception) {
                 Timber.e(ex, "Failed update password")
-                changePasswordState.postValue(ChangePasswordState.Failure(errors = setOf(ChangePasswordError.SERVER), message = null))
+                changePasswordState.value = ChangePasswordState.Failure(errors = setOf(ChangePasswordError.SERVER), message = null)
             }
         }
     }
@@ -115,8 +118,8 @@ enum class ChangePasswordError {
 }
 
 sealed class ChangePasswordState {
-    object Empty : ChangePasswordState()
-    object Loading : ChangePasswordState()
+    data object Empty : ChangePasswordState()
+    data object Loading : ChangePasswordState()
     data class Success(val result: String) : ChangePasswordState()
     data class Failure(val errors: Set<ChangePasswordError>, val message: String?) : ChangePasswordState()
 }
