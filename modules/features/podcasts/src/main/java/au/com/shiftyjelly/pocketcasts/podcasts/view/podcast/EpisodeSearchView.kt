@@ -5,7 +5,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -52,7 +51,9 @@ class EpisodeSearchView @JvmOverloads constructor(context: Context, attrs: Attri
         }
         searchText.addTextChangedListener(textChangeListener)
         cancelSearchBtn.setOnClickListener {
-            cancelSearch()
+            searchText.setText("")
+            searchText.clearFocus()
+            UiUtil.hideKeyboard(searchText)
         }
 
         // Stops the focus search going to a detached row and causing a crash
@@ -60,18 +61,5 @@ class EpisodeSearchView @JvmOverloads constructor(context: Context, attrs: Attri
             UiUtil.hideKeyboard(searchText)
             true
         }
-    }
-
-    override fun onWindowVisibilityChanged(visibility: Int) {
-        super.onWindowVisibilityChanged(visibility)
-        if (visibility != View.VISIBLE) {
-            cancelSearch()
-        }
-    }
-
-    private fun cancelSearch() {
-        searchText.setText("")
-        searchText.clearFocus()
-        UiUtil.hideKeyboard(searchText)
     }
 }

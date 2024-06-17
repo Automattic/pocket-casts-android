@@ -9,8 +9,6 @@
     *   Optimize writing large no. of podcast episodes into DB
         ([#2324](https://github.com/Automattic/pocket-casts-android/pull/2324))
 *   Bug Fixes
-    *   Fix: Search Term Persists When Navigating to Different Podcast Page
-        ([#2286](https://github.com/Automattic/pocket-casts-android/pull/2286))
     *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
         ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
     *   Fix: Flickering when double-tapping an item in the tab bar
