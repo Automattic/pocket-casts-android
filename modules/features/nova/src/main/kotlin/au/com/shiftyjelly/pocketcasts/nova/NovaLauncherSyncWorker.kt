@@ -47,16 +47,19 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
             try {
                 val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts(limit = 200)) }
                 val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts(limit = 25)) }
+                val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes(limit = 25)) }
 
                 val catalogSubmission = CatalogSubmission()
                     .setUserLibrary(listOf(subscribedPodcasts.await()))
                     .setTrending(listOf(trendingPodcasts.await()))
+                    .setUserLibraryNew(listOf(newEpisodes.await()))
 
                 val isDataSubmitted = BranchDynamicData.getOrInit(applicationContext).submit(catalogSubmission).isSuccess
 
                 val results = listOf(
                     SubmissionResult("Subscribed podcasts", subscribedPodcasts.await().size),
                     SubmissionResult("Trending podcasts", trendingPodcasts.await().size),
+                    SubmissionResult("New episodes", newEpisodes.await().size),
                 )
 
                 logInfo("Nova Launcher sync complete. ${if (isDataSubmitted) "Success" else "Failure"}: $results")

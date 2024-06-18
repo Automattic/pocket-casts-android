@@ -178,7 +178,7 @@ class EpisodeDaoTest {
                 season = 0,
                 number = 11,
                 publishedDate = publishedDate1,
-                lastPlaybackInteraction = 20122,
+                lastPlaybackInteraction = 20,
             ),
             PodcastEpisode(
                 uuid = "id-2",
@@ -207,7 +207,7 @@ class EpisodeDaoTest {
         podcastDao.insert(Podcast(uuid = "p-id-1", isSubscribed = true))
         podcastDao.insert(Podcast(uuid = "p-id-2", isSubscribed = true))
 
-        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes()
+        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherNewEpisode(
@@ -218,7 +218,7 @@ class EpisodeDaoTest {
                 currentPosition = 50,
                 seasonNumber = 0,
                 episodeNumber = 11,
-                releaseTimestamp = publishedDate1.time / 1000,
+                releaseTimestamp = publishedDate1.time,
                 lastUsedTimestamp = 20,
             ),
             NovaLauncherNewEpisode(
@@ -229,7 +229,7 @@ class EpisodeDaoTest {
                 currentPosition = 2021,
                 seasonNumber = 7,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate2.time / 1000,
+                releaseTimestamp = publishedDate2.time,
                 lastUsedTimestamp = null,
             ),
             NovaLauncherNewEpisode(
@@ -240,7 +240,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = 399,
-                releaseTimestamp = publishedDate3.time / 1000,
+                releaseTimestamp = publishedDate3.time,
                 lastUsedTimestamp = 0,
             ),
         )
@@ -248,7 +248,7 @@ class EpisodeDaoTest {
     }
 
     @Test
-    fun ignoreNewReleasesForNovaLauncherThatAreArchived() = runTest {
+    fun getNewReleasesForNovaLauncherSortedByReleaseDate() = runTest {
         val now = Instant.now()
         val publishedDate1 = Date.from(now.minus(10, ChronoUnit.MINUTES))
         val publishedDate2 = Date.from(now.minus(20, ChronoUnit.MINUTES))
@@ -270,7 +270,7 @@ class EpisodeDaoTest {
         episodeDao.insertAll(episodes)
         podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
 
-        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes()
+        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherNewEpisode(
@@ -281,7 +281,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate3.time / 1000,
+                releaseTimestamp = publishedDate3.time,
                 lastUsedTimestamp = null,
             ),
             NovaLauncherNewEpisode(
@@ -292,7 +292,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate1.time / 1000,
+                releaseTimestamp = publishedDate1.time,
                 lastUsedTimestamp = null,
             ),
             NovaLauncherNewEpisode(
@@ -303,7 +303,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate2.time / 1000,
+                releaseTimestamp = publishedDate2.time,
                 lastUsedTimestamp = null,
             ),
         )
@@ -311,7 +311,7 @@ class EpisodeDaoTest {
     }
 
     @Test
-    fun limitNovaLauncherNewReleasesTo500Episodes() = runTest {
+    fun limitNovaLauncherNewReleases() = runTest {
         val episodes = List(550) {
             PodcastEpisode(
                 uuid = "id-$it",
@@ -321,13 +321,13 @@ class EpisodeDaoTest {
         episodeDao.insertAll(episodes)
         podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
 
-        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes()
+        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes(limit = 75)
 
-        assertEquals(500, newEpisodes.size)
+        assertEquals(75, newEpisodes.size)
     }
 
     @Test
-    fun getNewReleasesForNovaLauncherSortedByReleaseDate() = runTest {
+    fun ignoreNewReleasesForNovaLauncherThatAreArchived() = runTest {
         val publishedDate = Date()
         val episodes = listOf(
             PodcastEpisode(
@@ -344,7 +344,7 @@ class EpisodeDaoTest {
         episodeDao.insertAll(episodes)
         podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
 
-        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes()
+        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherNewEpisode(
@@ -355,7 +355,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate.time / 1000,
+                releaseTimestamp = publishedDate.time,
                 lastUsedTimestamp = null,
             ),
         )
@@ -385,7 +385,7 @@ class EpisodeDaoTest {
         episodeDao.insertAll(episodes)
         podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
 
-        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes()
+        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherNewEpisode(
@@ -396,7 +396,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate.time / 1000,
+                releaseTimestamp = publishedDate.time,
                 lastUsedTimestamp = null,
             ),
         )
@@ -420,7 +420,7 @@ class EpisodeDaoTest {
         episodeDao.insertAll(episodes)
         podcastDao.insert(Podcast(uuid = "", isSubscribed = true))
 
-        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes()
+        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherNewEpisode(
@@ -431,7 +431,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate2.time / 1000,
+                releaseTimestamp = publishedDate2.time,
                 lastUsedTimestamp = null,
             ),
         )
@@ -457,7 +457,7 @@ class EpisodeDaoTest {
         podcastDao.insert(Podcast(uuid = "p-id-1", isSubscribed = true))
         podcastDao.insert(Podcast(uuid = "p-id-2", isSubscribed = false))
 
-        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes()
+        val newEpisodes = episodeDao.getNovaLauncherNewEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherNewEpisode(
@@ -468,7 +468,7 @@ class EpisodeDaoTest {
                 currentPosition = 0,
                 seasonNumber = null,
                 episodeNumber = null,
-                releaseTimestamp = publishedDate.time / 1000,
+                releaseTimestamp = publishedDate.time,
                 lastUsedTimestamp = null,
             ),
         )
