@@ -488,7 +488,7 @@ class EpisodeDaoTest {
                 number = 11,
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
                 publishedDate = Date(0),
-                lastPlaybackInteraction = 74211,
+                lastPlaybackInteraction = 74,
             ),
             PodcastEpisode(
                 uuid = "id-2",
@@ -499,7 +499,7 @@ class EpisodeDaoTest {
                 season = 7,
                 number = null,
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
-                publishedDate = Date(2000),
+                publishedDate = Date(2),
                 lastPlaybackInteraction = 0,
             ),
             PodcastEpisode(
@@ -511,13 +511,13 @@ class EpisodeDaoTest {
                 season = null,
                 number = 399,
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
-                publishedDate = Date(3412),
+                publishedDate = Date(3),
                 lastPlaybackInteraction = null,
             ),
         )
         episodeDao.insertAll(episodes)
 
-        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherInProgressEpisode(
@@ -563,25 +563,25 @@ class EpisodeDaoTest {
             PodcastEpisode(
                 uuid = "id-1",
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
-                publishedDate = Date(2000),
-                lastPlaybackInteraction = 1000,
+                publishedDate = Date(2),
+                lastPlaybackInteraction = 1,
             ),
             PodcastEpisode(
                 uuid = "id-2",
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
-                publishedDate = Date(3000),
+                publishedDate = Date(3),
                 lastPlaybackInteraction = null,
             ),
             PodcastEpisode(
                 uuid = "id-3",
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
-                publishedDate = Date(1000),
-                lastPlaybackInteraction = 3000,
+                publishedDate = Date(1),
+                lastPlaybackInteraction = 3,
             ),
         )
         episodeDao.insertAll(episodes)
 
-        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherInProgressEpisode(
@@ -622,7 +622,7 @@ class EpisodeDaoTest {
     }
 
     @Test
-    fun limitNovaLauncherInProgressEpisodesTo500Episodes() = runTest {
+    fun limitNovaLauncherInProgressEpisodes() = runTest {
         val episodes = List(550) {
             PodcastEpisode(
                 uuid = "id-$it",
@@ -632,9 +632,9 @@ class EpisodeDaoTest {
         }
         episodeDao.insertAll(episodes)
 
-        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes(limit = 20)
 
-        assertEquals(500, inProgressEpisodes.size)
+        assertEquals(20, inProgressEpisodes.size)
     }
 
     @Test
@@ -655,7 +655,7 @@ class EpisodeDaoTest {
         )
         episodeDao.insertAll(episodes)
 
-        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherInProgressEpisode(
@@ -694,7 +694,7 @@ class EpisodeDaoTest {
         )
         episodeDao.insertAll(episodes)
 
-        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes()
+        val inProgressEpisodes = episodeDao.getNovaLauncherInProgressEpisodes(limit = 100)
 
         val expected = listOf(
             NovaLauncherInProgressEpisode(

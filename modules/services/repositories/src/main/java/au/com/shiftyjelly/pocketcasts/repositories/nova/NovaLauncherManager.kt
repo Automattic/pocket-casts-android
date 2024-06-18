@@ -11,5 +11,5 @@ interface NovaLauncherManager {
     suspend fun getRecentlyPlayedPodcasts(): List<NovaLauncherRecentlyPlayedPodcast>
     suspend fun getTrendingPodcasts(limit: Int): List<NovaLauncherTrendingPodcast>
     suspend fun getNewEpisodes(limit: Int): List<NovaLauncherNewEpisode>
-    suspend fun getInProgressEpisodes(): List<NovaLauncherInProgressEpisode>
+    suspend fun getInProgressEpisodes(limit: Int): List<NovaLauncherInProgressEpisode>
 }
