@@ -105,42 +105,38 @@ internal class CatalogFactory(
             },
         )
 
-    private val NovaLauncherSubscribedPodcast.coverUrl get() = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$id.webp"
+    private val NovaLauncherSubscribedPodcast.coverUrl get() = podcastCover(id)
 
-    private val NovaLauncherSubscribedPodcast.intent get() = context.launcherIntent
+    private val NovaLauncherSubscribedPodcast.intent get() = openPodcastIntent(id, SourceView.NOVA_LAUNCHER_SUBSCRIBED_PODCASTS)
+
+    private val NovaLauncherRecentlyPlayedPodcast.coverUrl get() = podcastCover(id)
+
+    private val NovaLauncherRecentlyPlayedPodcast.intent get() = openPodcastIntent(id, SourceView.NOVA_LAUNCHER_RECENTLY_PLAYED)
+
+    private val NovaLauncherTrendingPodcast.coverUrl get() = podcastCover(id)
+
+    private val NovaLauncherTrendingPodcast.intent get() = openPodcastIntent(id, SourceView.NOVA_LAUNCHER_TRENDING_PODCASTS)
+
+    private val NovaLauncherNewEpisode.coverUrl get() = podcastCover(podcastId)
+
+    private val NovaLauncherNewEpisode.intent get() = openEpisodeIntent(episodeId = id, podcastId = podcastId, EpisodeViewSource.NOVA_LAUNCHER_NEW_RELEASES)
+
+    private val NovaLauncherInProgressEpisode.intent get() = openEpisodeIntent(episodeId = id, podcastId = podcastId, EpisodeViewSource.NOVA_LAUNCHER_IN_PROGRESS)
+
+    private val NovaLauncherInProgressEpisode.coverUrl get() = podcastCover(podcastId)
+
+    private fun podcastCover(podcastId: String) = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$podcastId.webp"
+
+    private fun openPodcastIntent(podcastId: String, sourceView: SourceView) = context.launcherIntent
         .setAction(Settings.INTENT_OPEN_APP_PODCAST_UUID)
-        .putExtra(Settings.PODCAST_UUID, id)
-        .putExtra(Settings.SOURCE_VIEW, SourceView.NOVA_LAUNCHER_SUBSCRIBED_PODCASTS.analyticsValue)
-
-    private val NovaLauncherRecentlyPlayedPodcast.coverUrl get() = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$id.webp"
-
-    private val NovaLauncherRecentlyPlayedPodcast.intent get() = context.launcherIntent
-        .setAction(Settings.INTENT_OPEN_APP_PODCAST_UUID)
-        .putExtra(Settings.PODCAST_UUID, id)
-        .putExtra(Settings.SOURCE_VIEW, SourceView.NOVA_LAUNCHER_RECENTLY_PLAYED.analyticsValue)
-
-    private val NovaLauncherTrendingPodcast.coverUrl get() = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$id.webp"
-
-    private val NovaLauncherTrendingPodcast.intent get() = context.launcherIntent
-        .setAction(Settings.INTENT_OPEN_APP_PODCAST_UUID)
-        .putExtra(Settings.PODCAST_UUID, id)
-        .putExtra(Settings.SOURCE_VIEW, SourceView.NOVA_LAUNCHER_TRENDING_PODCASTS.analyticsValue)
-
-    private val NovaLauncherNewEpisode.coverUrl get() = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$podcastId.webp"
-
-    private val NovaLauncherNewEpisode.intent get() = context.launcherIntent
-        .setAction(Settings.INTENT_OPEN_APP_EPISODE_UUID)
-        .putExtra(Settings.EPISODE_UUID, id)
         .putExtra(Settings.PODCAST_UUID, podcastId)
-        .putExtra(Settings.SOURCE_VIEW, EpisodeViewSource.NOVA_LAUNCHER_NEW_RELEASES.value)
+        .putExtra(Settings.SOURCE_VIEW, sourceView.analyticsValue)
 
-    private val NovaLauncherInProgressEpisode.intent get() = context.launcherIntent
+    private fun openEpisodeIntent(episodeId: String, podcastId: String, source: EpisodeViewSource) = context.launcherIntent
         .setAction(Settings.INTENT_OPEN_APP_EPISODE_UUID)
-        .putExtra(Settings.EPISODE_UUID, id)
+        .putExtra(Settings.EPISODE_UUID, episodeId)
         .putExtra(Settings.PODCAST_UUID, podcastId)
-        .putExtra(Settings.SOURCE_VIEW, EpisodeViewSource.NOVA_LAUNCHER_IN_PROGRESS.value)
-
-    private val NovaLauncherInProgressEpisode.coverUrl get() = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$podcastId.webp"
+        .putExtra(Settings.SOURCE_VIEW, source.value)
 
     private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
         "Missing launcher intent for $packageName"
