@@ -207,32 +207,38 @@ abstract class UpNextDao {
           up_next_episodes AS up_next 
           LEFT JOIN (
             SELECT
+              -- common properties
               TRUE AS is_podcast_episode, 
               episode.uuid AS id, 
               episode.title AS title, 
               episode.duration AS duration, 
               episode.played_up_to AS current_position, 
               episode.published_date AS release_timestamp, 
+              -- podcast episode properties
               episode.podcast_id AS podcast_id, 
               episode.season AS season_number, 
               episode.number AS episode_number, 
-              episode.last_playback_interaction_date AS last_used_timestamp, 
+              episode.last_playback_interaction_date AS last_used_timestamp,
+              -- user episode properties
               NULL AS artwork_url, 
               NULL AS tint_color_index
             FROM 
               podcast_episodes AS episode 
             UNION ALL 
             SELECT
+              -- common properties
               FALSE AS is_podcast_episode, 
               episode.uuid AS id, 
               episode.title AS title, 
               episode.duration AS duration, 
               episode.played_up_to AS current_position, 
               episode.published_date AS release_timestamp,
+              -- podcast episode properties
               NULL AS podcast_id, 
               NULL AS season_number, 
               NULL AS episode_number, 
               NULL AS last_used_timestamp,
+              -- user episode properties
               episode.artwork_url AS artwork_url, 
               episode.tint_color_index AS tint_color_index
             FROM 
