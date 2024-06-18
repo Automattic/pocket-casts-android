@@ -461,21 +461,24 @@ abstract class PodcastDao {
         """
         SELECT 
           podcasts.uuid AS id, 
-          podcasts.title AS title, 
-          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
-          (SELECT MIN(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
-          (SELECT MAX(podcast_episodes.published_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
-          (SELECT MAX(podcast_episodes.last_playback_interaction_date) / 1000 FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
+          podcasts.title AS title,
+          podcasts.podcast_category AS podcast_category,
+          (SELECT MIN(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
+          (SELECT MAX(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
+          (SELECT MAX(podcast_episodes.last_playback_interaction_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
         FROM 
           podcasts
         WHERE
         -- Select only episodes that were used at most 2 months ago
-          last_used_timestamp * 1000 >= (:currentTime - 5184000000)
+          last_used_timestamp >= (:currentTime - 5184000000)
         ORDER BY
           last_used_timestamp DESC
         LIMIT
-          200
+          :limit
         """,
     )
-    abstract suspend fun getNovaLauncherRecentlyPlayedPodcasts(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherRecentlyPlayedPodcast>
+    abstract suspend fun getNovaLauncherRecentlyPlayedPodcasts(
+        limit: Int,
+        currentTime: Long = System.currentTimeMillis(),
+    ): List<NovaLauncherRecentlyPlayedPodcast>
 }
