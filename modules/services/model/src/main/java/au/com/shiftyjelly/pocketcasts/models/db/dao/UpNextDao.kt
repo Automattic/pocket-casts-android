@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.map
 
 @Dao
 abstract class UpNextDao {
@@ -127,20 +126,6 @@ abstract class UpNextDao {
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT 1")
     abstract fun findCurrentUpNextEpisode(): UpNextEpisode?
 
-    @Query("SELECT episodeUuid FROM up_next_episodes ORDER BY position ASC LIMIT :limit")
-    protected abstract fun findUpNextEpisodeIds(limit: Int): List<String>
-
-    @Query("SELECT * FROM podcast_episodes WHERE uuid = :id")
-    protected abstract suspend fun findPodcastEpisode(id: String): PodcastEpisode?
-
-    @Query("SELECT * FROM user_episodes WHERE uuid = :id")
-    protected abstract suspend fun findUserEpisode(id: String): UserEpisode?
-
-    @Transaction
-    open suspend fun findUpNextEpisodes(limit: Int): List<BaseEpisode> {
-        return findUpNextEpisodeIds(limit).mapNotNull { findPodcastEpisode(it) ?: findUserEpisode(it) }
-    }
-
     @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
     abstract fun findEpisodes(): List<PodcastEpisode>
 
@@ -193,4 +178,22 @@ abstract class UpNextDao {
         val newUuids = episodes.map(BaseEpisode::uuid)
         databaseUuids.minus(newUuids).forEach(this::deleteByUuid)
     }
+
+    @Transaction
+    open suspend fun getUpNextBaseEpisodes(limit: Int): List<BaseEpisode> {
+        val upNextEpisodes = getUpNextEpisodes(limit)
+        val idToPosition = upNextEpisodes.associate { it.episodeUuid to it.position }
+        val podcastEpisodes = findPodcastEpisodes(idToPosition.keys)
+        val userEpisodes = if (podcastEpisodes.size != upNextEpisodes.size) findUserEpisodes(idToPosition.keys) else emptyList()
+        return (podcastEpisodes + userEpisodes).sortedBy { idToPosition[it.uuid] }
+    }
+
+    @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT :limit")
+    protected abstract suspend fun getUpNextEpisodes(limit: Int): List<UpNextEpisode>
+
+    @Query("SELECT * FROM podcast_episodes WHERE uuid IN (:ids)")
+    protected abstract suspend fun findPodcastEpisodes(ids: Collection<String>): List<PodcastEpisode>
+
+    @Query("SELECT * FROM user_episodes WHERE uuid IN (:ids)")
+    protected abstract suspend fun findUserEpisodes(ids: Collection<String>): List<UserEpisode>
 }
