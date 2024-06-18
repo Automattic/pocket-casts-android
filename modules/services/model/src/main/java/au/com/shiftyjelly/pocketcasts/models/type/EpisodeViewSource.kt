@@ -13,6 +13,7 @@ enum class EpisodeViewSource(val value: String) {
     NOTIFICATION_BOOKMARK("notification_bookmark"),
     NOVA_LAUNCHER_NEW_RELEASES("nova_launcher_new_releases"),
     NOVA_LAUNCHER_IN_PROGRESS("nova_launcher_in_progress"),
+    NOVA_LAUNCHER_QUEUE("nova_launcher_queue"),
     SEARCH("search"),
     SEARCH_HISTORY("search_history"),
     NOW_PLAYING("now_playing"),

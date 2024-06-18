@@ -1960,4 +1960,5 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="nova_launcher_new_releases">New Releases</string>
 <string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
     <string name="nova_launcher_continue_listening">Continue listening</string>
+    <string name="nova_launcher_up_next" translatable="false">@string/up_next</string>
 </resources>
