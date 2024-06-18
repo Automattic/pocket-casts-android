@@ -1431,7 +1431,7 @@ class MainActivity :
                     timestamp = timestamp,
                 )
             } else {
-                CloudFileBottomSheetFragment.newInstance(episode.uuid, forceDark = true)
+                CloudFileBottomSheetFragment.newInstance(episode.uuid, forceDark = true, source)
             }
 
             fragment.showAllowingStateLoss(supportFragmentManager, "episode_card")

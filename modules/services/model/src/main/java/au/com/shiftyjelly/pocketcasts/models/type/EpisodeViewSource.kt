@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 enum class EpisodeViewSource(val value: String) {
     DISCOVER("discover"),
+    FILES("files"),
     FILTERS("filters"),
     PODCAST_SCREEN("podcast_screen"),
     STARRED("starred"),
