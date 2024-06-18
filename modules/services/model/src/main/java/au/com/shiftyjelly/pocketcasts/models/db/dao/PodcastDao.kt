@@ -451,9 +451,11 @@ abstract class PodcastDao {
           LEFT JOIN podcasts AS podcast ON podcast.uuid = trending_podcast.uuid 
         WHERE 
           IFNULL(podcast.subscribed, 0) IS 0
+        LIMIT
+          :limit
         """,
     )
-    abstract suspend fun getNovaLauncherTrendingPodcasts(): List<NovaLauncherTrendingPodcast>
+    abstract suspend fun getNovaLauncherTrendingPodcasts(limit: Int): List<NovaLauncherTrendingPodcast>
 
     @Query(
         """
