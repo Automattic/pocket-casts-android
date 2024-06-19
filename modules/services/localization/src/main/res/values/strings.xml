@@ -570,6 +570,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="podcast_share_current_position">Current position</string>
     <string name="podcast_share_episode">Share episode</string>
     <string name="podcast_share_open_file_in">Open file in&#x2026;</string>
+    <string name="podcast_share_clip">Clip</string>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Subscribed</string>
