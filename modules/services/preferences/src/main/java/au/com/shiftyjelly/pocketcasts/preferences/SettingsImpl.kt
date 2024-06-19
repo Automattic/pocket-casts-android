@@ -194,6 +194,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val cacheEntirePlayingEpisode = UserSetting.BoolPref(
+        sharedPrefKey = "cacheEntirePlayingEpisode",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun setSelectPodcastsSortType(sortType: PodcastsSortType) {
         sharedPreferences.edit().apply {
             putString(Settings.PREFERENCE_SELECT_PODCAST_LIBRARY_SORT, sortType.clientId.toString())

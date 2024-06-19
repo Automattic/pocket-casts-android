@@ -288,6 +288,7 @@ interface Settings {
     val backgroundRefreshPodcasts: UserSetting<Boolean>
     val podcastsSortType: UserSetting<PodcastsSortType>
     val prioritizeSeekAccuracy: UserSetting<Boolean>
+    val cacheEntirePlayingEpisode: UserSetting<Boolean>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
