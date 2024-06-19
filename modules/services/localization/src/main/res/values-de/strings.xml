@@ -15,7 +15,6 @@ Language: de
     <string name="settings_general_sleep_timer">Schlummerfunktion</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Durch die Priorisierung der Suchgenauigkeit kann die Reaktionsfähigkeit der Suche erheblich verlangsamt werden, was bei Pocket Casts zu einem höheren Datenverbrauch führen kann.</string>
     <string name="settings_advanced_prioritize_seek_accuracy">Suchgenauigkeit priorisieren</string>
-    <string name="settings_storage_section_heading_seek_accuracy">Suchgenauigkeit</string>
     <string name="settings_import_opml_succeeded_message">OPML-Import erfolgreich</string>
     <string name="settings_import_opml_import_failed_message">Aus der angegebenen OPML-Datei konnten keine Podcasts importiert werden.</string>
     <string name="nova_launcher_recently_played">Zuletzt abgespielt</string>

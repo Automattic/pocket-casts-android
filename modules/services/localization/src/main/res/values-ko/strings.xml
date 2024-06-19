@@ -15,7 +15,6 @@ Language: ko_KR
     <string name="settings_general_sleep_timer">절전 타이머</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">검색 정확도를 우선시하면 검색 응답 속도가 크게 느려지고 Pocket Casts에서 더 많은 데이터를 사용합니다.</string>
     <string name="settings_advanced_prioritize_seek_accuracy">검색 정확도 우선</string>
-    <string name="settings_storage_section_heading_seek_accuracy">검색 정확도</string>
     <string name="settings_import_opml_succeeded_message">OPML 가져오기에 성공했습니다.</string>
     <string name="settings_import_opml_import_failed_message">지정하신 OPML 파일에서 팟캐스트를 가져올 수 없습니다.</string>
     <string name="nova_launcher_recently_played">최근 재생됨</string>

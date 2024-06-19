@@ -13,7 +13,6 @@ Language: nl
     <string name="settings_general_sleep_timer">Slaaptimer</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">De nauwkeurigheid van zoekopdrachten prioriteren kan de responsiviteit vertragen en ervoor zorgen dat Pocket Casts meer gegevens verbruikt.</string>
     <string name="settings_advanced_prioritize_seek_accuracy">Zoeknauwkeurigheid prioriteren</string>
-    <string name="settings_storage_section_heading_seek_accuracy">Zoeknauwkeurigheid</string>
     <string name="settings_import_opml_succeeded_message">Importeren van OPML is gelukt.</string>
     <string name="settings_import_opml_import_failed_message">Kan geen podcasts importeren via het OPML-bestand dat je hebt opgegeven.</string>
     <string name="nova_launcher_recently_played">Recent afgespeeld</string>

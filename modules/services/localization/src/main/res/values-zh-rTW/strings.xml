@@ -15,7 +15,6 @@ Language: zh_TW
     <string name="settings_general_sleep_timer">睡眠計時器</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">若將搜尋精確度設為優先，會大幅降低搜尋靈敏度，導致 Pocket Casts 消耗更多資料。</string>
     <string name="settings_advanced_prioritize_seek_accuracy">將搜尋精確度設為優先</string>
-    <string name="settings_storage_section_heading_seek_accuracy">搜尋精確度</string>
     <string name="settings_import_opml_succeeded_message">已成功匯入 OPML。</string>
     <string name="settings_import_opml_import_failed_message">無法從你指定的 OPML 檔案匯入 Podcast。</string>
     <string name="nova_launcher_recently_played">最近播放</string>
