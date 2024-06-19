@@ -14,8 +14,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 fun EpisodeImage(
     episode: BaseEpisode,
     useEpisodeArtwork: Boolean,
-    placeholderType: PlaceholderType = PlaceholderType.Large,
     modifier: Modifier = Modifier,
+    placeholderType: PlaceholderType = PlaceholderType.Large,
 ) {
     val context = LocalContext.current
 
