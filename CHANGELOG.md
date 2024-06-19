@@ -1,6 +1,8 @@
 7.67
 -----
 *   Bug Fixes
+    *   Fix sharing episodes when using multi-selection
+        ([#2376](https://github.com/Automattic/pocket-casts-android/pull/2376))
     *   Fix deselected chapters not synced correctly between different platforms
         ([#2357](https://github.com/Automattic/pocket-casts-android/pull/2357))
     *   Adds download episode action button to shelf list in Now Playing
