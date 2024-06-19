@@ -66,7 +66,7 @@ data class PocketCastsImageRequestFactory(
     ) = ImageRequest.Builder(context)
         .data(type.data(context))
         .placeholder(placeholderId)
-        .error(placeholderId)
+        .error(if (isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork)
         .transformations(
             buildList {
                 add(RoundedCornersTransformation(actualCornerRadius.toFloat()))
