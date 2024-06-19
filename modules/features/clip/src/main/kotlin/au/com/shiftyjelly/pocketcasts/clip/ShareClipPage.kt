@@ -86,11 +86,16 @@ internal fun ShareClipPage(
             Spacer(
                 modifier = Modifier.height(16.dp),
             )
+            val buttonColor = if (backgroundColor.luminance() < 0.25) {
+                ColorUtils.changeHsvValue(baseColor, 1.25f)
+            } else {
+                baseColor
+            }
             RowButton(
                 text = stringResource(LR.string.podcast_share_clip),
                 onClick = { },
-                colors = ButtonDefaults.buttonColors(backgroundColor = baseColor),
-                textColor = if (baseColor.luminance() < 0.5f) Color.White else Color.Black,
+                colors = ButtonDefaults.buttonColors(backgroundColor = buttonColor),
+                textColor = if (buttonColor.luminance() < 0.5f) Color.White else Color.Black,
                 elevation = null,
                 includePadding = false,
                 modifier = Modifier
