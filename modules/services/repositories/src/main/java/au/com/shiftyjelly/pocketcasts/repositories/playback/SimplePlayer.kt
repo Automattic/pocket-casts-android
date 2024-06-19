@@ -250,9 +250,7 @@ class SimplePlayer(
 
         addVideoListener(player)
 
-        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Pocket Casts")
-            .setAllowCrossProtocolRedirects(true)
+        val httpDataSourceFactory = exoPlayerHelper.getDataSourceFactory()
         val dataSourceFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
         val extractorsFactory = DefaultExtractorsFactory()
             .setConstantBitrateSeekingEnabled(true)
@@ -287,9 +285,10 @@ class SimplePlayer(
 
         val sourceFactory = exoPlayerHelper.getSimpleCache()?.let { cache ->
             if (location is EpisodeLocation.Stream) {
-                CacheDataSource.Factory()
-                    .setCache(cache)
-                    .setUpstreamDataSourceFactory(httpDataSourceFactory)
+                exoPlayerHelper.getCacheDataSourceFactory(
+                    httpDataSourceFactory,
+                    cache,
+                )
             } else {
                 dataSourceFactory
             }
