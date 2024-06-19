@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -101,10 +103,14 @@ class ShareFragment : BaseDialogFragment() {
             }
             close()
         }
+        binding.buttonShareClip.setOnClickListener {
+            close()
+        }
 
         binding.sharePodcast.isVisible = podcast != null
         binding.shareEpisode.isVisible = episode != null
         binding.shareCurrentPosition.isVisible = episode != null
+        binding.shareClip.isVisible = FeatureFlag.isEnabled(Feature.SHARE_CLIPS) && episode is PodcastEpisode
         binding.openFileIn.isVisible = episode != null && episode.isDownloaded
 
         return binding.root
