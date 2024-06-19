@@ -7,11 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
@@ -19,15 +16,12 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -35,42 +29,29 @@ import kotlinx.parcelize.TypeParceler
 class ShareClipFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
-    @Inject
-    lateinit var episodeManager: EpisodeManager
-
-    @Inject
-    lateinit var podcastManager: PodcastManager
+    private val viewModel by viewModels<ShareClipViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<ShareClipViewModel.Factory> { factory ->
+                factory.create(args.episodeUuid)
+            }
+        },
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        return ComposeView(requireActivity()).apply {
-            setContent {
-                var podcast by remember { mutableStateOf<Podcast?>(null) }
-                var episode by remember { mutableStateOf<PodcastEpisode?>(null) }
+    ) = ComposeView(requireActivity()).apply {
+        setContent {
+            val state by viewModel.uiState.collectAsState()
 
-                LaunchedEffect(args.episodeUuid) {
-                    episode = episodeManager.findEpisodeByUuid(args.episodeUuid) as? PodcastEpisode?
-                }
-
-                val podcastId = episode?.podcastUuid
-
-                if (podcastId != null) {
-                    LaunchedEffect(podcastId) {
-                        podcast = podcastManager.findPodcastByUuidSuspend(podcastId)
-                    }
-                }
-
-                ShareClipPage(
-                    podcast = podcast,
-                    episode = episode,
-                    useEpisodeArtwork = true,
-                    baseColor = args.baseColor,
-                    onClose = { dismiss() },
-                )
-            }
+            ShareClipPage(
+                episode = state.episode,
+                podcastTitle = state.podcastTitle,
+                useEpisodeArtwork = state.useEpisodeArtwork,
+                baseColor = args.baseColor,
+                onClose = { dismiss() },
+            )
         }
     }
 

@@ -38,8 +38,8 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 internal fun ClipCard(
     episode: PodcastEpisode,
-    useEpisodeArtwork: Boolean,
     podcastTitle: String,
+    useEpisodeArtwork: Boolean,
     baseColor: Color,
     modifier: Modifier = Modifier,
 ) {
@@ -146,7 +146,7 @@ private fun ClipCardPreview(
         publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
         title = "Nobis sapiente fugit vitae. Iusto magnam nam nam et odio. Debitis cupiditate officiis et. Sit quia in voluptate sit voluptatem magni.",
     ),
-    useEpisodeArtwork = true,
     podcastTitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    useEpisodeArtwork = true,
     baseColor = baseColor,
 )
