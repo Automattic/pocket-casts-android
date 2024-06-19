@@ -6,29 +6,37 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 import timber.log.Timber
 
+@Singleton
 @OptIn(UnstableApi::class)
-object ExoPlayerHelper {
-    private const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
+class ExoPlayerHelper @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val settings: Settings,
+    private val crashLogging: CrashLogging,
+) {
+    companion object {
+        private const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
+    }
+
     private var simpleCache: SimpleCache? = null
 
     @OptIn(UnstableApi::class)
     @Synchronized
-    fun getSimpleCache(
-        context: Context,
-        cacheSizeInMB: Long,
-        crashLogging: CrashLogging,
-    ): SimpleCache? {
+    fun getSimpleCache(): SimpleCache? {
         if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) && simpleCache == null) {
             val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
-            val cacheSizeInBytes = cacheSizeInMB * 1024 * 1024L
+            val cacheSizeInBytes = settings.getExoPlayerCacheSizeInMB() * 1024 * 1024L
             simpleCache = try {
                 if (BuildConfig.DEBUG) Timber.d("ExoPlayer cache initialized")
                 SimpleCache(
