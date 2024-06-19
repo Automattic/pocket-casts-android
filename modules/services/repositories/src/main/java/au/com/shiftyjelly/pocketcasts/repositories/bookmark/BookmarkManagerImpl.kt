@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
@@ -63,9 +64,15 @@ class BookmarkManagerImpl @Inject constructor(
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)
+        val podcastUuid = if (episode is PodcastEpisode) episode.podcastOrSubstituteUuid else "user_file"
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARK_CREATED,
-            mapOf("source" to creationSource.analyticsValue),
+            mapOf(
+                "source" to creationSource.analyticsValue,
+                "time" to addedAtMs,
+                "episode_uuid" to episode.uuid,
+                "podcast_uuid" to podcastUuid,
+            ),
         )
         return bookmark
     }
