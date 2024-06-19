@@ -51,7 +51,7 @@ internal fun ShareClipPage(
                 .background(backgroundColor),
         ) {
             Spacer(
-                modifier = Modifier.weight(0.3f),
+                modifier = Modifier.weight(0.5f),
             )
 
             TextH30(
