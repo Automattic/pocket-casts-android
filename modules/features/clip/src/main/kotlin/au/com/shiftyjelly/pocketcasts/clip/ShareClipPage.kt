@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,71 +42,77 @@ internal fun ShareClipPage(
     onClose: () -> Unit,
 ) {
     val backgroundColor = ColorUtils.changeHsvValue(baseColor, factor = 0.4f)
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor),
-    ) {
+    Box {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundColor),
+        ) {
+            Spacer(
+                modifier = Modifier.weight(0.3f),
+            )
+
+            TextH30(
+                text = stringResource(LR.string.podcast_create_clip),
+                color = if (backgroundColor.luminance() < 0.5f) Color.White else Color.Black,
+            )
+
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+
+            if (episode != null) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(horizontal = 50.dp),
+                ) {
+                    ClipCard(
+                        episode = episode,
+                        podcastTitle = podcastTitle,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        baseColor = baseColor,
+                    )
+                }
+                Spacer(
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            ClipSelector(
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            RowButton(
+                text = stringResource(LR.string.podcast_share_clip),
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(backgroundColor = baseColor),
+                textColor = if (baseColor.luminance() < 0.5f) Color.White else Color.Black,
+                elevation = null,
+                includePadding = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
+            )
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp),
+                .wrapContentHeight(),
         ) {
             Image(
                 painter = painterResource(IR.drawable.ic_close_sheet),
                 contentDescription = stringResource(LR.string.close),
                 modifier = Modifier
-                    .padding(end = 16.dp)
+                    .padding(top = 16.dp, end = 16.dp)
                     .clickable(onClick = onClose),
             )
         }
-        TextH30(
-            text = stringResource(LR.string.podcast_create_clip),
-            color = if (backgroundColor.luminance() < 0.5f) Color.White else Color.Black,
-        )
-
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
-
-        if (episode != null) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(horizontal = 50.dp),
-            ) {
-                ClipCard(
-                    episode = episode,
-                    podcastTitle = podcastTitle,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    baseColor = baseColor,
-                )
-            }
-            Spacer(
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        ClipSelector(
-            modifier = Modifier.padding(horizontal = 16.dp),
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        RowButton(
-            text = stringResource(LR.string.podcast_share_clip),
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(backgroundColor = baseColor),
-            textColor = if (baseColor.luminance() < 0.5f) Color.White else Color.Black,
-            elevation = null,
-            includePadding = false,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
-        )
     }
 }
 
