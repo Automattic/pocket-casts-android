@@ -15,7 +15,7 @@ import java.io.File
 import timber.log.Timber
 
 @OptIn(UnstableApi::class)
-object ExoPlayerCacheUtil {
+object ExoPlayerHelper {
     private const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
     private var simpleCache: SimpleCache? = null
 
