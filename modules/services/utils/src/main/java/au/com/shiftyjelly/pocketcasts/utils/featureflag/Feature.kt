@@ -115,6 +115,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    CACHE_ENTIRE_PLAYING_EPISODE(
+        key = "cache_entire_playing_episode",
+        title = "Cache entire playing episode",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
