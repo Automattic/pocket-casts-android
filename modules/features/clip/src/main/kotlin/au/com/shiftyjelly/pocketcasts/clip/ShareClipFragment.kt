@@ -17,6 +17,10 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +46,9 @@ class ShareClipFragment : BaseDialogFragment() {
     @Inject
     lateinit var clipPlayerFactory: ClipPlayer.Factory
 
+    @Inject
+    lateinit var analyticsTrackerWrapper: AnalyticsTrackerWrapper
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,11 +61,18 @@ class ShareClipFragment : BaseDialogFragment() {
             ShareClipPage(
                 episode = state.episode,
                 isPlaying = state.isPlaying,
-                podcastTitle = state.podcastTitle,
+                podcastTitle = state.podcast?.title.orEmpty(),
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 clipColors = clipColors,
                 onPlayClick = { viewModel.playClip() },
                 onPauseClick = { viewModel.stopClip() },
+                onClip = {
+                    state.podcast?.let { podcast ->
+                        state.clip?.let { clip ->
+                            shareClip(podcast, clip)
+                        }
+                    }
+                },
                 onClose = { dismiss() },
             )
         }
@@ -78,6 +92,19 @@ class ShareClipFragment : BaseDialogFragment() {
             WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = clipColors.backgroundColor.luminance() > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(argbColor)
+    }
+
+    private fun shareClip(podcast: Podcast, clip: Clip) {
+        SharePodcastHelper(
+            podcast,
+            clip.episode,
+            clip.range.start,
+            clip.range.end,
+            requireActivity(),
+            SharePodcastHelper.ShareType.CLIP,
+            SourceView.UNKNOWN,
+            analyticsTrackerWrapper,
+        ).showShareDialogDirect()
     }
 
     @Parcelize

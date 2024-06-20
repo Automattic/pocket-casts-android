@@ -39,6 +39,7 @@ internal fun ShareClipPage(
     podcastTitle: String,
     useEpisodeArtwork: Boolean,
     clipColors: ClipColors,
+    onClip: () -> Unit,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
     onClose: () -> Unit,
@@ -92,7 +93,7 @@ internal fun ShareClipPage(
             )
             RowButton(
                 text = stringResource(LR.string.podcast_share_clip),
-                onClick = { },
+                onClick = onClip,
                 colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
                 textColor = clipColors.buttonTextColor,
                 elevation = null,
@@ -135,6 +136,7 @@ fun ShareClipPagePreview() = ShareClipPage(
     podcastTitle = "Podcast title",
     useEpisodeArtwork = true,
     clipColors = ClipColors(Color(0xFF9BF6FF)),
+    onClip = {},
     onPlayClick = {},
     onPauseClick = {},
     onClose = {},
