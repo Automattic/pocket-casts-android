@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ShareDialog(
@@ -48,6 +49,7 @@ class ShareDialog(
                         podcast,
                         null,
                         null,
+                        null,
                         context,
                         ShareType.PODCAST,
                         sourceView,
@@ -64,6 +66,7 @@ class ShareDialog(
                         podcast,
                         episode,
                         null,
+                        null,
                         context,
                         ShareType.EPISODE,
                         sourceView,
@@ -77,7 +80,8 @@ class ShareDialog(
                     SharePodcastHelper(
                         podcast,
                         episode,
-                        episode.playedUpTo,
+                        episode.playedUpTo.seconds,
+                        null,
                         context,
                         ShareType.CURRENT_TIME,
                         sourceView,
@@ -100,7 +104,8 @@ class ShareDialog(
                         SharePodcastHelper(
                             podcast,
                             episode,
-                            episode.playedUpTo,
+                            episode.playedUpTo.seconds,
+                            null,
                             context,
                             ShareType.EPISODE_FILE,
                             sourceView,

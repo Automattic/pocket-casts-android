@@ -23,6 +23,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.math.round
+import kotlin.time.Duration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,7 +33,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 data class SharePodcastHelper(
     val podcast: Podcast, // Share just a podcast.
     val episode: PodcastEpisode? = null, // Share an episode of a podcast.
-    val upToInSeconds: Double? = null, // Share a position in an episode of a podcast.
+    val start: Duration? = null, // Share start position in an episode of a podcast.
+    val end: Duration? = null, // Share end position in an episode of a podcast.
     val context: Context,
     private val shareType: ShareType,
     private val source: SourceView,
@@ -44,10 +46,7 @@ data class SharePodcastHelper(
         val host = Settings.SERVER_SHORT_URL
         var url = ""
         episode?.let {
-            var timeMarker = ""
-            upToInSeconds?.let {
-                timeMarker = "?t=${round(it).toInt()}"
-            }
+            val timeMarker = listOfNotNull(start, end).takeIf { it.isNotEmpty() }?.joinToString(prefix = "?t=", separator = ",") { it.inWholeSeconds.toString() }
             url = "$host/episode/${it.uuid}$timeMarker"
         } ?: run {
             url = "$host/podcast/${podcast.uuid}"
