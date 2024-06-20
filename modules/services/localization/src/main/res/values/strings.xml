@@ -182,6 +182,10 @@
 
     <string name="episodes_singular">1 episode</string>
     <string name="episodes_plural">%d episodes</string>
+    <plurals name="episode_count">
+        <item quantity="one">%d episode</item>
+        <item quantity="other">%d episodes</item>
+    </plurals>
     <string name="empty_play_state">Pick an episode to begin</string>
 
     <string name="seconds_label">Seconds</string>
