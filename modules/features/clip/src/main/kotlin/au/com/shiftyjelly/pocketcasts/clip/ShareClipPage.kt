@@ -264,82 +264,25 @@ private fun HorizontalClipPage(
 @ShowkaseComposable(name = "ShareClipPageVertical", group = "Clip")
 @Preview(name = "ShareClipPageVertical")
 @Composable
-fun ShareClipPageVerticalPreview() = ShareClipPage(
-    episode = PodcastEpisode(
-        uuid = "episode-id",
-        podcastUuid = "podcast-id",
-        publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
-        title = "Episode title",
-    ),
-    podcast = Podcast(
-        uuid = "podcast-id",
-        title = "Podcast title",
-        episodeFrequency = "monthly",
-    ),
-    episodeCount = 120,
-    isPlaying = false,
-    useEpisodeArtwork = true,
-    clipColors = ClipColors(Color(0xFF931B17)),
-    onClip = {},
-    onPlayClick = {},
-    onPauseClick = {},
-    onClose = {},
-)
+fun ShareClipPageVerticalPreview() = ShareClipPagePreview()
 
 @ShowkaseComposable(name = "ShareClipVerticalSmallPage", group = "Clip")
 @Preview(name = "ShareClipVerticalSmallPage", device = "spec:width=360dp,height=640dp,dpi=320,orientation=portrait")
 @Composable
-fun ShareClipPageVerticalSmallPreview() = ShareClipPage(
-    episode = PodcastEpisode(
-        uuid = "episode-id",
-        podcastUuid = "podcast-id",
-        publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
-        title = "Episode title",
-    ),
-    podcast = Podcast(
-        uuid = "podcast-id",
-        title = "Podcast title",
-        episodeFrequency = "monthly",
-    ),
-    episodeCount = 120,
-    isPlaying = false,
-    useEpisodeArtwork = true,
-    clipColors = ClipColors(Color(0xFF931B17)),
-    onClip = {},
-    onPlayClick = {},
-    onPauseClick = {},
-    onClose = {},
-)
+fun ShareClipPageVerticalSmallPreview() = ShareClipPagePreview()
 
 @ShowkaseComposable(name = "ShareClipHorizontalPage", group = "Clip")
 @Preview(name = "ShareClipHorizontalPage", device = "spec:width=420dp,height=900dp,dpi=420,orientation=landscape")
 @Composable
-fun ShareClipPageHorizontalPreview() = ShareClipPage(
-    episode = PodcastEpisode(
-        uuid = "episode-id",
-        podcastUuid = "podcast-id",
-        publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
-        title = "Episode title",
-    ),
-    podcast = Podcast(
-        uuid = "podcast-id",
-        title = "Podcast title",
-        episodeFrequency = "monthly",
-    ),
-    episodeCount = 120,
-    isPlaying = false,
-    useEpisodeArtwork = true,
-    clipColors = ClipColors(Color(0xFF931B17)),
-    onClip = {},
-    onPlayClick = {},
-    onPauseClick = {},
-    onClose = {},
-)
+fun ShareClipPageHorizontalPreview() = ShareClipPagePreview()
 
 @ShowkaseComposable(name = "ShareClipHorizontalSmallPage", group = "Clip")
 @Preview(name = "ShareClipHorizontalSmallPage", device = "spec:width=360dp,height=640dp,dpi=320,orientation=landscape")
 @Composable
-fun ShareClipPageHorizontalSmallPreview() = ShareClipPage(
+fun ShareClipPageHorizontalSmallPreview() = ShareClipPagePreview()
+
+@Composable
+private fun ShareClipPagePreview() = ShareClipPage(
     episode = PodcastEpisode(
         uuid = "episode-id",
         podcastUuid = "podcast-id",
