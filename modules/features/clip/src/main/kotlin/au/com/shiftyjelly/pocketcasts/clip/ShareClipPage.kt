@@ -82,6 +82,7 @@ internal fun ShareClipPage(
 
             ClipSelector(
                 isPlaying = isPlaying,
+                clipColors = clipColors,
                 onPlayClick = onPlayClick,
                 onPauseClick = onPauseClick,
                 modifier = Modifier.padding(horizontal = 16.dp),
