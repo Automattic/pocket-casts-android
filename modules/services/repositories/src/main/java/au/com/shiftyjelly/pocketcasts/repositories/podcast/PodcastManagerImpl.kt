@@ -190,6 +190,15 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.exists(podcastUuid)
     }
 
+    override fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int> {
+        return flow {
+            val episode = episodeDao.findByUuid(uuid)
+            if (episode != null) {
+                emitAll(podcastDao.episodeCount(episode.podcastUuid))
+            }
+        }
+    }
+
     override fun refreshPodcastsIfRequired(fromLog: String) {
         // if it's been more than 5 minutes since the last refresh, do another one
         val lastUpdateTime = settings.getLastRefreshTime()

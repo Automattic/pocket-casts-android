@@ -29,12 +29,14 @@ class ShareClipViewModel @AssistedInject constructor(
     val uiState = combine(
         episodeManager.observeByUuid(episodeUuid),
         podcastManager.observePodcastByEpisodeUuid(episodeUuid),
+        podcastManager.observeEpisodeCountByEpisodeUuid(episodeUuid),
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         clipPlayer.isPlayingState,
-        transform = { episode, podcast, useEpisodeArtwork, isPlaying ->
+        transform = { episode, podcast, episodeCount, useEpisodeArtwork, isPlaying ->
             UiState(
                 episode = episode,
                 podcast = podcast,
+                episodeCount = episodeCount,
                 useEpisodeArtwork = useEpisodeArtwork,
                 isPlaying = isPlaying,
             )
@@ -56,6 +58,7 @@ class ShareClipViewModel @AssistedInject constructor(
     data class UiState(
         val episode: PodcastEpisode? = null,
         val podcast: Podcast? = null,
+        val episodeCount: Int = 0,
         val clipRange: Clip.Range = Clip.Range(15.seconds, 30.seconds),
         val useEpisodeArtwork: Boolean = false,
         val isPlaying: Boolean = false,

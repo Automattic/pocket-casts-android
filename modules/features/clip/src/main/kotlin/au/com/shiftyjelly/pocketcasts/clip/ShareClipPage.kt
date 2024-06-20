@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun ShareClipPage(
     episode: PodcastEpisode?,
     podcast: Podcast?,
+    episodeCount: Int,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
     clipColors: ClipColors,
@@ -44,82 +45,81 @@ internal fun ShareClipPage(
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
     onClose: () -> Unit,
-) {
-    Box {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(clipColors.backgroundColor),
-        ) {
-            Spacer(
-                modifier = Modifier.weight(0.5f),
-            )
+) = Box {
+    println(episodeCount)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(clipColors.backgroundColor),
+    ) {
+        Spacer(
+            modifier = Modifier.weight(0.5f),
+        )
 
-            TextH30(
-                text = stringResource(LR.string.podcast_create_clip),
-                color = clipColors.backgroundTextColor,
-            )
+        TextH30(
+            text = stringResource(LR.string.podcast_create_clip),
+            color = clipColors.backgroundTextColor,
+        )
 
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
+
+        if (episode != null && podcast != null) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.padding(horizontal = 50.dp),
+            ) {
+                VerticalClipCard(
+                    episode = episode,
+                    podcast = podcast,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    clipColors = clipColors,
+                )
+            }
             Spacer(
                 modifier = Modifier.weight(1f),
             )
-
-            if (episode != null && podcast != null) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(horizontal = 50.dp),
-                ) {
-                    VerticalClipCard(
-                        episode = episode,
-                        podcast = podcast,
-                        useEpisodeArtwork = useEpisodeArtwork,
-                        clipColors = clipColors,
-                    )
-                }
-                Spacer(
-                    modifier = Modifier.weight(1f),
-                )
-            }
-
-            ClipSelector(
-                isPlaying = isPlaying,
-                clipColors = clipColors,
-                onPlayClick = onPlayClick,
-                onPauseClick = onPauseClick,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-            Spacer(
-                modifier = Modifier.height(16.dp),
-            )
-            RowButton(
-                text = stringResource(LR.string.podcast_share_clip),
-                onClick = onClip,
-                colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
-                textColor = clipColors.buttonTextColor,
-                elevation = null,
-                includePadding = false,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp)
-                    .padding(horizontal = 16.dp),
-            )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
+
+        ClipSelector(
+            isPlaying = isPlaying,
+            clipColors = clipColors,
+            onPlayClick = onPlayClick,
+            onPauseClick = onPauseClick,
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        RowButton(
+            text = stringResource(LR.string.podcast_share_clip),
+            onClick = onClip,
+            colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
+            textColor = clipColors.buttonTextColor,
+            elevation = null,
+            includePadding = false,
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
-        ) {
-            Image(
-                painter = painterResource(IR.drawable.ic_close_sheet),
-                contentDescription = stringResource(LR.string.close),
-                modifier = Modifier
-                    .padding(top = 16.dp, end = 16.dp)
-                    .clickable(onClick = onClose),
-            )
-        }
+                .heightIn(min = 56.dp)
+                .padding(horizontal = 16.dp),
+        )
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End,
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+    ) {
+        Image(
+            painter = painterResource(IR.drawable.ic_close_sheet),
+            contentDescription = stringResource(LR.string.close),
+            modifier = Modifier
+                .padding(top = 16.dp, end = 16.dp)
+                .clickable(onClick = onClose),
+        )
     }
 }
 
@@ -138,6 +138,7 @@ fun ShareClipPagePreview() = ShareClipPage(
         title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         episodeFrequency = "monthly",
     ),
+    episodeCount = 120,
     isPlaying = false,
     useEpisodeArtwork = true,
     clipColors = ClipColors(Color(0xFF9BF6FF)),

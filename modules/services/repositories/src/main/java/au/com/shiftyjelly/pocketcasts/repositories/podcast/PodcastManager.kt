@@ -55,6 +55,7 @@ interface PodcastManager {
     fun findPodcastsAutodownload(): List<Podcast>
 
     fun exists(podcastUuid: String): Boolean
+    fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
