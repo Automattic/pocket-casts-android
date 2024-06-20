@@ -81,13 +81,6 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
 
     private fun logError(message: String, throwable: Throwable? = null) = logError(id, name, message, throwable)
 
-    private class SubmissionResult(
-        val label: String,
-        val itemCount: Int,
-    ) {
-        override fun toString() = "$label: $itemCount"
-    }
-
     companion object {
         private const val ONE_OFF_WORK_NAME = "NovaLauncherOneOffSyncWorker"
         private const val PERIODIC_WORK_NAME = "NovaLauncherPeriodicSyncWorker"

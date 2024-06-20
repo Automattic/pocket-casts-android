@@ -34,10 +34,17 @@
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
+            android:id="@+id/shareClip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="separator3,labelShareClip,buttonShareClip"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Group
             android:id="@+id/openFileIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="separator3,labelOpenFileIn,buttonOpenFileIn"
+            app:constraint_referenced_ids="separator4,labelOpenFileIn,buttonOpenFileIn"
             tools:ignore="MissingConstraints" />
 
         <View
@@ -156,6 +163,41 @@
             app:layout_constraintTop_toBottomOf="@+id/labelShareCurrentPosition" />
 
         <TextView
+            android:id="@+id/labelShareClip"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:text="@string/podcast_share_clip"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/separator3" />
+
+        <View
+            android:id="@+id/buttonShareClip"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/podcast_share_clip"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelShareClip"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelShareClip" />
+
+        <View
+            android:id="@+id/separator4"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/player_contrast_05"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labelShareClip" />
+
+        <TextView
             android:id="@+id/labelOpenFileIn"
             style="@style/DarkSubtitle1"
             android:layout_width="wrap_content"
@@ -166,7 +208,7 @@
             android:text="@string/podcast_share_open_file_in"
             android:textColor="?attr/player_contrast_01"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/separator3" />
+            app:layout_constraintTop_toBottomOf="@+id/separator4" />
 
         <View
             android:id="@+id/buttonOpenFileIn"

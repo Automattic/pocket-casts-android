@@ -748,6 +748,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             adapter?.notifyDataSetChanged()
         }
         coordinatorLayout = (activity as FragmentHostListener).snackBarView()
+        context = requireActivity()
         source = SourceView.PODCAST_SCREEN
         listener = object : MultiSelectHelper.Listener<T> {
             override fun multiSelectSelectNone() {

@@ -56,7 +56,7 @@ class PrivacyFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View {
         if (!viewModel.isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.PRIVACY_SETTINGS_SHOWN)
+            analyticsTracker.track(AnalyticsEvent.PRIVACY_SHOWN)
         }
         return ComposeView(requireContext()).apply {
             setContent {
