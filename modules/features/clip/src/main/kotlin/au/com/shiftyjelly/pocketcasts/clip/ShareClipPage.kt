@@ -69,7 +69,7 @@ internal fun ShareClipPage(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.padding(horizontal = 50.dp),
                 ) {
-                    ClipCard(
+                    VerticalClipCard(
                         episode = episode,
                         podcastTitle = podcastTitle,
                         useEpisodeArtwork = useEpisodeArtwork,

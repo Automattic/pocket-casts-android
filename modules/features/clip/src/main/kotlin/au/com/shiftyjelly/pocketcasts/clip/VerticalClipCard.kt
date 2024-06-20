@@ -34,7 +34,7 @@ import java.time.Instant
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
-internal fun ClipCard(
+internal fun VerticalClipCard(
     episode: PodcastEpisode,
     podcastTitle: String,
     useEpisodeArtwork: Boolean,
@@ -123,20 +123,20 @@ internal fun ClipCard(
     }
 }
 
-@ShowkaseComposable(name = "ClipCard", group = "Clip", styleName = "Light")
-@Preview(name = "ClipCardLight")
+@ShowkaseComposable(name = "VerticalClipCard", group = "Clip", styleName = "Light")
+@Preview(name = "VerticalClipCardLight")
 @Composable
-fun ClipCardLightPreview() = ClipCardPreview(Color(0xFF9BF6FF))
+fun VerticalClipCardLightPreview() = VerticalClipCardPreview(Color(0xFF9BF6FF))
 
-@ShowkaseComposable(name = "ClipCard", group = "Clip", styleName = "Dark")
-@Preview(name = "ClipCardDark")
+@ShowkaseComposable(name = "VerticalClipCard", group = "Clip", styleName = "Dark")
+@Preview(name = "VerticalClipCardDark")
 @Composable
-fun ClipCardDarkPreview() = ClipCardPreview(Color(0xFF152622))
+fun VerticalClipCardDarkPreview() = VerticalClipCardPreview(Color(0xFF152622))
 
 @Composable
-private fun ClipCardPreview(
+private fun VerticalClipCardPreview(
     baseColor: Color,
-) = ClipCard(
+) = VerticalClipCard(
     episode = PodcastEpisode(
         uuid = "episode-id",
         podcastUuid = "podcast-id",
