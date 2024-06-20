@@ -57,7 +57,13 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     override fun onPause() {
         super.onPause()
+        adapter?.enablePageTracking(enable = false)
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter?.enablePageTracking(enable = true)
     }
 
     override fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean) {
