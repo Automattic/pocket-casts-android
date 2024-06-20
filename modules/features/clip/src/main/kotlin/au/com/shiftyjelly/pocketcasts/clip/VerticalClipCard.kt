@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatMediumStyle
@@ -36,7 +37,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 internal fun VerticalClipCard(
     episode: PodcastEpisode,
-    podcastTitle: String,
+    podcast: Podcast,
     useEpisodeArtwork: Boolean,
     clipColors: ClipColors,
     modifier: Modifier = Modifier,
@@ -88,7 +89,7 @@ internal fun VerticalClipCard(
                 modifier = Modifier.height(6.dp),
             )
             TextH70(
-                text = podcastTitle,
+                text = podcast.title,
                 color = clipColors.cardTextColor.copy(alpha = 0.5f),
                 maxLines = 1,
             )
@@ -143,7 +144,10 @@ private fun VerticalClipCardPreview(
         publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
         title = "Nobis sapiente fugit vitae. Iusto magnam nam nam et odio. Debitis cupiditate officiis et. Sit quia in voluptate sit voluptatem magni.",
     ),
-    podcastTitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    podcast = Podcast(
+        uuid = "podcast-id",
+        title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    ),
     useEpisodeArtwork = true,
     clipColors = ClipColors(baseColor),
 )

@@ -61,7 +61,7 @@ class ShareClipFragment : BaseDialogFragment() {
             ShareClipPage(
                 episode = state.episode,
                 isPlaying = state.isPlaying,
-                podcastTitle = state.podcast?.title.orEmpty(),
+                podcast = state.podcast,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 clipColors = clipColors,
                 onPlayClick = { viewModel.playClip() },
