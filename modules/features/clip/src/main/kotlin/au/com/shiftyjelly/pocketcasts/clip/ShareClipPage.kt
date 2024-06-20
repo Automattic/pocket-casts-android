@@ -37,9 +37,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun ShareClipPage(
     episode: PodcastEpisode?,
+    isPlaying: Boolean,
     podcastTitle: String,
     useEpisodeArtwork: Boolean,
     baseColor: Color,
+    onPlayClick: () -> Unit,
+    onPauseClick: () -> Unit,
     onClose: () -> Unit,
 ) {
     val backgroundColor = ColorUtils.changeHsvValue(baseColor, factor = 0.4f)
@@ -81,6 +84,9 @@ internal fun ShareClipPage(
             }
 
             ClipSelector(
+                isPlaying = isPlaying,
+                onPlayClick = onPlayClick,
+                onPauseClick = onPauseClick,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
             Spacer(
@@ -132,8 +138,11 @@ fun ShareClipPagePreview() = ShareClipPage(
         publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
         title = "Episode title",
     ),
+    isPlaying = false,
     podcastTitle = "Podcast title",
     useEpisodeArtwork = true,
     baseColor = Color(0xFF9BF6FF),
+    onPlayClick = {},
+    onPauseClick = {},
     onClose = {},
 )

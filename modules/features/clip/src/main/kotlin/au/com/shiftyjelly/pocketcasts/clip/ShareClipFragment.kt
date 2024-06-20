@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -32,10 +33,13 @@ class ShareClipFragment : BaseDialogFragment() {
     private val viewModel by viewModels<ShareClipViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShareClipViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid)
+                factory.create(args.episodeUuid, clipPlayerFactory.create(requireActivity().applicationContext))
             }
         },
     )
+
+    @Inject
+    lateinit var clipPlayerFactory: ClipPlayer.Factory
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,9 +51,12 @@ class ShareClipFragment : BaseDialogFragment() {
 
             ShareClipPage(
                 episode = state.episode,
+                isPlaying = state.isPlaying,
                 podcastTitle = state.podcastTitle,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 baseColor = args.baseColor,
+                onPlayClick = { viewModel.playClip() },
+                onPauseClick = { viewModel.stopClip() },
                 onClose = { dismiss() },
             )
         }
