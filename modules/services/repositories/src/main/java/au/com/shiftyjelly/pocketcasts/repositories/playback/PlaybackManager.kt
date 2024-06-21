@@ -1165,6 +1165,12 @@ open class PlaybackManager @Inject constructor(
                 } else {
                     event.message
                 }
+
+                analyticsTracker.track(
+                    AnalyticsEvent.PLAYBACK_FAILED,
+                    mapOf("error" to errorMessage, "episode_uuid" to episode?.uuid.orEmpty()),
+                )
+
                 crashLogging.sendReport(
                     message = "Illegal playback state encountered",
                     exception = event.error ?: IllegalStateException(event.message),
