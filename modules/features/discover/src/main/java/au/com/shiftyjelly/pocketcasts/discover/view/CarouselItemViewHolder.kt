@@ -56,23 +56,21 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
         lblTagline.chipBackgroundColor = ColorStateList.valueOf(ThemeColor.contrast04(theme.activeTheme))
     }
 
-    var podcast: DiscoverPodcast? = null
-        set(value) {
-            field = value
-            if (value != null) {
-                imageRequestFactory.createForPodcast(value.uuid).loadInto(imageView)
-                lblTitle.text = value.title
-                lblTitle.setTextColor(ThemeColor.contrast01(theme.activeTheme))
-                lblSubtitle.text = value.author
-                lblSubtitle.setTextColor(ThemeColor.contrast03(theme.activeTheme))
-                setBackingGradient(value.color)
-                btnSubscribe.updateSubscribeButtonIcon(
-                    subscribed = value.isSubscribed,
-                    colorSubscribed = UR.attr.contrast_02,
-                    colorUnsubscribed = UR.attr.contrast_02,
-                )
-            } else {
-                reset()
-            }
+    fun setPodcast(podcast: DiscoverPodcast?) {
+        if (podcast != null) {
+            imageRequestFactory.createForPodcast(podcast.uuid).loadInto(imageView)
+            lblSubtitle.setTextColor(ThemeColor.contrast03(theme.activeTheme))
+            setBackingGradient(podcast.color)
+            btnSubscribe.updateSubscribeButtonIcon(
+                subscribed = podcast.isSubscribed,
+                colorSubscribed = UR.attr.contrast_02,
+                colorUnsubscribed = UR.attr.contrast_02,
+            )
+            lblTitle.text = podcast.title
+            lblTitle.setTextColor(ThemeColor.contrast01(theme.activeTheme))
+            lblSubtitle.text = podcast.author
+        } else {
+            reset()
         }
+    }
 }
