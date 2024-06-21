@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-10 16:54:02+0000
+Translation-Revision-Date: 2024-06-17 13:54:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="download_completed_for_episode">Ladda ner helt för %1$s</string>
+    <string name="episode_queued_for_download">Avsnitt placerat i kö för nedladdning</string>
+    <string name="episode_was_removed">Avsnittet togs bort</string>
+    <string name="remove_downloaded_file">Ta bort nedladdad fil</string>
     <string name="settings_export_database_failed">Export av databas misslyckades</string>
     <string name="settings_export_database">Exportera databas</string>
     <string name="settings_sleep_timer_auto_restart_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om automatiskt om du spelar upp ett avsnitt inom 5 minuter efter den senaste pausen.</string>
