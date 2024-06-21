@@ -52,7 +52,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr-rCA/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
     </issue>
 
@@ -63,7 +63,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es-rMX/strings.xml"
-            line="1696"
+            line="1702"
             column="5"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="1696"
+            line="1702"
             column="5"/>
     </issue>
 
@@ -107,7 +107,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr-rCA/strings.xml"
-            line="1696"
+            line="1702"
             column="5"/>
     </issue>
 
@@ -118,7 +118,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings.xml"
-            line="1696"
+            line="1702"
             column="5"/>
     </issue>
 
@@ -129,7 +129,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings.xml"
-            line="1696"
+            line="1702"
             column="5"/>
     </issue>
 
@@ -140,7 +140,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt-rBR/strings.xml"
-            line="1696"
+            line="1702"
             column="5"/>
     </issue>
 
@@ -151,7 +151,7 @@
         errorLine2="                                                              ^">
         <location
             file="src/main/res/values-de/strings.xml"
-            line="357"
+            line="363"
             column="63"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="                                  ^">
         <location
             file="src/main/res/values-es-rMX/strings.xml"
-            line="1603"
+            line="1609"
             column="35"/>
     </issue>
 
@@ -173,8 +173,624 @@
         errorLine2="                                  ^">
         <location
             file="src/main/res/values-es/strings.xml"
-            line="1603"
+            line="1609"
             column="35"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download abgeschlossen für %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Descarga de %1$s completada&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es-rMX/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Descarga de %1$s completada&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Téléchargement terminé pour %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr-rCA/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Téléchargement terminé pour %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download completato per %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>%1$sのダウンロードが完了しました&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ja/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>%1$s 다운로드 완료됨&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ko/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download voltooid van %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download concluído de %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt-rBR/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Скачивание %1$s завершено&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Ladda ner helt för %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>「%1$s」已下載完成&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rTW/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>%1$s 下载已完成&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Folge in die Download-Warteschlange gestellt&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episodio en cola para descargar&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es-rMX/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episodio en cola para descargar&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Épisode mis en file d’attente pour téléchargement&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr-rCA/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Épisode mis en file d’attente pour téléchargement&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episodio in coda per il download&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>エピソードをダウンロード待機リストに追加しました&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ja/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>다운로드 대기 중인 에피소드&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ko/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Aflevering in de wachtrij voor downloaden&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episódio na fila para download&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt-rBR/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Выпуск в очереди на скачивание&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Avsnitt placerat i kö för nedladdning&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>單集已排入下載佇列&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rTW/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>剧集正在排队等待下载&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Folge wurde entfernt&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Se ha eliminado el episodio&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es-rMX/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Se ha eliminado el episodio&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Épisode supprimé&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr-rCA/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Épisode supprimé&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Episodio rimosso&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>エピソードが削除されました&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ja/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>에피소드 삭제됨&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ko/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Aflevering is verwijderd&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Episódio removido&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt-rBR/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Выпуск удалён&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Avsnittet togs bort&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>單集已移除&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rTW/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>剧集已删除&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Heruntergeladene Datei entfernen&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Eliminar el archivo descargado&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es-rMX/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Eliminar el archivo descargado&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Supprimer le fichier téléchargé&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr-rCA/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Supprimer le fichier téléchargé&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Rimuovi il file scaricato&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>ダウンロードしたファイルを削除&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ja/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>다운로드한 파일 제거&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ko/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Gedownload bestand verwijderen?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Remover arquivo baixado&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt-rBR/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Удалить скачанный файл&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Ta bort nedladdad fil&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>移除已下載的檔案&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh-rTW/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
+        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>删除已下载的文件&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-zh/strings.xml"
+            line="12"
+            column="13"/>
     </issue>
 
     <issue
@@ -1515,7 +2131,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ja/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
@@ -1531,7 +2147,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ko/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
@@ -1547,7 +2163,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
@@ -1563,7 +2179,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-zh-rTW/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
@@ -1579,7 +2195,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-zh/strings.xml"
-            line="91"
+            line="97"
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
