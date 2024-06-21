@@ -54,14 +54,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/DarkH2"
-                android:maxLines="2"
+                android:ellipsize="end"
+                android:maxLines="3"
                 tools:text="Only A Game"/>
             <TextView
                 android:id="@+id/lblSubtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/DarkBody2"
-                android:layout_marginBottom="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:layout_marginBottom="4dp"
                 tools:text="wbur"/>
         </LinearLayout>
     </LinearLayout>
