@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.branch.engage.conduit.source.BranchDynamicData
+import io.branch.engage.conduit.source.CatalogSubmission
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.async
@@ -42,52 +43,32 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
             return Result.failure()
         }
 
-        val launcherBridge = BranchDynamicData.getOrInit(applicationContext)
-
         return coroutineScope {
-            val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts()) }
-            val recentlyPlayedPodcast = async { catalogFactory.recentlyPlayedPodcasts(manager.getRecentlyPlayedPodcasts()) }
-            val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts()) }
-            val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes()) }
-            val inProgressEpisodes = async { catalogFactory.inProgressEpisodes(manager.getInProgressEpisodes()) }
-
             try {
-                val isUserDataSubmitted = launcherBridge.submitUserData(listOf(subscribedPodcasts.await())).isSuccess
-                val isUsageHistorySubmitted = launcherBridge.submitUsageHistory(listOf(recentlyPlayedPodcast.await())).isSuccess
-                val isRecommendationsSubmitted = launcherBridge.submitRecommendations(listOf(trendingPodcasts.await(), newEpisodes.await(), inProgressEpisodes.await())).isSuccess
+                val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts(limit = 200)) }
+                val recentlyPlayedPodcasts = async { catalogFactory.recentlyPlayedPodcasts(manager.getRecentlyPlayedPodcasts(limit = 200)) }
+                val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts(limit = 25)) }
+                val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes(limit = 25)) }
+                val inProgressEpisodes = async { catalogFactory.inProgressEpisodes(manager.getInProgressEpisodes(limit = 25)) }
+
+                val catalogSubmission = CatalogSubmission()
+                    .setUserLibrary(listOf(subscribedPodcasts.await()))
+                    .setUsageHistory(listOf(recentlyPlayedPodcasts.await()))
+                    .setTrending(listOf(trendingPodcasts.await()))
+                    .setUserLibraryNew(listOf(newEpisodes.await()))
+                    .setContinue(listOf(inProgressEpisodes.await()))
+
+                val isDataSubmitted = BranchDynamicData.getOrInit(applicationContext).submit(catalogSubmission).isSuccess
 
                 val results = listOf(
-                    SubmissionResult(
-                        isUserDataSubmitted,
-                        "Subscribed podcasts",
-                        subscribedPodcasts.await().items.size,
-                    ),
-                    SubmissionResult(
-                        isUsageHistorySubmitted,
-                        "Recently played podcasts",
-                        recentlyPlayedPodcast.await().items.size,
-                    ),
-                    SubmissionResult(
-                        isRecommendationsSubmitted,
-                        "Trending podcasts",
-                        trendingPodcasts.await().items.size,
-                    ),
-                    SubmissionResult(
-                        isRecommendationsSubmitted,
-                        "New episodes",
-                        newEpisodes.await().items.size,
-                    ),
-                    SubmissionResult(
-                        isRecommendationsSubmitted,
-                        "In progress episodes",
-                        inProgressEpisodes.await().items.size,
-                    ),
+                    SubmissionResult("Subscribed podcasts", subscribedPodcasts.await().size),
+                    SubmissionResult("Recently played podcasts", recentlyPlayedPodcasts.await().size),
+                    SubmissionResult("Trending podcasts", trendingPodcasts.await().size),
+                    SubmissionResult("New episodes", newEpisodes.await().size),
+                    SubmissionResult("In progress episodes", inProgressEpisodes.await().size),
                 )
 
-                val successes = results.filter(SubmissionResult::isSuccess)
-                val failures = results.filterNot(SubmissionResult::isSuccess)
-
-                logInfo("Nova Launcher sync complete. Success: $successes, Failure: $failures")
+                logInfo("Nova Launcher sync complete. ${if (isDataSubmitted) "Success" else "Failure"}: $results")
                 Result.success()
             } catch (e: Throwable) {
                 logError("Nova Launcher sync failed", e)
@@ -99,14 +80,6 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
     private fun logInfo(message: String) = logInfo(id, name, message)
 
     private fun logError(message: String, throwable: Throwable? = null) = logError(id, name, message, throwable)
-
-    private class SubmissionResult(
-        val isSuccess: Boolean,
-        val label: String,
-        val itemCount: Int,
-    ) {
-        override fun toString() = "$label: $itemCount"
-    }
 
     companion object {
         private const val ONE_OFF_WORK_NAME = "NovaLauncherOneOffSyncWorker"

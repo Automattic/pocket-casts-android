@@ -1,6 +1,12 @@
 7.67
 -----
-
+*   Bug Fixes
+    *   Fix sharing episodes when using multi-selection
+        ([#2376](https://github.com/Automattic/pocket-casts-android/pull/2376))
+    *   Fix deselected chapters not synced correctly between different platforms
+        ([#2357](https://github.com/Automattic/pocket-casts-android/pull/2357))
+    *   Adds download episode action button to shelf list in Now Playing
+        ([#2325](https://github.com/Automattic/pocket-casts-android/pull/2325))
 
 7.66
 -----
@@ -16,7 +22,9 @@
         ([#2324](https://github.com/Automattic/pocket-casts-android/pull/2324))
 *   Bug Fixes
     *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
-        ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278)) 
+        ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
+    *   Fix syncing on app startup in the Automotive app
+        ([#2277](https://github.com/Automattic/pocket-casts-android/pull/2277))
 *   Updates:
     *   Playback speed can now be changed up to 5x.
         ([#1645](https://github.com/Automattic/pocket-casts-android/pull/1645))

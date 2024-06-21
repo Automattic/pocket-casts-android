@@ -549,9 +549,8 @@ abstract class EpisodeDao {
           episode.played_up_to AS current_position,
           episode.season AS season_number,
           episode.number AS episode_number,
-          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
-          episode.published_date / 1000 AS release_timestamp,
-          episode.last_playback_interaction_date / 1000 AS last_used_timestamp
+          episode.published_date AS release_timestamp,
+          episode.last_playback_interaction_date AS last_used_timestamp
         FROM
           podcast_episodes AS episode
           JOIN podcasts AS podcast ON podcast.uuid IS episode.podcast_id
@@ -565,10 +564,13 @@ abstract class EpisodeDao {
         ORDER BY
           episode.published_date DESC
         LIMIT
-          500
+          :limit
         """,
     )
-    abstract suspend fun getNovaLauncherNewEpisodes(currentTime: Long = System.currentTimeMillis()): List<NovaLauncherNewEpisode>
+    abstract suspend fun getNovaLauncherNewEpisodes(
+        limit: Int,
+        currentTime: Long = System.currentTimeMillis(),
+    ): List<NovaLauncherNewEpisode>
 
     @Query(
         """
@@ -580,9 +582,8 @@ abstract class EpisodeDao {
           episode.played_up_to AS current_position,
           episode.season AS season_number,
           episode.number AS episode_number,
-          -- Divide by 1000 to convert milliseconds that we store to seconds that Nova Launcher expects
-          episode.published_date / 1000 AS release_timestamp,
-          episode.last_playback_interaction_date / 1000 AS last_used_timestamp
+          episode.published_date AS release_timestamp,
+          episode.last_playback_interaction_date AS last_used_timestamp
         FROM
           podcast_episodes AS episode
         WHERE
@@ -592,8 +593,10 @@ abstract class EpisodeDao {
         ORDER BY
           episode.last_playback_interaction_date DESC
         LIMIT
-          500
+          :limit
         """,
     )
-    abstract suspend fun getNovaLauncherInProgressEpisodes(): List<NovaLauncherInProgressEpisode>
+    abstract suspend fun getNovaLauncherInProgressEpisodes(
+        limit: Int,
+    ): List<NovaLauncherInProgressEpisode>
 }

@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
+import java.time.Instant
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -41,23 +42,24 @@ class BookmarkManagerImpl @Inject constructor(
         timeSecs: Int,
         title: String,
         creationSource: BookmarkManager.CreationSource,
+        addedAt: Instant,
     ): Bookmark {
         // Prevent adding more than one bookmark at the same place
         val existingBookmark = findByEpisodeTime(episode = episode, timeSecs = timeSecs)
         if (existingBookmark != null) {
             return existingBookmark
         }
-        val modifiedAt = System.currentTimeMillis()
+        val addedAtMs = addedAt.toEpochMilli()
         val bookmark = Bookmark(
             uuid = UUID.randomUUID().toString(),
             episodeUuid = episode.uuid,
             podcastUuid = episode.podcastOrSubstituteUuid,
             timeSecs = timeSecs,
-            createdAt = Date(),
+            createdAt = Date.from(addedAt),
             title = title,
-            titleModified = modifiedAt,
+            titleModified = addedAtMs,
             deleted = false,
-            deletedModified = modifiedAt,
+            deletedModified = addedAtMs,
             syncStatus = SyncStatus.NOT_SYNCED,
         )
         bookmarkDao.insert(bookmark)

@@ -36,14 +36,14 @@ class ChapterManagerImpl @Inject constructor(
         val chaptersList = asSequence()
             .fixChapterTimestamps(episode)
             .filter { it.duration > Duration.ZERO }
-            .mapIndexed { index, chapter -> chapter.copy(index = index + 1) }
+            .mapIndexed { index, chapter -> chapter.copy(index = index) }
             .toList()
         return Chapters(chaptersList)
     }
 
     private fun Sequence<DbChapter>.fixChapterTimestamps(episode: BaseEpisode) = withIndex().windowed(size = 2, partialWindows = true) { window ->
         val index = window[0].index
-        val chapterIndex = window[0].index + 1
+        val chapterIndex = window[0].index
         val firstChapter = window[0].value
         val secondChapter = window.getOrNull(1)?.value
 

@@ -55,7 +55,7 @@ class ChapterManagerImplTest {
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
-                index = 1,
+                index = 0,
                 title = "Title",
                 startTime = 0.milliseconds,
                 endTime = 1.milliseconds,
@@ -99,21 +99,21 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
                 Chapter(
-                    index = 1,
+                    index = 0,
                     title = "Title 1",
                     startTime = 0.milliseconds,
                     endTime = 1.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 2,
+                    index = 1,
                     title = "Title 2",
                     startTime = 1.milliseconds,
                     endTime = 2.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 3,
+                    index = 2,
                     title = "Title 3",
                     startTime = 2.milliseconds,
                     endTime = 3.milliseconds,
@@ -143,7 +143,7 @@ class ChapterManagerImplTest {
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
-                index = 1,
+                index = 0,
                 title = "",
                 startTime = 0.milliseconds,
                 endTime = 1.milliseconds,
@@ -174,7 +174,7 @@ class ChapterManagerImplTest {
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
-                index = 1,
+                index = 0,
                 title = "Title",
                 startTime = 0.milliseconds,
                 endTime = 1.milliseconds,
@@ -205,7 +205,7 @@ class ChapterManagerImplTest {
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
-                index = 1,
+                index = 0,
                 title = "Title",
                 startTime = 0.milliseconds,
                 endTime = 1.milliseconds,
@@ -236,7 +236,7 @@ class ChapterManagerImplTest {
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = Chapter(
-                index = 1,
+                index = 0,
                 title = "Title",
                 startTime = 0.milliseconds,
                 endTime = 1.milliseconds,
@@ -252,7 +252,7 @@ class ChapterManagerImplTest {
 
     @Test
     fun `observe deselected chapters`() = runBlocking {
-        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.004, deselectedChapters = ChapterIndices(listOf(1, 4)))
+        val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.004, deselectedChapters = ChapterIndices(listOf(0, 3)))
         val dbChapters = listOf(
             DbChapter(
                 episodeUuid = "id",
@@ -286,28 +286,28 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
                 Chapter(
-                    index = 1,
+                    index = 0,
                     title = "Title 1",
                     startTime = 0.milliseconds,
                     endTime = 1.milliseconds,
                     selected = false,
                 ),
                 Chapter(
-                    index = 2,
+                    index = 1,
                     title = "Title 2",
                     startTime = 1.milliseconds,
                     endTime = 2.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 3,
+                    index = 2,
                     title = "Title 3",
                     startTime = 2.milliseconds,
                     endTime = 3.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 4,
+                    index = 3,
                     title = "Title 4",
                     startTime = 3.milliseconds,
                     endTime = 4.milliseconds,
@@ -350,21 +350,21 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
                 Chapter(
-                    index = 1,
+                    index = 0,
                     title = "Title 1",
                     startTime = 0.milliseconds,
                     endTime = 1.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 2,
+                    index = 1,
                     title = "Title 2",
                     startTime = 1.milliseconds,
                     endTime = 2.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 3,
+                    index = 2,
                     title = "Title 3",
                     startTime = 2.milliseconds,
                     endTime = 3.milliseconds,
@@ -401,14 +401,14 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
                 Chapter(
-                    index = 1,
+                    index = 0,
                     title = "Title 1",
                     startTime = 0.milliseconds,
                     endTime = 2.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 2,
+                    index = 1,
                     title = "Title 2",
                     startTime = 2.milliseconds,
                     endTime = 3.milliseconds,
@@ -437,7 +437,7 @@ class ChapterManagerImplTest {
 
         chapterManager.observerChaptersForEpisode("id").test {
             val expectedSelected = Chapter(
-                index = 1,
+                index = 0,
                 title = "Title",
                 startTime = 0.milliseconds,
                 endTime = 1.milliseconds,
@@ -445,7 +445,7 @@ class ChapterManagerImplTest {
             )
             assertEquals(Chapters(listOf(expectedSelected)), awaitItem())
 
-            episodesFlow.value = episode.copy(deselectedChapters = ChapterIndices(listOf(1)))
+            episodesFlow.value = episode.copy(deselectedChapters = ChapterIndices(listOf(0)))
 
             val expectedNotSelected = expectedSelected.copy(selected = false)
             assertEquals(Chapters(listOf(expectedNotSelected)), awaitItem())
@@ -478,14 +478,14 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
                 Chapter(
-                    index = 1,
+                    index = 0,
                     title = "Title 1",
                     startTime = 0.milliseconds,
                     endTime = 1.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 2,
+                    index = 1,
                     title = "Title 2",
                     startTime = 1.milliseconds,
                     endTime = 3.milliseconds,
@@ -522,14 +522,14 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
                 Chapter(
-                    index = 1,
+                    index = 0,
                     title = "Title 1",
                     startTime = 0.milliseconds,
                     endTime = 1.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 2,
+                    index = 1,
                     title = "Title 2",
                     startTime = 1.milliseconds,
                     endTime = 3.milliseconds,
@@ -584,21 +584,21 @@ class ChapterManagerImplTest {
         chapterManager.observerChaptersForEpisode("id").test {
             val expected = listOf(
                 Chapter(
-                    index = 1,
+                    index = 0,
                     title = "Title 2",
                     startTime = 0.milliseconds,
                     endTime = 1.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 2,
+                    index = 1,
                     title = "Title 3",
                     startTime = 1.milliseconds,
                     endTime = 2.milliseconds,
                     selected = true,
                 ),
                 Chapter(
-                    index = 3,
+                    index = 2,
                     title = "Title 5",
                     startTime = 2.milliseconds,
                     endTime = 3.milliseconds,

@@ -149,6 +149,7 @@ enum class AnalyticsEvent(val key: String) {
     LISTENING_HISTORY_SELECT_ALL_BELOW_TAPPED("listening_history_select_all_below_tapped"),
     LISTENING_HISTORY_MULTI_SELECT_ENTERED("listening_history_multi_select_entered"),
     LISTENING_HISTORY_MULTI_SELECT_EXITED("listening_history_multi_select_exited"),
+    LISTENING_HISTORY_CLEAR_HISTORY_BUTTON_TAPPED("listening_history_clear_history_button_tapped"),
     LISTENING_HISTORY_CLEARED("listening_history_cleared"),
 
     /* Uploaded Files */
@@ -253,7 +254,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC("playback_episode_position_changed_on_sync"),
 
     /* Privacy */
-    PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
+    PRIVACY_SHOWN("privacy_shown"),
     ANALYTICS_OPT_IN("analytics_opt_in"),
     ANALYTICS_OPT_OUT("analytics_opt_out"),
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
@@ -511,7 +512,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_HEADPHONE_CONTROLS_SHOWN("settings_headphone_controls_shown"),
     SETTINGS_HEADPHONE_CONTROLS_NEXT_CHANGED("settings_headphone_controls_next_changed"),
     SETTINGS_HEADPHONE_CONTROLS_PREVIOUS_CHANGED("settings_headphone_controls_previous_changed"),
-    SETTINGS_HEADPHONE_CONTROLS_BOOKMARK_CONFIRMATION_SOUND("settings_headphone_controls_bookmark_confirmation_sound"),
+    SETTINGS_HEADPHONE_CONTROLS_BOOKMARK_SOUND_TOGGLED("settings_headphone_controls_bookmark_sound_toggled"),
 
     /* Settings - Help */
     SETTINGS_HELP_SHOWN("settings_help_shown"),

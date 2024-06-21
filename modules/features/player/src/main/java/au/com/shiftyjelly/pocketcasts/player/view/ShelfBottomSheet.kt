@@ -8,12 +8,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.localization.R.string.episode_queued_for_download
+import au.com.shiftyjelly.pocketcasts.localization.R.string.episode_was_removed
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -33,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
@@ -141,15 +145,19 @@ class ShelfBottomSheet : BaseDialogFragment() {
             ShelfItem.Effects -> {
                 EffectsFragment().show(parentFragmentManager, "effects")
             }
+
             ShelfItem.Sleep -> {
                 SleepFragment().show(parentFragmentManager, "sleep")
             }
+
             ShelfItem.Star -> {
                 playerViewModel.starToggle()
             }
+
             ShelfItem.Share -> {
                 ShareFragment().show(parentFragmentManager, "sleep")
             }
+
             ShelfItem.Podcast -> {
                 (activity as FragmentHostListener).closePlayer()
                 val podcast = playerViewModel.podcast
@@ -159,22 +167,43 @@ class ShelfBottomSheet : BaseDialogFragment() {
                     (activity as? FragmentHostListener)?.openCloudFiles()
                 }
             }
+
             ShelfItem.Cast -> {
                 binding?.mediaRouteButton?.performClick()
             }
+
             ShelfItem.Played -> {
                 context?.let {
                     playerViewModel.markCurrentlyPlayingAsPlayed(it)?.show(parentFragmentManager, "mark_as_played")
                 }
             }
+
             ShelfItem.Archive -> {
                 playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
             }
+
             ShelfItem.Bookmark -> {
                 (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick(OnboardingUpgradeSource.OVERFLOW_MENU)
             }
+
             ShelfItem.Report -> {
                 openUrl(settings.getReportViolationUrl())
+            }
+
+            ShelfItem.Download -> {
+                Toast.makeText(context, episode_queued_for_download, Toast.LENGTH_SHORT).show()
+                launch {
+                    playerViewModel.downloadCurrentlyPlaying()
+                }
+            }
+
+            ShelfItem.Downloading -> {
+                // do nothing
+            }
+
+            ShelfItem.RemoveDownloaded -> {
+                playerViewModel.removeDownload()
+                Toast.makeText(context, episode_was_removed, Toast.LENGTH_LONG).show()
             }
         }
         analyticsTracker.track(

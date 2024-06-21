@@ -9,6 +9,7 @@
     <string name="empty" translatable="false" />
 
     <string name="account">Account</string>
+    <string name="remove_downloaded_file">Remove downloaded file</string>
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_bookmark_title">Add Bookmark</string>
     <string name="bookmark_added">Bookmark \"%s\" added</string>
@@ -228,6 +229,8 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="episode_was_removed">Episode was removed</string>
+    <string name="episode_queued_for_download">Episode queued for download</string>
     <string name="download_queued_singular">1 episode queued for download</string>
     <string name="download_queued_plural">%1$d episodes queued for download</string>
 
@@ -244,6 +247,7 @@
     <string name="download_warning_on_wifi_summary">Downloading this episode will use data.</string>
     <string name="download_warning_on_wifi_button">Download now</string>
     <string name="download_warning_on_wifi_later" translatable="false">@string/queue_for_later</string>
+    <string name="download_completed_for_episode">Download completed for %1$s</string>
 
     <string name="profile_cloud_upload_warning_title_on_wifi" translatable="false">@string/youre_not_on_wifi</string>
     <string name="profile_cloud_upload_warning_title_metered_wifi" translatable="false">@string/youre_on_metered_wifi</string>
@@ -566,6 +570,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="podcast_share_current_position">Current position</string>
     <string name="podcast_share_episode">Share episode</string>
     <string name="podcast_share_open_file_in">Open file in&#x2026;</string>
+    <string name="podcast_share_clip">Clip</string>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Subscribed</string>
@@ -1956,4 +1961,5 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="nova_launcher_new_releases">New Releases</string>
 <string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
     <string name="nova_launcher_continue_listening">Continue listening</string>
+    <string name="nova_launcher_up_next" translatable="false">@string/up_next</string>
 </resources>
