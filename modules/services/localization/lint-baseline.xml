@@ -178,622 +178,6 @@
     </issue>
 
     <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download abgeschlossen für %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Descarga de %1$s completada&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es-rMX/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Descarga de %1$s completada&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Téléchargement terminé pour %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr-rCA/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Téléchargement terminé pour %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download completato per %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>%1$sのダウンロードが完了しました&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ja/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>%1$s 다운로드 완료됨&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ko/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download voltooid van %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Download concluído de %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Скачивание %1$s завершено&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>Ladda ner helt för %1$s&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sv/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>「%1$s」已下載完成&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh-rTW/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;download_completed_for_episode&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;download_completed_for_episode&quot;>%1$s 下载已完成&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Folge in die Download-Warteschlange gestellt&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episodio en cola para descargar&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es-rMX/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episodio en cola para descargar&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Épisode mis en file d’attente pour téléchargement&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr-rCA/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Épisode mis en file d’attente pour téléchargement&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episodio in coda per il download&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>エピソードをダウンロード待機リストに追加しました&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ja/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>다운로드 대기 중인 에피소드&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ko/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Aflevering in de wachtrij voor downloaden&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Episódio na fila para download&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Выпуск в очереди на скачивание&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>Avsnitt placerat i kö för nedladdning&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sv/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>單集已排入下載佇列&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh-rTW/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_queued_for_download&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_queued_for_download&quot;>剧集正在排队等待下载&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Folge wurde entfernt&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Se ha eliminado el episodio&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es-rMX/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Se ha eliminado el episodio&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Épisode supprimé&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr-rCA/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Épisode supprimé&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Episodio rimosso&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>エピソードが削除されました&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ja/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>에피소드 삭제됨&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ko/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Aflevering is verwijderd&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Episódio removido&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Выпуск удалён&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>Avsnittet togs bort&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sv/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>單集已移除&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh-rTW/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;episode_was_removed&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;episode_was_removed&quot;>剧集已删除&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Heruntergeladene Datei entfernen&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-de/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Eliminar el archivo descargado&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es-rMX/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Eliminar el archivo descargado&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-es/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Supprimer le fichier téléchargé&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr-rCA/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Supprimer le fichier téléchargé&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Rimuovi il file scaricato&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-it/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>ダウンロードしたファイルを削除&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ja/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>다운로드한 파일 제거&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ko/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Gedownload bestand verwijderen?&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-nl/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Remover arquivo baixado&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-pt-rBR/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Удалить скачанный файл&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>Ta bort nedladdad fil&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sv/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>移除已下載的檔案&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh-rTW/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ExtraTranslation"
-        message="&quot;remove_downloaded_file&quot; is translated here but not found in default locale"
-        errorLine1="    &lt;string name=&quot;remove_downloaded_file&quot;>删除已下载的文件&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-zh/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
         id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;bookmarks&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;bookmarks_deleted_plural&quot;>%1$d bookmarks deleted&lt;/string>"
@@ -833,7 +217,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="182"
+            line="183"
             column="5"/>
     </issue>
 
@@ -844,7 +228,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="187"
+            line="188"
             column="5"/>
     </issue>
 
@@ -855,7 +239,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="189"
+            line="190"
             column="5"/>
     </issue>
 
@@ -866,7 +250,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="191"
+            line="192"
             column="5"/>
     </issue>
 
@@ -877,7 +261,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="193"
+            line="194"
             column="5"/>
     </issue>
 
@@ -888,7 +272,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="195"
+            line="196"
             column="5"/>
     </issue>
 
@@ -899,7 +283,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="196"
+            line="197"
             column="5"/>
     </issue>
 
@@ -910,7 +294,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="197"
+            line="198"
             column="5"/>
     </issue>
 
@@ -921,7 +305,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="199"
+            line="200"
             column="5"/>
     </issue>
 
@@ -932,7 +316,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="201"
+            line="202"
             column="5"/>
     </issue>
 
@@ -943,7 +327,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="203"
+            line="204"
             column="5"/>
     </issue>
 
@@ -954,7 +338,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="206"
+            line="207"
             column="5"/>
     </issue>
 
@@ -965,7 +349,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="209"
+            line="210"
             column="5"/>
     </issue>
 
@@ -976,7 +360,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="211"
+            line="212"
             column="5"/>
     </issue>
 
@@ -987,7 +371,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="214"
+            line="215"
             column="5"/>
     </issue>
 
@@ -998,7 +382,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="218"
+            line="219"
             column="5"/>
     </issue>
 
@@ -1009,7 +393,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="220"
+            line="221"
             column="5"/>
     </issue>
 
@@ -1020,7 +404,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="223"
+            line="224"
             column="5"/>
     </issue>
 
@@ -1031,7 +415,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="225"
+            line="226"
             column="5"/>
     </issue>
 
@@ -1042,7 +426,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="227"
+            line="228"
             column="5"/>
     </issue>
 
@@ -1053,7 +437,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="232"
+            line="235"
             column="5"/>
     </issue>
 
@@ -1064,7 +448,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="235"
+            line="238"
             column="5"/>
     </issue>
 
@@ -1075,7 +459,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="237"
+            line="240"
             column="5"/>
     </issue>
 
@@ -1086,7 +470,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="240"
+            line="243"
             column="5"/>
     </issue>
 
@@ -1119,7 +503,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="309"
+            line="313"
             column="5"/>
     </issue>
 
@@ -1130,7 +514,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="310"
+            line="314"
             column="5"/>
     </issue>
 
@@ -1141,7 +525,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="323"
+            line="327"
             column="5"/>
     </issue>
 
@@ -1152,7 +536,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="325"
+            line="329"
             column="5"/>
     </issue>
 
@@ -1163,7 +547,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="330"
+            line="334"
             column="5"/>
     </issue>
 
@@ -1174,7 +558,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="332"
+            line="336"
             column="5"/>
     </issue>
 
@@ -1185,7 +569,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="347"
+            line="351"
             column="5"/>
     </issue>
 
@@ -1202,28 +586,6 @@
 
     <issue
         id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;seconds&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;player_skipped_last&quot;>Skipped the last %d seconds&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="374"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;seconds&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;player_started_from&quot;>Starting podcast from %d seconds&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="375"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;episodes&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;player_up_next_clear_episodes_plural&quot;>Clear %1$d episodes&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -1235,12 +597,34 @@
 
     <issue
         id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;seconds&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;player_skipped_last&quot;>Skipped the last %d seconds&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="378"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;seconds&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;player_started_from&quot;>Starting podcast from %d seconds&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="379"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;chapters&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;number_of_chapters&quot;>%d chapters&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="384"
+            line="388"
             column="5"/>
     </issue>
 
@@ -1251,7 +635,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="388"
+            line="392"
             column="5"/>
     </issue>
 
@@ -1262,7 +646,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="389"
+            line="393"
             column="5"/>
     </issue>
 
@@ -1273,18 +657,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="401"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;Podcasts&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;podcasts_plural&quot;>%d Podcasts&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="425"
+            line="405"
             column="5"/>
     </issue>
 
@@ -1301,12 +674,23 @@
 
     <issue
         id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;Podcasts&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;podcasts_plural&quot;>%d Podcasts&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="429"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;selected&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;podcasts_share_selected&quot;>%d selected&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="445"
+            line="449"
             column="5"/>
     </issue>
 
@@ -1328,7 +712,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="476"
+            line="480"
             column="5"/>
     </issue>
 
@@ -1339,7 +723,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="499"
+            line="503"
             column="5"/>
     </issue>
 
@@ -1350,7 +734,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="500"
+            line="504"
             column="5"/>
     </issue>
 
@@ -1361,7 +745,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="502"
+            line="506"
             column="5"/>
     </issue>
 
@@ -1372,7 +756,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="529"
+            line="533"
             column="5"/>
     </issue>
 
@@ -1383,7 +767,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="544"
+            line="548"
             column="5"/>
     </issue>
 
@@ -1394,7 +778,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="563"
+            line="567"
             column="5"/>
     </issue>
 
@@ -1405,7 +789,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="586"
+            line="592"
             column="5"/>
     </issue>
 
@@ -1416,7 +800,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="621"
+            line="627"
             column="5"/>
     </issue>
 
@@ -1427,7 +811,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="649"
+            line="655"
             column="5"/>
     </issue>
 
@@ -1438,7 +822,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="673"
+            line="679"
             column="5"/>
     </issue>
 
@@ -1449,7 +833,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="714"
+            line="720"
             column="5"/>
     </issue>
 
@@ -1471,7 +855,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="779"
+            line="785"
             column="5"/>
     </issue>
 
@@ -1482,7 +866,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="781"
+            line="787"
             column="5"/>
     </issue>
 
@@ -1548,18 +932,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1171"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;episodes&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;settings_fix_downloads_progress&quot;>%1$d of %2$d episodes&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1178"
+            line="1177"
             column="5"/>
     </issue>
 
@@ -1576,12 +949,23 @@
 
     <issue
         id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;episodes&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;settings_fix_downloads_progress&quot;>%1$d of %2$d episodes&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1184"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;downloads&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;settings_fix_downloads_complete_message&quot;>Fixed %d downloads&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1182"
+            line="1188"
             column="5"/>
     </issue>
 
@@ -1598,23 +982,23 @@
 
     <issue
         id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;podcasts&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;settings_podcasts_selected_x&quot;>%d podcasts&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="1240"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;episode&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;podcast_settings_up_next_episode_limit&quot;>%d episode limit&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-en-rGB/strings.xml"
             line="1243"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;podcasts&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;settings_podcasts_selected_x&quot;>%d podcasts&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="1246"
             column="5"/>
     </issue>
 
@@ -1647,7 +1031,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1275"
+            line="1281"
             column="5"/>
     </issue>
 
@@ -2010,7 +1394,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1670"
+            line="1676"
             column="5"/>
     </issue>
 
@@ -2021,7 +1405,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1671"
+            line="1677"
             column="5"/>
     </issue>
 
@@ -2032,7 +1416,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1675"
+            line="1681"
             column="5"/>
     </issue>
 
@@ -2043,7 +1427,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1677"
+            line="1683"
             column="5"/>
     </issue>
 
@@ -2054,7 +1438,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1678"
+            line="1684"
             column="5"/>
     </issue>
 
@@ -2065,7 +1449,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1682"
+            line="1688"
             column="5"/>
     </issue>
 
@@ -2076,7 +1460,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1686"
+            line="1692"
             column="5"/>
     </issue>
 
@@ -2087,7 +1471,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1739"
+            line="1745"
             column="5"/>
     </issue>
 
@@ -2098,7 +1482,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1850"
+            line="1856"
             column="5"/>
     </issue>
 
@@ -2109,7 +1493,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1854"
+            line="1860"
             column="5"/>
     </issue>
 
@@ -2120,7 +1504,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="1856"
+            line="1862"
             column="5"/>
     </issue>
 
@@ -2135,7 +1519,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1069"
+            line="1075"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2151,7 +1535,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1069"
+            line="1075"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2167,7 +1551,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1069"
+            line="1075"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2183,7 +1567,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1069"
+            line="1075"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2199,7 +1583,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1069"
+            line="1075"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2215,7 +1599,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1368"
+            line="1374"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2231,7 +1615,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1367"
+            line="1373"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2247,7 +1631,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1366"
+            line="1372"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2263,7 +1647,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1365"
+            line="1371"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2279,7 +1663,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1364"
+            line="1370"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2295,7 +1679,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1363"
+            line="1369"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2311,7 +1695,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1362"
+            line="1368"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2327,7 +1711,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1361"
+            line="1367"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2343,7 +1727,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1360"
+            line="1366"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2359,7 +1743,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1359"
+            line="1365"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
@@ -2375,7 +1759,7 @@
             column="5"/>
         <location
             file="src/main/res/values/strings.xml"
-            line="1358"
+            line="1364"
             column="5"
             message="Conflicting number of arguments (1) here"/>
     </issue>
