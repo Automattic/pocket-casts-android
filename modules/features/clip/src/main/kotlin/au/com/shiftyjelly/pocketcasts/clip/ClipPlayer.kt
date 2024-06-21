@@ -9,6 +9,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
@@ -31,17 +33,22 @@ interface ClipPlayer {
 
     fun release()
 
+    @OptIn(UnstableApi::class)
     class Factory @Inject constructor(
         private val playbackManager: PlaybackManager,
+        @ClipSimpleCache private val simpleCache: SimpleCache,
     ) {
-        @OptIn(UnstableApi::class)
         fun create(context: Context): ClipPlayer {
             val httpSourceFactory = DefaultHttpDataSource.Factory()
                 .setUserAgent("Pocket Casts")
                 .setAllowCrossProtocolRedirects(true)
             val dataSourceFactory = DefaultDataSource.Factory(context, httpSourceFactory)
+            val cacheSourceFactory = CacheDataSource.Factory()
+                .setCache(simpleCache)
+                .setUpstreamDataSourceFactory(dataSourceFactory)
+
             val extractorsFactory = DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)
-            val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
+            val mediaSourceFactory = DefaultMediaSourceFactory(cacheSourceFactory, extractorsFactory)
             val exoPlayer = ExoPlayer.Builder(context).build()
             return ExoPlayerClipPlayer(exoPlayer, mediaSourceFactory, playbackManager)
         }
@@ -74,11 +81,10 @@ private class ExoPlayerClipPlayer(
 
     @OptIn(UnstableApi::class)
     override fun play(clip: Clip) {
-        if (exoPlayer.isLoading) {
+        if (exoPlayer.isLoading || exoPlayer.isPlaying) {
             return
         }
         playbackManager.pause()
-        exoPlayer.stop()
         exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(clip.toMediaItem()))
         exoPlayer.prepare()
         exoPlayer.play()
