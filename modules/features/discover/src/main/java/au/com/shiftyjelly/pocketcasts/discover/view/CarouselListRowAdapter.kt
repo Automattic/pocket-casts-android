@@ -48,7 +48,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
             } else {
                 pillText
             }
-            holder.podcast = podcast
+            holder.setPodcast(podcast)
 
             holder.setTaglineText(tagLineText)
             holder.itemView.setOnClickListener {
@@ -90,7 +90,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                 }
             }
         } else {
-            holder.podcast = null
+            holder.setPodcast(null)
         }
     }
 
