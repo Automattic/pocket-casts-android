@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-11 09:54:03+0000
+Translation-Revision-Date: 2024-06-19 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="download_completed_for_episode">%1$sのダウンロードが完了しました</string>
+    <string name="episode_queued_for_download">エピソードをダウンロード待機リストに追加しました</string>
+    <string name="episode_was_removed">エピソードが削除されました</string>
+    <string name="remove_downloaded_file">ダウンロードしたファイルを削除</string>
     <string name="settings_export_database_failed">データベースのエクスポートに失敗しました</string>
     <string name="settings_export_database">データベースをエクスポート</string>
     <string name="settings_sleep_timer_auto_restart_summary">オンにすると、最後の一時停止から5分以内にエピソードを再生した際にスリープタイマーが自動的に再開されます。</string>

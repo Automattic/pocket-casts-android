@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-10 21:54:02+0000
+Translation-Revision-Date: 2024-06-17 15:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="download_completed_for_episode">Download concluído de %1$s</string>
+    <string name="episode_queued_for_download">Episódio na fila para download</string>
+    <string name="episode_was_removed">Episódio removido</string>
+    <string name="remove_downloaded_file">Remover arquivo baixado</string>
     <string name="settings_export_database_failed">Falha ao exportar banco de dados</string>
     <string name="settings_export_database">Exportar banco de dados</string>
     <string name="settings_sleep_timer_auto_restart_summary">Quando ativado, o temporizador será reiniciado automaticamente se você reproduzir um episódio dentro de cinco minutos após a última pausa.</string>

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-11 12:54:03+0000
+Translation-Revision-Date: 2024-06-18 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="download_completed_for_episode">Download abgeschlossen für %1$s</string>
+    <string name="episode_queued_for_download">Folge in die Download-Warteschlange gestellt</string>
+    <string name="episode_was_removed">Folge wurde entfernt</string>
+    <string name="remove_downloaded_file">Heruntergeladene Datei entfernen</string>
     <string name="settings_export_database_failed">Datenbank-Export fehlgeschlagen</string>
     <string name="settings_export_database">Datenbank exportieren</string>
     <string name="settings_sleep_timer_auto_restart_summary">Wenn die Schlummerfunktion aktiviert ist, wird sie automatisch neu gestartet, wenn du innerhalb von fünf Minuten nach der letzten Pause eine Folge abspielst.</string>
