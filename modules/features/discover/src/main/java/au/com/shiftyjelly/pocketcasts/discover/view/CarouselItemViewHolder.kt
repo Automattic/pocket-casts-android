@@ -2,12 +2,14 @@ package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.content.res.ColorStateList
 import android.text.TextUtils
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
@@ -22,6 +24,7 @@ import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.ViewHolder(itemView) {
+
     private val cardBack: View = itemView.findViewById(R.id.cardBack)
     private val imageView: ImageView = itemView.findViewById(R.id.imageView)
     private val lblTitle: TextView = itemView.findViewById(R.id.lblTitle)
@@ -56,7 +59,7 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
         lblTagline.chipBackgroundColor = ColorStateList.valueOf(ThemeColor.contrast04(theme.activeTheme))
     }
 
-    fun setPodcast(podcast: DiscoverPodcast?) {
+    fun setPodcast(podcast: DiscoverPodcast?, isRankedList: Boolean = false) {
         if (podcast != null) {
             imageRequestFactory.createForPodcast(podcast.uuid).loadInto(imageView)
             lblSubtitle.setTextColor(ThemeColor.contrast03(theme.activeTheme))
@@ -69,6 +72,16 @@ class CarouselItemViewHolder(val theme: Theme, itemView: View) : RecyclerView.Vi
             lblTitle.text = podcast.title
             lblTitle.setTextColor(ThemeColor.contrast01(theme.activeTheme))
             lblSubtitle.text = podcast.author
+
+            if (!isRankedList) {
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    lblTitle,
+                    18,
+                    24,
+                    1,
+                    TypedValue.COMPLEX_UNIT_SP,
+                )
+            }
         } else {
             reset()
         }
