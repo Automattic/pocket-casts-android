@@ -17,6 +17,7 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
@@ -283,16 +284,27 @@ class SimplePlayer(
 
         val sourceFactory = exoPlayerHelper.getSimpleCache()?.let { cache ->
             if (location is EpisodeLocation.Stream) {
-                exoPlayerHelper.getCacheDataSourceFactory(
-                    httpDataSourceFactory,
-                    cache,
-                )
+                val cacheDataSourceFactory = CacheDataSource.Factory()
+                    .setUpstreamDataSourceFactory(httpDataSourceFactory)
+                    .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+                    .setCache(cache)
+
+                if (settings.cacheEntirePlayingEpisode.value) {
+                    cacheDataSourceFactory.setCacheWriteDataSinkFactory(null) // Disable on-the-fly caching
+                    CacheWorker.startCachingEntireEpisode(context, location.uri, episodeUuid)
+                }
+
+                cacheDataSourceFactory
             } else {
                 dataSourceFactory
             }
         } ?: dataSourceFactory
 
-        val mediaItem = MediaItem.fromUri(uri)
+        val mediaItem = MediaItem.Builder()
+            .setUri(uri)
+            .setCustomCacheKey(episodeUuid)
+            .build()
+
         val source = if (isHLS) {
             HlsMediaSource.Factory(sourceFactory)
         } else {

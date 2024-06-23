@@ -6,7 +6,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -36,7 +35,6 @@ class ExoPlayerHelper @Inject constructor(
 
     private var simpleCache: SimpleCache? = null
     private var dataSourceFactory: DataSource.Factory? = null
-    private var cacheDataSourceFactory: CacheDataSource.Factory? = null
 
     @OptIn(UnstableApi::class)
     @Synchronized
@@ -70,20 +68,5 @@ class ExoPlayerHelper @Inject constructor(
                 .setReadTimeoutMs(TIMEOUT_MILLI_SECS)
         }
         return requireNotNull(dataSourceFactory)
-    }
-
-    fun getCacheDataSourceFactory(
-        httpDataSourceFactory: DataSource.Factory,
-        cache: SimpleCache? = null,
-    ): CacheDataSource.Factory {
-        if (cacheDataSourceFactory == null) {
-            cacheDataSourceFactory = CacheDataSource.Factory()
-                .setUpstreamDataSourceFactory(httpDataSourceFactory)
-                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-            if (cache != null) {
-                cacheDataSourceFactory?.setCache(cache)
-            }
-        }
-        return requireNotNull(cacheDataSourceFactory)
     }
 }

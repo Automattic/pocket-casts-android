@@ -8,6 +8,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.CacheWriter
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
@@ -69,7 +74,33 @@ class CacheWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "CacheWorker"
-        const val URL_KEY = "url_key"
-        const val EPISODE_UUID_KEY = "episode_uuid_key"
+        private const val CACHE_WORKER_TAG = "pocket_casts_cache_worker_tag"
+        private const val URL_KEY = "url_key"
+        private const val EPISODE_UUID_KEY = "episode_uuid_key"
+
+        fun startCachingEntireEpisode(
+            context: Context,
+            url: String?,
+            episodeUuid: String?,
+        ) {
+            val inputData = Data.Builder()
+                .putString(URL_KEY, url)
+                .putString(EPISODE_UUID_KEY, episodeUuid)
+                .build()
+
+            // Cancel previous caching work
+            WorkManager.getInstance(context).cancelAllWorkByTag(CACHE_WORKER_TAG)
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.UNMETERED)
+                .build()
+
+            val cacheWorkRequest = OneTimeWorkRequest.Builder(CacheWorker::class.java)
+                .addTag(CACHE_WORKER_TAG)
+                .setConstraints(constraints)
+                .setInputData(inputData).build()
+
+            // Enqueue new caching work
+            WorkManager.getInstance(context).enqueue(cacheWorkRequest)
+        }
     }
 }
