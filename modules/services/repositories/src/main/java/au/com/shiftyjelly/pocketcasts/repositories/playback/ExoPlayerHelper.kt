@@ -31,6 +31,7 @@ class ExoPlayerHelper @Inject constructor(
         private const val CACHE_DIR_NAME = "pocketcasts-exoplayer-cache"
         private const val TIMEOUT_MILLI_SECS = 60 * 1000
         private const val USER_AGENT = "Pocket Casts"
+        private const val CACHE_ENTIRE_EPISODE_SIZE_IN_MB = 500L
     }
 
     private var simpleCache: SimpleCache? = null
@@ -41,7 +42,11 @@ class ExoPlayerHelper @Inject constructor(
     fun getSimpleCache(): SimpleCache? {
         if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) && simpleCache == null) {
             val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
-            val cacheSizeInBytes = settings.getExoPlayerCacheSizeInMB() * 1024 * 1024L
+            val cacheSizeInBytes = if (settings.cacheEntirePlayingEpisode.value) {
+                CACHE_ENTIRE_EPISODE_SIZE_IN_MB
+            } else {
+                settings.getExoPlayerCacheSizeInMB()
+            } * 1024 * 1024L
             simpleCache = try {
                 if (BuildConfig.DEBUG) Timber.d("ExoPlayer cache initialized")
                 SimpleCache(
