@@ -34,6 +34,11 @@ class CacheWorker @AssistedInject constructor(
         try {
             val url = inputData.getString(URL_KEY)
             val episodeUuid = inputData.getString(EPISODE_UUID_KEY)
+
+            if (url == null) {
+                Timber.tag(TAG).e("Episode url is null, worker id: '$id'")
+                return Result.failure()
+            }
             val uri = Uri.parse(url)
 
             val dataSourceFactory = exoPlayerHelper.getDataSourceFactory()
