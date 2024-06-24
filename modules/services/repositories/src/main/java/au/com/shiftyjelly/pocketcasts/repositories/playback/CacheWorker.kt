@@ -32,20 +32,14 @@ class CacheWorker @AssistedInject constructor(
 
     override fun doWork(): Result {
         try {
-            val url = inputData.getString(URL_KEY)
-            val episodeUuid = inputData.getString(EPISODE_UUID_KEY)
-
-            if (url == null) {
-                Timber.tag(TAG).e("Episode url is null, worker id: '$id'")
+            if (downloadUrl == null || episodeUuid == null) {
+                Timber.tag(TAG).e("Error: Episode download url or uuid is null, downloadUrl: '$downloadUrl' episodeUuid: '$episodeUuid' worker id: '$id'")
                 return Result.failure()
             }
-            val uri = Uri.parse(url)
+            val uri = Uri.parse(downloadUrl)
 
             val dataSourceFactory = exoPlayerHelper.getDataSourceFactory()
-            var dataSpec = DataSpec(uri)
-            if (episodeUuid != null) {
-                dataSpec = dataSpec.buildUpon().setKey(episodeUuid).build()
-            }
+            val dataSpec = DataSpec(uri).buildUpon().setKey(episodeUuid).build()
 
             val cacheDataSourceFactory = CacheDataSource.Factory()
                 .setUpstreamDataSourceFactory(dataSourceFactory)
