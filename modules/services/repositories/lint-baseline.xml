@@ -290,7 +290,7 @@
         errorLine2="                ~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/SimplePlayer.kt"
-            line="235"
+            line="233"
             column="17"/>
     </issue>
 
