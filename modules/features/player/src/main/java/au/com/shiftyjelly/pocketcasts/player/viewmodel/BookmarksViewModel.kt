@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
@@ -279,7 +280,8 @@ class BookmarksViewModel
                         SharePodcastHelper(
                             podcast,
                             episode,
-                            bookmark.timeSecs.toDouble(),
+                            bookmark.timeSecs.seconds,
+                            null,
                             context,
                             ShareType.BOOKMARK_TIME,
                             sourceView,

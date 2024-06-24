@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.clip
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -27,13 +28,13 @@ class ShareClipViewModel @AssistedInject constructor(
 
     val uiState = combine(
         episodeManager.observeByUuid(episodeUuid),
-        podcastManager.observePodcastByEpisodeUuid(episodeUuid).map { it.title },
+        podcastManager.observePodcastByEpisodeUuid(episodeUuid),
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         clipPlayer.isPlayingState,
-        transform = { episode, podcastTitle, useEpisodeArtwork, isPlaying ->
+        transform = { episode, podcast, useEpisodeArtwork, isPlaying ->
             UiState(
                 episode = episode,
-                podcastTitle = podcastTitle,
+                podcast = podcast,
                 useEpisodeArtwork = useEpisodeArtwork,
                 isPlaying = isPlaying,
             )
@@ -54,8 +55,8 @@ class ShareClipViewModel @AssistedInject constructor(
 
     data class UiState(
         val episode: PodcastEpisode? = null,
+        val podcast: Podcast? = null,
         val clipRange: Clip.Range = Clip.Range(15.seconds, 30.seconds),
-        val podcastTitle: String = "",
         val useEpisodeArtwork: Boolean = false,
         val isPlaying: Boolean = false,
     ) {

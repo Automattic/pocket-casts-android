@@ -56,6 +56,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -429,7 +430,8 @@ class PodcastViewModel
                     SharePodcastHelper(
                         podcast,
                         episode,
-                        bookmark.timeSecs.toDouble(),
+                        bookmark.timeSecs.seconds,
+                        null,
                         context,
                         ShareType.BOOKMARK_TIME,
                         SourceView.PODCAST_SCREEN,

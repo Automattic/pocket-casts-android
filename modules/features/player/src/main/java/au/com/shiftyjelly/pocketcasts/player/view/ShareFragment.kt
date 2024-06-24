@@ -24,6 +24,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @AndroidEntryPoint
 class ShareFragment : BaseDialogFragment() {
@@ -54,6 +55,7 @@ class ShareFragment : BaseDialogFragment() {
                     podcast,
                     null,
                     null,
+                    null,
                     requireContext(),
                     ShareType.PODCAST,
                     SourceView.PLAYER,
@@ -68,6 +70,7 @@ class ShareFragment : BaseDialogFragment() {
                     podcast,
                     episode,
                     null,
+                    null,
                     requireContext(),
                     ShareType.EPISODE,
                     SourceView.PLAYER,
@@ -81,7 +84,8 @@ class ShareFragment : BaseDialogFragment() {
                 SharePodcastHelper(
                     podcast,
                     episode,
-                    episode.playedUpTo,
+                    episode.playedUpTo.seconds,
+                    null,
                     requireContext(),
                     ShareType.CURRENT_TIME,
                     SourceView.PLAYER,
@@ -95,7 +99,8 @@ class ShareFragment : BaseDialogFragment() {
                 SharePodcastHelper(
                     podcast,
                     episode,
-                    episode.playedUpTo,
+                    episode.playedUpTo.seconds,
+                    null,
                     requireContext(),
                     ShareType.EPISODE_FILE,
                     SourceView.PLAYER,
