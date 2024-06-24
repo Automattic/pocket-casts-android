@@ -17,11 +17,11 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -29,27 +29,36 @@ import kotlinx.parcelize.TypeParceler
 class ShareClipFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
+    private val clipColors get() = ClipColors(args.baseColor)
+
     private val viewModel by viewModels<ShareClipViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShareClipViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid)
+                factory.create(args.episodeUuid, clipPlayerFactory.create(requireActivity().applicationContext))
             }
         },
     )
+
+    @Inject
+    lateinit var clipPlayerFactory: ClipPlayer.Factory
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
+        val clipColors = clipColors
         setContent {
             val state by viewModel.uiState.collectAsState()
 
             ShareClipPage(
                 episode = state.episode,
+                isPlaying = state.isPlaying,
                 podcastTitle = state.podcastTitle,
                 useEpisodeArtwork = state.useEpisodeArtwork,
-                baseColor = args.baseColor,
+                clipColors = clipColors,
+                onPlayClick = { viewModel.playClip() },
+                onPauseClick = { viewModel.stopClip() },
                 onClose = { dismiss() },
             )
         }
@@ -57,16 +66,16 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val backgroundColor = ColorUtils.changeHsvValue(args.baseColor, factor = 0.4f)
-        val argbColor = backgroundColor.toArgb()
+        val clipColors = clipColors
+        val argbColor = clipColors.backgroundColor.toArgb()
 
         requireActivity().window?.let { activityWindow ->
             activityWindow.statusBarColor = argbColor
-            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = backgroundColor.luminance() > 0.5f
+            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = clipColors.backgroundColor.luminance() > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
             dialogWindow.navigationBarColor = argbColor
-            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = backgroundColor.luminance() > 0.5f
+            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = clipColors.backgroundColor.luminance() > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(argbColor)
     }

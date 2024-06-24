@@ -18,6 +18,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
@@ -27,4 +28,6 @@ dependencies {
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
     implementation(project(":modules:services:views"))
+
+    testImplementation(project(":modules:services:sharedtest"))
 }
