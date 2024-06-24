@@ -17,8 +17,8 @@ object DownloadHelper {
         from: String,
         downloadManager: DownloadManager,
         episodeManager: EpisodeManager,
-        fireToast: Boolean = false,
         source: SourceView,
+        fireToast: Boolean = false,
     ) {
         if (episode.isDownloaded) {
             return

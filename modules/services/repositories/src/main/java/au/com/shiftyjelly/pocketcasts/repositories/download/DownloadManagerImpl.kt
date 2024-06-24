@@ -90,6 +90,8 @@ class DownloadManagerImpl @Inject constructor(
 
     private var workManagerListener: LiveData<Pair<List<WorkInfo>, Map<String?, String>>>? = null
 
+    private var sourceView: SourceView = SourceView.UNKNOWN
+
     override fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playlistManager: PlaylistManager, playbackManager: PlaybackManager) {
         this.episodeManager = episodeManager
         this.podcastManager = podcastManager
@@ -281,6 +283,8 @@ class DownloadManagerImpl @Inject constructor(
 
     // We only want to be able to queue one download at a time
     override fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, fireToast: Boolean, source: SourceView) {
+        updateSource(source)
+
         launch(downloadsCoroutineContext) {
             addDownloadMutex.withLock {
                 val updatedEpisode = episodeManager.findEpisodeByUuid(episode.uuid) ?: return@launch // Get the latest episode so we can check if it's downloaded
@@ -436,7 +440,7 @@ class DownloadManagerImpl @Inject constructor(
 
             if (result.success) {
                 episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED, uuid = episode.uuid)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED, uuid = episode.uuid, source = sourceView)
 
                 RefreshPodcastsThread.updateNotifications(settings.getNotificationLastSeen(), settings, podcastManager, episodeManager, notificationHelper, context)
             } else {
@@ -617,6 +621,10 @@ class DownloadManagerImpl @Inject constructor(
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         intent?.action = Settings.INTENT_OPEN_APP_DOWNLOADING
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+    }
+
+    private fun updateSource(source: SourceView) {
+        sourceView = source
     }
 
     internal data class DownloadingInfo(val episodeUUID: String, val jobId: UUID)
