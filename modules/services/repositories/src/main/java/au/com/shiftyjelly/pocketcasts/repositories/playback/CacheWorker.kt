@@ -51,12 +51,10 @@ class CacheWorker @AssistedInject constructor(
                 cacheDataSourceFactory.createDataSource(),
                 dataSpec,
                 null,
-            ) { requestLength: Long, bytesCached: Long, _: Long ->
-                if (bytesCached == requestLength) {
-                    Timber.d("$TAG: Caching complete for episode id: $episodeUuid")
-                }
-            }
+                null,
+            )
             cacheWriter?.cache()
+            Timber.tag(TAG).d("Caching complete for episode id: $episodeUuid")
         } catch (exception: Exception) {
             Timber.e("$TAG: ${exception.message}")
         }
