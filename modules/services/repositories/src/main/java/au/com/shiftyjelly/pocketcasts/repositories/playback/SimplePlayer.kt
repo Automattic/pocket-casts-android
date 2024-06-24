@@ -17,8 +17,6 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
@@ -33,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.automattic.android.tracks.crashlogging.CrashLogging
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +41,7 @@ class SimplePlayer(
     val settings: Settings,
     val statsManager: StatsManager,
     val context: Context,
-    val crashLogging: CrashLogging,
+    private val exoPlayerHelper: ExoPlayerHelper,
     override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
@@ -251,9 +248,7 @@ class SimplePlayer(
 
         addVideoListener(player)
 
-        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Pocket Casts")
-            .setAllowCrossProtocolRedirects(true)
+        val httpDataSourceFactory = exoPlayerHelper.getDataSourceFactory()
         val dataSourceFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
         val extractorsFactory = DefaultExtractorsFactory()
             .setConstantBitrateSeekingEnabled(true)
@@ -286,15 +281,12 @@ class SimplePlayer(
             }
         } ?: return
 
-        val sourceFactory = ExoPlayerCacheUtil.getSimpleCache(
-            context = context,
-            cacheSizeInMB = settings.getExoPlayerCacheSizeInMB(),
-            crashLogging = crashLogging,
-        )?.let { cache ->
+        val sourceFactory = exoPlayerHelper.getSimpleCache()?.let { cache ->
             if (location is EpisodeLocation.Stream) {
-                CacheDataSource.Factory()
-                    .setCache(cache)
-                    .setUpstreamDataSourceFactory(httpDataSourceFactory)
+                exoPlayerHelper.getCacheDataSourceFactory(
+                    httpDataSourceFactory,
+                    cache,
+                )
             } else {
                 dataSourceFactory
             }

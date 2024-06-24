@@ -19,7 +19,6 @@ Language: it
     <string name="settings_general_sleep_timer">Autospegnimento</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Dare priorità alla precisione della ricerca può rallentarne in modo significativo la reattività e comportare un maggiore consumo di dati da parte di Pocket Casts.</string>
     <string name="settings_advanced_prioritize_seek_accuracy">Dare priorità alla precisione della ricerca</string>
-    <string name="settings_storage_section_heading_seek_accuracy">Precisione della ricerca</string>
     <string name="settings_import_opml_succeeded_message">Importazione di OPML completata.</string>
     <string name="settings_import_opml_import_failed_message">Impossibile importare i podcast dal file OPML specificato.</string>
     <string name="nova_launcher_recently_played">Ascoltati di recente</string>
