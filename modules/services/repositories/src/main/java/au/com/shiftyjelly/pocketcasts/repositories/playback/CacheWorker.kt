@@ -15,6 +15,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -57,7 +58,9 @@ class CacheWorker @AssistedInject constructor(
             cacheWriter?.cache()
             Timber.tag(TAG).d("Caching complete for episode id: $episodeUuid worker id: '$id'")
         } catch (exception: Exception) {
-            Timber.tag(TAG).e(exception, "Failed to cache episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'")
+            val errorMessage = "Failed to cache episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'"
+            Timber.tag(TAG).e(exception, errorMessage)
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, errorMessage)
             return Result.failure()
         }
         return Result.success()
