@@ -950,6 +950,10 @@ class SettingsImpl @Inject constructor(
         return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB)
     }
 
+    override fun getExoPlayerCacheEntirePlayingEpisodeSizeInMB(): Long {
+        return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB)
+    }
+
     override fun getPlaybackEpisodePositionChangedOnSyncThresholdSecs(): Long {
         return firebaseRemoteConfig.getLong(FirebaseConfig.PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC_THRESHOLD_SECS)
     }
