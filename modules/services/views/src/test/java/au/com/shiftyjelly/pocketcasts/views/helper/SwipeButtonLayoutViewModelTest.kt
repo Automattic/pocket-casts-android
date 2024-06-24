@@ -49,6 +49,7 @@ class SwipeButtonLayoutViewModelTest {
             podcastManager = mock(),
             userEpisodeManager = mock(),
             applicationScope = CoroutineScope(Dispatchers.Default),
+            shareDialogFactory = mock(),
         )
     }
 

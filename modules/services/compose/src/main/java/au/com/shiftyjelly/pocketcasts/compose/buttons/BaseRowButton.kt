@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ButtonElevation
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,6 +37,7 @@ fun BaseRowButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -52,6 +54,7 @@ fun BaseRowButton(
         Button(
             onClick = { onClick() },
             shape = RoundedCornerShape(cornerRadius),
+            elevation = elevation,
             border = border,
             modifier = Modifier.fillMaxWidth(),
             colors = colors,
