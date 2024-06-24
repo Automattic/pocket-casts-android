@@ -49,6 +49,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -415,6 +417,15 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun observePodcastByUuidFlow(uuid: String): Flow<Podcast> {
         return podcastDao.observeByUuidFlow(uuid)
+    }
+
+    override fun observePodcastByEpisodeUuid(uuid: String): Flow<Podcast> {
+        return flow {
+            val episode = episodeDao.findByUuid(uuid)
+            if (episode != null) {
+                emitAll(podcastDao.observeByUuidFlow(episode.podcastUuid))
+            }
+        }
     }
 
     override fun findByUuids(uuids: Collection<String>): List<Podcast> {

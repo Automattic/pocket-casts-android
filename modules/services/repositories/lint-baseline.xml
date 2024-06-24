@@ -74,7 +74,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/DownloadManagerImpl.kt"
-            line="558"
+            line="559"
             column="25"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
-            line="201"
+            line="211"
             column="13"/>
     </issue>
 
@@ -290,7 +290,7 @@
         errorLine2="                ~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/SimplePlayer.kt"
-            line="235"
+            line="233"
             column="17"/>
     </issue>
 

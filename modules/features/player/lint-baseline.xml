@@ -19,7 +19,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/UpNextFragment.kt"
-            line="206"
+            line="209"
             column="18"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/UpNextFragment.kt"
-            line="345"
+            line="348"
             column="13"/>
     </issue>
 

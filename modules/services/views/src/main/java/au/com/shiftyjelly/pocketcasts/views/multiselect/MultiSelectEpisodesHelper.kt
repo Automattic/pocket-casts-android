@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -54,6 +54,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
+    private val shareDialogFactory: ShareDialogFactory,
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 
@@ -437,7 +438,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 return@launch
             }
 
-            ShareDialog(
+            shareDialogFactory.create(
                 episode = episode,
                 podcast = podcast,
                 fragmentManager = fragmentManager,

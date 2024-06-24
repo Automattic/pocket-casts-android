@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.clip.ShareClipFragment
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShareBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -104,6 +105,11 @@ class ShareFragment : BaseDialogFragment() {
             close()
         }
         binding.buttonShareClip.setOnClickListener {
+            if (podcast != null && episode is PodcastEpisode) {
+                ShareClipFragment
+                    .newInstance(episode.uuid, podcast.backgroundColor)
+                    .show(parentFragmentManager, "share_clip")
+            }
             close()
         }
 

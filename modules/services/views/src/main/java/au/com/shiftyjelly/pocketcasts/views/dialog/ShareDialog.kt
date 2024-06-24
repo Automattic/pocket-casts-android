@@ -18,9 +18,10 @@ class ShareDialog(
     private val episode: PodcastEpisode?,
     private val fragmentManager: FragmentManager?,
     private val context: Context?,
-    private val shouldShowPodcast: Boolean = true,
-    private val forceDarkTheme: Boolean = false,
+    private val shouldShowPodcast: Boolean,
+    private val forceDarkTheme: Boolean,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val shareActionProvider: ShareActionProvider,
 ) {
 
     init {
@@ -87,7 +88,9 @@ class ShareDialog(
             if (FeatureFlag.isEnabled(Feature.SHARE_CLIPS)) {
                 dialog.addCheckedOption(
                     titleId = LR.string.podcast_share_clip,
-                    click = {},
+                    click = {
+                        shareActionProvider.clipAction(episode, podcast, fragmentManager)
+                    },
                 )
             }
             if (episode.isDownloaded) {

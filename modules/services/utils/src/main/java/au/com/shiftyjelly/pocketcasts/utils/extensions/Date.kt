@@ -23,6 +23,13 @@ fun Date.switchInvalidForNow(): Date {
 }
 
 /**
+ * Convert date from UTC to the device's local time. Output string in the format Jan 12, 1952.
+ */
+fun Date.toLocalizedFormatMediumStyle(): String {
+    return DateUtil.toLocalizedFormatMediumStyle(this)
+}
+
+/**
  * Convert date from UTC to the device's local time. Output string in the format 23 April 2020.
  */
 fun Date.toLocalizedFormatLongStyle(): String {
