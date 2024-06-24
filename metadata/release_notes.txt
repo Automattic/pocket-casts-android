@@ -1,20 +1,11 @@
 *   New Features
-    *   Adds an option to export the database and preferences from the Help & Feedback view
-        ([#2309](https://github.com/Automattic/pocket-casts-android/pull/2309))
-    *   Chapters tab is now accessible from episode details.
-        ([#2318](https://github.com/Automattic/pocket-casts-android/pull/2318))
-*   Health
-    *   Increase target SDK version to 34
-        ([#2279](https://github.com/Automattic/pocket-casts-android/pull/2279))
-    *   Optimize writing large no. of podcast episodes into DB
-        ([#2324](https://github.com/Automattic/pocket-casts-android/pull/2324))
+    *   Adds advanced setting to enable caching playing episode in order to minimise streaming
+        ([#2380](https://github.com/Automattic/pocket-casts-android/pull/2380))
 *   Bug Fixes
-    *   Fix: Subscribe button is highlighted in green instead of gray in the carousel
-        ([#2278](https://github.com/Automattic/pocket-casts-android/pull/2278))
-    *   Fix syncing on app startup in the Automotive app
-        ([#2277](https://github.com/Automattic/pocket-casts-android/pull/2277))
-*   Updates:
-    *   Playback speed can now be changed up to 5x.
-        ([#1645](https://github.com/Automattic/pocket-casts-android/pull/1645))
-    *   Change up next tab position
-        ([#2310](https://github.com/Automattic/pocket-casts-android/pull/2310))
+    *   Fix sharing episodes when using multi-selection
+        ([#2376](https://github.com/Automattic/pocket-casts-android/pull/2376))
+    *   Fix deselected chapters not synced correctly between different platforms
+        ([#2357](https://github.com/Automattic/pocket-casts-android/pull/2357))
+    *   Adds download episode action button to shelf list in Now Playing
+        ([#2325](https://github.com/Automattic/pocket-casts-android/pull/2325))
+
