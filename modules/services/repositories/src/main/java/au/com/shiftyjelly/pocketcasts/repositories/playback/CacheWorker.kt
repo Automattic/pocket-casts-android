@@ -59,6 +59,7 @@ class CacheWorker @AssistedInject constructor(
             Timber.tag(TAG).d("Caching complete for episode id: $episodeUuid worker id: '$id'")
         } catch (exception: Exception) {
             Timber.tag(TAG).e(exception, "Failed to cache episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'")
+            return Result.failure()
         }
         return Result.success()
     }
