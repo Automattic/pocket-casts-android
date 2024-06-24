@@ -8,7 +8,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/account/ChangeEmailFragment.kt"
-            line="83"
+            line="82"
             column="18"/>
     </issue>
 

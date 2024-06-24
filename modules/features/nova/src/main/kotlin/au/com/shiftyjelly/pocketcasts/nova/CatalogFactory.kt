@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherQueueEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherRecentlyPlayedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
@@ -105,6 +106,25 @@ internal class CatalogFactory(
             },
         )
 
+    fun queuedEpisodes(data: List<NovaLauncherQueueEpisode>) = PodcastEpisodeCatalog("UpNextQueue")
+        .setLabel(context.getString(LR.string.nova_launcher_up_next))
+        .setPreferredAspectRatio(1, 1)
+        .addAllItems(
+            data.mapIndexed { index, episode ->
+                PodcastEpisode(episode.id)
+                    .setRank(index.toLong()) // Our queries sort episodes in a desired order.
+                    .setOpensDirectlyTo(episode.intent)
+                    .setName(episode.title)
+                    .setIcon(Image.WebUrl(episode.coverUrl, 1 to 1))
+                    .setReleaseTimestamp(episode.releaseTimestamp)
+                    .setLengthSeconds(episode.duration)
+                    .setCurrentPositionSeconds(episode.currentPosition)
+                    .setLastUsedTimestamp(episode.lastUsedTimestamp)
+                    .setSeasonNumber(episode.seasonNumber)
+                    .setEpisodeNumber(episode.episodeNumber)
+            },
+        )
+
     private val NovaLauncherSubscribedPodcast.coverUrl get() = podcastCover(id)
 
     private val NovaLauncherSubscribedPodcast.intent get() = openPodcastIntent(id, SourceView.NOVA_LAUNCHER_SUBSCRIBED_PODCASTS)
@@ -119,11 +139,23 @@ internal class CatalogFactory(
 
     private val NovaLauncherNewEpisode.coverUrl get() = podcastCover(podcastId)
 
-    private val NovaLauncherNewEpisode.intent get() = openEpisodeIntent(episodeId = id, podcastId = podcastId, EpisodeViewSource.NOVA_LAUNCHER_NEW_RELEASES)
+    private val NovaLauncherNewEpisode.intent get() = openPodcastEpisodeIntent(episodeId = id, podcastId = podcastId, EpisodeViewSource.NOVA_LAUNCHER_NEW_RELEASES)
 
-    private val NovaLauncherInProgressEpisode.intent get() = openEpisodeIntent(episodeId = id, podcastId = podcastId, EpisodeViewSource.NOVA_LAUNCHER_IN_PROGRESS)
+    private val NovaLauncherInProgressEpisode.intent get() = openPodcastEpisodeIntent(episodeId = id, podcastId = podcastId, EpisodeViewSource.NOVA_LAUNCHER_IN_PROGRESS)
 
     private val NovaLauncherInProgressEpisode.coverUrl get() = podcastCover(podcastId)
+
+    private val NovaLauncherQueueEpisode.intent get() = if (isPodcastEpisode) {
+        openPodcastEpisodeIntent(episodeId = id, podcastId = requireNotNull(podcastId), EpisodeViewSource.NOVA_LAUNCHER_QUEUE)
+    } else {
+        openUserEpisodeIntent(id, EpisodeViewSource.NOVA_LAUNCHER_QUEUE)
+    }
+
+    private val NovaLauncherQueueEpisode.coverUrl get() = if (isPodcastEpisode) {
+        podcastCover(requireNotNull(podcastId))
+    } else {
+        artworkUrl?.takeIf { tintColorIndex == 0 } ?: "${Settings.SERVER_STATIC_URL}/discover/images/artwork/dark/960/$tintColorIndex.png"
+    }
 
     private fun podcastCover(podcastId: String) = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$podcastId.webp"
 
@@ -132,10 +164,15 @@ internal class CatalogFactory(
         .putExtra(Settings.PODCAST_UUID, podcastId)
         .putExtra(Settings.SOURCE_VIEW, sourceView.analyticsValue)
 
-    private fun openEpisodeIntent(episodeId: String, podcastId: String, source: EpisodeViewSource) = context.launcherIntent
+    private fun openPodcastEpisodeIntent(episodeId: String, podcastId: String, source: EpisodeViewSource) = context.launcherIntent
         .setAction(Settings.INTENT_OPEN_APP_EPISODE_UUID)
         .putExtra(Settings.EPISODE_UUID, episodeId)
         .putExtra(Settings.PODCAST_UUID, podcastId)
+        .putExtra(Settings.SOURCE_VIEW, source.value)
+
+    private fun openUserEpisodeIntent(episodeId: String, source: EpisodeViewSource) = context.launcherIntent
+        .setAction(Settings.INTENT_OPEN_APP_EPISODE_UUID)
+        .putExtra(Settings.EPISODE_UUID, episodeId)
         .putExtra(Settings.SOURCE_VIEW, source.value)
 
     private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {

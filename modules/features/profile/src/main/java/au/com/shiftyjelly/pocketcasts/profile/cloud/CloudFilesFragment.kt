@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
@@ -126,8 +127,8 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private val onRowClick = { episode: BaseEpisode ->
-        analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_SHOWN)
-        CloudFileBottomSheetFragment.newInstance(episode.uuid)
+        CloudFileBottomSheetFragment
+            .newInstance(episode.uuid, source = EpisodeViewSource.FILES)
             .show(parentFragmentManager, "cloud_bottom_sheet")
     }
 

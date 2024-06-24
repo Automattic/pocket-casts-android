@@ -190,6 +190,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         val binding = FragmentUpnextBinding.inflate(themedInflater, container, false).also {
             realBinding = it
         }
+        if (upNextSource == UpNextSource.UP_NEXT_TAB) {
+            analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf("source" to "tab_bar"))
+        }
         return binding.root
     }
 

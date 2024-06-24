@@ -54,7 +54,7 @@ internal data class LargePlayerWidgetState(
             val upNextDao = context.widgetEntryPoint().upNextDao()
             val settings = context.widgetEntryPoint().settings()
             val playbackManager = context.widgetEntryPoint().playbackManager()
-            val queue = upNextDao.findUpNextEpisodes(limit = EPISODE_LIMIT).map(PlayerWidgetEpisode::fromBaseEpisode)
+            val queue = upNextDao.getUpNextBaseEpisodes(limit = EPISODE_LIMIT).map(PlayerWidgetEpisode::fromBaseEpisode)
             return LargePlayerWidgetState(
                 queue = queue,
                 isPlaying = playbackManager.isPlaying(),

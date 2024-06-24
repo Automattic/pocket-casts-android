@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-11 09:54:03+0000
+Translation-Revision-Date: 2024-06-18 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="download_completed_for_episode">%1$s 下载已完成</string>
+    <string name="episode_queued_for_download">剧集正在排队等待下载</string>
+    <string name="episode_was_removed">剧集已删除</string>
+    <string name="remove_downloaded_file">删除已下载的文件</string>
     <string name="settings_export_database_failed">数据库导出失败</string>
     <string name="settings_export_database">导出数据库</string>
     <string name="settings_sleep_timer_auto_restart_summary">如果打开，则如果您在最后一次暂停后的 5 分钟内播放了剧集，睡眠计时器将自动重启。</string>

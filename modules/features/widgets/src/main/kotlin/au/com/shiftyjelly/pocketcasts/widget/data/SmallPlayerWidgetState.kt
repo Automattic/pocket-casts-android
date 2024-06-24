@@ -48,7 +48,7 @@ internal data class SmallPlayerWidgetState(
             val upNextDao = context.widgetEntryPoint().upNextDao()
             val settings = context.widgetEntryPoint().settings()
             val playbackManager = context.widgetEntryPoint().playbackManager()
-            val episode = upNextDao.findUpNextEpisodes(limit = 1).map(PlayerWidgetEpisode::fromBaseEpisode).firstOrNull()
+            val episode = upNextDao.getUpNextBaseEpisodes(limit = 1).map(PlayerWidgetEpisode::fromBaseEpisode).firstOrNull()
             return SmallPlayerWidgetState(
                 episode = episode,
                 isPlaying = playbackManager.isPlaying(),

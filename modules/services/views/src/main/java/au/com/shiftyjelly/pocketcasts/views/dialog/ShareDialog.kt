@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ShareDialog(
@@ -82,6 +84,12 @@ class ShareDialog(
                     ).showShareDialogDirect()
                 },
             )
+            if (FeatureFlag.isEnabled(Feature.SHARE_CLIPS)) {
+                dialog.addCheckedOption(
+                    titleId = LR.string.podcast_share_clip,
+                    click = {},
+                )
+            }
             if (episode.isDownloaded) {
                 dialog.addCheckedOption(
                     titleId = LR.string.podcast_share_open_file_in,

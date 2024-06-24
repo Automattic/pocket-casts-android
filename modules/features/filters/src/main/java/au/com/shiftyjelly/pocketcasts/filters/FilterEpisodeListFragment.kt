@@ -453,6 +453,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar
+        multiSelectHelper.context = requireActivity()
         multiSelectHelper.source = SourceView.FILTERS
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             if (!multiSelectLoaded) {

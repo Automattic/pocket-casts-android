@@ -254,7 +254,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_EPISODE_POSITION_CHANGED_ON_SYNC("playback_episode_position_changed_on_sync"),
 
     /* Privacy */
-    PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
+    PRIVACY_SHOWN("privacy_shown"),
     ANALYTICS_OPT_IN("analytics_opt_in"),
     ANALYTICS_OPT_OUT("analytics_opt_out"),
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),

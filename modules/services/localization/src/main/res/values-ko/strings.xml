@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-11 09:54:03+0000
+Translation-Revision-Date: 2024-06-18 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="download_completed_for_episode">%1$s 다운로드 완료됨</string>
+    <string name="episode_queued_for_download">다운로드 대기 중인 에피소드</string>
+    <string name="episode_was_removed">에피소드 삭제됨</string>
+    <string name="remove_downloaded_file">다운로드한 파일 제거</string>
     <string name="settings_export_database_failed">데이터베이스 내보내기 실패</string>
     <string name="settings_export_database">데이터베이스 내보내기</string>
     <string name="settings_sleep_timer_auto_restart_summary">이 기능을 켜면 마지막 일시 중지 후 5분 이내에 에피소드를 재생하는 경우 절전 타이머가 자동으로 재시작됩니다.</string>
