@@ -19,7 +19,6 @@ Language: es
     <string name="settings_general_sleep_timer">Temporizador</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Priorizar la precisión en la búsqueda puede ralentizar significativamente la capacidad de respuesta de la búsqueda y hacer que Pocket Casts consuma más datos.</string>
     <string name="settings_advanced_prioritize_seek_accuracy">Priorizando la precisión en la búsqueda</string>
-    <string name="settings_storage_section_heading_seek_accuracy">Precisión en la búsqueda</string>
     <string name="settings_import_opml_succeeded_message">Importación de OPML realizada correctamente.</string>
     <string name="settings_import_opml_import_failed_message">No se pueden importar los podcasts del archivo OPML que has especificado.</string>
     <string name="nova_launcher_recently_played">Reproducido recientemente</string>

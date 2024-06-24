@@ -194,6 +194,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val cacheEntirePlayingEpisode = UserSetting.CacheEntirePlayingEpisodePref(
+        sharedPrefKey = "cacheEntirePlayingEpisode",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun setSelectPodcastsSortType(sortType: PodcastsSortType) {
         sharedPreferences.edit().apply {
             putString(Settings.PREFERENCE_SELECT_PODCAST_LIBRARY_SORT, sortType.clientId.toString())
@@ -942,6 +948,10 @@ class SettingsImpl @Inject constructor(
 
     override fun getExoPlayerCacheSizeInMB(): Long {
         return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB)
+    }
+
+    override fun getExoPlayerCacheEntirePlayingEpisodeSizeInMB(): Long {
+        return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB)
     }
 
     override fun getPlaybackEpisodePositionChangedOnSyncThresholdSecs(): Long {

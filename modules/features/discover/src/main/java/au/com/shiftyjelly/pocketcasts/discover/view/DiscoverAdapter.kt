@@ -136,10 +136,16 @@ internal class DiscoverAdapter(
     }
     var onChangeRegion: (() -> Unit)? = null
 
+    private var isFeaturePageTrackingEnabled = true
+
     private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
 
     init {
         setHasStableIds(true)
+    }
+
+    fun enablePageTracking(enable: Boolean) {
+        isFeaturePageTrackingEnabled = enable
     }
 
     abstract class NetworkLoadableViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -258,8 +264,12 @@ internal class DiscoverAdapter(
                         recyclerView?.scrollToPosition(nextPosition)
                     }
                     binding.pageIndicatorView.position = nextPosition
+
                     trackSponsoredListImpression(nextPosition)
-                    trackPageChanged(nextPosition)
+
+                    if (isFeaturePageTrackingEnabled) {
+                        trackPageChanged(nextPosition)
+                    }
                 }
             }
 

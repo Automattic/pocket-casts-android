@@ -49,6 +49,17 @@ class AdvancedSettingsViewModel
                 )
             },
         ),
+        cacheEntirePlayingEpisodeState = State.CacheEntirePlayingEpisodeState(
+            isChecked = settings.cacheEntirePlayingEpisode.value,
+            onCheckedChange = {
+                settings.cacheEntirePlayingEpisode.set(it, updateModifiedAt = false)
+                updateCacheEntirePlayingEpisodeState()
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_ADVANCED_CACHE_ENTIRE_PLAYING_EPISODE,
+                    mapOf("enabled" to it),
+                )
+            },
+        ),
     )
 
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {
@@ -75,6 +86,14 @@ class AdvancedSettingsViewModel
         )
     }
 
+    private fun updateCacheEntirePlayingEpisodeState() {
+        mutableState.value = mutableState.value.copy(
+            cacheEntirePlayingEpisodeState = mutableState.value.cacheEntirePlayingEpisodeState.copy(
+                isChecked = settings.cacheEntirePlayingEpisode.value,
+            ),
+        )
+    }
+
     fun onShown() {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_SHOWN)
     }
@@ -82,6 +101,7 @@ class AdvancedSettingsViewModel
     data class State(
         val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState,
         val prioritizeSeekAccuracyState: PrioritizeSeekAccuracyState,
+        val cacheEntirePlayingEpisodeState: CacheEntirePlayingEpisodeState,
     ) {
 
         data class BackgroundSyncOnMeteredState(
@@ -91,6 +111,11 @@ class AdvancedSettingsViewModel
         )
 
         data class PrioritizeSeekAccuracyState(
+            val isChecked: Boolean,
+            val onCheckedChange: (Boolean) -> Unit,
+        )
+
+        data class CacheEntirePlayingEpisodeState(
             val isChecked: Boolean,
             val onCheckedChange: (Boolean) -> Unit,
         )

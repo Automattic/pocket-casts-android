@@ -65,6 +65,7 @@
     <string name="pause">Pause</string>
     <string name="pause_episode">Pause episode</string>
     <string name="play">Play</string>
+    <string name="playback">Playback</string>
     <string name="play_all">Play all</string>
     <string name="play_all_from_here">Play all from here</string>
     <string name="play_episode">Play episode</string>
@@ -1291,7 +1292,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_storage_move_podcasts">Moving podcasts&#x2026;</string>
     <string name="settings_storage_section_heading_usage">Usage</string>
     <string name="settings_storage_section_heading_mobile_data">Mobile Data</string>
-    <string name="settings_storage_section_heading_seek_accuracy">Seek Accuracy</string>
+    <string name="settings_storage_section_heading_playback" translatable="false">@string/playback</string>
     <string name="settings_storage_size_free">%s free</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_store_on">Store podcasts on</string>
@@ -1490,10 +1491,13 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_open_on_phone">Open on phone</string>
     <string name="settings_could_not_open_on_phone">Unable to open on phone</string>
 
+    <string name="settings_advanced_heading_playback" translatable="false">@string/playback</string>
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
     <string name="settings_advanced_prioritize_seek_accuracy">Prioritizing seek accuracy</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Prioritizing seek accuracy can significantly slow down seek responsiveness and cause Pocket Casts to consume more data.</string>
+    <string name="settings_advanced_cache_entire_playing_episode">Cache playing episode</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">Entire playing episode is cached on an unmetered network to minimize streaming while playing. The episode is automatically removed from cache when the cache size limit is reached.</string>
     <!-- Used in a button meaning that the user understood the message. -->
     <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->

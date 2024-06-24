@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AdvancedSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
@@ -94,9 +96,12 @@ fun AdvancedSettingsView(
             }
             item {
                 SettingSection(
-                    heading = stringResource(LR.string.settings_storage_section_heading_seek_accuracy),
+                    heading = stringResource(LR.string.settings_advanced_heading_playback),
                     indent = false,
                 ) {
+                    if (FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)) {
+                        CacheEntirePlayingEpisodeRow(state.cacheEntirePlayingEpisodeState)
+                    }
                     PrioritizeSeekAccuracydRow(state.prioritizeSeekAccuracyState)
                 }
             }
@@ -140,6 +145,24 @@ private fun PrioritizeSeekAccuracydRow(
     )
 }
 
+@Composable
+private fun CacheEntirePlayingEpisodeRow(
+    state: AdvancedSettingsViewModel.State.CacheEntirePlayingEpisodeState,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_advanced_cache_entire_playing_episode),
+        secondaryText = stringResource(LR.string.settings_advanced_cache_entire_playing_episode_summary),
+        toggle = SettingRowToggle.Switch(state.isChecked),
+        indent = false,
+        modifier = modifier.toggleable(
+            value = state.isChecked,
+            role = Role.Switch,
+            onValueChange = { state.onCheckedChange(it) },
+        ),
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun AdvancedSettingsPreview(
@@ -154,6 +177,10 @@ private fun AdvancedSettingsPreview(
                     onCheckedChange = {},
                 ),
                 prioritizeSeekAccuracyState = AdvancedSettingsViewModel.State.PrioritizeSeekAccuracyState(
+                    isChecked = true,
+                    onCheckedChange = {},
+                ),
+                cacheEntirePlayingEpisodeState = AdvancedSettingsViewModel.State.CacheEntirePlayingEpisodeState(
                     isChecked = true,
                     onCheckedChange = {},
                 ),

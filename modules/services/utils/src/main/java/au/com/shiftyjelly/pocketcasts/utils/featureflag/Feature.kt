@@ -115,6 +115,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    CACHE_ENTIRE_PLAYING_EPISODE(
+        key = "cache_entire_playing_episode",
+        title = "Cache entire playing episode",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     SHARE_CLIPS(
         key = "share_clip",
         title = "Share episode clips",

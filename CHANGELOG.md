@@ -1,5 +1,8 @@
 7.67
 -----
+*   New Features
+    *   Adds advanced setting to enable caching playing episode in order to minimise streaming
+        ([#2380](https://github.com/Automattic/pocket-casts-android/pull/2380))
 *   Bug Fixes
     *   Fix sharing episodes when using multi-selection
         ([#2376](https://github.com/Automattic/pocket-casts-android/pull/2376))

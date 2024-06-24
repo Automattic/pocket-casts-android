@@ -19,7 +19,6 @@ Language: ja_JP
     <string name="settings_general_sleep_timer">スリープタイマー</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">探索の精度を優先すると、探索の応答性が大幅に低下し、Pocket Casts のデータ消費が増える可能性があります。</string>
     <string name="settings_advanced_prioritize_seek_accuracy">探索の精度を優先</string>
-    <string name="settings_storage_section_heading_seek_accuracy">探索の精度</string>
     <string name="settings_import_opml_succeeded_message">OPML をインポートできました。</string>
     <string name="settings_import_opml_import_failed_message">指定した OPML ファイルからポッドキャストをインポートできません。</string>
     <string name="nova_launcher_recently_played">最近再生済み</string>

@@ -247,6 +247,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SKIP_BACK("playback_skip_back"),
     PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
     PLAYBACK_STOP("playback_stop"),
+    PLAYBACK_FAILED("playback_failed"),
     PLAYBACK_SEEK("playback_seek"),
     PLAYBACK_EPISODE_AUTOPLAYED("playback_episode_autoplayed"),
     PLAYBACK_EPISODE_DURATION_CHANGED("playback_episode_duration_changed"),
@@ -557,6 +558,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_ADVANCED_SHOWN("settings_advanced_shown"),
     SETTINGS_ADVANCED_SYNC_ON_METERED("settings_advanced_sync_on_metered"),
     SETTINGS_ADVANCED_PRIORITIZE_SEEK_ACCURACY("settings_advanced_prioritize_seek_accuracy"),
+    SETTINGS_ADVANCED_CACHE_ENTIRE_PLAYING_EPISODE("settings_advanced_cache_entire_playing_episode"),
 
     /* Search */
     SEARCH_SHOWN("search_shown"),

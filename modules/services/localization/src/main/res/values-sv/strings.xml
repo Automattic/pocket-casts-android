@@ -19,7 +19,6 @@ Language: sv_SE
     <string name="settings_general_sleep_timer">Sömntimer</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Att prioritera sökprecision kan bromsa svarstiden för sökningar avsevärt och göra att Pocket Casts konsumerar mer data.</string>
     <string name="settings_advanced_prioritize_seek_accuracy">Prioritera sökprecision</string>
-    <string name="settings_storage_section_heading_seek_accuracy">Sökprecision</string>
     <string name="settings_import_opml_succeeded_message">OPML-importen har genomförts.</string>
     <string name="settings_import_opml_import_failed_message">Det gick inte att importera podcasts från den angivna OPML-filen.</string>
     <string name="nova_launcher_recently_played">Senast spelade</string>

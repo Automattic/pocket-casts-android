@@ -288,6 +288,7 @@ interface Settings {
     val backgroundRefreshPodcasts: UserSetting<Boolean>
     val podcastsSortType: UserSetting<PodcastsSortType>
     val prioritizeSeekAccuracy: UserSetting<Boolean>
+    val cacheEntirePlayingEpisode: UserSetting<Boolean>
 
     fun setSelectPodcastsSortType(sortType: PodcastsSortType)
     fun getSelectPodcastsSortType(): PodcastsSortType
@@ -409,6 +410,7 @@ interface Settings {
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
     fun getExoPlayerCacheSizeInMB(): Long
+    fun getExoPlayerCacheEntirePlayingEpisodeSizeInMB(): Long
     fun getPlaybackEpisodePositionChangedOnSyncThresholdSecs(): Long
 
     val podcastGroupingDefault: UserSetting<PodcastGrouping>

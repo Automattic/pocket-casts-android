@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
 import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,7 +73,7 @@ abstract class UserSetting<T>(
         }
     }
 
-    class BoolPref(
+    open class BoolPref(
         sharedPrefKey: String,
         private val defaultValue: Boolean,
         sharedPrefs: SharedPreferences,
@@ -271,6 +273,20 @@ abstract class UserSetting<T>(
             intValue.toString()
         },
     )
+
+    // This returns shared pref value only if CACHE_ENTIRE_PLAYING_EPISODE feature flag is enabled, otherwise returns always false
+    class CacheEntirePlayingEpisodePref(
+        sharedPrefKey: String,
+        private val defaultValue: Boolean,
+        sharedPrefs: SharedPreferences,
+    ) : BoolPref(sharedPrefKey, defaultValue, sharedPrefs) {
+
+        override fun get() = if (FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)) {
+            sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
+        } else {
+            false
+        }
+    }
 
     // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
     // from a mocked Settings class
