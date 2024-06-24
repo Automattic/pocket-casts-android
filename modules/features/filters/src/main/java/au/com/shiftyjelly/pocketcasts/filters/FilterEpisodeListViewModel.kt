@@ -144,7 +144,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         val trimmedList = episodes.subList(0, min(MAX_DOWNLOAD_ALL, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "filter download all", fireEvent = false, fireToast = false)
+                downloadManager.addEpisodeToQueue(it, "filter download all", fireEvent = false, fireToast = false, source = SourceView.FILTERS)
             }
         }
     }
