@@ -194,7 +194,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val cacheEntirePlayingEpisode = UserSetting.BoolPref(
+    override val cacheEntirePlayingEpisode = UserSetting.CacheEntirePlayingEpisodePref(
         sharedPrefKey = "cacheEntirePlayingEpisode",
         defaultValue = false,
         sharedPrefs = sharedPreferences,
