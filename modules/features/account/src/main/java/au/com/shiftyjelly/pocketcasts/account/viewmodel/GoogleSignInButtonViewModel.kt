@@ -56,6 +56,8 @@ class GoogleSignInButtonViewModel @Inject constructor(
         onError: suspend () -> Unit,
     ) {
         if (flow != null) {
+            analyticsTracker.track(AnalyticsEvent.SSO_STARTED, mapOf("source" to "google"))
+
             analyticsTracker.track(
                 AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
                 mapOf(
