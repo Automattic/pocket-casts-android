@@ -27,6 +27,8 @@ class CacheWorker @AssistedInject constructor(
     private val exoPlayerHelper: ExoPlayerHelper,
 ) : Worker(context, params) {
     private var cacheWriter: CacheWriter? = null
+    private val episodeUuid get() = inputData.getString(EPISODE_UUID_KEY)
+    private val downloadUrl get() = inputData.getString(URL_KEY)
 
     override fun doWork(): Result {
         try {
@@ -54,9 +56,9 @@ class CacheWorker @AssistedInject constructor(
                 null,
             )
             cacheWriter?.cache()
-            Timber.tag(TAG).d("Caching complete for episode id: $episodeUuid")
+            Timber.tag(TAG).d("Caching complete for episode id: $episodeUuid worker id: '$id'")
         } catch (exception: Exception) {
-            Timber.e("$TAG: ${exception.message}")
+            Timber.tag(TAG).e(exception, "Failed to cache episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'")
         }
         return Result.success()
     }
@@ -66,7 +68,7 @@ class CacheWorker @AssistedInject constructor(
             cacheWriter?.cancel()
             super.onStopped()
         } catch (exception: Exception) {
-            Timber.e("$TAG: ${exception.message}")
+            Timber.tag(TAG).e("Error: ${exception.message} worker id: '$id'")
         }
     }
 
