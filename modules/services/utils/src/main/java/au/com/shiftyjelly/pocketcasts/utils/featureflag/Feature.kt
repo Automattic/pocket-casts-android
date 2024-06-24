@@ -118,9 +118,9 @@ enum class Feature(
     CACHE_ENTIRE_PLAYING_EPISODE(
         key = "cache_entire_playing_episode",
         title = "Cache entire playing episode",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     SHARE_CLIPS(

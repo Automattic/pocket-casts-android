@@ -6,7 +6,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -36,14 +35,17 @@ class ExoPlayerHelper @Inject constructor(
 
     private var simpleCache: SimpleCache? = null
     private var dataSourceFactory: DataSource.Factory? = null
-    private var cacheDataSourceFactory: CacheDataSource.Factory? = null
 
     @OptIn(UnstableApi::class)
     @Synchronized
     fun getSimpleCache(): SimpleCache? {
         if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) && simpleCache == null) {
             val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
-            val cacheSizeInBytes = settings.getExoPlayerCacheSizeInMB() * 1024 * 1024L
+            val cacheSizeInBytes = if (settings.cacheEntirePlayingEpisode.value) {
+                settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB()
+            } else {
+                settings.getExoPlayerCacheSizeInMB()
+            } * 1024 * 1024L
             simpleCache = try {
                 if (BuildConfig.DEBUG) Timber.d("ExoPlayer cache initialized")
                 SimpleCache(
@@ -70,20 +72,5 @@ class ExoPlayerHelper @Inject constructor(
                 .setReadTimeoutMs(TIMEOUT_MILLI_SECS)
         }
         return requireNotNull(dataSourceFactory)
-    }
-
-    fun getCacheDataSourceFactory(
-        httpDataSourceFactory: DataSource.Factory,
-        cache: SimpleCache? = null,
-    ): CacheDataSource.Factory {
-        if (cacheDataSourceFactory == null) {
-            cacheDataSourceFactory = CacheDataSource.Factory()
-                .setUpstreamDataSourceFactory(httpDataSourceFactory)
-                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-            if (cache != null) {
-                cacheDataSourceFactory?.setCache(cache)
-            }
-        }
-        return requireNotNull(cacheDataSourceFactory)
     }
 }

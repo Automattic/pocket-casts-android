@@ -28,6 +28,10 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
             firebaseRemoteConfig
                 .getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB) > 0
 
+        Feature.CACHE_ENTIRE_PLAYING_EPISODE ->
+            firebaseRemoteConfig
+                .getLong(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB) > 0
+
         else -> firebaseRemoteConfig.getBoolean(feature.key)
     }
 
