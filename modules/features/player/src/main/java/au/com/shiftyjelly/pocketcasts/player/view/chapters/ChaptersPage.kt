@@ -22,7 +22,7 @@ fun ChaptersPage(
     totalChaptersCount: Int,
     onSelectionChange: (Boolean, Chapter) -> Unit,
     onChapterClick: (Chapter) -> Unit,
-    onUrlClick: (String) -> Unit,
+    onUrlClick: (Chapter) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
@@ -54,7 +54,7 @@ fun ChaptersPage(
                 selectedCount = selectedCount,
                 onSelectionChange = onSelectionChange,
                 onClick = { onChapterClick(state.chapter) },
-                onUrlClick = { onUrlClick(state.chapter.url.toString()) },
+                onUrlClick = { onUrlClick(state.chapter) },
                 modifier = Modifier.animateItemPlacement(),
             )
             if (index < chapters.lastIndex) {
