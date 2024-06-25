@@ -280,6 +280,7 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_SHOWN("filter_shown"),
     FILTER_SORT_BY_CHANGED("filter_sort_by_changed"),
     FILTER_UPDATED("filter_updated"),
+    FILTER_OPTIONS_MODAL_OPTION_TAPPED("filter_options_modal_option_tapped"),
 
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),
