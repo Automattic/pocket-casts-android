@@ -6,18 +6,44 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.currentStateAsState
 import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.compose.themeTypeToColors
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -32,7 +58,19 @@ import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.gravatar.api.models.Profile
+import com.gravatar.services.ProfileService
+import com.gravatar.services.Result
+import com.gravatar.types.Email
+import com.gravatar.ui.GravatarTheme
+import com.gravatar.ui.LocalGravatarTheme
+import com.gravatar.ui.components.ComponentState
+import com.gravatar.ui.components.LargeProfileSummary
+import com.gravatar.ui.components.atomic.ViewProfileButton
 import java.util.Date
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -54,7 +92,7 @@ open class UserView @JvmOverloads constructor(
     val maxSubscriptionExpiryMs = 30L * 24L * 60L * 60L * 1000L
     val lblUserEmail: TextView
     val lblSignInStatus: TextView?
-    val imgProfilePicture: ProfileCircleView
+    var imgProfilePicture: ProfileCircleView
     val btnAccount: Button?
     private val subscriptionBadge: ComposeView?
     private val isDarkTheme: Boolean
@@ -70,13 +108,13 @@ open class UserView @JvmOverloads constructor(
     }
 
     open fun update(signInState: SignInState?) {
-        updateProfileImageAndDaysRemaining(signInState)
+        updateProfileImageAndDaysRemaining(signInState = signInState)
         updateEmail(signInState)
         updateSubscriptionBadge(signInState)
         updateAccountButton(signInState)
     }
 
-    private fun updateProfileImageAndDaysRemaining(
+    fun updateProfileImageAndDaysRemaining(
         signInState: SignInState?,
     ) {
         when (signInState) {
@@ -212,10 +250,29 @@ class ExpandedUserView @JvmOverloads constructor(
     val lblPaymentStatus: TextView
         get() = findViewById(R.id.lblPaymentStatus)
 
+    // For Gravatar Profile
+    var appTheme: Theme? = null
+    private val gravatarProfileCard: ComposeView
+        get() = findViewById(R.id.gravatarProfileCard)
+    private val legacyImgProfilePicture: ProfileCircleView = imgProfilePicture
+
+    init {
+        if (FeatureFlag.isEnabled(Feature.GRAVATAR_PROFILE)) {
+            imgProfilePicture = ProfileCircleView(context)
+        }
+    }
+
     override fun update(signInState: SignInState?) {
         super.update(signInState)
 
         val status = (signInState as? SignInState.SignedIn)?.subscriptionStatus ?: return
+
+        if (FeatureFlag.isEnabled(Feature.GRAVATAR_PROFILE)) {
+            gravatarProfileCard.visibility = View.VISIBLE
+            legacyImgProfilePicture.visibility = View.GONE
+            setGravatarProfileCard(signInState)
+        }
+
         when (status) {
             is SubscriptionStatus.Free -> {
                 lblPaymentStatus.text = context.getString(LR.string.profile_free_account)
@@ -284,6 +341,127 @@ class ExpandedUserView @JvmOverloads constructor(
             val expiryDate = subscription.expiryDate?.let { it.toLocalizedFormatLongStyle() } ?: context.getString(LR.string.profile_expiry_date_unknown)
             lblSignInStatus?.text = context.getString(LR.string.supporter_subscription_ends, expiryDate)
             lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
+        }
+    }
+
+    private fun setGravatarProfileCard(signInState: SignInState.SignedIn) {
+        gravatarProfileCard.setContent {
+            val lifecycleOwner = LocalLifecycleOwner.current
+            val lifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
+            val scope = rememberCoroutineScope()
+            val profileService = ProfileService()
+            var profileState: ComponentState<Profile> by remember { mutableStateOf(ComponentState.Loading, neverEqualPolicy()) }
+
+            val colorScheme = appTheme?.activeTheme?.let { themeTypeToColorsScheme(it) } ?: lightColorScheme()
+
+            CompositionLocalProvider(
+                LocalGravatarTheme provides object : GravatarTheme {
+                    // Override theme colors
+                    override val colorScheme: ColorScheme
+                        @Composable
+                        get() = colorScheme
+                },
+            ) {
+                LaunchedEffect(lifecycleState) {
+                    if (lifecycleState == Lifecycle.State.RESUMED) {
+                        scope.launch {
+                            when (val result = profileService.fetch(Email(signInState.email))) {
+                                is Result.Success -> {
+                                    result.value.let {
+                                        profileState = ComponentState.Loaded(it)
+                                    }
+                                }
+
+                                is Result.Failure -> {
+                                    // TODO: Handle error
+                                    profileState = ComponentState.Empty
+                                }
+                            }
+                        }
+                    }
+                }
+                GravatarProfileCard(profileState = profileState, signInState = signInState)
+            }
+        }
+    }
+
+    @Composable
+    private fun GravatarProfileCard(profileState: ComponentState<Profile>, signInState: SignInState.SignedIn) {
+        GravatarTheme {
+            Surface(
+                modifier = Modifier
+                    .padding(vertical = 24.dp, horizontal = 32.dp)
+                    .clip(RoundedCornerShape(16.dp)),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (profileState) {
+                        is ComponentState.Loaded -> {
+                            LargeProfileSummary(
+                                profileState,
+                                avatar = { PocketCastAvatar(signInState) },
+                                viewProfile = {
+                                    ViewProfileButton(
+                                        profileState.loadedValue,
+                                        buttonText = stringResource(id = LR.string.profile_gravatar_edit),
+                                    )
+                                },
+                            )
+                        }
+
+                        ComponentState.Loading -> LargeProfileSummary(profileState, Modifier.padding(top = 16.dp))
+                        ComponentState.Empty,
+                        -> {
+                            LargeProfileSummary(
+                                profileState,
+                                avatar = { PocketCastAvatar(signInState) },
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun PocketCastAvatar(signInState: SignInState.SignedIn) {
+        var updated by remember { mutableStateOf(false) }
+        AndroidView(
+            factory = { _ -> imgProfilePicture },
+            modifier = Modifier
+                .size(132.dp)
+                .onGloballyPositioned {
+                    if (!updated) {
+                        updated = true
+                        updateProfileImageAndDaysRemaining(signInState)
+                    }
+                }
+                .padding(8.dp),
+        )
+    }
+
+    @Composable
+    private fun themeTypeToColorsScheme(themeType: Theme.ThemeType): ColorScheme {
+        return themeTypeToColors(themeType).let { colors ->
+            val baseColorScheme = if (themeType.darkTheme) {
+                darkColorScheme()
+            } else {
+                lightColorScheme()
+            }
+
+            baseColorScheme.copy(
+                primary = colors.primaryInteractive01,
+                secondary = colors.primaryInteractive01,
+                surface = colors.primaryUi01,
+                error = colors.support05,
+                onPrimary = colors.primaryInteractive02,
+                onSecondary = colors.primaryInteractive02,
+                onBackground = colors.primaryInteractive01,
+                onSurface = colors.primaryInteractive01,
+                onError = colors.secondaryIcon01,
+            )
         }
     }
 }

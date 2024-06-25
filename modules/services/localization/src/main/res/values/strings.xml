@@ -1027,6 +1027,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="profile_whats_included">What\'s Included?</string>
     <string name="profile_yearly">Yearly</string>
     <string name="profile_expiry_date_unknown">Unknown</string>
+    <string name="profile_gravatar_edit">Edit profile</string>
 
     <!-- Plus -->
 

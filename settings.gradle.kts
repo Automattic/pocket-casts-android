@@ -29,6 +29,14 @@ dependencyResolutionManagement {
                 includeGroup("com.automattic")
                 includeGroup("com.automattic.tracks")
                 includeGroupByRegex("org.wordpress.*")
+                includeGroup("com.gravatar")
+            }
+        }
+        // Jitpack is used to fetch the uCrop library. Required only for gravatar-ui module.
+        maven {
+            setUrl("https://jitpack.io")
+            content {
+                includeModule("com.github.yalantis", "ucrop")
             }
         }
     }

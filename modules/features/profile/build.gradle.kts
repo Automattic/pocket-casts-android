@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":modules:features:player"))
     implementation(project(":modules:features:podcasts"))
     implementation(project(":modules:features:settings"))
+    implementation(libs.compose.material3)
 
     // services
     implementation(project(":modules:services:analytics"))
@@ -39,4 +40,7 @@ dependencies {
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
     implementation(project(":modules:services:views"))
+
+    implementation("com.gravatar:gravatar-ui:trunk-9fefe1ad77827a346b29916767bbe7a0f100bf17")
+    implementation("com.gravatar:gravatar:trunk-9fefe1ad77827a346b29916767bbe7a0f100bf17")
 }

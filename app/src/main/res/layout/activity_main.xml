@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/root">
@@ -15,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingBottom="@dimen/design_bottom_navigation_height"
-            android:clipToPadding="false" />
+            android:clipToPadding="false"
+            tools:ignore="PrivateResource" />
 
         <!-- Hack: the only way to get the Snackbar in front of the bottom navigation view -->
         <androidx.coordinatorlayout.widget.CoordinatorLayout
