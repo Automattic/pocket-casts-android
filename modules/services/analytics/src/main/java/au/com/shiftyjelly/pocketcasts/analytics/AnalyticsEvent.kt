@@ -388,6 +388,9 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_REMOVED_FROM_UP_NEXT("episode_removed_from_up_next"),
     PODCAST_SHARED("podcast_shared"),
 
+    /* Auto Play */
+    AUTOPLAY_FINISHED_LAST_EPISODE("autoplay_finished_last_episode"),
+
     /* Episode Details */
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),
     EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),

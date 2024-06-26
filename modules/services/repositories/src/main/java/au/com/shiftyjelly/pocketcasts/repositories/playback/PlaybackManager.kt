@@ -1392,12 +1392,13 @@ open class PlaybackManager @Inject constructor(
         }
 
         // If no matches found, play the latest episode on Android Automotive to avoid the player stopping
-        return when (Util.getAppPlatform(application)) {
-            AppPlatform.Automotive -> episodeManager.findLatestEpisodeToPlay()
-
-            AppPlatform.Phone,
-            AppPlatform.WearOs,
-            -> null
+        when (Util.getAppPlatform(application)) {
+            AppPlatform.Automotive -> return episodeManager.findLatestEpisodeToPlay()
+            AppPlatform.WearOs -> return null
+            AppPlatform.Phone -> {
+                analyticsTracker.track(AnalyticsEvent.AUTOPLAY_FINISHED_LAST_EPISODE, mapOf("episode_source" to settings.lastAutoPlaySource.value))
+                return null
+            }
         }
     }
 
