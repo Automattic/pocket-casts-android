@@ -389,6 +389,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SHARED("podcast_shared"),
 
     /* Auto Play */
+    AUTOPLAY_STARTED("autoplay_started"),
     AUTOPLAY_FINISHED_LAST_EPISODE("autoplay_finished_last_episode"),
 
     /* Episode Details */
