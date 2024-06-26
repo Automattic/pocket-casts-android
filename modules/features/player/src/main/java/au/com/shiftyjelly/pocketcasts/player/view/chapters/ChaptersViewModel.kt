@@ -138,6 +138,26 @@ class ChaptersViewModel @AssistedInject constructor(
         viewModelScope.launch { _scrollToChapter.emit(chapter) }
     }
 
+    fun trackChapterLinkTap(chapter: Chapter) {
+        viewModelScope.launch(ioDispatcher) {
+            val episodeId = when (mode) {
+                is Mode.Episode -> mode.episodeId
+                is Mode.Player -> playbackManager.playbackStateFlow.first().episodeUuid
+            }
+
+            episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
+                tracker.track(
+                    AnalyticsEvent.CHAPTER_LINK_CLICKED,
+                    mapOf(
+                        "chapter_title" to chapter.title,
+                        "episode_uuid" to episodeId,
+                        "podcast_uuid" to episode.podcastOrSubstituteUuid,
+                    ),
+                )
+            }
+        }
+    }
+
     private fun createUiState(
         playbackState: PlaybackState,
         episode: BaseEpisode,

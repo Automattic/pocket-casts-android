@@ -20,6 +20,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Episode
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Player
@@ -109,11 +110,12 @@ class ChaptersFragment : BaseFragment() {
         }
     }
 
-    private fun openChapterUrl(url: String) {
+    private fun openChapterUrl(chapter: Chapter) {
         try {
-            startActivity(Intent(Intent.ACTION_VIEW).setData(url.toUri()))
+            viewModel.trackChapterLinkTap(chapter)
+            startActivity(Intent(Intent.ACTION_VIEW).setData(chapter.url.toString().toUri()))
         } catch (_: Throwable) {
-            UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, url), null)
+            UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, chapter.url.toString()), null)
         }
     }
 
