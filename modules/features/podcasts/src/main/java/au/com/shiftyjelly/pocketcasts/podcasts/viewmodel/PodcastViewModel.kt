@@ -378,7 +378,7 @@ class PodcastViewModel
         val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false, source = SourceView.PODCAST_SCREEN)
             }
         }
     }

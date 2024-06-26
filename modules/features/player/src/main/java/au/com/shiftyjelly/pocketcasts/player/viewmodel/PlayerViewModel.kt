@@ -515,7 +515,7 @@ class PlayerViewModel @Inject constructor(
             deleteEpisodeFile(episode, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
         } else {
             launch {
-                DownloadHelper.manuallyDownloadEpisodeNow(episode, "Player shelf", downloadManager, episodeManager, fireToast = true)
+                DownloadHelper.manuallyDownloadEpisodeNow(episode, "Player shelf", downloadManager, episodeManager, fireToast = true, source = source)
             }
         }
     }
