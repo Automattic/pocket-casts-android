@@ -76,4 +76,24 @@ class ShareClipViewModelTest {
             assertFalse(awaitItem().isPlaying)
         }
     }
+
+    @Test
+    fun `update clip start`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(Clip.Range(15.seconds, 30.seconds), awaitItem().clip?.range)
+
+            viewModel.updateClipStart(5.seconds)
+            assertEquals(Clip.Range(5.seconds, 30.seconds), awaitItem().clip?.range)
+        }
+    }
+
+    @Test
+    fun `update clip end`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(Clip.Range(15.seconds, 30.seconds), awaitItem().clip?.range)
+
+            viewModel.updateClipEnd(20.seconds)
+            assertEquals(Clip.Range(15.seconds, 20.seconds), awaitItem().clip?.range)
+        }
+    }
 }

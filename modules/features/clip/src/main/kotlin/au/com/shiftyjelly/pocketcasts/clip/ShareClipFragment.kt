@@ -61,12 +61,13 @@ class ShareClipFragment : BaseDialogFragment() {
             ShareClipPage(
                 episode = state.episode,
                 podcast = state.podcast,
+                clipRange = state.clipRange,
                 episodeCount = state.episodeCount,
                 isPlaying = state.isPlaying,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 clipColors = clipColors,
-                onPlayClick = { viewModel.playClip() },
-                onPauseClick = { viewModel.stopClip() },
+                onPlayClick = viewModel::playClip,
+                onPauseClick = viewModel::stopClip,
                 onClip = {
                     state.podcast?.let { podcast ->
                         state.clip?.let { clip ->
@@ -74,6 +75,8 @@ class ShareClipFragment : BaseDialogFragment() {
                         }
                     }
                 },
+                onClipStartUpdate = viewModel::updateClipStart,
+                onClipEndUpdate = viewModel::updateClipEnd,
                 onClose = { dismiss() },
             )
         }
