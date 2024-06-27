@@ -45,7 +45,7 @@ data class SharePodcastHelper(
         val host = Settings.SERVER_SHORT_URL
         var url = ""
         episode?.let {
-            val timeMarker = listOfNotNull(start, end).takeIf { it.isNotEmpty() }?.joinToString(prefix = "?t=", separator = ",") { it.inWholeSeconds.toString() }
+            val timeMarker = listOfNotNull(start, end).takeIf { it.isNotEmpty() }?.joinToString(prefix = "?t=", separator = ",") { it.inWholeSeconds.toString() }.orEmpty()
             url = "$host/episode/${it.uuid}$timeMarker"
         } ?: run {
             url = "$host/podcast/${podcast.uuid}"
