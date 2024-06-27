@@ -27,6 +27,7 @@ enum class AnalyticsEvent(val key: String) {
     USER_PASSWORD_UPDATED("user_password_updated"),
     USER_EMAIL_UPDATED("user_email_updated"),
     USER_PASSWORD_RESET("user_password_reset"),
+    SSO_STARTED("sso_started"),
     USER_ACCOUNT_CREATED("user_account_created"),
     USER_ACCOUNT_CREATION_FAILED("user_account_creation_failed"),
     USER_SIGNED_OUT("user_signed_out"),
@@ -279,6 +280,7 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_SHOWN("filter_shown"),
     FILTER_SORT_BY_CHANGED("filter_sort_by_changed"),
     FILTER_UPDATED("filter_updated"),
+    FILTER_OPTIONS_MODAL_OPTION_TAPPED("filter_options_modal_option_tapped"),
 
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),
@@ -385,6 +387,10 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_BULK_ADD_TO_UP_NEXT("episode_bulk_add_to_up_next"),
     EPISODE_REMOVED_FROM_UP_NEXT("episode_removed_from_up_next"),
     PODCAST_SHARED("podcast_shared"),
+
+    /* Auto Play */
+    AUTOPLAY_STARTED("autoplay_started"),
+    AUTOPLAY_FINISHED_LAST_EPISODE("autoplay_finished_last_episode"),
 
     /* Episode Details */
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),
@@ -613,6 +619,7 @@ enum class AnalyticsEvent(val key: String) {
     DESELECT_CHAPTERS_CHAPTER_SELECTED("deselect_chapters_chapter_selected"),
     DESELECT_CHAPTERS_CHAPTER_DESELECTED("deselect_chapters_chapter_deselected"),
     PLAYBACK_CHAPTER_SKIPPED("playback_chapter_skipped"),
+    CHAPTER_LINK_CLICKED("chapter_link_clicked"),
 
     /* Widgets */
     WIDGET_INSTALLED("widget_installed"),

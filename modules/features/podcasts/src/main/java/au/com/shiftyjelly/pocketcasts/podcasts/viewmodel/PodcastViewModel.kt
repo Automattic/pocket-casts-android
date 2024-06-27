@@ -56,6 +56,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -377,7 +378,7 @@ class PodcastViewModel
         val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false, source = SourceView.PODCAST_SCREEN)
             }
         }
     }
@@ -429,7 +430,8 @@ class PodcastViewModel
                     SharePodcastHelper(
                         podcast,
                         episode,
-                        bookmark.timeSecs.toDouble(),
+                        bookmark.timeSecs.seconds,
+                        null,
                         context,
                         ShareType.BOOKMARK_TIME,
                         SourceView.PODCAST_SCREEN,

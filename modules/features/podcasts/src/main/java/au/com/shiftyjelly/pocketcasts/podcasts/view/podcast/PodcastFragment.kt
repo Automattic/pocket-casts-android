@@ -968,6 +968,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 podcast,
                 null,
                 null,
+                null,
                 context,
                 SharePodcastHelper.ShareType.PODCAST,
                 SourceView.PODCAST_SCREEN,

@@ -204,6 +204,7 @@ open class PlaybackManager @Inject constructor(
     private var syncTimerDisposable: Disposable? = null
     private var lastWarnedPlayedEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
+    private var lastTrackedAutoPlaySource: AutoPlaySource? = null
 
     private val resumptionHelper = ResumptionHelper(settings)
 
@@ -1356,6 +1357,7 @@ open class PlaybackManager @Inject constructor(
         if (nextEpisode == null) {
             nextEpisode = autoLoadEpisode(autoPlay)
             if (nextEpisode == null) {
+                lastTrackedAutoPlaySource = null
                 stop()
                 shutdown()
             }
@@ -1365,15 +1367,23 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun autoSelectNextEpisode(): BaseEpisode? {
+        var episodeSource = settings.lastAutoPlaySource.value.toString().lowercase()
+
         val allEpisodes: List<BaseEpisode> = when (val autoSource = settings.lastAutoPlaySource.value) {
             is AutoPlaySource.Downloads -> episodeManager.observeDownloadEpisodes().asFlow().firstOrNull()
             is AutoPlaySource.Files -> cloudFilesManager.sortedCloudFiles.firstOrNull()
             is AutoPlaySource.Starred -> episodeManager.observeStarredEpisodes().asFlow().firstOrNull()
             // First check if it is a podcast uuid, then check if it is from a filter
-            is AutoPlaySource.PodcastOrFilter -> podcastManager.findPodcastByUuid(autoSource.uuid)
-                ?.let { podcast -> autoPlayOrderForPodcastEpisodes(podcast) }
-                ?: playlistManager.findByUuidSync(autoSource.uuid)
-                    ?.let { playlist -> playlistManager.findEpisodes(playlist, episodeManager, this) }
+            is AutoPlaySource.PodcastOrFilter -> {
+                episodeSource = "podcast"
+                podcastManager.findPodcastByUuid(autoSource.uuid)
+                    ?.let { podcast -> autoPlayOrderForPodcastEpisodes(podcast) }
+                    ?: playlistManager.findByUuidSync(autoSource.uuid)
+                        ?.let { playlist ->
+                            episodeSource = "filter"
+                            playlistManager.findEpisodes(playlist, episodeManager, this)
+                        }
+            }
             is AutoPlaySource.None -> null
         } ?: emptyList()
 
@@ -1387,17 +1397,22 @@ open class PlaybackManager @Inject constructor(
         for (episodeUuid in episodeUuidsSlice) {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: continue
             if (!episode.isArchived && !episode.isFinished) {
+                if (lastTrackedAutoPlaySource != settings.lastAutoPlaySource.value) {
+                    analyticsTracker.track(AnalyticsEvent.AUTOPLAY_STARTED, mapOf("episode_source" to episodeSource))
+                    lastTrackedAutoPlaySource = settings.lastAutoPlaySource.value
+                }
                 return episode
             }
         }
 
         // If no matches found, play the latest episode on Android Automotive to avoid the player stopping
-        return when (Util.getAppPlatform(application)) {
-            AppPlatform.Automotive -> episodeManager.findLatestEpisodeToPlay()
-
-            AppPlatform.Phone,
-            AppPlatform.WearOs,
-            -> null
+        when (Util.getAppPlatform(application)) {
+            AppPlatform.Automotive -> return episodeManager.findLatestEpisodeToPlay()
+            AppPlatform.WearOs -> return null
+            AppPlatform.Phone -> {
+                analyticsTracker.track(AnalyticsEvent.AUTOPLAY_FINISHED_LAST_EPISODE, mapOf("episode_source" to episodeSource))
+                return null
+            }
         }
     }
 

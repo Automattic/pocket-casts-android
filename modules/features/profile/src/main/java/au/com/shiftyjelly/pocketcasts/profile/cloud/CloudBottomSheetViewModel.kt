@@ -100,7 +100,7 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun download(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
-            DownloadHelper.manuallyDownloadEpisodeNow(episode, "cloud bottom sheet", downloadManager, episodeManager)
+            DownloadHelper.manuallyDownloadEpisodeNow(episode, "cloud bottom sheet", downloadManager, episodeManager, source = source)
         }
     }
 

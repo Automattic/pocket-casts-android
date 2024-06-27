@@ -228,7 +228,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="952"
+            line="953"
             column="55"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="959"
+            line="960"
             column="55"/>
     </issue>
 
@@ -261,11 +261,11 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1573"
+            line="1583"
             column="70"/>
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1577"
+            line="1587"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>

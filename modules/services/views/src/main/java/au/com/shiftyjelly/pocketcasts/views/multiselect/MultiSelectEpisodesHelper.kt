@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -54,6 +54,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
+    private val shareDialogFactory: ShareDialogFactory,
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 
@@ -313,7 +314,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedList.count())).toList()
         ConfirmationDialog.downloadWarningDialog(list.count(), resources) {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false, source = source)
             }
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED, source, trimmedList)
             val snackText = resources.getStringPlural(trimmedList.size, LR.string.download_queued_singular, LR.string.download_queued_plural)
@@ -437,7 +438,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 return@launch
             }
 
-            ShareDialog(
+            shareDialogFactory.create(
                 episode = episode,
                 podcast = podcast,
                 fragmentManager = fragmentManager,
