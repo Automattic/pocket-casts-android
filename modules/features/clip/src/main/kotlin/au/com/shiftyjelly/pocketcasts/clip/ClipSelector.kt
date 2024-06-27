@@ -269,7 +269,7 @@ private fun BoxWithConstraintsScope.ClipBox(
             .offset { IntOffset(-scrollOffset.roundToInt(), 0) }
             .fillMaxSize(),
     ) {
-        // Outer box to increast touch area of the handle
+        // Outer box to increase the touch area of the handle
         Box(
             modifier = Modifier
                 .offset { IntOffset((state.startOffset - handleWidthPx * 1.5).roundToInt(), 0) }
@@ -305,7 +305,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                 )
             }
         }
-        // Outer box to increast touch area of the handle
+        // Outer box to increas the touch area of the handle
         Box(
             modifier = Modifier
                 .offset { IntOffset((state.endOffset - handleWidthPx / 2).roundToInt(), 0) }
