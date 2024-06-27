@@ -41,14 +41,14 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
 
     override fun onBindViewHolder(holder: CarouselItemViewHolder, position: Int) {
         val podcast = getItem(position)
+        val context = holder.itemView.context
         if (podcast is DiscoverPodcast) {
-            val context = holder.itemView.context
             val tagLineText = if (podcast.isSponsored) {
                 context.getString(LR.string.discover_sponsored)
             } else {
                 pillText
             }
-            holder.podcast = podcast
+            holder.setPodcast(podcast = podcast)
 
             holder.setTaglineText(tagLineText)
             holder.itemView.setOnClickListener {
@@ -90,7 +90,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                 }
             }
         } else {
-            holder.podcast = null
+            holder.setPodcast(podcast = null)
         }
     }
 
