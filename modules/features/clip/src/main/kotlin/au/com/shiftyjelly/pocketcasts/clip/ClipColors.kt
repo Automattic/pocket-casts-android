@@ -20,4 +20,9 @@ internal data class ClipColors(
     val cardTop = ColorUtils.changeHsvValue(baseColor, 1.25f)
     val cardBottom = ColorUtils.changeHsvValue(baseColor, 0.75f)
     val cardTextColor = if (baseColor.luminance() < 0.5f) Color.White else Color.Black
+
+    val selectorColor = baseColor
+    val selectorHandleColor = backgroundColor.copy(alpha = 0.2f)
+    val selectorProgressColor = backgroundTextColor
+    val selectorTimelineColor = selectorProgressColor.copy(alpha = 0.4f)
 }
