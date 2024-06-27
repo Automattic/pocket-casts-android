@@ -344,6 +344,9 @@ private fun BoxWithConstraintsScope.ClipBox(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
+            // Frame offset needs to be calculated this way becasue .requiredWidth()
+            // centers content inside parent layout if the width is larger than parent.
+            // We need to account for that automatic offset.
             val frameWidthPx = state.endOffset - state.startOffset + handleWidthPx
             val maxWidthPx = with(LocalDensity.current) { this@ClipBox.maxWidth.toPx() }
             frameOffsetPx = if (frameWidthPx <= maxWidthPx) {
