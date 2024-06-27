@@ -165,10 +165,11 @@ private fun BoxWithConstraintsScope.ClipTimeline(
     val maxTickResolution by remember {
         val secondsCount = episodeDuration.inWholeSeconds.toInt()
         var resolution = 1
+        val minItemWidth = 1.5.dp + 4.dp
         while (resolution < 125) {
             val newResolution = resolution * 5
             val tickCount = (secondsCount / newResolution) + 1
-            val totalWidth = itemWidth * tickCount
+            val totalWidth = minItemWidth * tickCount
             if (totalWidth <= maxWidth) {
                 break
             } else {
