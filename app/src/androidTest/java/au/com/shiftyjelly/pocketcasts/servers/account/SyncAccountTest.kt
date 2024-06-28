@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.account
 import android.accounts.AccountManager
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -49,7 +50,7 @@ internal class SyncAccountTest {
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
-            analyticsTracker = mock(),
+            analyticsTracker = AnalyticsTracker.test(),
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,

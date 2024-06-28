@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -66,7 +66,7 @@ class AccountDetailsFragment : BaseFragment() {
         }
     }
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var episodeManager: EpisodeManager
 

@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
@@ -35,7 +35,7 @@ private const val MAX_STARS = 5
 class PodcastRatingsViewModel
 @Inject constructor(
     private val ratingsManager: RatingsManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

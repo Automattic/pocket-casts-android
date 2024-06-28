@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -24,7 +24,7 @@ class ShareListIncomingViewModel
     val podcastManager: PodcastManager,
     val listServerManager: ListServerManager,
     val playbackManager: PlaybackManager,
-    val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
     val share = MutableLiveData<ShareState>()

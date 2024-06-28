@@ -9,7 +9,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -56,7 +56,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     val playbackManager: PlaybackManager,
     val settings: Settings,
     private val showNotesManager: ShowNotesManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
@@ -10,7 +10,7 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class PlaylistUpdateAnalytics @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) {
 
     fun update(

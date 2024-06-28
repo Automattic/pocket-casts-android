@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.clip.ShareClipFragment
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 @AndroidEntryPoint
 class ShareFragment : BaseDialogFragment() {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
     override val statusBarColor: StatusBarColor? = null
 
     private val viewModel: PlayerViewModel by activityViewModels()

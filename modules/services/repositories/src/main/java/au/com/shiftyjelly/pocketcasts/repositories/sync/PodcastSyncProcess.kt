@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -112,7 +112,7 @@ class PodcastSyncProcess(
     var folderManager: FolderManager,
     var syncManager: SyncManager,
     val crashLogging: CrashLogging,
-    val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTracker,
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
@@ -106,7 +106,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var bookmarkManager: BookmarkManager
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory

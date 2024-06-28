@@ -8,7 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -35,7 +35,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
 
     @Inject lateinit var castManager: CastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     var multiSelectHelper: MultiSelectEpisodesHelper? = null
 

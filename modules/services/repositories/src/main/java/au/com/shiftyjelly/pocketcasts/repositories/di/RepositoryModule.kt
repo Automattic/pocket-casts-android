@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -83,6 +84,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesSyncAccountManager(syncAccountManagerImpl: SyncAccountManagerImpl): SyncAccountManager
+
+    @Binds
+    @Singleton
+    abstract fun providesAccountStatusInfo(accountManagerStatusInfo: AccountManagerStatusInfo): AccountStatusInfo
 
     @Binds
     @Singleton
@@ -151,10 +156,6 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideSyncManager(syncManagerImpl: SyncManagerImpl): SyncManager
-
-    @Binds
-    @Singleton
-    abstract fun provideAccountStatusInfo(syncManager: SyncManager): AccountStatusInfo
 
     @Binds
     @Singleton

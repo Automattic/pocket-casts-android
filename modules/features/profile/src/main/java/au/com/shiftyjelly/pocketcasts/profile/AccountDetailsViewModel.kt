@@ -9,7 +9,7 @@ import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -40,7 +40,7 @@ class AccountDetailsViewModel
     statsManager: StatsManager,
     private val settings: Settings,
     private val syncManager: SyncManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val crashLogging: CrashLogging,
 ) : ViewModel() {
 

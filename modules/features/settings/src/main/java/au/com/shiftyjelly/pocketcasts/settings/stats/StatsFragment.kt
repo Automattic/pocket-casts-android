@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
@@ -69,7 +69,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class StatsFragment : BaseFragment() {
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var settings: Settings
     private val viewModel: StatsViewModel by viewModels()

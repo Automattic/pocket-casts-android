@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
@@ -99,7 +100,7 @@ class PodcastSyncProcessTest {
             val folderManager: FolderManager = mock()
             whenever(folderManager.findFoldersToSync()).thenReturn(emptyList())
 
-            val bookmarkManager = BookmarkManagerImpl(appDatabase = appDatabase, mock())
+            val bookmarkManager = BookmarkManagerImpl(appDatabase = appDatabase, AnalyticsTracker.test())
             val bookmarkToUpdate = bookmarkManager.add(
                 episode = PodcastEpisode(
                     uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
@@ -142,7 +143,7 @@ class PodcastSyncProcessTest {
             )
 
             val syncManager = SyncManagerImpl(
-                analyticsTracker = mock(),
+                analyticsTracker = AnalyticsTracker.test(),
                 context = context,
                 settings = settings,
                 syncAccountManager = syncAccountManager,
@@ -166,7 +167,7 @@ class PodcastSyncProcessTest {
                 folderManager = folderManager,
                 syncManager = syncManager,
                 crashLogging = FakeCrashLogging(),
-                analyticsTracker = mock(),
+                analyticsTracker = AnalyticsTracker.test(),
             )
 
             val response = MockResponse()

@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -83,7 +83,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     @Inject lateinit var castManager: CastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null

@@ -9,7 +9,7 @@ import androidx.navigation.findNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateTosBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class CreateTOSFragment : BaseFragment() {
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: CreateAccountViewModel by activityViewModels()
     private var binding: FragmentCreateTosBinding? = null

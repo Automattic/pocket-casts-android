@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemMostPopularPodcastsBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 internal class MostPopularPodcastsAdapter(
     val onPodcastClicked: (DiscoverPodcast, String?) -> Unit,
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<DiscoverPodcast, MostPopularPodcastsViewHolder>(PODCASTS_FILTERED_DIFF) {
 
     private var fromListId: String? = null

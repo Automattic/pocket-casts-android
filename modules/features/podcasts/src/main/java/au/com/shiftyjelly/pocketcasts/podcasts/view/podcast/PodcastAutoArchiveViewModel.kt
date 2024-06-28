@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
@@ -24,7 +24,7 @@ class PodcastAutoArchiveViewModel @AssistedInject constructor(
     @Assisted private val podcastUuid: String,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     val state = combine(
         podcastManager.observePodcastByUuidFlow(podcastUuid),

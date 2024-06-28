@@ -15,7 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -126,7 +126,7 @@ open class PlaybackManager @Inject constructor(
     val upNextQueue: UpNextQueue,
     private val notificationHelper: NotificationHelper,
     private val userEpisodeManager: UserEpisodeManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     private val syncManager: SyncManager,
     private val cloudFilesManager: CloudFilesManager,

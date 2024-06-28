@@ -4,7 +4,7 @@ import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -48,7 +48,7 @@ class UserManagerImpl @Inject constructor(
     val subscriptionManager: SubscriptionManager,
     val podcastManager: PodcastManager,
     val userEpisodeManager: UserEpisodeManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
 ) : UserManager, CoroutineScope {
