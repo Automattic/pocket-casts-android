@@ -84,7 +84,9 @@ private class ExoPlayerClipPlayer(
         if (exoPlayer.isLoading || exoPlayer.isPlaying) {
             return false
         }
-        playbackManager.pause()
+        if (playbackManager.isPlaying()) {
+            playbackManager.pause()
+        }
         exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(clip.toMediaItem()))
         exoPlayer.prepare()
         exoPlayer.play()

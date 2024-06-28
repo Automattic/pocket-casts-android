@@ -11,13 +11,21 @@ class FakeClipPlayer : ClipPlayer {
 
     val clips = Turbine<Clip>()
 
-    override fun play(clip: Clip) {
+    override fun play(clip: Clip): Boolean {
+        if (isPlayingState.value) {
+            return false
+        }
         clips += clip
         isPlayingState.value = true
+        return true
     }
 
-    override fun stop() {
+    override fun stop(): Boolean {
+        if (!isPlayingState.value) {
+            return false
+        }
         isPlayingState.value = false
+        return true
     }
 
     override fun release() = Unit

@@ -24,6 +24,7 @@ class ShareClipViewModel @AssistedInject constructor(
     @Assisted private val episodeUuid: String,
     @Assisted initialClipRange: Clip.Range,
     @Assisted private val clipPlayer: ClipPlayer,
+    @Assisted private val clipAnalytics: ClipAnalytics,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
@@ -47,14 +48,18 @@ class ShareClipViewModel @AssistedInject constructor(
                 isPlaying = isPlaying,
             )
         },
-    ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = UiState(clipRange = initialClipRange))
+    ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = UiState(clipRange = initialClipRange))
 
     fun playClip() {
-        uiState.value.clip?.let(clipPlayer::play)
+        if (uiState.value.clip?.let(clipPlayer::play) == true) {
+            clipAnalytics.playTapped()
+        }
     }
 
     fun stopClip() {
-        clipPlayer.stop()
+        if (clipPlayer.stop()) {
+            clipAnalytics.pauseTapped()
+        }
     }
 
     fun updateClipStart(duration: Duration) {
@@ -63,6 +68,14 @@ class ShareClipViewModel @AssistedInject constructor(
 
     fun updateClipEnd(duration: Duration) {
         clipRange.value = clipRange.value.copy(end = duration)
+    }
+
+    fun onClipScreenShown() {
+        clipAnalytics.screenShown()
+    }
+
+    fun onClipLinkShared(clip: Clip) {
+        clipAnalytics.linkShared(clip)
     }
 
     override fun onCleared() {
@@ -86,6 +99,7 @@ class ShareClipViewModel @AssistedInject constructor(
             episodeUuid: String,
             initialClipRange: Clip.Range,
             clipPlayer: ClipPlayer,
+            clipAnalytics: ClipAnalytics,
         ): ShareClipViewModel
     }
 }

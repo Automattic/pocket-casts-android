@@ -155,7 +155,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Share -> {
-                ShareFragment().show(parentFragmentManager, "sleep")
+                ShareFragment.newInstance(SourceView.BOTTOM_SHELF).show(parentFragmentManager, "sleep")
             }
 
             ShelfItem.Podcast -> {

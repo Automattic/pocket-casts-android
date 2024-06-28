@@ -20,25 +20,26 @@ class ClipAnalytics @AssistedInject constructor(
     }
 
     fun playTapped() {
-        createBaseEvent(AnalyticsEvent.CLIP_SCREEN_PLAY_TAPPED)
+        trackEvent(createBaseEvent(AnalyticsEvent.CLIP_SCREEN_PLAY_TAPPED))
     }
 
     fun pauseTapped() {
-        createBaseEvent(AnalyticsEvent.CLIP_SCREEN_PAUSE_TAPPED)
+        trackEvent(createBaseEvent(AnalyticsEvent.CLIP_SCREEN_PAUSE_TAPPED))
     }
 
     fun linkShared(clip: Clip) {
-        val isStartModified = initialClipRange.start != clip.range.start
-        val isEndMofidied = initialClipRange.end != clip.range.end
-        createBaseEvent(
-            AnalyticsEvent.CLIP_SCREEN_SHOWN,
+        val isStartModified = initialClipRange.start.inWholeSeconds != clip.range.start.inWholeSeconds
+        val isEndMofidied = initialClipRange.end.inWholeSeconds != clip.range.end.inWholeSeconds
+        val event = createBaseEvent(
+            AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
             mapOf(
-                "start" to clip.range.start,
-                "end" to clip.range.end,
+                "start" to clip.range.start.inWholeSeconds.toInt(),
+                "end" to clip.range.end.inWholeSeconds.toInt(),
                 "start_modified" to isStartModified,
                 "end_modified" to isEndMofidied,
             ),
         )
+        trackEvent(event)
     }
 
     private fun trackEvent(event: Event) {
@@ -47,12 +48,12 @@ class ClipAnalytics @AssistedInject constructor(
 
     private fun createBaseEvent(type: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) = Event(
         type,
-        properties + mapOf(
-            "episode_id" to episodeId,
-            "podcast_id" to podcastId,
-            "clip_id" to clipId,
+        mapOf(
+            "episode_uuid" to episodeId,
+            "podcast_uuid" to podcastId,
+            "clip_uuid" to clipId,
             "source" to source.analyticsValue,
-        ),
+        ) + properties,
     )
 
     private class Event(

@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -25,9 +28,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class ShareFragment : BaseDialogFragment() {
+    private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
     override val statusBarColor: StatusBarColor? = null
@@ -112,7 +117,7 @@ class ShareFragment : BaseDialogFragment() {
         binding.buttonShareClip.setOnClickListener {
             if (podcast != null && episode is PodcastEpisode) {
                 ShareClipFragment
-                    .newInstance(episode, podcast.backgroundColor)
+                    .newInstance(episode, podcast.backgroundColor, args.source)
                     .show(parentFragmentManager, "share_clip")
             }
             close()
@@ -140,5 +145,22 @@ class ShareFragment : BaseDialogFragment() {
 
     private fun close() {
         dismiss()
+    }
+
+    @Parcelize
+    private class Args(
+        val source: SourceView,
+    ) : Parcelable
+
+    companion object {
+        private const val NEW_INSTANCE_ARG = "ShareFragmentArgs"
+
+        fun newInstance(
+            source: SourceView,
+        ) = ShareFragment().apply {
+            arguments = bundleOf(
+                NEW_INSTANCE_ARG to Args(source = source),
+            )
+        }
     }
 }

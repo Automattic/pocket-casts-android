@@ -93,7 +93,7 @@ class ShareDialog(
                 dialog.addCheckedOption(
                     titleId = LR.string.podcast_share_clip,
                     click = {
-                        shareActionProvider.clipAction(episode, podcast, fragmentManager)
+                        shareActionProvider.clipAction(episode, podcast, fragmentManager, sourceView)
                     },
                 )
             }
