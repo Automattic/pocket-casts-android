@@ -6,7 +6,7 @@ import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -40,7 +40,7 @@ class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
     private val shareableTextProvider: ShareableTextProvider,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val settings: Settings,
     private val subscriptionManager: SubscriptionManager,
     private val crashLogging: CrashLogging,

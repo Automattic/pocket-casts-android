@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -27,7 +27,7 @@ class AdvancedSettingsViewModelTest {
     private lateinit var settings: Settings
 
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     @ApplicationContext

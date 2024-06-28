@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -57,7 +57,7 @@ class ChaptersViewModelTest {
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
-    private val tracker = mock<AnalyticsTrackerWrapper>()
+    private val tracker = mock<AnalyticsTracker>()
     private val settings = mock<Settings>()
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())

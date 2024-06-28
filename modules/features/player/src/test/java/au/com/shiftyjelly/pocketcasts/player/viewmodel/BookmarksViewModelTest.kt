@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -75,7 +75,7 @@ class BookmarksViewModelTest {
     private lateinit var theme: Theme
 
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     private lateinit var bookmarkFeature: BookmarkFeatureControl

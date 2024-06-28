@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -34,7 +34,7 @@ class UpsellViewModelTest {
             .thenReturn(flowOf(FreeTrial(subscriptionTier = Subscription.SubscriptionTier.PLUS)))
 
         upsellViewModel = UpsellViewModel(
-            analyticsTracker = mock<AnalyticsTrackerWrapper>(),
+            analyticsTracker = mock<AnalyticsTracker>(),
             subscriptionManager = subscriptionManager,
         )
 

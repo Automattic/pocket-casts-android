@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -26,7 +26,7 @@ class ManualCleanupViewModelTest {
     val coroutineRule = MainCoroutineRule()
     private lateinit var episodeManager: EpisodeManager
     private lateinit var playbackManager: PlaybackManager
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var analyticsTracker: AnalyticsTracker
     private lateinit var viewModel: ManualCleanupViewModel
 
     private val episode: PodcastEpisode = PodcastEpisode(uuid = "1", publishedDate = Date())

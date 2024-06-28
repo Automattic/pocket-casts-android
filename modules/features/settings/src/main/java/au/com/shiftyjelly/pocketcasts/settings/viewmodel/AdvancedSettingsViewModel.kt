@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 class AdvancedSettingsViewModel
 @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(initState())

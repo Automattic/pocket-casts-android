@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.search.searchhistory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -22,7 +22,7 @@ class SearchHistoryViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     userManager: UserManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val signInState = userManager.getSignInState().asFlow()
     private var isSignedInAsPlusOrPatron = false

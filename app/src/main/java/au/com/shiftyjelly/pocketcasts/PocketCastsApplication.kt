@@ -5,7 +5,7 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker2
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
@@ -153,9 +153,9 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     private fun setupAnalytics() {
-        AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
-        AnalyticsTracker.init(settings)
-        AnalyticsTracker.refreshMetadata()
+        AnalyticsTracker2.register(tracksTracker, bumpStatsTracker)
+        AnalyticsTracker2.init(settings)
+        AnalyticsTracker2.refreshMetadata()
         downloadStatisticsReporter.setup()
     }
 

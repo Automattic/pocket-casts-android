@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.accounts.Account
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -63,7 +63,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
 class SyncManagerImpl @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
     private val settings: Settings,
     private val syncAccountManager: SyncAccountManager,

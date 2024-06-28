@@ -17,7 +17,7 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
@@ -47,7 +47,7 @@ class ShareClipFragment : BaseDialogFragment() {
     lateinit var clipPlayerFactory: ClipPlayer.Factory
 
     @Inject
-    lateinit var analyticsTrackerWrapper: AnalyticsTrackerWrapper
+    lateinit var analyticsTracker: AnalyticsTracker
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -104,7 +104,7 @@ class ShareClipFragment : BaseDialogFragment() {
             requireActivity(),
             SharePodcastHelper.ShareType.CLIP,
             SourceView.UNKNOWN,
-            analyticsTrackerWrapper,
+            analyticsTracker,
         ).showShareDialogDirect()
     }
 

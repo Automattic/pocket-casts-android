@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search.searchhistory
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -34,7 +34,7 @@ class SearchHistoryViewModelTest {
     private lateinit var searchHistoryManager: SearchHistoryManager
 
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var analyticsTracker: AnalyticsTracker
 
     private val subscriptionStatusPaid = SubscriptionStatus.Paid(
         expiry = Date(),

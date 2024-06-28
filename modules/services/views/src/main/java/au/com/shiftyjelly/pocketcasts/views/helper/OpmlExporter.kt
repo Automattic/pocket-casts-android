@@ -11,7 +11,7 @@ import android.util.Xml
 import androidx.core.text.HtmlCompat
 import androidx.preference.PreferenceFragmentCompat
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
@@ -34,7 +34,7 @@ class OpmlExporter(
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
     private val context: Context,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val applicationScope: CoroutineScope,
 ) {
 

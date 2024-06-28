@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
@@ -49,7 +49,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
     val downloadManager: DownloadManager,
-    val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTracker,
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,

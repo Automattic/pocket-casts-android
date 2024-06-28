@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -32,7 +32,7 @@ class BookmarkManagerTest {
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         bookmarkManager = BookmarkManagerImpl(
             appDatabase = appDatabase,
-            analyticsTracker = AnalyticsTrackerWrapper(),
+            analyticsTracker = AnalyticsTracker(),
         )
         episodeDao = appDatabase.episodeDao()
     }

@@ -13,7 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentRegionSelectBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowRegionBinding
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -61,7 +61,7 @@ class RegionSelectFragment : BaseFragment() {
 
     private var binding: FragmentRegionSelectBinding? = null
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var settings: Settings
 

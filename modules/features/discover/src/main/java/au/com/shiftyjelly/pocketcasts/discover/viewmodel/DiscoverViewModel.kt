@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPill
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -49,7 +49,7 @@ class DiscoverViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
     val userManager: UserManager,
-    val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTracker,
     val crashLogging: CrashLogging,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()

@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
@@ -29,7 +29,7 @@ class CreateAccountViewModel
 @Inject constructor(
     private val syncManager: SyncManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val podcastManager: PodcastManager,
 ) : AccountViewModel() {
 
@@ -55,7 +55,7 @@ class CreateAccountViewModel
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
 
-        fun trackPurchaseEvent(subscription: Subscription?, purchaseEvent: PurchaseEvent, analyticsTracker: AnalyticsTrackerWrapper) {
+        fun trackPurchaseEvent(subscription: Subscription?, purchaseEvent: PurchaseEvent, analyticsTracker: AnalyticsTracker) {
             val productKey = subscription?.productDetails?.productId?.let {
                 if (it in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID)) {
                     // retain short product id for plus subscriptions

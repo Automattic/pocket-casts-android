@@ -8,7 +8,7 @@ import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
@@ -122,7 +122,7 @@ class DownloadStatisticsReporterTest {
         assertEquals(1, tracker.trackedEvents.size)
     }
 
-    private class TestTracker : AnalyticsTrackerWrapper() {
+    private class TestTracker : AnalyticsTracker() {
         private val _trackedEvents = mutableListOf<Pair<AnalyticsEvent, Map<String, Any>>>()
         val trackedEvents get() = _trackedEvents.toList()
 

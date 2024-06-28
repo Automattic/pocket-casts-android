@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.dialog
 
 import android.content.Context
 import androidx.fragment.app.FragmentManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import javax.inject.Inject
@@ -17,6 +17,6 @@ class ShareDialogFactory @Inject constructor(
         context: Context?,
         shouldShowPodcast: Boolean = true,
         forceDarkTheme: Boolean = false,
-        analyticsTracker: AnalyticsTrackerWrapper,
+        analyticsTracker: AnalyticsTracker,
     ) = ShareDialog(podcast, episode, fragmentManager, context, shouldShowPodcast, forceDarkTheme, analyticsTracker, shareActionProvider)
 }

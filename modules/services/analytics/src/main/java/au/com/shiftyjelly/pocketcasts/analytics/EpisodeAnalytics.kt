@@ -7,7 +7,7 @@ import javax.inject.Singleton
 
 @Singleton
 class EpisodeAnalytics @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) {
     private val downloadEpisodeUuidQueue = mutableListOf<String>()
     private val uploadEpisodeUuidQueue = mutableListOf<String>()
