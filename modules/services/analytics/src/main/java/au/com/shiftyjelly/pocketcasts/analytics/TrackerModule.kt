@@ -12,7 +12,7 @@ import javax.inject.Singleton
 object TrackerModule {
     @Provides
     @Singleton
-    fun provideAnalyticsTrakcer(
+    fun provideAnalyticsTracker(
         tracksTracker: TracksAnalyticsTracker,
         bumpStatsTracker: AnonymousBumpStatsTracker,
         settings: Settings,
