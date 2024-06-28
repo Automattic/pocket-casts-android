@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
 
 @HiltViewModel(assistedFactory = ShareClipViewModel.Factory::class)
 class ShareClipViewModel @AssistedInject constructor(
@@ -52,29 +53,35 @@ class ShareClipViewModel @AssistedInject constructor(
 
     fun playClip() {
         if (uiState.value.clip?.let(clipPlayer::play) == true) {
+            Timber.tag("Clip playback started")
             clipAnalytics.playTapped()
         }
     }
 
     fun stopClip() {
         if (clipPlayer.stop()) {
+            Timber.tag("Clip playback stopped")
             clipAnalytics.pauseTapped()
         }
     }
 
     fun updateClipStart(duration: Duration) {
+        Timber.d("Clip start updated to $duration")
         clipRange.value = clipRange.value.copy(start = duration)
     }
 
     fun updateClipEnd(duration: Duration) {
+        Timber.d("Clip end updated to $duration")
         clipRange.value = clipRange.value.copy(end = duration)
     }
 
     fun onClipScreenShown() {
+        Timber.d("Clip screen shown")
         clipAnalytics.screenShown()
     }
 
     fun onClipLinkShared(clip: Clip) {
+        Timber.d("Clip shared: $clip")
         clipAnalytics.linkShared(clip)
     }
 
