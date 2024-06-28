@@ -17,6 +17,6 @@ open class AnalyticsTracker constructor(
     fun clearAllData() = trackers.forEach(Tracker::clearAllData)
 
     companion object {
-        fun test(vararg trackers: Tracker, isEnabled: Boolean = true) = AnalyticsTracker(trackers.toList(), { isEnabled })
+        fun test(vararg trackers: Tracker, isEnabled: Boolean = false) = AnalyticsTracker(trackers.toList(), { isEnabled })
     }
 }
