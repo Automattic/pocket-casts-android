@@ -137,7 +137,7 @@ interface UpNextQueue {
     fun updateCurrentEpisodeStateIfNeeded(episodeFromDb: BaseEpisode, state: State) {
         currentEpisode?.let { currentEpisode ->
             if (episodeFromDb.uuid == currentEpisode.uuid &&
-                episodeFromDb.deselectedChapters != currentEpisode.deselectedChapters
+                episodeFromDb.deselectedChapters.sorted() != currentEpisode.deselectedChapters.sorted()
             ) {
                 updateCurrentEpisodeState(state)
             }
@@ -150,6 +150,7 @@ enum class UpNextSource(val analyticsValue: String) {
     PLAYER("player"),
     NOW_PLAYING("now_playing"),
     UP_NEXT_SHORTCUT("up_next_shortcut"),
+    UP_NEXT_TAB("up_next_tab"),
     UNKNOWN("unknown"),
     ;
 

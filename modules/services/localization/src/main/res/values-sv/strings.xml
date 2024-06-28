@@ -1,33 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-12 11:54:03+0000
+Translation-Revision-Date: 2024-06-17 13:54:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="download_completed_for_episode">Ladda ner helt för %1$s</string>
+    <string name="episode_queued_for_download">Avsnitt placerat i kö för nedladdning</string>
+    <string name="episode_was_removed">Avsnittet togs bort</string>
+    <string name="remove_downloaded_file">Ta bort nedladdad fil</string>
+    <string name="settings_export_database_failed">Export av databas misslyckades</string>
+    <string name="settings_export_database">Exportera databas</string>
+    <string name="settings_sleep_timer_auto_restart_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om automatiskt om du spelar upp ett avsnitt inom 5 minuter efter den senaste pausen.</string>
+    <string name="settings_sleep_timer_auto_restart">Starta om sömntimern automatiskt</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om när du skakar din telefon.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Skaka för att starta om sömntimern</string>
+    <string name="settings_general_sleep_timer">Sömntimer</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Att prioritera sökprecision kan bromsa svarstiden för sökningar avsevärt och göra att Pocket Casts konsumerar mer data.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Prioritera sökprecision</string>
+    <string name="settings_import_opml_succeeded_message">OPML-importen har genomförts.</string>
+    <string name="settings_import_opml_import_failed_message">Det gick inte att importera podcasts från den angivna OPML-filen.</string>
+    <string name="nova_launcher_recently_played">Senast spelade</string>
+    <string name="notification_channel_description_fix_downloads_complete">Visas när åtgärdandet av nedladdningar har slutförts</string>
+    <string name="notification_channel_description_fix_downloads">Visas när åtgärdandet av nedladdningar utlöses</string>
+    <string name="settings_fix_downloads_complete_message">%d nedladdningar har åtgärdats</string>
+    <string name="settings_fix_downloads_complete_title">Åtgärdandet av nedladdningar har slutförts</string>
+    <string name="settings_fix_downloads_started_message">Åtgärdandet av nedladdningar startar snart. Se notiser för förlopp.</string>
+    <string name="settings_fix_downloads_stop">Stoppa</string>
+    <string name="settings_fix_downloads_progress">%1$d av %2$d avsnitt</string>
+    <string name="settings_fix_downloads_title">Åtgärdar nedladdningar</string>
+    <string name="clip_title">Klipp</string>
+    <string name="stop">Stoppa</string>
+    <string name="nova_launcher_continue_listening">Fortsätt lyssna</string>
+    <string name="episode_not_found">Avsnittet hittades inte</string>
+    <string name="settings_storage_fix_downloads_description">Försök återställa nedladdade filer om de saknas i Pocket Casts-appen.</string>
+    <string name="settings_storage_fix_downloads">Åtgärda nedladdningar</string>
+    <string name="nova_launcher_new_releases">Nya släpp</string>
+    <string name="nova_launcher_subscribed_podcasts">Podcastprenumerationer</string>
+    <string name="whats_new_new_widgets_message">Vi har lagt till tre nya widgetar så det blir mycket lättare att hantera dina podcasts från hemskärmen. Kolla in dem!</string>
+    <string name="medium_player_classic_widget_label">Medelstor spelare (klassisk)</string>
+    <string name="widget_preview_time_left_4">1 tim 36 min kvar</string>
+    <string name="widget_preview_time_left_3">55 min kvar</string>
+    <string name="widget_preview_time_left_2">12 min kvar</string>
+    <string name="widget_preview_time_left_1">25 min kvar</string>
+    <string name="widget_preview_episode_in_up_next_title">Avsnitt i Nästa</string>
+    <string name="widget_preview_episode_title">Avsnittstitel</string>
+    <string name="hour_and_minutes">1 timme och %d minuter</string>
+    <string name="hours_and_minutes">%d timmar och %d minuter</string>
+    <string name="player_sleep_time_fired_end_of_chapter">Vilolägestimern stoppades i slutet av kapitlet.</string>
+    <string name="player_sleep_in_chapters">Viloläge efter %d kapitel</string>
+    <string name="player_sleep_in_one_chapter">Viloläge efter 1 kapitel</string>
+    <string name="player_sleep_timer_in_chapter_plural">Efter %d kapitel</string>
+    <string name="player_sleep_timer_in_chapter">Efter 1 kapitel</string>
+    <string name="player_sleep_timer_in_episode_plural">Efter %d avsnitt</string>
+    <string name="player_sleep_timer_in_episode">Efter 1 avsnitt</string>
+    <string name="settings_use_episode_artwork_customization_description">Välj om du vill se avsnittsomslag i dessa sektioner av appen</string>
+    <string name="settings_use_episode_artwork_customization_section">Anpassning</string>
+    <string name="settings_use_episode_artwork_title">Avsnittsomslag</string>
+    <string name="settings_use_episode_artwork_advanced">Avancerade inställningar för avsnittsomslag</string>
+    <string name="player_sleep_in_episodes">Somna efter %d avsnitt</string>
+    <string name="player_sleep_in_one_episode">Somna efter 1 avsnitt</string>
+    <string name="player_sleep_timer_stopped_your_podcast">Vilolägestimern stoppade din podcast.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Vilolägestimern återstartad efter att enheten skakats</string>
+    <string name="whats_new_new_widgets_title">Nya widgetar</string>
+    <string name="widget_check_out_discover">Kolla in Discover om du vill veta mer</string>
+    <string name="widget_nothing_in_up_next">Inget i Nästa</string>
+    <string name="widget_no_episode_playing">Inget avsnitt spelas</string>
+    <string name="large_player_widget_label">Stor spelare</string>
+    <string name="medium_player_widget_label">Mellanstor spelare</string>
+    <string name="small_player_widget_label">Liten spelare</string>
+    <string name="clear_search">Rensa sökning</string>
+    <string name="bookmarks_search_results_not_found">Vi kunde inte hitta något bokmärke för denna sökning.</string>
+    <string name="podcast_and_episode">Podcast och avsnitt</string>
+    <string name="skip_chapters">Förvalda kapitel</string>
+    <string name="settings_use_episode_artwork_details">Vissa shower har anpassade omslag för specifika avsnitt. Aktivera det här alternativet så visar Pocket Casts dem istället för showens omslag.</string>
+    <string name="settings_use_episode_artwork">Använd avsnittsomslag</string>
+    <string name="episode_sort_title_z_a">Rubrik (Ö-A)</string>
+    <string name="episode_sort_title_a_z">Rubrik (A–Ö)</string>
+    <string name="discover_most_popular_in">Mest populärt i %s</string>
+    <string name="discover_select_categories">Välj en kategori</string>
+    <string name="discover_all_categories">Alla kategorier</string>
     <string name="upgrade_to_patron">Uppgradera till Patron</string>
     <string name="upgrade_to_plus">Uppgradera till Plus</string>
     <string name="whats_new_got_it_button">Uppfattat</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Prenumerera på Patron nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Prenumerera på Plus nu så att du kan välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_plus_message">Som en del av din Plus-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="whats_new_deselect_chapters_patron_message">Som en del av din Patron-prenumeration kan du nu välja och hoppa över kapitel i avsnitt som stöder detta.</string>
-    <string name="skip_chapters_patron_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Hoppa över kapitel och mycket annat med Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Använd inbäddat filomslag</string>
-    <string name="settings_episode_artwork_details">Visar omslag från avsnittets showanteckningar (om sådana finns) istället för att använda showens omslag. Om både fil- och RSS-omslag finns kommer RSS-omslaget att användas.</string>
-    <string name="select_one_chapter_message">Välj minst ett kapitel</string>
+    <string name="skip_chapters_patron_prompt">Välj kapitel och mer i förväg med Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Välj kapitel och mer i förväg med Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 kapitel • %d dolda</string>
     <string name="number_of_chapters_summary_plural">%1$d kapitel • %2$d dolda</string>
     <string name="single_chapter">1 kapitel</string>
     <string name="number_of_chapters">%d kapitel</string>
-    <string name="skip_chapters">Hoppa över kapitel</string>
     <string name="onboarding_plus_feature_slumber_studios_title">1 års exklusivt innehåll från &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Lös in din kod</string>
-    <string name="whats_new_slumber_studios_body_free_user">Prenumerera på Plus Yearly och få en 1-årig prenumeration på innehåll från Slumber Studios, podcasts utformade för ljuva drömmar. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Som en del av din Plus Yearly-prenumeration får du en 1-årig prenumeration på innehåll från Slumber Studios med koden %1$s. &lt;a href=\"https://slumberstudios.com/\"&gt;Läs mer&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_title">Dröm stort</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">efter ditt första år</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Återkommande betalning på %s</string>
     <string name="half_price_first_year">50 % rabatt på ditt första år</string>
@@ -73,13 +136,10 @@ Language: sv_SE
     <string name="eoy_story_top_podcasts_title">Du lyssnade även mycket på dessa podcasts.</string>
     <string name="end_of_year_story_top_podcast_title">%1$s var den podcast du lyssnade mest på under 2023</string>
     <string name="end_of_year_share_story">Dela den här berättelsen</string>
-    <string name="whats_new_bookmarks_enable_now_button">Aktivera det nu</string>
     <string name="podcast_log_in_to_rate">Du måste logga in för att ge ett betyg</string>
     <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
     <string name="podcast_rate">Omdöme %s</string>
     <string name="submit">Skicka</string>
-    <string name="whats_new_bookmarks_try_now_button">Testa nu</string>
-    <string name="whats_new_bookmarks_title">Bokmärkena är här!</string>
     <string name="bookmarks_upsell_instructions_early_access">Få tidig åtkomst till den här funktionen med Pocket Casts Patron och spara tidsstämplar för dina favoritavsnitt. Snart tillgänglig för Plus-prenumeranter.</string>
     <string name="bookmarks_upsell_instructions">Spara tidsstämplar för dina favoritavsnitt och lås upp många fler funktioner med Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Det gick inte att hitta programnotiser för detta avsnitt.</string>
@@ -801,7 +861,6 @@ Language: sv_SE
     <string name="settings_website_link">webbplatslänk</string>
     <string name="settings_view">Visa</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Använd inbäddat RSS-omslag</string>
     <string name="settings_use_android_light_dark_mode">Använd ljust/mörkt läge för Android</string>
     <string name="settings_up_next_tap_summary">Om detta är aktiverat spelas objekt i din Nästa-kö upp om du trycker på dem. En lång tryckning visar avsnittsalternativen.</string>
     <string name="settings_up_next_tap">Spela upp nästa avsnitt vid tryckning</string>
@@ -913,7 +972,6 @@ Language: sv_SE
     <string name="settings_export_send_email">Skicka e-post</string>
     <string name="settings_export_save_file_summary">Exportera OPML-filen till ditt lagringsutrymme.</string>
     <string name="settings_export_save_file">Spara fil</string>
-    <string name="settings_embedded_artwork_details">Visar omslag från den nedladdade filen (om ett sådant finns) i spelaren istället för att använda showens omslag.</string>
     <string name="settings_developer">Utvecklare</string>
     <string name="settings_close_upgrade_offer">stäng uppgraderingserbjudande</string>
     <string name="settings_choose_podcasts">Välj podcasts</string>
@@ -976,7 +1034,7 @@ Language: sv_SE
     <string name="plus_upgrade_to_pocket_casts_plus">Uppgradera till Pocket Casts Plus</string>
     <string name="plus_trial_finished_locked">Åtkomst till Pocket Casts Plus-funktioner kommer att låsas</string>
     <string name="plus_trial_finished_files_removed">Filer uppladdade till ditt konto kommer att tas bort efter en vecka</string>
-    <string name="plus_trial_finished_detail">Din kostnadsfria provperiod har nått sitt slut. Ditt konto har nu nedgraderats till ett gratiskonto.</string>
+    <string name="plus_trial_finished_detail">Din gratis provperiod har nått sitt slut. Ditt konto har nu nedgraderats till gratis.</string>
     <string name="plus_trial_finished_continue">Du kan uppgradera ditt konto när som helst för att fortsätta använda Pocket Casts Plus</string>
     <string name="plus_trial_finished">Pocket Casts Plus-provperioden har löpt ut</string>
     <string name="plus_themes_icons_body">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
@@ -1448,7 +1506,7 @@ Language: sv_SE
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Starta podcast från %d sekunder</string>
     <string name="player_skipped_last">Hoppade över de sista %d sekunderna</string>
-    <string name="player_sleep_time_fired">Sömntimern stoppades i slutet av ditt avsnitt.\nGodnatt!</string>
+    <string name="player_sleep_time_fired">Sömntimern stoppades i slutet av ditt avsnitt.</string>
     <string name="player_actions_show_as_delete_for_custom">Visas som ”Ta bort” för anpassade avsnitt</string>
     <string name="player_actions_hidden_for_custom">Dolda för anpassade avsnitt</string>
     <string name="player_rearrange_actions_hidden">Fler åtgärder</string>
@@ -1470,7 +1528,6 @@ Language: sv_SE
     <string name="player_time_saved_detail">Sammanlagt har du sparat %s genom att använda den här funktionen.</string>
     <string name="player_tab_playing_wide">Spelar nu upp</string>
     <string name="player_tab_playing">Spelar</string>
-    <string name="player_sleep_when_episode_ends">Sova när avsnittet slutar</string>
     <string name="player_sleep_timer">Sömntimer</string>
     <string name="player_sleep_timer_title">Sömntimer</string>
     <string name="player_sleep_end_of_episode">Avsnittets slut</string>
@@ -1479,7 +1536,6 @@ Language: sv_SE
     <string name="player_sleep_cancel_timer">Avbryt timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuter</string>
     <string name="player_sleep_60_minutes">60 minuter</string>
-    <string name="player_sleep_5_minutes">5 minuter</string>
     <string name="player_sleep_30_minutes">30 minuter</string>
     <string name="player_sleep_15_minutes">15 minuter</string>
     <string name="player_pip">Aktivera bild-i-bild </string>
@@ -1642,4 +1698,8 @@ Language: sv_SE
     <string name="unarchive">Avarkivera</string>
     <string name="archive">Arkiv</string>
     <string name="add_to_up_next">Lägg till i Nästa</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d avsnitt - %2$s kvar</item>
+        <item quantity="other">%1$d avsnitt - %2$s kvar</item>
+    </plurals>
 </resources>

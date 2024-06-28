@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -32,7 +33,7 @@ fun FilesScreen(
     val viewModel = hiltViewModel<FilesViewModel>()
     val userEpisodesState = viewModel.userEpisodes.collectAsState(null)
     val userEpisodes = userEpisodesState.value
-    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
+    val artworkCollection by viewModel.artworkConfiguration.collectAsState()
 
     when {
         // Show nothing while screen is loading
@@ -49,7 +50,7 @@ fun FilesScreen(
                 items(userEpisodes) { episode ->
                     EpisodeChip(
                         episode = episode,
-                        useRssArtwork = useRssArtwork,
+                        useEpisodeArtwork = artworkCollection.useEpisodeArtwork(Element.Files),
                         onClick = { navigateToEpisode(episode.uuid) },
                     )
                 }

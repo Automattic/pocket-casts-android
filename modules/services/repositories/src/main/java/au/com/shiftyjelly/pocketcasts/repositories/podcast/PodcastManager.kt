@@ -4,9 +4,11 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -28,6 +30,7 @@ interface PodcastManager {
     fun findPodcastByUuidRx(uuid: String): Maybe<Podcast>
     fun observePodcastByUuid(uuid: String): Flowable<Podcast>
     fun observePodcastByUuidFlow(uuid: String): Flow<Podcast>
+    fun observePodcastByEpisodeUuid(uuid: String): Flow<Podcast>
     fun observePodcastSubscriptions(): Flowable<List<String>>
 
     fun findSubscribed(): List<Podcast>
@@ -52,6 +55,7 @@ interface PodcastManager {
     fun findPodcastsAutodownload(): List<Podcast>
 
     fun exists(podcastUuid: String): Boolean
+    fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
@@ -65,6 +69,8 @@ interface PodcastManager {
     fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast>
 
     fun addFolderPodcast(podcast: Podcast)
+
+    suspend fun replaceTrendingPodcasts(podcasts: List<TrendingPodcast>)
 
     /** Update methods  */
     fun updatePodcast(podcast: Podcast)
@@ -148,5 +154,5 @@ interface PodcastManager {
     suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive)
     suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying)
     suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive)
-    suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?)
+    suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit)
 }

@@ -42,6 +42,7 @@
         android:src="@drawable/ic_bookmark"
         android:layout_gravity="center"
         android:layout_marginEnd="4dp"
+        android:visibility="gone"
         app:tint="?attr/support_05" />
 
     <au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
@@ -49,7 +50,8 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="center"
-        android:layout_marginEnd="4dp" />
+        android:layout_marginEnd="4dp"
+        android:visibility="gone" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -57,7 +59,8 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="center"
-        android:layout_marginEnd="4dp" />
+        android:layout_marginEnd="4dp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/lblStatus"

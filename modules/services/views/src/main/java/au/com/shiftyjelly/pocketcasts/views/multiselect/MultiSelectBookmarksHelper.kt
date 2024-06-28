@@ -7,18 +7,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import io.sentry.Sentry
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -26,17 +27,21 @@ class MultiSelectBookmarksHelper @Inject constructor(
     private val bookmarkManager: BookmarkManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : MultiSelectHelper<Bookmark>() {
-    override val maxToolbarIcons = 2
+    override val maxToolbarIcons = 3
 
-    private val _showEditBookmarkPage = MutableSharedFlow<Boolean>()
-    val showEditBookmarkPage = _showEditBookmarkPage.asSharedFlow()
+    private val _navigationState = MutableSharedFlow<NavigationState>()
+    val navigationState = _navigationState.asSharedFlow()
 
     override var source by bookmarkManager::sourceView
 
     override val toolbarActions: LiveData<List<MultiSelectAction>> = _selectedListLive
         .map {
-            Sentry.addBreadcrumb("MultiSelectBookmarksHelper toolbarActions updated, ${it.size} bookmarks from $source")
+            Timber.d("MultiSelectBookmarksHelper toolbarActions updated, ${it.size} bookmarks from $source")
             listOf(
+                MultiSelectBookmarkAction.ShareBookmark(
+                    isVisible = source != SourceView.FILES &&
+                        it.count() == 1,
+                ),
                 MultiSelectBookmarkAction.EditBookmark(isVisible = it.count() == 1),
                 MultiSelectBookmarkAction.DeleteBookmark,
                 MultiSelectAction.SelectAll,
@@ -52,6 +57,11 @@ class MultiSelectBookmarksHelper @Inject constructor(
         activity: FragmentActivity,
     ): Boolean {
         return when (itemId) {
+            R.id.menu_share -> {
+                share()
+                true
+            }
+
             UR.id.menu_edit -> {
                 edit()
                 true
@@ -84,8 +94,12 @@ class MultiSelectBookmarksHelper @Inject constructor(
         }
     }
 
+    private fun share() {
+        launch { _navigationState.emit(NavigationState.ShareBookmark) }
+    }
+
     private fun edit() {
-        launch { _showEditBookmarkPage.emit(true) }
+        launch { _navigationState.emit(NavigationState.EditBookmark) }
     }
 
     fun delete(resources: Resources, fragmentManager: FragmentManager) {
@@ -97,7 +111,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
 
         val count = bookmarks.size
         ConfirmationDialog()
-            .setForceDarkTheme(true)
+            .setForceDarkTheme(source == SourceView.PLAYER)
             .setButtonType(
                 ConfirmationDialog.ButtonType.Danger(
                     resources.getStringPlural(
@@ -139,5 +153,10 @@ class MultiSelectBookmarksHelper @Inject constructor(
                 closeMultiSelect()
             }
             .show(fragmentManager, "delete_bookmarks_warning")
+    }
+
+    sealed class NavigationState {
+        data object EditBookmark : NavigationState()
+        data object ShareBookmark : NavigationState()
     }
 }

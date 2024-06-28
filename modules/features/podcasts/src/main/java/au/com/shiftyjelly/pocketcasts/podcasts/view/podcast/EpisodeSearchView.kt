@@ -51,8 +51,8 @@ class EpisodeSearchView @JvmOverloads constructor(context: Context, attrs: Attri
         }
         searchText.addTextChangedListener(textChangeListener)
         cancelSearchBtn.setOnClickListener {
-            searchText.clearFocus()
             searchText.setText("")
+            searchText.clearFocus()
             UiUtil.hideKeyboard(searchText)
         }
 

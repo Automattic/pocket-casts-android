@@ -26,11 +26,11 @@ import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import io.reactivex.BackpressureStrategy
-import io.sentry.Sentry
 import javax.inject.Inject
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +53,8 @@ class MultiSelectEpisodesHelper @Inject constructor(
     val settings: Settings,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val crashLogging: CrashLogging,
+    private val shareDialogFactory: ShareDialogFactory,
 ) : MultiSelectHelper<BaseEpisode>() {
     override val maxToolbarIcons = 4
 
@@ -62,7 +64,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         .toLiveData()
         .combineLatest(_selectedListLive)
         .map { (actions, selectedEpisodes) ->
-            Sentry.addBreadcrumb("MultiSelectEpisodesHelper toolbarActions updated (${actions.size}): ${actions.map { it::class.java.simpleName }}, ${selectedEpisodes.size} selectedEpisodes from $source")
+            crashLogging.recordEvent("MultiSelectEpisodesHelper toolbarActions updated (${actions.size}): ${actions.map { it::class.java.simpleName }}, ${selectedEpisodes.size} selectedEpisodes from $source")
             actions.mapNotNull {
                 MultiSelectEpisodeAction.actionForGroup(it.groupId, selectedEpisodes)
             }
@@ -312,7 +314,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedList.count())).toList()
         ConfirmationDialog.downloadWarningDialog(list.count(), resources) {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", false)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false, source = source)
             }
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED, source, trimmedList)
             val snackText = resources.getStringPlural(trimmedList.size, LR.string.download_queued_singular, LR.string.download_queued_plural)
@@ -436,7 +438,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 return@launch
             }
 
-            ShareDialog(
+            shareDialogFactory.create(
                 episode = episode,
                 podcast = podcast,
                 fragmentManager = fragmentManager,
@@ -457,7 +459,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
 
             withContext(Dispatchers.Main) {
-                val snackText = resources.getStringPlural(selectedList.size, LR.string.removed_from_up_next_singular, LR.string.removed_from_up_next_plural)
+                val snackText = resources.getStringPlural(list.size, LR.string.removed_from_up_next_singular, LR.string.removed_from_up_next_plural)
                 showSnackBar(snackText)
             }
         }

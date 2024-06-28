@@ -33,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
@@ -73,7 +72,6 @@ class MediaSessionManager(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playlistManager: PlaylistManager,
-    val widgetManager: WidgetManager,
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
@@ -174,10 +172,9 @@ class MediaSessionManager(
                     episodeOne.uuid == episodeTwo.uuid && episodeOne.duration == episodeTwo.duration
                 }
             }
-        val useRssArtworkChanges = settings.useRssArtwork.flow
 
-        combine(upNextQueueChanges, useRssArtworkChanges) { queueState, useRssArtwork -> queueState to useRssArtwork }
-            .onEach { (queueState, useRssArtwork) -> updateUpNext(queueState, useRssArtwork) }
+        combine(upNextQueueChanges, settings.artworkConfiguration.flow) { queueState, artworkConfiguration -> queueState to artworkConfiguration }
+            .onEach { (queueState, artworkConfiguration) -> updateUpNext(queueState, artworkConfiguration.useEpisodeArtwork) }
             .catch { Timber.e(it) }
             .launchIn(this)
     }
@@ -298,17 +295,17 @@ class MediaSessionManager(
         }
     }
 
-    private fun updateUpNext(upNext: UpNextQueue.State, useRssArtwork: Boolean) {
+    private fun updateUpNext(upNext: UpNextQueue.State, useEpisodeArtwork: Boolean) {
         try {
             mediaSession.setQueueTitle("Up Next")
             if (upNext is UpNextQueue.State.Loaded) {
-                updateMetadata(upNext.episode, useRssArtwork)
+                updateMetadata(upNext.episode, useEpisodeArtwork)
 
                 val items = upNext.queue.map { episode ->
                     val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
-                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, settings.useRssArtwork.value)
+                    val localUri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, settings.artworkConfiguration.value.useEpisodeArtwork)
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)
@@ -321,7 +318,7 @@ class MediaSessionManager(
                 }
                 mediaSession.setQueue(items)
             } else {
-                updateMetadata(null, useRssArtwork)
+                updateMetadata(null, useEpisodeArtwork)
                 mediaSession.setQueue(emptyList())
 
                 val playbackStateCompat = getPlaybackStateCompat(PlaybackState(state = PlaybackState.State.EMPTY), currentEpisode = null)
@@ -380,7 +377,7 @@ class MediaSessionManager(
             ).addTo(disposables)
     }
 
-    private fun updateMetadata(episode: BaseEpisode?, useRssArtwork: Boolean) {
+    private fun updateMetadata(episode: BaseEpisode?, useEpisodeArtwork: Boolean) {
         if (episode == null) {
             Timber.i("MediaSession metadata. Nothing Playing.")
             mediaSession.setMetadata(NOTHING_PLAYING)
@@ -403,19 +400,25 @@ class MediaSessionManager(
             nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, podcast.author)
         }
 
-        val nowPlaying = nowPlayingBuilder.build()
         Timber.i("MediaSession metadata. Episode: ${episode.uuid} ${episode.title} Duration: ${episode.durationMs.toLong()}")
-        mediaSession.setMetadata(nowPlaying)
 
         if (settings.showArtworkOnLockScreen.value) {
-            val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context, useRssArtwork)?.toString()
+            val bitmapUri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork)?.toString()
             nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
             if (Util.isAutomotive(context)) nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
 
-            val nowPlayingWithArtwork = nowPlayingBuilder.build()
+            // Send the bitmap, as some devices don't support URLs, such as a Tesla.
+            // Don't do this for Wear OS or Automotive to reduce the amount memory used.
+            if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+                AutoConverter.getPodcastArtworkBitmap(episode, context, useEpisodeArtwork)?.let { bitmap ->
+                    nowPlayingBuilder = nowPlayingBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+                }
+            }
             Timber.i("MediaSession metadata. With artwork.")
-            mediaSession.setMetadata(nowPlayingWithArtwork)
         }
+
+        val nowPlaying = nowPlayingBuilder.build()
+        mediaSession.setMetadata(nowPlaying)
     }
 
     private fun addCustomActions(stateBuilder: PlaybackStateCompat.Builder, currentEpisode: BaseEpisode, playbackState: PlaybackState) {
@@ -459,6 +462,26 @@ class MediaSessionManager(
                             in 2.75..<2.85 -> IR.drawable.auto_2_8
                             in 2.85..<2.95 -> IR.drawable.auto_2_9
                             in 2.95..<3.05 -> IR.drawable.auto_3
+                            in 3.05..<3.15 -> IR.drawable.auto_3_1
+                            in 3.15..<3.25 -> IR.drawable.auto_3_2
+                            in 3.25..<3.35 -> IR.drawable.auto_3_3
+                            in 3.35..<3.45 -> IR.drawable.auto_3_4
+                            in 3.45..<3.55 -> IR.drawable.auto_3_5
+                            in 3.55..<3.65 -> IR.drawable.auto_3_6
+                            in 3.65..<3.75 -> IR.drawable.auto_3_7
+                            in 3.75..<3.85 -> IR.drawable.auto_3_8
+                            in 3.85..<3.95 -> IR.drawable.auto_3_9
+                            in 3.95..<4.05 -> IR.drawable.auto_4
+                            in 4.05..<4.15 -> IR.drawable.auto_4_1
+                            in 4.15..<4.25 -> IR.drawable.auto_4_2
+                            in 4.25..<4.35 -> IR.drawable.auto_4_3
+                            in 4.35..<4.45 -> IR.drawable.auto_4_4
+                            in 4.45..<4.55 -> IR.drawable.auto_4_5
+                            in 4.55..<4.65 -> IR.drawable.auto_4_6
+                            in 4.65..<4.75 -> IR.drawable.auto_4_7
+                            in 4.75..<4.85 -> IR.drawable.auto_4_8
+                            in 4.85..<4.95 -> IR.drawable.auto_4_9
+                            in 4.95..<5.05 -> IR.drawable.auto_5
                             else -> IR.drawable.auto_1
                         }
 
@@ -601,6 +624,12 @@ class MediaSessionManager(
         }
 
         override fun onPlay() {
+            if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
+                // https://developer.android.com/docs/quality-guidelines/car-app-quality#media-autoplay
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
+                return
+            }
+
             logEvent("play")
             enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = source) }
         }
@@ -744,8 +773,18 @@ class MediaSessionManager(
                 in 1.40..<1.60 -> 1.6
                 in 1.60..<1.80 -> 1.8
                 in 1.80..<2.00 -> 2.0
-                in 2.00..<3.00 -> 3.0
-                in 3.00..<3.05 -> 0.6
+                in 2.00..<2.20 -> 2.2
+                in 2.20..<2.40 -> 2.4
+                in 2.40..<2.60 -> 2.6
+                in 2.60..<2.80 -> 2.8
+                in 2.80..<3.00 -> 3.0
+                in 3.00..<3.20 -> 3.2
+                in 3.20..<3.40 -> 3.4
+                in 3.40..<3.60 -> 3.6
+                in 3.60..<3.80 -> 3.8
+                in 3.80..<4.00 -> 4.0
+                in 4.00..<5.00 -> 5.0
+                in 5.00..<5.05 -> 0.6
                 else -> 1.0
             }
 
@@ -763,7 +802,7 @@ class MediaSessionManager(
             // update global playback speed
             val effects = settings.globalPlaybackEffects.value
             effects.playbackSpeed = newSpeed
-            settings.globalPlaybackEffects.set(effects, needsSync = true)
+            settings.globalPlaybackEffects.set(effects, updateModifiedAt = true)
             playbackManager.updatePlayerEffects(effects = effects)
         }
     }

@@ -49,6 +49,7 @@ secret.properties
 firebase.secrets.json
 *.keystore
 *.jks
+!debug.keystore
 
 # Silver Searcher ignore file
 .agignore

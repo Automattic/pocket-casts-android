@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -8,50 +7,60 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class AutoArchiveFragmentViewModel @Inject constructor(
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    @ApplicationContext private val context: Context,
 ) : ViewModel() {
-    private var isFragmentChangingConfigurations: Boolean = false
 
-    fun onViewCreated() {
-        if (!isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_SHOWN)
-        }
+    private val mutableState = MutableStateFlow(initState())
+    val state: StateFlow<State> = mutableState
+
+    fun trackOnViewShownEvent() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_SHOWN)
     }
 
     fun onStarredChanged(newValue: Boolean) {
-        settings.autoArchiveIncludesStarred.set(newValue, needsSync = true)
+        settings.autoArchiveIncludesStarred.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED,
             mapOf("enabled" to newValue),
         )
+        mutableState.update { it.copy(starredEpisodes = newValue) }
     }
 
-    fun onPlayedEpisodesAfterChanged(newStringValue: String) {
-        val newValue = AutoArchiveAfterPlaying.fromString(newStringValue, context)
-        settings.autoArchiveAfterPlaying.set(newValue, needsSync = true)
+    fun onPlayedEpisodesAfterChanged(newValue: AutoArchiveAfterPlaying) {
+        settings.autoArchiveAfterPlaying.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
             mapOf("value" to newValue.analyticsValue),
         )
+        mutableState.update { it.copy(archiveAfterPlaying = newValue) }
     }
 
-    fun onInactiveChanged(newStringValue: String) {
-        val newValue = AutoArchiveInactive.fromString(newStringValue, context)
-        settings.autoArchiveInactive.set(newValue, needsSync = true)
+    fun onInactiveChanged(newValue: AutoArchiveInactive) {
+        settings.autoArchiveInactive.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
             mapOf("value" to newValue.analyticsValue),
         )
+        mutableState.update { it.copy(archiveInactive = newValue) }
     }
 
-    fun onFragmentPause(isChangingConfigurations: Boolean?) {
-        isFragmentChangingConfigurations = isChangingConfigurations ?: false
-    }
+    private fun initState() = State(
+        starredEpisodes = settings.autoArchiveIncludesStarred.value,
+        archiveAfterPlaying = settings.autoArchiveAfterPlaying.value,
+        archiveInactive = settings.autoArchiveInactive.value,
+    )
+
+    data class State(
+        val starredEpisodes: Boolean,
+        val archiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
+        val archiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
+    )
 }

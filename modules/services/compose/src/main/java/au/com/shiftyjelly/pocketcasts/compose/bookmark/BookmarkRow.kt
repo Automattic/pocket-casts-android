@@ -13,8 +13,6 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -103,7 +101,7 @@ sealed class BookmarkRowColors {
 @Composable
 fun BookmarkRow(
     bookmark: Bookmark,
-    episode: BaseEpisode,
+    episode: BaseEpisode?,
     isMultiSelecting: () -> Boolean,
     isSelected: (Bookmark) -> Boolean,
     onPlayClick: (Bookmark) -> Unit,
@@ -112,7 +110,8 @@ fun BookmarkRow(
     timePlayButtonStyle: TimePlayButtonStyle,
     timePlayButtonColors: TimePlayButtonColors,
     showIcon: Boolean,
-    useRssArtwork: Boolean,
+    useEpisodeArtwork: Boolean,
+    showEpisodeTitle: Boolean = false,
 ) {
     Column(
         modifier = modifier,
@@ -146,12 +145,14 @@ fun BookmarkRow(
             }
 
             if (showIcon) {
-                Box(modifier = Modifier.padding(start = 16.dp)) {
-                    EpisodeImage(
-                        episode = episode,
-                        useRssArtwork = useRssArtwork,
-                        modifier = modifier.size(56.dp),
-                    )
+                episode?.let {
+                    Box(modifier = Modifier.padding(start = 16.dp)) {
+                        EpisodeImage(
+                            episode = it,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            modifier = modifier.size(56.dp),
+                        )
+                    }
                 }
             }
 
@@ -160,7 +161,8 @@ fun BookmarkRow(
                     .weight(1f)
                     .padding(horizontal = 16.dp),
             ) {
-                if (bookmark.episodeTitle.isNotEmpty()) {
+                val shouldShowEpisodeTitle = showEpisodeTitle && bookmark.episodeTitle.isNotEmpty()
+                if (shouldShowEpisodeTitle) {
                     TextH70(
                         text = bookmark.episodeTitle,
                         color = colors.secondaryTextColor(),
@@ -171,7 +173,7 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        top = if (bookmark.episodeTitle.isNotEmpty()) 4.dp else 16.dp,
+                        top = if (shouldShowEpisodeTitle) 4.dp else 16.dp,
                     ),
                 )
 
@@ -190,7 +192,7 @@ fun BookmarkRow(
 
                 Spacer(
                     modifier = Modifier.padding(
-                        bottom = if (bookmark.episodeTitle.isNotEmpty()) 8.dp else 16.dp,
+                        bottom = if (shouldShowEpisodeTitle) 8.dp else 16.dp,
                     ),
                 )
             }
@@ -253,7 +255,7 @@ private fun BookmarkRowNormalPreview(themeType: Theme.ThemeType) {
             timePlayButtonStyle = TimePlayButtonStyle.Outlined,
             timePlayButtonColors = TimePlayButtonColors.Default,
             showIcon = false,
-            useRssArtwork = false,
+            useEpisodeArtwork = false,
         )
     }
 }
@@ -283,8 +285,8 @@ fun BookmarkRowPlayerPreview() {
             colors = BookmarkRowColors.Player,
             timePlayButtonStyle = TimePlayButtonStyle.Solid,
             timePlayButtonColors = TimePlayButtonColors.Player(textColor = Color.Black),
-            showIcon = false,
-            useRssArtwork = false,
+            showIcon = true,
+            useEpisodeArtwork = false,
         )
     }
 }

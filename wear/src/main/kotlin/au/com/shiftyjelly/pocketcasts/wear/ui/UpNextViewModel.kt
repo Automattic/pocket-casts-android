@@ -20,5 +20,5 @@ class UpNextViewModel @Inject constructor(
 
     val upNextQueue: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
 
-    val useRssArtwork = settings.useRssArtwork.flow
+    val artworkConfiguration = settings.artworkConfiguration.flow
 }

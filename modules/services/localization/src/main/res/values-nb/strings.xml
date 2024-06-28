@@ -802,7 +802,6 @@ Language: nb_NO
     <string name="settings_export_send_email">Send e-post</string>
     <string name="settings_export_save_file_summary">Eksport OPML-filen til lagringen din.</string>
     <string name="settings_export_save_file">Lagre fil</string>
-    <string name="settings_embedded_artwork_details">Viser grafikk fra den nedlastede filen (hvis den finnes) i avspilleren i stedet for å bruke grafikk fra programmet.</string>
     <string name="settings_developer">Utvikler</string>
     <string name="settings_close_upgrade_offer">lukk oppgraderingstilbud</string>
     <string name="settings_choose_podcasts">Velg podcaster</string>
@@ -1333,7 +1332,6 @@ Language: nb_NO
     <string name="podcasts">Podcaster</string>
     <string name="player_started_from">Starter podcast fra %d sekunder</string>
     <string name="player_skipped_last">Hoppet over de siste %d sekundene</string>
-    <string name="player_sleep_time_fired">Tidtaker for dvalemodus stoppet ved slutten av episoden.\nNatt natt!</string>
     <string name="player_actions_show_as_delete_for_custom">Vises som sletting for egendefinerte episoder</string>
     <string name="player_actions_hidden_for_custom">Skjult for egendefinerte episoder</string>
     <string name="player_rearrange_actions_hidden">Flere handlinger</string>
@@ -1355,7 +1353,6 @@ Language: nb_NO
     <string name="player_time_saved_detail">Totalt har du spart %s ved å bruke denne funksjonen.</string>
     <string name="player_tab_playing_wide">Spilles av nå</string>
     <string name="player_tab_playing">Spiller av</string>
-    <string name="player_sleep_when_episode_ends">I dvalemodus når episoden er ferdig</string>
     <string name="player_sleep_timer">Tidtaker for dvalemodus</string>
     <string name="player_sleep_timer_title">Tidtaker for dvalemodus</string>
     <string name="player_sleep_end_of_episode">Slutt på episode</string>
@@ -1364,7 +1361,6 @@ Language: nb_NO
     <string name="player_sleep_cancel_timer">Avbryt tidtaker</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutter</string>
     <string name="player_sleep_60_minutes">60 minutter</string>
-    <string name="player_sleep_5_minutes">5 minutter</string>
     <string name="player_sleep_30_minutes">30 minutter</string>
     <string name="player_sleep_15_minutes">15 minutter</string>
     <string name="player_pip">Gå inn i bilde-i-bilde</string>

@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Px
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.images.RoundedCornersTransformation
@@ -52,11 +53,11 @@ data class PocketCastsImageRequestFactory(
 
     fun create(
         episode: BaseEpisode,
-        useRssArtwork: Boolean,
+        useEpisodeArtwork: Boolean,
         onSuccess: () -> Unit = {},
     ) = when (episode) {
-        is PodcastEpisodeEntity -> create(RequestType.PodcastEpisode(episode, useRssArtwork), onSuccess)
-        is UserEpisodeEntity -> create(RequestType.UserEpisode(episode), onSuccess)
+        is PodcastEpisodeEntity -> create(RequestType.PodcastEpisode(episode, useEpisodeArtwork), onSuccess)
+        is UserEpisodeEntity -> create(RequestType.UserEpisode(episode, useEpisodeArtwork), onSuccess)
     }
 
     private fun create(
@@ -65,7 +66,7 @@ data class PocketCastsImageRequestFactory(
     ) = ImageRequest.Builder(context)
         .data(type.data(context))
         .placeholder(placeholderId)
-        .error(placeholderId)
+        .error(if (isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork)
         .transformations(
             buildList {
                 add(RoundedCornersTransformation(actualCornerRadius.toFloat()))
@@ -92,15 +93,23 @@ data class PocketCastsImageRequestFactory(
 
     private fun RequestType.Podcast.data(context: Context) = podcastUuid?.let { podcastArtworkUrl(context, it) } ?: placeholderId
 
-    private fun RequestType.PodcastEpisode.data(context: Context) = if (useRssArtwork) {
-        episode.imageUrl ?: episode.podcastArtworkUrl(context)
+    private fun RequestType.PodcastEpisode.data(context: Context) = if (useEpisodeArtwork) {
+        episode.imageUrl ?: EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists) ?: episode.podcastArtworkUrl(context)
     } else {
         episode.podcastArtworkUrl(context)
     }
 
-    private fun RequestType.UserEpisode.data(): String {
-        val tintColorIndex = episode.tintColorIndex
-        val artworkUrl = episode.artworkUrl
+    private fun RequestType.UserEpisode.data() = if (useEpisodeArtwork) {
+        EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists) ?: episode.artworkUrl()
+    } else {
+        episode.artworkUrl()
+    }
+
+    private fun PodcastEpisodeEntity.podcastArtworkUrl(context: Context) = podcastArtworkUrl(context, podcastUuid)
+
+    private fun UserEpisodeEntity.artworkUrl(): String {
+        val tintColorIndex = tintColorIndex
+        val artworkUrl = artworkUrl
         return if (tintColorIndex == 0 && artworkUrl != null) {
             artworkUrl
         } else {
@@ -113,8 +122,6 @@ data class PocketCastsImageRequestFactory(
             "${Settings.SERVER_STATIC_URL}/discover/images/artwork/$themeType/$urlSize/$tintColorIndex.png"
         }
     }
-
-    private fun PodcastEpisodeEntity.podcastArtworkUrl(context: Context) = podcastArtworkUrl(context, podcastUuid)
 
     private fun podcastArtworkUrl(context: Context, podcastUuid: String): String {
         val maxSize = if (Util.isWearOs(context)) 480 else 960
@@ -147,8 +154,8 @@ fun ImageRequest.loadInto(target: Target) = context.imageLoader.enqueue(newBuild
 
 private sealed interface RequestType {
     data class Podcast(val podcastUuid: String?) : RequestType
-    data class PodcastEpisode(val episode: PodcastEpisodeEntity, val useRssArtwork: Boolean) : RequestType
-    data class UserEpisode(val episode: UserEpisodeEntity) : RequestType
+    data class PodcastEpisode(val episode: PodcastEpisodeEntity, val useEpisodeArtwork: Boolean) : RequestType
+    data class UserEpisode(val episode: UserEpisodeEntity, val useEpisodeArtwork: Boolean) : RequestType
     data class FileOrUrl(val filePathOrUrl: String) : RequestType
 }
 

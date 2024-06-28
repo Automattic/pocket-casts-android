@@ -47,7 +47,7 @@ fun NowPlayingChip(
 
     val state by viewModel.state.collectAsState()
     val playbackState = state.playbackState
-    val useRssArtwork by viewModel.useRssArtwork.collectAsState()
+    val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
     val upNextQueue = state.upNextQueue
     val podcast = (upNextQueue as? UpNextQueue.State.Loaded)?.podcast
@@ -57,7 +57,7 @@ fun NowPlayingChip(
         podcast = podcast,
         episode = episode,
         isPlaying = playbackState?.isPlaying == true,
-        useRssArtwork = useRssArtwork,
+        useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
         onClick = onClick,
     )
 }
@@ -67,7 +67,7 @@ private fun Content(
     podcast: Podcast?,
     episode: BaseEpisode?,
     isPlaying: Boolean,
-    useRssArtwork: Boolean,
+    useEpisodeArtwork: Boolean,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -88,8 +88,8 @@ private fun Content(
         secondaryLabel = episode?.title,
         colors = ChipDefaults.imageBackgroundChipColors(
             backgroundImagePainter = if (episode != null) {
-                val imageRequest = remember(episode.uuid, useRssArtwork) {
-                    PocketCastsImageRequestFactory(context).themed().create(episode, useRssArtwork)
+                val imageRequest = remember(episode.uuid, useEpisodeArtwork) {
+                    PocketCastsImageRequestFactory(context).themed().create(episode, useEpisodeArtwork)
                 }
                 rememberAsyncImagePainter(
                     model = imageRequest,
@@ -161,7 +161,7 @@ private fun Preview() {
                 uuid = "57853d71-30ac-4477-af73-e8fe2b1d4dda",
                 publishedDate = Date(),
             ),
-            useRssArtwork = false,
+            useEpisodeArtwork = false,
             isPlaying = false,
             onClick = {},
         )

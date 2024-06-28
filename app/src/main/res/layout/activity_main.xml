@@ -28,7 +28,6 @@
             android:id="@+id/playerBottomSheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#000000"
             android:elevation="8dp"
             android:visibility="gone"
             app:behavior_peekHeight="@dimen/miniPlayerPeekHeight"

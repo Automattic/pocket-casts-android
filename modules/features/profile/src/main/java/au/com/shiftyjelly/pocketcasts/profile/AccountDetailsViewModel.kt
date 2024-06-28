@@ -20,8 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -41,6 +41,7 @@ class AccountDetailsViewModel
     private val settings: Settings,
     private val syncManager: SyncManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val crashLogging: CrashLogging,
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -57,7 +58,8 @@ class AccountDetailsViewModel
                         ),
                     )
                 }
-            Optional.of(subscriptionManager.getDefaultSubscription(subscriptions))
+            val filteredOffer = Subscription.filterOffers(subscriptions)
+            Optional.of(subscriptionManager.getDefaultSubscription(filteredOffer))
         } else {
             Optional.empty()
         }
@@ -95,7 +97,7 @@ class AccountDetailsViewModel
     private fun deleteAccountError(throwable: Throwable) {
         deleteAccountState.postValue(DeleteAccountState.Failure(message = null))
         Timber.e(throwable)
-        SentryHelper.recordException("Delete account failed", throwable)
+        crashLogging.sendReport(throwable, message = "Delete account failed")
     }
 
     fun clearDeleteAccountState() {
@@ -107,7 +109,7 @@ class AccountDetailsViewModel
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
             mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked),
         )
-        settings.marketingOptIn.set(isChecked, needsSync = true)
+        settings.marketingOptIn.set(isChecked, updateModifiedAt = true)
     }
 
     override fun onCleared() {

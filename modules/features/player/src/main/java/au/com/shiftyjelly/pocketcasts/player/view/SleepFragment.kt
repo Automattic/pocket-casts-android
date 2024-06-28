@@ -64,25 +64,35 @@ class SleepFragment : BaseDialogFragment() {
         val binding = FragmentSleepBinding.inflate(inflater, container, false)
         this.binding = binding
 
-        binding.buttonMins5.setOnClickListener { startTimer(mins = 5) }
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
-        binding.buttonMins60.setOnClickListener { startTimer(mins = 60) }
-        binding.buttonEndOfEpisode.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
-            startTimerEndOfEpisode()
-        }
+        binding.buttonOneHour.setOnClickListener { startTimer(mins = 60) }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
+        binding.endOfEpisodeMinusButton.setOnClickListener { minusEndOfEpisodeButtonClicked() }
+        binding.endOfChapterMinusButton.setOnClickListener { minusEndOfChapterButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
+        binding.endOfEpisodePlusButton.setOnClickListener { plusEndOfEpisodeButtonClicked() }
+        binding.endOfChapterPlusButton.setOnClickListener { plusEndOfChapterButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
+        binding.buttonEndOfEpisode.setOnClickListener {
+            val episodes = viewModel.getSleepEndOfEpisodes()
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodes))
+            startTimerEndOfEpisode(episodes = episodes)
+        }
+        binding.buttonEndOfChapter.setOnClickListener {
+            val chapters = viewModel.getSleepEndOfChapters()
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_CHAPTER, NUMBER_OF_CHAPTERS_KEY to chapters))
+            startTimerEndOfChapter(chapters = chapters)
+        }
         binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
         binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE))
-            startTimerEndOfEpisode()
+            val episodesAmountToExtend = 1
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodesAmountToExtend))
+            startTimerEndOfEpisode(episodes = episodesAmountToExtend)
         }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
-        binding.buttonCancelEndOfEpisode.setOnClickListener { cancelTimer() }
+        binding.buttonCancelEndOfEpisodeOrChapter.setOnClickListener { cancelTimer() }
 
         return binding.root
     }
@@ -99,15 +109,27 @@ class SleepFragment : BaseDialogFragment() {
             binding?.labelCustom?.text = customTimeText
         }
 
+        viewModel.sleepEndOfEpisodesText.observe(viewLifecycleOwner) { text ->
+            binding?.labelEndOfEpisode?.text = text
+        }
+
+        viewModel.sleepEndOfChaptersText.observe(viewLifecycleOwner) { text ->
+            binding?.labelEndOfChapter?.text = text
+        }
+
+        viewModel.sleepingInText.observe(viewLifecycleOwner) { text ->
+            binding?.sleepingInText?.text = text
+        }
+
         viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
             binding?.sleepSetup?.isVisible = !isSleepRunning
             binding?.sleepRunning?.isVisible = isSleepRunning
         }
 
-        viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisode)
+        viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisodeOrChapter)
             .observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfEpisode) ->
                 binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode
-                binding?.sleepRunningEndOfEpisode?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
+                binding?.sleepRunningEndOfEpisodeOrChapter?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
             }
 
         viewModel.playingEpisodeLive.observe(
@@ -122,8 +144,8 @@ class SleepFragment : BaseDialogFragment() {
                 binding.buttonAdd5Minute.setTextColor(tintColorStateList)
                 binding.buttonAdd1Minute.strokeColor = tintColorStateList
                 binding.buttonAdd1Minute.setTextColor(tintColorStateList)
-                binding.buttonCancelEndOfEpisode.strokeColor = tintColorStateList
-                binding.buttonCancelEndOfEpisode.setTextColor(tintColorStateList)
+                binding.buttonCancelEndOfEpisodeOrChapter.strokeColor = tintColorStateList
+                binding.buttonCancelEndOfEpisodeOrChapter.setTextColor(tintColorStateList)
                 binding.buttonCancelTime.strokeColor = tintColorStateList
                 binding.buttonCancelTime.setTextColor(tintColorStateList)
                 binding.buttonEndOfEpisode2.strokeColor = tintColorStateList
@@ -155,33 +177,65 @@ class SleepFragment : BaseDialogFragment() {
     }
 
     private fun startCustomTimer() {
-        viewModel.sleepTimerAfter(mins = viewModel.sleepCustomTimeMins)
-        binding?.root?.announceForAccessibility("Sleep timer set for ${viewModel.sleepCustomTimeMins} minutes")
-        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(viewModel.sleepCustomTimeMins.minutes())))
+        viewModel.sleepTimerAfter(mins = viewModel.sleepCustomTimeInMinutes)
+        binding?.root?.announceForAccessibility("Sleep timer set for ${viewModel.sleepCustomTimeInMinutes} minutes")
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(viewModel.sleepCustomTimeInMinutes.minutes())))
         close()
     }
 
     private fun plusButtonClicked() {
-        if (viewModel.sleepCustomTimeMins < 5) {
-            viewModel.sleepCustomTimeMins += 1
+        if (viewModel.sleepCustomTimeInMinutes < 5) {
+            viewModel.sleepCustomTimeInMinutes += 1
         } else {
-            viewModel.sleepCustomTimeMins += 5
+            viewModel.sleepCustomTimeInMinutes += 5
         }
-        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
+        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
+    }
+
+    private fun plusEndOfEpisodeButtonClicked() {
+        viewModel.setSleepEndOfEpisodes(viewModel.getSleepEndOfEpisodes() + 1)
+        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
+    }
+
+    private fun plusEndOfChapterButtonClicked() {
+        viewModel.setSleepEndOfChapters(viewModel.getSleepEndOfChapters() + 1)
+        binding?.root?.announceForAccessibility("Sleep time chapter ${viewModel.getSleepEndOfChapters()}")
     }
 
     private fun minusButtonClicked() {
-        if (viewModel.sleepCustomTimeMins <= 5) {
-            viewModel.sleepCustomTimeMins -= 1
+        if (viewModel.sleepCustomTimeInMinutes <= 5) {
+            viewModel.sleepCustomTimeInMinutes -= 1
         } else {
-            viewModel.sleepCustomTimeMins -= 5
+            viewModel.sleepCustomTimeInMinutes -= 5
         }
-        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
+        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
     }
 
-    private fun startTimerEndOfEpisode() {
-        viewModel.sleepTimerAfterEpisode()
+    private fun minusEndOfEpisodeButtonClicked() {
+        val endOfEpisodes = viewModel.getSleepEndOfEpisodes()
+        if (endOfEpisodes > 1) {
+            viewModel.setSleepEndOfEpisodes(endOfEpisodes - 1)
+        }
+        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
+    }
+
+    private fun minusEndOfChapterButtonClicked() {
+        val endOfChapters = viewModel.getSleepEndOfChapters()
+        if (endOfChapters > 1) {
+            viewModel.setSleepEndOfChapters(endOfChapters - 1)
+        }
+        binding?.root?.announceForAccessibility("Sleep time end of chapter ${viewModel.getSleepEndOfChapters() }")
+    }
+
+    private fun startTimerEndOfEpisode(episodes: Int) {
+        viewModel.sleepTimerAfterEpisode(episodes)
         binding?.root?.announceForAccessibility("Sleep timer set for end of episode")
+        close()
+    }
+
+    private fun startTimerEndOfChapter(chapters: Int) {
+        viewModel.sleepTimerAfterChapter(chapters)
+        binding?.root?.announceForAccessibility("Sleep timer set for end of chapter")
         close()
     }
 
@@ -206,6 +260,9 @@ class SleepFragment : BaseDialogFragment() {
     companion object {
         private const val TIME_KEY = "time" // in seconds
         private const val AMOUNT_KEY = "amount"
+        private const val NUMBER_OF_EPISODES_KEY = "number_of_episodes"
         private const val END_OF_EPISODE = "end_of_episode"
+        private const val NUMBER_OF_CHAPTERS_KEY = "number_of_chapters"
+        private const val END_OF_CHAPTER = "end_of_chapter"
     }
 }

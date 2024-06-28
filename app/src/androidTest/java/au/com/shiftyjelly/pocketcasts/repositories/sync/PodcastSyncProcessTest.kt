@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -164,6 +165,8 @@ class PodcastSyncProcessTest {
                 subscriptionManager = mock(),
                 folderManager = folderManager,
                 syncManager = syncManager,
+                crashLogging = FakeCrashLogging(),
+                analyticsTracker = mock(),
             )
 
             val response = MockResponse()

@@ -34,6 +34,8 @@ import java.net.URL
 import java.util.Scanner
 import java.util.regex.Pattern
 import javax.xml.parsers.SAXParserFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -41,9 +43,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
+import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -165,8 +169,16 @@ class OpmlImportTask @AssistedInject constructor(
             }
             val numberProcessed = processFile(uri)
             trackProcessed(numberProcessed)
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_succeeded_message), Toast.LENGTH_LONG).show()
+            }
             return Result.success()
         } catch (t: Throwable) {
+            if (t is SAXParseException) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_import_failed_message), Toast.LENGTH_LONG).show()
+                }
+            }
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
             trackFailure(reason = "unknown")
             return Result.failure()
@@ -180,7 +192,7 @@ class OpmlImportTask @AssistedInject constructor(
         )
     }
 
-    fun trackFailure(reason: String) {
+    private fun trackFailure(reason: String) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FAILED,
             mapOf("reason" to reason),
@@ -216,7 +228,8 @@ class OpmlImportTask @AssistedInject constructor(
         val resolver = applicationContext.contentResolver
         try {
             resolver.openInputStream(uri)?.use { inputStream ->
-                urls = readOpmlUrlsSax(inputStream)
+                val modifiedInputStream = PreProcessOpmlFile().replaceInvalidXmlCharacter(inputStream)
+                urls = readOpmlUrlsSax(modifiedInputStream)
             }
         } catch (e: SAXException) {
             resolver.openInputStream(uri)?.use { inputStream ->

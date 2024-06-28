@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -57,6 +58,7 @@ class UserEpisodeViewHolder(
     val imageRequestFactory: PocketCastsImageRequestFactory,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val userBookmarksObservable: Observable<List<Bookmark>>,
+    private val artworkContext: ArtworkConfiguration.Element,
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
 
     private var episodeInstance: BaseEpisode? = null
@@ -218,7 +220,7 @@ class UserEpisodeViewHolder(
 
         titleTextView.text = episode.title
 
-        imageRequestFactory.create(episode, settings.useRssArtwork.value).loadInto(artworkImageView)
+        imageRequestFactory.create(episode, settings.artworkConfiguration.value.useEpisodeArtwork(artworkContext)).loadInto(artworkImageView)
 
         val checkbox = binding.checkbox
         if (checkbox.isVisible != multiSelectEnabled) {

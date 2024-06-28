@@ -17,6 +17,7 @@ android {
 
 dependencies {
     implementation(project(":modules:services:analytics"))
+    implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:model"))

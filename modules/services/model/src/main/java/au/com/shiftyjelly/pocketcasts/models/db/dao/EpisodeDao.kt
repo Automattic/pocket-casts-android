@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -40,6 +42,9 @@ abstract class EpisodeDao {
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
+
+    @Query("SELECT * FROM podcast_episodes WHERE uuid IN (:episodeUuids)")
+    abstract suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode>
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
@@ -530,4 +535,68 @@ abstract class EpisodeDao {
         """,
     )
     abstract suspend fun getFailedDownloadsStatistics(): EpisodeDownloadFailureStatistics
+
+    @Query("SELECT * FROM podcast_episodes LIMIT :limit OFFSET :offset")
+    abstract suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode>
+
+    @Query(
+        """
+        SELECT
+          episode.uuid AS id,
+          episode.podcast_id AS podcast_id,
+          episode.title AS title,
+          episode.duration AS duration,
+          episode.played_up_to AS current_position,
+          episode.season AS season_number,
+          episode.number AS episode_number,
+          episode.published_date AS release_timestamp,
+          episode.last_playback_interaction_date AS last_used_timestamp
+        FROM
+          podcast_episodes AS episode
+          JOIN podcasts AS podcast ON podcast.uuid IS episode.podcast_id
+        WHERE
+          episode.archived IS 0
+          AND podcast.subscribed IS 1
+          -- Check that the episode is not played
+          AND episode.playing_status IS 0
+          -- Select only episodes that were released at most 2 weeks ago
+          AND episode.published_date >= (:currentTime - 1209600000)
+        ORDER BY
+          episode.published_date DESC
+        LIMIT
+          :limit
+        """,
+    )
+    abstract suspend fun getNovaLauncherNewEpisodes(
+        limit: Int,
+        currentTime: Long = System.currentTimeMillis(),
+    ): List<NovaLauncherNewEpisode>
+
+    @Query(
+        """
+        SELECT
+          episode.uuid AS id,
+          episode.podcast_id AS podcast_id,
+          episode.title AS title,
+          episode.duration AS duration,
+          episode.played_up_to AS current_position,
+          episode.season AS season_number,
+          episode.number AS episode_number,
+          episode.published_date AS release_timestamp,
+          episode.last_playback_interaction_date AS last_used_timestamp
+        FROM
+          podcast_episodes AS episode
+        WHERE
+          episode.archived IS 0
+          -- Check that the episode is in progress
+          AND episode.playing_status IS 1
+        ORDER BY
+          episode.last_playback_interaction_date DESC
+        LIMIT
+          :limit
+        """,
+    )
+    abstract suspend fun getNovaLauncherInProgressEpisodes(
+        limit: Int,
+    ): List<NovaLauncherInProgressEpisode>
 }

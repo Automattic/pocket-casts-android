@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -16,8 +17,8 @@ class SleepTimerReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
-        Toast.makeText(context, "Sleep timer stopped your podcast.\nNight night!", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.player_sleep_timer_stopped_your_podcast), Toast.LENGTH_LONG).show()
         playbackManager.pause(sourceView = SourceView.AUTO_PAUSE)
-        playbackManager.updateSleepTimerStatus(running = false)
+        playbackManager.updateSleepTimerStatus(sleepTimeRunning = false)
     }
 }

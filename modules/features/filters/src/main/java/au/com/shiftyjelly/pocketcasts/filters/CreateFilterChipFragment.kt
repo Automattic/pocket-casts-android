@@ -245,7 +245,7 @@ private class SimpleEpisodeListAdapter(
         holder.binding.lblSubtitle.text = timeLeft.text
         holder.binding.lblSubtitle.contentDescription = timeLeft.description
 
-        imageRequestFactory.create(item, settings.useRssArtwork.value).loadInto(holder.binding.imageView)
+        imageRequestFactory.create(item, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(holder.binding.imageView)
     }
 }
 

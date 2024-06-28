@@ -803,7 +803,6 @@ Language: ar
     <string name="settings_export_send_email">إرسال بريد إلكتروني</string>
     <string name="settings_export_save_file_summary">قم بتصدير ملف OPML إلى مساحة تخزينك.</string>
     <string name="settings_export_save_file">حفظ الملف</string>
-    <string name="settings_embedded_artwork_details">يعرض العمل الفني من الملف الذي تم تنزيله (إذا كان موجودًا) في المُشغِّل بدلاً من استخدام العمل الفني للعرض.</string>
     <string name="settings_developer">مطوّر</string>
     <string name="settings_close_upgrade_offer">إغلاق عرض الترقية</string>
     <string name="settings_choose_podcasts">اختيار البث الصوتي</string>
@@ -1334,7 +1333,6 @@ Language: ar
     <string name="podcasts">البث الصوتي</string>
     <string name="player_started_from">بدء البث الصوتي من %d من الثواني</string>
     <string name="player_skipped_last">تم تخطي آخر %d من الثواني</string>
-    <string name="player_sleep_time_fired">توقف مؤقت الإيقاف في نهاية حلقتك.\nليلة سعيدة!</string>
     <string name="player_actions_show_as_delete_for_custom">معروض كحذف للحلقات المخصصة</string>
     <string name="player_actions_hidden_for_custom">مخفي للحلقات المخصصة</string>
     <string name="player_rearrange_actions_hidden">المزيد من الإجراءات</string>
@@ -1356,7 +1354,6 @@ Language: ar
     <string name="player_time_saved_detail">لقد وفرت إجمالاً %s باستخدام هذه الميزة.</string>
     <string name="player_tab_playing_wide">ما يتم تشغيله الآن</string>
     <string name="player_tab_playing">تشغيل</string>
-    <string name="player_sleep_when_episode_ends">الإيقاف عند انتهاء الحلقة</string>
     <string name="player_sleep_timer">مؤقت الإيقاف</string>
     <string name="player_sleep_timer_title">مؤقت الإيقاف</string>
     <string name="player_sleep_end_of_episode">نهاية الحلقة</string>
@@ -1365,7 +1362,6 @@ Language: ar
     <string name="player_sleep_cancel_timer">إلغاء المؤقت</string>
     <string name="player_sleep_add_5_minutes">أكثر من 5 دقائق</string>
     <string name="player_sleep_60_minutes">60 دقيقة</string>
-    <string name="player_sleep_5_minutes">5 دقائق</string>
     <string name="player_sleep_30_minutes">30 دقيقة</string>
     <string name="player_sleep_15_minutes">15 دقيقة</string>
     <string name="player_pip">دخول صورة داخل صورة</string>

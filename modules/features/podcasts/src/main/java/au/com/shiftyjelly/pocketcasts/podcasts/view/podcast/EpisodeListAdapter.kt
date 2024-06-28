@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -52,6 +54,7 @@ class EpisodeListAdapter(
     val fragmentManager: FragmentManager,
     val fromListUuid: String? = null,
     val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
+    private val artworkContext: ArtworkConfiguration.Element,
 ) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
     val disposables = CompositeDisposable()
@@ -80,6 +83,7 @@ class EpisodeListAdapter(
                 imageRequestFactory = imageRequestFactory,
                 settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+                artworkContext = artworkContext,
             )
             R.layout.adapter_user_episode -> UserEpisodeViewHolder(
                 binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false),
@@ -90,6 +94,7 @@ class EpisodeListAdapter(
                 imageRequestFactory = imageRequestFactory,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
                 userBookmarksObservable = bookmarkManager.findUserEpisodesBookmarksFlow().asObservable(),
+                artworkContext = artworkContext,
             )
             else -> throw IllegalStateException("Unknown playable type")
         }
@@ -116,7 +121,7 @@ class EpisodeListAdapter(
             multiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
             disposables = disposables,
-            bookmarksObservable = bookmarkManager.findBookmarksFlow().asObservable(),
+            bookmarksObservable = bookmarkManager.findBookmarksFlow(BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST).asObservable(),
             bookmarksAvailable = bookmarksAvailable,
         )
         holder.episodeRow.setOnClickListener {

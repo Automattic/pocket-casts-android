@@ -73,6 +73,7 @@ interface UserEpisodeManager {
     fun observeEpisode(uuid: String): Flow<UserEpisode>
     fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
+    suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
     fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean)
     fun performUploadToServer(userEpisode: UserEpisode, playbackManager: PlaybackManager): Completable
     fun removeFromCloud(userEpisode: UserEpisode)
@@ -252,6 +253,10 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.findEpisodeByUuid(uuid)
     }
 
+    override suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode> {
+        return userEpisodeDao.findEpisodesByUuids(episodeUuids)
+    }
+
     override fun downloadMissingUserEpisode(uuid: String, placeholderTitle: String?, placeholderPublished: Date?): Maybe<UserEpisode> {
         val missingEpisode = UserEpisode(uuid = uuid, title = placeholderTitle ?: "Unable to find episode", publishedDate = placeholderPublished ?: Date(), serverStatus = UserEpisodeServerStatus.MISSING)
         val replaceEpisodeWithSubstitute = userEpisodeDao.insertRx(missingEpisode).andThen(userEpisodeDao.findEpisodeByUuidRx(uuid))
@@ -394,7 +399,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 if (settings.cloudAutoDownload.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
                     userEpisodeDao.updateAutoDownloadStatus(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
                     newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
-                    downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", false)
+                    downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", fireEvent = false, fireToast = false, source = SourceView.UNKNOWN)
                 }
             }
         }

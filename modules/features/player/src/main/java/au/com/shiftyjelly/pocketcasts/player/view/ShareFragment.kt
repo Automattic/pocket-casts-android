@@ -8,12 +8,15 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.clip.ShareClipFragment
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShareBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -21,6 +24,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @AndroidEntryPoint
 class ShareFragment : BaseDialogFragment() {
@@ -51,6 +55,7 @@ class ShareFragment : BaseDialogFragment() {
                     podcast,
                     null,
                     null,
+                    null,
                     requireContext(),
                     ShareType.PODCAST,
                     SourceView.PLAYER,
@@ -65,6 +70,7 @@ class ShareFragment : BaseDialogFragment() {
                     podcast,
                     episode,
                     null,
+                    null,
                     requireContext(),
                     ShareType.EPISODE,
                     SourceView.PLAYER,
@@ -78,7 +84,8 @@ class ShareFragment : BaseDialogFragment() {
                 SharePodcastHelper(
                     podcast,
                     episode,
-                    episode.playedUpTo,
+                    episode.playedUpTo.seconds,
+                    null,
                     requireContext(),
                     ShareType.CURRENT_TIME,
                     SourceView.PLAYER,
@@ -92,7 +99,8 @@ class ShareFragment : BaseDialogFragment() {
                 SharePodcastHelper(
                     podcast,
                     episode,
-                    episode.playedUpTo,
+                    episode.playedUpTo.seconds,
+                    null,
                     requireContext(),
                     ShareType.EPISODE_FILE,
                     SourceView.PLAYER,
@@ -101,10 +109,19 @@ class ShareFragment : BaseDialogFragment() {
             }
             close()
         }
+        binding.buttonShareClip.setOnClickListener {
+            if (podcast != null && episode is PodcastEpisode) {
+                ShareClipFragment
+                    .newInstance(episode.uuid, podcast.backgroundColor)
+                    .show(parentFragmentManager, "share_clip")
+            }
+            close()
+        }
 
         binding.sharePodcast.isVisible = podcast != null
         binding.shareEpisode.isVisible = episode != null
         binding.shareCurrentPosition.isVisible = episode != null
+        binding.shareClip.isVisible = FeatureFlag.isEnabled(Feature.SHARE_CLIPS) && episode is PodcastEpisode
         binding.openFileIn.isVisible = episode != null && episode.isDownloaded
 
         return binding.root

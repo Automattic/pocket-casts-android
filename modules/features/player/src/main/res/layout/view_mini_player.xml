@@ -1,108 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="68dp"
-    android:focusable="true"
-    android:clickable="true"
-    android:contentDescription="@string/player_open_full_size_player">
+    android:layout_height="68dp">
 
     <View
-        android:id="@+id/miniPlayerTint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/primary_ui_01" />
+        android:background="@drawable/background_miniplayer_gradient" />
 
-    <ImageView
-        android:id="@+id/artwork"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/round_corners_2dp"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/miniPlayerCardView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="6dp"
+        android:layout_marginHorizontal="6dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:elevation="2dp"
+        app:cardCornerRadius="12dp"
+        android:contentDescription="@string/player_open_full_size_player">
 
-    <ImageButton
-        android:id="@+id/skipForward"
-        android:layout_width="68dp"
-        android:layout_height="68dp"
-        android:layout_marginStart="8dp"
-        android:background="?android:attr/actionBarItemBackground"
-        android:scaleType="centerInside"
-        android:clickable="false"
-        android:contentDescription="@string/skip_forward"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
-        app:layout_constraintStart_toEndOf="@+id/miniPlayButton"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/mini_player_skip_forward" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/miniPlayButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/mini_player_play_background"
-        android:scaleType="centerInside"
-        android:clickable="false"
-        app:lottie_rawRes="@raw/mini_player_play_button"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <View
+                android:id="@+id/miniPlayerTint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/primary_ui_01" />
 
-    <ImageButton
-        android:id="@+id/skipBack"
-        android:layout_width="68dp"
-        android:layout_height="68dp"
-        android:layout_marginEnd="8dp"
-        android:background="?android:attr/actionBarItemBackground"
-        android:scaleType="centerInside"
-        android:clickable="false"
-        android:contentDescription="@string/skip_back"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
-        app:layout_constraintEnd_toStartOf="@+id/miniPlayButton"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/mini_player_skip_back" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/artworkCardView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:cardCornerRadius="@dimen/mini_player_artwork_corner_radius"
+                app:elevation="@dimen/mini_player_artwork_elevation"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:id="@+id/artwork"
+                    android:layout_width="@dimen/mini_player_artwork_size"
+                    android:layout_height="@dimen/mini_player_artwork_size" />
+            </androidx.cardview.widget.CardView>
 
-    <ImageButton
-        android:id="@+id/upNextButton"
-        android:layout_width="68dp"
-        android:layout_height="68dp"
-        android:background="?android:attr/actionBarItemBackground"
-        android:scaleType="centerInside"
-        android:clickable="false"
-        android:contentDescription="@string/player_up_next"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <ImageButton
+                android:id="@+id/skipForward"
+                android:layout_width="@dimen/mini_player_skip_button_size_68"
+                android:layout_height="@dimen/mini_player_skip_button_size_68"
+                android:layout_marginStart="8dp"
+                android:background="?android:attr/actionBarItemBackground"
+                android:scaleType="centerInside"
+                android:clickable="false"
+                android:contentDescription="@string/skip_forward"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintStart_toEndOf="@+id/miniPlayButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/mini_player_skip_forward" />
 
-    <TextView
-        android:id="@+id/countText"
-        android:layout_width="19dp"
-        android:layout_height="19dp"
-        android:layout_marginEnd="30.5dp"
-        android:textStyle="bold"
-        app:autoSizeTextType="uniform"
-        app:autoSizeMinTextSize="8sp"
-        app:autoSizeMaxTextSize="16sp"
-        app:autoSizeStepGranularity="1sp"
-        android:letterSpacing="-0.05"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:textColor="?attr/primary_ui_01"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/miniPlayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/mini_player_play_background_48"
+                android:scaleType="centerInside"
+                android:clickable="false"
+                app:lottie_rawRes="@raw/mini_player_play_button_48"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="0dp"
-        android:layout_height="3dp"
-        android:layout_gravity="center"
-        android:progressDrawable="@drawable/mini_player_progress_bar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal" />
+            <ImageButton
+                android:id="@+id/skipBack"
+                android:layout_width="@dimen/mini_player_skip_button_size_68"
+                android:layout_height="@dimen/mini_player_skip_button_size_68"
+                android:layout_marginEnd="8dp"
+                android:background="?android:attr/actionBarItemBackground"
+                android:scaleType="centerInside"
+                android:clickable="false"
+                android:contentDescription="@string/skip_back"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintEnd_toStartOf="@+id/miniPlayButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/mini_player_skip_back" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton
+                android:id="@+id/upNextButton"
+                android:layout_width="68dp"
+                android:layout_height="68dp"
+                android:background="?android:attr/actionBarItemBackground"
+                android:scaleType="centerInside"
+                android:clickable="false"
+                android:contentDescription="@string/player_up_next"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/countText"
+                android:layout_width="19dp"
+                android:layout_height="19dp"
+                android:layout_marginEnd="30.5dp"
+                android:textStyle="bold"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="8sp"
+                app:autoSizeMaxTextSize="16sp"
+                app:autoSizeStepGranularity="1sp"
+                android:letterSpacing="-0.05"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:textColor="?attr/primary_ui_01"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_gravity="center"
+                android:progressDrawable="@drawable/mini_player_progress_bar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

@@ -9,6 +9,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherQueueEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class UpNextDao {
@@ -126,12 +128,6 @@ abstract class UpNextDao {
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT 1")
     abstract fun findCurrentUpNextEpisode(): UpNextEpisode?
 
-    @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC LIMIT 1")
-    abstract fun findCurrentEpisode(): PodcastEpisode?
-
-    @Query("SELECT user_episodes.* FROM up_next_episodes JOIN user_episodes ON user_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC LIMIT 1")
-    abstract fun findCurrentUserEpisode(): UserEpisode?
-
     @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
     abstract fun findEpisodes(): List<PodcastEpisode>
 
@@ -184,4 +180,77 @@ abstract class UpNextDao {
         val newUuids = episodes.map(BaseEpisode::uuid)
         databaseUuids.minus(newUuids).forEach(this::deleteByUuid)
     }
+
+    @Transaction
+    open suspend fun getUpNextBaseEpisodes(limit: Int): List<BaseEpisode> {
+        val upNextEpisodes = getUpNextEpisodes(limit)
+        val idToPosition = upNextEpisodes.associate { it.episodeUuid to it.position }
+        val podcastEpisodes = findPodcastEpisodes(idToPosition.keys)
+        val userEpisodes = if (podcastEpisodes.size != upNextEpisodes.size) findUserEpisodes(idToPosition.keys) else emptyList()
+        return (podcastEpisodes + userEpisodes).sortedBy { idToPosition[it.uuid] }
+    }
+
+    @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT :limit")
+    protected abstract suspend fun getUpNextEpisodes(limit: Int): List<UpNextEpisode>
+
+    @Query("SELECT * FROM podcast_episodes WHERE uuid IN (:ids)")
+    protected abstract suspend fun findPodcastEpisodes(ids: Collection<String>): List<PodcastEpisode>
+
+    @Query("SELECT * FROM user_episodes WHERE uuid IN (:ids)")
+    protected abstract suspend fun findUserEpisodes(ids: Collection<String>): List<UserEpisode>
+
+    @Query(
+        """
+        SELECT
+          episode.*
+        FROM 
+          up_next_episodes AS up_next 
+          LEFT JOIN (
+            SELECT
+              -- common properties
+              TRUE AS is_podcast_episode, 
+              episode.uuid AS id, 
+              episode.title AS title, 
+              episode.duration AS duration, 
+              episode.played_up_to AS current_position, 
+              episode.published_date AS release_timestamp, 
+              -- podcast episode properties
+              episode.podcast_id AS podcast_id, 
+              episode.season AS season_number, 
+              episode.number AS episode_number, 
+              episode.last_playback_interaction_date AS last_used_timestamp,
+              -- user episode properties
+              NULL AS artwork_url, 
+              NULL AS tint_color_index
+            FROM 
+              podcast_episodes AS episode 
+            UNION ALL 
+            SELECT
+              -- common properties
+              FALSE AS is_podcast_episode, 
+              episode.uuid AS id, 
+              episode.title AS title, 
+              episode.duration AS duration, 
+              episode.played_up_to AS current_position, 
+              episode.published_date AS release_timestamp,
+              -- podcast episode properties
+              NULL AS podcast_id, 
+              NULL AS season_number, 
+              NULL AS episode_number, 
+              NULL AS last_used_timestamp,
+              -- user episode properties
+              episode.artwork_url AS artwork_url, 
+              episode.tint_color_index AS tint_color_index
+            FROM 
+              user_episodes AS episode
+          ) AS episode ON up_next.episodeUuid IS episode.id 
+        WHERE
+          episode.id IS NOT NULL
+        ORDER BY 
+          up_next.position ASC 
+        LIMIT 
+          :limit
+        """,
+    )
+    abstract fun getNovaLauncherQueueEpisodes(limit: Int): Flow<List<NovaLauncherQueueEpisode>>
 }

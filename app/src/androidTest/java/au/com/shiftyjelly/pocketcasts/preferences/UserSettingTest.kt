@@ -3,10 +3,11 @@ import android.content.SharedPreferences
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import java.time.Clock
+import au.com.shiftyjelly.pocketcasts.utils.MutableClock
 import java.time.Instant
-import java.time.ZoneId
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -17,7 +18,7 @@ class UserSettingTest {
         .targetContext
         .getSharedPreferences("instrumentation_test_shared_prefs", Context.MODE_PRIVATE)
 
-    private val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+    private val clock = MutableClock()
 
     private val userSetting = UserSetting.StringPref(
         defaultValue = "default",
@@ -37,28 +38,32 @@ class UserSettingTest {
     }
 
     @Test
-    fun handlesSetWithoutSync() {
-        userSetting.set("new_value", clock = clock, needsSync = false)
+    fun handlesSetWithoutTimestampUpdate() {
+        clock += 10.seconds
+        userSetting.set("new_value", clock = clock, updateModifiedAt = false)
 
         assertEquals("new_value", userSetting.value)
-        assertEquals(Instant.EPOCH, userSetting.modifiedAt)
+        assertNull(userSetting.modifiedAt)
     }
 
     @Test
-    fun handlesSetWithSync() {
-        userSetting.set("new_value", clock = clock, needsSync = true)
+    fun handlesSetWithTimestampUpdate() {
+        userSetting.set("new_value", clock = clock, updateModifiedAt = true)
 
         assertEquals("new_value", userSetting.value)
         assertEquals(clock.instant(), userSetting.modifiedAt)
     }
 
     @Test
-    fun doesNotSyncAfterModificationNotRequiringSync() {
-        userSetting.set("first_value", clock = clock, needsSync = true)
-        userSetting.set("second_value", clock = clock, needsSync = false)
+    fun updateValueButNotTimestampWithoutTimestampUpdate() {
+        val currentTime = clock.instant()
+
+        userSetting.set("first_value", clock = clock, updateModifiedAt = true)
+        clock += 10.seconds
+        userSetting.set("second_value", clock = clock, updateModifiedAt = false)
 
         assertEquals("second_value", userSetting.value)
-        assertEquals(Instant.EPOCH, userSetting.modifiedAt)
+        assertEquals(currentTime, userSetting.modifiedAt)
     }
 
     @Test
@@ -66,11 +71,32 @@ class UserSettingTest {
         userSetting.flow.test {
             assertEquals("default", awaitItem())
 
-            userSetting.set("new_value", needsSync = false)
+            userSetting.set("new_value", updateModifiedAt = false)
             assertEquals("new_value", awaitItem())
 
             cancel()
         }
+    }
+
+    @Test
+    fun useEpochPlusOneSecondAsDefaultSyncTimestamp() {
+        lateinit var timestamp: Instant
+        userSetting.getSyncSetting { _, modifiedAt ->
+            timestamp = modifiedAt
+        }
+        assertEquals(Instant.EPOCH.plusSeconds(1), timestamp)
+    }
+
+    @Test
+    fun useStoredSyncTimestamp() {
+        clock += 10.seconds
+        userSetting.set("new_value", clock = clock, updateModifiedAt = true)
+
+        lateinit var timestamp: Instant
+        userSetting.getSyncSetting { _, modifiedAt ->
+            timestamp = modifiedAt
+        }
+        assertEquals(clock.instant(), timestamp)
     }
 
     private class ReversingToSetting(
@@ -95,7 +121,7 @@ class UserSettingTest {
 
         assertEquals("default".reversed(), setting.value)
 
-        setting.set("new_value", clock = clock, needsSync = true)
+        setting.set("new_value", clock = clock, updateModifiedAt = true)
 
         assertEquals("new_value".reversed(), setting.value)
         // Verify if converter doesn't jumble modification timestamp
@@ -124,7 +150,7 @@ class UserSettingTest {
 
         assertEquals("default".reversed(), setting.value)
 
-        setting.set("new_value", clock = clock, needsSync = true)
+        setting.set("new_value", clock = clock, updateModifiedAt = true)
 
         assertEquals("new_value".reversed(), setting.value)
         // Verify if converter doesn't jumble modification timestamp

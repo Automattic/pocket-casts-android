@@ -38,6 +38,8 @@ class AdvancedSettingsViewModelTest {
     fun setUp() {
         whenever(settings.syncOnMeteredNetwork()).thenReturn(false)
         whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
+        whenever(settings.prioritizeSeekAccuracy).thenReturn(UserSetting.Mock(false, mock()))
+        whenever(settings.cacheEntirePlayingEpisode).thenReturn(UserSetting.Mock(false, mock()))
         viewModel = AdvancedSettingsViewModel(
             settings,
             analyticsTracker,
@@ -48,5 +50,7 @@ class AdvancedSettingsViewModelTest {
     @Test
     fun `verify settings methods initialize the viewModel state correctly`() {
         TestCase.assertEquals(viewModel.state.value.backgroundSyncOnMeteredState.isChecked, false)
+        TestCase.assertEquals(viewModel.state.value.prioritizeSeekAccuracyState.isChecked, false)
+        TestCase.assertEquals(viewModel.state.value.cacheEntirePlayingEpisodeState.isChecked, false)
     }
 }

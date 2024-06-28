@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHold
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -166,7 +167,7 @@ class PodcastAdapter(
     data class BookmarkItemData(
         val bookmark: Bookmark,
         val episode: BaseEpisode,
-        val useRssArtwork: Boolean,
+        val useEpisodeArtwork: Boolean,
         val onBookmarkPlayClicked: (Bookmark) -> Unit,
         val onBookmarkRowLongPress: (Bookmark) -> Unit,
         val onBookmarkRowClick: (Bookmark, Int) -> Unit,
@@ -232,6 +233,7 @@ class PodcastAdapter(
                 imageRequestFactory = imageRequestFactory.smallSize(),
                 settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
+                artworkContext = null,
             )
         }
     }
@@ -484,7 +486,7 @@ class PodcastAdapter(
                     episodeCount = episodeCount,
                     archivedCount = archivedCount,
                     searchTerm = searchTerm,
-                    episodeLimit = if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null,
+                    episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 ),
             )
             addAll(episodesPlusLimit)
@@ -573,7 +575,7 @@ class PodcastAdapter(
                                         bookmark,
                                     )
                                 },
-                                useRssArtwork = settings.useRssArtwork.value,
+                                useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Bookmarks),
                             )
                         },
                     )

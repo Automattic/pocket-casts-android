@@ -16,9 +16,9 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "10.5.0"
+aboutlibraries = "11.2.1"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
-android-application = "8.2.2"
+android-application = "8.4.1"
 billing = "6.0.1"
 coil = "2.5.0"
 compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -27,13 +27,15 @@ compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.andro
 compose-kotlin-compiler = "1.5.9"
 espresso = "3.4.0"
 firebase = "30.5.0"
+glance = "1.0.0"
 glide = "4.13.2"
 google-services = "4.3.14"
 hilt = "2.51"
 hilt-compiler = "1.2.0"
-horologist = "0.5.21"
+horologist = "0.5.26"
 kotlin = "1.9.22"
 kotlin-coroutines = "1.8.1-Beta"
+ktlint = "0.50.0"
 ksp = "1.9.22-1.0.17"
 lifecycle = "2.6.0"
 lottie = "6.3.0"
@@ -42,22 +44,23 @@ mockito = "4.0.0"
 mockito-android = "4.6.1"
 moshi = "1.13.0"
 navigation = "2.5.1"
-okhttp = "4.9.3"
+okhttp = "4.12.0"
 protobuf = "3.23.4"
 protobuf-plugin = "0.9.4"
 retrofit = "2.9.0"
 room = "2.5.1"
-sentry = "6.28.0"
-sentry-plugin = "3.10.0"
+sentry-plugin = "4.5.1"
 showkase = "1.0.2"
 test = "1.5.0"
+tracks = "5.1.0"
 wear-compose = "1.3.0"
 work = "2.8.1"
 java = "17"
+tasker-plugin = "0.4.10"
 
 [libraries]
 # About Libraries
-aboutLibraries-compose = "com.mikepenz:aboutlibraries-compose:10.5.0"
+aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlibraries" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
 
 # Billing
@@ -74,6 +77,7 @@ compose-animation = { module = "androidx.compose.animation:animation" }
 compose-icons = { module = "androidx.compose.material:material-icons-extended" }
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-material = { module = "androidx.compose.material:material" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
 compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
@@ -83,6 +87,8 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 compose-activity = "androidx.activity:activity-compose:1.8.2"
 compose-constraint = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+compose-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+compose-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 
 # Coroutines
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
@@ -203,20 +209,21 @@ rxjava = "io.reactivex.rxjava2:rxjava:2.2.21"
 rxkotlin = "io.reactivex.rxjava2:rxkotlin:2.4.0"
 rxrelay = "com.jakewharton.rxrelay2:rxrelay:2.1.1"
 
-# Sentry
-sentry-bom = { module = "io.sentry:sentry-bom", version.ref = "sentry" }
-sentry-android-core = { module = "io.sentry:sentry-android-core" }
-sentry-fragment = { module = "io.sentry:sentry-android-fragment" }
-sentry-timber = { module = "io.sentry:sentry-android-timber" }
-
 # Showkase
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
 showkase-processor = { module = "com.airbnb.android:showkase-processor", version.ref = "showkase" }
+
+# Tasker
+tasker = { module = "com.joaomgcd:taskerpluginlibrary", version.ref = "tasker-plugin" }
 
 # Test
 test-core = { module = "androidx.test:core", version.ref = "test" }
 test-rules = { module = "androidx.test:rules", version.ref = "test" }
 test-runner = { module = "androidx.test:runner", version.ref = "test" }
+
+# Tracks
+tracks = { module = "com.automattic:Automattic-Tracks-Android", version.ref = "tracks" }
+crashlogging = { module = "com.automattic.tracks:crashlogging", version.ref = "tracks" }
 
 # Wear Compose
 wear-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "wear-compose" }
@@ -235,24 +242,24 @@ annotation = "androidx.annotation:annotation:1.3.0"
 appcompat = "androidx.appcompat:appcompat:1.5.0"
 arch-core = "androidx.arch.core:core-testing:2.2.0"
 auth = "com.google.android.gms:play-services-auth:20.4.0"
-automattic-tracks = "com.automattic:Automattic-Tracks-Android:trunk-b3655d42123501a1d9a304789b738610ab4403c8"
 barista = "com.adevinta.android:barista:4.2.0"
 browser = "androidx.browser:browser:1.4.0"
 browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
-car = "androidx.car.app:app:1.2.0"
+car = "androidx.car.app:app:1.4.0-rc02"
 cardview = "androidx.cardview:cardview:1.0.0"
 cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 core-ktx = "androidx.core:core-ktx:1.10.1"
-desugar-jdk = "com.android.tools:desugar_jdk_libs:1.1.5"
+desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
 device-names = "com.jaredrummler:android-device-names:2.1.0"
+encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 fragment-ktx = "androidx.fragment:fragment-ktx:1.5.2"
-guava = "com.google.guava:guava:27.1-android" # Required to fix conflict between versions in exoplayer and workmanager
+guava = "com.google.guava:guava:33.1.0-android" # Required to fix conflict between versions in exoplayer and workmanager
 jsonassert = "org.skyscreamer:jsonassert:1.5.0"
 junit = "junit:junit:4.13.2"
 junit-ext = "androidx.test.ext:junit:1.1.3"
-leakcanary = "com.squareup.leakcanary:leakcanary-android:2.10"
+leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 material = "com.google.android.material:material:1.9.0"
 material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
@@ -402,12 +409,6 @@ rxjava = [
     "rxkotlin"
 ]
 
-sentry = [
-    "sentry-android-core",
-    "sentry-fragment",
-    "sentry-timber"
-]
-
 test = [
     "test-core",
     "test-runner",
@@ -426,7 +427,7 @@ work = [
 ]
 
 [plugins]
-aboutlibraries = "com.mikepenz.aboutlibraries.plugin:10.4.0"
+aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 android-application = { id = "com.android.application", version.ref = "android-application" }
 android-library = { id = "com.android.library", version.ref = "android-application" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
@@ -435,7 +436,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-measure-builds = "com.automattic.android.measure-builds:2.0.3"
+measure-builds = "com.automattic.android.measure-builds:3.0.0"
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 spotless = "com.diffplug.spotless:6.23.3"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }

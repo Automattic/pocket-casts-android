@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -54,6 +56,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -206,6 +209,7 @@ class PodcastViewModel
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+        podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed = null
     }
 
     fun updatePodcast(existingPodcast: Podcast) {
@@ -374,7 +378,7 @@ class PodcastViewModel
         val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", false)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false, source = SourceView.PODCAST_SCREEN)
             }
         }
     }
@@ -393,7 +397,7 @@ class PodcastViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
-        settings.podcastBookmarksSortType.set(order, needsSync = true)
+        settings.podcastBookmarksSortType.set(order, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(
@@ -414,6 +418,27 @@ class PodcastViewModel
                 }
             }
             playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
+        }
+    }
+
+    fun onShareBookmarkClick(context: Context) {
+        multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
+            viewModelScope.launch {
+                val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
+                val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
+                if (podcast != null && episode is PodcastEpisode) {
+                    SharePodcastHelper(
+                        podcast,
+                        episode,
+                        bookmark.timeSecs.seconds,
+                        null,
+                        context,
+                        ShareType.BOOKMARK_TIME,
+                        SourceView.PODCAST_SCREEN,
+                        analyticsTracker,
+                    ).showShareDialogDirect()
+                }
+            }
         }
     }
 
@@ -653,7 +678,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
             val showArchivedWithSearch = episodeSearchResults.searchUuids != null || showArchived
             val filteredList =
                 if (showArchivedWithSearch) searchList else searchList.filter { !it.isArchived }
-            val episodeLimit = podcast.autoArchiveEpisodeLimit
+            val episodeLimit = podcast.autoArchiveEpisodeLimit?.value
             val episodeLimitIndex: Int?
             // if the episode limit is on, the following texting is shown the episode list 'Limited to x most recent episodes'
             if (episodeLimit != null && filteredList.isNotEmpty() && podcast.overrideGlobalArchive) {
@@ -686,7 +711,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 archivedCount = archivedCount,
                 searchTerm = episodeSearchResults.searchTerm,
                 searchBookmarkTerm = bookmarkSearchResults.searchTerm,
-                episodeLimit = podcast.autoArchiveEpisodeLimit,
+                episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 episodeLimitIndex = episodeLimitIndex,
             )
             state

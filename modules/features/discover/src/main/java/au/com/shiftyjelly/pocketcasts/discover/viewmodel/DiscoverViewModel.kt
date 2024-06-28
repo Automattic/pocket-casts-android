@@ -3,11 +3,13 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 import android.content.res.Resources
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPill
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -24,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -36,6 +38,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.InvalidObjectException
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @HiltViewModel
@@ -47,12 +50,14 @@ class DiscoverViewModel @Inject constructor(
     val playbackManager: PlaybackManager,
     val userManager: UserManager,
     val analyticsTracker: AnalyticsTrackerWrapper,
+    val crashLogging: CrashLogging,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val sourceView = SourceView.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.discoverCountryCode.value
     private var replacements = emptyMap<String, String>()
+    private var adsForCategoryView = emptyList<DiscoverRow>()
     private var isFragmentChangingConfigurations: Boolean = false
 
     fun onShown() {
@@ -91,6 +96,9 @@ class DiscoverViewModel @Inject constructor(
                     // Update the list with the correct region substituted in where needed
                     val updatedList = it.layout.transformWithRegion(region, replacements, resources)
 
+                    // Save ads to display in category view
+                    adsForCategoryView = updatedList.filter { discoverRow -> discoverRow.categoryId != null }
+
                     state.postValue(DiscoverState.DataLoaded(updatedList, region, it.regions.values.toList()))
                 },
                 onError = { throwable ->
@@ -102,12 +110,12 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun changeRegion(region: DiscoverRegion, resources: Resources) {
-        settings.discoverCountryCode.set(region.code, needsSync = false)
+        settings.discoverCountryCode.set(region.code, updateModifiedAt = false)
         currentRegionCode = region.code
         loadData(resources)
     }
 
-    fun loadPodcastList(source: String): Flowable<PodcastList> {
+    fun loadPodcastList(source: String, categoryId: String): Flowable<PodcastList> {
         return repository.getListFeed(source)
             .map {
                 PodcastList(
@@ -122,15 +130,23 @@ class DiscoverViewModel @Inject constructor(
                     listId = it.listId,
                 )
             }
+            .doOnSuccess { podcastList ->
+                if (categoryId == NetworkLoadableList.TRENDING) {
+                    viewModelScope.launch {
+                        val podcastIds = podcastList.podcasts.map { TrendingPodcast(it.uuid, it.title.orEmpty()) }
+                        podcastManager.replaceTrendingPodcasts(podcastIds)
+                    }
+                }
+            }
             .flatMapPublisher { addSubscriptionStateToPodcasts(it) }
             .flatMap {
                 addPlaybackStateToList(it)
             }
     }
-    fun filterPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
+    fun filterPodcasts(source: String, categoryId: String, onPodcastsLoaded: (PodcastList) -> Unit) {
         state.postValue(DiscoverState.FilteringPodcastsByCategory)
 
-        loadPodcastList(source).subscribeBy(
+        loadPodcastList(source, categoryId).subscribeBy(
             onNext = {
                 state.postValue(DiscoverState.PodcastsFilteredByCategory)
                 onPodcastsLoaded(it)
@@ -144,6 +160,7 @@ class DiscoverViewModel @Inject constructor(
 
     fun loadCarouselSponsoredPodcasts(
         sponsoredPodcastList: List<SponsoredPodcast>,
+        categoryId: String,
     ): Flowable<List<CarouselSponsoredPodcast>> {
         val sponsoredPodcastsSources = sponsoredPodcastList
             .filter {
@@ -151,12 +168,12 @@ class DiscoverViewModel @Inject constructor(
                 if (isInvalidSponsoredSource) {
                     val message = "Invalid sponsored source found."
                     Timber.e(message)
-                    SentryHelper.recordException(InvalidObjectException(message))
+                    crashLogging.sendReport(InvalidObjectException(message))
                 }
                 !isInvalidSponsoredSource
             }
             .map { sponsoredPodcast ->
-                loadPodcastList(sponsoredPodcast.source as String)
+                loadPodcastList(sponsoredPodcast.source as String, categoryId)
                     .filter {
                         it.podcasts.isNotEmpty() && it.listId != null
                     }
@@ -297,6 +314,9 @@ class DiscoverViewModel @Inject constructor(
 
     fun stopPlayback() {
         playbackManager.stopAsync(sourceView = sourceView)
+    }
+    fun getAdForCategoryView(categoryInt: Int): DiscoverRow? {
+        return adsForCategoryView.firstOrNull { it.categoryId == categoryInt }
     }
 }
 

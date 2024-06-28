@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -14,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -52,6 +53,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -87,8 +89,17 @@ class EpisodeManagerImpl @Inject constructor(
         return userEpisodeManager.findEpisodeByUuid(uuid)
     }
 
+    override suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode> {
+        val episodes = findByUuids(uuids)
+        val userEpisodes = userEpisodeManager.findEpisodesByUuids(uuids)
+        return episodes + userEpisodes
+    }
+
     override suspend fun findByUuid(uuid: String): PodcastEpisode? =
         episodeDao.findByUuid(uuid)
+
+    private suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode> =
+        episodeDao.findByUuids(episodeUuids)
 
     @Deprecated("Use findByUuid suspended method instead")
     override fun findByUuidRx(uuid: String): Maybe<PodcastEpisode> =
@@ -615,14 +626,9 @@ class EpisodeManagerImpl @Inject constructor(
             if (episode !is PodcastEpisode) return@launch
             // check if we are meant to archive after episode is played
             val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid) ?: return@launch
-            val podcastOverrideSettings = podcast.overrideGlobalArchive
-            val podcastArchiveAfterPlaying = podcast.autoArchiveAfterPlaying
+            val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
 
-            val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcastOverrideSettings, podcastArchiveAfterPlaying)
-
-            if (shouldArchiveBasedOnSettings &&
-                (settings.autoArchiveIncludesStarred.value || !episode.isStarred)
-            ) {
+            if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying && (settings.autoArchiveIncludesStarred.value || !episode.isStarred)) {
                 if (sync) {
                     episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
                 } else {
@@ -634,12 +640,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    private fun shouldArchiveBasedOnSettings(podcastOverrideSettings: Boolean, podcastArchiveAfterPlaying: AutoArchiveAfterPlaying) =
-        (
-            (!podcastOverrideSettings && settings.autoArchiveAfterPlaying.value == AutoArchiveAfterPlaying.AfterPlaying) ||
-                (podcastArchiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying)
-            )
-
     @Suppress("NAME_SHADOWING")
     private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
         val episodesWithoutStarred = if (!settings.autoArchiveIncludesStarred.value) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
@@ -647,10 +647,9 @@ class EpisodeManagerImpl @Inject constructor(
 
         for ((podcastUuid, episodes) in episodesByPodcast) {
             val podcast = podcastManager.findPodcastByUuid(podcastUuid) ?: continue
-            val podcastArchiveAfterPlaying = podcast.autoArchiveAfterPlaying
-            val shouldArchiveBasedOnSettings = shouldArchiveBasedOnSettings(podcast.overrideGlobalSettings, podcastArchiveAfterPlaying)
+            val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
 
-            if (shouldArchiveBasedOnSettings) {
+            if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying) {
                 archiveAllInList(episodes, playbackManager)
             }
         }
@@ -711,6 +710,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    @OptIn(UnstableApi::class)
     override fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean) {
         episode ?: return
         val messageId: Int
@@ -836,7 +836,9 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
         if (addedEpisodes.isNotEmpty()) {
-            episodeDao.insertAll(addedEpisodes)
+            addedEpisodes.chunked(250).forEach { chunkedEpisodes ->
+                episodeDao.insertAll(chunkedEpisodes)
+            }
         }
 
         if (episodes.isNotEmpty()) {
@@ -904,9 +906,8 @@ class EpisodeManagerImpl @Inject constructor(
     override fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?) {
         val now = Date()
 
-        val podcastArchivePlaying = podcast.autoArchiveAfterPlaying
-        val autoArchiveSetting = if (podcast.overrideGlobalArchive) podcastArchivePlaying else settings.autoArchiveAfterPlaying.value
-        val autoArchiveAfterPlayingTime = autoArchiveSetting.timeSeconds * 1000L
+        val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
+        val autoArchiveAfterPlayingTime = archiveAfterPlaying.timeSeconds * 1000L
 
         if (autoArchiveAfterPlayingTime > 0) {
             val playedEpisodes = episodeDao.findByEpisodePlayingAndArchiveStatus(podcast.uuid, EpisodePlayingStatus.COMPLETED, false)
@@ -924,10 +925,9 @@ class EpisodeManagerImpl @Inject constructor(
             }
         }
 
-        val podcastInactiveSetting = podcast.autoArchiveInactive
-        val inactiveSetting = if (podcast.overrideGlobalArchive) podcastInactiveSetting else settings.autoArchiveInactive.value
+        val autoArchiveInactive = podcast.autoArchiveInactive ?: settings.autoArchiveInactive.value
 
-        val inactiveTime = inactiveSetting.timeSeconds * 1000L
+        val inactiveTime = autoArchiveInactive.timeSeconds * 1000L
         if (inactiveTime > 0) {
             val inactiveEpisodes = episodeDao.findInactiveEpisodes(podcast.uuid, Date(now.time - inactiveTime))
                 .filter { settings.autoArchiveIncludesStarred.value || !it.isStarred }
@@ -948,14 +948,12 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?) {
-        if (!podcast.overrideGlobalArchive) return
-
-        val episodeLimit = podcast.autoArchiveEpisodeLimit
+        val episodeLimit = podcast.autoArchiveEpisodeLimit?.value
 
         if (episodeLimit != null) {
             val allEpisodes = episodeDao.findByPodcastOrderPublishedDateDesc(podcast.uuid).filter { !it.excludeFromEpisodeLimit }
             if (allEpisodes.isNotEmpty() && episodeLimit < allEpisodes.size) {
-                val episodesToRemove = allEpisodes.subList(episodeLimit, allEpisodes.size)
+                val episodesToRemove = allEpisodes.drop(episodeLimit)
                     .filter { !it.isArchived }
                     .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
                     .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }
@@ -1004,7 +1002,7 @@ class EpisodeManagerImpl @Inject constructor(
     /**
      * Try downloading the episode if it is missing. If the server doesn't know about it insert the skeleton episode.
      */
-    override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<BaseEpisode> {
+    override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode> {
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
                 if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
@@ -1018,7 +1016,7 @@ class EpisodeManagerImpl @Inject constructor(
                         podcastManager.findPodcastByUuidRx(podcastUuid).zipWith(findByUuidRx(episodeUuid))
                     }.flatMap { (podcast, episode) ->
                         if (podcast.isAutoDownloadNewEpisodes) {
-                            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "download missing episode", downloadManager, this)
+                            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "download missing episode", downloadManager, episodeManager = this, source = source)
                         }
                         return@flatMap Maybe.just(episode)
                     }
@@ -1100,19 +1098,18 @@ class EpisodeManagerImpl @Inject constructor(
             return@withContext newDownloadUrl ?: episode.downloadUrl
         }
 
-    override suspend fun selectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
-        val deselectedChapterIndices = episode.deselectedChapters
-        if (!deselectedChapterIndices.contains(chapterIndex)) return
-        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices - chapterIndex)
-        episode.deselectedChaptersModified = Date()
-        episodeDao.update(episode)
-    }
-
-    override suspend fun deselectChapterIndexForEpisode(chapterIndex: Int, episode: PodcastEpisode) {
-        val deselectedChapterIndices = episode.deselectedChapters
-        if (deselectedChapterIndices.contains(chapterIndex)) return
-        episode.deselectedChapters = ChapterIndices(deselectedChapterIndices + chapterIndex)
-        episode.deselectedChaptersModified = Date()
-        episodeDao.update(episode)
+    override suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>> = flow {
+        var offset = 0
+        while (true) {
+            val episodes = episodeDao.getAllPodcastEpisodes(pageLimit, offset)
+            if (episodes.isNotEmpty()) {
+                episodes.forEachIndexed { index, episode ->
+                    emit(episode to (offset + index))
+                }
+                offset += pageLimit
+            } else {
+                break
+            }
+        }
     }
 }

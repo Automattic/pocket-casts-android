@@ -18,6 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,9 +26,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -65,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.settings.components.RowTextButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getComposeThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,15 +80,21 @@ class AboutFragment : BaseFragment() {
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
+    @Inject lateinit var settings: Settings
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
+                val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                 CallOnce {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHOWN)
                 }
 
                 AppThemeWithBackground(theme.activeTheme) {
-                    AboutPage(onBackPressed = { closeFragment() })
+                    AboutPage(
+                        onBackPressed = { closeFragment() },
+                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                    )
                 }
             }
         }
@@ -164,81 +172,117 @@ private val icons = listOf(
 )
 
 @Composable
-private fun AboutPage(onBackPressed: () -> Unit) {
+private fun AboutPage(
+    onBackPressed: () -> Unit,
+    bottomInset: Dp,
+) {
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
-    Column(
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(MaterialTheme.theme.colors.primaryUi02)
-            .verticalScroll(scrollState),
+            .background(MaterialTheme.theme.colors.primaryUi02),
+        contentPadding = PaddingValues(bottom = bottomInset),
     ) {
-        ThemedTopAppBar(
-            title = stringResource(LR.string.settings_title_about),
-            onNavigationClick = onBackPressed,
-        )
-        Image(
-            painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
-            contentDescription = stringResource(LR.string.settings_app_icon),
-            modifier = Modifier.padding(top = 56.dp),
-        )
-        Text(
-            text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier.padding(top = 8.dp),
-            color = MaterialTheme.theme.colors.primaryText02,
-        )
-        HorizontalDivider(
-            modifier = Modifier.padding(top = 56.dp, bottom = 8.dp),
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_rate_us),
-            onClick = { rateUs(context) },
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_share_with_friends),
-            onClick = { shareWithFriends(context) },
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_website),
-            secondaryText = "pocketcasts.com",
-            onClick = { openUrl("https://www.pocketcasts.com", context) },
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_instagram),
-            secondaryText = "@pocketcasts",
-            onClick = { openUrl("https://www.instagram.com/pocketcasts/", context) },
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_twitter),
-            secondaryText = "@pocketcasts",
-            onClick = { openUrl("https://twitter.com/pocketcasts", context) },
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        AutomatticFamilyRow()
-        HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
-        LegalAndMoreRow()
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        Column(
-            modifier = Modifier
-                .clickable { openUrl("https://automattic.com/work-with-us/", context) }
-                .fillMaxWidth()
-                .padding(all = 14.dp),
-        ) {
-            Text(
-                text = stringResource(LR.string.settings_about_work_with_us),
-                fontSize = 17.sp,
-                color = MaterialTheme.theme.colors.primaryText01,
+        item {
+            ThemedTopAppBar(
+                title = stringResource(LR.string.settings_title_about),
+                onNavigationClick = onBackPressed,
             )
+        }
+        item {
+            Image(
+                painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
+                contentDescription = stringResource(LR.string.settings_app_icon),
+                modifier = Modifier.padding(top = 56.dp),
+            )
+        }
+        item {
             Text(
-                text = stringResource(LR.string.settings_about_work_from_anywhere),
-                fontSize = 14.sp,
+                text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
                 style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(top = 8.dp),
                 color = MaterialTheme.theme.colors.primaryText02,
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 56.dp, bottom = 8.dp),
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_rate_us),
+                onClick = { rateUs(context) },
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_share_with_friends),
+                onClick = { shareWithFriends(context) },
+            )
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_website),
+                secondaryText = "pocketcasts.com",
+                onClick = { openUrl("https://www.pocketcasts.com", context) },
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_instagram),
+                secondaryText = "@pocketcasts",
+                onClick = { openUrl("https://www.instagram.com/pocketcasts/", context) },
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_twitter),
+                secondaryText = "@pocketcasts",
+                onClick = { openUrl("https://twitter.com/pocketcasts", context) },
+            )
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+        item {
+            AutomatticFamilyRow()
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+        }
+        item {
+            LegalAndMoreRow()
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+        item {
+            Column(
+                modifier = Modifier
+                    .clickable { openUrl("https://automattic.com/work-with-us/", context) }
+                    .fillMaxWidth()
+                    .padding(all = 14.dp),
+            ) {
+                Text(
+                    text = stringResource(LR.string.settings_about_work_with_us),
+                    fontSize = 17.sp,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                )
+                Text(
+                    text = stringResource(LR.string.settings_about_work_from_anywhere),
+                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 }
 
@@ -387,5 +431,8 @@ private fun AppLogoImage(width: Dp, image: Painter, text: String, color: Color, 
 @Preview
 @Composable
 private fun AboutPagePreview() {
-    AboutPage(onBackPressed = {})
+    AboutPage(
+        onBackPressed = {},
+        bottomInset = 0.dp,
+    )
 }

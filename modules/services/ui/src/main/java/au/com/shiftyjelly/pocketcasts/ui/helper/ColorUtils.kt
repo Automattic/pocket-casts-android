@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.ui.helper
 
 import android.graphics.Color
 import androidx.annotation.ColorInt
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Color as ComposeColor
 
 object ColorUtils {
     @ColorInt fun calculateCombinedColor(@ColorInt originalColor: Int, @ColorInt overlayColor: Int): Int {
@@ -32,6 +34,20 @@ object ColorUtils {
 
     fun colorIntToHexString(colorInt: Int): String {
         return String.format("#%06X", 0xFFFFFF and colorInt)
+    }
+
+    fun changeHsvValue(color: ComposeColor, factor: Float): ComposeColor {
+        val hsv = FloatArray(3).also {
+            Color.colorToHSV(color.toArgb(), it)
+        }
+        val targetValue = when (hsv[2]) {
+            in 0f..0.25f -> 0.25f
+            in 0.25f..0.5f -> 0.5f
+            in 0.5f..0.75f -> 0.75f
+            else -> 1f
+        }
+        hsv[2] = (factor * targetValue).coerceIn(0f, 1f)
+        return ComposeColor(Color.HSVToColor(hsv))
     }
 }
 

@@ -38,7 +38,8 @@ class BookmarkViewHolder(
                     timePlayButtonStyle = TimePlayButtonStyle.Outlined,
                     timePlayButtonColors = TimePlayButtonColors.Default,
                     showIcon = true,
-                    useRssArtwork = data.useRssArtwork,
+                    useEpisodeArtwork = data.useEpisodeArtwork,
+                    showEpisodeTitle = true,
                 )
             }
         }

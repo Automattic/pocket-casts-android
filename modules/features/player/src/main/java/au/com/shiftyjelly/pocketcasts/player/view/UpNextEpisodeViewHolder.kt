@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextBinding
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -28,7 +29,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getAttrTextStyleColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
@@ -53,6 +57,8 @@ class UpNextEpisodeViewHolder(
 ) : RecyclerView.ViewHolder(binding.root),
     UpNextTouchCallback.ItemTouchHelperViewHolder,
     RowSwipeable {
+    private val cardCornerRadius: Float = 4.dpToPx(itemView.context.resources.displayMetrics).toFloat()
+    private val cardElevation: Float = 2.dpToPx(itemView.context.resources.displayMetrics).toFloat()
     private val elevatedBackground = ContextCompat.getColor(binding.root.context, R.color.elevatedBackground)
     private val selectedBackground = ContextCompat.getColor(binding.root.context, R.color.selectedBackground)
 
@@ -118,7 +124,7 @@ class UpNextEpisodeViewHolder(
             false
         }
 
-        imageRequestFactory.create(episode, settings.useRssArtwork.value).loadInto(binding.image)
+        imageRequestFactory.create(episode, settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext)).loadInto(binding.image)
 
         val context = binding.itemContainer.context
         val transition = AutoTransition()
@@ -129,7 +135,7 @@ class UpNextEpisodeViewHolder(
         binding.checkbox.setOnClickListener { binding.itemContainer.performClick() }
 
         val selectedColor = context.getThemeColor(UR.attr.primary_ui_02_selected)
-        val unselectedColor = context.getThemeColor(UR.attr.primary_ui_02)
+        val unselectedColor = context.getThemeColor(UR.attr.primary_ui_01)
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             binding.itemContainer.setBackgroundColor(if (isMultiSelecting && isChecked) selectedColor else unselectedColor)
         }
@@ -140,6 +146,9 @@ class UpNextEpisodeViewHolder(
             rightMargin = if (isMultiSelecting) -binding.checkbox.marginLeft else 0.dpToPx(itemView.context)
             width = if (isMultiSelecting) 16.dpToPx(itemView.context) else 52.dpToPx(itemView.context)
         }
+        binding.dividerView.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
+        binding.imageCardView.radius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardCornerRadius else 0f
+        binding.imageCardView.elevation = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardElevation else 0f
     }
 
     private fun bindEpisode(episode: BaseEpisode) {

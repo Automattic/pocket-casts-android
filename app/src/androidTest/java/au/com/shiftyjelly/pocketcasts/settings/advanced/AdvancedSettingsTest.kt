@@ -5,6 +5,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -76,7 +78,7 @@ class AdvancedSettingsTest {
 
     @Test
     fun shelfItemsSettingsAlwaysSavesAllEntries() {
-        settings.shelfItems.set(listOf(ShelfItem.Archive), needsSync = false)
+        settings.shelfItems.set(listOf(ShelfItem.Archive), updateModifiedAt = false)
 
         val items = settings.shelfItems.value
 
@@ -85,7 +87,7 @@ class AdvancedSettingsTest {
 
     @Test
     fun shelfItemsDoNotSaveDuplicates() {
-        settings.shelfItems.set(listOf(ShelfItem.Cast, ShelfItem.Cast), needsSync = false)
+        settings.shelfItems.set(listOf(ShelfItem.Cast, ShelfItem.Cast), updateModifiedAt = false)
 
         val items = settings.shelfItems.value
 
@@ -96,8 +98,20 @@ class AdvancedSettingsTest {
     fun shelfItemsAreSavedInOrder() {
         val items = listOf(ShelfItem.Archive, ShelfItem.Bookmark, ShelfItem.Star, ShelfItem.Played, ShelfItem.Sleep)
 
-        settings.shelfItems.set(items, needsSync = false)
+        settings.shelfItems.set(items, updateModifiedAt = false)
 
         assertEquals(settings.shelfItems.value.take(5), items)
+    }
+
+    @Test
+    fun artworkConfigurationIsSavedCorrectly() {
+        val config = ArtworkConfiguration(
+            useEpisodeArtwork = true,
+            enabledElements = setOf(Element.Filters, Element.Downloads, Element.Bookmarks),
+        )
+
+        settings.artworkConfiguration.set(config, updateModifiedAt = false)
+
+        assertEquals(config, settings.artworkConfiguration.value)
     }
 }

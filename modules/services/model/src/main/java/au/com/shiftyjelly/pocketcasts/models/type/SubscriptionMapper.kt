@@ -5,6 +5,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
@@ -42,16 +44,16 @@ object SubscriptionMapper {
                         offerToken = relevantSubscriptionOfferDetails.offerToken,
                     )
                 } else {
-                    if (isTrial(productDetails)) {
-                        Subscription.Trial(
+                    if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED) && hasIntro(productDetails)) {
+                        Subscription.Intro(
                             tier = mapProductIdToTier(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
                             offerPricingPhase = offerPricingPhase,
                             productDetails = productDetails,
                             offerToken = relevantSubscriptionOfferDetails.offerToken,
                         )
-                    } else if (isIntro(productDetails)) {
-                        Subscription.Intro(
+                    } else if (hasTrial(productDetails)) {
+                        Subscription.Trial(
                             tier = mapProductIdToTier(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
                             offerPricingPhase = offerPricingPhase,
@@ -64,12 +66,12 @@ object SubscriptionMapper {
                 }
             }
     }
-    private fun isTrial(productDetails: ProductDetails): Boolean {
+    private fun hasTrial(productDetails: ProductDetails): Boolean {
         return productDetails.subscriptionOfferDetails?.any {
             it.offerId == Subscription.TRIAL_OFFER_ID
         } ?: false
     }
-    private fun isIntro(productDetails: ProductDetails): Boolean {
+    private fun hasIntro(productDetails: ProductDetails): Boolean {
         return productDetails.subscriptionOfferDetails?.any {
             it.offerId == Subscription.INTRO_OFFER_ID
         } ?: false

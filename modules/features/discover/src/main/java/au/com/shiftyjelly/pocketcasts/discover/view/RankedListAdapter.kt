@@ -40,7 +40,7 @@ class RankedListAdapter(
         }
         when (holder) {
             is CarouselItemViewHolder -> {
-                holder.podcast = podcast
+                holder.setPodcast(podcast = podcast, isRankedList = true)
                 holder.setRanking("1")
                 holder.itemView.setOnClickListener {
                     onPodcastClick(podcast)

@@ -34,7 +34,7 @@ class NowPlayingChipViewModel @Inject constructor(
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
-    val useRssArtwork = settings.useRssArtwork.flow
+    val artworkConfiguration = settings.artworkConfiguration.flow
 
     init {
         viewModelScope.launch {

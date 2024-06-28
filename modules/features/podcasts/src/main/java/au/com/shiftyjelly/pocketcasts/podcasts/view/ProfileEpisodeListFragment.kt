@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -30,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -154,6 +156,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     Mode.Starred -> EpisodeItemTouchHelper.SwipeSource.STARRED
                 },
             ),
+            artworkContext = when (mode) {
+                Mode.Downloaded -> Element.Downloads
+                Mode.History -> Element.ListeningHistory
+                Mode.Starred -> Element.Starred
+            },
         )
     }
 
@@ -195,7 +202,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             Mode.Downloaded -> AutoPlaySource.Downloads
             Mode.History -> AutoPlaySource.None
             Mode.Starred -> AutoPlaySource.Starred
-        }.let { settings.trackingAutoPlaySource.set(it, needsSync = false) }
+        }.let { settings.trackingAutoPlaySource.set(it, updateModifiedAt = false) }
     }
 
     override fun onDestroyView() {
@@ -334,6 +341,14 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, activity = requireActivity())
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding?.recyclerView?.updatePadding(bottom = it)
+                }
+            }
+        }
     }
 
     private fun updateToolbar() {
@@ -399,7 +414,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             .setTitle(resources.getString(LR.string.profile_clear_listening_history_title))
             .setSummary(resources.getString(LR.string.profile_clear_cannot_be_undone))
             .setButtonType(ConfirmationDialog.ButtonType.Danger(resources.getString(LR.string.profile_clear_all)))
-            .setOnConfirm { viewModel.clearAllEpisodeHistory() }
+            .setOnConfirm {
+                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_CLEAR_HISTORY_BUTTON_TAPPED)
+                viewModel.clearAllEpisodeHistory()
+            }
         dialog.show(parentFragmentManager, "clear_history")
     }
 

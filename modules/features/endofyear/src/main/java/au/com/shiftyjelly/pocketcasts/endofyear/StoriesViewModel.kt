@@ -16,21 +16,22 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
-import java.util.Timer
 import javax.inject.Inject
-import kotlin.concurrent.fixedRateTimer
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -42,6 +43,7 @@ class StoriesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val settings: Settings,
     private val subscriptionManager: SubscriptionManager,
+    private val crashLogging: CrashLogging,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading())
@@ -64,7 +66,7 @@ class StoriesViewModel @Inject constructor(
     private val gapLengthsInMs: Long
         get() = STORY_GAP_LENGTH_MS * numOfStories.minus(1).coerceAtLeast(0)
 
-    private var timer: Timer? = null
+    private var progressUpdateJob: Job? = null
 
     private val currentStoryIsPlus: Boolean
         get() = stories.value[currentIndex].plusOnly
@@ -101,7 +103,7 @@ class StoriesViewModel @Inject constructor(
         } catch (ex: Exception) {
             val message = "Failed to load end of year stories."
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, message)
-            SentryHelper.recordException(message, ex)
+            crashLogging.sendReport(ex, message = message)
             mutableState.value = State.Error
         }
     }
@@ -129,15 +131,13 @@ class StoriesViewModel @Inject constructor(
     fun start() {
         val currentState = state.value as? State.Loaded ?: return
         mutableState.value = currentState.copy(paused = false)
-        val progressFraction =
-            (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
-                .coerceAtMost(PROGRESS_END_VALUE)
+        val progressFraction = (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat()).coerceAtMost(PROGRESS_END_VALUE)
 
-        timer?.cancel()
-        timer = fixedRateTimer(period = PROGRESS_UPDATE_INTERVAL_MS) {
-            viewModelScope.launch {
-                var newProgress = (progress.value + progressFraction)
-                    .coerceIn(PROGRESS_START_VALUE, PROGRESS_END_VALUE)
+        progressUpdateJob?.cancel()
+        progressUpdateJob = viewModelScope.launch {
+            while (isActive) {
+                delay(PROGRESS_UPDATE_INTERVAL_MS)
+                var newProgress = (progress.value + progressFraction).coerceIn(PROGRESS_START_VALUE, PROGRESS_END_VALUE)
 
                 if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
                     manuallySkipped = false
@@ -147,11 +147,10 @@ class StoriesViewModel @Inject constructor(
                     } else {
                         currentIndex = nextIndex
                     }
-                    mutableState.value =
-                        currentState.copy(
-                            currentStory = stories.value[currentIndex],
-                            paused = false,
-                        )
+                    mutableState.value = currentState.copy(
+                        currentStory = stories.value[currentIndex],
+                        paused = false,
+                    )
                 }
 
                 mutableProgress.value = newProgress
@@ -187,7 +186,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     private fun skipToStoryAtIndex(index: Int) {
-        if (timer == null) start()
+        if (progressUpdateJob == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
         mutableState.value = (state.value as State.Loaded).copy(
@@ -275,13 +274,8 @@ class StoriesViewModel @Inject constructor(
         !isPaidUser() && !manuallySkipped && currentStoryIsPlus && nextStoryIsPlus()
 
     private fun cancelTimer() {
-        timer?.cancel()
-        timer = null
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        cancelTimer()
+        progressUpdateJob?.cancel()
+        progressUpdateJob = null
     }
 
     private fun Float.roundOff() = (this * 100.0).roundToInt()

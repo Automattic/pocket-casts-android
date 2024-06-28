@@ -23,6 +23,15 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
             firebaseRemoteConfig
                 .getString(FirebaseConfig.SLUMBER_STUDIOS_YEARLY_PROMO_CODE)
                 .isNotEmpty()
+
+        Feature.CACHE_PLAYING_EPISODE ->
+            firebaseRemoteConfig
+                .getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB) > 0
+
+        Feature.CACHE_ENTIRE_PLAYING_EPISODE ->
+            firebaseRemoteConfig
+                .getLong(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB) > 0
+
         else -> firebaseRemoteConfig.getBoolean(feature.key)
     }
 

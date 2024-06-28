@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR
 
@@ -98,7 +99,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     override fun closePodcastsToRoot() {
     }
 
-    override fun openPodcastPage(uuid: String) {
+    override fun openPodcastPage(uuid: String, sourceView: String?) {
     }
 
     override fun openCloudFiles() {
@@ -127,6 +128,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
+        timestamp: Duration?,
     ) {
     }
 

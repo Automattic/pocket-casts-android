@@ -38,6 +38,28 @@ class AdvancedSettingsViewModel
                 }
             },
         ),
+        prioritizeSeekAccuracyState = State.PrioritizeSeekAccuracyState(
+            isChecked = settings.prioritizeSeekAccuracy.value,
+            onCheckedChange = {
+                settings.prioritizeSeekAccuracy.set(it, updateModifiedAt = false)
+                updatePrioritizeSeekAccuracyState()
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_ADVANCED_PRIORITIZE_SEEK_ACCURACY,
+                    mapOf("enabled" to it),
+                )
+            },
+        ),
+        cacheEntirePlayingEpisodeState = State.CacheEntirePlayingEpisodeState(
+            isChecked = settings.cacheEntirePlayingEpisode.value,
+            onCheckedChange = {
+                settings.cacheEntirePlayingEpisode.set(it, updateModifiedAt = false)
+                updateCacheEntirePlayingEpisodeState()
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_ADVANCED_CACHE_ENTIRE_PLAYING_EPISODE,
+                    mapOf("enabled" to it),
+                )
+            },
+        ),
     )
 
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {
@@ -56,17 +78,45 @@ class AdvancedSettingsViewModel
         )
     }
 
+    private fun updatePrioritizeSeekAccuracyState() {
+        mutableState.value = mutableState.value.copy(
+            prioritizeSeekAccuracyState = mutableState.value.prioritizeSeekAccuracyState.copy(
+                isChecked = settings.prioritizeSeekAccuracy.value,
+            ),
+        )
+    }
+
+    private fun updateCacheEntirePlayingEpisodeState() {
+        mutableState.value = mutableState.value.copy(
+            cacheEntirePlayingEpisodeState = mutableState.value.cacheEntirePlayingEpisodeState.copy(
+                isChecked = settings.cacheEntirePlayingEpisode.value,
+            ),
+        )
+    }
+
     fun onShown() {
         analyticsTracker.track(AnalyticsEvent.SETTINGS_ADVANCED_SHOWN)
     }
 
     data class State(
         val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState,
+        val prioritizeSeekAccuracyState: PrioritizeSeekAccuracyState,
+        val cacheEntirePlayingEpisodeState: CacheEntirePlayingEpisodeState,
     ) {
 
         data class BackgroundSyncOnMeteredState(
             val isChecked: Boolean,
             val isEnabled: Boolean,
+            val onCheckedChange: (Boolean) -> Unit,
+        )
+
+        data class PrioritizeSeekAccuracyState(
+            val isChecked: Boolean,
+            val onCheckedChange: (Boolean) -> Unit,
+        )
+
+        data class CacheEntirePlayingEpisodeState(
+            val isChecked: Boolean,
             val onCheckedChange: (Boolean) -> Unit,
         )
     }

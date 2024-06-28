@@ -119,7 +119,7 @@ class WarningsHelper @Inject constructor(
                     if (!waitForWifi) {
                         it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                     }
-                    downloadManager.addEpisodeToQueue(it, from, true)
+                    downloadManager.addEpisodeToQueue(it, from, fireEvent = true, fireToast = false, source = SourceView.UNKNOWN)
                     launch {
                         episodeManager.unarchive(it)
                     }

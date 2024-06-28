@@ -17,9 +17,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/secondary_ui_01"
-            app:navigationContentDescription="@string/close"
-            app:navigationIcon="@drawable/ic_close" />
+            android:background="?attr/secondary_ui_01" />
         <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
             android:id="@+id/multiSelectToolbar"
             android:layout_width="match_parent"
@@ -36,7 +34,7 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingBottom="32dp"
-        android:background="?attr/primary_ui_04"
+        android:background="?attr/primary_ui_01"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,4 +48,3 @@
         android:elevation="100dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

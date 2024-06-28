@@ -9,6 +9,7 @@ import javax.inject.Inject
 class PlayerFactoryImpl @Inject constructor(
     private val settings: Settings,
     private val statsManager: StatsManager,
+    private val exoPlayerHelper: ExoPlayerHelper,
     @ApplicationContext private val context: Context,
 ) : PlayerFactory {
 
@@ -20,6 +21,6 @@ class PlayerFactoryImpl @Inject constructor(
     }
 
     override fun createSimplePlayer(onPlayerEvent: (Player, PlayerEvent) -> Unit): Player {
-        return SimplePlayer(settings, statsManager, context, onPlayerEvent)
+        return SimplePlayer(settings, statsManager, context, exoPlayerHelper, onPlayerEvent)
     }
 }

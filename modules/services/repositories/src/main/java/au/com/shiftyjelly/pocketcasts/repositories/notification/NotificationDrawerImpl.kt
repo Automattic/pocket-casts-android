@@ -17,7 +17,6 @@ import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.isPlaying
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -33,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class NotificationDrawerImpl @Inject constructor(
-    private val settings: Settings,
+    settings: Settings,
     private val notificationHelper: NotificationHelper,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
@@ -55,11 +54,14 @@ class NotificationDrawerImpl @Inject constructor(
         placeholderType = PlaceholderType.Small,
     )
 
-    override fun buildPlayingNotification(sessionToken: MediaSessionCompat.Token): Notification {
+    override fun buildPlayingNotification(
+        sessionToken: MediaSessionCompat.Token,
+        useEpisodeArtwork: Boolean,
+    ): Notification {
         val controller = MediaControllerCompat(context, sessionToken)
         val description = controller.metadata.description
         val playbackState = controller.playbackState
-        val data = getNotificationData(description.mediaId)
+        val data = getNotificationData(description.mediaId, useEpisodeArtwork)
 
         val builder = notificationHelper.playbackChannelBuilder()
 
@@ -86,13 +88,8 @@ class NotificationDrawerImpl @Inject constructor(
             .build()
     }
 
-    private fun loadArtwork(podcast: Podcast): Bitmap? {
-        val request = imageRequestFactory.create(podcast)
-        return context.imageLoader.executeBlocking(request).drawable?.toBitmap() ?: loadPlaceholderBitmap()
-    }
-
-    private fun loadUserEpisodeArtwork(episode: UserEpisode): Bitmap? {
-        val request = imageRequestFactory.create(episode, settings.useRssArtwork.value)
+    private fun loadArtwork(episode: BaseEpisode, useEpisodeArtwork: Boolean): Bitmap? {
+        val request = imageRequestFactory.create(episode, useEpisodeArtwork)
         return context.imageLoader.executeBlocking(request).drawable?.toBitmap() ?: loadPlaceholderBitmap()
     }
 
@@ -101,7 +98,7 @@ class NotificationDrawerImpl @Inject constructor(
         return context.imageLoader.executeBlocking(request).drawable?.toBitmap()
     }
 
-    private fun getNotificationData(episodeUuid: String?): NotificationData {
+    private fun getNotificationData(episodeUuid: String?, useEpisodeArtwork: Boolean): NotificationData {
         val episode: BaseEpisode? = if (episodeUuid == null) null else runBlocking { episodeManager.findEpisodeByUuid(episodeUuid) }
         val podcast: Podcast? = if (episode == null || episode !is PodcastEpisode) null else podcastManager.findPodcastByUuid(episode.podcastUuid)
 
@@ -111,11 +108,12 @@ class NotificationDrawerImpl @Inject constructor(
 
         val currentNotificationData = notificationData
         val currentEpisodeUuid = currentNotificationData?.episodeUuid
-        if (currentEpisodeUuid != null && currentEpisodeUuid == episodeUuid) {
+        val currentUseEpisodeArtwork = currentNotificationData?.useEpisodeArtwork
+        if (currentEpisodeUuid != null && currentEpisodeUuid == episodeUuid && currentUseEpisodeArtwork == useEpisodeArtwork) {
             return currentNotificationData
         }
 
-        val bitmap = if (episode is UserEpisode) loadUserEpisodeArtwork(episode) else if (podcast != null) loadArtwork(podcast) else null
+        val bitmap = loadArtwork(episode, useEpisodeArtwork)
         val podcastTitle = (if (episode is PodcastEpisode) podcast?.title else Podcast.userPodcast.title) ?: ""
 
         val data = NotificationData(
@@ -123,15 +121,17 @@ class NotificationDrawerImpl @Inject constructor(
             title = podcastTitle,
             text = episode.title,
             icon = bitmap,
+            useEpisodeArtwork = useEpisodeArtwork,
         )
         notificationData = data
         return data
     }
 
     data class NotificationData(
-        var episodeUuid: String = "",
-        var title: String = "",
-        var text: String = "",
-        var icon: Bitmap? = null,
+        val episodeUuid: String = "",
+        val title: String = "",
+        val text: String = "",
+        val icon: Bitmap? = null,
+        val useEpisodeArtwork: Boolean? = null,
     )
 }

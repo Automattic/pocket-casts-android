@@ -81,7 +81,7 @@ class CloudFilesViewModel @Inject constructor(
             AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
             mapOf(SORT_BY to sortOrder.analyticsValue),
         )
-        settings.cloudSortOrder.set(sortOrder, needsSync = true)
+        settings.cloudSortOrder.set(sortOrder, updateModifiedAt = true)
     }
 
     fun getSortOrder(): Settings.CloudSortOrder {

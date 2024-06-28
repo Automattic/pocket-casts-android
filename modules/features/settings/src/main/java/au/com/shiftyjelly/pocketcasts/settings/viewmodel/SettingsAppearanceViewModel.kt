@@ -29,8 +29,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val createAccountState = MutableLiveData<SettingsAppearanceState>().apply { value = SettingsAppearanceState.Empty }
     val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow
-    val useEmbeddedArtwork = settings.useEmbeddedArtwork.flow
-    val useRssArtwork = settings.useRssArtwork.flow
+    val artworkConfiguration = settings.artworkConfiguration.flow
 
     var changeThemeType: Pair<Theme.ThemeType?, Theme.ThemeType?> = Pair(null, null)
     var changeAppIconType: Pair<AppIcon.AppIconType?, AppIcon.AppIconType?> = Pair(null, null)
@@ -109,7 +108,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateUpNextDarkTheme(value: Boolean) {
-        settings.useDarkUpNextTheme.set(value, needsSync = true)
+        settings.useDarkUpNextTheme.set(value, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DARK_UP_NEXT_TOGGLED,
             mapOf("enabled" to value),
@@ -117,7 +116,7 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateWidgetForDynamicColors(value: Boolean) {
-        settings.useDynamicColorsForWidget.set(value, needsSync = true)
+        settings.useDynamicColorsForWidget.set(value, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_DYNAMIC_COLORS_WIDGET_TOGGLED,
             mapOf("enabled" to value),
@@ -125,23 +124,16 @@ class SettingsAppearanceViewModel @Inject constructor(
     }
 
     fun updateShowArtworkOnLockScreen(value: Boolean) {
-        settings.showArtworkOnLockScreen.set(value, needsSync = true)
+        settings.showArtworkOnLockScreen.set(value, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED,
             mapOf("enabled" to value),
         )
     }
 
-    fun updateUseEmbeddedArtwork(value: Boolean) {
-        settings.useEmbeddedArtwork.set(value, needsSync = true)
-        analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED,
-            mapOf("enabled" to value),
-        )
-    }
-
-    fun updateUseRssArtwork(value: Boolean) {
-        settings.useRssArtwork.set(value, needsSync = true)
+    fun updateUseEpisodeArtwork(value: Boolean) {
+        val currentConfiguration = settings.artworkConfiguration.value
+        settings.artworkConfiguration.set(currentConfiguration.copy(useEpisodeArtwork = value), updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_APPEARANCE_USE_EPISODE_ARTWORK_TOGGLED,
             mapOf("enabled" to value),

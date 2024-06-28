@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.FixDownloadsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
@@ -158,8 +159,20 @@ class StorageSettingsViewModel
         analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE)
     }
 
+    fun fixDownloadedFiles() {
+        FixDownloadsWorker.run(context)
+        viewModelScope.launch {
+            mutableAlertDialog.emit(
+                createAlertDialogState(
+                    title = context.getString(LR.string.settings_fix_downloads_started_message),
+                    showCancel = false,
+                ),
+            )
+        }
+    }
+
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
-        settings.warnOnMeteredNetwork.set(isChecked, needsSync = true)
+        settings.warnOnMeteredNetwork.set(isChecked, updateModifiedAt = true)
         updateMobileDataWarningState()
     }
 
@@ -172,7 +185,7 @@ class StorageSettingsViewModel
     }
 
     private fun onBackgroundRefreshCheckedChange(isChecked: Boolean) {
-        settings.backgroundRefreshPodcasts.set(isChecked, needsSync = true)
+        settings.backgroundRefreshPodcasts.set(isChecked, updateModifiedAt = true)
         updateBackgroundRefreshState()
     }
 
@@ -390,21 +403,26 @@ class StorageSettingsViewModel
     private fun createAlertDialogState(
         title: String,
         @StringRes message: Int? = null,
+        showCancel: Boolean = true,
     ) = AlertDialogState(
         title = title,
         message = message?.let { context.getString(message) },
-        buttons = listOf(
-            DialogButtonState(
-                text = context.getString(LR.string.cancel).uppercase(
-                    Locale.getDefault(),
+        buttons = buildList {
+            if (showCancel) {
+                add(
+                    DialogButtonState(
+                        text = context.getString(LR.string.cancel).uppercase(),
+                        onClick = {},
+                    ),
+                )
+            }
+            add(
+                DialogButtonState(
+                    text = context.getString(LR.string.ok),
+                    onClick = {},
                 ),
-                onClick = {},
-            ),
-            DialogButtonState(
-                text = context.getString(LR.string.ok),
-                onClick = {},
-            ),
-        ),
+            )
+        },
     )
 
     fun onShown() {
@@ -452,4 +470,8 @@ class StorageSettingsViewModel
         val message: String? = null,
         val buttons: List<DialogButtonState>,
     )
+
+    private companion object {
+        const val FIX_EPISODES_LIMIT = 10_000
+    }
 }

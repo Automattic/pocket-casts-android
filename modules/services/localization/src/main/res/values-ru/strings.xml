@@ -1,33 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-03-13 12:54:03+0000
+Translation-Revision-Date: 2024-06-18 22:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="download_completed_for_episode">Скачивание %1$s завершено</string>
+    <string name="episode_queued_for_download">Выпуск в очереди на скачивание</string>
+    <string name="episode_was_removed">Выпуск удалён</string>
+    <string name="remove_downloaded_file">Удалить скачанный файл</string>
+    <string name="settings_export_database_failed">Не удалось экспортировать базу данных</string>
+    <string name="settings_export_database">Экспортировать базу данных</string>
+    <string name="settings_sleep_timer_auto_restart_summary">В режиме «Включено» таймер сна будет автоматически перезапущен, если вы воспроизведёте выпуск в течение 5 минут после последней остановки.</string>
+    <string name="settings_sleep_timer_auto_restart">Автоматический перезапуск таймера сна</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">В режиме «Включено» таймер сна будет перезапущен, если телефон станет двигаться.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Встряхнуть телефон, чтобы перезапустить таймер сна</string>
+    <string name="settings_general_sleep_timer">Таймер сна</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Указание точности поиска в качестве приоритета может значительно замедлить его скорость отклика и привести к тому, что Pocket Casts станет потреблять больше данных.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Приоритет точности при поиске</string>
+    <string name="settings_import_opml_succeeded_message">Файлы OPML импортированы.</string>
+    <string name="settings_import_opml_import_failed_message">Не удаётся импортировать подкасты из указанного вами файла OPML.</string>
+    <string name="nova_launcher_recently_played">Недавно воспроизведённые</string>
+    <string name="notification_channel_description_fix_downloads_complete">Отображается по завершении исправления загрузок</string>
+    <string name="notification_channel_description_fix_downloads">Отображается при запуске исправления загрузок</string>
+    <string name="settings_fix_downloads_complete_message">Исправлено загрузок: %d</string>
+    <string name="settings_fix_downloads_complete_title">Исправление загрузок завершено</string>
+    <string name="settings_fix_downloads_started_message">Исправление загрузок скоро начнётся. Проверьте уведомления о выполнении.</string>
+    <string name="settings_fix_downloads_stop">Остановить</string>
+    <string name="settings_fix_downloads_progress">Выпуски: %1$d из %2$d</string>
+    <string name="settings_fix_downloads_title">Исправление загрузок</string>
+    <string name="clip_title">Обрезать</string>
+    <string name="stop">Остановить</string>
+    <string name="nova_launcher_continue_listening">Продолжить прослушивание</string>
+    <string name="episode_not_found">Выпуск не найден</string>
+    <string name="settings_storage_fix_downloads_description">Пытаться восстановить любые загруженные файлы в случае их отсутствия в приложении Pocket Casts.</string>
+    <string name="settings_storage_fix_downloads">Исправить загруженные файлы</string>
+    <string name="nova_launcher_new_releases">Новые выпуски</string>
+    <string name="nova_launcher_subscribed_podcasts">Подписки на подкасты</string>
+    <string name="whats_new_new_widgets_message">Мы добавили три новых виджета, так что управлять подкастами с главного экрана теперь будет гораздо проще. Попробуйте!</string>
+    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
+    <string name="widget_preview_time_left_4">Ещё 1 ч 36 мин</string>
+    <string name="widget_preview_time_left_3">Ещё 55 мин</string>
+    <string name="widget_preview_time_left_2">Ещё 12 мин</string>
+    <string name="widget_preview_time_left_1">Ещё 25 мин</string>
+    <string name="widget_preview_episode_in_up_next_title">Выпуск в Up Next</string>
+    <string name="widget_preview_episode_title">Название выпуска</string>
+    <string name="hour_and_minutes">1 ч %d мин</string>
+    <string name="hours_and_minutes">%d ч %d мин</string>
+    <string name="player_sleep_time_fired_end_of_chapter">Таймер сна остановился в конце главы.</string>
+    <string name="player_sleep_in_chapters">Переход в спящий режим через %d гл.</string>
+    <string name="player_sleep_in_one_chapter">Переход в спящий режим через 1 главу</string>
+    <string name="player_sleep_timer_in_chapter_plural">Через %d гл.</string>
+    <string name="player_sleep_timer_in_chapter">Через 1 главу</string>
+    <string name="player_sleep_timer_in_episode_plural">Через %d вып.</string>
+    <string name="player_sleep_timer_in_episode">Через 1 выпуск</string>
+    <string name="settings_use_episode_artwork_customization_description">Выберите, если хотите, чтобы в этом разделе приложения отображалось оформление выпуска</string>
+    <string name="settings_use_episode_artwork_customization_section">Пользовательские настройки</string>
+    <string name="settings_use_episode_artwork_title">Оформление выпусков</string>
+    <string name="settings_use_episode_artwork_advanced">Расширенные настройки оформления выпусков</string>
+    <string name="player_sleep_in_episodes">Переход в режим ожидания через %d вып.</string>
+    <string name="player_sleep_in_one_episode">Переход в режим ожидания через 1 выпуск</string>
+    <string name="player_sleep_timer_stopped_your_podcast">Таймер сна остановил ваш подкаст.</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Таймер сна перезагружен после встряхивания устройства</string>
+    <string name="whats_new_new_widgets_title">Новые виджеты</string>
+    <string name="widget_check_out_discover">Испытайте Discover и убедитесь сами</string>
+    <string name="widget_nothing_in_up_next">Очередь пуста</string>
+    <string name="widget_no_episode_playing">Ни один выпуск не воспроизводится</string>
+    <string name="large_player_widget_label">Крупный плеер</string>
+    <string name="medium_player_widget_label">Средний плеер</string>
+    <string name="small_player_widget_label">Малый плеер</string>
+    <string name="clear_search">Очистить поле поиска</string>
+    <string name="bookmarks_search_results_not_found">Не удалось найти закладку по этому запросу.</string>
+    <string name="podcast_and_episode">Подкаст и выпуск</string>
+    <string name="skip_chapters">Предварительный выбор глав</string>
+    <string name="settings_use_episode_artwork_details">В некоторых шоу есть специальное оформление отдельных выпусков. Включите эту опцию, и Pocket Casts будет отображать его вместо общего оформления шоу.</string>
+    <string name="settings_use_episode_artwork">Отображать оформление выпусков</string>
+    <string name="episode_sort_title_z_a">По названию (Z–A)</string>
+    <string name="episode_sort_title_a_z">По названию (A–Z)</string>
+    <string name="discover_most_popular_in">Самые популярные в %s</string>
+    <string name="discover_select_categories">Выбрать рубрику</string>
+    <string name="discover_all_categories">Все рубрики</string>
     <string name="upgrade_to_patron">Перейти на Patron</string>
     <string name="upgrade_to_plus">Перейти на Plus</string>
     <string name="whats_new_got_it_button">Понятно</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Подпишитесь на Patron, и вы сможете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Подпишитесь на Plus, и вы сможете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
-    <string name="whats_new_deselect_chapters_plus_message">В рамках подписки на Plus вы теперь можете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
-    <string name="whats_new_deselect_chapters_patron_message">В рамках подписки на Patron вы теперь можете выбирать и пропускать главы во всех выпусках, поддерживающих эту функцию.</string>
-    <string name="skip_chapters_patron_prompt">Возможность пропускать главы и множество других функций с Pocket Casts Patron</string>
-    <string name="skip_chapters_plus_prompt">Возможность пропускать главы и множество других функций с Pocket Casts Plus</string>
-    <string name="settings_use_embedded_podcast_artwork">Использовать встроенные обложки файлов</string>
-    <string name="settings_episode_artwork_details">Показывает тему из заметок для показа эпизода (при наличии) вместо темы шоу. Если имеется одновременно и обложка файла, и тема RSS, будет применяться тема RSS.</string>
-    <string name="select_one_chapter_message">Выберите хотя бы одну главу</string>
+    <string name="skip_chapters_patron_prompt">Возможность предварительно выбирать главы и множество других функций с Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Возможность предварительно выбирать главы и множество других функций с Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 глава • Скрыто: %d</string>
     <string name="number_of_chapters_summary_plural">Глав: %1$d • Скрыто: %2$d</string>
     <string name="single_chapter">1 глава</string>
     <string name="number_of_chapters">Глав: %d</string>
-    <string name="skip_chapters">Пропустить главы</string>
     <string name="onboarding_plus_feature_slumber_studios_title">Эксклюзивный контент от &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; на 1 год</string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Использовать код</string>
-    <string name="whats_new_slumber_studios_body_free_user">Подпишитесь на Plus Yearly и получите в качестве бонуса годовую подписку на контент Slumber Studios — подкасты, которые подарят вам самые сладкие сны. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_body">Примените код %1$s и получайте удовольствие, пользуясь годовой подпиской на контент Slumber Studios в качестве бонуса за подписку на Yearly Plus. &lt;a href=\"https://slumberstudios.com/\"&gt;Подробнее&lt;/a&gt;.</string>
-    <string name="whats_new_slumber_studios_title">Мечтайте о большем</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">по окончании первого года</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Регулярный платёж %s</string>
     <string name="half_price_first_year">Скидка 50 % на первый год</string>
@@ -73,13 +136,10 @@ Language: ru
     <string name="eoy_story_top_podcasts_title">А ещё вы были на высоте в этих шоу!</string>
     <string name="end_of_year_story_top_podcast_title">Шоу %1$s набрало больше всего прослушиваний в 2023 г.</string>
     <string name="end_of_year_share_story">Поделитесь этим</string>
-    <string name="whats_new_bookmarks_enable_now_button">Включить</string>
     <string name="podcast_log_in_to_rate">Чтобы поставить оценку, необходимо войти в систему</string>
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>
     <string name="podcast_rate">Оцените %s</string>
     <string name="submit">Отправить</string>
-    <string name="whats_new_bookmarks_try_now_button">Попробовать</string>
-    <string name="whats_new_bookmarks_title">Закладки уже готовы!</string>
     <string name="bookmarks_upsell_instructions_early_access">Получите ранний доступ к этой и многим другим функциям с Pocket Casts Patron и сохраняйте отметки времени понравившихся вам эпизодов. Уже скоро станет доступным для подписчиков Plus.</string>
     <string name="bookmarks_upsell_instructions">Сохраняйте отметки времени понравившихся вам эпизодов и разблокируйте многие другие функции с Pocket Casts Plus.</string>
     <string name="error_loading_show_notes">Не удалось найти заметки для показа к этому эпизоду.</string>
@@ -801,7 +861,6 @@ Language: ru
     <string name="settings_website_link">ссылка на веб-сайт</string>
     <string name="settings_view">Просмотреть</string>
     <string name="settings_version">Версия%1$s (%2$s)</string>
-    <string name="settings_use_episode_podcast_artwork">Использовать встроенную тему RSS</string>
     <string name="settings_use_android_light_dark_mode">Использовать светлый/тёмный режим Android</string>
     <string name="settings_up_next_tap_summary">Если функция включена, элемент очереди «Следующие» будет воспроизводиться при нажатии. При долгом нажатии появятся настройки выпуска.</string>
     <string name="settings_up_next_tap">Воспроизводить выпуск из очереди «Следующие» по нажатию</string>
@@ -913,7 +972,6 @@ Language: ru
     <string name="settings_export_send_email">Послать сообщение по эл.почте</string>
     <string name="settings_export_save_file_summary">Экспортировать файл OPML в ваше хранилище.</string>
     <string name="settings_export_save_file">Сохранить файл</string>
-    <string name="settings_embedded_artwork_details">Показывает в плеере тему из загруженного файла (при наличии) вместо темы шоу.</string>
     <string name="settings_developer">Разработчик</string>
     <string name="settings_close_upgrade_offer">закрыть предложение платной услуги</string>
     <string name="settings_choose_podcasts">Выбрать подкасты</string>
@@ -1448,7 +1506,7 @@ Language: ru
     <string name="podcasts">Подкасты</string>
     <string name="player_started_from">Начало подкаста через %d с.</string>
     <string name="player_skipped_last">Пропущены последние %d с.</string>
-    <string name="player_sleep_time_fired">Таймер сна остановился в конце вашего выпуска.\nСпокойной ночи!</string>
+    <string name="player_sleep_time_fired">Таймер сна остановился в конце вашего выпуска.</string>
     <string name="player_actions_show_as_delete_for_custom">Показать как удалённый для настраиваемых выпусков</string>
     <string name="player_actions_hidden_for_custom">Скрыто для настраиваемых выпусков</string>
     <string name="player_rearrange_actions_hidden">Другие действия</string>
@@ -1470,7 +1528,6 @@ Language: ru
     <string name="player_time_saved_detail">С помощью этой функции вы сэкономили в целом %s.</string>
     <string name="player_tab_playing_wide">Сейчас воспроизводится</string>
     <string name="player_tab_playing">Воспроизведение</string>
-    <string name="player_sleep_when_episode_ends">Переход в спящий режим после окончания выпуска</string>
     <string name="player_sleep_timer">Таймер сна</string>
     <string name="player_sleep_timer_title">Таймер сна</string>
     <string name="player_sleep_end_of_episode">Конец выпуска</string>
@@ -1479,7 +1536,6 @@ Language: ru
     <string name="player_sleep_cancel_timer">Отменить таймер</string>
     <string name="player_sleep_add_5_minutes">+ 5 минут</string>
     <string name="player_sleep_60_minutes">1 час</string>
-    <string name="player_sleep_5_minutes">5 минут</string>
     <string name="player_sleep_30_minutes">30 минут</string>
     <string name="player_sleep_15_minutes">15 минут</string>
     <string name="player_pip">Ввести «картинку в картинке»</string>
@@ -1642,4 +1698,9 @@ Language: ru
     <string name="unarchive">Из архива</string>
     <string name="archive">Архив</string>
     <string name="add_to_up_next">Добавить в «Следующие»</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one">%1$d выпуск — %2$s осталось</item>
+        <item quantity="few">%1$d вып. — %2$s осталось</item>
+        <item quantity="many">%1$d вып. — %2$s осталось</item>
+    </plurals>
 </resources>

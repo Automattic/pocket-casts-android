@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemMostPopularPodcastsBinding
-import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
+import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.MostPopularPodcastsAdapter.MostPopularPodcastsViewHolder
@@ -16,19 +16,21 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 
 internal class MostPopularPodcastsAdapter(
     val onPodcastClicked: (DiscoverPodcast, String?) -> Unit,
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-) : ListAdapter<Any, MostPopularPodcastsViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
+) : ListAdapter<DiscoverPodcast, MostPopularPodcastsViewHolder>(PODCASTS_FILTERED_DIFF) {
 
     private var fromListId: String? = null
 
     class MostPopularPodcastsViewHolder(
         val binding: ItemMostPopularPodcastsBinding,
         private val onItemClicked: (Int) -> Unit,
+        private val onSubscribeButtonClicked: (Int) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
         private val imageRequestFactory = PocketCastsImageRequestFactory(
             binding.root.context,
@@ -36,8 +38,12 @@ internal class MostPopularPodcastsAdapter(
         ).themed()
 
         init {
-            binding.podcast.setOnClickListener {
+            binding.imageView.setOnClickListener {
                 onItemClicked(bindingAdapterPosition)
+            }
+
+            binding.btnSubscribe.setOnClickListener {
+                onSubscribeButtonClicked(bindingAdapterPosition)
             }
         }
 
@@ -49,6 +55,8 @@ internal class MostPopularPodcastsAdapter(
 
             binding.lblSubtitle.text = podcast.author
             binding.lblSubtitle.contentDescription = podcast.author
+
+            binding.btnSubscribe.updateSubscribeButtonIcon(subscribed = podcast.isSubscribed, colorSubscribed = R.attr.contrast_01, colorUnsubscribed = R.attr.contrast_01)
         }
     }
 
@@ -58,26 +66,43 @@ internal class MostPopularPodcastsAdapter(
     ): MostPopularPodcastsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMostPopularPodcastsBinding.inflate(inflater, parent, false)
-        return MostPopularPodcastsViewHolder(binding) { position ->
-            val podcast = getItem(position) as DiscoverPodcast
-            trackImpression(podcast)
-            onPodcastClicked(podcast, fromListId)
-        }
+        return MostPopularPodcastsViewHolder(
+            binding,
+            onItemClicked = { position ->
+                val podcast = getItem(position) as DiscoverPodcast
+                trackImpression(podcast)
+                onPodcastClicked(podcast, fromListId)
+            },
+            onSubscribeButtonClicked = { position ->
+                val podcast = getItem(position) as DiscoverPodcast
+                binding.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = R.attr.contrast_01, colorUnsubscribed = R.attr.contrast_01)
+                fromListId?.let {
+                    FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid)
+                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+                }
+                onPodcastSubscribe(podcast, fromListId)
+            },
+        )
     }
-    override fun onBindViewHolder(holder: MostPopularPodcastsViewHolder, position: Int) {
-        val podcast = getItem(position)
 
-        if (podcast is DiscoverPodcast) {
-            holder.bind(podcast)
-        }
+    override fun onBindViewHolder(holder: MostPopularPodcastsViewHolder, position: Int) {
+        holder.bind(getItem(position))
     }
+
     fun replaceList(list: List<DiscoverPodcast>) {
-        submitList(null) // We need this to avoid displaying the previous category list when switching from a different category
+        val changedPodcastList = currentList.map { it.uuid } != list.map { it.uuid }
+
+        if (changedPodcastList) {
+            submitList(null) // We need this to avoid displaying the previous category list when switching from a different category
+        }
+
         submitList(list)
     }
+
     fun setFromListId(value: String) {
         this.fromListId = value
     }
+
     private fun trackImpression(podcast: DiscoverPodcast) {
         fromListId?.let {
             FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)

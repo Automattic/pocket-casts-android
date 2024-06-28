@@ -17,8 +17,11 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -33,9 +36,11 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -74,6 +79,14 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         )
         toolbar.setOnMenuItemClickListener(this)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.uiState.collect { state ->
+                    loadingView?.isVisible = state.isLoading
+                }
+            }
+        }
+
         FirebaseAnalyticsTracker.userGuideOpened()
     }
 
@@ -111,6 +124,14 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
             contactSupport()
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    view?.updatePadding(bottom = it)
+                }
+            }
+        }
+
         return view
     }
 
@@ -125,6 +146,11 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
             R.id.menu_status_page -> {
                 val fragment = StatusFragment()
                 (activity as? FragmentHostListener)?.addFragment(fragment)
+                true
+            }
+
+            R.id.menu_export_database -> {
+                viewModel.onExportDatabaseMenuItemClick(::sendIntentFile)
                 true
             }
 
@@ -263,5 +289,15 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
                 UiUtil.displayDialogNoEmailApp(context)
             }
         }
+    }
+
+    private fun sendIntentFile(file: File) {
+        val context = context ?: return
+        IntentUtil.sendIntent(
+            context = context,
+            file = file,
+            intentType = "application/zip",
+            errorMessage = context.getString(LR.string.settings_export_database_failed),
+        )
     }
 }

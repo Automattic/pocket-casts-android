@@ -4,6 +4,8 @@ import android.app.Application
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,4 +24,10 @@ object ModelModule {
 
     @Provides
     fun provideChapterDao(database: AppDatabase): ChapterDao = database.chapterDao()
+
+    @Provides
+    fun provideUpNextDao(database: AppDatabase): UpNextDao = database.upNextDao()
+
+    @Provides
+    fun providePodcastDao(database: AppDatabase): PodcastDao = database.podcastDao()
 }

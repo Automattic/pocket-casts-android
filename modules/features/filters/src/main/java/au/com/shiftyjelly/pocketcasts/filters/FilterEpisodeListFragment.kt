@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -129,6 +131,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
             ),
+            artworkContext = Element.Filters,
         )
     }
 
@@ -187,7 +190,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         recyclerView.adapter = adapter
         listSavedState?.let { recyclerView.layoutManager?.onRestoreInstanceState(it) }
         setShowFilterOptions(showingFilterOptionsBeforeModal)
-        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), needsSync = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(viewModel.playlistUUID), updateModifiedAt = false)
     }
 
     override fun onDestroyView() {
@@ -240,23 +243,28 @@ class FilterEpisodeListFragment : BaseFragment() {
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "delete_filter"))
                     showDeleteConfirmation()
                     true
                 }
                 R.id.menu_playall -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "play_all"))
                     val firstEpisode = viewModel.episodesList.value?.firstOrNull() ?: return@setOnMenuItemClickListener true
                     playAllFromHereWarning(firstEpisode, isFirstEpisode = true)
                     true
                 }
                 R.id.menu_sortby -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "sort_by"))
                     showSortOptions()
                     true
                 }
                 R.id.menu_options -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "filter_options"))
                     showFilterSettings()
                     true
                 }
                 R.id.menu_downloadall -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "download_all"))
                     downloadAll()
                     true
                 }
@@ -291,6 +299,14 @@ class FilterEpisodeListFragment : BaseFragment() {
                 episodeListBookmarkViewModel.stateFlow.collect {
                     adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
                     adapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding.recyclerView.updatePadding(bottom = it)
                 }
             }
         }
@@ -442,6 +458,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar
+        multiSelectHelper.context = requireActivity()
         multiSelectHelper.source = SourceView.FILTERS
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             if (!multiSelectLoaded) {
@@ -549,7 +566,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         val binding = binding ?: return
 
         val toolbar = binding.toolbar
-        val colors = ToolbarColors.User(color = color, theme = theme)
+        val colors = ToolbarColors.user(color = color, theme = theme)
         setupToolbarAndStatusBar(
             toolbar = toolbar,
             navigationIcon = BackArrow,

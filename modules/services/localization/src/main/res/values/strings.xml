@@ -9,6 +9,7 @@
     <string name="empty" translatable="false" />
 
     <string name="account">Account</string>
+    <string name="remove_downloaded_file">Remove downloaded file</string>
     <string name="add_bookmark">Add bookmark</string>
     <string name="add_bookmark_title">Add Bookmark</string>
     <string name="bookmark_added">Bookmark \"%s\" added</string>
@@ -40,6 +41,7 @@
     <string name="downloads">Downloads</string>
     <string name="edit">Edit</string>
     <string name="effects">Effects</string>
+    <string name="episode_not_found">Episode not found</string>
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
@@ -63,6 +65,7 @@
     <string name="pause">Pause</string>
     <string name="pause_episode">Pause episode</string>
     <string name="play">Play</string>
+    <string name="playback">Playback</string>
     <string name="play_all">Play all</string>
     <string name="play_all_from_here">Play all from here</string>
     <string name="play_episode">Play episode</string>
@@ -72,6 +75,7 @@
     <string name="play_now">Play now</string>
     <string name="play_on">Play on&#8230;</string>
     <string name="played">Played</string>
+    <string name="podcast_and_episode">Podcast &amp; Episode</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="removed">Removed</string>
@@ -83,6 +87,7 @@
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
     <string name="select_all_above">Select all above</string>
+    <string name="stop">Stop</string>
     <string name="deselect_all_above">Deselect all above</string>
     <string name="deselect_all">Deselect all</string>
     <string name="deselect_all_below">Deselect all below</string>
@@ -150,6 +155,7 @@
     <string name="please_try_again">Please try again</string>
     <string name="next">Next</string>
     <string name="select_podcasts">Select podcasts</string>
+    <string name="clip_title">Clip</string>
     <string name="support">Support</string>
     <string name="go_to_top">Go to top</string>
     <string name="go_to_bottom">Go to bottom</string>
@@ -157,12 +163,29 @@
     <string name="report">Report</string>
     <string name="report_subtitle">Report inappropriate content</string>
     <string name="widget">Widget</string>
+    <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
+    <string name="small_player_widget_label">Small Player</string>
+    <string name="medium_player_widget_label">Medium Player</string>
+    <string name="large_player_widget_label">Large Player</string>
+    <string name="widget_no_episode_playing">No episode playing</string>
+    <string name="widget_nothing_in_up_next">Nothing in Up Next</string>
+    <string name="widget_check_out_discover">Check out Discover for more</string>
+    <string name="widget_preview_episode_title">Episode title</string>
+    <string name="widget_preview_episode_in_up_next_title">Episode in Up Next</string>
+    <string name="widget_preview_time_left_1">25m left</string>
+    <string name="widget_preview_time_left_2">12m left</string>
+    <string name="widget_preview_time_left_3">55m left</string>
+    <string name="widget_preview_time_left_4">1h 36m left</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
 
     <string name="episodes_singular">1 episode</string>
     <string name="episodes_plural">%d episodes</string>
+    <plurals name="episode_count">
+        <item quantity="one">%d episode</item>
+        <item quantity="other">%d episodes</item>
+    </plurals>
     <string name="empty_play_state">Pick an episode to begin</string>
 
     <string name="seconds_label">Seconds</string>
@@ -176,6 +199,8 @@
     <string name="minutes_short_plural">%d mins</string>
     <string name="hours_singular">1 hour</string>
     <string name="hours_plural">%d hours</string>
+    <string name="hours_and_minutes">%d hours and %d minutes</string>
+    <string name="hour_and_minutes">1 hour and %d minutes</string>
     <string name="days_singular">1 day</string>
     <string name="days_plural">%d days</string>
     <string name="months_singular">1 month</string>
@@ -209,6 +234,8 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="episode_was_removed">Episode was removed</string>
+    <string name="episode_queued_for_download">Episode queued for download</string>
     <string name="download_queued_singular">1 episode queued for download</string>
     <string name="download_queued_plural">%1$d episodes queued for download</string>
 
@@ -225,6 +252,7 @@
     <string name="download_warning_on_wifi_summary">Downloading this episode will use data.</string>
     <string name="download_warning_on_wifi_button">Download now</string>
     <string name="download_warning_on_wifi_later" translatable="false">@string/queue_for_later</string>
+    <string name="download_completed_for_episode">Download completed for %1$s</string>
 
     <string name="profile_cloud_upload_warning_title_on_wifi" translatable="false">@string/youre_not_on_wifi</string>
     <string name="profile_cloud_upload_warning_title_metered_wifi" translatable="false">@string/youre_on_metered_wifi</string>
@@ -292,7 +320,6 @@
     <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
-    <string name="player_sleep_5_minutes">5 minutes</string>
     <string name="player_sleep_1_minute">1 minute</string>
     <string name="player_sleep_60_minutes">60 minutes</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
@@ -301,10 +328,19 @@
     <string name="player_sleep_custom_minus">Custom minus</string>
     <string name="player_sleep_custom_plus">Custom plus</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
+    <string name="player_sleep_timer_in_episode">In 1 episode</string>
+    <string name="player_sleep_timer_in_episode_plural">In %d episodes</string>
+    <string name="player_sleep_timer_in_chapter">In 1 chapter</string>
+    <string name="player_sleep_timer_in_chapter_plural">In %d chapters</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
-    <string name="player_sleep_when_episode_ends">Sleeping when episode ends</string>
+    <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
+    <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>
+up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
+    <string name="player_sleep_in_chapters">Sleeping in %d chapters</string>
+    <string name="player_sleep_timer_restarted_after_device_shake">Sleep timer restarted after device shake</string>
+    <string name="player_sleep_timer_stopped_your_podcast">Sleep timer stopped your podcast.</string>
     <string name="player_star" translatable="false">@string/star</string>
     <string name="player_tab_bookmarks" translatable="false">@string/bookmarks</string>
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
@@ -326,6 +362,11 @@
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
     <string name="player_up_next_time_remaining">Total time remaining %s</string>
+    <string name="player_up_next_time_left" translatable="false">@string/time_left</string>
+    <plurals name="player_up_next_header_title">
+        <item quantity="one" formatted="true">%1$d episode - %2$s left</item>
+        <item quantity="other" formatted="true">%1$d episodes - %2$s left</item>
+    </plurals>
     <string name="player_open_url_failed">Could not find a browser to open %s.</string>
     <string name="player_archive_title" translatable="false">@string/archive</string>
     <string name="player_archive_summary">Are you sure you want to archive this episode?</string>
@@ -337,7 +378,8 @@
     <string name="player_rearrange_actions_hidden">More actions</string>
     <string name="player_actions_hidden_for_custom">Hidden for custom episodes</string>
     <string name="player_actions_show_as_delete_for_custom">Shown as delete for custom episodes</string>
-    <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.\nNight night!</string>
+    <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.</string>
+    <string name="player_sleep_time_fired_end_of_chapter">Sleep timer stopped at the end of your chapter.</string>
     <string name="player_skipped_last">Skipped the last %d seconds</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>
@@ -345,8 +387,8 @@
 
     <!-- Chapters -->
 
-    <!-- Label that toggles the option for the user to choose which chapters of the podcast they want to skip (to not be played) -->
-    <string name="skip_chapters">Skip chapters</string>
+    <!-- Label that toggles the option for the user to choose which chapters of the podcast they want to preselect (to be played) -->
+    <string name="skip_chapters">Preselect chapters</string>
     <!-- Indicates the number of chapters in a podcast episode. %d is the number of chapters. -->
     <string name="number_of_chapters">%d chapters</string>
     <!-- Singular indication of number of chapters -->
@@ -354,9 +396,8 @@
     <!-- %1$d is the number of total chapters. %2$d is the number of hidden chapters. -->
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
-    <string name="select_one_chapter_message">Please select at least one chapter</string>
-    <string name="skip_chapters_plus_prompt">Skip chapters and more with Pocket Casts Plus</string>
-    <string name="skip_chapters_patron_prompt">Skip chapters and more with Pocket Casts Patron</string>
+    <string name="skip_chapters_plus_prompt">Preselect chapters and more with Pocket Casts Plus</string>
+    <string name="skip_chapters_patron_prompt">Preselect chapters and more with Pocket Casts Patron</string>
 
     <!-- Podcasts -->
 
@@ -534,6 +575,8 @@
     <string name="podcast_share_current_position">Current position</string>
     <string name="podcast_share_episode">Share episode</string>
     <string name="podcast_share_open_file_in">Open file in&#x2026;</string>
+    <string name="podcast_create_clip">Create clip</string>
+    <string name="podcast_share_clip">Clip</string>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Subscribed</string>
@@ -1104,7 +1147,6 @@
     <string name="settings_developer">Developer</string>
     <string name="settings_downloads_clean_up">Clean up</string>
     <string name="settings_downloads_clean_up_summary">Are you sure you want to delete these downloaded files?</string>
-    <string name="settings_embedded_artwork_details">Shows artwork from the downloaded file (if it exists) in the player instead of using the show\'s artwork.</string>
     <string name="settings_export_save_file">Save file</string>
     <string name="settings_export_save_file_summary">Export the OPML file to your storage.</string>
     <string name="settings_export_send_email">Send email</string>
@@ -1112,6 +1154,7 @@
     <string name="settings_export_subscriptions">Export subscriptions</string>
     <string name="settings_general_defaults">Defaults</string>
     <string name="settings_general_player">Player</string>
+    <string name="settings_general_sleep_timer">Sleep Timer</string>
     <string name="settings_get_plus_and_more">Get Pocket Casts Plus to unlock this feature and more!</string>
     <string name="settings_headphone_controls_action_next">Next action</string>
     <string name="settings_headphone_controls_action_previous">Previous action</string>
@@ -1140,6 +1183,14 @@
     <string name="settings_import_opml_stop">Stop</string>
     <string name="settings_import_opml_title">Import OPML</string>
     <string name="settings_import_opml_toast">Importing podcasts&#x2026;</string>
+    <string name="settings_import_opml_import_failed_message">Unable to import podcasts from the OPML file you specified.</string>
+    <string name="settings_import_opml_succeeded_message">OPML Import Succeeded.</string>
+    <string name="settings_fix_downloads_title">Fixing downloads</string>
+    <string name="settings_fix_downloads_progress">%1$d of %2$d episodes</string>
+    <string name="settings_fix_downloads_stop">Stop</string>
+    <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
+    <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
+    <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -1245,9 +1296,12 @@
     <string name="settings_storage_move_podcasts">Moving podcasts&#x2026;</string>
     <string name="settings_storage_section_heading_usage">Usage</string>
     <string name="settings_storage_section_heading_mobile_data">Mobile Data</string>
+    <string name="settings_storage_section_heading_playback" translatable="false">@string/playback</string>
     <string name="settings_storage_size_free">%s free</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_store_on">Store podcasts on</string>
+    <string name="settings_storage_fix_downloads">Fix downloads</string>
+    <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
     <string name="settings_subscribe_to_played">Subscribe to played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
@@ -1276,6 +1330,10 @@
     <string name="settings_up_next_swipe_play_last" translatable="false">@string/play_last</string>
     <string name="settings_up_next_swipe_play_next" translatable="false">@string/play_next</string>
     <string name="settings_up_next_swipe_summary">When swiping from left to right on an episode, the default action will be %s.</string>
+    <string name="settings_sleep_timer_shake_to_reset">Shake to restart Sleep Timer</string>
+    <string name="settings_sleep_timer_shake_to_reset_summary">If on, the sleep timer will restart when you shake your phone.</string>
+    <string name="settings_sleep_timer_auto_restart">Auto Restart Sleep Timer</string>
+    <string name="settings_sleep_timer_auto_restart_summary">If on, the sleep timer will restart automatically if you play an episode within 5 minutes after the last pause.</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
     <string name="settings_autoplay">Autoplay</string>
@@ -1285,9 +1343,12 @@
     <string name="settings_use_dark_up_next_details">When enabled the Up Next will always use the dark theme, or will match the current theme when disabled</string>
     <string name="settings_use_dynamic_colors_widget">Use dynamic colors for widget</string>
     <string name="settings_use_dynamic_colors_widget_details">When enabled, widget colors will change based on the device theme colors.</string>
-    <string name="settings_use_embedded_podcast_artwork">Use embedded file artwork</string>
-    <string name="settings_use_episode_podcast_artwork">Use embedded RSS artwork</string>
-    <string name="settings_episode_artwork_details">Shows artwork from the episode\'s show notes (if it exists) instead of using the show\'s artwork. If both file and RSS artwork are present, RSS artwork will be used.</string>
+    <string name="settings_use_episode_artwork">Use episode artwork</string>
+    <string name="settings_use_episode_artwork_details">Some shows have custom artwork for certain episodes. Enable this option and Pocket Casts will display them instead of the show’s artwork.</string>
+    <string name="settings_use_episode_artwork_advanced">Advanced episode artwork settings</string>
+    <string name="settings_use_episode_artwork_title">Episode Artwork</string>
+    <string name="settings_use_episode_artwork_customization_section">Customization</string>
+    <string name="settings_use_episode_artwork_customization_description">Select if you want to see episode artwork in these sections of the app</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
     <string name="settings_view">View</string>
     <string name="settings_website_link">website link</string>
@@ -1374,6 +1435,8 @@
     <string name="settings_subscribe_to_played_summary">Podcasts you listen to will be automatically added to the Podcasts tab</string>
     <string name="settings_notification_default_sound">Default sound</string>
     <string name="settings_import_title">Import subscriptions</string>
+    <string name="settings_export_database">Export database</string>
+    <string name="settings_export_database_failed">Database export failed</string>
     <string name="settings_status_page">Status Page</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_watch_logs">Watch logs</string>
@@ -1432,27 +1495,21 @@
     <string name="settings_open_on_phone">Open on phone</string>
     <string name="settings_could_not_open_on_phone">Unable to open on phone</string>
 
+    <string name="settings_advanced_heading_playback" translatable="false">@string/playback</string>
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
-    <string name="whats_new_slumber_studios_title">Dream big</string>
-    <!-- %1$s is Slumber Studios promo code -->
-    <string name="whats_new_slumber_studios_body">As part of your Yearly Plus subscription, enjoy a 1-year subscription to Slumber Studios content using code %1$s. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
-    <string name="whats_new_slumber_studios_body_free_user">Subscribe to Plus Yearly and enjoy a 1-year subscription to Slumber Studios content, podcasts designed for the sweetest dreams. <![CDATA[<a href="https://slumberstudios.com/">Learn more</a>.]]></string>
-    <string name="whats_new_slumber_studios_redeem_now_button">Redeem your code</string>
-    <!-- Skip Chapters what's new message for Patron users. Don't translate "Patron" -->
-    <string name="whats_new_deselect_chapters_patron_message">As part of your Patron subscription, you can now select and skip chapters in any episode that supports them.</string>
-    <!-- Skip Chapters what's new message for Plus users. Don't translate "Plus" -->
-    <string name="whats_new_deselect_chapters_plus_message">As part of your Plus subscription, you can now select and skip chapters in any episode that supports them.</string>
-    <!-- Skip Chapters what's new message to subscribe to Plus. Don't translate "Plus" -->
-    <string name="whats_new_deselect_chapters_subscribe_to_plus_message">Subscribe to Plus now so you can select and skip chapters in any episode that supports them.</string>
-    <!-- Skip Chapters what's new message to subscribe to Patron. Don't translate "Patron" -->
-    <string name="whats_new_deselect_chapters_subscribe_to_patron_message">Subscribe to Patron now so you can select and skip chapters in any episode that supports them.</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Prioritizing seek accuracy</string>
+    <string name="settings_advanced_prioritize_seek_accuracy_summary">Prioritizing seek accuracy can significantly slow down seek responsiveness and cause Pocket Casts to consume more data.</string>
+    <string name="settings_advanced_cache_entire_playing_episode">Cache playing episode</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">Entire playing episode is cached on an unmetered network to minimize streaming while playing. The episode is automatically removed from cache when the cache size limit is reached.</string>
     <!-- Used in a button meaning that the user understood the message. -->
     <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->
     <string name="upgrade_to_plus">Upgrade to Plus</string>
     <!-- Button title to upgrade to Patron. Don't translate "Patron" -->
     <string name="upgrade_to_patron">Upgrade to Patron</string>
+    <string name="whats_new_new_widgets_title">New widgets</string>
+    <string name="whats_new_new_widgets_message">We’ve just added three new widgets, so managing your podcasts from the home screen got a whole lot easier. Please check them out!</string>
 
     <!-- Errors -->
 
@@ -1795,6 +1852,8 @@
     <string name="notification_channel_description_podcast_import">Import podcast collections</string>
     <string name="notification_channel_description_sign_in_error">Shows when signed out in background and cannot auto re sign-in</string>
     <string name="notification_channel_description_bookmark">Shows when bookmark is added using headphones</string>
+    <string name="notification_channel_description_fix_downloads">Shows when downloads fix is triggered</string>
+    <string name="notification_channel_description_fix_downloads_complete">Shows when downloads fix is complete</string>
 
     <!-- Bookmarks -->
 
@@ -1823,6 +1882,7 @@
     <string name="bookmark_notification_action_delete_title" translatable="false">@string/delete</string>
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
+    <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
 
     <!--    Tasker Plugin-->
 
@@ -1873,6 +1933,7 @@
     <string name="dont_clear">Don\'t Clear</string>
     <string name="clear_up_next">Clear Up Next</string>
     <string name="clear_all">Clear All</string>
+    <string name="clear_search">Clear Search</string>
     <string name="add_mode">Add Mode</string>
     <string name="start_playing">Start Playing</string>
     <string name="last">Last</string>
@@ -1901,4 +1962,13 @@
 
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
+
+
+    <!-- Nova Launcher -->
+    <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
+    <string name="nova_launcher_recently_played">Recently Played</string>
+    <string name="nova_launcher_new_releases">New Releases</string>
+<string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
+    <string name="nova_launcher_continue_listening">Continue listening</string>
+    <string name="nova_launcher_up_next" translatable="false">@string/up_next</string>
 </resources>

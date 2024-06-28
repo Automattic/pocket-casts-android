@@ -19,10 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
-import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -55,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ChapterRow(
     state: ChaptersViewModel.ChapterState,
     isTogglingChapters: Boolean,
+    selectedCount: Int,
     onSelectionChange: (Boolean, Chapter) -> Unit,
     onClick: () -> Unit,
     onUrlClick: () -> Unit,
@@ -73,15 +71,18 @@ fun ChapterRow(
         if (state is ChaptersViewModel.ChapterState.Playing) {
             ChapterProgressBar(progress = state.progress)
         }
+        val isEnabled = !selectedState || selectedCount > 1
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable {
                     if (isTogglingChapters) {
-                        val selected = !selectedState
-                        selectedState = selected
-                        onSelectionChange(selected, chapter)
+                        if (isEnabled) {
+                            val selected = !selectedState
+                            selectedState = selected
+                            onSelectionChange(selected, chapter)
+                        }
                     } else {
                         onClick()
                     }
@@ -90,20 +91,18 @@ fun ChapterRow(
         ) {
             AnimatedVisibility(visible = isTogglingChapters) {
                 Checkbox(
+                    enabled = isEnabled,
                     checked = selectedState,
                     onCheckedChange = { selected ->
                         selectedState = selected
                         onSelectionChange(selected, chapter)
                     },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.theme.colors.playerContrast01,
-                        uncheckedColor = MaterialTheme.theme.colors.playerContrast02,
-                    ),
+                    colors = LocalChaptersTheme.current.checkbox,
                 )
                 Spacer(Modifier.width(8.dp))
             }
             TextH50(
-                text = chapter.index.toString(),
+                text = (chapter.index + 1).toString(),
                 color = textColor,
                 modifier = Modifier
                     .padding(horizontal = 12.dp),
@@ -142,13 +141,13 @@ private fun ChapterProgressBar(progress: Float, modifier: Modifier = Modifier) {
     Box(
         modifier
             .fillMaxSize()
-            .background(MaterialTheme.theme.colors.playerContrast06),
+            .background(LocalChaptersTheme.current.progressBackground),
     ) {
         Box(
             Modifier
                 .fillMaxWidth(fraction = progress)
                 .fillMaxHeight()
-                .background(MaterialTheme.theme.colors.playerContrast05),
+                .background(LocalChaptersTheme.current.progress),
         )
     }
 }
@@ -160,7 +159,7 @@ private fun LinkButton(textColor: Color, onClick: () -> Unit, modifier: Modifier
         modifier = modifier
             .padding(4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.theme.colors.playerContrast05)
+            .background(LocalChaptersTheme.current.linkIconBackground)
             .size(24.dp),
     ) {
         Icon(
@@ -178,22 +177,70 @@ private fun getTextColor(
     isTogglingChapters: Boolean,
 ) = if (isTogglingChapters) {
     if (state.chapter.selected) {
-        MaterialTheme.theme.colors.playerContrast01
+        LocalChaptersTheme.current.chapterTogglingSelected
     } else {
-        MaterialTheme.theme.colors.playerContrast02
+        LocalChaptersTheme.current.chapterTogglingDeselected
     }
 } else {
     if (state is ChaptersViewModel.ChapterState.Played) {
-        MaterialTheme.theme.colors.playerContrast04
+        LocalChaptersTheme.current.chapterPlayed
     } else {
-        MaterialTheme.theme.colors.playerContrast01
+        LocalChaptersTheme.current.chapterNotPlayed
     }
 }
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Default - DARK")
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Light")
+@Preview(name = "Light")
+@Composable
+fun ChapterRowLightPreview() = ChapterRowPreview(Theme.ThemeType.LIGHT)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun ChapterRowPreview() {
+fun ChapterRowDarkPreview() = ChapterRowPreview(Theme.ThemeType.DARK)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Rose")
+@Preview(name = "Rose")
+@Composable
+fun ChapterRowRosePreview() = ChapterRowPreview(Theme.ThemeType.ROSE)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Indigo")
+@Preview(name = "Indigo")
+@Composable
+fun ChapterRowIndigoPreview() = ChapterRowPreview(Theme.ThemeType.INDIGO)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "ExtraDark")
+@Preview(name = "ExtraDark")
+@Composable
+fun ChapterRowExtraDarkPreview() = ChapterRowPreview(Theme.ThemeType.EXTRA_DARK)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "DarkContrast")
+@Preview(name = "DarkContrast")
+@Composable
+fun ChapterRowDarkContrastPreview() = ChapterRowPreview(Theme.ThemeType.DARK_CONTRAST)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "LightContrast")
+@Preview(name = "LightContrast")
+@Composable
+fun ChapterRowLightContrastPreview() = ChapterRowPreview(Theme.ThemeType.LIGHT_CONTRAST)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Electric")
+@Preview(name = "Electric")
+@Composable
+fun ChapterRowElectricPreview() = ChapterRowPreview(Theme.ThemeType.ELECTRIC)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Classic")
+@Preview(name = "Classic")
+@Composable
+fun ChapterRowClassicPreview() = ChapterRowPreview(Theme.ThemeType.CLASSIC_LIGHT)
+
+@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Radioactive")
+@Preview(name = "Radioactive")
+@Composable
+fun ChapterRowRadioactivePreview() = ChapterRowPreview(Theme.ThemeType.RADIOACTIVE)
+
+@Composable
+private fun ChapterRowPreview(theme: Theme.ThemeType) {
     val chapter = Chapter(
         title = "Chapter Title",
         startTime = Duration.ZERO,
@@ -202,29 +249,58 @@ fun ChapterRowPreview() {
         imagePath = null,
         index = 1,
     )
-    AppThemeWithBackground(Theme.ThemeType.DARK) {
-        Column {
-            ChapterRow(
-                state = ChaptersViewModel.ChapterState.Played(chapter = chapter),
-                isTogglingChapters = false,
-                onSelectionChange = { _, _ -> },
-                onClick = {},
-                onUrlClick = {},
-            )
-            ChapterRow(
-                state = ChaptersViewModel.ChapterState.Playing(chapter = chapter, progress = 0.5f),
-                isTogglingChapters = false,
-                onSelectionChange = { _, _ -> },
-                onClick = {},
-                onUrlClick = {},
-            )
-            ChapterRow(
-                state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter),
-                isTogglingChapters = false,
-                onSelectionChange = { _, _ -> },
-                onClick = {},
-                onUrlClick = {},
-            )
+    AppThemeWithBackground(theme) {
+        ChaptersTheme {
+            Column {
+                ChapterRow(
+                    state = ChaptersViewModel.ChapterState.Played(chapter = chapter.copy(title = "Played chapter")),
+                    isTogglingChapters = false,
+                    selectedCount = 2,
+                    onSelectionChange = { _, _ -> },
+                    onClick = {},
+                    onUrlClick = {},
+                )
+                ChapterRow(
+                    state = ChaptersViewModel.ChapterState.Playing(chapter = chapter.copy(title = "Playing chapter"), progress = 0.5f),
+                    isTogglingChapters = false,
+                    selectedCount = 2,
+                    onSelectionChange = { _, _ -> },
+                    onClick = {},
+                    onUrlClick = {},
+                )
+                ChapterRow(
+                    state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter.copy(title = "Not played chapter")),
+                    isTogglingChapters = false,
+                    selectedCount = 2,
+                    onSelectionChange = { _, _ -> },
+                    onClick = {},
+                    onUrlClick = {},
+                )
+                ChapterRow(
+                    state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter.copy(title = "Selected chapter")),
+                    isTogglingChapters = true,
+                    selectedCount = 2,
+                    onSelectionChange = { _, _ -> },
+                    onClick = {},
+                    onUrlClick = {},
+                )
+                ChapterRow(
+                    state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter.copy(title = "Deselected chapter", selected = false)),
+                    isTogglingChapters = true,
+                    selectedCount = 2,
+                    onSelectionChange = { _, _ -> },
+                    onClick = {},
+                    onUrlClick = {},
+                )
+                ChapterRow(
+                    state = ChaptersViewModel.ChapterState.NotPlayed(chapter = chapter.copy(title = "Last selected chapter")),
+                    isTogglingChapters = true,
+                    selectedCount = 1,
+                    onSelectionChange = { _, _ -> },
+                    onClick = {},
+                    onUrlClick = {},
+                )
+            }
         }
     }
 }

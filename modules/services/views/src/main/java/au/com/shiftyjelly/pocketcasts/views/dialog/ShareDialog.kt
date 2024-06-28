@@ -9,6 +9,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ShareDialog(
@@ -16,9 +19,10 @@ class ShareDialog(
     private val episode: PodcastEpisode?,
     private val fragmentManager: FragmentManager?,
     private val context: Context?,
-    private val shouldShowPodcast: Boolean = true,
-    private val forceDarkTheme: Boolean = false,
+    private val shouldShowPodcast: Boolean,
+    private val forceDarkTheme: Boolean,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val shareActionProvider: ShareActionProvider,
 ) {
 
     init {
@@ -45,6 +49,7 @@ class ShareDialog(
                         podcast,
                         null,
                         null,
+                        null,
                         context,
                         ShareType.PODCAST,
                         sourceView,
@@ -61,6 +66,7 @@ class ShareDialog(
                         podcast,
                         episode,
                         null,
+                        null,
                         context,
                         ShareType.EPISODE,
                         sourceView,
@@ -74,7 +80,8 @@ class ShareDialog(
                     SharePodcastHelper(
                         podcast,
                         episode,
-                        episode.playedUpTo,
+                        episode.playedUpTo.seconds,
+                        null,
                         context,
                         ShareType.CURRENT_TIME,
                         sourceView,
@@ -82,6 +89,14 @@ class ShareDialog(
                     ).showShareDialogDirect()
                 },
             )
+            if (FeatureFlag.isEnabled(Feature.SHARE_CLIPS)) {
+                dialog.addCheckedOption(
+                    titleId = LR.string.podcast_share_clip,
+                    click = {
+                        shareActionProvider.clipAction(episode, podcast, fragmentManager)
+                    },
+                )
+            }
             if (episode.isDownloaded) {
                 dialog.addCheckedOption(
                     titleId = LR.string.podcast_share_open_file_in,
@@ -89,7 +104,8 @@ class ShareDialog(
                         SharePodcastHelper(
                             podcast,
                             episode,
-                            episode.playedUpTo,
+                            episode.playedUpTo.seconds,
+                            null,
                             context,
                             ShareType.EPISODE_FILE,
                             sourceView,

@@ -1,11 +1,13 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_frame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/widget_background"
-    android:layoutDirection="ltr"
     android:clickable="true"
     android:focusable="true"
+    android:layoutDirection="ltr"
     android:theme="@style/PCWidgetDefaultTheme">
 
     <include layout="@layout/widget" />

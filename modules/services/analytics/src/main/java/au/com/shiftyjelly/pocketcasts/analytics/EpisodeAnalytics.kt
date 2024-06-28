@@ -21,7 +21,7 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.sourceAndUuidMap(source, uuid))
     }
 
-    fun trackEvent(event: AnalyticsEvent, uuid: String) {
+    fun trackEvent(event: AnalyticsEvent, uuid: String, source: SourceView? = null) {
         if (event == AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED || event == AnalyticsEvent.EPISODE_DOWNLOAD_FAILED) {
             if (downloadEpisodeUuidQueue.contains(uuid)) {
                 downloadEpisodeUuidQueue.remove(uuid)
@@ -36,7 +36,11 @@ class EpisodeAnalytics @Inject constructor(
             }
         }
 
-        analyticsTracker.track(event, AnalyticsProp.uuidMap(uuid))
+        if (source != null) {
+            analyticsTracker.track(event, AnalyticsProp.sourceAndUuidMap(source, uuid))
+        } else {
+            analyticsTracker.track(event, AnalyticsProp.uuidMap(uuid))
+        }
     }
 
     fun trackEvent(

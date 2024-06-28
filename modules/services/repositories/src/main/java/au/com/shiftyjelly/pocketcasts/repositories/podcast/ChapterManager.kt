@@ -5,7 +5,16 @@ import kotlinx.coroutines.flow.Flow
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter as Chapter
 
 interface ChapterManager {
-    suspend fun updateChapters(episodeUuid: String, chapters: List<Chapter>)
+    suspend fun updateChapters(
+        episodeUuid: String,
+        chapters: List<Chapter>,
+    )
+
+    suspend fun selectChapter(
+        episodeUuid: String,
+        chapterIndex: Int,
+        select: Boolean,
+    )
 
     fun observerChaptersForEpisode(episodeUuid: String): Flow<Chapters>
 }

@@ -11,12 +11,8 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -26,9 +22,10 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.request.Disposable
-import coil.request.ErrorResult
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -36,7 +33,6 @@ import com.airbnb.lottie.model.KeyPath
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -61,8 +57,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     init {
         // open full screen player on click
-        binding.root.setOnClickListener { openPlayer() }
-        binding.root.setOnLongClickListener {
+        binding.miniPlayerCardView.setOnClickListener { openPlayer() }
+        binding.miniPlayerCardView.setOnLongClickListener {
             clickListener?.onLongClick()
             true
         }
@@ -73,6 +69,40 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.skipForward.setOnClickListener { skipForwardClicked() }
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
+
+        val elevation = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_elevation) else 0f
+        binding.miniPlayerCardView.elevation = elevation
+        val cornerRadius = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_corner_radius) else 0f
+        binding.miniPlayerCardView.radius = cornerRadius
+        val margin = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_margin).toInt() else 0
+        (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
+
+        val playBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.drawable.mini_player_play_background_40
+        } else {
+            R.drawable.mini_player_play_background_48
+        }
+        binding.miniPlayButton.background = ContextCompat.getDrawable(context, playBackground)
+        val playButtonLottieBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.raw.mini_player_play_button_40
+        } else {
+            R.raw.mini_player_play_button_48
+        }
+        binding.miniPlayButton.setAnimation(playButtonLottieBackground)
+
+        val skipButtonSize = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
+            R.dimen.mini_player_skip_button_size_56
+        } else {
+            R.dimen.mini_player_skip_button_size_68
+        }
+        with(binding.skipBack.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
+        with(binding.skipForward.layoutParams) {
+            width = resources.getDimensionPixelSize(skipButtonSize)
+            height = resources.getDimensionPixelSize(skipButtonSize)
+        }
 
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
@@ -85,7 +115,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        updatePlayButton(isPlaying = playing, animate = false)
+        if (changed) {
+            updatePlayButton(isPlaying = playing, animate = false)
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -137,9 +169,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
     }
 
-    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme, useRssArtwork: Boolean) {
+    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme, useEpisodeArtwork: Boolean) {
         if (upNextState is UpNextQueue.State.Loaded) {
-            loadArtwork(upNextState.podcast, upNextState.episode, useRssArtwork)
+            loadEpisodeArtwork(upNextState.episode, useEpisodeArtwork, binding.artwork)
 
             val podcast = upNextState.podcast
             if (podcast != null) {
@@ -217,76 +249,21 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         button.contentDescription = if (isPlaying) stringPause else stringPlay
     }
 
-    private fun loadArtwork(podcast: Podcast?, episode: BaseEpisode, useRssArtwork: Boolean) {
-        val imageView = binding.artwork
-        imageView.clipToOutline = true
+    private var lastLoadedBaseEpisodeId: String? = null
+    private var lastUseEpisodeArtwork: Boolean? = null
 
-        val artwork = getEpisodeArtwork(episode, useRssArtwork)
-        if (artwork == Artwork.None && podcast?.uuid != null) {
-            loadPodcastArtwork(podcast)
-        } else {
-            loadEpisodeArtwork(artwork, imageView)?.let { disposable ->
-                launch {
-                    // If episode artwork fails to load, then load podcast artwork
-                    val result = disposable.job.await()
-                    if (result is ErrorResult && podcast?.uuid != null) {
-                        loadPodcastArtwork(podcast)
-                    }
-                }
-            }
-        }
-    }
-
-    private var loadedPodcastUuid: String? = null
-    private fun loadPodcastArtwork(
-        podcast: Podcast,
-    ) {
-        if (loadedPodcastUuid == podcast.uuid) return
-        val imageView = binding.artwork
-        imageRequestFactory.create(podcast).loadInto(imageView)
-        loadedPodcastUuid = podcast.uuid
-        loadedEpisodeArtwork = null
-    }
-
-    private var loadedEpisodeArtwork: Artwork? = null
     private fun loadEpisodeArtwork(
-        artwork: Artwork,
+        baseEpisode: BaseEpisode,
+        useEpisodeArtwork: Boolean,
         imageView: ImageView,
     ): Disposable? {
-        if (artwork is Artwork.None || loadedEpisodeArtwork == artwork) return null
-        imageView.imageTintList = null
-        loadedEpisodeArtwork = artwork
-        loadedPodcastUuid = null
-
-        return when (artwork) {
-            is Artwork.Path -> imageRequestFactory.createForFileOrUrl(artwork.path).loadInto(imageView)
-            is Artwork.Url -> imageRequestFactory.createForFileOrUrl(artwork.url).loadInto(imageView)
-            else -> null
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
+            return null
         }
-    }
 
-    companion object {
-        private fun getEpisodeArtwork(episode: BaseEpisode, useRssArtwork: Boolean): Artwork {
-            val showNotesImageUrl = (episode as? PodcastEpisode)?.imageUrl
-            return if (showNotesImageUrl != null && useRssArtwork) {
-                Artwork.Url(showNotesImageUrl)
-            } else if (episode is UserEpisode) {
-                val artworkUrl = episode.getUrlForArtwork(themeIsDark = true)
-                if (artworkUrl.startsWith("/")) {
-                    Artwork.Path(artworkUrl)
-                } else {
-                    Artwork.Url(artworkUrl)
-                }
-            } else {
-                Artwork.None
-            }
-        }
-    }
-
-    sealed class Artwork {
-        data class Url(val url: String) : Artwork()
-        data class Path(val path: String) : Artwork()
-        object None : Artwork()
+        lastLoadedBaseEpisodeId = baseEpisode.uuid
+        lastUseEpisodeArtwork = useEpisodeArtwork
+        return imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }
 
     interface OnMiniPlayerClicked {

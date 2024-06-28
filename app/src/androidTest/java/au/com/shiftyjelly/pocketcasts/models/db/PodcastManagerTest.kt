@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
 import java.util.UUID
@@ -83,6 +84,7 @@ class PodcastManagerTest {
             syncManager = syncManagerSignedOut,
             appDatabase = appDatabase,
             applicationScope = CoroutineScope(Dispatchers.Default),
+            crashLogging = FakeCrashLogging(),
         )
         podcastManagerSignedIn = PodcastManagerImpl(
             episodeManager = episodeManager,
@@ -95,6 +97,7 @@ class PodcastManagerTest {
             syncManager = syncManagerSignedIn,
             applicationScope = CoroutineScope(Dispatchers.Default),
             appDatabase = appDatabase,
+            crashLogging = FakeCrashLogging(),
         )
     }
 

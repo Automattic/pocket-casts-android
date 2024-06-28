@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -22,10 +24,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBinding
@@ -104,6 +108,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,
             ),
+            artworkContext = Element.Files,
         )
     }
 
@@ -122,8 +127,8 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private val onRowClick = { episode: BaseEpisode ->
-        analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_SHOWN)
-        CloudFileBottomSheetFragment.newInstance(episode.uuid)
+        CloudFileBottomSheetFragment
+            .newInstance(episode.uuid, source = EpisodeViewSource.FILES)
             .show(parentFragmentManager, "cloud_bottom_sheet")
     }
 
@@ -141,7 +146,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onResume() {
         super.onResume()
-        settings.trackingAutoPlaySource.set(AutoPlaySource.Files, needsSync = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.Files, updateModifiedAt = false)
     }
 
     override fun onPause() {
@@ -199,6 +204,17 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         binding?.layoutUsage?.isVisible = false
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect { bottomInset ->
+                    binding?.recyclerView?.updatePadding(bottom = bottomInset)
+                    binding?.fab?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        bottomMargin = bottomInset + resources.getDimensionPixelSize(R.dimen.files_fab_margin_bottom)
+                    }
+                }
+            }
+        }
 
         viewModel.accountUsage.observe(
             viewLifecycleOwner,

@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlin.time.Duration
@@ -82,19 +81,18 @@ data class Chapters(
         return getChapterIndex(time) == items.size - 1
     }
 
-    fun updateChaptersTimes(episodeDuration: Duration) = copy(
-        items = items.mapIndexed { index, chapter ->
-            when (index) {
-                0 -> chapter.copy(startTime = Duration.ZERO)
-                items.lastIndex -> chapter.copy(endTime = episodeDuration)
-                else -> chapter
-            }
-        },
-    )
-
-    fun updateDeselectedState(currentEpisode: BaseEpisode?) = copy(
-        items = items.map { chapter ->
-            chapter.copy(selected = currentEpisode?.deselectedChapters?.contains(chapter.index) == false)
-        },
-    )
+    fun toDbChapters(
+        episodeId: String,
+        isEmbedded: Boolean,
+    ) = items.map { chapter ->
+        DbChapter(
+            episodeUuid = episodeId,
+            startTimeMs = chapter.startTime.inWholeMilliseconds,
+            endTimeMs = chapter.endTime.inWholeMilliseconds,
+            title = chapter.title,
+            imageUrl = chapter.imagePath,
+            url = chapter.url?.toString(),
+            isEmbedded = isEmbedded,
+        )
+    }
 }

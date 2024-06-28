@@ -2,7 +2,8 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
 import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,16 +18,16 @@ abstract class UserSetting<T>(
 
     private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
 
-    val modifiedAt get(): Instant = runCatching {
+    val modifiedAt get(): Instant? = runCatching {
         Instant.parse(getModifiedAtServerString())
-    }.getOrDefault(Instant.EPOCH)
+    }.getOrNull()
 
     /**
      * Returns the value to sync. If sync is not needed or the modification timestamp is unknown
-     * it provides [Instant.EPOCH] as the modification timestamp.
+     * it provides [Instant.EPOCH] plus one millisecond as the modification timestamp.
      */
     fun <U> getSyncSetting(f: (T, Instant) -> U): U {
-        return f(value, modifiedAt)
+        return f(value, modifiedAt ?: DefaultFallbackTimestamp)
     }
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
@@ -53,34 +54,26 @@ abstract class UserSetting<T>(
 
     open fun set(
         value: T,
-        needsSync: Boolean,
+        updateModifiedAt: Boolean,
         commit: Boolean = false,
         clock: Clock = Clock.systemUTC(),
     ) {
         persist(value, commit)
         _flow.value = get()
-        val modifiedAt = if (needsSync) Instant.now(clock).toString() else null
+        val modifiedAt = if (updateModifiedAt) Instant.now(clock) else null
         updateModifiedAtServerString(modifiedAt)
     }
 
-    // A null parameter reflects a setting that does not need to be synced
-    private fun updateModifiedAtServerString(modifiedAt: String?) {
+    private fun updateModifiedAtServerString(modifiedAt: Instant?) {
         if (modifiedAt != null) {
-            val parsable = runCatching { Instant.parse(modifiedAt) }.isSuccess
-            if (!parsable) {
-                // Only persist the string if it is parsable
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Cannot set invalid modified at server string: $modifiedAt")
-                return
+            sharedPrefs.edit().run {
+                putString(modifiedAtKey, modifiedAt.toString())
+                apply()
             }
-        }
-
-        sharedPrefs.edit().run {
-            putString(modifiedAtKey, modifiedAt)
-            apply()
         }
     }
 
-    class BoolPref(
+    open class BoolPref(
         sharedPrefKey: String,
         private val defaultValue: Boolean,
         sharedPrefs: SharedPreferences,
@@ -281,6 +274,20 @@ abstract class UserSetting<T>(
         },
     )
 
+    // This returns shared pref value only if CACHE_ENTIRE_PLAYING_EPISODE feature flag is enabled, otherwise returns always false
+    class CacheEntirePlayingEpisodePref(
+        sharedPrefKey: String,
+        private val defaultValue: Boolean,
+        sharedPrefs: SharedPreferences,
+    ) : BoolPref(sharedPrefKey, defaultValue, sharedPrefs) {
+
+        override fun get() = if (FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)) {
+            sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
+        } else {
+            false
+        }
+    }
+
     // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
     // from a mocked Settings class
     class Mock<T>(
@@ -292,6 +299,13 @@ abstract class UserSetting<T>(
     ) {
         override fun get(): T = initialValue
         override fun persist(value: T, commit: Boolean) = Unit
-        override fun set(value: T, needsSync: Boolean, commit: Boolean, clock: Clock) = Unit
+        override fun set(value: T, updateModifiedAt: Boolean, commit: Boolean, clock: Clock) = Unit
+    }
+
+    companion object {
+        // We use EPOCH +1 second as a default timestamp for updates because initial values of when app is installed are null.
+        // This means that if a user syncs settings that were set before we started tracking timestamps
+        // they would not update on a new device because we update settings only if the local timestamp is before remote timestamp.
+        val DefaultFallbackTimestamp: Instant = Instant.EPOCH.plusSeconds(1)
     }
 }

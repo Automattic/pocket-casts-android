@@ -1,14 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -31,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
@@ -39,7 +43,6 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.sentry.Sentry
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
@@ -47,6 +50,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -62,6 +67,7 @@ class PodcastManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase,
+    private val crashLogging: CrashLogging,
 ) : PodcastManager, CoroutineScope {
 
     companion object {
@@ -183,6 +189,15 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun exists(podcastUuid: String): Boolean {
         return podcastDao.exists(podcastUuid)
+    }
+
+    override fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int> {
+        return flow {
+            val episode = episodeDao.findByUuid(uuid)
+            if (episode != null) {
+                emitAll(podcastDao.episodeCount(episode.podcastUuid))
+            }
+        }
     }
 
     override fun refreshPodcastsIfRequired(fromLog: String) {
@@ -329,7 +344,7 @@ class PodcastManagerImpl @Inject constructor(
                 }
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Error refreshing podcast ${existingPodcast.uuid} in background")
-                Sentry.captureException(e)
+                crashLogging.sendReport(e)
             }
         }
     }
@@ -412,6 +427,15 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun observePodcastByUuidFlow(uuid: String): Flow<Podcast> {
         return podcastDao.observeByUuidFlow(uuid)
+    }
+
+    override fun observePodcastByEpisodeUuid(uuid: String): Flow<Podcast> {
+        return flow {
+            val episode = episodeDao.findByUuid(uuid)
+            if (episode != null) {
+                emitAll(podcastDao.observeByUuidFlow(episode.podcastUuid))
+            }
+        }
     }
 
     override fun findByUuids(uuids: Collection<String>): List<Podcast> {
@@ -584,6 +608,10 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.insert(podcast)
     }
 
+    override suspend fun replaceTrendingPodcasts(podcasts: List<TrendingPodcast>) {
+        podcastDao.replaceAllTrendingPodcasts(podcasts)
+    }
+
     override fun updatePodcast(podcast: Podcast) {
         podcastDao.update(podcast)
     }
@@ -594,7 +622,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun updateAllShowNotifications(showNotifications: Boolean) {
         if (showNotifications) {
-            settings.notifyRefreshPodcast.set(true, needsSync = true)
+            settings.notifyRefreshPodcast.set(true, updateModifiedAt = true)
         }
         podcastDao.updateAllShowNotifications(showNotifications)
     }
@@ -656,7 +684,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun updateShowNotifications(podcast: Podcast, show: Boolean) {
         if (show) {
-            settings.notifyRefreshPodcast.set(true, needsSync = true)
+            settings.notifyRefreshPodcast.set(true, updateModifiedAt = true)
         }
         podcastDao.updateShowNotifications(show, podcast.uuid)
     }
@@ -739,7 +767,7 @@ class PodcastManagerImpl @Inject constructor(
                 continue
             }
 
-            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "podcast auto download " + episode.podcastUuid, downloadManager, episodeManager)
+            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "podcast auto download " + episode.podcastUuid, downloadManager, episodeManager, source = SourceView.UNKNOWN)
             uuidToAdded[episodeUuid] = java.lang.Boolean.TRUE
         }
     }
@@ -802,7 +830,7 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateArchiveAfterInactive(uuid, value)
     }
 
-    override suspend fun updateArchiveEpisodeLimit(uuid: String, value: Int?) {
+    override suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit) {
         podcastDao.updateArchiveEpisodeLimit(uuid, value)
     }
 }

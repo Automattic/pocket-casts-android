@@ -5,11 +5,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -40,8 +43,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import io.sentry.Sentry
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -54,35 +55,58 @@ fun DeveloperPage(
     onDeleteFirstEpisodeClick: () -> Unit,
     onTriggerUpdateEpisodeDetails: () -> Unit,
     onTriggerResetEoYModalProfileBadge: () -> Unit,
+    bottomInset: Dp,
+    onSendCrash: (String) -> Unit,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
     var crashMessage by remember { mutableStateOf("Test crash") }
 
-    Column(modifier = modifier) {
-        ThemedTopAppBar(
-            title = stringResource(LR.string.settings_developer),
-            onNavigationClick = onBackClick,
-        )
-        ShowkaseSetting(onClick = onShowkaseClick)
-        ForceRefreshSetting(onClick = onForceRefreshClick)
-        SendCrashSetting(
-            crashMessage = crashMessage,
-            onLongClick = { openCrashMessageDialog = true },
-        )
-        TriggerNotificationSetting(onClick = onTriggerNotificationClick)
-        DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
-        TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
-        EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(bottom = bottomInset),
+    ) {
+        item {
+            ThemedTopAppBar(
+                title = stringResource(LR.string.settings_developer),
+                onNavigationClick = onBackClick,
+            )
+        }
+        item {
+            ShowkaseSetting(onClick = onShowkaseClick)
+        }
+        item {
+            ForceRefreshSetting(onClick = onForceRefreshClick)
+        }
+        item {
+            SendCrashSetting(
+                onClick = { onSendCrash(crashMessage) },
+                onLongClick = { openCrashMessageDialog = true },
+            )
+        }
+        item {
+            TriggerNotificationSetting(onClick = onTriggerNotificationClick)
+        }
+        item {
+            DeleteFirstEpisodeSetting(onClick = onDeleteFirstEpisodeClick)
+        }
+        item {
+            TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
+        }
+        item {
+            EndOfYear(onClick = onTriggerResetEoYModalProfileBadge)
+        }
 
         if (openCrashMessageDialog) {
-            CrashMessageDialog(
-                initialMessage = crashMessage,
-                onDismiss = { openCrashMessageDialog = false },
-                onConfirm = { message ->
-                    openCrashMessageDialog = false
-                    crashMessage = message
-                },
-            )
+            item {
+                CrashMessageDialog(
+                    initialMessage = crashMessage,
+                    onDismiss = { openCrashMessageDialog = false },
+                    onConfirm = { message ->
+                        openCrashMessageDialog = false
+                        crashMessage = message
+                    },
+                )
+            }
         }
     }
 }
@@ -116,8 +140,8 @@ private fun ForceRefreshSetting(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun SendCrashSetting(
-    crashMessage: String,
     onLongClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingRow(
@@ -125,10 +149,7 @@ private fun SendCrashSetting(
         secondaryText = "Send an exception to Sentry",
         icon = rememberVectorPainter(Icons.Outlined.BugReport),
         modifier = modifier.combinedClickable(
-            onClick = {
-                Sentry.captureException(Exception(crashMessage))
-                Timber.d("Test crash message: \"$crashMessage\"")
-            },
+            onClick = onClick,
             onLongClick = onLongClick,
         ),
     )
@@ -267,6 +288,8 @@ private fun DeveloperPagePreview() {
         onDeleteFirstEpisodeClick = {},
         onTriggerUpdateEpisodeDetails = {},
         onTriggerResetEoYModalProfileBadge = {},
+        bottomInset = 0.dp,
+        onSendCrash = {},
     )
 }
 

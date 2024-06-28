@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -168,7 +169,7 @@ class UpNextQueueImpl @Inject constructor(
         if (queueEpisodes.isEmpty()) {
             // when the upNextQueue is empty, save the source for auto playing the next episode
             automaticUpNextSource?.let {
-                settings.lastAutoPlaySource.set(value = it, needsSync = true)
+                settings.lastAutoPlaySource.set(value = it, updateModifiedAt = true)
             }
             saveChanges(UpNextAction.ClearAll)
         }
@@ -312,14 +313,14 @@ class UpNextQueueImpl @Inject constructor(
         // clear last loaded uuid if anything gets added to the up next queue
         val hasQueuedItems = currentEpisode != null
         if (hasQueuedItems) {
-            settings.trackingAutoPlaySource.set(AutoPlaySource.None, needsSync = false)
-            settings.lastAutoPlaySource.set(AutoPlaySource.None, needsSync = true)
+            settings.trackingAutoPlaySource.set(AutoPlaySource.None, updateModifiedAt = false)
+            settings.lastAutoPlaySource.set(AutoPlaySource.None, updateModifiedAt = true)
         }
     }
 
     private fun downloadIfPossible(episode: BaseEpisode, downloadManager: DownloadManager) {
         if (settings.autoDownloadUpNext.value) {
-            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "up next auto download", downloadManager, episodeManager)
+            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "up next auto download", downloadManager, episodeManager, source = SourceView.UP_NEXT)
         }
     }
 

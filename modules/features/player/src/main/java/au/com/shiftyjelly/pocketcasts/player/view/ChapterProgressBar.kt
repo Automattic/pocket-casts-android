@@ -37,7 +37,7 @@ class ChapterProgressBar @JvmOverloads constructor(
             backgroundPaint.color = when {
                 field.darkTheme -> ThemeColor.playerContrast06(field)
                 field == Theme.ThemeType.LIGHT_CONTRAST -> ThemeColor.primaryUi05(field)
-                else -> ThemeColor.primaryUi02(field)
+                else -> ThemeColor.primaryUi04(field)
             }
             progressPaint.color = when {
                 field == Theme.ThemeType.ROSE -> ThemeColor.primaryIcon02Selected(field).colorIntWithAlpha(25)
