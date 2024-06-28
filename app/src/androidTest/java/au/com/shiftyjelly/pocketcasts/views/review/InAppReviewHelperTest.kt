@@ -27,9 +27,6 @@ class InAppReviewHelperTest {
     @Mock
     private lateinit var settings: Settings
 
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
-
     private lateinit var inAppReviewHelper: InAppReviewHelper
 
     private lateinit var reviewManager: ReviewManager
@@ -65,7 +62,7 @@ class InAppReviewHelperTest {
     private fun initInAppReviewHelper() {
         inAppReviewHelper = InAppReviewHelper(
             settings = settings,
-            analyticsTracker = analyticsTracker,
+            analyticsTracker = AnalyticsTracker.test(),
             reviewManager = reviewManager,
             crashLogging = FakeCrashLogging(),
         )
