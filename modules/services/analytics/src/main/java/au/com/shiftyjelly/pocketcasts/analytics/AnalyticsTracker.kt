@@ -10,11 +10,17 @@ open class AnalyticsTracker constructor(
         }
     }
 
-    fun refreshMetadata() = trackers.forEach(Tracker::refreshMetadata)
+    fun refreshMetadata() {
+        trackers.forEach(Tracker::refreshMetadata)
+    }
 
-    fun flush() = trackers.forEach(Tracker::flush)
+    fun flush() {
+        trackers.forEach(Tracker::flush)
+    }
 
-    fun clearAllData() = trackers.forEach(Tracker::clearAllData)
+    fun clearAllData() {
+        trackers.forEach(Tracker::clearAllData)
+    }
 
     companion object {
         fun test(vararg trackers: Tracker, isEnabled: Boolean = false) = AnalyticsTracker(trackers.toList(), { isEnabled })
