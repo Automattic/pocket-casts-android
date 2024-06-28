@@ -20,12 +20,14 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -38,7 +40,11 @@ class ShareClipFragment : BaseDialogFragment() {
     private val viewModel by viewModels<ShareClipViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShareClipViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid, clipPlayerFactory.create(requireActivity().applicationContext))
+                factory.create(
+                    args.episodeUuid,
+                    args.clipRange,
+                    clipPlayerFactory.create(requireActivity().applicationContext),
+                )
             }
         },
     )
@@ -77,7 +83,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 },
                 onClipStartUpdate = viewModel::updateClipStart,
                 onClipEndUpdate = viewModel::updateClipEnd,
-                onClose = { dismiss() },
+                onClose = ::dismiss,
             )
         }
     }
@@ -114,6 +120,7 @@ class ShareClipFragment : BaseDialogFragment() {
     @Parcelize
     private class Args(
         val episodeUuid: String,
+        val clipRange: Clip.Range,
         @TypeParceler<Color, ColorParceler>() val baseColor: Color,
     ) : Parcelable
 
@@ -121,10 +128,16 @@ class ShareClipFragment : BaseDialogFragment() {
         private const val NEW_INSTANCE_ARG = "ShareClipFragmentArgs"
 
         fun newInstance(
-            episodeUuid: String,
+            episode: PodcastEpisode,
             @ColorInt baseColor: Int,
         ) = ShareClipFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARG to Args(episodeUuid, Color(baseColor)))
+            arguments = bundleOf(
+                NEW_INSTANCE_ARG to Args(
+                    episodeUuid = episode.uuid,
+                    clipRange = Clip.Range.fromPosition(episode.playedUpTo.seconds, episode.duration.seconds),
+                    baseColor = Color(baseColor),
+                ),
+            )
         }
     }
 }

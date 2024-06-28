@@ -50,6 +50,7 @@ class ShareClipViewModelTest {
 
         viewModel = ShareClipViewModel(
             "episode-id",
+            Clip.Range(15.seconds, 30.seconds),
             clipPlayer,
             episodeManager,
             podcastManager,

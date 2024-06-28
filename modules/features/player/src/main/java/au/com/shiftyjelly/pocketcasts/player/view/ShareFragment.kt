@@ -112,7 +112,7 @@ class ShareFragment : BaseDialogFragment() {
         binding.buttonShareClip.setOnClickListener {
             if (podcast != null && episode is PodcastEpisode) {
                 ShareClipFragment
-                    .newInstance(episode.uuid, podcast.backgroundColor)
+                    .newInstance(episode, podcast.backgroundColor)
                     .show(parentFragmentManager, "share_clip")
             }
             close()

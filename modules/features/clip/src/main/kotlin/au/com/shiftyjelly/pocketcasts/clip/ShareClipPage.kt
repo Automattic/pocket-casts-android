@@ -57,7 +57,9 @@ internal fun ShareClipPage(
     onClipEndUpdate: (Duration) -> Unit,
     onClose: () -> Unit,
 ) {
-    val state = rememberClipSelectorState()
+    val state = rememberClipSelectorState(
+        firstVisibleItemIndex = (clipRange.start.inWholeSeconds.toInt() - 10).coerceAtLeast(0),
+    )
     when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
             episode = episode,

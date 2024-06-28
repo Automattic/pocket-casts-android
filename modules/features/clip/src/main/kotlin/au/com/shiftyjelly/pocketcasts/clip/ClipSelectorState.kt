@@ -18,16 +18,31 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-internal fun rememberClipSelectorState() = rememberSaveable(saver = ClipSelectorState.Saver, init = ::ClipSelectorState)
+internal fun rememberClipSelectorState(
+    firstVisibleItemIndex: Int,
+) = rememberSaveable(
+    saver = ClipSelectorState.Saver,
+    init = {
+        ClipSelectorState(
+            firstVisibleItemIndex = firstVisibleItemIndex,
+            firstVisibleItemScrollOffset = 0,
+            scale = 1f,
+            secondsPerTick = 1,
+            itemWidth = 0f,
+            startOffset = 0f,
+            endOffset = 0f,
+        )
+    },
+)
 
 internal class ClipSelectorState(
-    firstVisibleItemIndex: Int = 0,
-    firstVisibleItemScrollOffset: Int = 0,
-    scale: Float = 1f,
-    secondsPerTick: Int = 1,
-    itemWidth: Float = 0f,
-    startOffset: Float = 0f,
-    endOffset: Float = 0f,
+    firstVisibleItemIndex: Int,
+    firstVisibleItemScrollOffset: Int,
+    scale: Float,
+    secondsPerTick: Int,
+    itemWidth: Float,
+    startOffset: Float,
+    endOffset: Float,
 ) {
     val listState = LazyListState(firstVisibleItemIndex, firstVisibleItemScrollOffset)
     val scrollOffset: Float

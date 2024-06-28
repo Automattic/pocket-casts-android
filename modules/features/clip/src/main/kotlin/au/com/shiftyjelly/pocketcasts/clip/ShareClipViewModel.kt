@@ -22,12 +22,13 @@ import kotlinx.coroutines.flow.stateIn
 @HiltViewModel(assistedFactory = ShareClipViewModel.Factory::class)
 class ShareClipViewModel @AssistedInject constructor(
     @Assisted private val episodeUuid: String,
+    @Assisted initialClipRange: Clip.Range,
     @Assisted private val clipPlayer: ClipPlayer,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
 ) : ViewModel() {
-    private val clipRange = MutableStateFlow(Clip.Range(15.seconds, 30.seconds))
+    private val clipRange = MutableStateFlow(initialClipRange)
 
     val uiState = combine(
         episodeManager.observeByUuid(episodeUuid),
@@ -46,7 +47,7 @@ class ShareClipViewModel @AssistedInject constructor(
                 isPlaying = isPlaying,
             )
         },
-    ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = UiState())
+    ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = UiState(clipRange = initialClipRange))
 
     fun playClip() {
         uiState.value.clip?.let(clipPlayer::play)
@@ -83,6 +84,7 @@ class ShareClipViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             episodeUuid: String,
+            initialClipRange: Clip.Range,
             clipPlayer: ClipPlayer,
         ): ShareClipViewModel
     }
