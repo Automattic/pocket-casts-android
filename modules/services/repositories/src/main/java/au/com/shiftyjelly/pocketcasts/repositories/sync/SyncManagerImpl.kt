@@ -112,11 +112,7 @@ class SyncManagerImpl @Inject constructor(
         syncAccountManager.setAccessToken(response.accessToken)
     }
 
-    override fun getUuid(): String? =
-        syncAccountManager.getUuid()
-
-    override fun isLoggedIn(): Boolean =
-        syncAccountManager.isLoggedIn()
+    override fun isLoggedIn(): Boolean = syncAccountManager.isLoggedIn()
 
     override fun isGoogleLogin(): Boolean =
         getLoginIdentity() == LoginIdentity.Google

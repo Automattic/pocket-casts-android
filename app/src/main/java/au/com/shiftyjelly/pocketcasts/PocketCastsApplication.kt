@@ -5,10 +5,8 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker2
-import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -99,9 +97,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var userManager: UserManager
 
-    @Inject lateinit var tracksTracker: TracksAnalyticsTracker
-
-    @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var syncManager: SyncManager
 
@@ -153,9 +149,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     private fun setupAnalytics() {
-        AnalyticsTracker2.register(tracksTracker, bumpStatsTracker)
-        AnalyticsTracker2.init(settings)
-        AnalyticsTracker2.refreshMetadata()
+        analyticsTracker.clearAllData()
+        analyticsTracker.refreshMetadata()
         downloadStatisticsReporter.setup()
     }
 

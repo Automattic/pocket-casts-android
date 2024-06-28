@@ -1,28 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import javax.inject.Inject
-
-open class AnalyticsTracker @Inject constructor() {
-
-    open fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        AnalyticsTracker2.track(event, properties)
+class AnalyticsTracker(
+    val trackers: List<Tracker>,
+    val isTrackingEnabled: () -> Boolean,
+) {
+    fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
+        if (isTrackingEnabled()) {
+            trackers.forEach { it.track(event, properties) }
+        }
     }
 
-    fun refreshMetadata() {
-        AnalyticsTracker2.refreshMetadata()
-    }
+    fun refreshMetadata() = trackers.forEach(Tracker::refreshMetadata)
 
-    fun flush() {
-        AnalyticsTracker2.flush()
-    }
+    fun flush() = trackers.forEach(Tracker::flush)
 
-    fun clearAllData() {
-        AnalyticsTracker2.clearAllData()
-    }
-
-    fun setSendUsageStats(send: Boolean) {
-        AnalyticsTracker2.setSendUsageStats(send)
-    }
-
-    fun getSendUsageStats() = AnalyticsTracker2.getSendUsageStats()
+    fun clearAllData() = trackers.forEach(Tracker::clearAllData)
 }
