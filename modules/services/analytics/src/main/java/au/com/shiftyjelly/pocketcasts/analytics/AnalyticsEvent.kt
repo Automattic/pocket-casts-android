@@ -624,4 +624,10 @@ enum class AnalyticsEvent(val key: String) {
     /* Widgets */
     WIDGET_INSTALLED("widget_installed"),
     WIDGET_UNINSTALLED("widget_uninstalled"),
+
+    /* Clips */
+    CLIP_SCREEN_SHOWN("clip_screen_shown"),
+    CLIP_SCREEN_PLAY_TAPPED("clip_screen_play_tapped"),
+    CLIP_SCREEN_PAUSE_TAPPED("clip_screen_pause_tapped"),
+    CLIP_SCREEN_LINK_SHARED("clip_screen_link_shared"),
 }
