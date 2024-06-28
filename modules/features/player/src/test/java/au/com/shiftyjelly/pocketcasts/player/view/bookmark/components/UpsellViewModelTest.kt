@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -14,7 +14,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -34,7 +33,7 @@ class UpsellViewModelTest {
             .thenReturn(flowOf(FreeTrial(subscriptionTier = Subscription.SubscriptionTier.PLUS)))
 
         upsellViewModel = UpsellViewModel(
-            analyticsTracker = mock<AnalyticsTrackerWrapper>(),
+            analyticsTracker = AnalyticsTracker.test(),
             subscriptionManager = subscriptionManager,
         )
 

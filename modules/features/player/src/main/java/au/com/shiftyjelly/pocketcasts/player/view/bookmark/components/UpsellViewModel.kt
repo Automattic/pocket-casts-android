@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark.components
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.FreeTrial
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UpsellViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val subscriptionManager: SubscriptionManager,
 ) : ViewModel() {
 

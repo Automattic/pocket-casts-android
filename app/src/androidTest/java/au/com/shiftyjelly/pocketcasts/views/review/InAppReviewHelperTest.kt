@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.review
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
@@ -26,9 +26,6 @@ class InAppReviewHelperTest {
 
     @Mock
     private lateinit var settings: Settings
-
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var inAppReviewHelper: InAppReviewHelper
 
@@ -65,7 +62,7 @@ class InAppReviewHelperTest {
     private fun initInAppReviewHelper() {
         inAppReviewHelper = InAppReviewHelper(
             settings = settings,
-            analyticsTracker = analyticsTracker,
+            analyticsTracker = AnalyticsTracker.test(),
             reviewManager = reviewManager,
             crashLogging = FakeCrashLogging(),
         )

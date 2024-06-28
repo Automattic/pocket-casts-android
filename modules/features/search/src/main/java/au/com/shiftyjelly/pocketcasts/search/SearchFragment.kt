@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -49,7 +49,7 @@ private const val SEARCH_RESULTS_TAG = "search_results"
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var settings: Settings
 

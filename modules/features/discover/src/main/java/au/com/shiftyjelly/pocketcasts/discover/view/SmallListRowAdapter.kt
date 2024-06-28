@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
@@ -35,7 +35,7 @@ private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
 internal class SmallListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
-    val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<List<Any>, SmallListRowAdapter.SmallListViewHolder>(SmallListDiffer) {
     class SmallListViewHolder(val binding: ItemSmallListBinding) : RecyclerView.ViewHolder(binding.root) {
 

@@ -19,7 +19,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -59,7 +58,7 @@ class OpmlImportTask @AssistedInject constructor(
     var podcastManager: PodcastManager,
     var refreshServerManager: RefreshServerManager,
     var notificationHelper: NotificationHelper,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : CoroutineWorker(context, parameters) {
 
     companion object {
@@ -77,7 +76,6 @@ class OpmlImportTask @AssistedInject constructor(
         }
 
         private fun run(data: Data, context: Context) {
-            AnalyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -155,6 +153,7 @@ class OpmlImportTask @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
+            analyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
             val url = inputData.getString(INPUT_URL)
             if (!url.isNullOrBlank()) {
                 val numberProcessed = processUrl(URL(url))

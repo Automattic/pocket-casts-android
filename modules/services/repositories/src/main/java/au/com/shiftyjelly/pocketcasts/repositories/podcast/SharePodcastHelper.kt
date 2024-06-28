@@ -9,7 +9,7 @@ import android.os.Build
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -37,7 +37,7 @@ data class SharePodcastHelper(
     val context: Context,
     private val shareType: ShareType,
     private val source: SourceView,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) {
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()
 
@@ -45,7 +45,7 @@ data class SharePodcastHelper(
         val host = Settings.SERVER_SHORT_URL
         var url = ""
         episode?.let {
-            val timeMarker = listOfNotNull(start, end).takeIf { it.isNotEmpty() }?.joinToString(prefix = "?t=", separator = ",") { it.inWholeSeconds.toString() }
+            val timeMarker = listOfNotNull(start, end).takeIf { it.isNotEmpty() }?.joinToString(prefix = "?t=", separator = ",") { it.inWholeSeconds.toString() }.orEmpty()
             url = "$host/episode/${it.uuid}$timeMarker"
         } ?: run {
             url = "$host/podcast/${podcast.uuid}"

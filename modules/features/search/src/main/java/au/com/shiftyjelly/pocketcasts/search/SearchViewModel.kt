@@ -5,7 +5,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
@@ -29,7 +29,7 @@ class SearchViewModel @Inject constructor(
     private val searchHandler: SearchHandler,
     private val searchHistoryManager: SearchHistoryManager,
     private val podcastManager: PodcastManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true

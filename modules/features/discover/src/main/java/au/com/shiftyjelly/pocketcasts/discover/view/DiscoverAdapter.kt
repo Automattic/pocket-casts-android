@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_AD_CATEG
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_CLOSED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
@@ -116,7 +116,7 @@ internal class DiscoverAdapter(
     loadPodcastList: (source: String, categoryId: String) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>, categoryId: String) -> Flowable<List<CarouselSponsoredPodcast>>,
     val loadCategories: (String) -> Flowable<List<CategoryPill>>,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
         fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?, isFeatured: Boolean = false)

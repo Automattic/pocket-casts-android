@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
@@ -30,7 +30,7 @@ internal class LargeListRowAdapter(
     context: Context,
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit),
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
     private var fromListId: String? = null
 

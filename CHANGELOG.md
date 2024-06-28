@@ -14,6 +14,8 @@
         ([#2357](https://github.com/Automattic/pocket-casts-android/pull/2357))
     *   Adds download episode action button to shelf list in Now Playing
         ([#2325](https://github.com/Automattic/pocket-casts-android/pull/2325))
+    *    Updates carousel title size
+         ([#2401](https://github.com/Automattic/pocket-casts-android/pull/2401))
 
 7.66
 -----

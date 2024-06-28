@@ -9,7 +9,7 @@ import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -28,7 +28,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHelperAdapter {
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var multiSelectEpisodesHelper: MultiSelectEpisodesHelper
     private val source: String

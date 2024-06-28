@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -79,7 +79,7 @@ class MainActivityViewModelTest {
     lateinit var bookmark: Bookmark
 
     @Mock
-    lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    lateinit var analyticsTracker: AnalyticsTracker
 
     private lateinit var viewModel: MainActivityViewModel
 

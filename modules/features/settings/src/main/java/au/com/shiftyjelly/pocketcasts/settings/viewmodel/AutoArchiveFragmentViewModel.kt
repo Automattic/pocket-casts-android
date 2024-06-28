@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class AutoArchiveFragmentViewModel @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow(initState())

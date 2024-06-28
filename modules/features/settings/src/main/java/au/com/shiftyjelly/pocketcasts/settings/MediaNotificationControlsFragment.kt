@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -64,7 +64,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     lateinit var settings: Settings
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    lateinit var analyticsTracker: AnalyticsTracker
 
     private lateinit var itemTouchHelper: ItemTouchHelper
     private val adapter = MediaActionAdapter(dragListener = this::onMediaActionItemStartDrag)

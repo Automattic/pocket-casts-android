@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.Loading
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.NoSubscriptions
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -36,7 +36,7 @@ import timber.log.Timber
 @HiltViewModel
 class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val settings: Settings,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {

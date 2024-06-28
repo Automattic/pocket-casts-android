@@ -14,7 +14,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -58,7 +58,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
     @Inject lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var settings: Settings
 

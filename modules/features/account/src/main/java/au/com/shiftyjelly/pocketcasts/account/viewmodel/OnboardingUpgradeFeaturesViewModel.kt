@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureC
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -35,7 +35,7 @@ import timber.log.Timber
 @HiltViewModel
 class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     app: Application,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
     savedStateHandle: SavedStateHandle,

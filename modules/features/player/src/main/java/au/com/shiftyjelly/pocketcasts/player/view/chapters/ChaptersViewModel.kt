@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.chapters
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -47,7 +47,7 @@ class ChaptersViewModel @AssistedInject constructor(
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
     private val settings: Settings,
-    private val tracker: AnalyticsTrackerWrapper,
+    private val tracker: AnalyticsTracker,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)

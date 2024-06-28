@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.views.dialog
 import android.app.Application
 import android.content.Context
 import androidx.fragment.app.FragmentManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -21,7 +21,7 @@ class ShareDialog(
     private val context: Context?,
     private val shouldShowPodcast: Boolean,
     private val forceDarkTheme: Boolean,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val shareActionProvider: ShareActionProvider,
 ) {
 
