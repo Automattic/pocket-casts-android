@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-class AnalyticsTracker(
+open class AnalyticsTracker constructor(
     val trackers: List<Tracker>,
     val isTrackingEnabled: () -> Boolean,
 ) {
@@ -15,4 +15,8 @@ class AnalyticsTracker(
     fun flush() = trackers.forEach(Tracker::flush)
 
     fun clearAllData() = trackers.forEach(Tracker::clearAllData)
+
+    companion object {
+        fun test(vararg trackers: Tracker, isEnabled: Boolean = true) = AnalyticsTracker(trackers.toList(), { isEnabled })
+    }
 }

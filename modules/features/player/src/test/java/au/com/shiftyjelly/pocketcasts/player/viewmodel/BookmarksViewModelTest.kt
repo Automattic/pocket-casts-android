@@ -75,9 +75,6 @@ class BookmarksViewModelTest {
     private lateinit var theme: Theme
 
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
-
-    @Mock
     private lateinit var bookmarkFeature: BookmarkFeatureControl
 
     private lateinit var bookmarkSearchHandler: BookmarkSearchHandler
@@ -115,7 +112,7 @@ class BookmarksViewModelTest {
         whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
         bookmarkSearchHandler = BookmarkSearchHandler(bookmarkManager)
         bookmarksViewModel = BookmarksViewModel(
-            analyticsTracker = analyticsTracker,
+            analyticsTracker = AnalyticsTracker.test(),
             bookmarkManager = bookmarkManager,
             episodeManager = episodeManager,
             podcastManager = podcastManager,

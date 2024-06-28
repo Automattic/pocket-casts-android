@@ -32,7 +32,7 @@ class BookmarkManagerTest {
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         bookmarkManager = BookmarkManagerImpl(
             appDatabase = appDatabase,
-            analyticsTracker = AnalyticsTracker(),
+            analyticsTracker = AnalyticsTracker.test(),
         )
         episodeDao = appDatabase.episodeDao()
     }

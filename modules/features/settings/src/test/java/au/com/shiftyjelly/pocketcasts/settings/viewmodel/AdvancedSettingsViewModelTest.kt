@@ -27,9 +27,6 @@ class AdvancedSettingsViewModelTest {
     private lateinit var settings: Settings
 
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
-
-    @Mock
     @ApplicationContext
     private lateinit var context: Context
     private lateinit var viewModel: AdvancedSettingsViewModel
@@ -42,7 +39,7 @@ class AdvancedSettingsViewModelTest {
         whenever(settings.cacheEntirePlayingEpisode).thenReturn(UserSetting.Mock(false, mock()))
         viewModel = AdvancedSettingsViewModel(
             settings,
-            analyticsTracker,
+            AnalyticsTracker.test(),
             context,
         )
     }

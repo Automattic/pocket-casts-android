@@ -33,9 +33,6 @@ class SearchHistoryViewModelTest {
     @Mock
     private lateinit var searchHistoryManager: SearchHistoryManager
 
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
-
     private val subscriptionStatusPaid = SubscriptionStatus.Paid(
         expiry = Date(),
         autoRenew = true,
@@ -106,7 +103,7 @@ class SearchHistoryViewModelTest {
         whenever(searchHistoryManager.findAll(showFolders = anyBoolean()))
             .thenReturn(mock())
         val viewModel =
-            SearchHistoryViewModel(searchHistoryManager, userManager, UnconfinedTestDispatcher(), analyticsTracker)
+            SearchHistoryViewModel(searchHistoryManager, userManager, UnconfinedTestDispatcher(), AnalyticsTracker.test())
         viewModel.setOnlySearchRemote(isOnlySearchRemote)
         return viewModel
     }

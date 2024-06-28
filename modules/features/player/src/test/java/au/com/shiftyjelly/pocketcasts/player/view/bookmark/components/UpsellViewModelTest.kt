@@ -14,7 +14,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -34,7 +33,7 @@ class UpsellViewModelTest {
             .thenReturn(flowOf(FreeTrial(subscriptionTier = Subscription.SubscriptionTier.PLUS)))
 
         upsellViewModel = UpsellViewModel(
-            analyticsTracker = mock<AnalyticsTracker>(),
+            analyticsTracker = AnalyticsTracker.test(),
             subscriptionManager = subscriptionManager,
         )
 

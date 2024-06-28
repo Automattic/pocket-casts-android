@@ -33,9 +33,6 @@ class SearchViewModelTest {
     @Mock
     private lateinit var podcastManager: PodcastManager
 
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTracker
-
     private lateinit var viewModel: SearchViewModel
 
     @Before
@@ -43,7 +40,7 @@ class SearchViewModelTest {
         whenever(searchHandler.searchResults).thenReturn(mock())
         whenever(searchHandler.loading).thenReturn(mock())
         viewModel =
-            SearchViewModel(searchHandler, searchHistoryManager, podcastManager, analyticsTracker)
+            SearchViewModel(searchHandler, searchHistoryManager, podcastManager, AnalyticsTracker.test())
     }
 
     @Test

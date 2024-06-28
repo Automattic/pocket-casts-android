@@ -57,8 +57,8 @@ class ChaptersViewModelTest {
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
     private val episodeManager = mock<EpisodeManager>()
-    private val tracker = mock<AnalyticsTracker>()
     private val settings = mock<Settings>()
+    private val tracker = AnalyticsTracker.test()
 
     private val episode = PodcastEpisode(uuid = "id", publishedDate = Date())
     private val chapters = Chapters(
@@ -93,7 +93,6 @@ class ChaptersViewModelTest {
         val userSetting = mock<UserSetting<SubscriptionStatus?>>()
         whenever(userSetting.flow).thenReturn(subscriptionStatusFlow)
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
-        whenever(tracker.getSendUsageStats()).thenReturn(false)
 
         FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
 

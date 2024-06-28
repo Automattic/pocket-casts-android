@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -41,7 +42,7 @@ class SwipeButtonLayoutViewModelTest {
     @Before
     fun setup() {
         testSubject = SwipeButtonLayoutViewModel(
-            analyticsTracker = mock(),
+            analyticsTracker = AnalyticsTracker.test(),
             context = mock(),
             episodeAnalytics = mock(),
             episodeManager = mock(),

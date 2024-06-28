@@ -26,7 +26,6 @@ class ManualCleanupViewModelTest {
     val coroutineRule = MainCoroutineRule()
     private lateinit var episodeManager: EpisodeManager
     private lateinit var playbackManager: PlaybackManager
-    private lateinit var analyticsTracker: AnalyticsTracker
     private lateinit var viewModel: ManualCleanupViewModel
 
     private val episode: PodcastEpisode = PodcastEpisode(uuid = "1", publishedDate = Date())
@@ -38,10 +37,9 @@ class ManualCleanupViewModelTest {
     fun setUp() {
         episodeManager = mock()
         playbackManager = mock()
-        analyticsTracker = mock()
         whenever(episodeManager.observeDownloadedEpisodes())
             .thenReturn(Flowable.generate { listOf(episodes) })
-        viewModel = ManualCleanupViewModel(episodeManager, playbackManager, analyticsTracker)
+        viewModel = ManualCleanupViewModel(episodeManager, playbackManager, AnalyticsTracker.test())
     }
 
     @Test

@@ -48,7 +48,7 @@ class DownloadStatisticsReporterTest {
         }
         reporter = DownloadStatisticsReporter(
             episodeDao,
-            EpisodeAnalytics(AnalyticsTracker(listOf(tracker), isTrackingEnabled = { true })),
+            EpisodeAnalytics(AnalyticsTracker.test(tracker)),
             lifecycleOwner,
             CoroutineScope(testDispatcher),
         )
