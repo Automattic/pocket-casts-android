@@ -100,7 +100,7 @@ class PodcastSyncProcessTest {
             val folderManager: FolderManager = mock()
             whenever(folderManager.findFoldersToSync()).thenReturn(emptyList())
 
-            val bookmarkManager = BookmarkManagerImpl(appDatabase = appDatabase, mock())
+            val bookmarkManager = BookmarkManagerImpl(appDatabase = appDatabase, AnalyticsTracker.test())
             val bookmarkToUpdate = bookmarkManager.add(
                 episode = PodcastEpisode(
                     uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
