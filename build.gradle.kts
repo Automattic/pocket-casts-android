@@ -68,7 +68,7 @@ spotless {
 fun Project.configureSentry() {
     extensions.getByType(SentryPluginExtension::class.java).apply {
         val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
-                !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+            !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
         includeProguardMapping = shouldUploadDebugFiles
         includeSourceContext = shouldUploadDebugFiles
 
