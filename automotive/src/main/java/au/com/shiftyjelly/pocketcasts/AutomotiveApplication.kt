@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -59,6 +60,8 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -68,6 +71,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         RxJavaUncaughtExceptionHandling.setUp()
         setupRemoteLogging()
         setupLogging()
+        setupAnalytics()
         setupApp()
     }
 
@@ -117,5 +121,9 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
+    }
+
+    private fun setupAnalytics() {
+        analyticsTracker.clearAllData()
     }
 }
