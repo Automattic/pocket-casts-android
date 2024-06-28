@@ -67,8 +67,10 @@ spotless {
 
 fun Project.configureSentry() {
     extensions.getByType(SentryPluginExtension::class.java).apply {
-        includeProguardMapping = System.getenv()["CI"].toBoolean() &&
-            !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+        val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
+                !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+        includeProguardMapping = shouldUploadDebugFiles
+        includeSourceContext = shouldUploadDebugFiles
 
         tracingInstrumentation {
             features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP)
