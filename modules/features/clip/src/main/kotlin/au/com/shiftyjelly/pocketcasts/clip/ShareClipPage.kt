@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -182,15 +181,10 @@ private fun VerticalClipPage(
             .fillMaxWidth()
             .wrapContentHeight(),
     ) {
-        Image(
-            painter = painterResource(IR.drawable.ic_close_sheet),
-            contentDescription = stringResource(LR.string.close),
-            colorFilter = ColorFilter.tint(clipColors.closeButtonIcon),
-            modifier = Modifier
-                .clickable(onClick = onClose)
-                .padding(top = 16.dp, end = 16.dp)
-                .clip(CircleShape)
-                .background(clipColors.closeButton),
+        CloseButton(
+            clipColors = clipColors,
+            onClose = onClose,
+            modifier = Modifier.padding(top = 16.dp, end = 16.dp),
         )
     }
 }
@@ -290,15 +284,10 @@ private fun HorizontalClipPage(
                 .fillMaxWidth()
                 .padding(top = 28.dp),
         )
-        Image(
-            painter = painterResource(IR.drawable.ic_close_sheet),
-            contentDescription = stringResource(LR.string.close),
-            colorFilter = ColorFilter.tint(clipColors.closeButtonIcon),
-            modifier = Modifier
-                .clickable(onClick = onClose)
-                .padding(top = 24.dp, end = 16.dp)
-                .clip(CircleShape)
-                .background(clipColors.closeButton),
+        CloseButton(
+            clipColors = clipColors,
+            onClose = onClose,
+            modifier = Modifier.padding(top = 24.dp, end = 16.dp),
         )
     }
 }
@@ -309,24 +298,37 @@ private fun ClipButton(
     clip: Clip.Range,
     clipColors: ClipColors,
     onClip: () -> Unit,
-    modifier: Modifier,
-) {
-    RowButton(
-        text = stringResource(LR.string.podcast_share_clip),
-        contentDescription = stringResource(
-            id = LR.string.podcast_share_clip_description,
-            episode.title,
-            clip.startInSeconds,
-            clip.endInSeconds,
-        ),
-        onClick = onClip,
-        colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
-        textColor = clipColors.clipButtonText,
-        elevation = null,
-        includePadding = false,
-        modifier = modifier,
-    )
-}
+    modifier: Modifier = Modifier,
+) = RowButton(
+    text = stringResource(LR.string.podcast_share_clip),
+    contentDescription = stringResource(
+        id = LR.string.podcast_share_clip_description,
+        episode.title,
+        clip.startInSeconds,
+        clip.endInSeconds,
+    ),
+    onClick = onClip,
+    colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
+    textColor = clipColors.clipButtonText,
+    elevation = null,
+    includePadding = false,
+    modifier = modifier,
+)
+
+@Composable
+private fun CloseButton(
+    clipColors: ClipColors,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+) = Image(
+    painter = painterResource(IR.drawable.ic_close_sheet),
+    contentDescription = stringResource(LR.string.close),
+    colorFilter = ColorFilter.tint(clipColors.closeButtonIcon),
+    modifier = modifier
+        .clickable(onClick = onClose)
+        .clip(CircleShape)
+        .background(clipColors.closeButton),
+)
 
 @ShowkaseComposable(name = "ShareClipPageVertical", group = "Clip")
 @Preview(name = "ShareClipPageVertical", device = "spec:width=400dp,height=800dp,dpi=320")
