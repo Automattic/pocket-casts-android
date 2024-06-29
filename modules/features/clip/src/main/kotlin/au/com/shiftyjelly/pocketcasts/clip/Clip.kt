@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -17,6 +18,10 @@ data class Clip(
         @TypeParceler<Duration, DurationParceler>() val start: Duration,
         @TypeParceler<Duration, DurationParceler>() val end: Duration,
     ) : Parcelable {
+        @IgnoredOnParcel val startInSeconds = start.inWholeSeconds.toInt()
+
+        @IgnoredOnParcel val endInSeconds = end.inWholeSeconds.toInt()
+
         companion object {
             fun fromPosition(
                 playbackPosition: Duration,

@@ -61,7 +61,7 @@ internal fun ShareClipPage(
     onClipEndUpdate: (Duration) -> Unit,
     onClose: () -> Unit,
     state: ClipSelectorState = rememberClipSelectorState(
-        firstVisibleItemIndex = (clipRange.start.inWholeSeconds.toInt() - 10).coerceAtLeast(0),
+        firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
     ),
 ) = when (LocalConfiguration.current.orientation) {
     Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
@@ -316,8 +316,8 @@ private fun ClipButton(
         contentDescription = stringResource(
             id = LR.string.podcast_share_clip_description,
             episode.title,
-            clip.start.inWholeSeconds,
-            clip.end.inWholeSeconds,
+            clip.startInSeconds,
+            clip.endInSeconds,
         ),
         onClick = onClip,
         colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),

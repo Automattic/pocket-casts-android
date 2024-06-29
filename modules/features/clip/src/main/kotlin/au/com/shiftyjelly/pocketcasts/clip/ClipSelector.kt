@@ -252,8 +252,8 @@ private fun BoxWithConstraintsScope.ClipBox(
     ) {
         val startDescription = pluralStringResource(
             id = LR.plurals.podcast_share_start_handle_description,
-            count = clipRange.start.inWholeSeconds.toInt(),
-            clipRange.start.inWholeSeconds.toInt(),
+            count = clipRange.startInSeconds,
+            clipRange.startInSeconds,
         )
         // Outer box to increase the touch area of the handle
         Box(
@@ -294,8 +294,8 @@ private fun BoxWithConstraintsScope.ClipBox(
         }
         val endDescription = pluralStringResource(
             id = LR.plurals.podcast_share_end_handle_description,
-            count = clipRange.end.inWholeSeconds.toInt(),
-            clipRange.end.inWholeSeconds.toInt(),
+            count = clipRange.endInSeconds,
+            clipRange.endInSeconds,
         )
         // Outer box to increas the touch area of the handle
         Box(
