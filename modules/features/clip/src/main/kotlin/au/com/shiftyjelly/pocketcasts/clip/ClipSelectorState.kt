@@ -20,17 +20,21 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 internal fun rememberClipSelectorState(
     firstVisibleItemIndex: Int,
+    firstVisibleItemScrollOffset: Int = 0,
+    scale: Float = 1f,
+    startOffset: Float = 0f,
+    endOffset: Float = 0f,
 ) = rememberSaveable(
     saver = ClipSelectorState.Saver,
     init = {
         ClipSelectorState(
             firstVisibleItemIndex = firstVisibleItemIndex,
-            firstVisibleItemScrollOffset = 0,
-            scale = 1f,
+            firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
+            scale = scale,
             secondsPerTick = 1,
             itemWidth = 0f,
-            startOffset = 0f,
-            endOffset = 0f,
+            startOffset = startOffset,
+            endOffset = endOffset,
         )
     },
 )
