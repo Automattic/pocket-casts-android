@@ -45,8 +45,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -247,6 +250,11 @@ private fun BoxWithConstraintsScope.ClipBox(
             .offset { IntOffset(-scrollOffset.roundToInt(), 0) }
             .fillMaxSize(),
     ) {
+        val startDescription = pluralStringResource(
+            id = LR.plurals.podcast_share_start_handle_description,
+            count = clipRange.start.inWholeSeconds.toInt(),
+            clipRange.start.inWholeSeconds.toInt(),
+        )
         // Outer box to increase the touch area of the handle
         Box(
             modifier = Modifier
@@ -263,7 +271,8 @@ private fun BoxWithConstraintsScope.ClipBox(
                         }
                     },
                     orientation = Orientation.Horizontal,
-                ),
+                )
+                .semantics { contentDescription = startDescription },
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -283,6 +292,11 @@ private fun BoxWithConstraintsScope.ClipBox(
                 )
             }
         }
+        val endDescription = pluralStringResource(
+            id = LR.plurals.podcast_share_end_handle_description,
+            count = clipRange.end.inWholeSeconds.toInt(),
+            clipRange.end.inWholeSeconds.toInt(),
+        )
         // Outer box to increas the touch area of the handle
         Box(
             modifier = Modifier
@@ -299,7 +313,8 @@ private fun BoxWithConstraintsScope.ClipBox(
                         }
                     },
                     orientation = Orientation.Horizontal,
-                ),
+                )
+                .semantics { contentDescription = endDescription },
         ) {
             Box(
                 contentAlignment = Alignment.Center,

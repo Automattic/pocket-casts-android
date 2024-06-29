@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,6 +80,7 @@ internal fun ShareClipPage(
         onClose = onClose,
         state = state,
     )
+
     else -> VerticalClipPage(
         episode = episode,
         podcast = podcast,
@@ -161,13 +163,11 @@ private fun VerticalClipPage(
             Spacer(
                 modifier = Modifier.height(16.dp),
             )
-            RowButton(
-                text = stringResource(LR.string.podcast_share_clip),
-                onClick = onClip,
-                colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
-                textColor = clipColors.clipButtonText,
-                elevation = null,
-                includePadding = false,
+            ClipButton(
+                episode = episode,
+                clip = clipRange,
+                clipColors = clipColors,
+                onClip = onClip,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
@@ -269,13 +269,11 @@ private fun HorizontalClipPage(
                     Spacer(
                         modifier = Modifier.height(16.dp),
                     )
-                    RowButton(
-                        text = stringResource(LR.string.podcast_share_clip),
-                        onClick = onClip,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
-                        textColor = clipColors.clipButtonText,
-                        elevation = null,
-                        includePadding = false,
+                    ClipButton(
+                        episode = episode,
+                        clip = clipRange,
+                        clipColors = clipColors,
+                        onClip = onClip,
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 56.dp)
@@ -303,6 +301,31 @@ private fun HorizontalClipPage(
                 .background(clipColors.closeButton),
         )
     }
+}
+
+@Composable
+private fun ClipButton(
+    episode: PodcastEpisode,
+    clip: Clip.Range,
+    clipColors: ClipColors,
+    onClip: () -> Unit,
+    modifier: Modifier,
+) {
+    RowButton(
+        text = stringResource(LR.string.podcast_share_clip),
+        contentDescription = stringResource(
+            id = LR.string.podcast_share_clip_description,
+            episode.title,
+            clip.start.inWholeSeconds,
+            clip.end.inWholeSeconds,
+        ),
+        onClick = onClip,
+        colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
+        textColor = clipColors.clipButtonText,
+        elevation = null,
+        includePadding = false,
+        modifier = modifier,
+    )
 }
 
 @ShowkaseComposable(name = "ShareClipPageVertical", group = "Clip")

@@ -40,6 +40,7 @@ fun RowButton(
     cornerRadius: Dp = 12.dp,
     textVerticalPadding: Dp = 6.dp,
     @DrawableRes textIcon: Int? = null,
+    contentDescription: String? = null,
 ) {
     BaseRowButton(
         text = text,
@@ -69,6 +70,7 @@ fun RowButton(
         cornerRadius = cornerRadius,
         textVerticalPadding = textVerticalPadding,
         textIcon = textIcon,
+        contentDescription = contentDescription,
     )
 }
 

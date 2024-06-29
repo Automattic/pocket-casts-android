@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +47,7 @@ fun BaseRowButton(
     cornerRadius: Dp = 12.dp,
     textVerticalPadding: Dp = 6.dp,
     @DrawableRes textIcon: Int? = null,
+    contentDescription: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -56,7 +59,7 @@ fun BaseRowButton(
             shape = RoundedCornerShape(cornerRadius),
             elevation = elevation,
             border = border,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().let { if (contentDescription != null) it.semantics { this.contentDescription = contentDescription } else it },
             colors = colors,
             enabled = enabled,
         ) {

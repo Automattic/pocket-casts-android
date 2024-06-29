@@ -577,6 +577,15 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="podcast_share_open_file_in">Open file in&#x2026;</string>
     <string name="podcast_create_clip">Create clip</string>
     <string name="podcast_share_clip">Clip</string>
+    <string name="podcast_share_clip_description">Create clip between %2$d and %3$d seconds for %1$s episode</string>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="one">Start clip handle: %d second</item>
+        <item quantity="other">Start clip handle: %d seconds</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="one">End clip handle: %d second</item>
+        <item quantity="other">End clip handle: %d seconds</item>
+    </plurals>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Subscribed</string>
@@ -637,6 +646,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="episode_removed_from_up_next">Removed from up next</string>
     <string name="episode_in_up_next">In up next</string>
     <string name="episode_downloading">Downloading</string>
+    <string name="episode_cover_description">Cover of %s episode</string>
 
     <!-- Supporter -->
 
