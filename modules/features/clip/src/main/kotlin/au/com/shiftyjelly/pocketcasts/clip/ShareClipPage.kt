@@ -36,6 +36,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.sql.Date
 import java.time.Instant
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -43,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun ShareClipPage(
     episode: PodcastEpisode?,
     podcast: Podcast?,
+    clipRange: Clip.Range,
     episodeCount: Int,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
@@ -50,44 +53,61 @@ internal fun ShareClipPage(
     onClip: () -> Unit,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
+    onClipStartUpdate: (Duration) -> Unit,
+    onClipEndUpdate: (Duration) -> Unit,
     onClose: () -> Unit,
-) = when (LocalConfiguration.current.orientation) {
-    Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
-        episode = episode,
-        podcast = podcast,
-        episodeCount = episodeCount,
-        isPlaying = isPlaying,
-        useEpisodeArtwork = useEpisodeArtwork,
-        clipColors = clipColors,
-        onClip = onClip,
-        onPlayClick = onPlayClick,
-        onPauseClick = onPauseClick,
-        onClose = onClose,
-    )
-    else -> VerticalClipPage(
-        episode = episode,
-        podcast = podcast,
-        isPlaying = isPlaying,
-        useEpisodeArtwork = useEpisodeArtwork,
-        clipColors = clipColors,
-        onClip = onClip,
-        onPlayClick = onPlayClick,
-        onPauseClick = onPauseClick,
-        onClose = onClose,
-    )
+) {
+    val state = rememberClipSelectorState()
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
+            episode = episode,
+            podcast = podcast,
+            clipRange = clipRange,
+            episodeCount = episodeCount,
+            isPlaying = isPlaying,
+            useEpisodeArtwork = useEpisodeArtwork,
+            clipColors = clipColors,
+            onClip = onClip,
+            onPlayClick = onPlayClick,
+            onPauseClick = onPauseClick,
+            onClipStartUpdate = onClipStartUpdate,
+            onClipEndUpdate = onClipEndUpdate,
+            onClose = onClose,
+            state = state,
+        )
+        else -> VerticalClipPage(
+            episode = episode,
+            podcast = podcast,
+            clipRange = clipRange,
+            isPlaying = isPlaying,
+            useEpisodeArtwork = useEpisodeArtwork,
+            clipColors = clipColors,
+            onClip = onClip,
+            onPlayClick = onPlayClick,
+            onPauseClick = onPauseClick,
+            onClipStartUpdate = onClipStartUpdate,
+            onClipEndUpdate = onClipEndUpdate,
+            onClose = onClose,
+            state = state,
+        )
+    }
 }
 
 @Composable
 private fun VerticalClipPage(
     episode: PodcastEpisode?,
     podcast: Podcast?,
+    clipRange: Clip.Range,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
     clipColors: ClipColors,
     onClip: () -> Unit,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
+    onClipStartUpdate: (Duration) -> Unit,
+    onClipEndUpdate: (Duration) -> Unit,
     onClose: () -> Unit,
+    state: ClipSelectorState,
 ) = Box {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -123,30 +143,34 @@ private fun VerticalClipPage(
             Spacer(
                 modifier = Modifier.weight(1f),
             )
+            ClipSelector(
+                episodeDuration = episode.duration.seconds,
+                clipRange = clipRange,
+                isPlaying = isPlaying,
+                clipColors = clipColors,
+                onPlayClick = onPlayClick,
+                onPauseClick = onPauseClick,
+                onClipStartUpdate = onClipStartUpdate,
+                onClipEndUpdate = onClipEndUpdate,
+                modifier = Modifier.padding(horizontal = 16.dp),
+                state = state,
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            RowButton(
+                text = stringResource(LR.string.podcast_share_clip),
+                onClick = onClip,
+                colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
+                textColor = clipColors.buttonTextColor,
+                elevation = null,
+                includePadding = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp)
+                    .padding(horizontal = 16.dp),
+            )
         }
-
-        ClipSelector(
-            isPlaying = isPlaying,
-            clipColors = clipColors,
-            onPlayClick = onPlayClick,
-            onPauseClick = onPauseClick,
-            modifier = Modifier.padding(horizontal = 16.dp),
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        RowButton(
-            text = stringResource(LR.string.podcast_share_clip),
-            onClick = onClip,
-            colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
-            textColor = clipColors.buttonTextColor,
-            elevation = null,
-            includePadding = false,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp)
-                .padding(horizontal = 16.dp),
-        )
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -169,6 +193,7 @@ private fun VerticalClipPage(
 private fun HorizontalClipPage(
     episode: PodcastEpisode?,
     podcast: Podcast?,
+    clipRange: Clip.Range,
     episodeCount: Int,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
@@ -176,7 +201,10 @@ private fun HorizontalClipPage(
     onClip: () -> Unit,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
+    onClipStartUpdate: (Duration) -> Unit,
+    onClipEndUpdate: (Duration) -> Unit,
     onClose: () -> Unit,
+    state: ClipSelectorState,
 ) {
     Box(
         contentAlignment = Alignment.TopEnd,
@@ -219,28 +247,35 @@ private fun HorizontalClipPage(
                     .fillMaxHeight()
                     .padding(end = 32.dp),
             ) {
-                ClipSelector(
-                    isPlaying = isPlaying,
-                    clipColors = clipColors,
-                    onPlayClick = onPlayClick,
-                    onPauseClick = onPauseClick,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-                Spacer(
-                    modifier = Modifier.height(16.dp),
-                )
-                RowButton(
-                    text = stringResource(LR.string.podcast_share_clip),
-                    onClick = onClip,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
-                    textColor = clipColors.buttonTextColor,
-                    elevation = null,
-                    includePadding = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 56.dp)
-                        .padding(horizontal = 16.dp),
-                )
+                if (episode != null) {
+                    ClipSelector(
+                        episodeDuration = episode.duration.seconds,
+                        clipRange = clipRange,
+                        isPlaying = isPlaying,
+                        clipColors = clipColors,
+                        onPlayClick = onPlayClick,
+                        onPauseClick = onPauseClick,
+                        onClipStartUpdate = onClipStartUpdate,
+                        onClipEndUpdate = onClipEndUpdate,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        state = state,
+                    )
+                    Spacer(
+                        modifier = Modifier.height(16.dp),
+                    )
+                    RowButton(
+                        text = stringResource(LR.string.podcast_share_clip),
+                        onClick = onClip,
+                        colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
+                        textColor = clipColors.buttonTextColor,
+                        elevation = null,
+                        includePadding = false,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 56.dp)
+                            .padding(horizontal = 16.dp),
+                    )
+                }
             }
         }
         TextH30(
@@ -288,12 +323,14 @@ private fun ShareClipPagePreview() = ShareClipPage(
         podcastUuid = "podcast-id",
         publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
         title = "Episode title",
+        duration = 125.0,
     ),
     podcast = Podcast(
         uuid = "podcast-id",
         title = "Podcast title",
         episodeFrequency = "monthly",
     ),
+    clipRange = Clip.Range(0.seconds, 15.seconds),
     episodeCount = 120,
     isPlaying = false,
     useEpisodeArtwork = true,
@@ -301,5 +338,7 @@ private fun ShareClipPagePreview() = ShareClipPage(
     onClip = {},
     onPlayClick = {},
     onPauseClick = {},
+    onClipStartUpdate = {},
+    onClipEndUpdate = {},
     onClose = {},
 )

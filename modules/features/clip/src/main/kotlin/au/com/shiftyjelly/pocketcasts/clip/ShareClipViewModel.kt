@@ -7,13 +7,15 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -25,17 +27,20 @@ class ShareClipViewModel @AssistedInject constructor(
     private val podcastManager: PodcastManager,
     private val settings: Settings,
 ) : ViewModel() {
+    private val clipRange = MutableStateFlow(Clip.Range(15.seconds, 30.seconds))
 
     val uiState = combine(
         episodeManager.observeByUuid(episodeUuid),
         podcastManager.observePodcastByEpisodeUuid(episodeUuid),
         podcastManager.observeEpisodeCountByEpisodeUuid(episodeUuid),
+        clipRange,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         clipPlayer.isPlayingState,
-        transform = { episode, podcast, episodeCount, useEpisodeArtwork, isPlaying ->
+        transform = { episode, podcast, episodeCount, clipRange, useEpisodeArtwork, isPlaying ->
             UiState(
                 episode = episode,
                 podcast = podcast,
+                clipRange = clipRange,
                 episodeCount = episodeCount,
                 useEpisodeArtwork = useEpisodeArtwork,
                 isPlaying = isPlaying,
@@ -49,6 +54,14 @@ class ShareClipViewModel @AssistedInject constructor(
 
     fun stopClip() {
         clipPlayer.stop()
+    }
+
+    fun updateClipStart(duration: Duration) {
+        clipRange.value = clipRange.value.copy(start = duration)
+    }
+
+    fun updateClipEnd(duration: Duration) {
+        clipRange.value = clipRange.value.copy(end = duration)
     }
 
     override fun onCleared() {

@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -168,7 +168,7 @@ class BookmarksViewModel
         val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
         val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
         val bookmarkSearchResults = bookmarkSearchHandler.getBookmarkSearchResultsFlow()
-        combine6(
+        combine(
             bookmarksFlow,
             isMultiSelectingFlow,
             selectedListFlow,
