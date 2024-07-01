@@ -75,7 +75,7 @@ private fun Content(
 
         state.total?.let {
             TextP40(
-                text = it.abbreviated,
+                text = "(${it.abbreviated})",
                 modifier = Modifier.padding(start = 6.dp),
             )
         }
