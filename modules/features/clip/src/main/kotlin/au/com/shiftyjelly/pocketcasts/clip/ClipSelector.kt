@@ -168,18 +168,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
     }
 
     val transformation = rememberTransformableState { zoom, _, _ ->
-        val newScale = state.scale * zoom
-        when {
-            newScale > 5f -> if (state.secondsPerTick != 1) {
-                state.secondsPerTick /= 5
-                state.scale = 1f
-            }
-            newScale < 1f -> if (state.secondsPerTick != maxSecondsPerTick) {
-                state.secondsPerTick *= 5
-                state.scale = 5f
-            }
-            else -> state.scale = newScale
-        }
+        state.updateTimelineScale(zoom, maxSecondsPerTick)
     }
 
     LazyRow(

@@ -68,6 +68,21 @@ internal class ClipSelectorState(
         return resolution.coerceAtLeast(1)
     }
 
+    fun updateTimelineScale(zoom: Float, maxSecondsPerTick: Int) {
+        val newScale = scale * zoom
+        when {
+            newScale > 5f -> if (secondsPerTick != 1) {
+                secondsPerTick /= 5
+                scale = 1f
+            }
+            newScale < 1f -> if (secondsPerTick != maxSecondsPerTick) {
+                secondsPerTick *= 5
+                scale = 5f
+            }
+            else -> scale = newScale
+        }
+    }
+
     fun refreshItemWidth(density: Density) {
         spaceWidthDp = SpaceWidth * scale
         itemWidth = with(density) { (tickWidthDp + spaceWidthDp).toPx() }
