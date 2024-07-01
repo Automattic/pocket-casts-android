@@ -59,7 +59,10 @@ interface ClipPlayer {
         private val playbackManager: PlaybackManager,
         @ClipSimpleCache private val simpleCache: SimpleCache,
     ) {
-        fun create(context: Context): ClipPlayer {
+        fun create(
+            context: Context,
+            initialClip: Clip,
+        ): ClipPlayer {
             val httpSourceFactory = DefaultHttpDataSource.Factory()
                 .setUserAgent("Pocket Casts")
                 .setAllowCrossProtocolRedirects(true)
@@ -71,14 +74,21 @@ interface ClipPlayer {
             val extractorsFactory = DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)
             val mediaSourceFactory = DefaultMediaSourceFactory(cacheSourceFactory, extractorsFactory)
             val exoPlayer = ExoPlayer.Builder(context).build()
-            return ExoPlayerClipPlayer(exoPlayer, mediaSourceFactory, playbackManager)
+            return ExoPlayerClipPlayer(
+                exoPlayer,
+                mediaSourceFactory,
+                initialClip,
+                playbackManager,
+            )
         }
     }
 }
 
+@OptIn(UnstableApi::class)
 private class ExoPlayerClipPlayer(
     private val exoPlayer: ExoPlayer,
     private val mediaSourceFactory: MediaSource.Factory,
+    initialClip: Clip,
     private val playbackManager: PlaybackManager,
 ) : ClipPlayer {
     private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
@@ -118,9 +128,10 @@ private class ExoPlayerClipPlayer(
                 errors.tryEmit(error)
             }
         })
+        exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(initialClip.toMediaItem()))
+        exoPlayer.prepare()
     }
 
-    @OptIn(UnstableApi::class)
     override fun play(clip: Clip): Boolean {
         if (exoPlayer.isLoading || exoPlayer.isPlaying) {
             return false
@@ -184,7 +195,7 @@ private class ExoPlayerClipPlayer(
     }
 
     private fun Clip.toMediaItem() = MediaItem.Builder()
-        .setUri(episode.let { if (it.isDownloaded) it.downloadedFilePath else it.downloadUrl })
+        .setUri(sourceUri)
         .setClippingConfiguration(
             ClippingConfiguration.Builder()
                 .setStartPositionMs(range.start.inWholeMilliseconds)

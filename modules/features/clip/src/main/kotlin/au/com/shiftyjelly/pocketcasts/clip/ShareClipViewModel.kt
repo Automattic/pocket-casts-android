@@ -113,7 +113,7 @@ class ShareClipViewModel @AssistedInject constructor(
         val playbackProgress: Duration = Duration.ZERO,
         val isPlaying: Boolean = false,
     ) {
-        val clip get() = episode?.let { Clip(it, clipRange) }
+        val clip get() = episode?.let { Clip.fromEpisode(it, clipRange) }
     }
 
     @AssistedFactory

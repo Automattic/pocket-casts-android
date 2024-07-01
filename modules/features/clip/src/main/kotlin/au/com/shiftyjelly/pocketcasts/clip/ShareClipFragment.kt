@@ -25,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -40,8 +39,8 @@ class ShareClipFragment : BaseDialogFragment() {
             defaultViewModelCreationExtras.withCreationCallback<ShareClipViewModel.Factory> { factory ->
                 factory.create(
                     args.episodeUuid,
-                    args.clipRange,
-                    clipPlayerFactory.create(requireActivity().applicationContext),
+                    args.clip.range,
+                    clipPlayerFactory.create(requireActivity().applicationContext, args.clip),
                     clipAnalytics,
                 )
             }
@@ -63,7 +62,7 @@ class ShareClipFragment : BaseDialogFragment() {
             podcastId = args.podcastUuid,
             clipId = args.clipUuid,
             sourceView = args.source,
-            initialClipRange = args.clipRange,
+            initialClipRange = args.clip.range,
         )
         if (savedInstanceState == null) {
             viewModel.onClipScreenShown()
@@ -115,7 +114,7 @@ class ShareClipFragment : BaseDialogFragment() {
         val episodeUuid: String,
         val podcastUuid: String,
         val clipUuid: String,
-        val clipRange: Clip.Range,
+        val clip: Clip,
         @TypeParceler<Color, ColorParceler>() val baseColor: Color,
         val source: SourceView,
     ) : Parcelable
@@ -133,7 +132,7 @@ class ShareClipFragment : BaseDialogFragment() {
                     episodeUuid = episode.uuid,
                     podcastUuid = episode.podcastUuid,
                     clipUuid = UUID.randomUUID().toString(),
-                    clipRange = Clip.Range.fromPosition(episode.playedUpTo.seconds, episode.duration.seconds),
+                    clip = Clip.fromEpisode(episode),
                     baseColor = Color(baseColor),
                     source = source,
                 ),
