@@ -42,7 +42,7 @@ object AppModule {
     @Provides
     fun shareActionProvider() = object : ShareActionProvider {
         override fun clipAction(podcastEpisode: PodcastEpisode, podcast: Podcast, fragmentManager: FragmentManager) {
-            ShareClipFragment.newInstance(podcastEpisode.uuid, podcast.backgroundColor).show(fragmentManager, "share_clip")
+            ShareClipFragment.newInstance(podcastEpisode, podcast.backgroundColor).show(fragmentManager, "share_clip")
         }
     }
 }

@@ -71,7 +71,7 @@ internal fun ClipSelector(
     onClipStartUpdate: (Duration) -> Unit,
     onClipEndUpdate: (Duration) -> Unit,
     modifier: Modifier = Modifier,
-    state: ClipSelectorState = rememberClipSelectorState(),
+    state: ClipSelectorState = rememberClipSelectorState(firstVisibleItemIndex = 0),
 ) {
     val density = LocalDensity.current
     LaunchedEffect(state.scale) {
