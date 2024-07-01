@@ -33,11 +33,11 @@ internal class ClipSelectorState(
             return scrolledItemsWidth + listState.firstVisibleItemScrollOffset
         }
     val scrollOffsetState get() = derivedStateOf { scrollOffset }
-    var scale by mutableFloatStateOf(scale)
-    var tickResolution by mutableIntStateOf(tickResolution)
-    var itemWidth by mutableFloatStateOf(itemWidth)
     var startOffset by mutableFloatStateOf(startOffset)
     var endOffset by mutableFloatStateOf(endOffset)
+    var itemWidth by mutableFloatStateOf(itemWidth)
+    var scale by mutableFloatStateOf(scale)
+    var tickResolution by mutableIntStateOf(tickResolution)
 
     fun scaleBoxOffsets(clipRange: Clip.Range) {
         startOffset = durationToPixels(clipRange.start)
