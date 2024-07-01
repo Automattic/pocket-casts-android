@@ -614,6 +614,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="podcast_log_in_to_rate">You must log in to leave a rating</string>
     <string name="podcast_submit_rating_no_internet">No internet connection found. Please connect to the internet to submit a rating.</string>
     <string name="rate_button">Rate</string>
+    <string name="no_ratings">No ratings</string>
 
     <!-- Episodes -->
 

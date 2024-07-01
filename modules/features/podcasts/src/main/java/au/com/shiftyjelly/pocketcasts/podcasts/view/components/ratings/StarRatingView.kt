@@ -63,8 +63,6 @@ private fun Content(
     state: RatingState.Loaded,
     onClick: () -> Unit,
 ) {
-    if (state.noRatings) return
-
     Row(
         modifier = Modifier
             .padding(horizontal = 14.dp, vertical = 4.dp),
@@ -76,18 +74,18 @@ private fun Content(
             onClick = onClick,
         )
 
-        state.total?.let {
-            TextP40(
-                text = "(${it.abbreviated})",
-                modifier = Modifier.padding(start = 6.dp).clickable { onClick() },
-            )
-        }
+        TextP40(
+            text = if (state.noRatings) stringResource(R.string.no_ratings) else "(${state.total?.abbreviated})",
+            modifier = Modifier
+                .padding(start = 6.dp)
+                .clickable { onClick() },
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
         TextP40(
             text = stringResource(R.string.rate_button),
-            fontWeight = FontWeight.W400,
+            fontWeight = FontWeight.W500,
             modifier = Modifier.clickable { onClick() },
         )
     }
