@@ -104,6 +104,12 @@ class PodcastRatingsViewModel
 
             val stars: List<Star> = starsList()
 
+            val roundedAverage: String
+                get() {
+                    val rating = average ?: 0.0
+                    return (Math.round(rating * 10) / 10.0).toString()
+                }
+
             private fun starsList(): List<Star> {
                 val rating = average ?: 0.0
                 // truncate the floating points off without rounding

@@ -74,10 +74,20 @@ private fun Content(
             onClick = onClick,
         )
 
+        if (!state.noRatings) {
+            TextP40(
+                text = state.roundedAverage,
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .clickable { onClick() },
+                fontWeight = FontWeight.W700,
+            )
+        }
+
         TextP40(
             text = if (state.noRatings) stringResource(R.string.no_ratings) else "(${state.total?.abbreviated})",
             modifier = Modifier
-                .padding(start = 6.dp)
+                .padding(start = 4.dp)
                 .clickable { onClick() },
         )
 
