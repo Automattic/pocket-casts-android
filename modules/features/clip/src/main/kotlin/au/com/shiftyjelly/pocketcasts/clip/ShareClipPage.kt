@@ -45,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareClipPageListener {
-    fun onClip(podcast: Podcast, clip: Clip): Unit
+    fun onClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Unit
     fun onClickPlay(): Unit
     fun onClickPause(): Unit
     fun onUpdateClipStart(duration: Duration): Unit
@@ -56,7 +56,7 @@ internal interface ShareClipPageListener {
 
     companion object {
         val Preview = object : ShareClipPageListener {
-            override fun onClip(podcast: Podcast, clip: Clip) = Unit
+            override fun onClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = Unit
             override fun onClickPlay() = Unit
             override fun onClickPause() = Unit
             override fun onUpdateClipStart(duration: Duration) = Unit
@@ -168,10 +168,11 @@ private fun VerticalClipPage(
                 modifier = Modifier.height(16.dp),
             )
             ClipButton(
+                podcast = podcast,
                 episode = episode,
-                clip = clipRange,
+                clipRange = clipRange,
                 clipColors = clipColors,
-                onClip = { listener.onClip(podcast, Clip(episode, clipRange)) },
+                listener = listener,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
@@ -263,10 +264,11 @@ private fun HorizontalClipPage(
                         modifier = Modifier.height(16.dp),
                     )
                     ClipButton(
+                        podcast = podcast,
                         episode = episode,
-                        clip = clipRange,
+                        clipRange = clipRange,
                         clipColors = clipColors,
-                        onClip = { listener.onClip(podcast, Clip(episode, clipRange)) },
+                        listener = listener,
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 56.dp)
@@ -293,20 +295,21 @@ private fun HorizontalClipPage(
 
 @Composable
 private fun ClipButton(
+    podcast: Podcast,
     episode: PodcastEpisode,
-    clip: Clip.Range,
+    clipRange: Clip.Range,
     clipColors: ClipColors,
-    onClip: () -> Unit,
+    listener: ShareClipPageListener,
     modifier: Modifier = Modifier,
 ) = RowButton(
     text = stringResource(LR.string.podcast_share_clip),
     contentDescription = stringResource(
         id = LR.string.podcast_share_clip_description,
         episode.title,
-        clip.startInSeconds,
-        clip.endInSeconds,
+        clipRange.startInSeconds,
+        clipRange.endInSeconds,
     ),
-    onClick = onClip,
+    onClick = { listener.onClip(podcast, episode, clipRange) },
     colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
     textColor = clipColors.clipButtonText,
     elevation = null,

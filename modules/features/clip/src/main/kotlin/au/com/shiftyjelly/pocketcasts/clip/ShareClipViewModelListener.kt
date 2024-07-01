@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.clip
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import kotlin.time.Duration
 
@@ -11,13 +12,13 @@ internal class ShareClipViewModelListener(
     private val viewModel: ShareClipViewModel,
     private val analyticsTracker: AnalyticsTracker,
 ) : ShareClipPageListener {
-    override fun onClip(podcast: Podcast, clip: Clip) {
-        viewModel.onClipLinkShared(clip)
+    override fun onClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange))
         SharePodcastHelper(
             podcast,
-            clip.episode,
-            clip.range.start,
-            clip.range.end,
+            episode,
+            clipRange.start,
+            clipRange.end,
             fragment.requireActivity(),
             SharePodcastHelper.ShareType.CLIP,
             SourceView.CLIP_SHARING,

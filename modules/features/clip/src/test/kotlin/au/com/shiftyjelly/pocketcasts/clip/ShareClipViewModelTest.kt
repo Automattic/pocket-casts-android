@@ -78,7 +78,7 @@ class ShareClipViewModelTest {
         viewModel.uiState.test {
             viewModel.playClip()
 
-            assertEquals(Clip(episode, Clip.Range(15.seconds, 30.seconds)), clipPlayer.clips.awaitItem())
+            assertEquals(Clip.fromEpisode(episode, Clip.Range(15.seconds, 30.seconds)), clipPlayer.clips.awaitItem())
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -232,7 +232,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks no changes to the clip`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, clipRange))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange))
 
         val event = tracker.events.last()
 
@@ -256,7 +256,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks changes to the clip start`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, clipRange.copy(start = 7.seconds)))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange.copy(start = 7.seconds)))
 
         val event = tracker.events.last()
 
@@ -280,7 +280,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks changes to the clip end`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, clipRange.copy(end = 20.seconds)))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange.copy(end = 20.seconds)))
 
         val event = tracker.events.last()
 
@@ -304,7 +304,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks changes to the whole clip`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, Clip.Range(17.seconds, 34.seconds)))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, Clip.Range(17.seconds, 34.seconds)))
 
         val event = tracker.events.last()
 

@@ -9,10 +9,21 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
-data class Clip(
-    val episode: PodcastEpisode,
+@Parcelize
+data class Clip constructor(
+    val sourceUri: String,
     val range: Range,
-) {
+) : Parcelable {
+    companion object {
+        fun fromEpisode(
+            episode: PodcastEpisode,
+            range: Range = Range.fromPosition(episode.playedUpTo.seconds, episode.duration.seconds),
+        ) = Clip(
+            sourceUri = episode.let { if (it.isDownloaded) it.downloadedFilePath else it.downloadUrl }.orEmpty(),
+            range = range,
+        )
+    }
+
     @Parcelize
     data class Range(
         @TypeParceler<Duration, DurationParceler>() val start: Duration,
