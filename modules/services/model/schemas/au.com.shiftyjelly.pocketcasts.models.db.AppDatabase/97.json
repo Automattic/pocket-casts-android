@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 97,
-    "identityHash": "37a4f5b7c63a9efd4556ce5e373033df",
+    "identityHash": "42021750d762130733c983144099e35b",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1729,12 +1729,61 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "episode_transcript",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`episode_uuid` TEXT NOT NULL, `url` TEXT NOT NULL, `type` TEXT NOT NULL, `language` TEXT, PRIMARY KEY(`episode_uuid`, `url`))",
+        "fields": [
+          {
+            "fieldPath": "episodeUuid",
+            "columnName": "episode_uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "episode_uuid",
+            "url"
+          ]
+        },
+        "indices": [
+          {
+            "name": "transcript_episode_uuid_index",
+            "unique": false,
+            "columnNames": [
+              "episode_uuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `transcript_episode_uuid_index` ON `${TABLE_NAME}` (`episode_uuid`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '37a4f5b7c63a9efd4556ce5e373033df')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '42021750d762130733c983144099e35b')"
     ]
   }
 }

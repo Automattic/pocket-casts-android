@@ -461,7 +461,7 @@ class ShowNotesProcessTest {
                 language = "Language 2",
             ),
         )
-        verify(transcriptsManager).updateTranscripts(expected1)
+        verify(transcriptsManager).updateTranscripts("episode-id", expected1)
     }
 
     @Test
@@ -489,7 +489,7 @@ class ShowNotesProcessTest {
         processor.process("episode-id", showNotes)
 
         val expected2 = emptyList<Transcript>()
-        verify(transcriptsManager).updateTranscripts(expected2)
+        verify(transcriptsManager).updateTranscripts("episode-id", expected2)
     }
 
     @Test
@@ -510,6 +510,6 @@ class ShowNotesProcessTest {
         processor.process("episode-id", showNotes)
 
         val expected2 = emptyList<Transcript>()
-        verify(transcriptsManager, never()).updateTranscripts(expected2)
+        verify(transcriptsManager, never()).updateTranscripts("episode-id", expected2)
     }
 }

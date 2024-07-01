@@ -81,7 +81,7 @@ class ShowNotesProcessor @Inject constructor(
             ?.firstOrNull { it.uuid == episodeUuid }
             ?.transcripts
             ?.mapNotNull { it.takeIf { it.url != null && it.type != null }?.toTranscript(episodeUuid) }
-        transcripts?.let { transcriptsManager.updateTranscripts(it) }
+        transcripts?.let { transcriptsManager.updateTranscripts(episodeUuid, it) }
     }
 
     private fun ShowNotesChapter.toChapter(episodeUuid: String) = Chapter(
