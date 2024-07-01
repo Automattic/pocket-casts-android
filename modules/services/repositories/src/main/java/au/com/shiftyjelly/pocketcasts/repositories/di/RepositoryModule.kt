@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
@@ -172,4 +174,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideNovaLauncherManager(novaLauncherManagerImpl: NovaLauncherManagerImpl): NovaLauncherManager
+
+    @Binds
+    abstract fun provideTranscriptsManager(transcriptsManagerImpl: TranscriptsManagerImpl): TranscriptsManager
 }
