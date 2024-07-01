@@ -264,8 +264,8 @@ private fun BoxWithConstraintsScope.ClipBox(
                         val newOffset = progressOffsetPx + delta
                         val newProgress = state.pixelsToDuration(newOffset)
                         if ((clipRange.start + newProgress) in clipRange) {
+                            listener.onUpdateClipProgress(state.pixelsToDuration(newOffset))
                             progressOffsetPx = newOffset
-                            listener.onUpdateClipProgress(state.pixelsToDuration(progressOffsetPx))
                         }
                     },
                     orientation = Orientation.Horizontal,
@@ -295,8 +295,9 @@ private fun BoxWithConstraintsScope.ClipBox(
                         val newStartOffset = state.startOffset + delta
                         val newClipStart = state.pixelsToDuration(newStartOffset)
                         if (newClipStart >= Duration.ZERO && (clipRange.end - newClipStart) >= 1.seconds) {
-                            state.startOffset = newStartOffset
                             listener.onUpdateClipStart(newClipStart)
+                            state.startOffset = newStartOffset
+                            progressOffsetPx = 0f
                         }
                     },
                     orientation = Orientation.Horizontal,
@@ -338,8 +339,9 @@ private fun BoxWithConstraintsScope.ClipBox(
                         val newEndOffset = state.endOffset + delta
                         val newClipEnd = state.pixelsToDuration(newEndOffset)
                         if (newClipEnd <= episodeDuration && (newClipEnd - clipRange.start) >= 1.seconds) {
-                            state.endOffset = newEndOffset
                             listener.onUpdateClipEnd(newClipEnd)
+                            state.endOffset = newEndOffset
+                            progressOffsetPx = 0f
                         }
                     },
                     orientation = Orientation.Horizontal,
