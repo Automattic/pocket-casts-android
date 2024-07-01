@@ -18,9 +18,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,6 +75,7 @@ class ShareClipFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
+        val listener = ShareClipViewModelListener(this@ShareClipFragment, viewModel, clipAnalytics.analyticsTracker)
         val clipColors = clipColors
         setContent {
             val state by viewModel.uiState.collectAsState()
@@ -90,20 +89,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 isPlaying = state.isPlaying,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 clipColors = clipColors,
-                onPlayClick = viewModel::playClip,
-                onPauseClick = viewModel::pauseClip,
-                onClip = {
-                    state.podcast?.let { podcast ->
-                        state.clip?.let { clip ->
-                            shareClip(podcast, clip)
-                        }
-                    }
-                },
-                onClipStartUpdate = viewModel::updateClipStart,
-                onClipEndUpdate = viewModel::updateClipEnd,
-                onPlaybackProgressUpdate = viewModel::onClipProgressUpdate,
-                onTimelineScaleUpdate = viewModel::onTimelineResolutionUpdate,
-                onClose = ::dismiss,
+                listener = listener,
             )
         }
     }
@@ -122,20 +108,6 @@ class ShareClipFragment : BaseDialogFragment() {
             WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = clipColors.background.luminance() > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(argbColor)
-    }
-
-    private fun shareClip(podcast: Podcast, clip: Clip) {
-        viewModel.onClipLinkShared(clip)
-        SharePodcastHelper(
-            podcast,
-            clip.episode,
-            clip.range.start,
-            clip.range.end,
-            requireActivity(),
-            SharePodcastHelper.ShareType.CLIP,
-            SourceView.CLIP_SHARING,
-            clipAnalytics.analyticsTracker,
-        ).showShareDialogDirect()
     }
 
     @Parcelize
