@@ -89,12 +89,12 @@ class ShareClipViewModel @AssistedInject constructor(
         clipAnalytics.linkShared(clip)
     }
 
-    fun onClipProgressUpdate(progress: Duration) {
+    fun updateClipProgress(progress: Duration) {
         Timber.tag(TAG).d("Clip progress updated: $progress")
         clipPlayer.seekTo(progress)
     }
 
-    fun onTimelineResolutionUpdate(scale: Float, tickResolution: Int) {
+    fun updateProgressPollingPeriod(scale: Float, tickResolution: Int) {
         val pollingPeriod = tickResolution.seconds / (5 * scale.toDouble())
         Timber.tag(TAG).d("Update clip playback polling period: $pollingPeriod")
         clipPlayer.setPlaybackPollingPeriod(pollingPeriod)

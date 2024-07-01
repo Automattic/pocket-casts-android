@@ -44,6 +44,30 @@ import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+internal interface ShareClipPageListener {
+    fun onClip(podcast: Podcast, clip: Clip): Unit
+    fun onClickPlay(): Unit
+    fun onClickPause(): Unit
+    fun onUpdateClipStart(duration: Duration): Unit
+    fun onUpdateClipEnd(duration: Duration): Unit
+    fun onUpdateClipProgress(duration: Duration): Unit
+    fun onUpdateTimeline(scale: Float, secondsPerTick: Int): Unit
+    fun onClose(): Unit
+
+    companion object {
+        val Preview = object : ShareClipPageListener {
+            override fun onClip(podcast: Podcast, clip: Clip) = Unit
+            override fun onClickPlay() = Unit
+            override fun onClickPause() = Unit
+            override fun onUpdateClipStart(duration: Duration) = Unit
+            override fun onUpdateClipEnd(duration: Duration) = Unit
+            override fun onUpdateClipProgress(duration: Duration) = Unit
+            override fun onUpdateTimeline(scale: Float, secondsPerTick: Int) = Unit
+            override fun onClose() = Unit
+        }
+    }
+}
+
 @Composable
 internal fun ShareClipPage(
     episode: PodcastEpisode?,
@@ -54,14 +78,7 @@ internal fun ShareClipPage(
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
     clipColors: ClipColors,
-    onClip: () -> Unit,
-    onPlayClick: () -> Unit,
-    onPauseClick: () -> Unit,
-    onClipStartUpdate: (Duration) -> Unit,
-    onClipEndUpdate: (Duration) -> Unit,
-    onPlaybackProgressUpdate: (Duration) -> Unit,
-    onTimelineScaleUpdate: (Float, Int) -> Unit,
-    onClose: () -> Unit,
+    listener: ShareClipPageListener,
     state: ClipSelectorState = rememberClipSelectorState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
     ),
@@ -75,14 +92,7 @@ internal fun ShareClipPage(
         isPlaying = isPlaying,
         useEpisodeArtwork = useEpisodeArtwork,
         clipColors = clipColors,
-        onClip = onClip,
-        onPlayClick = onPlayClick,
-        onPauseClick = onPauseClick,
-        onClipStartUpdate = onClipStartUpdate,
-        onClipEndUpdate = onClipEndUpdate,
-        onPlaybackProgressUpdate = onPlaybackProgressUpdate,
-        onTimelineScaleUpdate = onTimelineScaleUpdate,
-        onClose = onClose,
+        listener = listener,
         state = state,
     )
 
@@ -93,15 +103,7 @@ internal fun ShareClipPage(
         playbackProgress = playbackProgress,
         isPlaying = isPlaying,
         useEpisodeArtwork = useEpisodeArtwork,
-        clipColors = clipColors,
-        onClip = onClip,
-        onPlayClick = onPlayClick,
-        onPauseClick = onPauseClick,
-        onClipStartUpdate = onClipStartUpdate,
-        onClipEndUpdate = onClipEndUpdate,
-        onPlaybackProgressUpdate = onPlaybackProgressUpdate,
-        onTimelineScaleUpdate = onTimelineScaleUpdate,
-        onClose = onClose,
+        clipColors = clipColors, listener = listener,
         state = state,
     )
 }
@@ -115,14 +117,7 @@ private fun VerticalClipPage(
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
     clipColors: ClipColors,
-    onClip: () -> Unit,
-    onPlayClick: () -> Unit,
-    onPauseClick: () -> Unit,
-    onClipStartUpdate: (Duration) -> Unit,
-    onClipEndUpdate: (Duration) -> Unit,
-    onPlaybackProgressUpdate: (Duration) -> Unit,
-    onTimelineScaleUpdate: (Float, Int) -> Unit,
-    onClose: () -> Unit,
+    listener: ShareClipPageListener,
     state: ClipSelectorState,
 ) = Box {
     Column(
@@ -165,12 +160,7 @@ private fun VerticalClipPage(
                 playbackProgress = playbackProgress,
                 isPlaying = isPlaying,
                 clipColors = clipColors,
-                onPlayClick = onPlayClick,
-                onPauseClick = onPauseClick,
-                onClipStartUpdate = onClipStartUpdate,
-                onClipEndUpdate = onClipEndUpdate,
-                onTimelineScaleUpdate = onTimelineScaleUpdate,
-                onPlaybackProgressUpdate = onPlaybackProgressUpdate,
+                listener = listener,
                 modifier = Modifier.padding(horizontal = 16.dp),
                 state = state,
             )
@@ -181,7 +171,7 @@ private fun VerticalClipPage(
                 episode = episode,
                 clip = clipRange,
                 clipColors = clipColors,
-                onClip = onClip,
+                onClip = { listener.onClip(podcast, Clip(episode, clipRange)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
@@ -198,7 +188,7 @@ private fun VerticalClipPage(
     ) {
         CloseButton(
             clipColors = clipColors,
-            onClose = onClose,
+            onClose = listener::onClose,
             modifier = Modifier.padding(top = 16.dp, end = 16.dp),
         )
     }
@@ -214,14 +204,7 @@ private fun HorizontalClipPage(
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
     clipColors: ClipColors,
-    onClip: () -> Unit,
-    onPlayClick: () -> Unit,
-    onPauseClick: () -> Unit,
-    onClipStartUpdate: (Duration) -> Unit,
-    onClipEndUpdate: (Duration) -> Unit,
-    onPlaybackProgressUpdate: (Duration) -> Unit,
-    onTimelineScaleUpdate: (Float, Int) -> Unit,
-    onClose: () -> Unit,
+    listener: ShareClipPageListener,
     state: ClipSelectorState,
 ) {
     Box(
@@ -265,19 +248,14 @@ private fun HorizontalClipPage(
                     .fillMaxHeight()
                     .padding(end = 32.dp),
             ) {
-                if (episode != null) {
+                if (podcast != null && episode != null) {
                     ClipSelector(
                         episodeDuration = episode.duration.seconds,
                         clipRange = clipRange,
                         playbackProgress = playbackProgress,
                         isPlaying = isPlaying,
                         clipColors = clipColors,
-                        onPlayClick = onPlayClick,
-                        onPauseClick = onPauseClick,
-                        onClipStartUpdate = onClipStartUpdate,
-                        onClipEndUpdate = onClipEndUpdate,
-                        onPlaybackProgressUpdate = onPlaybackProgressUpdate,
-                        onTimelineScaleUpdate = onTimelineScaleUpdate,
+                        listener = listener,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         state = state,
                     )
@@ -288,7 +266,7 @@ private fun HorizontalClipPage(
                         episode = episode,
                         clip = clipRange,
                         clipColors = clipColors,
-                        onClip = onClip,
+                        onClip = { listener.onClip(podcast, Clip(episode, clipRange)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 56.dp)
@@ -307,7 +285,7 @@ private fun HorizontalClipPage(
         )
         CloseButton(
             clipColors = clipColors,
-            onClose = onClose,
+            onClose = listener::onClose,
             modifier = Modifier.padding(top = 24.dp, end = 16.dp),
         )
     }
@@ -398,14 +376,7 @@ internal fun ShareClipPagePreview(
         isPlaying = false,
         useEpisodeArtwork = true,
         clipColors = ClipColors(Color(color)),
-        onClip = {},
-        onPlayClick = {},
-        onPauseClick = {},
-        onClipStartUpdate = {},
-        onClipEndUpdate = {},
-        onPlaybackProgressUpdate = {},
-        onTimelineScaleUpdate = { _, _ -> },
-        onClose = {},
+        listener = ShareClipPageListener.Preview,
         state = rememberClipSelectorState(
             firstVisibleItemIndex = 0,
             endOffset = clipRange.end.inWholeSeconds * PreviewPixelsPerDuration,

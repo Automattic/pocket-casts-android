@@ -150,13 +150,13 @@ class ShareClipViewModelTest {
         viewModel.uiState.test {
             skipItems(1)
 
-            viewModel.onTimelineResolutionUpdate(scale = 1f, tickResolution = 1)
+            viewModel.updateProgressPollingPeriod(scale = 1f, tickResolution = 1)
             assertEquals(200.milliseconds, clipPlayer.pollingPeriods.awaitItem())
 
-            viewModel.onTimelineResolutionUpdate(scale = 5f, tickResolution = 1)
+            viewModel.updateProgressPollingPeriod(scale = 5f, tickResolution = 1)
             assertEquals(40.milliseconds, clipPlayer.pollingPeriods.awaitItem())
 
-            viewModel.onTimelineResolutionUpdate(scale = 1f, tickResolution = 5)
+            viewModel.updateProgressPollingPeriod(scale = 1f, tickResolution = 5)
             assertEquals(1.seconds, clipPlayer.pollingPeriods.awaitItem())
         }
     }
