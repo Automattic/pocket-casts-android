@@ -20,7 +20,7 @@ internal class ClipSelectorState(
     firstVisibleItemIndex: Int = 0,
     firstVisibleItemScrollOffset: Int = 0,
     scale: Float = 1f,
-    tickResolution: Int = 1,
+    secondsPerTick: Int = 1,
     itemWidth: Float = 0f,
     startOffset: Float = 0f,
     endOffset: Float = 0f,
@@ -37,7 +37,7 @@ internal class ClipSelectorState(
     var endOffset by mutableFloatStateOf(endOffset)
     var itemWidth by mutableFloatStateOf(itemWidth)
     var scale by mutableFloatStateOf(scale)
-    var tickResolution by mutableIntStateOf(tickResolution)
+    var secondsPerTick by mutableIntStateOf(secondsPerTick)
 
     fun scaleBoxOffsets(clipRange: Clip.Range) {
         startOffset = durationToPixels(clipRange.start)
@@ -46,13 +46,13 @@ internal class ClipSelectorState(
 
     fun durationToPixels(duration: Duration): Float {
         val seconds = duration.inWholeSeconds
-        val ticks = seconds.toFloat() / tickResolution
+        val ticks = seconds.toFloat() / secondsPerTick
         return itemWidth * ticks
     }
 
     fun pixelsToDuration(pixels: Float): Duration {
         val ticks = pixels / itemWidth
-        val seconds = ticks * tickResolution
+        val seconds = ticks * secondsPerTick
         return seconds.toDouble().seconds
     }
 
@@ -63,7 +63,7 @@ internal class ClipSelectorState(
                     it.listState.firstVisibleItemIndex,
                     it.listState.firstVisibleItemScrollOffset,
                     it.scale,
-                    it.tickResolution,
+                    it.secondsPerTick,
                     it.itemWidth,
                     it.startOffset,
                     it.endOffset,
@@ -74,7 +74,7 @@ internal class ClipSelectorState(
                     firstVisibleItemIndex = it[0] as Int,
                     firstVisibleItemScrollOffset = it[1] as Int,
                     scale = it[2] as Float,
-                    tickResolution = it[3] as Int,
+                    secondsPerTick = it[3] as Int,
                     itemWidth = it[4] as Float,
                     startOffset = it[5] as Float,
                     endOffset = it[6] as Float,
