@@ -10,6 +10,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,6 +40,23 @@ internal class ClipSelectorState(
     var itemWidth by mutableFloatStateOf(itemWidth)
     var scale by mutableFloatStateOf(scale)
     var secondsPerTick by mutableIntStateOf(secondsPerTick)
+
+    fun calculateMaxSecondsPerTick(episodeDuration: Duration, timelineWidth: Dp): Int {
+        val secondsCount = episodeDuration.inWholeSeconds.toInt()
+        var resolution = 1
+        val minItemWidth = 1.5.dp + 4.dp
+        while (resolution < 125) {
+            val newResolution = resolution * 5
+            val tickCount = (secondsCount / newResolution) + 1
+            val totalWidth = minItemWidth * tickCount
+            if (totalWidth <= timelineWidth) {
+                break
+            } else {
+                resolution = newResolution
+            }
+        }
+        return resolution.coerceAtLeast(1)
+    }
 
     fun scaleBoxOffsets(clipRange: Clip.Range) {
         startOffset = durationToPixels(clipRange.start)

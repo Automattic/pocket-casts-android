@@ -162,21 +162,8 @@ private fun BoxWithConstraintsScope.ClipTimeline(
     state.itemWidth = with(localDensity) { itemWidth.toPx() }
     LaunchedEffect(state.scale) { state.scaleBoxOffsets(clipRange) }
 
-    val maxSecondsPerTick by remember {
-        val secondsCount = episodeDuration.inWholeSeconds.toInt()
-        var resolution = 1
-        val minItemWidth = 1.5.dp + 4.dp
-        while (resolution < 125) {
-            val newResolution = resolution * 5
-            val tickCount = (secondsCount / newResolution) + 1
-            val totalWidth = minItemWidth * tickCount
-            if (totalWidth <= maxWidth) {
-                break
-            } else {
-                resolution = newResolution
-            }
-        }
-        mutableIntStateOf(resolution.coerceAtLeast(1))
+    val maxSecondsPerTick by remember(episodeDuration, maxWidth) {
+        mutableIntStateOf(state.calculateMaxSecondsPerTick(episodeDuration, maxWidth))
     }
 
     val transformation = rememberTransformableState { zoom, _, _ ->
