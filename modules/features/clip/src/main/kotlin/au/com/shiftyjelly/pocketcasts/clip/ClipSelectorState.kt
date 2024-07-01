@@ -67,6 +67,23 @@ internal class ClipSelectorState(
     var spaceWidthDp by mutableStateOf(SpaceWidth * scale)
 
     /**
+     * Represents the width at which the distance between ticks in a larger resolution
+     * matches the distance between five ticks in a smaller resolution.
+     *
+     * For example, if each tick represents 5 seconds, when the user zooms in,
+     * we want to switch to 1 second per tick at a certain point. This switch point
+     * occurs when the distances between the ticks match.
+     *
+     * Illustration:
+     * |                   | - 5 seconds per tick
+     * | - | - | - | - | - | - 1 second per tick
+     *
+     * At this switch point, the tick resolution will change depending on
+     * whether the user is zooming in or zooming out.
+     */
+    private val scaleTippingPoint = (TickWidth + SpaceWidth) * 5
+
+    /**
      * Compute maxium tick resolution in seconds that would allow to diplay episode duration
      * on a timeline at least once.
      */
@@ -94,15 +111,16 @@ internal class ClipSelectorState(
         onTimelineScaleUpdate: (Float, Int) -> Unit,
     ) {
         val newScale = scale * zoom
+        val expectedSpace = SpaceWidth * newScale
         when {
-            newScale > 5f -> if (secondsPerTick != 1) {
+            newScale > 1f && expectedSpace >= scaleTippingPoint -> if (secondsPerTick != 1) {
                 secondsPerTick /= 5
                 scale = 1f
                 onTimelineScaleUpdate(scale, secondsPerTick)
             }
-            newScale < 1f -> if (secondsPerTick != maxSecondsPerTick) {
+            newScale < 1f && expectedSpace <= scaleTippingPoint -> if (secondsPerTick != maxSecondsPerTick) {
                 secondsPerTick *= 5
-                scale = 5f
+                scale = scaleTippingPoint / expectedSpace
                 onTimelineScaleUpdate(scale, secondsPerTick)
             }
             else -> {

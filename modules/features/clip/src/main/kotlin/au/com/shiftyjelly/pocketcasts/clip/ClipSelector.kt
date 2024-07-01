@@ -173,6 +173,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
     }
 
     LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(state.spaceWidthDp),
         verticalAlignment = Alignment.CenterVertically,
         state = state.listState,
         modifier = Modifier
@@ -204,7 +205,10 @@ private fun BoxWithConstraintsScope.ClipTimeline(
                 )
             },
     ) {
-        items(episodeDuration.inWholeSeconds.toInt().ceilDiv(state.secondsPerTick) + 1) { index ->
+        items(
+            count = episodeDuration.inWholeSeconds.toInt().ceilDiv(state.secondsPerTick) + 1,
+            key = { index -> index },
+        ) { index ->
             val heightIndex = when (index % 10) {
                 0 -> largeTickHeight
                 5 -> mediumTickHeight
@@ -212,7 +216,6 @@ private fun BoxWithConstraintsScope.ClipTimeline(
             }
             Box(
                 modifier = Modifier
-                    .padding(end = state.spaceWidthDp)
                     .width(state.tickWidthDp)
                     .height(heightIndex)
                     .background(clipColors.timelineTick),
