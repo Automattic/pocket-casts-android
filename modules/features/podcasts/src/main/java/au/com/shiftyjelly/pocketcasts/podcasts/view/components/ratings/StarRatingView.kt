@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.UUID
 
 @Composable
@@ -93,11 +95,13 @@ private fun Content(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        TextP40(
-            text = stringResource(R.string.rate_button),
-            fontWeight = FontWeight.W500,
-            modifier = Modifier.clickable { onClick() },
-        )
+        if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
+            TextP40(
+                text = stringResource(R.string.rate_button),
+                fontWeight = FontWeight.W500,
+                modifier = Modifier.clickable { onClick() },
+            )
+        }
     }
 }
 
