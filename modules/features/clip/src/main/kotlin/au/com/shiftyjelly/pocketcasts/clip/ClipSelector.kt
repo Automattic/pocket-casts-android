@@ -371,46 +371,41 @@ private fun BoxWithConstraintsScope.ClipBox(
 }
 
 @ShowkaseComposable(name = "ClipSelectorPaused", group = "Clip")
-@Preview(name = "ClipSelectorPaused", device = "spec:width=400dp,height=800dp,dpi=320")
+@Preview(name = "Paused", device = PreviewDevicePortrait)
 @Composable
 fun ClipSelectorPausedPreview() = ClipSelectorPreview()
 
-@ShowkaseComposable(name = "ClipSelectorPaused", group = "Clip")
-@Preview(name = "ClipSelectorPaused", device = "spec:width=400dp,height=800dp,dpi=320")
+@ShowkaseComposable(name = "ClipSelectorPlaying", group = "Clip")
+@Preview(name = "Playing", device = PreviewDevicePortrait)
 @Composable
 fun ClipSelectorPlayingPreview() = ClipSelectorPreview(isPlaying = true)
 
-@Preview(name = "ClipSelectorZoomed", device = "spec:width=400dp,height=800dp,dpi=320")
+@Preview(name = "Zoomed in", device = PreviewDevicePortrait)
 @Composable
 private fun ClipSelectorZoomedPreview() = ClipSelectorPreview(
     clipEnd = 10.seconds,
     scale = 5f,
-    endOffset = 430f,
 )
 
-@Preview(name = "ClipSelectorScrolled", device = "spec:width=400dp,height=800dp,dpi=320")
+@Preview(name = "Scrolled", device = PreviewDevicePortrait)
 @Composable
 private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
     clipEnd = 55.seconds,
-    startOffset = 385f,
-    endOffset = 605f,
-    firstVisibleItemIndex = 20,
+    firstVisibleItemIndex = 25,
 )
 
-@Preview(name = "ClipSelectorNoStartHandle", device = "spec:width=400dp,height=800dp,dpi=320")
+@Preview(name = "No start handle", device = PreviewDevicePortrait)
 @Composable
 private fun ClipSelectorNoStartHandlePreview() = ClipSelectorPreview(
     firstVisibleItemIndex = 5,
 )
 
-@Preview(name = "ClipSelectorNoEndHandle", device = "spec:width=400dp,height=800dp,dpi=320")
+@Preview(name = "No end handle", device = PreviewDevicePortrait)
 @Composable
 private fun ClipSelectorNoEndHandlePreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
     clipEnd = 75.seconds,
-    startOffset = 385f,
-    endOffset = 825f,
 )
 
 @Composable
@@ -420,8 +415,6 @@ private fun ClipSelectorPreview(
     isPlaying: Boolean = false,
     firstVisibleItemIndex: Int = 0,
     scale: Float = 1f,
-    startOffset: Float = 0f,
-    endOffset: Float = 165f,
 ) {
     val clipColors = ClipColors(Color(0xFFEC0404))
     Box(
@@ -439,8 +432,6 @@ private fun ClipSelectorPreview(
             state = rememberClipSelectorState(
                 firstVisibleItemIndex = firstVisibleItemIndex,
                 scale = scale,
-                startOffset = startOffset,
-                endOffset = endOffset,
             ),
         )
     }

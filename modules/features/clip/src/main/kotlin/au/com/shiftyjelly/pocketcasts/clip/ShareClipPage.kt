@@ -330,20 +330,24 @@ private fun CloseButton(
         .background(clipColors.closeButton),
 )
 
+internal const val PreviewDevicePortrait = "spec:width=400dp,height=800dp,dpi=320"
+internal const val PreviewDeviceLandscape = "$PreviewDevicePortrait,orientation=landscape"
+internal const val PreviewPixelsPerDuration = 11f
+
 @ShowkaseComposable(name = "ShareClipPageVertical", group = "Clip")
-@Preview(name = "ShareClipPageVertical", device = "spec:width=400dp,height=800dp,dpi=320")
+@Preview(name = "ShareClipPageVertical", device = PreviewDevicePortrait)
 @Composable
 fun ShareClipPageVerticalPreview() = ShareClipPagePreview()
+
+@ShowkaseComposable(name = "ShareClipHorizontalPage", group = "Clip")
+@Preview(name = "ShareClipHorizontalPage", device = PreviewDeviceLandscape)
+@Composable
+fun ShareClipPageHorizontalPreview() = ShareClipPagePreview()
 
 @ShowkaseComposable(name = "ShareClipVerticalSmallPage", group = "Clip")
 @Preview(name = "ShareClipVerticalSmallPage", device = "spec:width=360dp,height=640dp,dpi=320,orientation=portrait")
 @Composable
 fun ShareClipPageVerticalSmallPreview() = ShareClipPagePreview()
-
-@ShowkaseComposable(name = "ShareClipHorizontalPage", group = "Clip")
-@Preview(name = "ShareClipHorizontalPage", device = "spec:width=400dp,height=800dp,dpi=320,orientation=landscape")
-@Composable
-fun ShareClipPageHorizontalPreview() = ShareClipPagePreview()
 
 @ShowkaseComposable(name = "ShareClipHorizontalSmallPage", group = "Clip")
 @Preview(name = "ShareClipHorizontalSmallPage", device = "spec:width=360dp,height=640dp,dpi=320,orientation=landscape")
@@ -353,33 +357,35 @@ fun ShareClipPageHorizontalSmallPreview() = ShareClipPagePreview()
 @Composable
 internal fun ShareClipPagePreview(
     color: Long = 0xFFEC0404,
-    endOffset: Float = 165f,
-) = ShareClipPage(
-    episode = PodcastEpisode(
-        uuid = "episode-id",
-        podcastUuid = "podcast-id",
-        publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
-        title = "Episode title",
-        duration = 125.0,
-    ),
-    podcast = Podcast(
-        uuid = "podcast-id",
-        title = "Podcast title",
-        episodeFrequency = "monthly",
-    ),
-    clipRange = Clip.Range(0.seconds, 15.seconds),
-    episodeCount = 120,
-    isPlaying = false,
-    useEpisodeArtwork = true,
-    clipColors = ClipColors(Color(color)),
-    onClip = {},
-    onPlayClick = {},
-    onPauseClick = {},
-    onClipStartUpdate = {},
-    onClipEndUpdate = {},
-    onClose = {},
-    state = rememberClipSelectorState(
-        firstVisibleItemIndex = 0,
-        endOffset = endOffset,
-    ),
-)
+) {
+    val clipRange = Clip.Range(0.seconds, 15.seconds)
+    ShareClipPage(
+        episode = PodcastEpisode(
+            uuid = "episode-id",
+            podcastUuid = "podcast-id",
+            publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
+            title = "Episode title",
+            duration = 125.0,
+        ),
+        podcast = Podcast(
+            uuid = "podcast-id",
+            title = "Podcast title",
+            episodeFrequency = "monthly",
+        ),
+        clipRange = clipRange,
+        episodeCount = 120,
+        isPlaying = false,
+        useEpisodeArtwork = true,
+        clipColors = ClipColors(Color(color)),
+        onClip = {},
+        onPlayClick = {},
+        onPauseClick = {},
+        onClipStartUpdate = {},
+        onClipEndUpdate = {},
+        onClose = {},
+        state = rememberClipSelectorState(
+            firstVisibleItemIndex = 0,
+            endOffset = clipRange.end.inWholeSeconds * PreviewPixelsPerDuration,
+        ),
+    )
+}
