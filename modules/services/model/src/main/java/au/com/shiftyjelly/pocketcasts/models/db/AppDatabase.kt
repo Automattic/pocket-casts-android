@@ -85,7 +85,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         TrendingPodcast::class,
         Transcript::class,
     ],
-    version = 97,
+    version = 98,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
