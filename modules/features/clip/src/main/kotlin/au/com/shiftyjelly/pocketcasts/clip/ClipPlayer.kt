@@ -110,9 +110,13 @@ private class ExoPlayerClipPlayer(
             }
         }
     }.stateIn(coroutineScope, SharingStarted.Lazily, Duration.ZERO)
+
+    // Progress UI indicator syncs with playback progress emited from the player.
+    // Disable the dispatch to make dragging animation smoother.
     private var isPlaybackProgressDispatchEnabled = true
     private var playbackPollingFrequency = 100.milliseconds
     private var pendingPlaybkacProgressJob: Job? = null
+    private var currentSeekToDuration: Duration? = null
 
     init {
         exoPlayer.addListener(object : Player.Listener {
@@ -141,51 +145,63 @@ private class ExoPlayerClipPlayer(
         }
         pendingPlaybkacProgressJob?.cancel()
         isPlaybackProgressDispatchEnabled = true
-        if (exoPlayer.currentMediaItem != null) {
-            if (exoPlayer.playbackState == STATE_ENDED) {
-                exoPlayer.seekTo(0L)
-            }
-            exoPlayer.play()
-            return true
+        if (!continuePlayback()) {
+            playNewClip(clip)
         }
-        exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(clip.toMediaItem()))
-        exoPlayer.prepare()
-        exoPlayer.play()
         return true
     }
 
+    private fun continuePlayback() = if (exoPlayer.currentMediaItem != null) {
+        if (exoPlayer.playbackState == STATE_ENDED) {
+            exoPlayer.seekTo(0L)
+        } else {
+            currentSeekToDuration?.let { exoPlayer.seekTo(it.inWholeMilliseconds) }
+            currentSeekToDuration = null
+        }
+        exoPlayer.play()
+        true
+    } else {
+        false
+    }
+
+    private fun playNewClip(clip: Clip) {
+        exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(clip.toMediaItem()))
+        exoPlayer.prepare()
+        currentSeekToDuration?.let { exoPlayer.seekTo(it.inWholeMilliseconds) }
+        currentSeekToDuration = null
+        exoPlayer.play()
+    }
+
     override fun stop(): Boolean {
-        isPlaybackProgressDispatchEnabled = true
         if (!exoPlayer.isPlaying) {
             exoPlayer.clearMediaItems()
             return false
         }
         exoPlayer.stop()
+        isPlaybackProgressDispatchEnabled = true
         exoPlayer.clearMediaItems()
         return true
     }
 
     override fun pause(): Boolean {
-        isPlaybackProgressDispatchEnabled = true
         if (!exoPlayer.isPlaying) {
             return false
         }
         exoPlayer.pause()
+        isPlaybackProgressDispatchEnabled = true
         return true
     }
 
     override fun seekTo(duration: Duration) {
-        // Progress UI indicator syncs with playback progress emited from the player.
-        // Disable the dispatch to make dragging animation smoother.
         isPlaybackProgressDispatchEnabled = false
         if (exoPlayer.isPlaying) {
             exoPlayer.pause()
         }
-        exoPlayer.seekTo(duration.inWholeMilliseconds)
+        currentSeekToDuration = duration
     }
 
     override fun setPlaybackPollingPeriod(idleDuration: Duration) {
-        this.playbackPollingFrequency = idleDuration
+        playbackPollingFrequency = idleDuration
         pendingPlaybkacProgressJob?.cancel()
     }
 
