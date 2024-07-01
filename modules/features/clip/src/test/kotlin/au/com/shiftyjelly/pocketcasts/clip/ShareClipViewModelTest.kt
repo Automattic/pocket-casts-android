@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.clip.FakeClipPlayer.PlaybackState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.util.Date
 import junit.framework.TestCase.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +78,7 @@ class ShareClipViewModelTest {
         viewModel.uiState.test {
             viewModel.playClip()
 
-            assertEquals(Clip(episode, Clip.Range(15.seconds, 30.seconds)), clipPlayer.clips.awaitItem())
+            assertEquals(Clip.fromEpisode(episode, Clip.Range(15.seconds, 30.seconds)), clipPlayer.clips.awaitItem())
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -89,9 +91,11 @@ class ShareClipViewModelTest {
 
             viewModel.playClip()
             assertTrue(awaitItem().isPlaying)
+            assertEquals(PlaybackState.Playing, clipPlayer.playbackStates.awaitItem())
 
-            viewModel.stopClip()
+            viewModel.pauseClip()
             assertFalse(awaitItem().isPlaying)
+            assertEquals(PlaybackState.Paused, clipPlayer.playbackStates.awaitItem())
         }
     }
 
@@ -112,6 +116,48 @@ class ShareClipViewModelTest {
 
             viewModel.updateClipEnd(20.seconds)
             assertEquals(Clip.Range(15.seconds, 20.seconds), awaitItem().clip?.range)
+        }
+    }
+
+    @Test
+    fun `updating clip start stops playback`() = runTest {
+        viewModel.uiState.test {
+            viewModel.playClip()
+            skipItems(2)
+            assertEquals(PlaybackState.Playing, clipPlayer.playbackStates.awaitItem())
+
+            viewModel.updateClipStart(10.seconds)
+            skipItems(2)
+            assertEquals(PlaybackState.Stopped, clipPlayer.playbackStates.awaitItem())
+        }
+    }
+
+    @Test
+    fun `update clip end stops playback`() = runTest {
+        viewModel.uiState.test {
+            viewModel.playClip()
+            skipItems(2)
+            assertEquals(PlaybackState.Playing, clipPlayer.playbackStates.awaitItem())
+
+            viewModel.updateClipEnd(80.seconds)
+            skipItems(2)
+            assertEquals(PlaybackState.Stopped, clipPlayer.playbackStates.awaitItem())
+        }
+    }
+
+    @Test
+    fun `update polling period`() = runTest {
+        viewModel.uiState.test {
+            skipItems(1)
+
+            viewModel.updateProgressPollingPeriod(scale = 1f, tickResolution = 1)
+            assertEquals(200.milliseconds, clipPlayer.pollingPeriods.awaitItem())
+
+            viewModel.updateProgressPollingPeriod(scale = 5f, tickResolution = 1)
+            assertEquals(40.milliseconds, clipPlayer.pollingPeriods.awaitItem())
+
+            viewModel.updateProgressPollingPeriod(scale = 1f, tickResolution = 5)
+            assertEquals(1.seconds, clipPlayer.pollingPeriods.awaitItem())
         }
     }
 
@@ -143,7 +189,7 @@ class ShareClipViewModelTest {
     fun `pausing clip tracks analytics event`() = runTest {
         viewModel.uiState.test {
             viewModel.playClip()
-            viewModel.stopClip()
+            viewModel.pauseClip()
 
             val event = tracker.events.last()
 
@@ -186,7 +232,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks no changes to the clip`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, clipRange))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange))
 
         val event = tracker.events.last()
 
@@ -210,7 +256,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks changes to the clip start`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, clipRange.copy(start = 7.seconds)))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange.copy(start = 7.seconds)))
 
         val event = tracker.events.last()
 
@@ -234,7 +280,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks changes to the clip end`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, clipRange.copy(end = 20.seconds)))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange.copy(end = 20.seconds)))
 
         val event = tracker.events.last()
 
@@ -258,7 +304,7 @@ class ShareClipViewModelTest {
 
     @Test
     fun `sharing clip link tracks changes to the whole clip`() = runTest {
-        viewModel.onClipLinkShared(Clip(episode, Clip.Range(17.seconds, 34.seconds)))
+        viewModel.onClipLinkShared(Clip.fromEpisode(episode, Clip.Range(17.seconds, 34.seconds)))
 
         val event = tracker.events.last()
 

@@ -33,6 +33,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,6 +61,7 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -67,12 +69,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun ClipSelector(
     episodeDuration: Duration,
     clipRange: Clip.Range,
+    playbackProgress: Duration,
     isPlaying: Boolean,
     clipColors: ClipColors,
-    onPlayClick: () -> Unit,
-    onPauseClick: () -> Unit,
-    onClipStartUpdate: (Duration) -> Unit,
-    onClipEndUpdate: (Duration) -> Unit,
+    listener: ShareClipPageListener,
     modifier: Modifier = Modifier,
     state: ClipSelectorState = rememberClipSelectorState(firstVisibleItemIndex = 0),
 ) {
@@ -101,7 +101,7 @@ internal fun ClipSelector(
                     indication = rememberRipple(color = clipColors.base),
                     onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
                     role = Role.Button,
-                    onClick = if (isPlaying) onPauseClick else onPlayClick,
+                    onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
                 )
                 .padding(16.dp),
         )
@@ -111,9 +111,9 @@ internal fun ClipSelector(
         ClipSelector(
             episodeDuration = episodeDuration,
             clipRange = clipRange,
+            playbackProgress = playbackProgress,
             clipColors = clipColors,
-            onClipStartUpdate = onClipStartUpdate,
-            onClipEndUpdate = onClipEndUpdate,
+            listener = listener,
             state = state,
         )
     }
@@ -123,10 +123,10 @@ internal fun ClipSelector(
 private fun ClipSelector(
     episodeDuration: Duration,
     clipRange: Clip.Range,
+    playbackProgress: Duration,
     clipColors: ClipColors,
     state: ClipSelectorState,
-    onClipStartUpdate: (Duration) -> Unit,
-    onClipEndUpdate: (Duration) -> Unit,
+    listener: ShareClipPageListener,
 ) {
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize(),
@@ -136,16 +136,15 @@ private fun ClipSelector(
             clipRange = clipRange,
             clipColors = clipColors,
             state = state,
-            onClipStartUpdate = onClipStartUpdate,
-            onClipEndUpdate = onClipEndUpdate,
+            listener = listener,
         )
         ClipBox(
             episodeDuration = episodeDuration,
             clipRange = clipRange,
+            playbackProgress = playbackProgress,
             clipColors = clipColors,
             state = state,
-            onClipStartUpdate = onClipStartUpdate,
-            onClipEndUpdate = onClipEndUpdate,
+            listener = listener,
         )
     }
 }
@@ -156,8 +155,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
     clipRange: Clip.Range,
     clipColors: ClipColors,
     state: ClipSelectorState,
-    onClipStartUpdate: (Duration) -> Unit,
-    onClipEndUpdate: (Duration) -> Unit,
+    listener: ShareClipPageListener,
 ) {
     val largeTickHeight = maxHeight / 3
     val mediumTickHeight = maxHeight / 6
@@ -171,7 +169,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
     }
 
     val transformation = rememberTransformableState { zoom, _, _ ->
-        state.updateTimelineScale(zoom, maxSecondsPerTick)
+        state.updateTimelineScale(zoom, maxSecondsPerTick, listener::onUpdateTimeline)
     }
 
     LazyRow(
@@ -193,13 +191,13 @@ private fun BoxWithConstraintsScope.ClipTimeline(
                             val newClipStart = state.pixelsToDuration(offsetX)
                             if (newClipStart >= Duration.ZERO && (clipRange.end - newClipStart) >= 1.seconds) {
                                 state.startOffset = offsetX
-                                onClipStartUpdate(newClipStart)
+                                listener.onUpdateClipStart(newClipStart)
                             }
                         } else {
                             val newClipEnd = state.pixelsToDuration(offsetX)
                             if (newClipEnd <= episodeDuration && (newClipEnd - clipRange.start) >= 1.seconds) {
                                 state.endOffset = offsetX
-                                onClipEndUpdate(newClipEnd)
+                                listener.onUpdateClipEnd(newClipEnd)
                             }
                         }
                     },
@@ -227,9 +225,9 @@ private fun BoxWithConstraintsScope.ClipTimeline(
 private fun BoxWithConstraintsScope.ClipBox(
     episodeDuration: Duration,
     clipRange: Clip.Range,
+    playbackProgress: Duration,
     clipColors: ClipColors,
-    onClipStartUpdate: (Duration) -> Unit,
-    onClipEndUpdate: (Duration) -> Unit,
+    listener: ShareClipPageListener,
     state: ClipSelectorState,
 ) {
     val handleWidth = 16.dp
@@ -237,6 +235,9 @@ private fun BoxWithConstraintsScope.ClipBox(
 
     var frameOffsetPx by remember { mutableIntStateOf(-(handleWidthPx / 2).roundToInt()) }
     val scrollOffset by remember { state.scrollOffsetState }
+    var progressOffsetPx by remember(playbackProgress, state.itemWidth) {
+        mutableFloatStateOf(state.durationToPixels(playbackProgress, accuracy = DurationUnit.MILLISECONDS))
+    }
 
     Box(
         modifier = Modifier
@@ -250,6 +251,34 @@ private fun BoxWithConstraintsScope.ClipBox(
             .offset { IntOffset(-scrollOffset.roundToInt(), 0) }
             .fillMaxSize(),
     ) {
+        // Outer box to increase the touch area of the progress bar
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .offset(x = -handleWidth + 1.dp)
+                .offset { IntOffset((progressOffsetPx + state.startOffset).roundToInt(), 0) }
+                .width(handleWidth * 2)
+                .fillMaxHeight()
+                .draggable(
+                    state = rememberDraggableState { delta ->
+                        val newOffset = progressOffsetPx + delta
+                        val newProgress = state.pixelsToDuration(newOffset)
+                        if ((clipRange.start + newProgress) in clipRange) {
+                            listener.onUpdateClipProgress(state.pixelsToDuration(newOffset))
+                            progressOffsetPx = newOffset
+                        }
+                    },
+                    orientation = Orientation.Horizontal,
+                ),
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(2.dp)
+                    .fillMaxHeight()
+                    .background(clipColors.timelineProgress),
+            )
+        }
+
         val startDescription = pluralStringResource(
             id = LR.plurals.podcast_share_start_handle_description,
             count = clipRange.startInSeconds,
@@ -258,7 +287,7 @@ private fun BoxWithConstraintsScope.ClipBox(
         // Outer box to increase the touch area of the handle
         Box(
             modifier = Modifier
-                .offset { IntOffset((state.startOffset - handleWidthPx * 1.5).roundToInt(), 0) }
+                .offset { IntOffset((state.startOffset - handleWidthPx * 2).roundToInt(), 0) }
                 .width(handleWidth * 2)
                 .fillMaxHeight()
                 .draggable(
@@ -266,8 +295,9 @@ private fun BoxWithConstraintsScope.ClipBox(
                         val newStartOffset = state.startOffset + delta
                         val newClipStart = state.pixelsToDuration(newStartOffset)
                         if (newClipStart >= Duration.ZERO && (clipRange.end - newClipStart) >= 1.seconds) {
+                            listener.onUpdateClipStart(newClipStart)
                             state.startOffset = newStartOffset
-                            onClipStartUpdate(newClipStart)
+                            progressOffsetPx = 0f
                         }
                     },
                     orientation = Orientation.Horizontal,
@@ -277,7 +307,7 @@ private fun BoxWithConstraintsScope.ClipBox(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .offset(handleWidth / 2)
+                    .offset(handleWidth)
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topStart = handleWidth / 2, bottomStart = handleWidth / 2))
@@ -300,7 +330,8 @@ private fun BoxWithConstraintsScope.ClipBox(
         // Outer box to increas the touch area of the handle
         Box(
             modifier = Modifier
-                .offset { IntOffset((state.endOffset - handleWidthPx / 2).roundToInt(), 0) }
+                .offset(x = state.tickWidthDp)
+                .offset { IntOffset(state.endOffset.roundToInt(), 0) }
                 .width(handleWidth * 2)
                 .fillMaxHeight()
                 .draggable(
@@ -308,8 +339,9 @@ private fun BoxWithConstraintsScope.ClipBox(
                         val newEndOffset = state.endOffset + delta
                         val newClipEnd = state.pixelsToDuration(newEndOffset)
                         if (newClipEnd <= episodeDuration && (newClipEnd - clipRange.start) >= 1.seconds) {
+                            listener.onUpdateClipEnd(newClipEnd)
                             state.endOffset = newEndOffset
-                            onClipEndUpdate(newClipEnd)
+                            progressOffsetPx = 0f
                         }
                     },
                     orientation = Orientation.Horizontal,
@@ -319,7 +351,6 @@ private fun BoxWithConstraintsScope.ClipBox(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .offset(handleWidth / 2)
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topEnd = handleWidth / 2, bottomEnd = handleWidth / 2))
@@ -334,6 +365,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                 )
             }
         }
+
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -408,10 +440,23 @@ private fun ClipSelectorNoEndHandlePreview() = ClipSelectorPreview(
     clipEnd = 75.seconds,
 )
 
+@Preview(name = "Playback in middle", device = PreviewDevicePortrait)
+@Composable
+private fun ClipSelectorInProgressPreview() = ClipSelectorPreview(
+    progressPlayback = 10.seconds,
+)
+
+@Preview(name = "Playback at end", device = PreviewDevicePortrait)
+@Composable
+private fun ClipSelectorPlayedPreview() = ClipSelectorPreview(
+    progressPlayback = 15.seconds,
+)
+
 @Composable
 private fun ClipSelectorPreview(
     clipStart: Duration = 0.seconds,
     clipEnd: Duration = 15.seconds,
+    progressPlayback: Duration = 0.seconds,
     isPlaying: Boolean = false,
     firstVisibleItemIndex: Int = 0,
     scale: Float = 1f,
@@ -423,12 +468,10 @@ private fun ClipSelectorPreview(
         ClipSelector(
             episodeDuration = 5.minutes,
             clipRange = Clip.Range(clipStart, clipEnd),
+            playbackProgress = progressPlayback,
             isPlaying = isPlaying,
             clipColors = clipColors,
-            onPlayClick = {},
-            onPauseClick = {},
-            onClipStartUpdate = {},
-            onClipEndUpdate = {},
+            listener = ShareClipPageListener.Preview,
             state = rememberClipSelectorState(
                 firstVisibleItemIndex = firstVisibleItemIndex,
                 scale = scale,
