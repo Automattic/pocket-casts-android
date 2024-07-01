@@ -38,14 +38,16 @@ class ShareClipViewModel @AssistedInject constructor(
         podcastManager.observeEpisodeCountByEpisodeUuid(episodeUuid),
         clipRange,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
+        clipPlayer.playbackProgress,
         clipPlayer.isPlayingState,
-        transform = { episode, podcast, episodeCount, clipRange, useEpisodeArtwork, isPlaying ->
+        transform = { episode, podcast, episodeCount, clipRange, useEpisodeArtwork, playbackProgress, isPlaying ->
             UiState(
                 episode = episode,
                 podcast = podcast,
                 clipRange = clipRange,
                 episodeCount = episodeCount,
                 useEpisodeArtwork = useEpisodeArtwork,
+                playbackProgress = playbackProgress,
                 isPlaying = isPlaying,
             )
         },
@@ -53,36 +55,49 @@ class ShareClipViewModel @AssistedInject constructor(
 
     fun playClip() {
         if (uiState.value.clip?.let(clipPlayer::play) == true) {
-            Timber.tag("Clip playback started")
+            Timber.tag(TAG).d("Clip playback started")
             clipAnalytics.playTapped()
         }
     }
 
-    fun stopClip() {
-        if (clipPlayer.stop()) {
-            Timber.tag("Clip playback stopped")
+    fun pauseClip() {
+        if (clipPlayer.pause()) {
+            Timber.tag(TAG).d("Clip playback paused")
             clipAnalytics.pauseTapped()
         }
     }
 
     fun updateClipStart(duration: Duration) {
-        Timber.d("Clip start updated to $duration")
+        Timber.tag(TAG).d("Clip start updated to $duration")
         clipRange.value = clipRange.value.copy(start = duration)
+        clipPlayer.stop()
     }
 
     fun updateClipEnd(duration: Duration) {
-        Timber.d("Clip end updated to $duration")
+        Timber.tag(TAG).d("Clip end updated to $duration")
         clipRange.value = clipRange.value.copy(end = duration)
+        clipPlayer.stop()
     }
 
     fun onClipScreenShown() {
-        Timber.d("Clip screen shown")
+        Timber.tag(TAG).d("Clip screen shown")
         clipAnalytics.screenShown()
     }
 
     fun onClipLinkShared(clip: Clip) {
-        Timber.d("Clip shared: $clip")
+        Timber.tag(TAG).d("Clip shared: $clip")
         clipAnalytics.linkShared(clip)
+    }
+
+    fun onClipProgressUpdate(progress: Duration) {
+        Timber.tag(TAG).d("Clip progress updated: $progress")
+        clipPlayer.seekTo(progress)
+    }
+
+    fun onTimelineResolutionUpdate(scale: Float, tickResolution: Int) {
+        val pollingPeriod = tickResolution.seconds / (5 * scale.toDouble())
+        Timber.tag(TAG).d("Update clip playback polling period: $pollingPeriod")
+        clipPlayer.setPlaybackPollingPeriod(pollingPeriod)
     }
 
     override fun onCleared() {
@@ -95,6 +110,7 @@ class ShareClipViewModel @AssistedInject constructor(
         val episodeCount: Int = 0,
         val clipRange: Clip.Range = Clip.Range(15.seconds, 30.seconds),
         val useEpisodeArtwork: Boolean = false,
+        val playbackProgress: Duration = Duration.ZERO,
         val isPlaying: Boolean = false,
     ) {
         val clip get() = episode?.let { Clip(it, clipRange) }
@@ -108,5 +124,9 @@ class ShareClipViewModel @AssistedInject constructor(
             clipPlayer: ClipPlayer,
             clipAnalytics: ClipAnalytics,
         ): ShareClipViewModel
+    }
+
+    private companion object {
+        const val TAG = "ClipSharing"
     }
 }

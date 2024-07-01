@@ -85,12 +85,13 @@ class ShareClipFragment : BaseDialogFragment() {
                 episode = state.episode,
                 podcast = state.podcast,
                 clipRange = state.clipRange,
+                playbackProgress = state.playbackProgress,
                 episodeCount = state.episodeCount,
                 isPlaying = state.isPlaying,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 clipColors = clipColors,
                 onPlayClick = viewModel::playClip,
-                onPauseClick = viewModel::stopClip,
+                onPauseClick = viewModel::pauseClip,
                 onClip = {
                     state.podcast?.let { podcast ->
                         state.clip?.let { clip ->
@@ -100,6 +101,8 @@ class ShareClipFragment : BaseDialogFragment() {
                 },
                 onClipStartUpdate = viewModel::updateClipStart,
                 onClipEndUpdate = viewModel::updateClipEnd,
+                onPlaybackProgressUpdate = viewModel::onClipProgressUpdate,
+                onTimelineScaleUpdate = viewModel::onTimelineResolutionUpdate,
                 onClose = ::dismiss,
             )
         }
