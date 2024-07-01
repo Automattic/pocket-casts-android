@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @Composable
 internal fun rememberClipSelectorState(
@@ -87,18 +88,27 @@ internal class ClipSelectorState(
         return resolution.coerceAtLeast(1)
     }
 
-    fun updateTimelineScale(zoom: Float, maxSecondsPerTick: Int) {
+    fun updateTimelineScale(
+        zoom: Float,
+        maxSecondsPerTick: Int,
+        onTimelineScaleUpdate: (Float, Int) -> Unit,
+    ) {
         val newScale = scale * zoom
         when {
             newScale > 5f -> if (secondsPerTick != 1) {
                 secondsPerTick /= 5
                 scale = 1f
+                onTimelineScaleUpdate(scale, secondsPerTick)
             }
             newScale < 1f -> if (secondsPerTick != maxSecondsPerTick) {
                 secondsPerTick *= 5
                 scale = 5f
+                onTimelineScaleUpdate(scale, secondsPerTick)
             }
-            else -> scale = newScale
+            else -> {
+                scale = newScale
+                onTimelineScaleUpdate(scale, secondsPerTick)
+            }
         }
     }
 
@@ -112,9 +122,8 @@ internal class ClipSelectorState(
         endOffset = durationToPixels(clipRange.end)
     }
 
-    fun durationToPixels(duration: Duration): Float {
-        val seconds = duration.inWholeSeconds
-        val ticks = seconds.toFloat() / secondsPerTick
+    fun durationToPixels(duration: Duration, accuracy: DurationUnit = DurationUnit.SECONDS): Float {
+        val ticks = duration.inWholeUnitsAsSeconds(accuracy) / secondsPerTick
         return itemWidth * ticks
     }
 
@@ -122,6 +131,16 @@ internal class ClipSelectorState(
         val ticks = pixels / itemWidth
         val seconds = ticks * secondsPerTick
         return seconds.toDouble().seconds
+    }
+
+    private fun Duration.inWholeUnitsAsSeconds(accuracy: DurationUnit) = when (accuracy) {
+        DurationUnit.NANOSECONDS -> inWholeNanoseconds.toFloat() / 1_000_000_000
+        DurationUnit.MICROSECONDS -> inWholeMicroseconds.toFloat() / 1_000_000
+        DurationUnit.MILLISECONDS -> inWholeMilliseconds.toFloat() / 1_000
+        DurationUnit.SECONDS -> inWholeSeconds.toFloat()
+        DurationUnit.MINUTES -> inWholeMinutes.toFloat() * 60
+        DurationUnit.HOURS -> inWholeHours.toFloat() * 3600
+        DurationUnit.DAYS -> inWholeDays.toFloat() * 86_400
     }
 
     companion object {

@@ -22,6 +22,8 @@ data class Clip(
 
         @IgnoredOnParcel val endInSeconds = end.inWholeSeconds.toInt()
 
+        operator fun contains(duration: Duration) = duration in start..end
+
         companion object {
             fun fromPosition(
                 playbackPosition: Duration,
