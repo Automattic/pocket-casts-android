@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.di
 
 import androidx.fragment.app.FragmentManager
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
@@ -33,6 +34,6 @@ object AutomotiveAppModule {
 
     @Provides
     fun shareActionProvider() = object : ShareActionProvider {
-        override fun clipAction(podcastEpisode: PodcastEpisode, podcast: Podcast, fragmentManager: FragmentManager) = Unit
+        override fun clipAction(podcastEpisode: PodcastEpisode, podcast: Podcast, fragmentManager: FragmentManager, source: SourceView) = Unit
     }
 }

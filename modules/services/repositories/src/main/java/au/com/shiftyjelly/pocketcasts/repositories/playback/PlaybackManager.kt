@@ -551,6 +551,7 @@ open class PlaybackManager @Inject constructor(
         when (sourceView) {
             SourceView.AUTO_PAUSE,
             SourceView.AUTO_PLAY,
+            SourceView.CLIP_SHARING,
             SourceView.CHROMECAST,
             SourceView.DISCOVER,
             SourceView.DISCOVER_PLAIN_LIST,

@@ -27,9 +27,9 @@ interface ClipPlayer {
 
     val errors: Flow<Exception>
 
-    fun play(clip: Clip)
+    fun play(clip: Clip): Boolean
 
-    fun stop()
+    fun stop(): Boolean
 
     fun release()
 
@@ -80,18 +80,25 @@ private class ExoPlayerClipPlayer(
     }
 
     @OptIn(UnstableApi::class)
-    override fun play(clip: Clip) {
+    override fun play(clip: Clip): Boolean {
         if (exoPlayer.isLoading || exoPlayer.isPlaying) {
-            return
+            return false
         }
-        playbackManager.pause()
+        if (playbackManager.isPlaying()) {
+            playbackManager.pause()
+        }
         exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(clip.toMediaItem()))
         exoPlayer.prepare()
         exoPlayer.play()
+        return true
     }
 
-    override fun stop() {
+    override fun stop(): Boolean {
+        if (!exoPlayer.isPlaying) {
+            return false
+        }
         exoPlayer.stop()
+        return true
     }
 
     override fun release() {

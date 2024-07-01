@@ -18,12 +18,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
 
 @HiltViewModel(assistedFactory = ShareClipViewModel.Factory::class)
 class ShareClipViewModel @AssistedInject constructor(
     @Assisted private val episodeUuid: String,
     @Assisted initialClipRange: Clip.Range,
     @Assisted private val clipPlayer: ClipPlayer,
+    @Assisted private val clipAnalytics: ClipAnalytics,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
@@ -47,22 +49,40 @@ class ShareClipViewModel @AssistedInject constructor(
                 isPlaying = isPlaying,
             )
         },
-    ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = UiState(clipRange = initialClipRange))
+    ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = UiState(clipRange = initialClipRange))
 
     fun playClip() {
-        uiState.value.clip?.let(clipPlayer::play)
+        if (uiState.value.clip?.let(clipPlayer::play) == true) {
+            Timber.tag("Clip playback started")
+            clipAnalytics.playTapped()
+        }
     }
 
     fun stopClip() {
-        clipPlayer.stop()
+        if (clipPlayer.stop()) {
+            Timber.tag("Clip playback stopped")
+            clipAnalytics.pauseTapped()
+        }
     }
 
     fun updateClipStart(duration: Duration) {
+        Timber.d("Clip start updated to $duration")
         clipRange.value = clipRange.value.copy(start = duration)
     }
 
     fun updateClipEnd(duration: Duration) {
+        Timber.d("Clip end updated to $duration")
         clipRange.value = clipRange.value.copy(end = duration)
+    }
+
+    fun onClipScreenShown() {
+        Timber.d("Clip screen shown")
+        clipAnalytics.screenShown()
+    }
+
+    fun onClipLinkShared(clip: Clip) {
+        Timber.d("Clip shared: $clip")
+        clipAnalytics.linkShared(clip)
     }
 
     override fun onCleared() {
@@ -86,6 +106,7 @@ class ShareClipViewModel @AssistedInject constructor(
             episodeUuid: String,
             initialClipRange: Clip.Range,
             clipPlayer: ClipPlayer,
+            clipAnalytics: ClipAnalytics,
         ): ShareClipViewModel
     }
 }

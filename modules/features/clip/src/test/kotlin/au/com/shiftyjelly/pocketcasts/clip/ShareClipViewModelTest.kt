@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.clip
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -30,12 +33,14 @@ class ShareClipViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val clipPlayer = FakeClipPlayer()
+    private val tracker = FakeTracker()
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
     private val settings = mock<Settings>()
 
-    private val episode = PodcastEpisode(uuid = "episode-id", publishedDate = Date())
+    private val episode = PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date())
     private val podcast = Podcast(uuid = "podcast-id", title = "Podcast Title")
+    private val clipRange = Clip.Range(15.seconds, 30.seconds)
 
     private lateinit var viewModel: ShareClipViewModel
 
@@ -49,9 +54,17 @@ class ShareClipViewModelTest {
         whenever(settings.artworkConfiguration).thenReturn(artworkSetting)
 
         viewModel = ShareClipViewModel(
-            "episode-id",
-            Clip.Range(15.seconds, 30.seconds),
+            episode.uuid,
+            clipRange,
             clipPlayer,
+            ClipAnalytics(
+                episodeId = episode.uuid,
+                podcastId = podcast.uuid,
+                clipId = "clip-id",
+                source = SourceView.PLAYER,
+                initialClipRange = clipRange,
+                analyticsTracker = AnalyticsTracker.test(tracker, isEnabled = true),
+            ),
             episodeManager,
             podcastManager,
             settings,
@@ -60,9 +73,13 @@ class ShareClipViewModelTest {
 
     @Test
     fun `play clip`() = runTest {
-        viewModel.playClip()
+        viewModel.uiState.test {
+            viewModel.playClip()
 
-        assertEquals(Clip(episode, Clip.Range(15.seconds, 30.seconds)), clipPlayer.clips.awaitItem())
+            assertEquals(Clip(episode, Clip.Range(15.seconds, 30.seconds)), clipPlayer.clips.awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -96,5 +113,170 @@ class ShareClipViewModelTest {
             viewModel.updateClipEnd(20.seconds)
             assertEquals(Clip.Range(15.seconds, 20.seconds), awaitItem().clip?.range)
         }
+    }
+
+    @Test
+    fun `playing clip tracks analytics event`() = runTest {
+        viewModel.uiState.test {
+            viewModel.playClip()
+
+            val event = tracker.events.last()
+
+            assertEquals(
+                TrackEvent(
+                    AnalyticsEvent.CLIP_SCREEN_PLAY_TAPPED,
+                    mapOf(
+                        "episode_uuid" to "episode-id",
+                        "podcast_uuid" to "podcast-id",
+                        "clip_uuid" to "clip-id",
+                        "source" to "player",
+                    ),
+                ),
+                event,
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `pausing clip tracks analytics event`() = runTest {
+        viewModel.uiState.test {
+            viewModel.playClip()
+            viewModel.stopClip()
+
+            val event = tracker.events.last()
+
+            assertEquals(
+                TrackEvent(
+                    AnalyticsEvent.CLIP_SCREEN_PAUSE_TAPPED,
+                    mapOf(
+                        "episode_uuid" to "episode-id",
+                        "podcast_uuid" to "podcast-id",
+                        "clip_uuid" to "clip-id",
+                        "source" to "player",
+                    ),
+                ),
+                event,
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `track screen show event`() = runTest {
+        viewModel.onClipScreenShown()
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.CLIP_SCREEN_SHOWN,
+                mapOf(
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "clip_uuid" to "clip-id",
+                    "source" to "player",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `sharing clip link tracks no changes to the clip`() = runTest {
+        viewModel.onClipLinkShared(Clip(episode, clipRange))
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                mapOf(
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "clip_uuid" to "clip-id",
+                    "source" to "player",
+                    "start" to 15,
+                    "end" to 30,
+                    "start_modified" to false,
+                    "end_modified" to false,
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `sharing clip link tracks changes to the clip start`() = runTest {
+        viewModel.onClipLinkShared(Clip(episode, clipRange.copy(start = 7.seconds)))
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                mapOf(
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "clip_uuid" to "clip-id",
+                    "source" to "player",
+                    "start" to 7,
+                    "end" to 30,
+                    "start_modified" to true,
+                    "end_modified" to false,
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `sharing clip link tracks changes to the clip end`() = runTest {
+        viewModel.onClipLinkShared(Clip(episode, clipRange.copy(end = 20.seconds)))
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                mapOf(
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "clip_uuid" to "clip-id",
+                    "source" to "player",
+                    "start" to 15,
+                    "end" to 20,
+                    "start_modified" to false,
+                    "end_modified" to true,
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `sharing clip link tracks changes to the whole clip`() = runTest {
+        viewModel.onClipLinkShared(Clip(episode, Clip.Range(17.seconds, 34.seconds)))
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                mapOf(
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "clip_uuid" to "clip-id",
+                    "source" to "player",
+                    "start" to 17,
+                    "end" to 34,
+                    "start_modified" to true,
+                    "end_modified" to true,
+                ),
+            ),
+            event,
+        )
     }
 }

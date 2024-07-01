@@ -445,7 +445,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onShareClick() {
         trackShelfAction(ShelfItem.Share.analyticsValue)
-        ShareFragment().show(parentFragmentManager, "share_sheet")
+        ShareFragment.newInstance(SourceView.PLAYER).show(parentFragmentManager, "share_sheet")
     }
 
     private fun showPodcast() {

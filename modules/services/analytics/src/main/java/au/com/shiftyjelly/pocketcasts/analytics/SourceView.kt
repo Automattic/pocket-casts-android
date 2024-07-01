@@ -4,6 +4,7 @@ enum class SourceView(val analyticsValue: String) {
     AUTO_PAUSE("auto_pause"),
     AUTO_PLAY("auto_play"),
     BOTTOM_SHELF("bottom_shelf"),
+    CLIP_SHARING("clip_sharing"),
     CHROMECAST("chromecast"),
     DISCOVER("discover"),
     DISCOVER_PLAIN_LIST("discover_plain_list"),

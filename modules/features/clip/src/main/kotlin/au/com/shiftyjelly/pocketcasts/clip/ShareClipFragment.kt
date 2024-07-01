@@ -17,7 +17,6 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -26,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
@@ -44,6 +44,7 @@ class ShareClipFragment : BaseDialogFragment() {
                     args.episodeUuid,
                     args.clipRange,
                     clipPlayerFactory.create(requireActivity().applicationContext),
+                    clipAnalytics,
                 )
             }
         },
@@ -53,7 +54,23 @@ class ShareClipFragment : BaseDialogFragment() {
     lateinit var clipPlayerFactory: ClipPlayer.Factory
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTracker
+    lateinit var clipAnalyticsFactory: ClipAnalytics.Factory
+
+    private lateinit var clipAnalytics: ClipAnalytics
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        clipAnalytics = clipAnalyticsFactory.create(
+            episodeId = args.episodeUuid,
+            podcastId = args.podcastUuid,
+            clipId = args.clipUuid,
+            sourceView = args.source,
+            initialClipRange = args.clipRange,
+        )
+        if (savedInstanceState == null) {
+            viewModel.onClipScreenShown()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -105,6 +122,7 @@ class ShareClipFragment : BaseDialogFragment() {
     }
 
     private fun shareClip(podcast: Podcast, clip: Clip) {
+        viewModel.onClipLinkShared(clip)
         SharePodcastHelper(
             podcast,
             clip.episode,
@@ -112,16 +130,19 @@ class ShareClipFragment : BaseDialogFragment() {
             clip.range.end,
             requireActivity(),
             SharePodcastHelper.ShareType.CLIP,
-            SourceView.UNKNOWN,
-            analyticsTracker,
+            SourceView.CLIP_SHARING,
+            clipAnalytics.analyticsTracker,
         ).showShareDialogDirect()
     }
 
     @Parcelize
     private class Args(
         val episodeUuid: String,
+        val podcastUuid: String,
+        val clipUuid: String,
         val clipRange: Clip.Range,
         @TypeParceler<Color, ColorParceler>() val baseColor: Color,
+        val source: SourceView,
     ) : Parcelable
 
     companion object {
@@ -130,12 +151,16 @@ class ShareClipFragment : BaseDialogFragment() {
         fun newInstance(
             episode: PodcastEpisode,
             @ColorInt baseColor: Int,
+            source: SourceView,
         ) = ShareClipFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
                     episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastUuid,
+                    clipUuid = UUID.randomUUID().toString(),
                     clipRange = Clip.Range.fromPosition(episode.playedUpTo.seconds, episode.duration.seconds),
                     baseColor = Color(baseColor),
+                    source = source,
                 ),
             )
         }
