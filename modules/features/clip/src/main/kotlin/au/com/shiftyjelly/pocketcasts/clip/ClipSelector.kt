@@ -73,6 +73,11 @@ internal fun ClipSelector(
     modifier: Modifier = Modifier,
     state: ClipSelectorState = rememberClipSelectorState(),
 ) {
+    val density = LocalDensity.current
+    LaunchedEffect(state.scale) {
+        state.refreshItemWidth(density)
+        state.scaleBoxOffsets(clipRange)
+    }
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -151,17 +156,13 @@ private fun BoxWithConstraintsScope.ClipTimeline(
     onClipStartUpdate: (Duration) -> Unit,
     onClipEndUpdate: (Duration) -> Unit,
 ) {
-    val localDensity = LocalDensity.current
     val largeTickHeight = maxHeight / 3
     val mediumTickHeight = maxHeight / 6
     val smallTickHeight = maxHeight / 12
 
-    val tickWidth = 1.5.dp
-    val spaceWidth = 4.dp * state.scale
-    val itemWidth = tickWidth + spaceWidth
-    state.itemWidth = with(localDensity) { itemWidth.toPx() }
-    LaunchedEffect(state.scale) { state.scaleBoxOffsets(clipRange) }
-
+    // Some episode are very short (couple of minutes or even dozen of seconds).
+    // For those episodes we want to disable scaling timeline beyond a point
+    // where ticks are too dense and an episode fits more than one in a timeline.
     val maxSecondsPerTick by remember(episodeDuration, maxWidth) {
         mutableIntStateOf(state.calculateMaxSecondsPerTick(episodeDuration, maxWidth))
     }
@@ -221,8 +222,8 @@ private fun BoxWithConstraintsScope.ClipTimeline(
             }
             Box(
                 modifier = Modifier
-                    .padding(end = spaceWidth)
-                    .width(tickWidth)
+                    .padding(end = state.spaceWidthDp)
+                    .width(state.tickWidthDp)
                     .height(heightIndex)
                     .background(clipColors.selectorTimelineColor),
             )
