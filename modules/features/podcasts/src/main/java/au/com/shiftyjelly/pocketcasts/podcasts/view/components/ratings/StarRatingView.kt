@@ -65,7 +65,7 @@ private fun Content(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 14.dp, vertical = 4.dp),
+            .padding(horizontal = 16.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Stars(

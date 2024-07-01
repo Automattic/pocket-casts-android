@@ -89,7 +89,7 @@ class PodcastRatingsViewModel
     }
 
     sealed class RatingState {
-        object Loading : RatingState()
+        data object Loading : RatingState()
 
         data class Loaded(
             private val ratings: PodcastRatings,
@@ -130,7 +130,7 @@ class PodcastRatingsViewModel
             }
         }
 
-        object Error : RatingState()
+        data object Error : RatingState()
     }
 
     enum class Star(val icon: ImageVector) {
