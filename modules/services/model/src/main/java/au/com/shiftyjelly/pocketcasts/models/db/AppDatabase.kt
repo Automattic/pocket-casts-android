@@ -822,7 +822,7 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 """.trimIndent(),
             )
-            database.execSQL("CREATE INDEX transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
+            database.execSQL("CREATE INDEX IF NOT EXISTS transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
