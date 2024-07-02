@@ -85,6 +85,7 @@ class GiveRatingFragment : BaseDialogFragment() {
                         },
                     )
                     GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
+                    is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(state = state, onDismiss = { dismiss() })
                 }
             }
         }

@@ -30,7 +30,7 @@ class GiveRatingViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class Loaded(
             val podcastUuid: String,
             val podcastTitle: String,
@@ -53,6 +53,7 @@ class GiveRatingViewModel @Inject constructor(
                 Five,
             }
         }
+        data class NotAllowedToRate(val podcastUuid: String) : State()
     }
 
     private val _state = MutableStateFlow<State>(State.Loading)
