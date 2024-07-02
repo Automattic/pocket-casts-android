@@ -67,7 +67,7 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    CACHE_PLAYING_EPISODE(
+    CACHE_PLAYING_EPISODE( // Used for on-the-fly caching
         key = "cache_playing_episode_enabled",
         title = "Cache playing episode",
         defaultValue = true,
