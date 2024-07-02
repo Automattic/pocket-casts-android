@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -68,23 +67,22 @@ private fun Content(
     state: RatingState.Loaded,
     onClick: () -> Unit,
 ) {
+    val verticalPadding = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 8.dp else 18.dp
+
     Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 18.dp),
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = verticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Stars(
             stars = state.stars,
             color = MaterialTheme.theme.colors.filter03,
-            onClick = onClick,
         )
 
         if (!state.noRatings) {
             TextP40(
                 text = state.roundedAverage,
                 modifier = Modifier
-                    .padding(start = 4.dp)
-                    .clickable { onClick() },
+                    .padding(start = 4.dp),
                 fontWeight = FontWeight.W700,
             )
         }
@@ -92,8 +90,7 @@ private fun Content(
         TextP40(
             text = if (state.noRatings) stringResource(R.string.no_ratings) else "(${state.total?.abbreviated})",
             modifier = Modifier
-                .padding(start = 4.dp)
-                .clickable { onClick() },
+                .padding(start = 4.dp),
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -122,12 +119,9 @@ private fun Content(
 private fun Stars(
     stars: List<Star>,
     color: Color,
-    onClick: () -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.clickable { onClick() },
-
     ) {
         stars.forEach { star ->
             Icon(
