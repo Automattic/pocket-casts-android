@@ -268,7 +268,7 @@ fun Stars(
                 } else {
                     Icons.Filled.StarBorder
                 },
-                tint = MaterialTheme.theme.colors.primaryIcon01,
+                tint = MaterialTheme.theme.colors.primaryText01,
                 contentDescription = null,
                 modifier = modifier(index)
                     .fillMaxHeight()
