@@ -39,7 +39,10 @@ class ExoPlayerHelper @Inject constructor(
     @OptIn(UnstableApi::class)
     @Synchronized
     fun getSimpleCache(): SimpleCache? {
-        if (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) && simpleCache == null) {
+        if (
+            simpleCache == null &&
+            (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) || FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE))
+        ) {
             val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
             val cacheSizeInBytes = if (settings.cacheEntirePlayingEpisode.value) {
                 settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB()
