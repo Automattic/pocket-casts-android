@@ -50,6 +50,52 @@
                 app:layout_constraintTop_toBottomOf="@+id/userUpgradeComposeView" />
 
             <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/primary_interactive_01"
+                app:layout_constraintBottom_toBottomOf="@id/btnChangeAvatar"
+                app:layout_constraintStart_toStartOf="@id/btnChangeAvatar"
+                app:layout_constraintTop_toTopOf="@id/btnChangeAvatar"
+                app:srcCompat="@drawable/ic_avatar" />
+
+            <TextView
+                android:id="@+id/lblChangeAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_change_avatar"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnChangeAvatar"
+                app:layout_constraintStart_toEndOf="@+id/imgMail"
+                app:layout_constraintTop_toTopOf="@id/btnChangeAvatar" />
+
+            <View
+                android:id="@+id/btnChangeAvatar"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/profile_change_avatar"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
+
+            <View
+                android:id="@+id/dividerChangeEmail"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnChangeAvatar" />
+
+            <ImageView
                 android:id="@+id/imgMail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,7 +129,7 @@
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
+                app:layout_constraintTop_toBottomOf="@+id/dividerChangeEmail" />
 
             <View
                 android:id="@+id/dividerView2"

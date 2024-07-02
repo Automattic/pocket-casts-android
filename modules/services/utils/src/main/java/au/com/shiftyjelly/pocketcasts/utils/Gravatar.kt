@@ -4,6 +4,9 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.sha256
 
 object Gravatar {
 
+    // TODO: Replace with the final URL
+    const val GRAVATAR_CHANGE_AVATAR_URL = "https://gravatar.com/profile/avatars"
+
     /**
      * d=404: display no image if there is not one associated with the requested email hash
      * s=400: size of the image

@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -170,6 +171,11 @@ class AccountDetailsFragment : BaseFragment() {
                     binding.mainScrollView.updatePadding(bottom = bottomInset)
                 }
             }
+        }
+
+        binding.btnChangeAvatar?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+            context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.GRAVATAR_CHANGE_AVATAR_URL)))
         }
 
         binding.btnChangeEmail?.setOnClickListener {
