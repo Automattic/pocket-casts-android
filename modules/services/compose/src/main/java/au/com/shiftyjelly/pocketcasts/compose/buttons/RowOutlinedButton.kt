@@ -23,8 +23,10 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -48,8 +50,10 @@ fun RowOutlinedButton(
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     disableScale: Boolean = false,
     textIcon: Painter? = null,
+    textPadding: Dp = 6.dp,
     fontFamily: FontFamily? = null,
     fontSize: TextUnit? = null,
+    fontWeight: FontWeight? = null,
     leadingIcon: Painter? = null,
     tintIcon: Boolean = true,
     onClick: () -> Unit,
@@ -88,8 +92,9 @@ fun RowOutlinedButton(
                         color = colors.contentColor(enabled = true).value,
                         textAlign = TextAlign.Center,
                         fontFamily = fontFamily,
+                        fontWeight = fontWeight,
                         fontSize = if (disableScale) fontSize?.value?.nonScaledSp else fontSize,
-                        modifier = Modifier.padding(6.dp),
+                        modifier = Modifier.padding(textPadding),
                     )
                 }
             }

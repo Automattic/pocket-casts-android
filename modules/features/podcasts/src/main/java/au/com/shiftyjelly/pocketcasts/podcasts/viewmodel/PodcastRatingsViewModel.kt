@@ -89,7 +89,7 @@ class PodcastRatingsViewModel
     }
 
     sealed class RatingState {
-        object Loading : RatingState()
+        data object Loading : RatingState()
 
         data class Loaded(
             private val ratings: PodcastRatings,
@@ -103,6 +103,12 @@ class PodcastRatingsViewModel
                 get() = total == null || total == 0
 
             val stars: List<Star> = starsList()
+
+            val roundedAverage: String
+                get() {
+                    val rating = average ?: 0.0
+                    return (Math.round(rating * 10) / 10.0).toString()
+                }
 
             private fun starsList(): List<Star> {
                 val rating = average ?: 0.0
@@ -124,7 +130,7 @@ class PodcastRatingsViewModel
             }
         }
 
-        object Error : RatingState()
+        data object Error : RatingState()
     }
 
     enum class Star(val icon: ImageVector) {

@@ -1,6 +1,8 @@
 7.68
 -----
-
+*   Updates:
+    *   Update Give rating view to include the average rating
+        ([#2421](https://github.com/Automattic/pocket-casts-android/pull/2421))
 
 7.67
 -----
