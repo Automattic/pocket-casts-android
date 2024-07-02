@@ -75,7 +75,7 @@ private fun Content(
     ) {
         Stars(
             stars = state.stars,
-            color = MaterialTheme.theme.colors.filter03,
+            color = MaterialTheme.theme.colors.primaryUi05Selected,
         )
 
         if (!state.noRatings) {
