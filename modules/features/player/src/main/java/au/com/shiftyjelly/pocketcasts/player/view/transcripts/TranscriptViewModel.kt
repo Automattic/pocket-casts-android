@@ -7,6 +7,7 @@ import androidx.media3.common.Format
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
 import androidx.media3.extractor.text.SubtitleParser
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
@@ -33,28 +34,37 @@ class TranscriptViewModel @Inject constructor(
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<UiState> = playbackManager.playbackStateFlow
-        .map { it.episodeUuid }
+        .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
         .distinctUntilChanged()
         .flatMapLatest(::createUiStateFlow)
-        .stateIn(viewModelScope, SharingStarted.Lazily, UiState())
+        .stateIn(viewModelScope, SharingStarted.Lazily, UiState.Empty())
 
-    private fun createUiStateFlow(episodeId: String) =
-        transcriptsManager.observerTranscriptForEpisode(episodeId)
+    private fun createUiStateFlow(podcastAndEpisode: PodcastAndEpisode) =
+        transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
             .map { transcript ->
-                val cues = transcript?.let { parseTranscript(it) } ?: emptyList()
-                UiState(
-                    transcript = transcript,
-                    episodeId = episodeId,
-                    cues = cues,
-                )
+                if (transcript == null) {
+                    UiState.Empty(podcastAndEpisode.podcast)
+                } else {
+                    try {
+                        UiState.Success(
+                            transcript = transcript,
+                            podcast = podcastAndEpisode.podcast,
+                            cues = parseTranscript(transcript),
+                        )
+                    } catch (e: UnsupportedOperationException) {
+                        UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode.podcast)
+                    } catch (e: Exception) {
+                        UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode.podcast)
+                    }
+                }
             }
 
     private suspend fun parseTranscript(transcript: Transcript): List<CuesWithTiming> {
         val format = Format.Builder()
             .setSampleMimeType(transcript.type)
             .build()
-        return if (subtitleParserFactory.supportsFormat(format).not()) {
-            emptyList()
+        if (subtitleParserFactory.supportsFormat(format).not()) {
+            throw UnsupportedOperationException("Unsupported MIME type: ${transcript.type}")
         } else {
             val result = ImmutableList.builder<CuesWithTiming>()
             urlUtil.contentBytes(transcript.url)?.let { data ->
@@ -70,9 +80,32 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    data class UiState(
-        val transcript: Transcript? = null,
-        val episodeId: String? = null,
-        val cues: List<CuesWithTiming> = emptyList(),
+    data class PodcastAndEpisode(
+        val podcast: Podcast?,
+        val episodeUuid: String,
     )
+
+    sealed class UiState {
+        abstract val podcast: Podcast?
+
+        data class Empty(
+            override val podcast: Podcast? = null,
+        ) : UiState()
+
+        data class Success(
+            val transcript: Transcript?,
+            override val podcast: Podcast?,
+            val cues: List<CuesWithTiming> = emptyList(),
+        ) : UiState()
+
+        data class Error(
+            val error: TranscriptError,
+            override val podcast: Podcast?,
+        ) : UiState()
+    }
+
+    sealed class TranscriptError {
+        data class NotSupported(val format: String) : TranscriptError()
+        data object FailedToLoad : TranscriptError()
+    }
 }

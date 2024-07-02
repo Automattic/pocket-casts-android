@@ -17,5 +17,4 @@ abstract class TranscriptDao {
 
     @Query("DELETE FROM episode_transcript WHERE episode_uuid IS :episodeUuid")
     abstract suspend fun deleteForEpisode(episodeUuid: String)
-
 }

@@ -1886,6 +1886,10 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
     <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
 
+    <!-- Transcripts -->
+    <string name="error_transcript_failed_to_load">Transcript failed to load</string>
+    <string name="error_transcript_format_not_supported">Transcript format not supported: %s</string>
+
     <!--    Tasker Plugin-->
 
     <string name="must_provide_filter_name">Must provide filter name</string>

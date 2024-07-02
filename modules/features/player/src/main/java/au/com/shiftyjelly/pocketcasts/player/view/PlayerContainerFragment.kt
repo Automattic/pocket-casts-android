@@ -60,9 +60,11 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class PlayerContainerFragment : BaseFragment(), HasBackstack {
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
     private val bookmarksViewModel: BookmarksViewModel by viewModels()
 
     lateinit var upNextBottomSheetBehavior: BottomSheetBehavior<View>
@@ -166,17 +168,21 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "now_playing"))
                         FirebaseAnalyticsTracker.nowPlayingOpen()
                     }
+
                     adapter.isNotesTab(position) -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "show_notes"))
                         FirebaseAnalyticsTracker.openedPlayerNotes()
                     }
+
                     adapter.isBookmarksTab(position) -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "bookmarks"))
                     }
+
                     adapter.isChaptersTab(position) -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "chapters"))
                         FirebaseAnalyticsTracker.openedPlayerChapters()
                     }
+
                     else -> {
                         Timber.e("Invalid tab selected")
                     }
@@ -223,8 +229,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    transcriptViewModel.uiState.collect {
-                        adapter.updateTranscript(addTranscript = it.transcript != null)
+                    transcriptViewModel.uiState.collect { uiState ->
+                        adapter.updateTranscript(uiState !is TranscriptViewModel.UiState.Empty)
                     }
                 }
             }
@@ -330,11 +336,13 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 true
             }
+
             bookmarksViewModel.multiSelectHelper.isMultiSelecting -> {
                 bookmarksViewModel.multiSelectHelper.closeMultiSelect()
                 binding?.viewPager?.isUserInputEnabled = true
                 true
             }
+
             else -> false
         }
     }
@@ -482,7 +490,8 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         }
     }
 
-    @StringRes fun pageTitle(position: Int): Int {
+    @StringRes
+    fun pageTitle(position: Int): Int {
         return sections[position].titleRes
     }
 
