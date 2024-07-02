@@ -813,7 +813,7 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_97_98 = addMigration(97, 98) { database ->
             database.execSQL(
                 """
-                    CREATE TABLE episode_transcript(
+                    CREATE TABLE IF NOT EXISTS episode_transcript(
                         episode_uuid TEXT NOT NULL, 
                         url TEXT NOT NULL,
                         type TEXT NOT NULL,
@@ -822,7 +822,7 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 """.trimIndent(),
             )
-            database.execSQL("CREATE INDEX transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
+            database.execSQL("CREATE INDEX IF NOT EXISTS transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
