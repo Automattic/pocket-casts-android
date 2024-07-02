@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
@@ -60,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import java.io.File
 import java.util.Arrays
 import java.util.Date
@@ -81,8 +83,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         PodcastRatings::class,
         DbChapter::class,
         TrendingPodcast::class,
+        Transcript::class,
     ],
-    version = 97,
+    version = 98,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -123,6 +126,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastRatingsDao(): PodcastRatingsDao
     abstract fun bookmarkDao(): BookmarkDao
     abstract fun chapterDao(): ChapterDao
+    abstract fun transcriptDao(): TranscriptDao
 
     fun databaseFiles() =
         openHelper.readableDatabase.path?.let {
@@ -806,6 +810,21 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX up_next_episode_episodeUuid ON up_next_episodes(episodeUuid)")
         }
 
+        val MIGRATION_97_98 = addMigration(97, 98) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE episode_transcript(
+                        episode_uuid TEXT NOT NULL, 
+                        url TEXT NOT NULL,
+                        type TEXT NOT NULL,
+                        language TEXT,
+                        PRIMARY KEY (episode_uuid, url)
+                    )
+                """.trimIndent(),
+            )
+            database.execSQL("CREATE INDEX transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1193,6 +1212,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_94_95,
                 MIGRATION_95_96,
                 MIGRATION_96_97,
+                MIGRATION_97_98,
             )
         }
 
