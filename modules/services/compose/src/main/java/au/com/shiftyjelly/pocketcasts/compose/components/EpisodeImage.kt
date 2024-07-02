@@ -5,10 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun EpisodeImage(
@@ -25,7 +27,7 @@ fun EpisodeImage(
 
     CoilImage(
         imageRequest = imageRequest,
-        title = "",
+        title = stringResource(id = LR.string.episode_cover_description, episode.title),
         showTitle = false,
         modifier = modifier.aspectRatio(1f),
     )

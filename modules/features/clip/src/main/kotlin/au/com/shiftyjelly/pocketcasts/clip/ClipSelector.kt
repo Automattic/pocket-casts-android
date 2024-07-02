@@ -45,8 +45,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -84,18 +87,18 @@ internal fun ClipSelector(
         modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
-            .background(Color(0x476B6B6B), RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
+            .background(clipColors.timeline, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
     ) {
         Image(
             painter = painterResource(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
             contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
-            colorFilter = ColorFilter.tint(Color.White),
+            colorFilter = ColorFilter.tint(clipColors.playPauseButton),
             modifier = Modifier
                 .size(72.dp)
                 .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                 .clickable(
                     interactionSource = remember(::MutableInteractionSource),
-                    indication = rememberRipple(color = clipColors.baseColor),
+                    indication = rememberRipple(color = clipColors.base),
                     onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
                     role = Role.Button,
                     onClick = if (isPlaying) onPauseClick else onPlayClick,
@@ -177,7 +180,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 6.dp)
-            .background(clipColors.backgroundColor)
+            .background(clipColors.background)
             .transformable(transformation)
             .pointerInput(clipRange) {
                 detectTapGestures(
@@ -214,7 +217,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
                     .padding(end = state.spaceWidthDp)
                     .width(state.tickWidthDp)
                     .height(heightIndex)
-                    .background(clipColors.selectorTimelineColor),
+                    .background(clipColors.timelineTick),
             )
         }
     }
@@ -247,6 +250,11 @@ private fun BoxWithConstraintsScope.ClipBox(
             .offset { IntOffset(-scrollOffset.roundToInt(), 0) }
             .fillMaxSize(),
     ) {
+        val startDescription = pluralStringResource(
+            id = LR.plurals.podcast_share_start_handle_description,
+            count = clipRange.startInSeconds,
+            clipRange.startInSeconds,
+        )
         // Outer box to increase the touch area of the handle
         Box(
             modifier = Modifier
@@ -263,7 +271,8 @@ private fun BoxWithConstraintsScope.ClipBox(
                         }
                     },
                     orientation = Orientation.Horizontal,
-                ),
+                )
+                .semantics { contentDescription = startDescription },
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -272,17 +281,22 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topStart = handleWidth / 2, bottomStart = handleWidth / 2))
-                    .background(clipColors.selectorColor),
+                    .background(clipColors.selector),
             ) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
                         .height(this@ClipBox.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
-                        .background(clipColors.selectorHandleColor),
+                        .background(clipColors.selectorHandle),
                 )
             }
         }
+        val endDescription = pluralStringResource(
+            id = LR.plurals.podcast_share_end_handle_description,
+            count = clipRange.endInSeconds,
+            clipRange.endInSeconds,
+        )
         // Outer box to increas the touch area of the handle
         Box(
             modifier = Modifier
@@ -299,7 +313,8 @@ private fun BoxWithConstraintsScope.ClipBox(
                         }
                     },
                     orientation = Orientation.Horizontal,
-                ),
+                )
+                .semantics { contentDescription = endDescription },
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -308,14 +323,14 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topEnd = handleWidth / 2, bottomEnd = handleWidth / 2))
-                    .background(clipColors.selectorColor),
+                    .background(clipColors.selector),
             ) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
                         .height(this@ClipBox.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
-                        .background(clipColors.selectorHandleColor),
+                        .background(clipColors.selectorHandle),
                 )
             }
         }
@@ -339,7 +354,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .offset { IntOffset(frameOffsetPx, 0) }
                     .requiredWidth(frameWidth)
                     .height(6.dp)
-                    .background(clipColors.selectorColor),
+                    .background(clipColors.selector),
             )
             Spacer(
                 modifier = Modifier.weight(1f),
@@ -349,45 +364,75 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .offset { IntOffset(frameOffsetPx, 0) }
                     .requiredWidth(frameWidth)
                     .height(6.dp)
-                    .background(clipColors.selectorColor),
+                    .background(clipColors.selector),
             )
         }
     }
 }
 
-@ShowkaseComposable(name = "ClipSelector", group = "Clip", styleName = "Light")
-@Preview(name = "ClipSelectorLight", showBackground = true, backgroundColor = 0xFF3E6266)
+@ShowkaseComposable(name = "ClipSelectorPaused", group = "Clip")
+@Preview(name = "Paused", device = PreviewDevicePortrait)
 @Composable
-fun ClipSelectorLightPreview() = ClipSelectorPreview(Color(0xFF9BF6FF))
+fun ClipSelectorPausedPreview() = ClipSelectorPreview()
 
-@ShowkaseComposable(name = "ClipSelector", group = "Clip", styleName = "Dark")
-@Preview(name = "ClipSelectorDark", showBackground = true, backgroundColor = 0xFF0E1A17)
+@ShowkaseComposable(name = "ClipSelectorPlaying", group = "Clip")
+@Preview(name = "Playing", device = PreviewDevicePortrait)
 @Composable
-fun ClipSelectorDarkPreview() = ClipSelectorPreview(Color(0xFF152622))
+fun ClipSelectorPlayingPreview() = ClipSelectorPreview(isPlaying = true)
+
+@Preview(name = "Zoomed in", device = PreviewDevicePortrait)
+@Composable
+private fun ClipSelectorZoomedPreview() = ClipSelectorPreview(
+    clipEnd = 10.seconds,
+    scale = 5f,
+)
+
+@Preview(name = "Scrolled", device = PreviewDevicePortrait)
+@Composable
+private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
+    clipStart = 35.seconds,
+    clipEnd = 55.seconds,
+    firstVisibleItemIndex = 25,
+)
+
+@Preview(name = "No start handle", device = PreviewDevicePortrait)
+@Composable
+private fun ClipSelectorNoStartHandlePreview() = ClipSelectorPreview(
+    firstVisibleItemIndex = 5,
+)
+
+@Preview(name = "No end handle", device = PreviewDevicePortrait)
+@Composable
+private fun ClipSelectorNoEndHandlePreview() = ClipSelectorPreview(
+    clipStart = 35.seconds,
+    clipEnd = 75.seconds,
+)
 
 @Composable
 private fun ClipSelectorPreview(
-    color: Color,
-) = Column {
-    ClipSelector(
-        episodeDuration = 10.minutes,
-        clipRange = Clip.Range(0.seconds, 15.seconds),
-        isPlaying = false,
-        clipColors = ClipColors(color),
-        onPlayClick = {},
-        onPauseClick = {},
-        onClipStartUpdate = {},
-        onClipEndUpdate = {},
-    )
-    Spacer(modifier = Modifier.height(32.dp))
-    ClipSelector(
-        episodeDuration = 10.minutes,
-        clipRange = Clip.Range(0.seconds, 15.seconds),
-        isPlaying = true,
-        clipColors = ClipColors(color),
-        onPlayClick = {},
-        onPauseClick = {},
-        onClipStartUpdate = {},
-        onClipEndUpdate = {},
-    )
+    clipStart: Duration = 0.seconds,
+    clipEnd: Duration = 15.seconds,
+    isPlaying: Boolean = false,
+    firstVisibleItemIndex: Int = 0,
+    scale: Float = 1f,
+) {
+    val clipColors = ClipColors(Color(0xFFEC0404))
+    Box(
+        modifier = Modifier.background(clipColors.background),
+    ) {
+        ClipSelector(
+            episodeDuration = 5.minutes,
+            clipRange = Clip.Range(clipStart, clipEnd),
+            isPlaying = isPlaying,
+            clipColors = clipColors,
+            onPlayClick = {},
+            onPauseClick = {},
+            onClipStartUpdate = {},
+            onClipEndUpdate = {},
+            state = rememberClipSelectorState(
+                firstVisibleItemIndex = firstVisibleItemIndex,
+                scale = scale,
+            ),
+        )
+    }
 }

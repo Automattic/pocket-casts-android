@@ -74,14 +74,14 @@ internal fun VerticalClipCard(
         ) {
             TextH70(
                 text = episode.publishedDate.toLocalizedFormatMediumStyle(),
-                color = clipColors.cardTextColor.copy(alpha = 0.5f),
+                color = clipColors.cardText.copy(alpha = 0.5f),
             )
             Spacer(
                 modifier = Modifier.height(6.dp),
             )
             TextH40(
                 text = episode.title,
-                color = clipColors.cardTextColor,
+                color = clipColors.cardText,
                 maxLines = 2,
                 textAlign = TextAlign.Center,
             )
@@ -90,7 +90,7 @@ internal fun VerticalClipCard(
             )
             TextH70(
                 text = podcast.title,
-                color = clipColors.cardTextColor.copy(alpha = 0.5f),
+                color = clipColors.cardText.copy(alpha = 0.5f),
                 maxLines = 1,
             )
         }

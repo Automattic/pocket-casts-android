@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,43 +59,42 @@ internal fun ShareClipPage(
     onClipStartUpdate: (Duration) -> Unit,
     onClipEndUpdate: (Duration) -> Unit,
     onClose: () -> Unit,
-) {
-    val state = rememberClipSelectorState(
-        firstVisibleItemIndex = (clipRange.start.inWholeSeconds.toInt() - 10).coerceAtLeast(0),
+    state: ClipSelectorState = rememberClipSelectorState(
+        firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
+    ),
+) = when (LocalConfiguration.current.orientation) {
+    Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
+        episode = episode,
+        podcast = podcast,
+        clipRange = clipRange,
+        episodeCount = episodeCount,
+        isPlaying = isPlaying,
+        useEpisodeArtwork = useEpisodeArtwork,
+        clipColors = clipColors,
+        onClip = onClip,
+        onPlayClick = onPlayClick,
+        onPauseClick = onPauseClick,
+        onClipStartUpdate = onClipStartUpdate,
+        onClipEndUpdate = onClipEndUpdate,
+        onClose = onClose,
+        state = state,
     )
-    when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
-            episode = episode,
-            podcast = podcast,
-            clipRange = clipRange,
-            episodeCount = episodeCount,
-            isPlaying = isPlaying,
-            useEpisodeArtwork = useEpisodeArtwork,
-            clipColors = clipColors,
-            onClip = onClip,
-            onPlayClick = onPlayClick,
-            onPauseClick = onPauseClick,
-            onClipStartUpdate = onClipStartUpdate,
-            onClipEndUpdate = onClipEndUpdate,
-            onClose = onClose,
-            state = state,
-        )
-        else -> VerticalClipPage(
-            episode = episode,
-            podcast = podcast,
-            clipRange = clipRange,
-            isPlaying = isPlaying,
-            useEpisodeArtwork = useEpisodeArtwork,
-            clipColors = clipColors,
-            onClip = onClip,
-            onPlayClick = onPlayClick,
-            onPauseClick = onPauseClick,
-            onClipStartUpdate = onClipStartUpdate,
-            onClipEndUpdate = onClipEndUpdate,
-            onClose = onClose,
-            state = state,
-        )
-    }
+
+    else -> VerticalClipPage(
+        episode = episode,
+        podcast = podcast,
+        clipRange = clipRange,
+        isPlaying = isPlaying,
+        useEpisodeArtwork = useEpisodeArtwork,
+        clipColors = clipColors,
+        onClip = onClip,
+        onPlayClick = onPlayClick,
+        onPauseClick = onPauseClick,
+        onClipStartUpdate = onClipStartUpdate,
+        onClipEndUpdate = onClipEndUpdate,
+        onClose = onClose,
+        state = state,
+    )
 }
 
 @Composable
@@ -115,7 +117,7 @@ private fun VerticalClipPage(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .background(clipColors.backgroundColor),
+            .background(clipColors.background),
     ) {
         Spacer(
             modifier = Modifier.weight(0.5f),
@@ -123,7 +125,7 @@ private fun VerticalClipPage(
 
         TextH30(
             text = stringResource(LR.string.podcast_create_clip),
-            color = clipColors.backgroundTextColor,
+            color = clipColors.backgroundText,
         )
 
         Spacer(
@@ -160,13 +162,11 @@ private fun VerticalClipPage(
             Spacer(
                 modifier = Modifier.height(16.dp),
             )
-            RowButton(
-                text = stringResource(LR.string.podcast_share_clip),
-                onClick = onClip,
-                colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
-                textColor = clipColors.buttonTextColor,
-                elevation = null,
-                includePadding = false,
+            ClipButton(
+                episode = episode,
+                clip = clipRange,
+                clipColors = clipColors,
+                onClip = onClip,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
@@ -181,12 +181,10 @@ private fun VerticalClipPage(
             .fillMaxWidth()
             .wrapContentHeight(),
     ) {
-        Image(
-            painter = painterResource(IR.drawable.ic_close_sheet),
-            contentDescription = stringResource(LR.string.close),
-            modifier = Modifier
-                .padding(top = 16.dp, end = 16.dp)
-                .clickable(onClick = onClose),
+        CloseButton(
+            clipColors = clipColors,
+            onClose = onClose,
+            modifier = Modifier.padding(top = 16.dp, end = 16.dp),
         )
     }
 }
@@ -212,7 +210,7 @@ private fun HorizontalClipPage(
         contentAlignment = Alignment.TopEnd,
         modifier = Modifier
             .fillMaxSize()
-            .background(clipColors.backgroundColor),
+            .background(clipColors.background),
     ) {
         Row {
             Column(
@@ -265,13 +263,11 @@ private fun HorizontalClipPage(
                     Spacer(
                         modifier = Modifier.height(16.dp),
                     )
-                    RowButton(
-                        text = stringResource(LR.string.podcast_share_clip),
-                        onClick = onClip,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.buttonColor),
-                        textColor = clipColors.buttonTextColor,
-                        elevation = null,
-                        includePadding = false,
+                    ClipButton(
+                        episode = episode,
+                        clip = clipRange,
+                        clipColors = clipColors,
+                        onClip = onClip,
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 56.dp)
@@ -282,36 +278,76 @@ private fun HorizontalClipPage(
         }
         TextH30(
             text = stringResource(LR.string.podcast_create_clip),
-            color = clipColors.backgroundTextColor,
+            color = clipColors.backgroundText,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 28.dp),
         )
-        Image(
-            painter = painterResource(IR.drawable.ic_close_sheet),
-            contentDescription = stringResource(LR.string.close),
-            modifier = Modifier
-                .clickable(onClick = onClose)
-                .padding(top = 24.dp, end = 16.dp),
+        CloseButton(
+            clipColors = clipColors,
+            onClose = onClose,
+            modifier = Modifier.padding(top = 24.dp, end = 16.dp),
         )
     }
 }
 
+@Composable
+private fun ClipButton(
+    episode: PodcastEpisode,
+    clip: Clip.Range,
+    clipColors: ClipColors,
+    onClip: () -> Unit,
+    modifier: Modifier = Modifier,
+) = RowButton(
+    text = stringResource(LR.string.podcast_share_clip),
+    contentDescription = stringResource(
+        id = LR.string.podcast_share_clip_description,
+        episode.title,
+        clip.startInSeconds,
+        clip.endInSeconds,
+    ),
+    onClick = onClip,
+    colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
+    textColor = clipColors.clipButtonText,
+    elevation = null,
+    includePadding = false,
+    modifier = modifier,
+)
+
+@Composable
+private fun CloseButton(
+    clipColors: ClipColors,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+) = Image(
+    painter = painterResource(IR.drawable.ic_close_sheet),
+    contentDescription = stringResource(LR.string.close),
+    colorFilter = ColorFilter.tint(clipColors.closeButtonIcon),
+    modifier = modifier
+        .clickable(onClick = onClose)
+        .clip(CircleShape)
+        .background(clipColors.closeButton),
+)
+
+internal const val PreviewDevicePortrait = "spec:width=400dp,height=800dp,dpi=320"
+internal const val PreviewDeviceLandscape = "$PreviewDevicePortrait,orientation=landscape"
+internal const val PreviewPixelsPerDuration = 11f
+
 @ShowkaseComposable(name = "ShareClipPageVertical", group = "Clip")
-@Preview(name = "ShareClipPageVertical")
+@Preview(name = "ShareClipPageVertical", device = PreviewDevicePortrait)
 @Composable
 fun ShareClipPageVerticalPreview() = ShareClipPagePreview()
+
+@ShowkaseComposable(name = "ShareClipHorizontalPage", group = "Clip")
+@Preview(name = "ShareClipHorizontalPage", device = PreviewDeviceLandscape)
+@Composable
+fun ShareClipPageHorizontalPreview() = ShareClipPagePreview()
 
 @ShowkaseComposable(name = "ShareClipVerticalSmallPage", group = "Clip")
 @Preview(name = "ShareClipVerticalSmallPage", device = "spec:width=360dp,height=640dp,dpi=320,orientation=portrait")
 @Composable
 fun ShareClipPageVerticalSmallPreview() = ShareClipPagePreview()
-
-@ShowkaseComposable(name = "ShareClipHorizontalPage", group = "Clip")
-@Preview(name = "ShareClipHorizontalPage", device = "spec:width=420dp,height=900dp,dpi=420,orientation=landscape")
-@Composable
-fun ShareClipPageHorizontalPreview() = ShareClipPagePreview()
 
 @ShowkaseComposable(name = "ShareClipHorizontalSmallPage", group = "Clip")
 @Preview(name = "ShareClipHorizontalSmallPage", device = "spec:width=360dp,height=640dp,dpi=320,orientation=landscape")
@@ -319,28 +355,37 @@ fun ShareClipPageHorizontalPreview() = ShareClipPagePreview()
 fun ShareClipPageHorizontalSmallPreview() = ShareClipPagePreview()
 
 @Composable
-private fun ShareClipPagePreview() = ShareClipPage(
-    episode = PodcastEpisode(
-        uuid = "episode-id",
-        podcastUuid = "podcast-id",
-        publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
-        title = "Episode title",
-        duration = 125.0,
-    ),
-    podcast = Podcast(
-        uuid = "podcast-id",
-        title = "Podcast title",
-        episodeFrequency = "monthly",
-    ),
-    clipRange = Clip.Range(0.seconds, 15.seconds),
-    episodeCount = 120,
-    isPlaying = false,
-    useEpisodeArtwork = true,
-    clipColors = ClipColors(Color(0xFF931B17)),
-    onClip = {},
-    onPlayClick = {},
-    onPauseClick = {},
-    onClipStartUpdate = {},
-    onClipEndUpdate = {},
-    onClose = {},
-)
+internal fun ShareClipPagePreview(
+    color: Long = 0xFFEC0404,
+) {
+    val clipRange = Clip.Range(0.seconds, 15.seconds)
+    ShareClipPage(
+        episode = PodcastEpisode(
+            uuid = "episode-id",
+            podcastUuid = "podcast-id",
+            publishedDate = Date.from(Instant.parse("2024-12-03T10:15:30.00Z")),
+            title = "Episode title",
+            duration = 125.0,
+        ),
+        podcast = Podcast(
+            uuid = "podcast-id",
+            title = "Podcast title",
+            episodeFrequency = "monthly",
+        ),
+        clipRange = clipRange,
+        episodeCount = 120,
+        isPlaying = false,
+        useEpisodeArtwork = true,
+        clipColors = ClipColors(Color(color)),
+        onClip = {},
+        onPlayClick = {},
+        onPauseClick = {},
+        onClipStartUpdate = {},
+        onClipEndUpdate = {},
+        onClose = {},
+        state = rememberClipSelectorState(
+            firstVisibleItemIndex = 0,
+            endOffset = clipRange.end.inWholeSeconds * PreviewPixelsPerDuration,
+        ),
+    )
+}

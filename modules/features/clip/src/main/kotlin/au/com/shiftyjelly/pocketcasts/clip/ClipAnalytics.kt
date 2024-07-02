@@ -28,13 +28,13 @@ class ClipAnalytics @AssistedInject constructor(
     }
 
     fun linkShared(clip: Clip) {
-        val isStartModified = initialClipRange.start.inWholeSeconds != clip.range.start.inWholeSeconds
-        val isEndMofidied = initialClipRange.end.inWholeSeconds != clip.range.end.inWholeSeconds
+        val isStartModified = initialClipRange.startInSeconds != clip.range.startInSeconds
+        val isEndMofidied = initialClipRange.endInSeconds != clip.range.endInSeconds
         val event = createBaseEvent(
             AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
             mapOf(
-                "start" to clip.range.start.inWholeSeconds.toInt(),
-                "end" to clip.range.end.inWholeSeconds.toInt(),
+                "start" to clip.range.startInSeconds,
+                "end" to clip.range.endInSeconds,
                 "start_modified" to isStartModified,
                 "end_modified" to isEndMofidied,
             ),
