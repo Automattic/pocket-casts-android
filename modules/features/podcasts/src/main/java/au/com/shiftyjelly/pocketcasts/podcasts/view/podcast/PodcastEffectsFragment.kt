@@ -9,7 +9,7 @@ import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlaybackSpeedPreference
@@ -34,7 +34,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
     @Inject lateinit var theme: Theme
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private var preferenceCustomForPodcast: SwitchPreference? = null
     private var preferencePlaybackSpeed: PlaybackSpeedPreference? = null

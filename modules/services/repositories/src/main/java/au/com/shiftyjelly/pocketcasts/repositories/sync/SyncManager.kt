@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.accounts.Account
-import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -36,13 +35,12 @@ import java.io.File
 import java.time.Instant
 import retrofit2.Response
 
-interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
+interface SyncManager : NamedSettingsCaller {
 
     // Account
     val isLoggedInObservable: BehaviorRelay<Boolean>
-    override fun getUuid(): String?
-    override fun isLoggedIn(): Boolean
     fun isGoogleLogin(): Boolean
+    fun isLoggedIn(): Boolean
     fun getLoginIdentity(): LoginIdentity?
     fun getEmail(): String?
     fun signOut(action: () -> Unit = {})

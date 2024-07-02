@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search.searchhistory
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -32,9 +32,6 @@ class SearchHistoryViewModelTest {
 
     @Mock
     private lateinit var searchHistoryManager: SearchHistoryManager
-
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val subscriptionStatusPaid = SubscriptionStatus.Paid(
         expiry = Date(),
@@ -106,7 +103,7 @@ class SearchHistoryViewModelTest {
         whenever(searchHistoryManager.findAll(showFolders = anyBoolean()))
             .thenReturn(mock())
         val viewModel =
-            SearchHistoryViewModel(searchHistoryManager, userManager, UnconfinedTestDispatcher(), analyticsTracker)
+            SearchHistoryViewModel(searchHistoryManager, userManager, UnconfinedTestDispatcher(), AnalyticsTracker.test())
         viewModel.setOnlySearchRemote(isOnlySearchRemote)
         return viewModel
     }

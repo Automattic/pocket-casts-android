@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
@@ -106,7 +106,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var bookmarkManager: BookmarkManager
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
@@ -243,23 +243,28 @@ class FilterEpisodeListFragment : BaseFragment() {
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "delete_filter"))
                     showDeleteConfirmation()
                     true
                 }
                 R.id.menu_playall -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "play_all"))
                     val firstEpisode = viewModel.episodesList.value?.firstOrNull() ?: return@setOnMenuItemClickListener true
                     playAllFromHereWarning(firstEpisode, isFirstEpisode = true)
                     true
                 }
                 R.id.menu_sortby -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "sort_by"))
                     showSortOptions()
                     true
                 }
                 R.id.menu_options -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "filter_options"))
                     showFilterSettings()
                     true
                 }
                 R.id.menu_downloadall -> {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_MODAL_OPTION_TAPPED, mapOf("option" to "download_all"))
                     downloadAll()
                     true
                 }

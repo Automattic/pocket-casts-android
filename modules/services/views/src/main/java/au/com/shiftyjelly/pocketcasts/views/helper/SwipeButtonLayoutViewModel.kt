@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SwipeButtonLayoutViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
     private val episodeAnalytics: EpisodeAnalytics,
     private val episodeManager: EpisodeManager,
@@ -35,6 +35,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val userEpisodeManager: UserEpisodeManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val shareDialogFactory: ShareDialogFactory,
 ) : ViewModel() {
 
     fun share(
@@ -51,7 +52,7 @@ class SwipeButtonLayoutViewModel @Inject constructor(
 
             val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) ?: return@launch
 
-            ShareDialog(
+            shareDialogFactory.create(
                 episode = episode,
                 podcast = podcast,
                 fragmentManager = fragmentManager,

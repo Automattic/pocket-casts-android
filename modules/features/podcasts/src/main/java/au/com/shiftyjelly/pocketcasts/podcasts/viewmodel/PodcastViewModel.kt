@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -56,6 +56,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +78,7 @@ class PodcastViewModel
     private val castManager: CastManager,
     private val downloadManager: DownloadManager,
     private val userManager: UserManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
@@ -377,7 +378,7 @@ class PodcastViewModel
         val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false, source = SourceView.PODCAST_SCREEN)
             }
         }
     }
@@ -429,7 +430,8 @@ class PodcastViewModel
                     SharePodcastHelper(
                         podcast,
                         episode,
-                        bookmark.timeSecs.toDouble(),
+                        bookmark.timeSecs.seconds,
+                        null,
                         context,
                         ShareType.BOOKMARK_TIME,
                         SourceView.PODCAST_SCREEN,

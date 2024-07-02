@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.chapters
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -47,7 +47,7 @@ class ChaptersViewModel @AssistedInject constructor(
     private val playbackManager: PlaybackManager,
     private val episodeManager: EpisodeManager,
     private val settings: Settings,
-    private val tracker: AnalyticsTrackerWrapper,
+    private val tracker: AnalyticsTracker,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
@@ -136,6 +136,26 @@ class ChaptersViewModel @AssistedInject constructor(
 
     fun scrollToChapter(chapter: Chapter) {
         viewModelScope.launch { _scrollToChapter.emit(chapter) }
+    }
+
+    fun trackChapterLinkTap(chapter: Chapter) {
+        viewModelScope.launch(ioDispatcher) {
+            val episodeId = when (mode) {
+                is Mode.Episode -> mode.episodeId
+                is Mode.Player -> playbackManager.playbackStateFlow.first().episodeUuid
+            }
+
+            episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
+                tracker.track(
+                    AnalyticsEvent.CHAPTER_LINK_CLICKED,
+                    mapOf(
+                        "chapter_title" to chapter.title,
+                        "episode_uuid" to episodeId,
+                        "podcast_uuid" to episode.podcastOrSubstituteUuid,
+                    ),
+                )
+            }
+        }
     }
 
     private fun createUiState(

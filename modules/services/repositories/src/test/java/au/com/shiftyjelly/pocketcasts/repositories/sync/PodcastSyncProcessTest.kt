@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -305,7 +306,7 @@ class PodcastSyncProcessTest {
         folderManager = mock(),
         syncManager = mock(),
         crashLogging = FakeCrashLogging(),
-        analyticsTracker = mock(),
+        analyticsTracker = AnalyticsTracker.test(),
     )
 
     private fun mockPodcast(

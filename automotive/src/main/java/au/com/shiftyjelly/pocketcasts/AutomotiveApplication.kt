@@ -60,6 +60,8 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -122,6 +124,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     }
 
     private fun setupAnalytics() {
-        AnalyticsTracker.init(settings)
+        analyticsTracker.clearAllData()
     }
 }

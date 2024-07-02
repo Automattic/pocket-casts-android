@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -259,7 +260,7 @@ class StoriesViewModelTest {
             endOfYearManager = endOfYearManager,
             fileUtilWrapper = fileUtilWrapper,
             shareableTextProvider = mock(),
-            analyticsTracker = mock(),
+            analyticsTracker = AnalyticsTracker.test(),
             settings = settings,
             subscriptionManager = subscriptionManager,
             crashLogging = FakeCrashLogging(),

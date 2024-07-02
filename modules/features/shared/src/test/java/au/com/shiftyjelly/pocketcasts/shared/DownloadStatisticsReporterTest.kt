@@ -8,8 +8,9 @@ import androidx.lifecycle.Lifecycle.Event.ON_STOP
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import java.time.Instant
@@ -47,7 +48,7 @@ class DownloadStatisticsReporterTest {
         }
         reporter = DownloadStatisticsReporter(
             episodeDao,
-            EpisodeAnalytics(tracker),
+            EpisodeAnalytics(AnalyticsTracker.test(tracker, isEnabled = true)),
             lifecycleOwner,
             CoroutineScope(testDispatcher),
         )
@@ -122,12 +123,18 @@ class DownloadStatisticsReporterTest {
         assertEquals(1, tracker.trackedEvents.size)
     }
 
-    private class TestTracker : AnalyticsTrackerWrapper() {
+    private class TestTracker : Tracker {
         private val _trackedEvents = mutableListOf<Pair<AnalyticsEvent, Map<String, Any>>>()
         val trackedEvents get() = _trackedEvents.toList()
 
         override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
             _trackedEvents.add(event to properties)
         }
+
+        override fun refreshMetadata() = Unit
+
+        override fun flush() = Unit
+
+        override fun clearAllData() = Unit
     }
 }

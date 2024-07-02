@@ -5,7 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
@@ -39,7 +39,7 @@ class PodcastWidget : AppWidgetProvider(), CoroutineScope {
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var tracker: AnalyticsTrackerWrapper
+    @Inject lateinit var tracker: AnalyticsTracker
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

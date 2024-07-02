@@ -13,7 +13,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R.string.episode_queued_for_download
 import au.com.shiftyjelly.pocketcasts.localization.R.string.episode_was_removed
@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var castManager: CastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
 
@@ -155,7 +155,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Share -> {
-                ShareFragment().show(parentFragmentManager, "sleep")
+                ShareFragment.newInstance(SourceView.BOTTOM_SHELF).show(parentFragmentManager, "sleep")
             }
 
             ShelfItem.Podcast -> {

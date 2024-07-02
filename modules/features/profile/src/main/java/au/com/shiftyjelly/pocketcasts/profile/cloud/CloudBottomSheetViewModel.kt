@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -35,7 +35,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val downloadManager: DownloadManager,
     private val podcastManager: PodcastManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
     userManager: UserManager,
@@ -100,7 +100,7 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun download(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
-            DownloadHelper.manuallyDownloadEpisodeNow(episode, "cloud bottom sheet", downloadManager, episodeManager)
+            DownloadHelper.manuallyDownloadEpisodeNow(episode, "cloud bottom sheet", downloadManager, episodeManager, source = source)
         }
     }
 

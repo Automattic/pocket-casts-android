@@ -8,7 +8,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="156"
+            line="157"
             column="18"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="193"
+            line="194"
             column="13"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="200"
+            line="201"
             column="21"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="281"
+            line="282"
             column="13"/>
     </issue>
 
@@ -228,7 +228,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="288"
+            line="289"
             column="21"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="297"
+            line="298"
             column="21"/>
     </issue>
 
@@ -250,7 +250,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="310"
+            line="311"
             column="21"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="323"
+            line="324"
             column="21"/>
     </issue>
 
@@ -272,7 +272,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="335"
+            line="336"
             column="25"/>
     </issue>
 
@@ -283,7 +283,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="347"
+            line="348"
             column="25"/>
     </issue>
 
@@ -804,7 +804,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
-            line="242"
+            line="243"
             column="45"/>
     </issue>
 

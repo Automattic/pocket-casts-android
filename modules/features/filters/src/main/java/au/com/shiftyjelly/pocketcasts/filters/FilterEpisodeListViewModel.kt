@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -41,7 +41,7 @@ class FilterEpisodeListViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
 
     companion object {
@@ -144,7 +144,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         val trimmedList = episodes.subList(0, min(MAX_DOWNLOAD_ALL, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "filter download all", fireEvent = false, fireToast = false)
+                downloadManager.addEpisodeToQueue(it, "filter download all", fireEvent = false, fireToast = false, source = SourceView.FILTERS)
             }
         }
     }

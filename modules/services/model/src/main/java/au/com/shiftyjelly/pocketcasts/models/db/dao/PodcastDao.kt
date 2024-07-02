@@ -249,6 +249,9 @@ abstract class PodcastDao {
         return countByUuid(uuid) != 0
     }
 
+    @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id IS :podcastUuid")
+    abstract fun episodeCount(podcastUuid: String): Flow<Int>
+
     fun existsRx(uuid: String): Single<Boolean> {
         return Single.fromCallable { exists(uuid) }
     }

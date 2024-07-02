@@ -19,7 +19,7 @@ import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -80,7 +80,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     @Inject lateinit var warningsHelper: WarningsHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var bookmarkFeature: BookmarkFeatureControl
 
@@ -445,7 +445,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onShareClick() {
         trackShelfAction(ShelfItem.Share.analyticsValue)
-        ShareFragment().show(parentFragmentManager, "share_sheet")
+        ShareFragment.newInstance(SourceView.PLAYER).show(parentFragmentManager, "share_sheet")
     }
 
     private fun showPodcast() {

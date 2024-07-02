@@ -30,6 +30,7 @@ interface PodcastManager {
     fun findPodcastByUuidRx(uuid: String): Maybe<Podcast>
     fun observePodcastByUuid(uuid: String): Flowable<Podcast>
     fun observePodcastByUuidFlow(uuid: String): Flow<Podcast>
+    fun observePodcastByEpisodeUuid(uuid: String): Flow<Podcast>
     fun observePodcastSubscriptions(): Flowable<List<String>>
 
     fun findSubscribed(): List<Podcast>
@@ -54,6 +55,7 @@ interface PodcastManager {
     fun findPodcastsAutodownload(): List<Podcast>
 
     fun exists(podcastUuid: String): Boolean
+    fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)

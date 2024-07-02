@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
@@ -33,9 +33,6 @@ class SearchViewModelTest {
     @Mock
     private lateinit var podcastManager: PodcastManager
 
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
-
     private lateinit var viewModel: SearchViewModel
 
     @Before
@@ -43,7 +40,7 @@ class SearchViewModelTest {
         whenever(searchHandler.searchResults).thenReturn(mock())
         whenever(searchHandler.loading).thenReturn(mock())
         viewModel =
-            SearchViewModel(searchHandler, searchHistoryManager, podcastManager, analyticsTracker)
+            SearchViewModel(searchHandler, searchHistoryManager, podcastManager, AnalyticsTracker.test())
     }
 
     @Test

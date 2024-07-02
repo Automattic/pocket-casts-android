@@ -10,12 +10,21 @@ object DateUtil {
 
     const val MILLISECS_PER_DAY = (24 * 60 * 60 * 1000).toLong()
 
+    private val dateTimeFormatteMedium = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
     private val dateTimeFormatterLong = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
 
     fun daysBetweenTwoDates(dateOne: Date, dateTwo: Date): Int {
         val timeDifference = (dateTwo.time - dateOne.time).toDouble()
         val result = timeDifference / MILLISECS_PER_DAY
         return result.roundToInt()
+    }
+
+    fun toLocalizedFormatMediumStyle(date: Date): String {
+        return date
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .format(dateTimeFormatteMedium)
     }
 
     fun toLocalizedFormatLongStyle(date: Date): String {

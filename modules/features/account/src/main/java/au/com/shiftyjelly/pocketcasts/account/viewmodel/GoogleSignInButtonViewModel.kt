@@ -6,7 +6,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -33,7 +33,7 @@ import timber.log.Timber
 
 @HiltViewModel
 class GoogleSignInButtonViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
@@ -56,6 +56,8 @@ class GoogleSignInButtonViewModel @Inject constructor(
         onError: suspend () -> Unit,
     ) {
         if (flow != null) {
+            analyticsTracker.track(AnalyticsEvent.SSO_STARTED, mapOf("source" to "google"))
+
             analyticsTracker.track(
                 AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
                 mapOf(

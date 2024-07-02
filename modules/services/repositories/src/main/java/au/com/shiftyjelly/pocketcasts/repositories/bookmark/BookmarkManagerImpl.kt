@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.flowOf
 
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : BookmarkManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext

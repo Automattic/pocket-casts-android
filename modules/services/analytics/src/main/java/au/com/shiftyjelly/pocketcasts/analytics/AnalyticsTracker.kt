@@ -1,46 +1,28 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-
-object AnalyticsTracker {
-    private val trackers: MutableList<Tracker> = mutableListOf()
-    private lateinit var settings: Settings
-
-    fun init(settings: Settings) {
-        this.settings = settings
-        trackers.forEach { it.clearAllData() }
-    }
-
-    fun register(vararg trackers: Tracker) {
-        this.trackers.addAll(trackers)
-    }
-
+open class AnalyticsTracker constructor(
+    val trackers: List<Tracker>,
+    val isTrackingEnabled: () -> Boolean,
+) {
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        if (getSendUsageStats()) {
+        if (isTrackingEnabled()) {
             trackers.forEach { it.track(event, properties) }
         }
     }
 
     fun refreshMetadata() {
-        trackers.forEach { it.refreshMetadata() }
+        trackers.forEach(Tracker::refreshMetadata)
     }
 
     fun flush() {
-        trackers.forEach { it.flush() }
+        trackers.forEach(Tracker::flush)
     }
 
     fun clearAllData() {
-        trackers.forEach { it.clearAllData() }
+        trackers.forEach(Tracker::clearAllData)
     }
 
-    fun setSendUsageStats(send: Boolean) {
-        if (send != getSendUsageStats()) {
-            settings.collectAnalytics.set(send, updateModifiedAt = true)
-            if (!send) {
-                trackers.forEach { it.clearAllData() }
-            }
-        }
+    companion object {
+        fun test(vararg trackers: Tracker, isEnabled: Boolean = false) = AnalyticsTracker(trackers.toList(), { isEnabled })
     }
-
-    fun getSendUsageStats() = settings.collectAnalytics.value
 }

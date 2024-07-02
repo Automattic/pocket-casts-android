@@ -115,7 +115,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun downloadEpisode(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                DownloadHelper.manuallyDownloadEpisodeNow(episode, "download from intent", downloadManager, episodeManager)
+                DownloadHelper.manuallyDownloadEpisodeNow(episode, "download from intent", downloadManager, episodeManager, source = source)
             }
         }
     }
