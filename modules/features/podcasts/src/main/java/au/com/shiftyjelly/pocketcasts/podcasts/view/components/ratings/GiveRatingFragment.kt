@@ -64,12 +64,10 @@ class GiveRatingFragment : BaseDialogFragment() {
                                 dismiss()
                             }
                         },
-                        onFailure = ::exitWithError,
                     )
                 }
 
-                val state = viewModel.state.collectAsState().value
-                when (state) {
+                when (val state = viewModel.state.collectAsState().value) {
                     is GiveRatingViewModel.State.Loaded -> GiveRatingScreen(
                         state = state,
                         onDismiss = ::dismiss,
@@ -84,8 +82,11 @@ class GiveRatingFragment : BaseDialogFragment() {
                             )
                         },
                     )
-                    GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
                     is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(state = state, onDismiss = { dismiss() })
+                    is GiveRatingViewModel.State.FailedToRate -> {
+                        exitWithError(state.message)
+                    }
+                    GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
                 }
             }
         }

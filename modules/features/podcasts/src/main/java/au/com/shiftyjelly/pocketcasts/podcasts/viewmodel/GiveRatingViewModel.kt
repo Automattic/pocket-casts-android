@@ -54,6 +54,7 @@ class GiveRatingViewModel @Inject constructor(
             }
         }
         data class NotAllowedToRate(val podcastUuid: String) : State()
+        data class FailedToRate(val message: String) : State()
     }
 
     private val _state = MutableStateFlow<State>(State.Loading)
@@ -62,7 +63,6 @@ class GiveRatingViewModel @Inject constructor(
     fun checkIfUserCanRatePodcast(
         podcastUuid: String,
         onUserSignedOut: () -> Unit,
-        onFailure: (String) -> Unit,
     ) {
         _state.value = State.Loading
 
@@ -74,30 +74,31 @@ class GiveRatingViewModel @Inject constructor(
                 }
 
                 is SignInState.SignedIn -> {
-                    val newState = getPodcastInfo(podcastUuid)
-                    if (newState != null) {
-                        _state.value = newState
-                    } else {
-                        onFailure("Cannot give rating, unable to fetch podcast with id $podcastUuid")
+                    withContext(Dispatchers.IO) {
+                        val playedEpisodesFromPodcast = podcastManager.findPlayedEpisodesFrom(podcastUuid)
+
+                        if (playedEpisodesFromPodcast.isEmpty()) {
+                            _state.value = State.NotAllowedToRate(podcastUuid)
+                        } else {
+                            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+                            if (podcast == null) {
+                                _state.value = State.FailedToRate("Failed to rate")
+                            } else {
+                                val rating = ratingsManager.podcastRatings(podcastUuid).first()
+                                val stars = getStarsFromRating(rating)
+
+                                _state.value = State.Loaded(
+                                    podcastUuid = podcast.uuid,
+                                    podcastTitle = podcast.title,
+                                    _stars = stars,
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
-    private suspend fun getPodcastInfo(podcastUuid: String): State.Loaded? =
-        withContext(Dispatchers.IO) {
-            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
-                ?: return@withContext null
-            val rating = ratingsManager.podcastRatings(podcastUuid).first()
-            val stars = getStarsFromRating(rating)
-
-            return@withContext State.Loaded(
-                podcastUuid = podcast.uuid,
-                podcastTitle = podcast.title,
-                _stars = stars,
-            )
-        }
 
     private fun getStarsFromRating(podcastRatings: PodcastRatings): State.Loaded.Stars? {
         val rating = podcastRatings.average ?: 0.0
