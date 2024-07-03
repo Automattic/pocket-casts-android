@@ -47,6 +47,9 @@ import kotlin.math.abs
 import kotlin.math.max
 
 private const val numStars = 5
+private const val zeroStarIndexInStopPoints = 0
+private const val halfStarIndexInStopPoints = 1
+private const val oneFullStarIndexInStopPoints = 2
 
 @Composable
 fun SwipeableStars(
@@ -214,8 +217,8 @@ private fun getDesiredStopPoint(
 
             val desiredStarIndex = stopPoints.indexOf(desiredStopPoint.toDouble())
 
-            if (desiredStarIndex == 0 || desiredStarIndex == 1) {
-                stopPoints.getOrNull(2)?.toFloat() ?: 0F
+            if (desiredStarIndex == zeroStarIndexInStopPoints || desiredStarIndex == halfStarIndexInStopPoints) {
+                stopPoints.getOrNull(oneFullStarIndexInStopPoints)?.toFloat() ?: 0F
             } else {
                 desiredStopPoint
             }
