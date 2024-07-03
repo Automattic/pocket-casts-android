@@ -69,6 +69,8 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     override val name: String
         get() = "Cast"
 
+    override var isDownloading: Boolean = false
+
     override val episodeUuid: String?
         get() = episode?.uuid
 

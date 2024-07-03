@@ -18,6 +18,7 @@ interface Player {
     val url: String?
     val episodeUuid: String?
     val name: String
+    var isDownloading: Boolean
     val onPlayerEvent: (Player, PlayerEvent) -> Unit
 
     suspend fun load(currentPositionMs: Int)
