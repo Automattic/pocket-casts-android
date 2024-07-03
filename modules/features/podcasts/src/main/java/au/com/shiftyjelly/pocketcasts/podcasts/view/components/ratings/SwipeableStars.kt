@@ -217,9 +217,12 @@ private fun getDesiredStopPoint(
 
             val desiredStarIndex = stopPoints.indexOf(desiredStopPoint.toDouble())
 
+            // Verify if the user is trying to select zero star or a half star
             if (desiredStarIndex == zeroStarIndexInStopPoints || desiredStarIndex == halfStarIndexInStopPoints) {
+                // If trying to select zero star or a half star, we will select one full star instead
                 stopPoints.getOrNull(oneFullStarIndexInStopPoints)?.toFloat() ?: 0F
             } else {
+                // Otherwise, we will select the desired star
                 desiredStopPoint
             }
         }
