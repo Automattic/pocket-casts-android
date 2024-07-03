@@ -95,6 +95,7 @@ class CacheWorker @AssistedInject constructor(
             WorkManager.getInstance(context).cancelAllWorkByTag(CACHE_WORKER_TAG)
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.UNMETERED)
+                .setRequiresStorageNotLow(true)
                 .build()
 
             val cacheWorkRequest = OneTimeWorkRequest.Builder(CacheWorker::class.java)
