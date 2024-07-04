@@ -21,15 +21,14 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun GiveRatingScreen(
-    state: GiveRatingViewModel.State.Loaded,
-    setRating: (Double) -> Unit,
-    submitRating: () -> Unit,
+fun GiveRatingNotAllowedToRate(
+    state: GiveRatingViewModel.State.NotAllowedToRate,
     onDismiss: () -> Unit,
 ) {
     Column(
@@ -58,27 +57,27 @@ fun GiveRatingScreen(
             Spacer(Modifier.height(40.dp))
 
             TextH30(
-                text = stringResource(LR.string.podcast_rate, state.podcastTitle),
-                textAlign = TextAlign.Center,
+                text = stringResource(R.string.not_allowed_to_rate_title),
                 fontWeight = FontWeight.W600,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
 
             Spacer(Modifier.height(32.dp))
 
-            SwipeableStars(
-                onStarsChanged = setRating,
-                modifier = Modifier
-                    .height(48.dp)
-                    .padding(horizontal = 16.dp),
+            TextP40(
+                text = stringResource(R.string.not_allowed_to_rate_description),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.W400,
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
 
         Spacer(Modifier.weight(1f))
 
         RowButton(
-            text = stringResource(LR.string.submit),
-            onClick = submitRating,
+            text = stringResource(R.string.done),
+            onClick = onDismiss,
             colors = ButtonDefaults.outlinedButtonColors(
                 backgroundColor = MaterialTheme.theme.colors.primaryText01,
             ),

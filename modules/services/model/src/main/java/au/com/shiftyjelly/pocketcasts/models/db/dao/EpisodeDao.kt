@@ -46,6 +46,9 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE uuid IN (:episodeUuids)")
     abstract suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode>
 
+    @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid AND played_up_to != 0.0")
+    abstract suspend fun findPlayedEpisodesFrom(podcastUuid: String): List<PodcastEpisode>
+
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
 
