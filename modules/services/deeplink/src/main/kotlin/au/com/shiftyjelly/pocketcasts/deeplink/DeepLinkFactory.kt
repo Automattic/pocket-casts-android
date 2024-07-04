@@ -4,7 +4,9 @@ import android.content.Intent
 import timber.log.Timber
 
 class DeepLinkFactory {
-    private val adapters = listOf<DeepLinkAdapter>()
+    private val adapters = listOf(
+        GoToDownloadedEpisodes.Adapter,
+    )
 
     fun createDeepLink(intent: Intent): DeepLink? {
         Timber.tag(TAG).i("Deep linking using intent '$intent'")

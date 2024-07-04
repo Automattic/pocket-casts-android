@@ -49,6 +49,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
+import au.com.shiftyjelly.pocketcasts.deeplink.GoToDownloadedEpisodes
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
@@ -279,6 +281,8 @@ class MainActivity :
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) {}
+
+    private val deepLinkFactory = DeepLinkFactory()
 
     @SuppressLint("WrongConstant") // for custom snackbar duration constant
     private fun checkForNotificationPermission(onPermissionGranted: () -> Unit = {}) {
@@ -1224,11 +1228,14 @@ class MainActivity :
         }
 
         try {
-            // downloading episode notification tapped
-            if (action == Settings.INTENT_OPEN_APP_DOWNLOADING) {
-                closeToRoot()
-                addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
-            } else if (action == Settings.INTENT_OPEN_APP_ADD_BOOKMARK) {
+            when (deepLinkFactory.createDeepLink(intent)) {
+                is GoToDownloadedEpisodes -> {
+                    closeToRoot()
+                    addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
+                }
+                null -> Unit
+            }
+            if (action == Settings.INTENT_OPEN_APP_ADD_BOOKMARK) {
                 viewModel.buildBookmarkArguments { args ->
                     bookmarkActivityLauncher.launch(args.getIntent(this))
                 }
