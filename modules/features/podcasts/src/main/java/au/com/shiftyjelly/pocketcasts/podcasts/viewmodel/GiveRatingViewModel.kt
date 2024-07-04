@@ -68,31 +68,27 @@ class GiveRatingViewModel @Inject constructor(
 
         viewModelScope.launch {
             val signInState = userManager.getSignInState().blockingFirst()
-            when (signInState) {
-                SignInState.SignedOut -> {
-                    onUserSignedOut()
-                }
+            if (signInState == SignInState.SignedOut) {
+                onUserSignedOut()
+            } else if (signInState is SignInState.SignedIn) {
+                withContext(Dispatchers.IO) {
+                    val playedEpisodesFromPodcast = podcastManager.findPlayedEpisodesFrom(podcastUuid)
 
-                is SignInState.SignedIn -> {
-                    withContext(Dispatchers.IO) {
-                        val playedEpisodesFromPodcast = podcastManager.findPlayedEpisodesFrom(podcastUuid)
-
-                        if (playedEpisodesFromPodcast.isEmpty()) {
-                            _state.value = State.NotAllowedToRate(podcastUuid)
+                    if (playedEpisodesFromPodcast.isEmpty()) {
+                        _state.value = State.NotAllowedToRate(podcastUuid)
+                    } else {
+                        val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+                        if (podcast == null) {
+                            _state.value = State.FailedToRate("Failed to rate")
                         } else {
-                            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
-                            if (podcast == null) {
-                                _state.value = State.FailedToRate("Failed to rate")
-                            } else {
-                                val rating = ratingsManager.podcastRatings(podcastUuid).first()
-                                val stars = getStarsFromRating(rating)
+                            val rating = ratingsManager.podcastRatings(podcastUuid).first()
+                            val stars: State.Loaded.Stars? = getStarsFromRating(rating)
 
-                                _state.value = State.Loaded(
-                                    podcastUuid = podcast.uuid,
-                                    podcastTitle = podcast.title,
-                                    _stars = stars,
-                                )
-                            }
+                            _state.value = State.Loaded(
+                                podcastUuid = podcast.uuid,
+                                podcastTitle = podcast.title,
+                                _stars = stars,
+                            )
                         }
                     }
                 }
