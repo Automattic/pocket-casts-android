@@ -462,6 +462,26 @@ class MediaSessionManager(
                             in 2.75..<2.85 -> IR.drawable.auto_2_8
                             in 2.85..<2.95 -> IR.drawable.auto_2_9
                             in 2.95..<3.05 -> IR.drawable.auto_3
+                            in 3.05..<3.15 -> IR.drawable.auto_3_1
+                            in 3.15..<3.25 -> IR.drawable.auto_3_2
+                            in 3.25..<3.35 -> IR.drawable.auto_3_3
+                            in 3.35..<3.45 -> IR.drawable.auto_3_4
+                            in 3.45..<3.55 -> IR.drawable.auto_3_5
+                            in 3.55..<3.65 -> IR.drawable.auto_3_6
+                            in 3.65..<3.75 -> IR.drawable.auto_3_7
+                            in 3.75..<3.85 -> IR.drawable.auto_3_8
+                            in 3.85..<3.95 -> IR.drawable.auto_3_9
+                            in 3.95..<4.05 -> IR.drawable.auto_4
+                            in 4.05..<4.15 -> IR.drawable.auto_4_1
+                            in 4.15..<4.25 -> IR.drawable.auto_4_2
+                            in 4.25..<4.35 -> IR.drawable.auto_4_3
+                            in 4.35..<4.45 -> IR.drawable.auto_4_4
+                            in 4.45..<4.55 -> IR.drawable.auto_4_5
+                            in 4.55..<4.65 -> IR.drawable.auto_4_6
+                            in 4.65..<4.75 -> IR.drawable.auto_4_7
+                            in 4.75..<4.85 -> IR.drawable.auto_4_8
+                            in 4.85..<4.95 -> IR.drawable.auto_4_9
+                            in 4.95..<5.05 -> IR.drawable.auto_5
                             else -> IR.drawable.auto_1
                         }
 
