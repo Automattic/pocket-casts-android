@@ -79,7 +79,7 @@ fun GiveRatingScreen(
         RowButton(
             text = stringResource(LR.string.submit),
             onClick = submitRating,
-            colors = ButtonDefaults.outlinedButtonColors(
+            colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.theme.colors.primaryText01,
             ),
         )

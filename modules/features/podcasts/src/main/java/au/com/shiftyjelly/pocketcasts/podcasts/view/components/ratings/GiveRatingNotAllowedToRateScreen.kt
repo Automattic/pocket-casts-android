@@ -78,7 +78,7 @@ fun GiveRatingNotAllowedToRate(
         RowButton(
             text = stringResource(R.string.done),
             onClick = onDismiss,
-            colors = ButtonDefaults.outlinedButtonColors(
+            colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.theme.colors.primaryText01,
             ),
         )
