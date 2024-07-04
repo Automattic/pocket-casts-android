@@ -15,6 +15,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -85,6 +86,7 @@ class CacheWorker @AssistedInject constructor(
             context: Context,
             url: String?,
             episodeUuid: String?,
+            settings: Settings,
         ) {
             val inputData = Data.Builder()
                 .putString(URL_KEY, url)
@@ -94,12 +96,15 @@ class CacheWorker @AssistedInject constructor(
             // Cancel previous caching work
             WorkManager.getInstance(context).cancelAllWorkByTag(CACHE_WORKER_TAG)
             val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.UNMETERED)
-                .build()
+            if (settings.warnOnMeteredNetwork.value) {
+                constraints.setRequiredNetworkType(NetworkType.UNMETERED)
+            } else {
+                constraints.setRequiredNetworkType(NetworkType.CONNECTED)
+            }
 
             val cacheWorkRequest = OneTimeWorkRequest.Builder(CacheWorker::class.java)
                 .addTag(CACHE_WORKER_TAG)
-                .setConstraints(constraints)
+                .setConstraints(constraints.build())
                 .setInputData(inputData).build()
 
             // Enqueue new caching work
