@@ -56,7 +56,7 @@ class CacheWorker @AssistedInject constructor(
                 null,
             )
             cacheWriter?.cache()
-            Timber.tag(TAG).d("Caching complete for episode id: $episodeUuid worker id: '$id'")
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Caching complete for episode id: $episodeUuid worker id: '$id'")
         } catch (exception: Exception) {
             val errorMessage = "Failed to cache episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'"
             Timber.tag(TAG).e(exception, errorMessage)
