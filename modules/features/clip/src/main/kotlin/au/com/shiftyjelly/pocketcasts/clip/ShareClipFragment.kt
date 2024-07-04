@@ -18,15 +18,15 @@ import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
+import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
@@ -77,6 +77,7 @@ class ShareClipFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
+        val listener = ShareClipViewModelListener(this@ShareClipFragment, viewModel, clipAnalytics.analyticsTracker)
         val clipColors = clipColors
         setContent {
             val state by viewModel.uiState.collectAsState()
@@ -85,22 +86,12 @@ class ShareClipFragment : BaseDialogFragment() {
                 episode = state.episode,
                 podcast = state.podcast,
                 clipRange = state.clipRange,
+                playbackProgress = state.playbackProgress,
                 episodeCount = state.episodeCount,
                 isPlaying = state.isPlaying,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 clipColors = clipColors,
-                onPlayClick = viewModel::playClip,
-                onPauseClick = viewModel::stopClip,
-                onClip = {
-                    state.podcast?.let { podcast ->
-                        state.clip?.let { clip ->
-                            shareClip(podcast, clip)
-                        }
-                    }
-                },
-                onClipStartUpdate = viewModel::updateClipStart,
-                onClipEndUpdate = viewModel::updateClipEnd,
-                onClose = ::dismiss,
+                listener = listener,
             )
         }
     }
@@ -121,29 +112,18 @@ class ShareClipFragment : BaseDialogFragment() {
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(argbColor)
     }
 
-    private fun shareClip(podcast: Podcast, clip: Clip) {
-        viewModel.onClipLinkShared(clip)
-        SharePodcastHelper(
-            podcast,
-            clip.episode,
-            clip.range.start,
-            clip.range.end,
-            requireActivity(),
-            SharePodcastHelper.ShareType.CLIP,
-            SourceView.CLIP_SHARING,
-            clipAnalytics.analyticsTracker,
-        ).showShareDialogDirect()
-    }
-
     @Parcelize
     private class Args(
         val episodeUuid: String,
         val podcastUuid: String,
         val clipUuid: String,
-        val clipRange: Clip.Range,
+        @TypeParceler<Duration, DurationParceler>() val clipStart: Duration,
+        @TypeParceler<Duration, DurationParceler>() val clipEnd: Duration,
         @TypeParceler<Color, ColorParceler>() val baseColor: Color,
         val source: SourceView,
-    ) : Parcelable
+    ) : Parcelable {
+        val clipRange get() = Clip.Range(clipStart, clipEnd)
+    }
 
     companion object {
         private const val NEW_INSTANCE_ARG = "ShareClipFragmentArgs"
@@ -153,12 +133,18 @@ class ShareClipFragment : BaseDialogFragment() {
             @ColorInt baseColor: Int,
             source: SourceView,
         ) = ShareClipFragment().apply {
+            val clipRange = Clip.Range.fromPosition(
+                playbackPosition = episode.playedUpTo.seconds,
+                episodeDuration = episode.duration.seconds,
+            )
+
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
                     episodeUuid = episode.uuid,
                     podcastUuid = episode.podcastUuid,
                     clipUuid = UUID.randomUUID().toString(),
-                    clipRange = Clip.Range.fromPosition(episode.playedUpTo.seconds, episode.duration.seconds),
+                    clipStart = clipRange.start,
+                    clipEnd = clipRange.end,
                     baseColor = Color(baseColor),
                     source = source,
                 ),

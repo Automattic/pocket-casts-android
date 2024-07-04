@@ -1,26 +1,31 @@
 package au.com.shiftyjelly.pocketcasts.clip
 
-import android.os.Parcelable
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.parcelize.IgnoredOnParcel
-import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.TypeParceler
 
 data class Clip(
-    val episode: PodcastEpisode,
+    val sourceUri: String,
     val range: Range,
 ) {
-    @Parcelize
-    data class Range(
-        @TypeParceler<Duration, DurationParceler>() val start: Duration,
-        @TypeParceler<Duration, DurationParceler>() val end: Duration,
-    ) : Parcelable {
-        @IgnoredOnParcel val startInSeconds = start.inWholeSeconds.toInt()
+    companion object {
+        fun fromEpisode(
+            episode: PodcastEpisode,
+            range: Range = Range.fromPosition(episode.playedUpTo.seconds, episode.duration.seconds),
+        ) = Clip(
+            sourceUri = episode.let { if (it.isDownloaded) it.downloadedFilePath else it.downloadUrl }.orEmpty(),
+            range = range,
+        )
+    }
 
-        @IgnoredOnParcel val endInSeconds = end.inWholeSeconds.toInt()
+    data class Range(
+        val start: Duration,
+        val end: Duration,
+    ) {
+        val startInSeconds = start.inWholeSeconds.toInt()
+        val endInSeconds = end.inWholeSeconds.toInt()
+
+        operator fun contains(duration: Duration) = duration in start..end
 
         companion object {
             fun fromPosition(
