@@ -291,7 +291,7 @@ class SimplePlayer(
 
                 if (settings.cacheEntirePlayingEpisode.value) {
                     cacheDataSourceFactory.setCacheWriteDataSinkFactory(null) // Disable on-the-fly caching
-                    CacheWorker.startCachingEntireEpisode(context, location.uri, episodeUuid, settings)
+                    CacheWorker.startCachingEntireEpisode(context, location.uri, episodeUuid)
                 }
 
                 cacheDataSourceFactory
