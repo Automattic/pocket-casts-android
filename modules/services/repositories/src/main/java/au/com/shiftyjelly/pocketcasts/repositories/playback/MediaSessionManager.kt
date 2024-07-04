@@ -462,26 +462,6 @@ class MediaSessionManager(
                             in 2.75..<2.85 -> IR.drawable.auto_2_8
                             in 2.85..<2.95 -> IR.drawable.auto_2_9
                             in 2.95..<3.05 -> IR.drawable.auto_3
-                            in 3.05..<3.15 -> IR.drawable.auto_3_1
-                            in 3.15..<3.25 -> IR.drawable.auto_3_2
-                            in 3.25..<3.35 -> IR.drawable.auto_3_3
-                            in 3.35..<3.45 -> IR.drawable.auto_3_4
-                            in 3.45..<3.55 -> IR.drawable.auto_3_5
-                            in 3.55..<3.65 -> IR.drawable.auto_3_6
-                            in 3.65..<3.75 -> IR.drawable.auto_3_7
-                            in 3.75..<3.85 -> IR.drawable.auto_3_8
-                            in 3.85..<3.95 -> IR.drawable.auto_3_9
-                            in 3.95..<4.05 -> IR.drawable.auto_4
-                            in 4.05..<4.15 -> IR.drawable.auto_4_1
-                            in 4.15..<4.25 -> IR.drawable.auto_4_2
-                            in 4.25..<4.35 -> IR.drawable.auto_4_3
-                            in 4.35..<4.45 -> IR.drawable.auto_4_4
-                            in 4.45..<4.55 -> IR.drawable.auto_4_5
-                            in 4.55..<4.65 -> IR.drawable.auto_4_6
-                            in 4.65..<4.75 -> IR.drawable.auto_4_7
-                            in 4.75..<4.85 -> IR.drawable.auto_4_8
-                            in 4.85..<4.95 -> IR.drawable.auto_4_9
-                            in 4.95..<5.05 -> IR.drawable.auto_5
                             else -> IR.drawable.auto_1
                         }
 
@@ -773,18 +753,8 @@ class MediaSessionManager(
                 in 1.40..<1.60 -> 1.6
                 in 1.60..<1.80 -> 1.8
                 in 1.80..<2.00 -> 2.0
-                in 2.00..<2.20 -> 2.2
-                in 2.20..<2.40 -> 2.4
-                in 2.40..<2.60 -> 2.6
-                in 2.60..<2.80 -> 2.8
-                in 2.80..<3.00 -> 3.0
-                in 3.00..<3.20 -> 3.2
-                in 3.20..<3.40 -> 3.4
-                in 3.40..<3.60 -> 3.6
-                in 3.60..<3.80 -> 3.8
-                in 3.80..<4.00 -> 4.0
-                in 4.00..<5.00 -> 5.0
-                in 5.00..<5.05 -> 0.6
+                in 2.00..<3.00 -> 3.0
+                in 3.00..<3.05 -> 0.6
                 else -> 1.0
             }
 
