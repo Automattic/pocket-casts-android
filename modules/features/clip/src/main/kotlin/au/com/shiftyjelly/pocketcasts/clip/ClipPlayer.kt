@@ -59,10 +59,7 @@ interface ClipPlayer {
         private val playbackManager: PlaybackManager,
         @ClipSimpleCache private val simpleCache: SimpleCache,
     ) {
-        fun create(
-            context: Context,
-            initialClip: Clip,
-        ): ClipPlayer {
+        fun create(context: Context): ClipPlayer {
             val httpSourceFactory = DefaultHttpDataSource.Factory()
                 .setUserAgent("Pocket Casts")
                 .setAllowCrossProtocolRedirects(true)
@@ -77,7 +74,6 @@ interface ClipPlayer {
             return ExoPlayerClipPlayer(
                 exoPlayer,
                 mediaSourceFactory,
-                initialClip,
                 playbackManager,
             )
         }
@@ -88,7 +84,6 @@ interface ClipPlayer {
 private class ExoPlayerClipPlayer(
     private val exoPlayer: ExoPlayer,
     private val mediaSourceFactory: MediaSource.Factory,
-    initialClip: Clip,
     private val playbackManager: PlaybackManager,
 ) : ClipPlayer {
     private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
@@ -132,8 +127,6 @@ private class ExoPlayerClipPlayer(
                 errors.tryEmit(error)
             }
         })
-        exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(initialClip.toMediaItem()))
-        exoPlayer.prepare()
     }
 
     override fun play(clip: Clip): Boolean {
