@@ -283,7 +283,7 @@ class SimplePlayer(
         } ?: return
 
         val sourceFactory = exoPlayerHelper.getSimpleCache()?.let { cache ->
-            if (location is EpisodeLocation.Stream) {
+            if (location is EpisodeLocation.Stream && !isDownloading) {
                 val cacheDataSourceFactory = CacheDataSource.Factory()
                     .setUpstreamDataSourceFactory(httpDataSourceFactory)
                     .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)

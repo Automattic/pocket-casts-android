@@ -1496,7 +1496,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_advanced_prioritize_seek_accuracy">Prioritizing seek accuracy</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Prioritizing seek accuracy can significantly slow down seek responsiveness and cause Pocket Casts to consume more data.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Cache playing episode</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">Entire playing episode is cached on an unmetered network to minimize streaming while playing. The episode is automatically removed from cache when the cache size limit is reached.</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">Entire playing episode is temporarily cached to minimize streaming.</string>
     <!-- Used in a button meaning that the user understood the message. -->
     <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->
