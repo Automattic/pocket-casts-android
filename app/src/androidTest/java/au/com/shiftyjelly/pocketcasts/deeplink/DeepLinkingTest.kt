@@ -27,4 +27,11 @@ class DeepLinkingTest {
 
         assertEquals("INTENT_OPEN_APP_DOWNLOADING", intent.action)
     }
+
+    @Test
+    fun failThisTest() {
+        val intent = GoToDownloadedEpisodes.toIntent(context)
+
+        assertEquals("???", intent.action)
+    }
 }
