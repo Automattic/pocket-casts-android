@@ -3,9 +3,8 @@ package au.com.shiftyjelly.pocketcasts.clip
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.parcelize.IgnoredOnParcel
 
-data class Clip constructor(
+data class Clip(
     val sourceUri: String,
     val range: Range,
 ) {
@@ -23,9 +22,8 @@ data class Clip constructor(
         val start: Duration,
         val end: Duration,
     ) {
-        @IgnoredOnParcel val startInSeconds = start.inWholeSeconds.toInt()
-
-        @IgnoredOnParcel val endInSeconds = end.inWholeSeconds.toInt()
+        val startInSeconds = start.inWholeSeconds.toInt()
+        val endInSeconds = end.inWholeSeconds.toInt()
 
         operator fun contains(duration: Duration) = duration in start..end
 
