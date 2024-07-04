@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,56 +33,63 @@ fun GiveRatingScreen(
     submitRating: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+    Box(
+        modifier = Modifier.fillMaxSize(),
     ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(top = 56.dp),
+        ) {
+            Spacer(Modifier.weight(1f))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                PodcastCover(
+                    uuid = state.podcastUuid,
+                    coverWidth = 164.dp,
+                )
+
+                Spacer(Modifier.height(40.dp))
+
+                TextH30(
+                    text = stringResource(LR.string.podcast_rate, state.podcastTitle),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.W600,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                SwipeableStars(
+                    onStarsChanged = setRating,
+                    modifier = Modifier
+                        .height(48.dp)
+                        .padding(horizontal = 16.dp),
+                )
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            RowButton(
+                text = stringResource(LR.string.submit),
+                onClick = submitRating,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.theme.colors.primaryText01,
+                ),
+            )
+        }
+
         NavigationIconButton(
             iconColor = MaterialTheme.theme.colors.primaryText01,
             navigationButton = NavigationButton.Close,
             onNavigationClick = onDismiss,
-            modifier = Modifier.align(Alignment.Start),
-        )
-
-        Spacer(Modifier.weight(1f))
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            PodcastCover(
-                uuid = state.podcastUuid,
-                coverWidth = 164.dp,
-            )
-
-            Spacer(Modifier.height(40.dp))
-
-            TextH30(
-                text = stringResource(LR.string.podcast_rate, state.podcastTitle),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.W600,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-
-            Spacer(Modifier.height(32.dp))
-
-            SwipeableStars(
-                onStarsChanged = setRating,
-                modifier = Modifier
-                    .height(48.dp)
-                    .padding(horizontal = 16.dp),
-            )
-        }
-
-        Spacer(Modifier.weight(1f))
-
-        RowButton(
-            text = stringResource(LR.string.submit),
-            onClick = submitRating,
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.theme.colors.primaryText01,
-            ),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp),
         )
     }
 }
