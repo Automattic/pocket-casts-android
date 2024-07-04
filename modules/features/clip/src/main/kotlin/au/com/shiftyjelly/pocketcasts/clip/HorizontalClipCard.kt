@@ -66,7 +66,7 @@ internal fun HorizontalClipCard(
         ) {
             TextH70(
                 text = podcast.title,
-                color = clipColors.cardTextColor.copy(alpha = 0.5f),
+                color = clipColors.cardText.copy(alpha = 0.5f),
                 maxLines = 1,
             )
             Spacer(
@@ -74,7 +74,7 @@ internal fun HorizontalClipCard(
             )
             TextH40(
                 text = episode.title,
-                color = clipColors.cardTextColor,
+                color = clipColors.cardText,
                 maxLines = 1,
             )
             Spacer(
@@ -85,7 +85,7 @@ internal fun HorizontalClipCard(
                     pluralStringResource(LR.plurals.episode_count, count = episodeCount, episodeCount),
                     podcast.displayableFrequency(LocalContext.current.resources),
                 ).joinToString(" · "),
-                color = clipColors.cardTextColor.copy(alpha = 0.5f),
+                color = clipColors.cardText.copy(alpha = 0.5f),
             )
         }
     }

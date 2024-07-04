@@ -108,15 +108,15 @@ class ShareClipFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val clipColors = clipColors
-        val argbColor = clipColors.backgroundColor.toArgb()
+        val argbColor = clipColors.background.toArgb()
 
         requireActivity().window?.let { activityWindow ->
             activityWindow.statusBarColor = argbColor
-            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = clipColors.backgroundColor.luminance() > 0.5f
+            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = clipColors.background.luminance() > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
             dialogWindow.navigationBarColor = argbColor
-            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = clipColors.backgroundColor.luminance() > 0.5f
+            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = clipColors.background.luminance() > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(argbColor)
     }
