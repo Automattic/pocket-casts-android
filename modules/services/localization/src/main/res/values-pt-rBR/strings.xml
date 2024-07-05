@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-17 15:54:03+0000
+Translation-Revision-Date: 2024-07-01 15:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="podcast_create_clip">Criar clipe</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">O episódio completo de reprodução é armazenado em uma rede ilimitada para minimizar o streaming durante a reprodução. O episódio é removido automaticamente do cache quando o limite de tamanho é atingido.</string>
+    <string name="settings_advanced_cache_entire_playing_episode">Episódio de reprodução em cache</string>
+    <string name="playback">Reprodução</string>
+    <string name="podcast_share_clip">Clipe</string>
     <string name="download_completed_for_episode">Download concluído de %1$s</string>
     <string name="episode_queued_for_download">Episódio na fila para download</string>
     <string name="episode_was_removed">Episódio removido</string>
@@ -1698,6 +1703,10 @@ Language: pt_BR
     <string name="unarchive">Desarquivar</string>
     <string name="archive">Arquivo</string>
     <string name="add_to_up_next">Adicionar aos Próximos</string>
+    <plurals name="episode_count">
+        <item quantity="one">%d episódio</item>
+        <item quantity="other">%d episódios</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d episódio - %2$s restante(s)</item>
         <item quantity="other">%1$d episódios - %2$s restante(s)</item>

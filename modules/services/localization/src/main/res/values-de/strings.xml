@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-18 12:54:03+0000
+Translation-Revision-Date: 2024-07-02 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="podcast_create_clip">Clip erstellen</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">Die ganze wiedergegebene Folge wird auf einem unbegrenzten Netzwerk zwischengespeichert, um das Streaming während der Wiedergabe zu minimieren. Die Folge wird automatisch aus dem Cache entfernt, wenn die Cache-Grenze erreicht wurde.</string>
+    <string name="settings_advanced_cache_entire_playing_episode">Wiedergegebene Folge zwischenspeichern</string>
+    <string name="playback">Wiedergabe</string>
+    <string name="podcast_share_clip">Clip</string>
     <string name="download_completed_for_episode">Download abgeschlossen für %1$s</string>
     <string name="episode_queued_for_download">Folge in die Download-Warteschlange gestellt</string>
     <string name="episode_was_removed">Folge wurde entfernt</string>
@@ -1698,6 +1703,10 @@ Language: de
     <string name="unarchive">Wiederherstellen</string>
     <string name="archive">Archivieren</string>
     <string name="add_to_up_next">Zur Warteschlange hinzufügen</string>
+    <plurals name="episode_count">
+        <item quantity="one">%d Folge</item>
+        <item quantity="other">%d Folgen</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d Folge - %2$s verbleibend</item>
         <item quantity="other">%1$d Folgen - %2$s verbleibend</item>

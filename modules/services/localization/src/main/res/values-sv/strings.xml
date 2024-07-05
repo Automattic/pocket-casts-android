@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-17 13:54:05+0000
+Translation-Revision-Date: 2024-07-03 11:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="podcast_create_clip">Skapa klipp</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">Hela avsnittet cachelagras på ett obegränsat nätverk för att minimera streaming under spelning. Avsnittet tas automatiskt bort från cacheminnet när gränsen för cacheminnets storlek har nåtts.</string>
+    <string name="settings_advanced_cache_entire_playing_episode">Cacheminne för uppspelning av avsnitt</string>
+    <string name="playback">Uppspelning</string>
+    <string name="podcast_share_clip">Klipp</string>
     <string name="download_completed_for_episode">Ladda ner helt för %1$s</string>
     <string name="episode_queued_for_download">Avsnitt placerat i kö för nedladdning</string>
     <string name="episode_was_removed">Avsnittet togs bort</string>
@@ -18,7 +23,7 @@ Language: sv_SE
     <string name="settings_sleep_timer_shake_to_reset">Skaka för att starta om sömntimern</string>
     <string name="settings_general_sleep_timer">Sömntimer</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Att prioritera sökprecision kan bromsa svarstiden för sökningar avsevärt och göra att Pocket Casts konsumerar mer data.</string>
-    <string name="settings_advanced_prioritize_seek_accuracy">Prioritera sökprecision</string>
+    <string name="settings_advanced_prioritize_seek_accuracy">Prioritera noggrannhet i sökning</string>
     <string name="settings_import_opml_succeeded_message">OPML-importen har genomförts.</string>
     <string name="settings_import_opml_import_failed_message">Det gick inte att importera podcasts från den angivna OPML-filen.</string>
     <string name="nova_launcher_recently_played">Senast spelade</string>
@@ -1698,6 +1703,10 @@ Language: sv_SE
     <string name="unarchive">Avarkivera</string>
     <string name="archive">Arkiv</string>
     <string name="add_to_up_next">Lägg till i Nästa</string>
+    <plurals name="episode_count">
+        <item quantity="one">%d avsnitt</item>
+        <item quantity="other">%d avsnitt</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d avsnitt - %2$s kvar</item>
         <item quantity="other">%1$d avsnitt - %2$s kvar</item>

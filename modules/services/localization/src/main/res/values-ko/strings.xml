@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-18 09:54:04+0000
+Translation-Revision-Date: 2024-07-03 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="podcast_create_clip">클립 만들기</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">재생 중인 에피소드 전체가 재생 시 스트리밍을 최소화하기 위해 무제한 네트워크에 캐시됩니다. 캐시 크기 한도에 도달하면 캐시에서 에피소드가 자동으로 삭제됩니다.</string>
+    <string name="settings_advanced_cache_entire_playing_episode">재생 중인 에피소드 캐시</string>
+    <string name="playback">재생</string>
+    <string name="podcast_share_clip">클립</string>
     <string name="download_completed_for_episode">%1$s 다운로드 완료됨</string>
     <string name="episode_queued_for_download">다운로드 대기 중인 에피소드</string>
     <string name="episode_was_removed">에피소드 삭제됨</string>
@@ -1698,6 +1703,9 @@ Language: ko_KR
     <string name="unarchive">아카이빙 취소</string>
     <string name="archive">아카이빙</string>
     <string name="add_to_up_next">다음 차례에 추가</string>
+    <plurals name="episode_count">
+        <item quantity="other">에피소드 %d개</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other">%1$d 에피소드 - %2$s 남음</item>
     </plurals>
