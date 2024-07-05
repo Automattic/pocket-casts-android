@@ -47,6 +47,9 @@ import kotlin.math.abs
 import kotlin.math.max
 
 private const val numStars = 5
+private const val zeroStarIndexInStopPoints = 0
+private const val halfStarIndexInStopPoints = 1
+private const val oneFullStarIndexInStopPoints = 2
 
 @Composable
 fun SwipeableStars(
@@ -56,7 +59,7 @@ fun SwipeableStars(
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
-    var stopPointType by remember { mutableStateOf(StopPointType.FullAndHalfStars) }
+    var stopPointType by remember { mutableStateOf(StopPointType.None) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
     var touchX by remember { mutableStateOf(0f) }
     var iconPositions by remember { mutableStateOf(listOf<Position>()) }
@@ -204,11 +207,25 @@ private fun getDesiredStopPoint(
     when (stopPointType) {
         StopPointType.None -> touchX // ignore stop points
 
-        StopPointType.FullAndHalfStars ->
-            stopPoints
-                .minByOrNull { abs(it - touchX) }
-                ?.toFloat()
-                ?: 0f
+        StopPointType.FullAndHalfStars -> {
+            val desiredStopPoint: Float = (
+                stopPoints
+                    .minByOrNull { abs(it - touchX) }
+                    ?.toFloat()
+                    ?: 0f
+                )
+
+            val desiredStarIndex = stopPoints.indexOf(desiredStopPoint.toDouble())
+
+            // Verify if the user is trying to select zero star or a half star
+            if (desiredStarIndex == zeroStarIndexInStopPoints || desiredStarIndex == halfStarIndexInStopPoints) {
+                // If trying to select zero star or a half star, we will select one full star instead
+                stopPoints.getOrNull(oneFullStarIndexInStopPoints)?.toFloat() ?: 0F
+            } else {
+                // Otherwise, we will select the desired star
+                desiredStopPoint
+            }
+        }
 
         StopPointType.FullStars -> {
             // These stop points are used to determine which star to fill based on the
