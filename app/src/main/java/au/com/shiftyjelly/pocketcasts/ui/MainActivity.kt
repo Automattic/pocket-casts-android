@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
@@ -1248,10 +1249,9 @@ class MainActivity :
                         }
                         notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                     }
-                }
-            } else if (action == Settings.INTENT_OPEN_APP_VIEW_BOOKMARKS) {
-                intent.getStringExtra(BOOKMARK_UUID)?.let {
-                    viewModel.viewBookmark(it)
+                    is ShowBookmarkDeepLink -> {
+                        viewModel.viewBookmark(deepLink.bookmarkUuid)
+                    }
                 }
             } else if (action == Settings.INTENT_OPEN_APP_DELETE_BOOKMARK) {
                 intent.getStringExtra(BOOKMARK_UUID)?.let {

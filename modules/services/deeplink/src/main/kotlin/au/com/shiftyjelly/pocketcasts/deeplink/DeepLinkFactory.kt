@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
@@ -12,6 +13,7 @@ class DeepLinkFactory {
         DownloadsAdapter(),
         AddBookmarkAdapter(),
         ChangeBookmarkTitleAdapter(),
+        ShowBookmarkAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -62,6 +64,14 @@ private class AddBookmarkAdapter : DeepLinkAdapter {
 private class ChangeBookmarkTitleAdapter : DeepLinkAdapter {
     override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_CHANGE_BOOKMARK_TITLE) {
         intent.getStringExtra(EXTRA_BOOKMARK_UUID)?.let(::ChangeBookmarkTitleDeepLink)
+    } else {
+        null
+    }
+}
+
+private class ShowBookmarkAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_BOOKMARK) {
+        intent.getStringExtra(EXTRA_BOOKMARK_UUID)?.let(::ShowBookmarkDeepLink)
     } else {
         null
     }

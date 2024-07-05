@@ -49,4 +49,25 @@ class DeepLinkFactoryTest {
 
         assertNull(deepLink)
     }
+
+    @Test
+    fun showBookmark() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_VIEW_BOOKMARKS")
+            .putExtra("bookmark_uuid", "bookmark-id")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowBookmarkDeepLink("bookmark-id"), deepLink)
+    }
+
+    @Test
+    fun showBookmarkWithoutBookmarkUuid() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_VIEW_BOOKMARKS")
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
 }

@@ -10,9 +10,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
@@ -101,13 +101,7 @@ private fun buildAndShowNotification(
         .setSmallIcon(IR.drawable.notification)
         .setAutoCancel(true)
         .setOnlyAlertOnce(true)
-        .setContentIntent(
-            buildPendingIntent(
-                context,
-                INTENT_OPEN_APP_VIEW_BOOKMARKS,
-                bookmarkUuid,
-            ),
-        )
+        .setContentIntent(buildPendingIntent(context, ShowBookmarkDeepLink(bookmarkUuid).toIntent(context)))
         .addAction(changeTitleAction)
         .addAction(deleteAction)
         .build()
