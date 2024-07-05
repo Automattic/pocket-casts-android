@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.nova
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
@@ -165,16 +166,17 @@ internal class CatalogFactory(
         sourceView = sourceView.analyticsValue,
     ).toIntent(context)
 
-    private fun openPodcastEpisodeIntent(episodeId: String, podcastId: String, source: EpisodeViewSource) = context.launcherIntent
-        .setAction(Settings.INTENT_OPEN_APP_EPISODE_UUID)
-        .putExtra(Settings.EPISODE_UUID, episodeId)
-        .putExtra(Settings.PODCAST_UUID, podcastId)
-        .putExtra(Settings.SOURCE_VIEW, source.value)
+    private fun openPodcastEpisodeIntent(episodeId: String, podcastId: String, source: EpisodeViewSource) = ShowEpisodeDeepLink(
+        episodeUuid = episodeId,
+        podcastUuid = podcastId,
+        sourceView = source.value,
+    ).toIntent(context)
 
-    private fun openUserEpisodeIntent(episodeId: String, source: EpisodeViewSource) = context.launcherIntent
-        .setAction(Settings.INTENT_OPEN_APP_EPISODE_UUID)
-        .putExtra(Settings.EPISODE_UUID, episodeId)
-        .putExtra(Settings.SOURCE_VIEW, source.value)
+    private fun openUserEpisodeIntent(episodeId: String, source: EpisodeViewSource) = ShowEpisodeDeepLink(
+        episodeUuid = episodeId,
+        podcastUuid = null,
+        sourceView = source.value,
+    ).toIntent(context)
 
     private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
         "Missing launcher intent for $packageName"

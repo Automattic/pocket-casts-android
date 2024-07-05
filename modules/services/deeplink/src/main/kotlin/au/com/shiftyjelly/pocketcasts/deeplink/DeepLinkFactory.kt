@@ -6,8 +6,10 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BO
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EPISODE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 import timber.log.Timber
@@ -20,6 +22,7 @@ class DeepLinkFactory {
         ShowBookmarkAdapter(),
         DeleteBookmarkAdapter(),
         ShowPodcastAdapter(),
+        ShowEpisodeAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -101,5 +104,24 @@ private class ShowPodcastAdapter : DeepLinkAdapter {
         }
     } else {
         null
+    }
+}
+
+private class ShowEpisodeAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (ACTION_REGEX.matches(intent.action.orEmpty())) {
+        intent.getStringExtra(EXTRA_EPISODE_UUID)?.let { episodeUuid ->
+            ShowEpisodeDeepLink(
+                episodeUuid = episodeUuid,
+                podcastUuid = intent.getStringExtra(EXTRA_PODCAST_UUID),
+                sourceView = intent.getStringExtra(EXTRA_SOURCE_VIEW),
+            )
+        }
+    } else {
+        null
+    }
+
+    private companion object {
+        // We match on this pattern to handle notification intents that add numbers to actions for pending intents
+        private val ACTION_REGEX = ("^" + ACTION_OPEN_EPISODE + """\d*$""").toRegex()
     }
 }

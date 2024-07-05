@@ -124,4 +124,67 @@ class DeepLinkFactoryTest {
 
         assertEquals(ShowPodcastDeepLink("Podcast ID", sourceView = null), deepLink)
     }
+
+    @Test
+    fun showEpisode() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_EPISODE_UUID")
+            .putExtra("episode_uuid", "Episode ID")
+            .putExtra("podcast_uuid", "Podcast ID")
+            .putExtra("source_view", "Source View")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", "Source View"), deepLink)
+    }
+
+    // Notifications add numbers to the action to display multiple of them
+    @Test
+    fun showEpisodeWithActionEndingWithNumbers() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_EPISODE_UUID87123648710")
+            .putExtra("episode_uuid", "Episode ID")
+            .putExtra("podcast_uuid", "Podcast ID")
+            .putExtra("source_view", "Source View")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", "Source View"), deepLink)
+    }
+
+    @Test
+    fun showEpisodeWithoutEpisodeId() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_EPISODE_UUID")
+            .putExtra("podcast_uuid", "Podcast ID")
+            .putExtra("source_view", "Source View")
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
+    fun showEpisodeWithoutPodcastId() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_EPISODE_UUID")
+            .putExtra("episode_uuid", "Episode ID")
+            .putExtra("source_view", "Source View")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowEpisodeDeepLink("Episode ID", podcastUuid = null, "Source View"), deepLink)
+    }
+
+    @Test
+    fun showEpisodeWithoutSourceView() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_EPISODE_UUID")
+            .putExtra("episode_uuid", "Episode ID")
+            .putExtra("podcast_uuid", "Podcast ID")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", sourceView = null), deepLink)
+    }
 }
