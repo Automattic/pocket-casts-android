@@ -51,12 +51,17 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowFilterDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
@@ -104,8 +109,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
-import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts.INTENT_EXTRA_PAGE
-import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts.INTENT_EXTRA_PLAYLIST_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
@@ -968,8 +971,8 @@ class MainActivity :
         settings.updateBottomInset(miniPlayerHeight)
 
         // Handle up next shortcut
-        if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
-            intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
+        if (intent.getStringExtra(EXTRA_PAGE) == ShowUpNextDeepLink.pageId) {
+            intent.removeExtra(EXTRA_PAGE)
             binding.playerBottomSheet.openPlayer()
             showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
         }
@@ -1266,32 +1269,31 @@ class MainActivity :
                             forceDark = false,
                         )
                     }
-                }
-            } else if (action == Intent.ACTION_VIEW) {
-                val extraPage = intent.extras?.getString(INTENT_EXTRA_PAGE, null)
-                if (extraPage != null) {
-                    when (extraPage) {
-                        "podcasts" -> openTab(VR.id.navigation_podcasts)
-                        "search" -> openTab(VR.id.navigation_discover)
-                        "playlist" -> {
-                            val playlistId = intent.extras?.getLong(INTENT_EXTRA_PLAYLIST_ID, -1)
-                                ?: -1
-                            launch(Dispatchers.Default) {
-                                playlistManager.findById(playlistId)?.let {
-                                    withContext(Dispatchers.Main) {
-                                        settings.setSelectedFilter(it.uuid)
-
-                                        // HACK: Go diving to find if a filter fragment
-                                        openTab(VR.id.navigation_filters)
-                                        val filtersFragment =
-                                            supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
-                                        filtersFragment?.openPlaylist(it)
-                                    }
+                    is ShowPodcastsDeepLink -> {
+                        openTab(VR.id.navigation_podcasts)
+                    }
+                    is ShowDiscoverDeepLink -> {
+                        openTab(VR.id.navigation_discover)
+                    }
+                    is ShowUpNextDeepLink -> {
+                        // Do nothig, handled in onMiniPlayerVisible()
+                    }
+                    is ShowFilterDeepLink -> {
+                        launch(Dispatchers.Default) {
+                            playlistManager.findById(deepLink.filterId)?.let {
+                                withContext(Dispatchers.Main) {
+                                    settings.setSelectedFilter(it.uuid)
+                                    // HACK: Go diving to find if a filter fragment
+                                    openTab(VR.id.navigation_filters)
+                                    val filtersFragment = supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
+                                    filtersFragment?.openPlaylist(it)
                                 }
                             }
                         }
                     }
-                } else if (IntentUtil.isPocketCastsWebsite(intent)) {
+                }
+            } else if (action == Intent.ACTION_VIEW) {
+                if (IntentUtil.isPocketCastsWebsite(intent)) {
                     // when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
                     return
                 } else if (IntentUtil.isPodloveUrl(intent)) {
