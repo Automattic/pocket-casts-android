@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -26,5 +27,26 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(AddBookmarkDeepLink, deepLink)
+    }
+
+    @Test
+    fun changeBookmarkTitle() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE")
+            .putExtra("bookmark_uuid", "bookmark-id")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ChangeBookmarkTitleDeepLink("bookmark-id"), deepLink)
+    }
+
+    @Test
+    fun changeBookmarkTitleWithoutBookmarkUuid() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE")
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
     }
 }
