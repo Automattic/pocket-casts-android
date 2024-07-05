@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
+import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
@@ -17,7 +18,9 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 import timber.log.Timber
 
-class DeepLinkFactory {
+class DeepLinkFactory(
+    private val webBaseHost: String = WEB_BASE_HOST,
+) {
     private val adapters = listOf(
         DownloadsAdapter(),
         AddBookmarkAdapter(),
@@ -27,6 +30,7 @@ class DeepLinkFactory {
         ShowPodcastAdapter(),
         ShowEpisodeAdapter(),
         ShowPageAdapter(),
+        PocketCastsWebsiteAdapter(webBaseHost),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -139,6 +143,16 @@ private class ShowPageAdapter : DeepLinkAdapter {
             "playlist" -> ShowFilterDeepLink(filterId = intent.getLongExtra(EXTRA_FILTER_ID, -1))
             else -> null
         }
+    } else {
+        null
+    }
+}
+
+private class PocketCastsWebsiteAdapter(
+    private val webBaseHost: String,
+) : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (intent.action == ACTION_VIEW && intent.data?.host == webBaseHost) {
+        PocketCastsWebsiteDeepLink
     } else {
         null
     }

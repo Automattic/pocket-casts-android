@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -10,7 +11,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DeepLinkFactoryTest {
-    private val factory = DeepLinkFactory()
+    private val factory = DeepLinkFactory(
+        webBaseHost = "pocketcasts.com",
+    )
 
     @Test
     fun downloads() {
@@ -232,5 +235,16 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(ShowFilterDeepLink(filterId = 10), deepLink)
+    }
+
+    @Test
+    fun pocketCastsWebsiteDeepLink() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(PocketCastsWebsiteDeepLink, deepLink)
     }
 }

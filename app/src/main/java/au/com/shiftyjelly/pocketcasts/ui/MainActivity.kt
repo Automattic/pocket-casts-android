@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
@@ -1291,12 +1292,12 @@ class MainActivity :
                             }
                         }
                     }
+                    is PocketCastsWebsiteDeepLink -> {
+                        // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isPocketCastsWebsite(intent)) {
-                    // when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
-                    return
-                } else if (IntentUtil.isPodloveUrl(intent)) {
+                if (IntentUtil.isPodloveUrl(intent)) {
                     openPodcastUrl(IntentUtil.getPodloveUrl(intent))
                     return
                 } else if (IntentUtil.isSonosAppLinkUrl(intent)) {
