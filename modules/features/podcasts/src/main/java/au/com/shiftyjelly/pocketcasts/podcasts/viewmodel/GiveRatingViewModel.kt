@@ -29,6 +29,10 @@ class GiveRatingViewModel @Inject constructor(
     private val userManager: UserManager,
 ) : ViewModel() {
 
+    companion object {
+        const val NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE = 2
+    }
+
     sealed class State {
         data object Loading : State()
         data class Loaded(
@@ -74,7 +78,7 @@ class GiveRatingViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     val playedEpisodesFromPodcast = podcastManager.findPlayedEpisodesFrom(podcastUuid)
 
-                    if (playedEpisodesFromPodcast.isEmpty()) {
+                    if (playedEpisodesFromPodcast.size < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
                         _state.value = State.NotAllowedToRate(podcastUuid)
                     } else {
                         val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
