@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.nova
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherInProgressEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherNewEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherQueueEpisode
@@ -159,10 +160,10 @@ internal class CatalogFactory(
 
     private fun podcastCover(podcastId: String) = "${Settings.SERVER_STATIC_URL}/discover/images/webp/960/$podcastId.webp"
 
-    private fun openPodcastIntent(podcastId: String, sourceView: SourceView) = context.launcherIntent
-        .setAction(Settings.INTENT_OPEN_APP_PODCAST_UUID)
-        .putExtra(Settings.PODCAST_UUID, podcastId)
-        .putExtra(Settings.SOURCE_VIEW, sourceView.analyticsValue)
+    private fun openPodcastIntent(podcastId: String, sourceView: SourceView) = ShowPodcastDeepLink(
+        podcastUuid = podcastId,
+        sourceView = sourceView.analyticsValue,
+    ).toIntent(context)
 
     private fun openPodcastEpisodeIntent(episodeId: String, podcastId: String, source: EpisodeViewSource) = context.launcherIntent
         .setAction(Settings.INTENT_OPEN_APP_EPISODE_UUID)
