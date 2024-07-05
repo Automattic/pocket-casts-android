@@ -134,6 +134,10 @@ data class ShowFilterDeepLink(
 
 data object PocketCastsWebsiteDeepLink : DeepLink
 
+data class ShowPodcastFromUrlDeepLink(
+    val url: String,
+) : DeepLink
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }

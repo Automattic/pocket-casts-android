@@ -61,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFilterDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -1295,12 +1296,12 @@ class MainActivity :
                     is PocketCastsWebsiteDeepLink -> {
                         // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
                     }
+                    is ShowPodcastFromUrlDeepLink -> {
+                        openPodcastUrl(deepLink.url)
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isPodloveUrl(intent)) {
-                    openPodcastUrl(IntentUtil.getPodloveUrl(intent))
-                    return
-                } else if (IntentUtil.isSonosAppLinkUrl(intent)) {
+                if (IntentUtil.isSonosAppLinkUrl(intent)) {
                     startActivityForResult(
                         SonosAppLinkActivity.buildIntent(intent, this),
                         SonosAppLinkActivity.SONOS_APP_ACTIVITY_RESULT,

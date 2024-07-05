@@ -31,6 +31,7 @@ class DeepLinkFactory(
         ShowEpisodeAdapter(),
         ShowPageAdapter(),
         PocketCastsWebsiteAdapter(webBaseHost),
+        PodloveAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -155,5 +156,23 @@ private class PocketCastsWebsiteAdapter(
         PocketCastsWebsiteDeepLink
     } else {
         null
+    }
+}
+
+private class PodloveAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.dataString.orEmpty()
+        val groupValues = PODLOVE_REGEX.matchEntire(uriData)?.groupValues
+
+        return if (intent.action == ACTION_VIEW && groupValues != null) {
+            val scheme = if (groupValues[1] == "subscribe") "http" else "https"
+            ShowPodcastFromUrlDeepLink("$scheme://${groupValues[2]}")
+        } else {
+            null
+        }
+    }
+
+    private companion object {
+        private val PODLOVE_REGEX = """^pktc://(subscribe|subscribehttps)/(.{3,})$""".toRegex()
     }
 }

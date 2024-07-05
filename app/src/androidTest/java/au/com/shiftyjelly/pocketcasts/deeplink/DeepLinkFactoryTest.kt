@@ -247,4 +247,81 @@ class DeepLinkFactoryTest {
 
         assertEquals(PocketCastsWebsiteDeepLink, deepLink)
     }
+
+    @Test
+    fun podloveHttps() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://subscribehttps/mypodcast.com/rss/123"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://mypodcast.com/rss/123"), deepLink)
+    }
+
+    @Test
+    fun podloveHttpsWithParams() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://subscribehttps/mypodcast.com/rss/123?someKey=someValue"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://mypodcast.com/rss/123?someKey=someValue"), deepLink)
+    }
+
+    @Test
+    fun podloveHttp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://subscribe/mypodcast.com/rss/123"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("http://mypodcast.com/rss/123"), deepLink)
+    }
+
+    @Test
+    fun podloveHttpWithParams() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://subscribe/mypodcast.com/rss/123?someKey=someValue"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("http://mypodcast.com/rss/123?someKey=someValue"), deepLink)
+    }
+
+    @Test
+    fun podloveWithWrongScheme() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://subscribehttps/mypodcast.com/rss/123"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
+    fun podloveWithWrongHost() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://subscribehttp/mypodcast.com/rss/123"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
+    fun podloveWithShortPath() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://subscribe/aa"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
 }

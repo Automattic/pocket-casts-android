@@ -18,16 +18,6 @@ import timber.log.Timber
 
 object IntentUtil {
 
-    fun isPodloveUrl(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc" || intent.data == null || intent.data?.host == null) {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "subscribe" || host == "subscribehttps"
-    }
-
     fun isSonosAppLinkUrl(intent: Intent): Boolean {
         val scheme = intent.scheme
         if (scheme == null || scheme != "pktc" || intent.data == null || intent.data?.host == null) {
@@ -36,20 +26,6 @@ object IntentUtil {
 
         val host = intent.data?.host
         return host == "applink"
-    }
-
-    fun getPodloveUrl(intent: Intent): String? {
-        val uri = intent.data ?: return null
-        var path = uri.path ?: return null
-        if (path.startsWith("/")) {
-            path = path.replaceFirst(Matcher.quoteReplacement("/").toRegex(), "")
-        }
-        if (path.length < 3) {
-            return null
-        }
-        val host = uri.host
-        val params = uri.encodedQuery
-        return (if (host == "subscribehttps") "https" else "http") + "://" + path + if (!params.isNullOrEmpty()) "?${uri.encodedQuery}" else ""
     }
 
     fun isShareLink(intent: Intent): Boolean {
