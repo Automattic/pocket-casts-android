@@ -4,6 +4,7 @@ import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import timber.log.Timber
@@ -14,6 +15,7 @@ class DeepLinkFactory {
         AddBookmarkAdapter(),
         ChangeBookmarkTitleAdapter(),
         ShowBookmarkAdapter(),
+        DeleteBookmarkAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -72,6 +74,14 @@ private class ChangeBookmarkTitleAdapter : DeepLinkAdapter {
 private class ShowBookmarkAdapter : DeepLinkAdapter {
     override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_BOOKMARK) {
         intent.getStringExtra(EXTRA_BOOKMARK_UUID)?.let(::ShowBookmarkDeepLink)
+    } else {
+        null
+    }
+}
+
+private class DeleteBookmarkAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_DELETE_BOOKMARK) {
+        intent.getStringExtra(EXTRA_BOOKMARK_UUID)?.let(::DeleteBookmarkDeepLink)
     } else {
         null
     }
