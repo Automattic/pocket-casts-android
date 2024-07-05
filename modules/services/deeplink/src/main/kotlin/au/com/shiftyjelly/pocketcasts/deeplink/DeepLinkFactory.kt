@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import timber.log.Timber
 
 class DeepLinkFactory {
@@ -30,5 +31,17 @@ class DeepLinkFactory {
 
     private companion object {
         val TAG = "DeepLinking"
+    }
+}
+
+private interface DeepLinkAdapter {
+    fun create(intent: Intent): DeepLink?
+}
+
+private class DownloadsAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_DOWNLOADS) {
+        DownloadsDeepLink
+    } else {
+        null
     }
 }
