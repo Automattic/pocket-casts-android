@@ -3,13 +3,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.bookmark
 import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
@@ -40,10 +39,7 @@ class BookmarkHelper @Inject constructor(
             Util.getAppPlatform(context) == AppPlatform.Phone &&
             !isAndroidAutoConnected
         ) {
-            val bookmarkIntent =
-                context.packageManager.getLaunchIntentForPackage(context.packageName)
-                    ?.apply { action = INTENT_OPEN_APP_ADD_BOOKMARK }
-            bookmarkIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val bookmarkIntent = AddBookmarkDeepLink.toIntent(context)
             context.startActivity(bookmarkIntent)
         } else {
             if (playbackManager.getCurrentEpisode() == null) return
