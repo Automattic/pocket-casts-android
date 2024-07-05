@@ -9,57 +9,77 @@ import androidx.media3.extractor.text.CuesWithTiming
 import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+@kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
 @HiltViewModel
 class TranscriptViewModel @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
-    playbackManager: PlaybackManager,
+    private val playbackManager: PlaybackManager,
     private val urlUtil: UrlUtil,
     private val subtitleParserFactory: SubtitleParser.Factory,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
+    private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty())
+    val uiState: StateFlow<UiState> = _uiState
 
-    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    val uiState: StateFlow<UiState> = playbackManager.playbackStateFlow
-        .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
-        .distinctUntilChanged()
-        .flatMapLatest(::createUiStateFlow)
-        .stateIn(viewModelScope, SharingStarted.Lazily, UiState.Empty())
+    init {
+        viewModelScope.launch {
+            playbackManager.playbackStateFlow
+                .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
+                .distinctUntilChanged { t1, t2 -> t1.episodeUuid == t2.episodeUuid }
+                .stateIn(viewModelScope)
+                .flatMapLatest(::transcriptFlow)
+                .collect { _uiState.value = it }
+        }
+    }
 
-    private fun createUiStateFlow(podcastAndEpisode: PodcastAndEpisode) =
+    private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
         transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
             .map { transcript ->
-                if (transcript == null) {
-                    UiState.Empty(podcastAndEpisode.podcast)
-                } else {
-                    try {
-                        UiState.Success(
-                            transcript = transcript,
-                            podcast = podcastAndEpisode.podcast,
-                            cues = parseTranscript(transcript),
-                        )
-                    } catch (e: UnsupportedOperationException) {
-                        UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode.podcast)
-                    } catch (e: Exception) {
-                        UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode.podcast)
-                    }
-                }
+                transcript?.let {
+                    UiState.TranscriptFound(podcastAndEpisode, transcript)
+                } ?: UiState.Empty(podcastAndEpisode)
             }
 
-    private suspend fun parseTranscript(transcript: Transcript): List<CuesWithTiming> {
+    fun parseAndLoadTranscript() {
+        _uiState.value.transcript?.let { transcript ->
+            viewModelScope.launch {
+                val podcastAndEpisode = _uiState.value.podcastAndEpisode
+                _uiState.value = try {
+                    val result = parseTranscript(transcript)
+                    UiState.TranscriptLoaded(
+                        transcript = transcript,
+                        podcastAndEpisode = podcastAndEpisode,
+                        cues = result,
+                    )
+                } catch (e: UnsupportedOperationException) {
+                    UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode)
+                } catch (e: Exception) {
+                    UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode)
+                }
+            }
+        }
+    }
+
+    private suspend fun parseTranscript(transcript: Transcript) = withContext(ioDispatcher) {
         val format = Format.Builder()
             .setSampleMimeType(transcript.type)
             .build()
@@ -76,7 +96,7 @@ class TranscriptViewModel @Inject constructor(
                     element?.let { result.add(it) }
                 }
             }
-            return result.build()
+            result.build()
         }
     }
 
@@ -86,21 +106,27 @@ class TranscriptViewModel @Inject constructor(
     )
 
     sealed class UiState {
-        abstract val podcast: Podcast?
+        open val transcript: Transcript? = null
+        open val podcastAndEpisode: PodcastAndEpisode? = null
 
         data class Empty(
-            override val podcast: Podcast? = null,
+            override val podcastAndEpisode: PodcastAndEpisode? = null,
         ) : UiState()
 
-        data class Success(
-            val transcript: Transcript?,
-            override val podcast: Podcast?,
+        data class TranscriptFound(
+            override val podcastAndEpisode: PodcastAndEpisode? = null,
+            override val transcript: Transcript,
+        ) : UiState()
+
+        data class TranscriptLoaded(
+            override val podcastAndEpisode: PodcastAndEpisode? = null,
+            override val transcript: Transcript,
             val cues: List<CuesWithTiming> = emptyList(),
         ) : UiState()
 
         data class Error(
             val error: TranscriptError,
-            override val podcast: Podcast?,
+            override val podcastAndEpisode: PodcastAndEpisode? = null,
         ) : UiState()
     }
 

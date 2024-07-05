@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -48,23 +49,36 @@ class TranscriptViewModelTest {
     }
 
     @Test
-    fun `given transcript is available and supported, then Success state is returned`() = runTest {
+    fun `given transcript is available, then transcript found state is returned`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
-        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
 
         initViewModel()
 
         viewModel.uiState.test {
-            assertEquals(transcript, (awaitItem() as UiState.Success).transcript)
+            assertEquals(transcript, (awaitItem() as UiState.TranscriptFound).transcript)
         }
     }
 
     @Test
-    fun `given transcript is not supported, then NotSupported error is returned`() = runTest {
+    fun `given transcript is supported, when transcript load invoked, then loaded state is returned`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript()
+
+        viewModel.uiState.test {
+            assertEquals(transcript, (awaitItem() as UiState.TranscriptLoaded).transcript)
+        }
+    }
+
+    @Test
+    fun `given transcript is not supported, when transcript load invoked, then NotSupported error is returned`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(false)
-
         initViewModel()
+
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.NotSupported)
@@ -76,16 +90,24 @@ class TranscriptViewModelTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         whenever(urlUtil.contentBytes(any())).thenThrow(RuntimeException())
-
         initViewModel()
+
+        viewModel.parseAndLoadTranscript()
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.FailedToLoad)
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun initViewModel() {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
-        viewModel = TranscriptViewModel(transcriptsManager, playbackManager, urlUtil, subtitleParserFactory)
+        viewModel = TranscriptViewModel(
+            transcriptsManager = transcriptsManager,
+            playbackManager = playbackManager,
+            urlUtil = urlUtil,
+            subtitleParserFactory = subtitleParserFactory,
+            ioDispatcher = UnconfinedTestDispatcher(),
+        )
     }
 }

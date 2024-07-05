@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -44,11 +46,18 @@ fun TranscriptPage(
     val state = viewModel.uiState.collectAsState()
     when (state.value) {
         is UiState.Empty -> Unit
-        is UiState.Success -> {
-            val successState = state.value as UiState.Success
+
+        is UiState.TranscriptFound -> {
+            val transcriptFoundState = state.value as UiState.TranscriptFound
+            val colors = DefaultColors(theme, transcriptFoundState.podcastAndEpisode?.podcast)
+            LoadingView(Modifier.background(colors.backgroundColor()))
+        }
+
+        is UiState.TranscriptLoaded -> {
+            val loadedState = state.value as UiState.TranscriptLoaded
             TranscriptContent(
-                state = successState,
-                colors = DefaultColors(theme, successState.podcast),
+                state = loadedState,
+                colors = DefaultColors(theme, loadedState.podcastAndEpisode?.podcast),
             )
         }
 
@@ -56,16 +65,20 @@ fun TranscriptPage(
             val errorState = state.value as UiState.Error
             TranscriptError(
                 state = errorState,
-                colors = DefaultColors(theme, errorState.podcast),
+                colors = DefaultColors(theme, errorState.podcastAndEpisode?.podcast),
             )
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.parseAndLoadTranscript()
     }
 }
 
 @OptIn(UnstableApi::class)
 @Composable
 private fun TranscriptContent(
-    state: UiState.Success,
+    state: UiState.TranscriptLoaded,
     colors: DefaultColors,
 ) {
     LazyColumn(
