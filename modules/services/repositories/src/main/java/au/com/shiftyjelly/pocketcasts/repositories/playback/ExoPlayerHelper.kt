@@ -41,14 +41,10 @@ class ExoPlayerHelper @Inject constructor(
     fun getSimpleCache(): SimpleCache? {
         if (
             simpleCache == null &&
-            (FeatureFlag.isEnabled(Feature.CACHE_PLAYING_EPISODE) || FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE))
+            FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)
         ) {
             val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
-            val cacheSizeInBytes = if (settings.cacheEntirePlayingEpisode.value) {
-                settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB()
-            } else {
-                settings.getExoPlayerCacheSizeInMB()
-            } * 1024 * 1024L
+            val cacheSizeInBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L
             simpleCache = try {
                 if (BuildConfig.DEBUG) Timber.d("ExoPlayer cache initialized")
                 SimpleCache(

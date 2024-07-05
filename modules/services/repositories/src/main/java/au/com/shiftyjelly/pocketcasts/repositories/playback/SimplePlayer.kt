@@ -283,16 +283,17 @@ class SimplePlayer(
         } ?: return
 
         val sourceFactory = exoPlayerHelper.getSimpleCache()?.let { cache ->
-            if (location is EpisodeLocation.Stream && !isDownloading) {
+            if (location is EpisodeLocation.Stream &&
+                !isDownloading &&
+                settings.cacheEntirePlayingEpisode.value
+            ) {
                 val cacheDataSourceFactory = CacheDataSource.Factory()
                     .setUpstreamDataSourceFactory(httpDataSourceFactory)
                     .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
                     .setCache(cache)
+                    .setCacheWriteDataSinkFactory(null) // Disable on-the-fly caching
 
-                if (settings.cacheEntirePlayingEpisode.value) {
-                    cacheDataSourceFactory.setCacheWriteDataSinkFactory(null) // Disable on-the-fly caching
-                    CacheWorker.startCachingEntireEpisode(context, location.uri, episodeUuid)
-                }
+                CacheWorker.startCachingEntireEpisode(context, location.uri, episodeUuid)
 
                 cacheDataSourceFactory
             } else {
