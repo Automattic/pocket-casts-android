@@ -8,6 +8,7 @@ import android.content.Intent
 import androidx.core.os.BundleCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
@@ -72,7 +73,7 @@ class PocketCastsAccountAuthenticatorTest {
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
 
         val syncManager = SyncManagerImpl(
-            analyticsTracker = mock(),
+            analyticsTracker = AnalyticsTracker.test(),
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,

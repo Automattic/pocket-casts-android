@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.widget.di
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -18,7 +18,7 @@ interface WidgetEntryPoint {
     fun upNextDao(): UpNextDao
     fun playbackManager(): PlaybackManager
     fun settings(): Settings
-    fun analyticsTracker(): AnalyticsTrackerWrapper
+    fun analyticsTracker(): AnalyticsTracker
 }
 
 internal fun Context.widgetEntryPoint() = EntryPointAccessors.fromApplication<WidgetEntryPoint>(this)

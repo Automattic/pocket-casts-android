@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.search
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -33,7 +33,7 @@ class SearchHandler @Inject constructor(
     val userManager: UserManager,
     val settings: Settings,
     private val cacheServerManager: PodcastCacheServerManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     folderManager: FolderManager,
 ) {
     private var source: SourceView = SourceView.UNKNOWN

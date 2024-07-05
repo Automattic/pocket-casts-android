@@ -25,6 +25,7 @@ data class ShowNotesEpisode(
     @Json(name = "image") val image: String? = null,
     @Json(name = "chapters") val chapters: List<ShowNotesChapter>? = null,
     @Json(name = "chapters_url") val chaptersUrl: String? = null,
+    @Json(name = "transcripts") val transcripts: List<ShowNotesTranscript>? = null,
 )
 
 @JsonClass(generateAdapter = true)
@@ -39,4 +40,11 @@ data class ShowNotesChapter(
 @JsonClass(generateAdapter = true)
 data class RawChaptersResponse(
     @Json(name = "chapters") val chapters: List<ShowNotesChapter>? = null,
+)
+
+@JsonClass(generateAdapter = true)
+data class ShowNotesTranscript(
+    @Json(name = "url") val url: String? = null,
+    @Json(name = "type") val type: String? = null,
+    @Json(name = "language") val language: String? = null,
 )

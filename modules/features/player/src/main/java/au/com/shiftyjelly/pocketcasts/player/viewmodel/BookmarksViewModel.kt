@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelp
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
@@ -57,7 +58,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class BookmarksViewModel
 @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val bookmarkManager: BookmarkManager,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
@@ -167,7 +168,7 @@ class BookmarksViewModel
         val isMultiSelectingFlow = multiSelectHelper.isMultiSelectingLive.asFlow()
         val selectedListFlow = multiSelectHelper.selectedListLive.asFlow()
         val bookmarkSearchResults = bookmarkSearchHandler.getBookmarkSearchResultsFlow()
-        combine6(
+        combine(
             bookmarksFlow,
             isMultiSelectingFlow,
             selectedListFlow,
@@ -279,7 +280,8 @@ class BookmarksViewModel
                         SharePodcastHelper(
                             podcast,
                             episode,
-                            bookmark.timeSecs.toDouble(),
+                            bookmark.timeSecs.seconds,
+                            null,
                             context,
                             ShareType.BOOKMARK_TIME,
                             sourceView,

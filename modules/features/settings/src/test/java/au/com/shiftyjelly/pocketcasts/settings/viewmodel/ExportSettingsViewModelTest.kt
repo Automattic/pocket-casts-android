@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -15,7 +15,7 @@ import org.mockito.kotlin.verify
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExportSettingsViewModelTest {
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var analyticsTracker: AnalyticsTracker
     private lateinit var testSubject: ExportSettingsViewModel
 
     @Before

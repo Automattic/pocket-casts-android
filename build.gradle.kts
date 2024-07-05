@@ -27,6 +27,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize) apply false
     alias(libs.plugins.measure.builds)
     alias(libs.plugins.protobuf) apply false
+    alias(libs.plugins.dependency.analysis)
 }
 
 apply(from = rootProject.file("dependencies.gradle.kts"))
@@ -67,8 +68,10 @@ spotless {
 
 fun Project.configureSentry() {
     extensions.getByType(SentryPluginExtension::class.java).apply {
-        includeProguardMapping = System.getenv()["CI"].toBoolean() &&
+        val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
             !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
+        includeProguardMapping = shouldUploadDebugFiles
+        includeSourceContext = shouldUploadDebugFiles
 
         tracingInstrumentation {
             features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP)

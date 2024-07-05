@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
@@ -173,7 +173,7 @@ class EpisodeViewModel @Inject constructor(
                 }
             }
 
-        stateFlow = combine6(
+        stateFlow = combine(
             episodeFlow,
             // Emitting a value "onStart" for the flows that shouldn't block the UI
             podcastFlow.onStart { emit(null) },
@@ -283,7 +283,7 @@ class EpisodeViewModel @Inject constructor(
             } else if (!episode.isDownloaded) {
                 episode.autoDownloadStatus =
                     PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                downloadManager.addEpisodeToQueue(episode, fromString, fireEvent = true, fireToast = false)
+                downloadManager.addEpisodeToQueue(episode, fromString, fireEvent = true, fireToast = false, source = sourceView)
 
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,

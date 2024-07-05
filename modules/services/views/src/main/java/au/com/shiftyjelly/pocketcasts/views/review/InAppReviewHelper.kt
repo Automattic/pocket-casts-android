@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.review
 
 import androidx.appcompat.app.AppCompatActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -15,7 +15,7 @@ import timber.log.Timber
 @Singleton
 class InAppReviewHelper @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val reviewManager: ReviewManager,
     private val crashLogging: CrashLogging,
 ) {

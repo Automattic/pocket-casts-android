@@ -1,6 +1,11 @@
 7.68
 -----
-
+*   Updates:
+    *   Update Give rating view to include the average rating
+        ([#2421](https://github.com/Automattic/pocket-casts-android/pull/2421))
+*   Bug Fixes
+    *   Fix playback speed label tap behavior
+        ([#2439](https://github.com/Automattic/pocket-casts-android/pull/2439))
 
 7.67
 -----

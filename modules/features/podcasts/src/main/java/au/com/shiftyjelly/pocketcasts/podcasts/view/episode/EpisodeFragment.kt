@@ -24,7 +24,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
@@ -52,7 +52,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormatt
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
+import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -122,9 +122,11 @@ class EpisodeFragment : BaseFragment() {
 
     @Inject lateinit var warningsHelper: WarningsHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
+
+    @Inject lateinit var shareDialogFactory: ShareDialogFactory
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
@@ -585,7 +587,7 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun share(state: EpisodeFragmentState.Loaded) {
-        ShareDialog(
+        shareDialogFactory.create(
             state.podcast,
             state.episode,
             parentFragmentManager,

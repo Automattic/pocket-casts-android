@@ -9,7 +9,7 @@ import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.text.format.DateUtils
 import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Singleton
 class SleepTimer @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
 ) {
     companion object {

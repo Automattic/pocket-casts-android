@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
@@ -33,7 +33,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
     }
 }
 
-internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, val onPodcastClicked: ((DiscoverPodcast, String?, Boolean) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit), private val analyticsTracker: AnalyticsTrackerWrapper) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
+internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, val onPodcastClicked: ((DiscoverPodcast, String?, Boolean) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit), private val analyticsTracker: AnalyticsTracker) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_carousel, parent, false)
         return CarouselItemViewHolder(theme, view)

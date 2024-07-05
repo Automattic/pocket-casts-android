@@ -7,7 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.PLAYER_SLEEP_TIMER_RESTARTED
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 class SleepTimerRestartWhenShakingDevice @Inject constructor(
     private val sleepTimer: SleepTimer,
     private var playbackManager: PlaybackManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
 ) : SensorEventListener {

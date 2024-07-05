@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
-    val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTracker,
     private val repository: ListRepository,
     private val settings: Settings,
     app: Application,

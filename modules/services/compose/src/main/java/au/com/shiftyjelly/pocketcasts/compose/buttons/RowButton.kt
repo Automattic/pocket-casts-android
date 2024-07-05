@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ButtonElevation
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ fun RowButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     @DrawableRes leadingIcon: Int? = null,
@@ -38,6 +40,7 @@ fun RowButton(
     cornerRadius: Dp = 12.dp,
     textVerticalPadding: Dp = 6.dp,
     @DrawableRes textIcon: Int? = null,
+    contentDescription: String? = null,
 ) {
     BaseRowButton(
         text = text,
@@ -47,6 +50,7 @@ fun RowButton(
         border = border,
         colors = colors,
         textColor = textColor,
+        elevation = elevation,
         fontFamily = fontFamily,
         fontWeight = fontWeight,
         leadingIcon = if (leadingIcon != null) {
@@ -66,6 +70,7 @@ fun RowButton(
         cornerRadius = cornerRadius,
         textVerticalPadding = textVerticalPadding,
         textIcon = textIcon,
+        contentDescription = contentDescription,
     )
 }
 

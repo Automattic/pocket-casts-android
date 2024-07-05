@@ -104,6 +104,7 @@
     <string name="star_episode">Star episode</string>
     <string name="token_refresh_sign_in_error_title">Sign In Error</string>
     <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
+    <string name="transcript">Transcript</string>
     <string name="unstar">Unstar</string>
     <string name="unstar_episode">Unstar episode</string>
     <string name="starred">Starred</string>
@@ -182,6 +183,10 @@
 
     <string name="episodes_singular">1 episode</string>
     <string name="episodes_plural">%d episodes</string>
+    <plurals name="episode_count">
+        <item quantity="one">%d episode</item>
+        <item quantity="other">%d episodes</item>
+    </plurals>
     <string name="empty_play_state">Pick an episode to begin</string>
 
     <string name="seconds_label">Seconds</string>
@@ -340,6 +345,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="player_star" translatable="false">@string/star</string>
     <string name="player_tab_bookmarks" translatable="false">@string/bookmarks</string>
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
+    <string name="player_tab_transcript" translatable="false">@string/transcript</string>
     <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
     <string name="player_tab_playing_wide">Now Playing</string>
@@ -571,7 +577,17 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="podcast_share_current_position">Current position</string>
     <string name="podcast_share_episode">Share episode</string>
     <string name="podcast_share_open_file_in">Open file in&#x2026;</string>
+    <string name="podcast_create_clip">Create clip</string>
     <string name="podcast_share_clip">Clip</string>
+    <string name="podcast_share_clip_description">Create clip between %2$d and %3$d seconds for %1$s episode</string>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="one">Start clip handle: %d second</item>
+        <item quantity="other">Start clip handle: %d seconds</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="one">End clip handle: %d second</item>
+        <item quantity="other">End clip handle: %d seconds</item>
+    </plurals>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Subscribed</string>
@@ -603,8 +619,15 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="podcast_season_x">Season %d</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
+
+    <!-- Give Rating -->
+
     <string name="podcast_log_in_to_rate">You must log in to leave a rating</string>
     <string name="podcast_submit_rating_no_internet">No internet connection found. Please connect to the internet to submit a rating.</string>
+    <string name="rate_button">Rate</string>
+    <string name="no_ratings">No ratings</string>
+    <string name="not_allowed_to_rate_title">Please listen to this podcast first</string>
+    <string name="not_allowed_to_rate_description">Only listeners of this podcast can give it a rating. Have a listen to a few episodes and then come back to give your rating. We look forward to hearing what you think!</string>
 
     <!-- Episodes -->
 
@@ -632,6 +655,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="episode_removed_from_up_next">Removed from up next</string>
     <string name="episode_in_up_next">In up next</string>
     <string name="episode_downloading">Downloading</string>
+    <string name="episode_cover_description">Cover of %s episode</string>
 
     <!-- Supporter -->
 
@@ -1878,6 +1902,10 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="bookmarks_upsell_instructions">Save timestamps of your favorite episodes and unlock many more features with Pocket&#160;Casts Plus.</string>
     <string name="bookmarks_upsell_instructions_early_access">Get early access to this feature with Pocket&#160;Casts Patron and save timestamps of your favorite episodes. Available for Plus subscribers soon.</string>
     <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
+
+    <!-- Transcripts -->
+    <string name="error_transcript_failed_to_load">Transcript failed to load</string>
+    <string name="error_transcript_format_not_supported">Transcript format not supported: %s</string>
 
     <!--    Tasker Plugin-->
 

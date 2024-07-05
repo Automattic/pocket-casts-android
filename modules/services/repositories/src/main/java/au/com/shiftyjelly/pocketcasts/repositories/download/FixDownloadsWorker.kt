@@ -14,7 +14,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -34,7 +34,7 @@ class FixDownloadsWorker @AssistedInject constructor(
     @Assisted parameters: WorkerParameters,
     private val episodeManager: EpisodeManager,
     private val fileStorage: FileStorage,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val notificationHelper: NotificationHelper,
 ) : CoroutineWorker(context, parameters) {
     override suspend fun doWork(): Result {

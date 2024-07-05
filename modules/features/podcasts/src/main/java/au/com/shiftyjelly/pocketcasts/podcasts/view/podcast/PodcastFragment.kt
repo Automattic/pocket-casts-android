@@ -21,7 +21,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
@@ -152,7 +152,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     @Inject lateinit var coilManager: CoilManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -966,6 +966,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
             SharePodcastHelper(
                 podcast,
+                null,
                 null,
                 null,
                 context,

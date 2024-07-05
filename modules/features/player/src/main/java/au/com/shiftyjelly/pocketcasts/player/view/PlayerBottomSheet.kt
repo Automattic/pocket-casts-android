@@ -11,7 +11,7 @@ import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewPlayerBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.helper.BottomSheetAnimation
@@ -36,7 +36,7 @@ import kotlinx.coroutines.Dispatchers
 @AndroidEntryPoint
 class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs), CoroutineScope {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 

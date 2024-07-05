@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -49,6 +50,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -186,6 +189,15 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun exists(podcastUuid: String): Boolean {
         return podcastDao.exists(podcastUuid)
+    }
+
+    override fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int> {
+        return flow {
+            val episode = episodeDao.findByUuid(uuid)
+            if (episode != null) {
+                emitAll(podcastDao.episodeCount(episode.podcastUuid))
+            }
+        }
     }
 
     override fun refreshPodcastsIfRequired(fromLog: String) {
@@ -415,6 +427,15 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun observePodcastByUuidFlow(uuid: String): Flow<Podcast> {
         return podcastDao.observeByUuidFlow(uuid)
+    }
+
+    override fun observePodcastByEpisodeUuid(uuid: String): Flow<Podcast> {
+        return flow {
+            val episode = episodeDao.findByUuid(uuid)
+            if (episode != null) {
+                emitAll(podcastDao.observeByUuidFlow(episode.podcastUuid))
+            }
+        }
     }
 
     override fun findByUuids(uuids: Collection<String>): List<Podcast> {
@@ -746,7 +767,7 @@ class PodcastManagerImpl @Inject constructor(
                 continue
             }
 
-            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "podcast auto download " + episode.podcastUuid, downloadManager, episodeManager)
+            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "podcast auto download " + episode.podcastUuid, downloadManager, episodeManager, source = SourceView.UNKNOWN)
             uuidToAdded[episodeUuid] = java.lang.Boolean.TRUE
         }
     }
@@ -811,5 +832,9 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit) {
         podcastDao.updateArchiveEpisodeLimit(uuid, value)
+    }
+
+    override suspend fun findPlayedEpisodesFrom(podcastUuid: String): List<PodcastEpisode> {
+        return episodeDao.findPlayedEpisodesFrom(podcastUuid)
     }
 }

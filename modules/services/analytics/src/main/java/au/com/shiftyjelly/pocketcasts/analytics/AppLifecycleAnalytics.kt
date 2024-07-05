@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AppLifecycleAnalytics @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) {
     /* The date the app was last opened, used for calculating time in app */
     private var applicationOpenedDate: Date? = null

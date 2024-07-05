@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
@@ -35,7 +35,7 @@ private const val MAX_STARS = 5
 class PodcastRatingsViewModel
 @Inject constructor(
     private val ratingsManager: RatingsManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -89,7 +89,7 @@ class PodcastRatingsViewModel
     }
 
     sealed class RatingState {
-        object Loading : RatingState()
+        data object Loading : RatingState()
 
         data class Loaded(
             private val ratings: PodcastRatings,
@@ -103,6 +103,12 @@ class PodcastRatingsViewModel
                 get() = total == null || total == 0
 
             val stars: List<Star> = starsList()
+
+            val roundedAverage: String
+                get() {
+                    val rating = average ?: 0.0
+                    return (Math.round(rating * 10) / 10.0).toString()
+                }
 
             private fun starsList(): List<Star> {
                 val rating = average ?: 0.0
@@ -124,7 +130,7 @@ class PodcastRatingsViewModel
             }
         }
 
-        object Error : RatingState()
+        data object Error : RatingState()
     }
 
     enum class Star(val icon: ImageVector) {

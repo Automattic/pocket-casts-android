@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.chromecast
 import android.content.Context
 import androidx.core.content.ContextCompat
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.Session
@@ -20,7 +20,7 @@ import timber.log.Timber
 
 class CastManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : CastManager {
 
     private val sessionManagerListener = CastSessionManagerListener()

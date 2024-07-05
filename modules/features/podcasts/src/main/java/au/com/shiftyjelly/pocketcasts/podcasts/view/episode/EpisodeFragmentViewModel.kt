@@ -9,7 +9,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -56,7 +56,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     val playbackManager: PlaybackManager,
     val settings: Settings,
     private val showNotesManager: ShowNotesManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -97,7 +97,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 if (episode != null) {
                     Maybe.just(episode)
                 } else {
-                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, PodcastEpisode(uuid = episodeUuid, publishedDate = Date()), podcastManager, downloadMetaData = true).flatMap { missingEpisode ->
+                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, PodcastEpisode(uuid = episodeUuid, publishedDate = Date()), podcastManager, downloadMetaData = true, source = source).flatMap { missingEpisode ->
                         if (missingEpisode is PodcastEpisode) {
                             Maybe.just(missingEpisode)
                         } else {
@@ -192,7 +192,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                     analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED
                 } else if (!it.isDownloaded) {
                     it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                    downloadManager.addEpisodeToQueue(it, "episode card", fireEvent = true, fireToast = false)
+                    downloadManager.addEpisodeToQueue(it, "episode card", fireEvent = true, fireToast = false, source = source)
                     analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED
                 }
                 episodeManager.clearPlaybackError(episode)

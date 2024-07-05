@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -319,7 +320,7 @@ class UpNextQueueImpl @Inject constructor(
 
     private fun downloadIfPossible(episode: BaseEpisode, downloadManager: DownloadManager) {
         if (settings.autoDownloadUpNext.value) {
-            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "up next auto download", downloadManager, episodeManager)
+            DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "up next auto download", downloadManager, episodeManager, source = SourceView.UP_NEXT)
         }
     }
 

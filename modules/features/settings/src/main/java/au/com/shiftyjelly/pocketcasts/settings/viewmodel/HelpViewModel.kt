@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val databaseExportHelper: DatabaseExportHelper,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState())

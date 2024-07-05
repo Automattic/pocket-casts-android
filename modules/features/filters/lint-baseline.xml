@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
         id="MissingSuperCall"
@@ -162,7 +162,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="483"
+            line="484"
             column="13"/>
     </issue>
 
@@ -173,7 +173,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="492"
+            line="493"
             column="21"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="500"
+            line="501"
             column="21"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="513"
+            line="514"
             column="21"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="525"
+            line="526"
             column="25"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="538"
+            line="539"
             column="25"/>
     </issue>
 
@@ -228,7 +228,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="552"
+            line="553"
             column="21"/>
     </issue>
 

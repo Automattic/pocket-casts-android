@@ -30,6 +30,7 @@ interface PodcastManager {
     fun findPodcastByUuidRx(uuid: String): Maybe<Podcast>
     fun observePodcastByUuid(uuid: String): Flowable<Podcast>
     fun observePodcastByUuidFlow(uuid: String): Flow<Podcast>
+    fun observePodcastByEpisodeUuid(uuid: String): Flow<Podcast>
     fun observePodcastSubscriptions(): Flowable<List<String>>
 
     fun findSubscribed(): List<Podcast>
@@ -54,6 +55,7 @@ interface PodcastManager {
     fun findPodcastsAutodownload(): List<Podcast>
 
     fun exists(podcastUuid: String): Boolean
+    fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
@@ -148,6 +150,8 @@ interface PodcastManager {
     suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 
     suspend fun findRandomPodcasts(limit: Int): List<Podcast>
+
+    suspend fun findPlayedEpisodesFrom(podcastUuid: String): List<PodcastEpisode>
 
     suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive)
     suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying)

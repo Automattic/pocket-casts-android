@@ -12,7 +12,7 @@ import org.mockito.kotlin.verify
 @RunWith(MockitoJUnitRunner::class)
 class AppLifecycleAnalyticsTest {
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var analyticsTracker: AnalyticsTracker
     lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
 
     @Before

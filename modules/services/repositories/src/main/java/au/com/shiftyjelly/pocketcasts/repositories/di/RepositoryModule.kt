@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
@@ -42,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -83,6 +86,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesSyncAccountManager(syncAccountManagerImpl: SyncAccountManagerImpl): SyncAccountManager
+
+    @Binds
+    @Singleton
+    abstract fun providesAccountStatusInfo(accountManagerStatusInfo: AccountManagerStatusInfo): AccountStatusInfo
 
     @Binds
     @Singleton
@@ -154,10 +161,6 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun provideAccountStatusInfo(syncManager: SyncManager): AccountStatusInfo
-
-    @Binds
-    @Singleton
     abstract fun provideRatingsManager(ratingsManagerImpl: RatingsManagerImpl): RatingsManager
 
     @Binds
@@ -171,4 +174,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideNovaLauncherManager(novaLauncherManagerImpl: NovaLauncherManagerImpl): NovaLauncherManager
+
+    @Binds
+    abstract fun provideTranscriptsManager(transcriptsManagerImpl: TranscriptsManagerImpl): TranscriptsManager
 }

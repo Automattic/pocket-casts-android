@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -112,7 +112,7 @@ class PodcastSyncProcess(
     var folderManager: FolderManager,
     var syncManager: SyncManager,
     val crashLogging: CrashLogging,
-    val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTracker,
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -125,9 +125,9 @@ class PodcastSyncProcess(
             return Completable.complete()
         }
 
-        val lasSyncTimeString = settings.getLastModified()
-        val lastSyncTime = runCatching { Instant.parse(lasSyncTimeString) }
-            .onFailure { Timber.e(it, "Could not convert lastModified String to Long: $lasSyncTimeString") }
+        val lastSyncTimeString = settings.getLastModified()
+        val lastSyncTime = runCatching { Instant.parse(lastSyncTimeString) }
+            .onFailure { Timber.e(it, "Could not convert lastModified String to Long: $lastSyncTimeString") }
             .getOrDefault(Instant.EPOCH)
 
         val downloadObservable = if (lastSyncTime == Instant.EPOCH) {
@@ -360,7 +360,7 @@ class PodcastSyncProcess(
         return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
             .toMaybe()
-            .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not import server podcast $podcastResponse.uuid", it) }
+            .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast %s", podcastUuid) }
             .onErrorComplete()
     }
 
@@ -904,7 +904,7 @@ class PodcastSyncProcess(
                     podcastManager.updatePodcast(podcast)
                 }
                 .toMaybe()
-                .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not import server podcast $podcastUuid", it) }
+                .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast  %s", podcastUuid) }
                 .onErrorComplete()
         } else {
             return Maybe.empty<Podcast>()

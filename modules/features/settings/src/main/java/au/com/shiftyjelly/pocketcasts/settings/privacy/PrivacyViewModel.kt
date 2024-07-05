@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.privacy
 
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 class PrivacyViewModel @Inject constructor(
     settings: Settings,
     private val syncManager: SyncManager,
-    analyticsTracker: AnalyticsTrackerWrapper,
     private val userAnalyticsSettings: UserAnalyticsSettings,
 ) : ViewModel() {
 
@@ -32,7 +30,7 @@ class PrivacyViewModel @Inject constructor(
 
     private val mutableUiState = MutableStateFlow<UiState>(
         UiState.Loaded(
-            analytics = analyticsTracker.getSendUsageStats(),
+            analytics = settings.collectAnalytics.value,
             crashReports = settings.sendCrashReports.value,
             linkAccount = settings.linkCrashReportsToUser.value,
             getUserEmail = { syncManager.getEmail() },
