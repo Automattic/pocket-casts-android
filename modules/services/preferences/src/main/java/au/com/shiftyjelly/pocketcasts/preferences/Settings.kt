@@ -105,7 +105,6 @@ interface Settings {
         const val AUTO_ARCHIVE_INCLUDE_STARRED = "autoArchiveIncludeStarred"
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
-        const val INTENT_LINK_UPGRADE = "pktc://upgrade"
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
 
         const val LOG_TAG_AUTO = "PocketCastsAuto"
