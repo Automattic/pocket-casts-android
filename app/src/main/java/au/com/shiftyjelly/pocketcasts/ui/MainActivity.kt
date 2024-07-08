@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
@@ -82,9 +83,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.EPISODE_UUID
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PODCAST_UUID
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SOURCE_VIEW
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
 import au.com.shiftyjelly.pocketcasts.profile.SubCancelledFragment
 import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
@@ -1260,27 +1258,15 @@ class MainActivity :
                     is ShowPodcastDeepLink -> {
                         openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
                     }
+                    is ShowEpisodeDeepLink -> {
+                        openEpisodeDialog(
+                            episodeUuid = deepLink.episodeUuid,
+                            podcastUuid = deepLink.podcastUuid,
+                            source = EpisodeViewSource.fromString(deepLink.sourceView),
+                            forceDark = false,
+                        )
+                    }
                 }
-            } else if (action == Settings.INTENT_OPEN_APP_EPISODE_UUID) {
-                intent.getStringExtra(EPISODE_UUID)?.let {
-                    openEpisodeDialog(
-                        episodeUuid = it,
-                        source = EpisodeViewSource.fromString(intent.getStringExtra(SOURCE_VIEW)),
-                        podcastUuid = intent.getStringExtra(PODCAST_UUID),
-                        forceDark = false,
-                    )
-                }
-            } // new episode notification tapped
-            else if (intent.extras?.containsKey(Settings.INTENT_OPEN_APP_EPISODE_UUID) ?: false) {
-                // intents were being reused for notifications so we had to use the extra to pass action
-                val episodeUuid =
-                    intent.extras?.getString(Settings.INTENT_OPEN_APP_EPISODE_UUID, null)
-                openEpisodeDialog(
-                    episodeUuid = episodeUuid,
-                    source = EpisodeViewSource.NOTIFICATION,
-                    podcastUuid = null,
-                    forceDark = false,
-                )
             } else if (action == Intent.ACTION_VIEW) {
                 val extraPage = intent.extras?.getString(INTENT_EXTRA_PAGE, null)
                 if (extraPage != null) {
