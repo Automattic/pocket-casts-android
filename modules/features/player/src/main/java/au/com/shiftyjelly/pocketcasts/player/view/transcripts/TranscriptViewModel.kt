@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Format
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
+import androidx.media3.extractor.text.CuesWithTimingSubtitle
 import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -68,7 +69,7 @@ class TranscriptViewModel @Inject constructor(
                     UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
-                        cues = result,
+                        cuesWithTimingSubtitle = result,
                     )
                 } catch (e: UnsupportedOperationException) {
                     UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode)
@@ -96,7 +97,7 @@ class TranscriptViewModel @Inject constructor(
                     element?.let { result.add(it) }
                 }
             }
-            result.build()
+            CuesWithTimingSubtitle(result.build())
         }
     }
 
@@ -121,7 +122,7 @@ class TranscriptViewModel @Inject constructor(
         data class TranscriptLoaded(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
-            val cues: List<CuesWithTiming> = emptyList(),
+            val cuesWithTimingSubtitle: CuesWithTimingSubtitle,
         ) : UiState()
 
         data class Error(
