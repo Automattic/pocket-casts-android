@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
+import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -1235,10 +1236,11 @@ class MainActivity :
                         closeToRoot()
                         addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
                     }
-                }
-            } else if (action == Settings.INTENT_OPEN_APP_ADD_BOOKMARK) {
-                viewModel.buildBookmarkArguments { args ->
-                    bookmarkActivityLauncher.launch(args.getIntent(this))
+                    is AddBookmarkDeepLink -> {
+                        viewModel.buildBookmarkArguments { args ->
+                            bookmarkActivityLauncher.launch(args.getIntent(this))
+                        }
+                    }
                 }
             } else if (action == Settings.INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE) {
                 viewModel.buildBookmarkArguments(intent.getStringExtra(BOOKMARK_UUID)) { args ->

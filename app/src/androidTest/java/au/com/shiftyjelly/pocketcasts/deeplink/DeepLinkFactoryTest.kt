@@ -18,4 +18,13 @@ class DeepLinkFactoryTest {
 
         assertEquals(DownloadsDeepLink, deepLink)
     }
+
+    @Test
+    fun addBookmark() {
+        val intent = Intent().setAction("INTENT_OPEN_APP_ADD_BOOKMARK")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(AddBookmarkDeepLink, deepLink)
+    }
 }

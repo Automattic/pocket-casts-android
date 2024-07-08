@@ -1,12 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import timber.log.Timber
 
 class DeepLinkFactory {
     private val adapters = listOf(
         DownloadsAdapter(),
+        AddBookmarkAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -41,6 +43,14 @@ private interface DeepLinkAdapter {
 private class DownloadsAdapter : DeepLinkAdapter {
     override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_DOWNLOADS) {
         DownloadsDeepLink
+    } else {
+        null
+    }
+}
+
+private class AddBookmarkAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_ADD_BOOKMARK) {
+        AddBookmarkDeepLink
     } else {
         null
     }
