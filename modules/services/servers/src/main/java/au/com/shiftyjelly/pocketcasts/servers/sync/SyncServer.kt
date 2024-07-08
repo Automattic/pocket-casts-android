@@ -165,4 +165,7 @@ interface SyncServer {
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/bookmark/list")
     suspend fun getBookmarkList(@Header("Authorization") authorization: String, @Body request: BookmarkRequest): BookmarksResponse
+
+    @POST("/user/podcast_rating/add")
+    suspend fun addPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingAddRequest): PodcastRatingAddResponse
 }

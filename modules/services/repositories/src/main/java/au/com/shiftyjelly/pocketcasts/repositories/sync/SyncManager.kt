@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -87,6 +89,9 @@ interface SyncManager : NamedSettingsCaller {
 
     suspend fun userSyncUpdate(request: SyncUpdateRequest): SyncUpdateResponse
     fun episodeSync(request: EpisodeSyncRequest): Completable
+
+    // Rating
+    suspend fun addPodcastRating(request: PodcastRatingAddRequest): PodcastRatingAddResponse
 
     // Other
     suspend fun exchangeSonos(): ExchangeSonosResponse
