@@ -13,7 +13,6 @@ import java.io.File
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.util.Arrays
-import java.util.regex.Matcher
 import timber.log.Timber
 
 object IntentUtil {
@@ -26,33 +25,6 @@ object IntentUtil {
     fun isNativeShareLink(intent: Intent): Boolean {
         val scheme = intent.scheme
         return scheme != null && scheme in listOf("http", "https") && intent.data != null && intent.data?.host in listOf("pca.st", "pcast.pocketcasts.net")
-    }
-
-    // http://subscribeonandroid.com/geeknewscentral.com/podcast.xml
-    fun isSubscribeOnAndroidUrl(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || !(scheme == "http" || scheme == "https")) {
-            return false
-        }
-
-        if (intent.data == null || intent.data?.host == null) {
-            return false
-        }
-        val host = intent.data?.host
-        return host == "subscribeonandroid.com" || host == "www.subscribeonandroid.com"
-    }
-
-    fun getSubscribeOnAndroidUrl(intent: Intent): String? {
-        val uri = intent.data ?: return null
-        var path = uri.path ?: return null
-        if (path.startsWith("/")) {
-            path = path.replaceFirst(Matcher.quoteReplacement("/").toRegex(), "")
-        }
-        if (path.length < 3) {
-            return null
-        }
-        val scheme = intent.scheme
-        return "$scheme://$path"
     }
 
     fun webViewShouldOverrideUrl(url: String?, context: Context): Boolean {
