@@ -13,6 +13,7 @@ import org.junit.runner.RunWith
 class DeepLinkFactoryTest {
     private val factory = DeepLinkFactory(
         webBaseHost = "pocketcasts.com",
+        listHost = "lists.pocketcasts.com",
     )
 
     @Test
@@ -345,5 +346,82 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertNull(deepLink)
+    }
+
+    @Test
+    fun shareListHttp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("http://lists.pocketcasts.com/path/to/list"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+    }
+
+    @Test
+    fun shareListHttps() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://lists.pocketcasts.com/path/to/list"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+    }
+
+    @Test
+    fun shareListNative() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://sharelist/path/to/list"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+    }
+
+    @Test
+    fun shareListWithoutPath() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://lists.pocketcasts.com/"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
+    fun shareListNativeWithoutPath() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://sharelist/"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
+    fun shareListWithQuery() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://lists.pocketcasts.com/path/to/list?someKey=someValue"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+    }
+
+    @Test
+    fun shareListNativeWithQuery() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://sharelist/path/to/list?someKey=someValue"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
     }
 }

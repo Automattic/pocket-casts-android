@@ -152,26 +152,6 @@ object IntentUtil {
         return true
     }
 
-    fun isPodcastListShare(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || !(scheme == "http" || scheme == "https")) {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "lists.pocketcasts.com"
-    }
-
-    fun isPodcastListShareMobile(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "sharelist"
-    }
-
     fun getUrl(intent: Intent): String? {
         return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
     }

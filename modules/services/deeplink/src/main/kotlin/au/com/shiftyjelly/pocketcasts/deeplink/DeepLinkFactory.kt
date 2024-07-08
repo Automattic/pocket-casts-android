@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
+import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_LIST_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
@@ -16,11 +17,11 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_I
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
-import au.com.shiftyjelly.pocketcasts.deeplink.PodloveAdapter.Companion.PODLOVE_REGEX
 import timber.log.Timber
 
 class DeepLinkFactory(
     private val webBaseHost: String = WEB_BASE_HOST,
+    private val listHost: String = SERVER_LIST_HOST,
 ) {
     private val adapters = listOf(
         DownloadsAdapter(),
@@ -34,6 +35,8 @@ class DeepLinkFactory(
         PocketCastsWebsiteAdapter(webBaseHost),
         PodloveAdapter(),
         SonosAdapter(),
+        ShareListAdapter(listHost),
+        ShareListNativeAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -188,6 +191,38 @@ private class SonosAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "applink" && state != null) {
             SonosDeepLink(state)
+        } else {
+            null
+        }
+    }
+}
+
+private class ShareListAdapter(
+    private val listHost: String,
+) : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+        val path = uriData?.path?.takeIf { it != "/" }
+
+        return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == listHost && path != null) {
+            ShareListDeepLink(path)
+        } else {
+            null
+        }
+    }
+}
+
+private class ShareListNativeAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+        val path = uriData?.path?.takeIf { it != "/" }
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "sharelist" && path != null) {
+            ShareListDeepLink(path)
         } else {
             null
         }
