@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
+import android.app.SearchManager
 import android.content.Intent
 import android.content.Intent.ACTION_SEND
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.EXTRA_STREAM
 import android.net.Uri
+import android.provider.MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
 import androidx.core.content.IntentCompat
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_LIST_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_SHORT_URL
@@ -52,6 +54,8 @@ class DeepLinkFactory(
         ShareLinkAdapter(shareHost),
         OpmlAdapter(listOf(listHost, shareHost)),
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost)),
+        PlayFromSearchAdapter(),
+        AssistantAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -455,5 +459,26 @@ private class PodcastUrlSchemeAdapter(
             "subscribeonandroid.com",
             "www.subscribeonandroid.com",
         )
+    }
+}
+
+private class PlayFromSearchAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val query = intent.extras?.getString(SearchManager.QUERY)
+        return if (intent.action == INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH && !query.isNullOrBlank()) {
+            PlayFromSearchDeepLink(query)
+        } else {
+            null
+        }
+    }
+}
+
+private class AssistantAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        return if (intent.extras?.getBoolean("extra_accl_intent", false) == true || intent.extras?.getBoolean("handled_by_nga", false) == true) {
+            AssistantDeepLink
+        } else {
+            null
+        }
     }
 }
