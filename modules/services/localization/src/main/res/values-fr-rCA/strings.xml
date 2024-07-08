@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-17 17:54:03+0000
+Translation-Revision-Date: 2024-07-03 11:54:02+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="podcast_create_clip">Créer un clip</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">L’intégralité de l’épisode en cours de lecture est mis en cache sur un réseau illimité pour minimiser le streaming lors de la lecture. L’épisode est automatiquement supprimé du cache lorsque la taille maximale de ce dernier est atteinte.</string>
+    <string name="settings_advanced_cache_entire_playing_episode">Lecture de l’épisode en cache</string>
+    <string name="playback">Écoute</string>
+    <string name="podcast_share_clip">Clip</string>
     <string name="download_completed_for_episode">Téléchargement terminé pour %1$s</string>
     <string name="episode_queued_for_download">Épisode mis en file d’attente pour téléchargement</string>
     <string name="episode_was_removed">Épisode supprimé</string>
@@ -1698,6 +1703,10 @@ Language: fr
     <string name="unarchive">Désarchiver</string>
     <string name="archive">Archiver</string>
     <string name="add_to_up_next">Ajouter à la file d\'attente</string>
+    <plurals name="episode_count">
+        <item quantity="one">%d épisode</item>
+        <item quantity="other">%d épisodes</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d épisode - %2$s restant</item>
         <item quantity="other">%1$d épisodes - %2$s restant(s)</item>

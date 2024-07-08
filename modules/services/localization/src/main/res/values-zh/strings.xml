@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-18 09:54:04+0000
+Translation-Revision-Date: 2024-07-02 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="podcast_create_clip">创建片段</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">整个播放剧集都缓存在不计流量的网络上，以尽可能减少播放时的流媒体传输。 当达到缓存大小限制时，系统会自动将剧集从缓存中删除。</string>
+    <string name="settings_advanced_cache_entire_playing_episode">缓存播放剧集</string>
+    <string name="playback">播放</string>
+    <string name="podcast_share_clip">片段</string>
     <string name="download_completed_for_episode">%1$s 下载已完成</string>
     <string name="episode_queued_for_download">剧集正在排队等待下载</string>
     <string name="episode_was_removed">剧集已删除</string>
@@ -1698,6 +1703,9 @@ Language: zh_CN
     <string name="unarchive">取消存档</string>
     <string name="archive">存档</string>
     <string name="add_to_up_next">添加到“接下来播放”</string>
+    <plurals name="episode_count">
+        <item quantity="other">%d 集</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other">%1$d 集 — 剩余 %2$s</item>
     </plurals>

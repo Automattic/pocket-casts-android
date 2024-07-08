@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-06-19 11:54:03+0000
+Translation-Revision-Date: 2024-07-04 15:54:02+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="podcast_create_clip">建立短片</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">完整播放單集會以快取形式儲存於不受限的網路，以便在播放時將流量縮減至最小。 若單集達到快取大小限制，系統會自動將其從快取移除。</string>
+    <string name="settings_advanced_cache_entire_playing_episode">快取播放單集</string>
+    <string name="playback">播放</string>
+    <string name="podcast_share_clip">片段</string>
     <string name="download_completed_for_episode">「%1$s」已下載完成</string>
     <string name="episode_queued_for_download">單集已排入下載佇列</string>
     <string name="episode_was_removed">單集已移除</string>
@@ -1698,6 +1703,9 @@ Language: zh_TW
     <string name="unarchive">取消封存</string>
     <string name="archive">封存</string>
     <string name="add_to_up_next">新增到「接下來播放」</string>
+    <plurals name="episode_count">
+        <item quantity="other">%d 集</item>
+    </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other">%1$d 集單集 - 剩餘 %2$s</item>
     </plurals>

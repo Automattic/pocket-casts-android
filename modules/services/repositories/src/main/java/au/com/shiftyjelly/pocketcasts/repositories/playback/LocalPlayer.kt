@@ -34,6 +34,8 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
     override val url: String?
         get() = (episodeLocation as? EpisodeLocation.Stream)?.uri
 
+    override var isDownloading: Boolean = false
+
     override val filePath: String?
         get() = (episodeLocation as? EpisodeLocation.Downloaded)?.filePath
 
@@ -185,6 +187,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
     override fun setEpisode(episode: BaseEpisode) {
         this.episodeUuid = episode.uuid
         this.isHLS = episode.isHLS
+        this.isDownloading = episode.isDownloading
         episodeLocation = if (episode.isDownloaded) {
             EpisodeLocation.Downloaded(episode.downloadedFilePath)
         } else {
