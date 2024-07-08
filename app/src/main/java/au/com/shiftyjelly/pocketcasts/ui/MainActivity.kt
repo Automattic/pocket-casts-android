@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -1241,12 +1242,13 @@ class MainActivity :
                             bookmarkActivityLauncher.launch(args.getIntent(this))
                         }
                     }
+                    is ChangeBookmarkTitleDeepLink -> {
+                        viewModel.buildBookmarkArguments(deepLink.bookmarkUuid) { args ->
+                            bookmarkActivityLauncher.launch(args.getIntent(this))
+                        }
+                        notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
+                    }
                 }
-            } else if (action == Settings.INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE) {
-                viewModel.buildBookmarkArguments(intent.getStringExtra(BOOKMARK_UUID)) { args ->
-                    bookmarkActivityLauncher.launch(args.getIntent(this))
-                }
-                notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
             } else if (action == Settings.INTENT_OPEN_APP_VIEW_BOOKMARKS) {
                 intent.getStringExtra(BOOKMARK_UUID)?.let {
                     viewModel.viewBookmark(it)
