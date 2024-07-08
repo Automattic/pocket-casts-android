@@ -1,11 +1,7 @@
-*   New Features
-    *   Adds advanced setting to enable caching playing episode in order to minimise streaming
-        ([#2380](https://github.com/Automattic/pocket-casts-android/pull/2380))
+*   Updates:
+    *   Update Give rating view to include the average rating
+        ([#2421](https://github.com/Automattic/pocket-casts-android/pull/2421))
 *   Bug Fixes
-    *   Fix sharing episodes when using multi-selection
-        ([#2376](https://github.com/Automattic/pocket-casts-android/pull/2376))
-    *   Fix deselected chapters not synced correctly between different platforms
-        ([#2357](https://github.com/Automattic/pocket-casts-android/pull/2357))
-    *   Adds download episode action button to shelf list in Now Playing
-        ([#2325](https://github.com/Automattic/pocket-casts-android/pull/2325))
+    *   Fix playback speed label tap behavior
+        ([#2439](https://github.com/Automattic/pocket-casts-android/pull/2439))
 
