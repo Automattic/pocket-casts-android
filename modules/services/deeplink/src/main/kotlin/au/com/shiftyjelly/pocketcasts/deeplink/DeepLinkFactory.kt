@@ -42,6 +42,7 @@ class DeepLinkFactory(
         AppleAdapter(),
         CloudFilesAdapter(),
         UpdageAccountAdapter(),
+        PromoCodeAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -289,6 +290,20 @@ private class UpdageAccountAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "upgrade") {
             UpgradeAccountDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class PromoCodeAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val dataString = uriData?.toString().orEmpty()
+        val pathSegments = uriData?.pathSegments.orEmpty()
+
+        return if (intent.action == ACTION_VIEW && dataString.startsWith("pktc://redeem/promo") && pathSegments.size >= 2) {
+            PromoCodeDeepLink(pathSegments.last())
         } else {
             null
         }
