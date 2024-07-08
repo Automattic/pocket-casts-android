@@ -14,10 +14,10 @@ class TranscriptsManagerImpl @Inject constructor(
         episodeUuid: String,
         transcripts: List<Transcript>,
     ) {
+        if (transcripts.isEmpty()) return
+        transcriptDao.deleteForEpisode(episodeUuid)
         findBestTranscript(transcripts)?.let { bestTranscript ->
             transcriptDao.insert(bestTranscript)
-        } ?: run {
-            transcriptDao.deleteForEpisode(episodeUuid)
         }
     }
 
