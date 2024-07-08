@@ -151,7 +151,7 @@ interface PodcastManager {
 
     suspend fun findRandomPodcasts(limit: Int): List<Podcast>
 
-    suspend fun findPlayedEpisodesFrom(podcastUuid: String): List<PodcastEpisode>
+    suspend fun countPlayedEpisodes(podcastUuid: String): Int
 
     suspend fun updateArchiveSettings(uuid: String, enable: Boolean, afterPlaying: AutoArchiveAfterPlaying, inactive: AutoArchiveInactive)
     suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying)
