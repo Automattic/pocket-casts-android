@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +35,9 @@ fun GiveRatingNotAllowedToRate(
     state: GiveRatingViewModel.State.NotAllowedToRate,
     onDismiss: () -> Unit,
 ) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -48,10 +53,12 @@ fun GiveRatingNotAllowedToRate(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                PodcastCover(
-                    uuid = state.podcastUuid,
-                    coverWidth = 164.dp,
-                )
+                if (!isLandscape) {
+                    PodcastCover(
+                        uuid = state.podcastUuid,
+                        coverWidth = 164.dp,
+                    )
+                }
 
                 Spacer(Modifier.height(40.dp))
 
