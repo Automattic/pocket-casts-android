@@ -39,6 +39,7 @@ class DeepLinkFactory(
         ShareListAdapter(listHost),
         ShareListNativeAdapter(),
         SubscribeOnAndroidAdapter(),
+        AppleAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -245,6 +246,19 @@ private class SubscribeOnAndroidAdapter : DeepLinkAdapter {
             path != null
         ) {
             ShowPodcastFromUrlDeepLink("$scheme://$path")
+        } else {
+            null
+        }
+    }
+}
+
+private class AppleAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && host in listOf("itunes.apple.com", "podcasts.apple.com") && uriData != null) {
+            ShowPodcastFromUrlDeepLink(uriData.toString())
         } else {
             null
         }
