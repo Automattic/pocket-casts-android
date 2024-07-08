@@ -62,7 +62,7 @@ class GiveRatingViewModel @Inject constructor(
             }
         }
         data class NotAllowedToRate(val podcastUuid: String) : State()
-        data class FailedToRate(val message: String) : State()
+        data object ErrorWhenLoadingPodcast : State()
     }
 
     private val _state = MutableStateFlow<State>(State.Loading)
@@ -87,7 +87,7 @@ class GiveRatingViewModel @Inject constructor(
                     } else {
                         val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
                         if (podcast == null) {
-                            _state.value = State.FailedToRate("Failed to rate")
+                            _state.value = State.ErrorWhenLoadingPodcast
                         } else {
                             val rating = ratingsManager.podcastRatings(podcastUuid).first()
                             val stars: Stars? = getStarsFromRating(rating)

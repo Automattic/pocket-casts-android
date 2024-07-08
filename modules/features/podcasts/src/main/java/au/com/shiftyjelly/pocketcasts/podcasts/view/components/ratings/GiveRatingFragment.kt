@@ -82,15 +82,17 @@ class GiveRatingFragment : BaseDialogFragment() {
                                         dismiss()
                                     },
                                     onError = {
-                                        Toast.makeText(context, getString(LR.string.could_not_rate_this_podcast), Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context, getString(LR.string.something_went_wrong_to_rate_this_podcast), Toast.LENGTH_LONG).show()
                                     },
                                 )
                             }
                         },
                     )
                     is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(state = state, onDismiss = { dismiss() })
-                    is GiveRatingViewModel.State.FailedToRate -> {
-                        exitWithError(state.message)
+                    is GiveRatingViewModel.State.ErrorWhenLoadingPodcast -> {
+                        val error = getString(LR.string.something_went_wrong_to_rate_this_podcast)
+                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                        exitWithError(error)
                     }
                     GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
                 }

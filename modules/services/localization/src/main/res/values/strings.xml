@@ -629,7 +629,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="not_allowed_to_rate_title">Please listen to this podcast first</string>
     <string name="not_allowed_to_rate_description">Only listeners of this podcast can give it a rating. Have a listen to a few episodes and then come back to give your rating. We look forward to hearing what you think!</string>
     <string name="thank_you_for_rating">Thank you for rating!</string>
-    <string name="could_not_rate_this_podcast">Could not rate this podcast</string>
+    <string name="something_went_wrong_to_rate_this_podcast">Something went wrong. Please try again later</string>
 
     <!-- Episodes -->
 
