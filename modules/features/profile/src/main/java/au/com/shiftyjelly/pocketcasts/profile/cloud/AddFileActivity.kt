@@ -36,6 +36,7 @@ import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
+import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -511,8 +512,7 @@ class AddFileActivity :
                     if (isFileChooserMode) {
                         finish()
                     } else {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INTENT_LINK_CLOUD_FILES))
-                        startActivity(intent)
+                        startActivity(CloudFilesDeepLink.toIntent(this@AddFileActivity))
                         finish()
                     }
                 }
