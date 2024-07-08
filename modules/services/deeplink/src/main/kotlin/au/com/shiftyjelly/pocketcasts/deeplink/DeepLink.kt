@@ -7,8 +7,11 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BO
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_NOTIFICATION_TAG
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 
 sealed interface DeepLink {
     fun toIntent(context: Context): Intent
@@ -19,8 +22,11 @@ sealed interface DeepLink {
         const val ACTION_OPEN_CHANGE_BOOKMARK_TITLE = "INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE"
         const val ACTION_OPEN_BOOKMARK = "INTENT_OPEN_APP_VIEW_BOOKMARKS"
         const val ACTION_OPEN_DELETE_BOOKMARK = "INTENT_OPEN_APP_DELETE_BOOKMARK"
+        const val ACTION_OPEN_PODCAST = "INTENT_OPEN_APP_PODCAST_UUID"
 
         const val EXTRA_BOOKMARK_UUID = "bookmark_uuid"
+        const val EXTRA_PODCAST_UUID = "podcast_uuid"
+        const val EXTRA_SOURCE_VIEW = "source_view"
         const val EXTRA_NOTIFICATION_TAG = "NOTIFICATION_TAG"
     }
 }
@@ -61,6 +67,16 @@ data class DeleteBookmarkDeepLink(
         .setAction(ACTION_OPEN_DELETE_BOOKMARK)
         .putExtra(EXTRA_BOOKMARK_UUID, bookmarkUuid)
         .putExtra(EXTRA_NOTIFICATION_TAG, "${EXTRA_BOOKMARK_UUID}_$bookmarkUuid")
+}
+
+data class ShowPodcastDeepLink(
+    val podcastUuid: String,
+    val sourceView: String?,
+) : DeepLink {
+    override fun toIntent(context: Context) = context.launcherIntent
+        .setAction(ACTION_OPEN_PODCAST)
+        .putExtra(EXTRA_PODCAST_UUID, podcastUuid)
+        .putExtra(EXTRA_SOURCE_VIEW, sourceView)
 }
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {

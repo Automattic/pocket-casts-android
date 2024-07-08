@@ -6,7 +6,10 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BO
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 import timber.log.Timber
 
 class DeepLinkFactory {
@@ -16,6 +19,7 @@ class DeepLinkFactory {
         ChangeBookmarkTitleAdapter(),
         ShowBookmarkAdapter(),
         DeleteBookmarkAdapter(),
+        ShowPodcastAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -82,6 +86,19 @@ private class ShowBookmarkAdapter : DeepLinkAdapter {
 private class DeleteBookmarkAdapter : DeepLinkAdapter {
     override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_DELETE_BOOKMARK) {
         intent.getStringExtra(EXTRA_BOOKMARK_UUID)?.let(::DeleteBookmarkDeepLink)
+    } else {
+        null
+    }
+}
+
+private class ShowPodcastAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (intent.action == ACTION_OPEN_PODCAST) {
+        intent.getStringExtra(EXTRA_PODCAST_UUID)?.let { podcastUuid ->
+            ShowPodcastDeepLink(
+                podcastUuid = podcastUuid,
+                sourceView = intent.getStringExtra(EXTRA_SOURCE_VIEW),
+            )
+        }
     } else {
         null
     }

@@ -91,4 +91,37 @@ class DeepLinkFactoryTest {
 
         assertNull(deepLink)
     }
+
+    @Test
+    fun showPodcast() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_PODCAST_UUID")
+            .putExtra("podcast_uuid", "Podcast ID")
+            .putExtra("source_view", "Source View")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastDeepLink("Podcast ID", "Source View"), deepLink)
+    }
+
+    @Test
+    fun showPodcastWithoutPodcastId() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_PODCAST_UUID")
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
+    fun showPodcastWithoutSourceView() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_PODCAST_UUID")
+            .putExtra("podcast_uuid", "Podcast ID")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastDeepLink("Podcast ID", sourceView = null), deepLink)
+    }
 }

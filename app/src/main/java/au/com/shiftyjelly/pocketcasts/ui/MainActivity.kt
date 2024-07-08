@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
@@ -1256,10 +1257,9 @@ class MainActivity :
                         viewModel.deleteBookmark(deepLink.bookmarkUuid)
                         notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
                     }
-                }
-            } else if (action == Settings.INTENT_OPEN_APP_PODCAST_UUID) {
-                intent.getStringExtra(PODCAST_UUID)?.let {
-                    openPodcastPage(it, intent.getStringExtra(SOURCE_VIEW))
+                    is ShowPodcastDeepLink -> {
+                        openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
+                    }
                 }
             } else if (action == Settings.INTENT_OPEN_APP_EPISODE_UUID) {
                 intent.getStringExtra(EPISODE_UUID)?.let {
