@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel.State.Loaded.Stars
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +30,7 @@ class GiveRatingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val ratingsManager: RatingsManager,
     private val userManager: UserManager,
+    private val syncManager: SyncManager,
 ) : ViewModel() {
 
     companion object {
@@ -86,7 +90,7 @@ class GiveRatingViewModel @Inject constructor(
                             _state.value = State.FailedToRate("Failed to rate")
                         } else {
                             val rating = ratingsManager.podcastRatings(podcastUuid).first()
-                            val stars: State.Loaded.Stars? = getStarsFromRating(rating)
+                            val stars: Stars? = getStarsFromRating(rating)
 
                             _state.value = State.Loaded(
                                 podcastUuid = podcast.uuid,
@@ -100,23 +104,23 @@ class GiveRatingViewModel @Inject constructor(
         }
     }
 
-    private fun getStarsFromRating(podcastRatings: PodcastRatings): State.Loaded.Stars? {
+    private fun getStarsFromRating(podcastRatings: PodcastRatings): Stars? {
         val rating = podcastRatings.average ?: 0.0
 
         val ratingInt = rating.toInt()
         val half = rating % 1 >= 0.5
 
         return when (ratingInt) {
-            0 -> State.Loaded.Stars.Zero
-            1 -> if (half) State.Loaded.Stars.OneAndHalf else State.Loaded.Stars.One
-            2 -> if (half) State.Loaded.Stars.TwoAndHalf else State.Loaded.Stars.Two
-            3 -> if (half) State.Loaded.Stars.ThreeAndHalf else State.Loaded.Stars.Three
-            4 -> if (half) State.Loaded.Stars.FourAndHalf else State.Loaded.Stars.Four
-            else -> State.Loaded.Stars.Five // if the rating is somehow higher than 5, just return 5
+            0 -> Stars.Zero
+            1 -> if (half) Stars.OneAndHalf else Stars.One
+            2 -> if (half) Stars.TwoAndHalf else Stars.Two
+            3 -> if (half) Stars.ThreeAndHalf else Stars.Three
+            4 -> if (half) Stars.FourAndHalf else Stars.Four
+            else -> Stars.Five // if the rating is somehow higher than 5, just return 5
         }
     }
 
-    fun submitRating(context: Context, onSuccess: () -> Unit) {
+    suspend fun submitRating(podcastUuid: String, context: Context, onSuccess: () -> Unit, onError: () -> Unit) {
         if (!Network.isConnected(context)) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Cannot submit rating, no network connection")
             Toast.makeText(
@@ -126,9 +130,16 @@ class GiveRatingViewModel @Inject constructor(
             ).show()
             return
         }
+
         val stars = (state.value as State.Loaded).stars
-        Timber.e("submitRating function not implemented yet, but would have submitted a rating of $stars")
-        onSuccess()
+
+        try {
+            val response = syncManager.addPodcastRating(PodcastRatingAddRequest(podcastUuid, starsToRating(stars)))
+            Timber.e("Submitted a rating of ${response.podcastRating} for ${response.podcastUuid}")
+            onSuccess()
+        } catch (e: Exception) {
+            onError()
+        }
     }
 
     fun setRating(rating: Double) {
@@ -141,16 +152,25 @@ class GiveRatingViewModel @Inject constructor(
     }
 
     private fun ratingToStars(rating: Double) = when {
-        rating <= 0 -> State.Loaded.Stars.Zero
-        rating <= 0.5 -> State.Loaded.Stars.Half
-        rating <= 1 -> State.Loaded.Stars.One
-        rating <= 1.5 -> State.Loaded.Stars.OneAndHalf
-        rating <= 2 -> State.Loaded.Stars.Two
-        rating <= 2.5 -> State.Loaded.Stars.TwoAndHalf
-        rating <= 3 -> State.Loaded.Stars.Three
-        rating <= 3.5 -> State.Loaded.Stars.ThreeAndHalf
-        rating <= 4 -> State.Loaded.Stars.Four
-        rating <= 4.5 -> State.Loaded.Stars.FourAndHalf
-        else -> State.Loaded.Stars.Five
+        rating <= 0 -> Stars.Zero
+        rating <= 0.5 -> Stars.Half
+        rating <= 1 -> Stars.One
+        rating <= 1.5 -> Stars.OneAndHalf
+        rating <= 2 -> Stars.Two
+        rating <= 2.5 -> Stars.TwoAndHalf
+        rating <= 3 -> Stars.Three
+        rating <= 3.5 -> Stars.ThreeAndHalf
+        rating <= 4 -> Stars.Four
+        rating <= 4.5 -> Stars.FourAndHalf
+        else -> Stars.Five
+    }
+
+    private fun starsToRating(star: Stars): Int = when (star) {
+        Stars.One -> { 1 }
+        Stars.Two -> { 2 }
+        Stars.Three -> { 3 }
+        Stars.Four -> { 4 }
+        Stars.Five -> { 5 }
+        else -> { 5 }
     }
 }

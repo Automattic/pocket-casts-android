@@ -73,13 +73,19 @@ class GiveRatingFragment : BaseDialogFragment() {
                         onDismiss = ::dismiss,
                         setRating = viewModel::setRating,
                         submitRating = {
-                            viewModel.submitRating(
-                                context = context,
-                                onSuccess = {
-                                    Toast.makeText(context, "TODO: Submit rating", Toast.LENGTH_LONG).show()
-                                    dismiss()
-                                },
-                            )
+                            coroutineScope.launch {
+                                viewModel.submitRating(
+                                    podcastUuid = podcastUuid,
+                                    context = context,
+                                    onSuccess = {
+                                        Toast.makeText(context, getString(LR.string.thank_you_for_rating), Toast.LENGTH_LONG).show()
+                                        dismiss()
+                                    },
+                                    onError = {
+                                        Toast.makeText(context, getString(LR.string.could_not_rate_this_podcast), Toast.LENGTH_LONG).show()
+                                    },
+                                )
+                            }
                         },
                     )
                     is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(state = state, onDismiss = { dismiss() })
