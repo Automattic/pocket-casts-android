@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 class TranscriptsManagerImplTest {
@@ -59,16 +60,13 @@ class TranscriptsManagerImplTest {
     }
 
     @Test
-    fun `updateTranscripts deletes existing transcript when no transcript is available`() = runTest {
-        val transcripts1 = listOf(
-            Transcript("1", "url_1", "application/srt"),
-            Transcript("1", "url_2", "text/vtt"),
-        )
+    fun `updateTranscripts deletes existing transcript when new transcript is available`() = runTest {
+        val transcripts1 = listOf(Transcript("1", "url_1", "application/srt"))
         transcriptsManager.updateTranscripts("1", transcripts1)
 
-        val transcripts2 = emptyList<Transcript>()
+        val transcripts2 = listOf(Transcript("1", "url_2", "text/vtt"))
         transcriptsManager.updateTranscripts("1", transcripts2)
 
-        verify(transcriptDao).deleteForEpisode("1")
+        verify(transcriptDao, times(2)).deleteForEpisode("1")
     }
 }
