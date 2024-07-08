@@ -834,7 +834,7 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateArchiveEpisodeLimit(uuid, value)
     }
 
-    override suspend fun findPlayedEpisodesFrom(podcastUuid: String): List<PodcastEpisode> {
-        return episodeDao.findPlayedEpisodesFrom(podcastUuid)
+    override suspend fun countPlayedEpisodes(podcastUuid: String): Int {
+        return episodeDao.countPlayedEpisodes(podcastUuid)
     }
 }

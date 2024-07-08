@@ -76,9 +76,9 @@ class GiveRatingViewModel @Inject constructor(
                 onUserSignedOut()
             } else if (signInState is SignInState.SignedIn) {
                 withContext(Dispatchers.IO) {
-                    val playedEpisodesFromPodcast = podcastManager.findPlayedEpisodesFrom(podcastUuid)
+                    val countPlayedEpisodes = podcastManager.countPlayedEpisodes(podcastUuid)
 
-                    if (playedEpisodesFromPodcast.size < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
+                    if (countPlayedEpisodes < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
                         _state.value = State.NotAllowedToRate(podcastUuid)
                     } else {
                         val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
