@@ -12,13 +12,13 @@ class DeepLinkFactory {
     fun create(intent: Intent): DeepLink? {
         Timber.tag(TAG).i("Deep linking to: $intent")
         val deepLinks = adapters.mapNotNull { it.create(intent) }
-        return when {
-            deepLinks.size == 1 -> {
+        return when (deepLinks.size) {
+            1 -> {
                 val deepLink = deepLinks.first()
                 Timber.tag(TAG).d("Found a matching deep link: $deepLink")
                 deepLink
             }
-            deepLinks.size == 0 -> {
+            0 -> {
                 Timber.tag(TAG).w("No matching deep links found")
                 null
             }
