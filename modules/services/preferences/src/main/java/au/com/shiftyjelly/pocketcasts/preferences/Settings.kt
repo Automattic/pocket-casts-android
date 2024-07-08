@@ -107,7 +107,6 @@ interface Settings {
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
         const val INTENT_OPEN_APP_PODCAST_UUID = "INTENT_OPEN_APP_PODCAST_UUID"
         const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
-        const val INTENT_OPEN_APP_DELETE_BOOKMARK = "INTENT_OPEN_APP_DELETE_BOOKMARK"
         const val INTENT_LINK_CLOUD_FILES = "pktc://cloudfiles"
         const val INTENT_LINK_UPGRADE = "pktc://upgrade"
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
@@ -117,8 +116,6 @@ interface Settings {
         const val NOTIFICATIONS_DISABLED_MESSAGE_SHOWN = "notificationsDisabledMessageShown"
 
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
-
-        const val BOOKMARK_UUID = "bookmark_uuid"
 
         const val PODCAST_UUID = "podcast_uuid"
 

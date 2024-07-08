@@ -70,4 +70,25 @@ class DeepLinkFactoryTest {
 
         assertNull(deepLink)
     }
+
+    @Test
+    fun deleteBookmark() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_DELETE_BOOKMARK")
+            .putExtra("bookmark_uuid", "bookmark-id")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(DeleteBookmarkDeepLink("bookmark-id"), deepLink)
+    }
+
+    @Test
+    fun deleteBookmarkWithoutBookmarkUuid() {
+        val intent = Intent()
+            .setAction("INTENT_OPEN_APP_DELETE_BOOKMARK")
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
 }

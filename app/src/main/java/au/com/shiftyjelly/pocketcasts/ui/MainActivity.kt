@@ -52,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
+import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -80,7 +81,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SOURCE_VIEW
@@ -1252,12 +1252,11 @@ class MainActivity :
                     is ShowBookmarkDeepLink -> {
                         viewModel.viewBookmark(deepLink.bookmarkUuid)
                     }
+                    is DeleteBookmarkDeepLink -> {
+                        viewModel.deleteBookmark(deepLink.bookmarkUuid)
+                        notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
+                    }
                 }
-            } else if (action == Settings.INTENT_OPEN_APP_DELETE_BOOKMARK) {
-                intent.getStringExtra(BOOKMARK_UUID)?.let {
-                    viewModel.deleteBookmark(it)
-                }
-                notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
             } else if (action == Settings.INTENT_OPEN_APP_PODCAST_UUID) {
                 intent.getStringExtra(PODCAST_UUID)?.let {
                     openPodcastPage(it, intent.getStringExtra(SOURCE_VIEW))

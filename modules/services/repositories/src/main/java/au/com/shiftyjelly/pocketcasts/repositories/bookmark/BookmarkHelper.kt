@@ -10,12 +10,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
@@ -88,7 +87,7 @@ private fun buildAndShowNotification(
     val deleteAction = NotificationCompat.Action(
         R.drawable.ic_delete_black,
         context.getString(LR.string.bookmark_notification_action_delete_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid),
+        buildPendingIntent(context, DeleteBookmarkDeepLink(bookmarkUuid).toIntent(context)),
     )
 
     val notification = NotificationCompat.Builder(
@@ -115,22 +114,6 @@ private fun buildAndShowNotification(
     } else {
         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Post notification permission not granted.")
     }
-}
-
-private fun buildPendingIntent(
-    context: Context,
-    actionKey: String,
-    bookmarkUuid: String,
-): PendingIntent {
-    val appIntent = context.packageManager
-        .getLaunchIntentForPackage(context.packageName)
-        ?.apply {
-            action = actionKey
-            putExtra(Settings.BOOKMARK_UUID, bookmarkUuid)
-            putExtra(INTENT_EXTRA_NOTIFICATION_TAG, "${Settings.BOOKMARK_UUID}_$bookmarkUuid")
-        }
-
-    return buildPendingIntent(context, appIntent)
 }
 
 private fun buildPendingIntent(
