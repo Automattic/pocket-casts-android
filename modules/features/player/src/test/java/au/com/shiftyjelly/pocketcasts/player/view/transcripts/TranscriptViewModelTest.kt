@@ -114,27 +114,37 @@ class TranscriptViewModelTest {
     }
 
     @Test
-    fun `new line added to dot at the end of cue text`() = runTest {
+    fun `new line added after period, exclamation mark, or question mark at end of cue text`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         initViewModel()
-        val cuesWithTiming = CuesWithTiming(listOf(Cue.Builder().setText("Text.").build()), 0L, 0L)
+        val cuesWithTiming = CuesWithTiming(
+            listOf(
+                Cue.Builder().setText("Text.").build(),
+                Cue.Builder().setText("Text!").build(),
+                Cue.Builder().setText("Text?").build(),
+            ),
+            0L,
+            0L,
+        )
 
         val result = viewModel.modifiedCues(cuesWithTiming)
 
         assertTrue(result[0].text == "Text.\n\n")
+        assertTrue(result[1].text == "Text!\n\n")
+        assertTrue(result[2].text == "Text?\n\n")
     }
 
     @Test
-    fun `new line not added to dot in middle of the cue text`() = runTest {
+    fun `new line not added after period, exclamation mark, or question mark in middle of the cue text`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         initViewModel()
-        val cuesWithTiming = CuesWithTiming(listOf(Cue.Builder().setText("Text1. Text2.").build()), 0L, 0L)
+        val cuesWithTiming = CuesWithTiming(listOf(Cue.Builder().setText("Text1.!? Text2").build()), 0L, 0L)
 
         val result = viewModel.modifiedCues(cuesWithTiming)
 
-        assertTrue(result[0].text == "Text1. Text2.\n\n")
+        assertTrue(result[0].text == "Text1.!? Text2")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

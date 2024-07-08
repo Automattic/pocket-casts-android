@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,9 +29,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// TODO: [Transcript] Modify SpeakerRegex for non english languages
-private val SpeakerRegex = Pattern.compile("Speaker \\d*: ")
-private val NewLineRegex = Pattern.compile("\\.$")
+// TODO: [Transcript] Modify regex for non english languages
+private val SpeakerRegex = """Speaker \d+: """.toRegex()
+private val NewLineRegex = """[.?!]$""".toRegex()
 
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
@@ -125,8 +124,8 @@ class TranscriptViewModel @Inject constructor(
         cuesWithTiming.cues.map { cue ->
             val cueBuilder = cue.buildUpon()
             val newText = cue.text.toString()
-                .replace(SpeakerRegex.toRegex(), "")
-                .replace(NewLineRegex.toRegex(), ".\n\n")
+                .replace(SpeakerRegex, "")
+                .replace(NewLineRegex, "${cue.text.toString().last()}\n\n")
             cueBuilder.setText(newText)
             cueBuilder.build()
         }
