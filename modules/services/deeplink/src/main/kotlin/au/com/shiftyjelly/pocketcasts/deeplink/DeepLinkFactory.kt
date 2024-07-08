@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_I
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
+import au.com.shiftyjelly.pocketcasts.deeplink.PodloveAdapter.Companion.PODLOVE_REGEX
 import timber.log.Timber
 
 class DeepLinkFactory(
@@ -32,6 +33,7 @@ class DeepLinkFactory(
         ShowPageAdapter(),
         PocketCastsWebsiteAdapter(webBaseHost),
         PodloveAdapter(),
+        SonosAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -174,5 +176,20 @@ private class PodloveAdapter : DeepLinkAdapter {
 
     private companion object {
         private val PODLOVE_REGEX = """^pktc://(subscribe|subscribehttps)/(.{3,})$""".toRegex()
+    }
+}
+
+private class SonosAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+        val state = uriData?.getQueryParameter("state")
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "applink" && state != null) {
+            SonosDeepLink(state)
+        } else {
+            null
+        }
     }
 }

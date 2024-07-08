@@ -64,6 +64,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
@@ -1299,15 +1300,15 @@ class MainActivity :
                     is ShowPodcastFromUrlDeepLink -> {
                         openPodcastUrl(deepLink.url)
                     }
+                    is SonosDeepLink -> {
+                        startActivityForResult(
+                            SonosAppLinkActivity.buildIntent(deepLink.state, this),
+                            SonosAppLinkActivity.SONOS_APP_ACTIVITY_RESULT,
+                        )
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isSonosAppLinkUrl(intent)) {
-                    startActivityForResult(
-                        SonosAppLinkActivity.buildIntent(intent, this),
-                        SonosAppLinkActivity.SONOS_APP_ACTIVITY_RESULT,
-                    )
-                    return
-                } else if (IntentUtil.isPodcastListShare(intent) || IntentUtil.isPodcastListShareMobile(
+                if (IntentUtil.isPodcastListShare(intent) || IntentUtil.isPodcastListShareMobile(
                         intent,
                     )
                 ) {

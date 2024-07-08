@@ -30,9 +30,9 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
         const val SONOS_APP_ACTIVITY_RESULT = 1007
         const val SONOS_STATE_EXTRA = "state"
 
-        fun buildIntent(intent: Intent, context: Context): Intent {
+        fun buildIntent(state: String, context: Context): Intent {
             return Intent(context, SonosAppLinkActivity::class.java).apply {
-                putExtra(SonosAppLinkActivity.SONOS_STATE_EXTRA, intent.data?.query)
+                putExtra(SonosAppLinkActivity.SONOS_STATE_EXTRA, state)
             }
         }
     }
@@ -107,7 +107,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
             val sonosToken = response.accessToken
 
             val code = URLEncoder.encode(sonosToken.value, "UTF-8")
-            val state = sonosState.replace("state=", "")
+            val state = sonosState
 
             val result = Intent().apply {
                 putExtra("code", code)
