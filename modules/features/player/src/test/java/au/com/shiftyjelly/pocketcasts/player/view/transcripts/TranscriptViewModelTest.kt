@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
+import androidx.media3.common.text.Cue
+import androidx.media3.extractor.text.CuesWithTiming
 import androidx.media3.extractor.text.SubtitleParser
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -97,6 +99,42 @@ class TranscriptViewModelTest {
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.FailedToLoad)
         }
+    }
+
+    @Test
+    fun `speaker is trimmed from cue text`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        initViewModel()
+        val cuesWithTiming = CuesWithTiming(listOf(Cue.Builder().setText("Speaker 11: Text").build()), 0L, 0L)
+
+        val result = viewModel.modifiedCues(cuesWithTiming)
+
+        assertTrue(result[0].text == "Text")
+    }
+
+    @Test
+    fun `new line added to dot at the end of cue text`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        initViewModel()
+        val cuesWithTiming = CuesWithTiming(listOf(Cue.Builder().setText("Text.").build()), 0L, 0L)
+
+        val result = viewModel.modifiedCues(cuesWithTiming)
+
+        assertTrue(result[0].text == "Text.\n\n")
+    }
+
+    @Test
+    fun `new line not added to dot in middle of the cue text`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        initViewModel()
+        val cuesWithTiming = CuesWithTiming(listOf(Cue.Builder().setText("Text1. Text2.").build()), 0L, 0L)
+
+        val result = viewModel.modifiedCues(cuesWithTiming)
+
+        assertTrue(result[0].text == "Text1. Text2.\n\n")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Format
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,6 +29,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+// TODO: [Transcript] Modify SpeakerRegex for non english languages
+private val SpeakerRegex = Pattern.compile("Speaker \\d*: ")
+private val NewLineRegex = Pattern.compile("\\.$")
 
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
@@ -94,12 +100,36 @@ class TranscriptViewModel @Inject constructor(
                     data,
                     SubtitleParser.OutputOptions.allCues(),
                 ) { element: CuesWithTiming? ->
-                    element?.let { result.add(it) }
+                    element?.let {
+                        result.add(
+                            CuesWithTiming(
+                                modifiedCues(it),
+                                it.startTimeUs,
+                                it.endTimeUs,
+                            ),
+                        )
+                    }
                 }
             }
             CuesWithTimingSubtitle(result.build())
         }
     }
+
+    /**
+     * Modifies the cues in the given [CuesWithTiming] object.
+     * - Removes speaker names from the cue text using the [SpeakerRegex].
+     * - Replaces cue text ending with dot with newlines.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun modifiedCues(cuesWithTiming: CuesWithTiming) =
+        cuesWithTiming.cues.map { cue ->
+            val cueBuilder = cue.buildUpon()
+            val newText = cue.text.toString()
+                .replace(SpeakerRegex.toRegex(), "")
+                .replace(NewLineRegex.toRegex(), ".\n\n")
+            cueBuilder.setText(newText)
+            cueBuilder.build()
+        }
 
     data class PodcastAndEpisode(
         val podcast: Podcast?,
