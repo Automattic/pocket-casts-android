@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
@@ -11,7 +12,9 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EP
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_ID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_NOTIFICATION_TAG
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 
@@ -32,6 +35,8 @@ sealed interface DeepLink {
         const val EXTRA_EPISODE_UUID = "episode_uuid"
         const val EXTRA_SOURCE_VIEW = "source_view"
         const val EXTRA_NOTIFICATION_TAG = "NOTIFICATION_TAG"
+        const val EXTRA_PAGE = "launch-page"
+        const val EXTRA_FILTER_ID = "playlist-id"
     }
 }
 
@@ -94,6 +99,35 @@ data class ShowEpisodeDeepLink(
         .putExtra(EXTRA_EPISODE_UUID, episodeUuid)
         .putExtra(EXTRA_PODCAST_UUID, podcastUuid)
         .putExtra(EXTRA_SOURCE_VIEW, sourceView)
+}
+
+sealed interface ShowPageDeepLink : DeepLink {
+    val pageId: String
+
+    override fun toIntent(context: Context) = context.launcherIntent
+        .setAction(ACTION_VIEW)
+        .putExtra(EXTRA_PAGE, pageId)
+}
+
+data object ShowPodcastsDeepLink : ShowPageDeepLink {
+    override val pageId = "podcasts"
+}
+
+data object ShowDiscoverDeepLink : ShowPageDeepLink {
+    override val pageId = "search"
+}
+
+data object ShowUpNextDeepLink : ShowPageDeepLink {
+    override val pageId = "upnext"
+}
+
+data class ShowFilterDeepLink(
+    val filterId: Long,
+) : ShowPageDeepLink {
+    override val pageId = "playlist"
+
+    override fun toIntent(context: Context) = super.toIntent(context)
+        .putExtra(EXTRA_FILTER_ID, filterId)
 }
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {

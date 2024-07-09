@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
@@ -10,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EP
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_ID
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 import timber.log.Timber
@@ -23,6 +26,7 @@ class DeepLinkFactory {
         DeleteBookmarkAdapter(),
         ShowPodcastAdapter(),
         ShowEpisodeAdapter(),
+        ShowPageAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -123,5 +127,19 @@ private class ShowEpisodeAdapter : DeepLinkAdapter {
     private companion object {
         // We match on this pattern to handle notification intents that add numbers to actions for pending intents
         private val ACTION_REGEX = ("^" + ACTION_OPEN_EPISODE + """\d*$""").toRegex()
+    }
+}
+
+private class ShowPageAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent) = if (intent.action == ACTION_VIEW) {
+        when (intent.getStringExtra(EXTRA_PAGE)) {
+            "podcasts" -> ShowPodcastsDeepLink
+            "search" -> ShowDiscoverDeepLink
+            "upnext" -> ShowUpNextDeepLink
+            "playlist" -> ShowFilterDeepLink(filterId = intent.getLongExtra(EXTRA_FILTER_ID, -1))
+            else -> null
+        }
+    } else {
+        null
     }
 }

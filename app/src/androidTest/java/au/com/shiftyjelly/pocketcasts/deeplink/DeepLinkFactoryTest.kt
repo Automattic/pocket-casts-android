@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -186,5 +187,50 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", sourceView = null), deepLink)
+    }
+
+    @Test
+    fun showPodcasts() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .putExtra("launch-page", "podcasts")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastsDeepLink, deepLink)
+    }
+
+    @Test
+    fun showDiscover() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .putExtra("launch-page", "search")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowDiscoverDeepLink, deepLink)
+    }
+
+    @Test
+    fun showUpNext() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .putExtra("launch-page", "upnext")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowUpNextDeepLink, deepLink)
+    }
+
+    @Test
+    fun showFilter() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .putExtra("launch-page", "playlist")
+            .putExtra("playlist-id", 10L)
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowFilterDeepLink(filterId = 10), deepLink)
     }
 }
