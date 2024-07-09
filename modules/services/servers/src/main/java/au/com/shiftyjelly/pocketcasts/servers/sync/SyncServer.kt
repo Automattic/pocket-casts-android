@@ -168,4 +168,7 @@ interface SyncServer {
 
     @POST("/user/podcast_rating/add")
     suspend fun addPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingAddRequest): PodcastRatingAddResponse
+
+    @GET("/user/podcast_rating/list")
+    suspend fun getPodcastRating(@Header("Authorization") authorization: String): PodcastRatingAddListResponse
 }

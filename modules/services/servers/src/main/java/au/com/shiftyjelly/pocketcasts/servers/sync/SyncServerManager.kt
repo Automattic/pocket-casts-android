@@ -273,6 +273,10 @@ open class SyncServerManager @Inject constructor(
         return server.addPodcastRating(addBearer(token), request)
     }
 
+    suspend fun getPodcastRating(token: AccessToken): PodcastRatingAddListResponse {
+        return server.getPodcastRating(addBearer(token))
+    }
+
     fun signOut() {
         cache.evictAll()
     }
