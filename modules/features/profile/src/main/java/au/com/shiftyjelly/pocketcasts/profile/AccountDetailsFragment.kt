@@ -121,6 +121,7 @@ class AccountDetailsFragment : BaseFragment() {
             if (signInState is SignInState.SignedIn) {
                 binding.btnChangeAvatar?.setOnClickListener {
                     analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+                    Gravatar.refreshGravatarTimestamp()
                     context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
                 }
             }
