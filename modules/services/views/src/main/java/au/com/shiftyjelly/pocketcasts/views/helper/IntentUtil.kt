@@ -7,7 +7,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
@@ -18,10 +17,6 @@ import java.util.regex.Matcher
 import timber.log.Timber
 
 object IntentUtil {
-
-    fun isPocketCastsWebsite(intent: Intent): Boolean {
-        return intent.data?.host == BuildConfig.WEB_BASE_HOST
-    }
 
     fun isPodloveUrl(intent: Intent): Boolean {
         val scheme = intent.scheme

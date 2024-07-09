@@ -19,8 +19,6 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 
 sealed interface DeepLink {
-    fun toIntent(context: Context): Intent
-
     companion object {
         const val ACTION_OPEN_DOWNLOADS = "INTENT_OPEN_APP_DOWNLOADING"
         const val ACTION_OPEN_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
@@ -40,12 +38,16 @@ sealed interface DeepLink {
     }
 }
 
-data object DownloadsDeepLink : DeepLink {
+sealed interface IntentableDeepLink : DeepLink {
+    fun toIntent(context: Context): Intent
+}
+
+data object DownloadsDeepLink : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_DOWNLOADS)
 }
 
-data object AddBookmarkDeepLink : DeepLink {
+data object AddBookmarkDeepLink : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_ADD_BOOKMARK)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -53,7 +55,7 @@ data object AddBookmarkDeepLink : DeepLink {
 
 data class ChangeBookmarkTitleDeepLink(
     val bookmarkUuid: String,
-) : DeepLink {
+) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_CHANGE_BOOKMARK_TITLE)
         .putExtra(EXTRA_BOOKMARK_UUID, bookmarkUuid)
@@ -62,7 +64,7 @@ data class ChangeBookmarkTitleDeepLink(
 
 data class ShowBookmarkDeepLink(
     val bookmarkUuid: String,
-) : DeepLink {
+) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_BOOKMARK)
         .putExtra(EXTRA_BOOKMARK_UUID, bookmarkUuid)
@@ -71,7 +73,7 @@ data class ShowBookmarkDeepLink(
 
 data class DeleteBookmarkDeepLink(
     val bookmarkUuid: String,
-) : DeepLink {
+) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_DELETE_BOOKMARK)
         .putExtra(EXTRA_BOOKMARK_UUID, bookmarkUuid)
@@ -81,7 +83,7 @@ data class DeleteBookmarkDeepLink(
 data class ShowPodcastDeepLink(
     val podcastUuid: String,
     val sourceView: String?,
-) : DeepLink {
+) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_PODCAST)
         .putExtra(EXTRA_PODCAST_UUID, podcastUuid)
@@ -92,7 +94,7 @@ data class ShowEpisodeDeepLink(
     val episodeUuid: String,
     val podcastUuid: String?,
     val sourceView: String?,
-) : DeepLink {
+) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_EPISODE)
         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -101,7 +103,7 @@ data class ShowEpisodeDeepLink(
         .putExtra(EXTRA_SOURCE_VIEW, sourceView)
 }
 
-sealed interface ShowPageDeepLink : DeepLink {
+sealed interface ShowPageDeepLink : IntentableDeepLink {
     val pageId: String
 
     override fun toIntent(context: Context) = context.launcherIntent
@@ -129,6 +131,8 @@ data class ShowFilterDeepLink(
     override fun toIntent(context: Context) = super.toIntent(context)
         .putExtra(EXTRA_FILTER_ID, filterId)
 }
+
+data object PocketCastsWebsiteDeepLink : DeepLink
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
