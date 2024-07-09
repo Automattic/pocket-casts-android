@@ -38,6 +38,7 @@ class GiveRatingViewModel @Inject constructor(
         data class Loaded(
             val podcastUuid: String,
             val podcastTitle: String,
+            val rate: Int?,
             private val _stars: Stars?,
         ) : State() {
             val stars: Stars = _stars
@@ -97,21 +98,27 @@ class GiveRatingViewModel @Inject constructor(
             if (podcast == null) {
                 _state.value = State.ErrorWhenLoadingPodcast
             } else {
-                val response = syncManager.getPodcastRating()
-                val ratedPodcast = response.list.firstOrNull { it.podcastUuid == podcastUuid }
+                try {
+                    val response = syncManager.getPodcastRating()
+                    val ratedPodcast = response.list.firstOrNull { it.podcastUuid == podcastUuid }
 
-                if (ratedPodcast != null) {
-                    _state.value = State.Loaded(
-                        podcastUuid = podcast.uuid,
-                        podcastTitle = podcast.title,
-                        _stars = ratingToStars(ratedPodcast.podcastRating.toDouble()),
-                    )
-                } else {
-                    _state.value = State.Loaded(
-                        podcastUuid = podcast.uuid,
-                        podcastTitle = podcast.title,
-                        _stars = null,
-                    )
+                    if (ratedPodcast != null) {
+                        _state.value = State.Loaded(
+                            podcastUuid = podcast.uuid,
+                            podcastTitle = podcast.title,
+                            _stars = ratingToStars(ratedPodcast.podcastRating.toDouble()),
+                            rate = ratedPodcast.podcastRating,
+                        )
+                    } else {
+                        _state.value = State.Loaded(
+                            podcastUuid = podcast.uuid,
+                            podcastTitle = podcast.title,
+                            _stars = null,
+                            rate = null,
+                        )
+                    }
+                } catch (e: Exception) {
+                    _state.value = State.ErrorWhenLoadingPodcast
                 }
             }
         }

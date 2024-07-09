@@ -72,6 +72,7 @@ fun GiveRatingScreen(
                 Spacer(Modifier.height(32.dp))
 
                 SwipeableStars(
+                    initialRate = state.rate ?: 1,
                     onStarsChanged = setRating,
                     modifier = Modifier
                         .height(48.dp)

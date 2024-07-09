@@ -54,12 +54,13 @@ private const val oneFullStarIndexInStopPoints = 2
 @Composable
 fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
+    initialRate: Int = 1,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
-    var stopPointType by remember { mutableStateOf(StopPointType.FullStars) }
+    var stopPointType by remember { mutableStateOf(StopPointType.InitialStars) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
     var touchX by remember { mutableStateOf(0f) }
     var iconPositions by remember { mutableStateOf(listOf<Position>()) }
@@ -69,6 +70,7 @@ fun SwipeableStars(
         touchX = touchX,
         stopPoints = stopPoints,
         stopPointType = stopPointType,
+        initialRate,
     )
     onStarsChanged(getStarsDouble(stopPoints, desiredStopPoint))
 
@@ -203,9 +205,27 @@ private fun getDesiredStopPoint(
     touchX: Float,
     stopPoints: List<Double>,
     stopPointType: StopPointType,
+    initialRate: Int,
 ) = remember(stopPoints, touchX, stopPointType) {
     when (stopPointType) {
         StopPointType.None -> touchX // ignore stop points
+
+        StopPointType.InitialStars -> {
+            // These stop points are in between the stars, so filling to one of them will
+            // result in every star being either entirely filled or entirely unfilled
+            val betweenStarStopPoints = stopPoints.filterIndexed { i, _ -> i % 2 == 0 }
+
+            val numberOfEmptyStars = numStars - initialRate // get the number of empty stars
+
+            val indexOfFullStars = betweenStarStopPoints.lastIndex - numberOfEmptyStars
+
+            // It needs this check due a race condition that sets empty stopPoints first before setting it
+            if (betweenStarStopPoints.isEmpty()) {
+                touchX // ignore stop points
+            } else {
+                betweenStarStopPoints[indexOfFullStars].toFloat()
+            }
+        }
 
         StopPointType.FullAndHalfStars -> {
             val desiredStopPoint: Float = (
@@ -320,6 +340,7 @@ private enum class StopPointType {
     None, // No stop points
     FullStars, // stop points for full stars only
     FullAndHalfStars, // stop points for full and half stars
+    InitialStars, // this is to set a external rate
 }
 
 private enum class ChangeType {
