@@ -68,6 +68,9 @@ class GiveRatingFragment : BaseDialogFragment() {
                 }
 
                 when (val state = viewModel.state.collectAsState().value) {
+                    is GiveRatingViewModel.State.AllowedToRate -> {
+                        viewModel.loadData(state.podcastUuid)
+                    }
                     is GiveRatingViewModel.State.Loaded -> GiveRatingScreen(
                         state = state,
                         onDismiss = ::dismiss,

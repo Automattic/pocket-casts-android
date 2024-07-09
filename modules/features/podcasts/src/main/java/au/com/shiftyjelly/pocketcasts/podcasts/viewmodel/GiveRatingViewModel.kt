@@ -61,6 +61,7 @@ class GiveRatingViewModel @Inject constructor(
                 Five,
             }
         }
+        data class AllowedToRate(val podcastUuid: String) : State()
         data class NotAllowedToRate(val podcastUuid: String) : State()
         data object ErrorWhenLoadingPodcast : State()
     }
@@ -85,21 +86,29 @@ class GiveRatingViewModel @Inject constructor(
                     if (countPlayedEpisodes < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
                         _state.value = State.NotAllowedToRate(podcastUuid)
                     } else {
-                        val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
-                        if (podcast == null) {
-                            _state.value = State.ErrorWhenLoadingPodcast
-                        } else {
-                            val rating = ratingsManager.podcastRatings(podcastUuid).first()
-                            val stars: Stars? = getStarsFromRating(rating)
-
-                            _state.value = State.Loaded(
-                                podcastUuid = podcast.uuid,
-                                podcastTitle = podcast.title,
-                                _stars = stars,
-                            )
-                        }
+                        _state.value = State.AllowedToRate(podcastUuid)
                     }
                 }
+            }
+        }
+    }
+
+    fun loadData(podcastUuid: String) {
+        viewModelScope.launch {
+            _state.value = State.Loading
+
+            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+            if (podcast == null) {
+                _state.value = State.ErrorWhenLoadingPodcast
+            } else {
+                val rating = ratingsManager.podcastRatings(podcastUuid).first()
+                val stars: Stars? = getStarsFromRating(rating)
+
+                _state.value = State.Loaded(
+                    podcastUuid = podcast.uuid,
+                    podcastTitle = podcast.title,
+                    _stars = stars,
+                )
             }
         }
     }
