@@ -67,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
@@ -1314,12 +1315,12 @@ class MainActivity :
                     is CloudFilesDeepLink -> {
                         openCloudFiles()
                     }
+                    is UpgradeAccountDeepLink -> {
+                        showAccountUpgradeNowDialog(shouldClose = true)
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isUpgradeIntent(intent)) {
-                    showAccountUpgradeNowDialog(shouldClose = true)
-                    return
-                } else if (IntentUtil.isPromoCodeIntent(intent)) {
+                if (IntentUtil.isPromoCodeIntent(intent)) {
                     openPromoCode(intent)
                     return
                 } else if (IntentUtil.isShareLink(intent)) { // Must go last, catches all pktc links

@@ -128,15 +128,6 @@ object IntentUtil {
         return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
     }
 
-    fun isUpgradeIntent(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        return Uri.parse(Settings.INTENT_LINK_UPGRADE).host == intent.data?.host
-    }
-
     fun isPromoCodeIntent(intent: Intent): Boolean {
         val scheme = intent.scheme
         if (scheme == null || scheme != "pktc") {

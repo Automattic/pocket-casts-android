@@ -501,4 +501,15 @@ class DeepLinkFactoryTest {
 
         assertEquals(CloudFilesDeepLink, deepLink)
     }
+
+    @Test
+    fun upgradeAccount() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://upgrade"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(UpgradeAccountDeepLink, deepLink)
+    }
 }
