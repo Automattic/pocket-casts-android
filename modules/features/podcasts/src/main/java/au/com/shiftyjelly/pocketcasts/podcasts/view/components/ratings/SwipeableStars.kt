@@ -47,14 +47,11 @@ import kotlin.math.abs
 import kotlin.math.max
 
 private const val numStars = 5
-private const val zeroStarIndexInStopPoints = 0
-private const val halfStarIndexInStopPoints = 1
-private const val oneFullStarIndexInStopPoints = 2
 
 @Composable
 fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
-    initialRate: Int = 1,
+    initialRate: Int? = null,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
@@ -205,12 +202,13 @@ private fun getDesiredStopPoint(
     touchX: Float,
     stopPoints: List<Double>,
     stopPointType: StopPointType,
-    initialRate: Int,
+    initialRate: Int?,
 ) = remember(stopPoints, touchX, stopPointType) {
     when (stopPointType) {
         StopPointType.None -> touchX // ignore stop points
 
         StopPointType.InitialStars -> {
+            if (initialRate == null) return@remember touchX
             // These stop points are in between the stars, so filling to one of them will
             // result in every star being either entirely filled or entirely unfilled
             val betweenStarStopPoints = stopPoints.filterIndexed { i, _ -> i % 2 == 0 }

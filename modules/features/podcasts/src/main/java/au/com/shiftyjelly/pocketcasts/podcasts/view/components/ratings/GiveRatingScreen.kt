@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.starsToRating
 
 @Composable
 fun GiveRatingScreen(
@@ -72,7 +73,7 @@ fun GiveRatingScreen(
                 Spacer(Modifier.height(32.dp))
 
                 SwipeableStars(
-                    initialRate = state.lastRate ?: 1,
+                    initialRate = state.previousRate?.let { starsToRating(it) },
                     onStarsChanged = setRating,
                     modifier = Modifier
                         .height(48.dp)
@@ -82,12 +83,14 @@ fun GiveRatingScreen(
 
             Spacer(Modifier.weight(1f))
 
-            if (state.isChangingRate) {
+            if (state.previousRate != state.currentSelectedRate) {
                 RowButton(
                     text = stringResource(R.string.submit),
                     onClick = submitRating,
+                    enabled = state.currentSelectedRate != GiveRatingViewModel.State.Loaded.Stars.Zero,
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.theme.colors.primaryText01,
+                        disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
                     ),
                 )
             }

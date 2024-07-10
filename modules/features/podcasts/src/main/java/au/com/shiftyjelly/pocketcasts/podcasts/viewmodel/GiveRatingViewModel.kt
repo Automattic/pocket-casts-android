@@ -40,11 +40,10 @@ class GiveRatingViewModel @Inject constructor(
         data class Loaded(
             val podcastUuid: String,
             val podcastTitle: String,
-            val lastRate: Int?,
-            private val _stars: Stars?,
+            val previousRate: Stars?,
+            private val _currentSelectedRate: Stars?,
         ) : State() {
-            val stars: Stars = _stars ?: Stars.Zero
-            val isChangingRate = lastRate != starsToRating(stars)
+            val currentSelectedRate: Stars = _currentSelectedRate ?: Stars.Zero
 
             enum class Stars {
                 Zero,
@@ -102,16 +101,16 @@ class GiveRatingViewModel @Inject constructor(
                     _state.value = State.Loaded(
                         podcastUuid = podcast.uuid,
                         podcastTitle = podcast.title,
-                        _stars = ratingToStars(ratedPodcast.podcastRating.toDouble()),
-                        lastRate = ratedPodcast.podcastRating,
+                        _currentSelectedRate = ratingToStars(ratedPodcast.podcastRating.toDouble()),
+                        previousRate = ratingToStars(ratedPodcast.podcastRating.toDouble()),
                     )
                 } catch (e: HttpException) {
                     if (e.code() == 404) { // Does not have previous rate
                         _state.value = State.Loaded(
                             podcastUuid = podcast.uuid,
                             podcastTitle = podcast.title,
-                            _stars = null,
-                            lastRate = null,
+                            _currentSelectedRate = null,
+                            previousRate = null,
                         )
                     } else {
                         _state.value = State.ErrorWhenLoadingPodcast
@@ -134,7 +133,7 @@ class GiveRatingViewModel @Inject constructor(
             return
         }
 
-        val stars = (state.value as State.Loaded).stars
+        val stars = (state.value as State.Loaded).currentSelectedRate
 
         try {
             val response = syncManager.addPodcastRating(PodcastRatingAddRequest(podcastUuid, starsToRating(stars)))
@@ -151,7 +150,7 @@ class GiveRatingViewModel @Inject constructor(
         if (stateValue !is State.Loaded) {
             throw IllegalStateException("Cannot set stars when state is not CanRate")
         }
-        _state.value = stateValue.copy(_stars = stars)
+        _state.value = stateValue.copy(_currentSelectedRate = stars)
     }
 }
 
