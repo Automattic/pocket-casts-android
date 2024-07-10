@@ -18,16 +18,6 @@ import timber.log.Timber
 
 object IntentUtil {
 
-    fun isSonosAppLinkUrl(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc" || intent.data == null || intent.data?.host == null) {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "applink"
-    }
-
     fun isShareLink(intent: Intent): Boolean {
         val scheme = intent.scheme
         return scheme != null && scheme == "pktc" && intent.data != null && intent.data?.path != null
