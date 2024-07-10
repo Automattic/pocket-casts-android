@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
@@ -1318,12 +1319,12 @@ class MainActivity :
                     is UpgradeAccountDeepLink -> {
                         showAccountUpgradeNowDialog(shouldClose = true)
                     }
+                    is PromoCodeDeepLink -> {
+                        openPromoCode(deepLink.code)
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isPromoCodeIntent(intent)) {
-                    openPromoCode(intent)
-                    return
-                } else if (IntentUtil.isShareLink(intent)) { // Must go last, catches all pktc links
+                if (IntentUtil.isShareLink(intent)) { // Must go last, catches all pktc links
                     openSharingUrl(intent)
                     return
                 } else if (IntentUtil.isNativeShareLink(intent)) {
@@ -1560,13 +1561,9 @@ class MainActivity :
     }
 
     @Suppress("DEPRECATION")
-    private fun openPromoCode(intent: Intent) {
-        val code = intent.data?.lastPathSegment
-
-        if (code != null) {
-            val accountIntent = AccountActivity.promoCodeInstance(this, code)
-            startActivityForResult(accountIntent, PROMOCODE_REQUEST_CODE)
-        }
+    private fun openPromoCode(code: String) {
+        val accountIntent = AccountActivity.promoCodeInstance(this, code)
+        startActivityForResult(accountIntent, PROMOCODE_REQUEST_CODE)
     }
 
     private fun showUpgradedFromPromoCode(description: String) {

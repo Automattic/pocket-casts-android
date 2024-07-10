@@ -154,6 +154,10 @@ data object CloudFilesDeepLink : IntentableDeepLink {
 
 data object UpgradeAccountDeepLink : DeepLink
 
+data class PromoCodeDeepLink(
+    val code: String,
+) : DeepLink
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }
