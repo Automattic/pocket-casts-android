@@ -59,7 +59,7 @@ fun SwipeableStars(
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
-    var stopPointType by remember { mutableStateOf(StopPointType.None) }
+    var stopPointType by remember { mutableStateOf(StopPointType.FullStars) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
     var touchX by remember { mutableStateOf(0f) }
     var iconPositions by remember { mutableStateOf(listOf<Position>()) }
@@ -96,7 +96,7 @@ fun SwipeableStars(
                         touchX += dragAmount
                     },
                     onDragEnd = {
-                        stopPointType = StopPointType.FullAndHalfStars
+                        stopPointType = StopPointType.FullStars
                         changeType = ChangeType.Animated
                     },
                 )
@@ -234,11 +234,6 @@ private fun getDesiredStopPoint(
                 val stopPointsInTheMiddleOfStars = stopPoints
                     .filterIndexed { i, _ -> i % 2 != 0 }
 
-                // Add the 0.0 stop point so the user can tap the first quarter
-                // of the first star to select 0 stars. Anything to further to the
-                // right will be closer to the stop point in the middle of the first
-                // star, which gets translated to the first full star.
-                add(0.0)
                 addAll(stopPointsInTheMiddleOfStars)
             }
             val nearestTouchStopPoint = touchStopPoints

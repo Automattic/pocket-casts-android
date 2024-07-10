@@ -269,6 +269,10 @@ open class SyncServerManager @Inject constructor(
     fun getFileUsage(token: AccessToken): Single<FileAccount> =
         server.getFilesUsage(addBearer(token))
 
+    suspend fun addPodcastRating(request: PodcastRatingAddRequest, token: AccessToken): PodcastRatingAddResponse {
+        return server.addPodcastRating(addBearer(token), request)
+    }
+
     fun signOut() {
         cache.evictAll()
     }

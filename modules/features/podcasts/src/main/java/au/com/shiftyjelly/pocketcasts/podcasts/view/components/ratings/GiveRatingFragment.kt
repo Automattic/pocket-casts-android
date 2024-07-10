@@ -73,18 +73,26 @@ class GiveRatingFragment : BaseDialogFragment() {
                         onDismiss = ::dismiss,
                         setRating = viewModel::setRating,
                         submitRating = {
-                            viewModel.submitRating(
-                                context = context,
-                                onSuccess = {
-                                    Toast.makeText(context, "TODO: Submit rating", Toast.LENGTH_LONG).show()
-                                    dismiss()
-                                },
-                            )
+                            coroutineScope.launch {
+                                viewModel.submitRating(
+                                    podcastUuid = podcastUuid,
+                                    context = context,
+                                    onSuccess = {
+                                        Toast.makeText(context, getString(LR.string.thank_you_for_rating), Toast.LENGTH_LONG).show()
+                                        dismiss()
+                                    },
+                                    onError = {
+                                        Toast.makeText(context, getString(LR.string.something_went_wrong_to_rate_this_podcast), Toast.LENGTH_LONG).show()
+                                    },
+                                )
+                            }
                         },
                     )
                     is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(state = state, onDismiss = { dismiss() })
-                    is GiveRatingViewModel.State.FailedToRate -> {
-                        exitWithError(state.message)
+                    is GiveRatingViewModel.State.ErrorWhenLoadingPodcast -> {
+                        val error = getString(LR.string.something_went_wrong_to_rate_this_podcast)
+                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                        exitWithError(error)
                     }
                     GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
                 }
