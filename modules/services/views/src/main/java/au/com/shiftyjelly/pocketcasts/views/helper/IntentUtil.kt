@@ -128,10 +128,6 @@ object IntentUtil {
         return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
     }
 
-    fun isItunesLink(intent: Intent): Boolean {
-        return intent.data?.host == "itunes.apple.com" || intent.data?.host == "podcasts.apple.com"
-    }
-
     fun isCloudFilesIntent(intent: Intent): Boolean {
         val scheme = intent.scheme
         if (scheme == null || scheme != "pktc") {

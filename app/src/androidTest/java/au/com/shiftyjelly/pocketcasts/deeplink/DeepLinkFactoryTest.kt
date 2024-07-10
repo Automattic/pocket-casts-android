@@ -468,4 +468,26 @@ class DeepLinkFactoryTest {
 
         assertNull(deepLink)
     }
+
+    @Test
+    fun iTunes() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://itunes.apple.com/some/podcast"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://itunes.apple.com/some/podcast"), deepLink)
+    }
+
+    @Test
+    fun applePodcasts() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://podcasts.apple.com/some/podcast"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://podcasts.apple.com/some/podcast"), deepLink)
+    }
 }

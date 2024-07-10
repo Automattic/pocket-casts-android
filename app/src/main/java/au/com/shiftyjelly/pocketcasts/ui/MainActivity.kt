@@ -1312,10 +1312,7 @@ class MainActivity :
                     }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isItunesLink(intent)) {
-                    openPodcastUrl(IntentUtil.getUrl(intent))
-                    return
-                } else if (IntentUtil.isCloudFilesIntent(intent)) {
+                if (IntentUtil.isCloudFilesIntent(intent)) {
                     openCloudFiles()
                     return
                 } else if (IntentUtil.isUpgradeIntent(intent)) {
