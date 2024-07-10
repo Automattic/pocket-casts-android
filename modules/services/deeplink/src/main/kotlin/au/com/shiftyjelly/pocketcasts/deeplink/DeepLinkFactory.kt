@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_I
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
+import au.com.shiftyjelly.pocketcasts.deeplink.PodloveAdapter.Companion.PODLOVE_REGEX
 import timber.log.Timber
 
 class DeepLinkFactory(
@@ -37,6 +38,7 @@ class DeepLinkFactory(
         SonosAdapter(),
         ShareListAdapter(listHost),
         ShareListNativeAdapter(),
+        SubscribeOnAndroidAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -223,6 +225,26 @@ private class ShareListNativeAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "sharelist" && path != null) {
             ShareListDeepLink(path)
+        } else {
+            null
+        }
+    }
+}
+
+// http://subscribeonandroid.com/geeknewscentral.com/podcast.xml
+private class SubscribeOnAndroidAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+        val path = uriData?.path?.replaceFirst("/", "")?.takeIf { it.length >= 3 }
+
+        return if (intent.action == ACTION_VIEW &&
+            scheme in listOf("http", "https") &&
+            host in listOf("subscribeonandroid.com", "www.subscribeonandroid.com") &&
+            path != null
+        ) {
+            ShowPodcastFromUrlDeepLink("$scheme://$path")
         } else {
             null
         }

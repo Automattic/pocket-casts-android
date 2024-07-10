@@ -424,4 +424,48 @@ class DeepLinkFactoryTest {
 
         assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
     }
+
+    @Test
+    fun subscribeOnAndroid() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://subscribeonandroid.com/blubrry.com/feed/podcast/"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://blubrry.com/feed/podcast/"), deepLink)
+    }
+
+    @Test
+    fun subscribeOnAndroidHttp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("http://subscribeonandroid.com/blubrry.com/feed/podcast/"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("http://blubrry.com/feed/podcast/"), deepLink)
+    }
+
+    @Test
+    fun subscribeOnAndroidWithWwwHost() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://www.subscribeonandroid.com/blubrry.com/feed/podcast/"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://blubrry.com/feed/podcast/"), deepLink)
+    }
+
+    @Test
+    fun subscribeOnAndroidWithTooShortPath() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://subscribeonandroid.com/bl"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
 }
