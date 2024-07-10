@@ -44,10 +44,10 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
     companion object {
         const val EXTRA_URL = "EXTRA_URL"
 
-        fun newInstance(url: String): ShareListIncomingFragment {
+        fun newInstance(listPath: String): ShareListIncomingFragment {
             return ShareListIncomingFragment().apply {
                 arguments = bundleOf(
-                    EXTRA_URL to url,
+                    EXTRA_URL to listPath,
                 )
             }
         }

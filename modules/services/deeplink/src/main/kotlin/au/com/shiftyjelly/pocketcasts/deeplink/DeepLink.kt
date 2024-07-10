@@ -142,6 +142,10 @@ data class SonosDeepLink(
     val state: String,
 ) : DeepLink
 
+data class ShareListDeepLink(
+    val path: String,
+) : DeepLink
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }

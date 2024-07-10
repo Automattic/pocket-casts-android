@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
@@ -1306,15 +1307,12 @@ class MainActivity :
                             SonosAppLinkActivity.SONOS_APP_ACTIVITY_RESULT,
                         )
                     }
+                    is ShareListDeepLink -> {
+                        addFragment(ShareListIncomingFragment.newInstance(deepLink.path))
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isPodcastListShare(intent) || IntentUtil.isPodcastListShareMobile(
-                        intent,
-                    )
-                ) {
-                    intent.data?.path?.let { addFragment(ShareListIncomingFragment.newInstance(it)) }
-                    return
-                } else if (IntentUtil.isSubscribeOnAndroidUrl(intent)) {
+                if (IntentUtil.isSubscribeOnAndroidUrl(intent)) {
                     openPodcastUrl(IntentUtil.getSubscribeOnAndroidUrl(intent))
                     return
                 } else if (IntentUtil.isItunesLink(intent)) {
