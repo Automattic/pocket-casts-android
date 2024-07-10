@@ -1,5 +1,8 @@
 7.69
 -----
+* Updated
+    *   App opened from a link with an episode timestamp no longer starts playing automatically.
+        ([#2479](https://github.com/Automattic/pocket-casts-android/pull/2479))
 *   Bug Fixes
     *   Links to episodes with playback position shared from the app are now correctly recognized.
         ([#2471](https://github.com/Automattic/pocket-casts-android/pull/2471))
