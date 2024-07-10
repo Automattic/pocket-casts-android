@@ -160,13 +160,9 @@ open class PlaybackManager @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private val focusManager: FocusManager by lazy {
-        FocusManager(settings, application).apply {
-            focusChangeListener = this@PlaybackManager
-        }
-    }
-    private var audioNoisyManager =
-        AudioNoisyManager(application)
+    private val focusManager = FocusManager(application, settings, this)
+
+    private var audioNoisyManager = AudioNoisyManager(application)
 
     private val bookmarkTonePlayer: MediaPlayer by lazy {
         MediaPlayer().apply {
