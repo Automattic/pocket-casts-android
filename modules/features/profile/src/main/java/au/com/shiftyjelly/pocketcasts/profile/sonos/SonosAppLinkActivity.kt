@@ -32,7 +32,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
 
         fun buildIntent(state: String, context: Context): Intent {
             return Intent(context, SonosAppLinkActivity::class.java).apply {
-                putExtra(SonosAppLinkActivity.SONOS_STATE_EXTRA, state)
+                putExtra(SONOS_STATE_EXTRA, state)
             }
         }
     }
