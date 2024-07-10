@@ -167,8 +167,8 @@ interface SyncServer {
     suspend fun getBookmarkList(@Header("Authorization") authorization: String, @Body request: BookmarkRequest): BookmarksResponse
 
     @POST("/user/podcast_rating/add")
-    suspend fun addPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingAddRequest): PodcastRatingAddResponse
+    suspend fun addPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingAddRequest): PodcastRatingResponse
 
-    @GET("/user/podcast_rating/list")
-    suspend fun getPodcastRating(@Header("Authorization") authorization: String): PodcastRatingAddListResponse
+    @POST("/user/podcast_rating/show")
+    suspend fun getPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingShowRequest): PodcastRatingResponse
 }

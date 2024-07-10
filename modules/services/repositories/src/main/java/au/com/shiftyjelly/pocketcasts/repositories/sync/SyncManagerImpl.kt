@@ -28,9 +28,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddListResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingShowRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -383,14 +383,14 @@ class SyncManagerImpl @Inject constructor(
 
     // Rating
 
-    override suspend fun addPodcastRating(request: PodcastRatingAddRequest): PodcastRatingAddResponse =
+    override suspend fun addPodcastRating(request: PodcastRatingAddRequest): PodcastRatingResponse =
         getCacheTokenOrLogin { token ->
             syncServerManager.addPodcastRating(request, token)
         }
 
-    override suspend fun getPodcastRating(): PodcastRatingAddListResponse =
+    override suspend fun getPodcastRating(request: PodcastRatingShowRequest): PodcastRatingResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.getPodcastRating(token)
+            syncServerManager.getPodcastRating(request, token)
         }
 
     // Other

@@ -10,13 +10,13 @@ data class PodcastRatingAddRequest(
 )
 
 @JsonClass(generateAdapter = true)
-data class PodcastRatingAddResponse(
+data class PodcastRatingResponse(
     @field:Json(name = "podcastUuid") val podcastUuid: String,
     @field:Json(name = "modifiedAt") val modifiedAt: String,
     @field:Json(name = "podcastRating") val podcastRating: Int,
 )
 
 @JsonClass(generateAdapter = true)
-data class PodcastRatingAddListResponse(
-    @Json(name = "podcastRatings") val list: List<PodcastRatingAddResponse>,
+data class PodcastRatingShowRequest(
+    @field:Json(name = "podcastUuid") val podcastUuid: String,
 )

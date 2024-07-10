@@ -269,12 +269,12 @@ open class SyncServerManager @Inject constructor(
     fun getFileUsage(token: AccessToken): Single<FileAccount> =
         server.getFilesUsage(addBearer(token))
 
-    suspend fun addPodcastRating(request: PodcastRatingAddRequest, token: AccessToken): PodcastRatingAddResponse {
+    suspend fun addPodcastRating(request: PodcastRatingAddRequest, token: AccessToken): PodcastRatingResponse {
         return server.addPodcastRating(addBearer(token), request)
     }
 
-    suspend fun getPodcastRating(token: AccessToken): PodcastRatingAddListResponse {
-        return server.getPodcastRating(addBearer(token))
+    suspend fun getPodcastRating(request: PodcastRatingShowRequest, token: AccessToken): PodcastRatingResponse {
+        return server.getPodcastRating(addBearer(token), request)
     }
 
     fun signOut() {
