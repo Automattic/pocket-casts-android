@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
+import android.net.Uri
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
@@ -145,6 +146,11 @@ data class SonosDeepLink(
 data class ShareListDeepLink(
     val path: String,
 ) : DeepLink
+
+data object CloudFilesDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://cloudfiles"))
+}
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"

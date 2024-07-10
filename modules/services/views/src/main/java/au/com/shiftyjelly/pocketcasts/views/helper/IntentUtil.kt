@@ -128,15 +128,6 @@ object IntentUtil {
         return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
     }
 
-    fun isCloudFilesIntent(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        return Uri.parse(Settings.INTENT_LINK_CLOUD_FILES).host == intent.data?.host
-    }
-
     fun isUpgradeIntent(intent: Intent): Boolean {
         val scheme = intent.scheme
         if (scheme == null || scheme != "pktc") {

@@ -490,4 +490,15 @@ class DeepLinkFactoryTest {
 
         assertEquals(ShowPodcastFromUrlDeepLink("https://podcasts.apple.com/some/podcast"), deepLink)
     }
+
+    @Test
+    fun cloudFiles() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://cloudfiles"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(CloudFilesDeepLink, deepLink)
+    }
 }

@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
@@ -1310,12 +1311,12 @@ class MainActivity :
                     is ShareListDeepLink -> {
                         addFragment(ShareListIncomingFragment.newInstance(deepLink.path))
                     }
+                    is CloudFilesDeepLink -> {
+                        openCloudFiles()
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isCloudFilesIntent(intent)) {
-                    openCloudFiles()
-                    return
-                } else if (IntentUtil.isUpgradeIntent(intent)) {
+                if (IntentUtil.isUpgradeIntent(intent)) {
                     showAccountUpgradeNowDialog(shouldClose = true)
                     return
                 } else if (IntentUtil.isPromoCodeIntent(intent)) {
