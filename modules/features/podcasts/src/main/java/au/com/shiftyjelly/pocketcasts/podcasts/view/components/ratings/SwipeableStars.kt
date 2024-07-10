@@ -227,26 +227,6 @@ private fun getDesiredStopPoint(
             }
         }
 
-        StopPointType.FullAndHalfStars -> {
-            val desiredStopPoint: Float = (
-                stopPoints
-                    .minByOrNull { abs(it - touchX) }
-                    ?.toFloat()
-                    ?: 0f
-                )
-
-            val desiredStarIndex = stopPoints.indexOf(desiredStopPoint.toDouble())
-
-            // Verify if the user is trying to select zero star or a half star
-            if (desiredStarIndex == zeroStarIndexInStopPoints || desiredStarIndex == halfStarIndexInStopPoints) {
-                // If trying to select zero star or a half star, we will select one full star instead
-                stopPoints.getOrNull(oneFullStarIndexInStopPoints)?.toFloat() ?: 0F
-            } else {
-                // Otherwise, we will select the desired star
-                desiredStopPoint
-            }
-        }
-
         StopPointType.FullStars -> {
             // These stop points are used to determine which star to fill based on the
             // the touch point. For that reason, these stop points are in the middle of the stars.
@@ -339,7 +319,6 @@ private data class Position(
 private enum class StopPointType {
     None, // No stop points
     FullStars, // stop points for full stars only
-    FullAndHalfStars, // stop points for full and half stars
     InitialStars, // this is to set a external rate
 }
 

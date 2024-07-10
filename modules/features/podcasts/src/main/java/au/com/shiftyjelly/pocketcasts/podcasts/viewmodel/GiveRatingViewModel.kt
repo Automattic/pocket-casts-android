@@ -38,24 +38,28 @@ class GiveRatingViewModel @Inject constructor(
         data class Loaded(
             val podcastUuid: String,
             val podcastTitle: String,
-            val rate: Int?,
+            val lastRate: Int?,
             private val _stars: Stars?,
         ) : State() {
-            val stars: Stars = _stars
-                ?: Stars.Zero
+            val stars: Stars = _stars ?: Stars.Zero
+            val isChangingRate = lastRate != starsToRating(stars)
 
             enum class Stars {
                 Zero,
-                Half,
                 One,
-                OneAndHalf,
                 Two,
-                TwoAndHalf,
                 Three,
-                ThreeAndHalf,
                 Four,
-                FourAndHalf,
                 Five,
+            }
+
+            fun starsToRating(star: Stars): Int = when (star) {
+                Stars.One -> { 1 }
+                Stars.Two -> { 2 }
+                Stars.Three -> { 3 }
+                Stars.Four -> { 4 }
+                Stars.Five -> { 5 }
+                else -> { 5 }
             }
         }
         data class NotAllowedToRate(val podcastUuid: String) : State()
@@ -107,14 +111,14 @@ class GiveRatingViewModel @Inject constructor(
                             podcastUuid = podcast.uuid,
                             podcastTitle = podcast.title,
                             _stars = ratingToStars(ratedPodcast.podcastRating.toDouble()),
-                            rate = ratedPodcast.podcastRating,
+                            lastRate = ratedPodcast.podcastRating,
                         )
                     } else {
                         _state.value = State.Loaded(
                             podcastUuid = podcast.uuid,
                             podcastTitle = podcast.title,
                             _stars = null,
-                            rate = null,
+                            lastRate = null,
                         )
                     }
                 } catch (e: Exception) {
@@ -155,21 +159,16 @@ class GiveRatingViewModel @Inject constructor(
         _state.value = stateValue.copy(_stars = stars)
     }
 
-    private fun ratingToStars(rating: Double) = when {
+    fun ratingToStars(rating: Double) = when {
         rating <= 0 -> Stars.Zero
-        rating <= 0.5 -> Stars.Half
         rating <= 1 -> Stars.One
-        rating <= 1.5 -> Stars.OneAndHalf
         rating <= 2 -> Stars.Two
-        rating <= 2.5 -> Stars.TwoAndHalf
         rating <= 3 -> Stars.Three
-        rating <= 3.5 -> Stars.ThreeAndHalf
         rating <= 4 -> Stars.Four
-        rating <= 4.5 -> Stars.FourAndHalf
         else -> Stars.Five
     }
 
-    private fun starsToRating(star: Stars): Int = when (star) {
+    fun starsToRating(star: Stars): Int = when (star) {
         Stars.One -> { 1 }
         Stars.Two -> { 2 }
         Stars.Three -> { 3 }

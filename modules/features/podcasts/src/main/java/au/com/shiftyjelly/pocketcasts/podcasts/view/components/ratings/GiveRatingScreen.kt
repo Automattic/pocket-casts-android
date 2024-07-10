@@ -72,7 +72,7 @@ fun GiveRatingScreen(
                 Spacer(Modifier.height(32.dp))
 
                 SwipeableStars(
-                    initialRate = state.rate ?: 1,
+                    initialRate = state.lastRate ?: 1,
                     onStarsChanged = setRating,
                     modifier = Modifier
                         .height(48.dp)
@@ -82,13 +82,15 @@ fun GiveRatingScreen(
 
             Spacer(Modifier.weight(1f))
 
-            RowButton(
-                text = stringResource(LR.string.submit),
-                onClick = submitRating,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.theme.colors.primaryText01,
-                ),
-            )
+            if (state.isChangingRate) {
+                RowButton(
+                    text = stringResource(LR.string.submit),
+                    onClick = submitRating,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.theme.colors.primaryText01,
+                    ),
+                )
+            }
         }
 
         NavigationIconButton(
