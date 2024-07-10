@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.deeplink
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_LIST_HOST
+import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_SHORT_URL
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
@@ -17,12 +18,12 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_I
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
-import au.com.shiftyjelly.pocketcasts.deeplink.PodloveAdapter.Companion.PODLOVE_REGEX
 import timber.log.Timber
 
 class DeepLinkFactory(
     private val webBaseHost: String = WEB_BASE_HOST,
     private val listHost: String = SERVER_LIST_HOST,
+    private val shareHost: String = SERVER_SHORT_URL.substringAfter("https://"),
 ) {
     private val adapters = listOf(
         DownloadsAdapter(),
@@ -43,6 +44,8 @@ class DeepLinkFactory(
         CloudFilesAdapter(),
         UpdageAccountAdapter(),
         PromoCodeAdapter(),
+        ShareLinkNativeAdapter(),
+        ShareLinkAdapter(shareHost),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -304,6 +307,74 @@ private class PromoCodeAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && dataString.startsWith("pktc://redeem/promo") && pathSegments.size >= 2) {
             PromoCodeDeepLink(pathSegments.last())
+        } else {
+            null
+        }
+    }
+}
+
+private class ShareLinkNativeAdapter : DeepLinkAdapter {
+    private val timestampParser = SharingUrlTimestampParser()
+
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+        val pathSegments = uriData?.pathSegments.orEmpty()
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && pathSegments.isNotEmpty() && host !in EXCLUDED_HOSTS) {
+            val timestamps = uriData.getQueryParameter("t")?.let(timestampParser::parseTimestamp)
+            NativeShareDeepLink(
+                uri = uriData,
+                startTimestamp = timestamps?.first,
+                endTimestamp = timestamps?.second,
+            )
+        } else {
+            null
+        }
+    }
+
+    private companion object {
+        val EXCLUDED_HOSTS = listOf(
+            "subscribe",
+            "subscribehttps",
+            "applink",
+            "sharelist",
+            "cloudfiles",
+            "upgrade",
+            "redeem",
+        )
+    }
+}
+
+private class ShareLinkAdapter(
+    private val shareHost: String,
+) : DeepLinkAdapter {
+    private val timestampParser = SharingUrlTimestampParser()
+
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == shareHost) {
+            val timestamps = uriData.getQueryParameter("t")?.let(timestampParser::parseTimestamp)
+            when {
+                uriData.pathSegments.size < 2 -> NativeShareDeepLink(
+                    uri = uriData,
+                    startTimestamp = timestamps?.first,
+                    endTimestamp = timestamps?.second,
+                )
+                uriData.pathSegments[0] == "podcast" -> ShowPodcastFromUrlDeepLink(uriData.toString())
+                uriData.pathSegments[0] == "episode" -> ShowEpisodeDeepLink(
+                    episodeUuid = uriData.pathSegments[1],
+                    podcastUuid = null,
+                    startTimestamp = timestamps?.first,
+                    endTimestamp = timestamps?.second,
+                    sourceView = null,
+                )
+                else -> null
+            }
         } else {
             null
         }

@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_NOTIFICA
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
+import kotlin.time.Duration
 
 sealed interface DeepLink {
     companion object {
@@ -95,6 +96,8 @@ data class ShowEpisodeDeepLink(
     val episodeUuid: String,
     val podcastUuid: String?,
     val sourceView: String?,
+    val startTimestamp: Duration? = null,
+    val endTimestamp: Duration? = null,
 ) : IntentableDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_EPISODE)
@@ -157,6 +160,19 @@ data object UpgradeAccountDeepLink : DeepLink
 data class PromoCodeDeepLink(
     val code: String,
 ) : DeepLink
+
+data class NativeShareDeepLink(
+    val uri: Uri,
+    val startTimestamp: Duration? = null,
+    val endTimestamp: Duration? = null,
+) : DeepLink {
+    val sharePath get() = buildString {
+        if (uri.pathSegments.size == 1) {
+            append("/social/share/show")
+        }
+        append(uri.path)
+    }
+}
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.utils
+package au.com.shiftyjelly.pocketcasts.deeplink
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -6,7 +6,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class SharingUrlTimestampParser {
+internal class SharingUrlTimestampParser {
     companion object {
         val intervalPattern = Regex("""^(\d+\.?\d*)$""")
         val hmsPattern = Regex("""^(?:(\d+)h)?(?:(0?[0-5]?\d)m)?(?:(0?[0-5]?\d)s)?$""")
