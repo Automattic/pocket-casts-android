@@ -25,8 +25,8 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun GiveRatingScreen(
@@ -63,7 +63,7 @@ fun GiveRatingScreen(
                 Spacer(Modifier.height(40.dp))
 
                 TextH30(
-                    text = stringResource(LR.string.podcast_rate, state.podcastTitle),
+                    text = stringResource(R.string.podcast_rate, state.podcastTitle),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.W600,
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -84,7 +84,7 @@ fun GiveRatingScreen(
 
             if (state.isChangingRate) {
                 RowButton(
-                    text = stringResource(LR.string.submit),
+                    text = stringResource(R.string.submit),
                     onClick = submitRating,
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.theme.colors.primaryText01,

@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingShowRequest
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -63,6 +65,7 @@ class GiveRatingViewModel @Inject constructor(
     fun checkIfUserCanRatePodcast(
         podcastUuid: String,
         onUserSignedOut: () -> Unit,
+        onSuccess: () -> Unit,
     ) {
         _state.value = State.Loading
 
@@ -77,14 +80,14 @@ class GiveRatingViewModel @Inject constructor(
                     if (countPlayedEpisodes < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
                         _state.value = State.NotAllowedToRate(podcastUuid)
                     } else {
-                        loadData(podcastUuid)
+                        onSuccess()
                     }
                 }
             }
         }
     }
 
-    private fun loadData(podcastUuid: String) {
+    fun loadData(podcastUuid: String) {
         viewModelScope.launch {
             _state.value = State.Loading
 
@@ -94,23 +97,24 @@ class GiveRatingViewModel @Inject constructor(
                 _state.value = State.ErrorWhenLoadingPodcast
             } else {
                 try {
-                    val response = syncManager.getPodcastRating()
-                    val ratedPodcast = response.list.firstOrNull { it.podcastUuid == podcastUuid }
+                    val ratedPodcast = syncManager.getPodcastRating(PodcastRatingShowRequest(podcastUuid))
 
-                    if (ratedPodcast != null) {
-                        _state.value = State.Loaded(
-                            podcastUuid = podcast.uuid,
-                            podcastTitle = podcast.title,
-                            _stars = ratingToStars(ratedPodcast.podcastRating.toDouble()),
-                            lastRate = ratedPodcast.podcastRating,
-                        )
-                    } else {
+                    _state.value = State.Loaded(
+                        podcastUuid = podcast.uuid,
+                        podcastTitle = podcast.title,
+                        _stars = ratingToStars(ratedPodcast.podcastRating.toDouble()),
+                        lastRate = ratedPodcast.podcastRating,
+                    )
+                } catch (e: HttpException) {
+                    if (e.code() == 404) { // Does not have previous rate
                         _state.value = State.Loaded(
                             podcastUuid = podcast.uuid,
                             podcastTitle = podcast.title,
                             _stars = null,
                             lastRate = null,
                         )
+                    } else {
+                        _state.value = State.ErrorWhenLoadingPodcast
                     }
                 } catch (e: Exception) {
                     _state.value = State.ErrorWhenLoadingPodcast
