@@ -22,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
-import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -57,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
@@ -144,7 +144,6 @@ import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
-import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -1327,36 +1326,10 @@ class MainActivity :
                     is NativeShareDeepLink -> {
                         openSharingUrl(deepLink)
                     }
-                }
-            } else if (action == Intent.ACTION_VIEW) {
-                val scheme = intent.scheme
-                if (scheme != null) {
-                    // import opml from email
-                    if (scheme == "content") {
-                        val uri = Uri.parse(intent.dataString)
-                        OpmlImportTask.run(uri, this)
-                    }
-                    // import podcast feed
-                    else if (scheme == "rss" || scheme == "feed" || scheme == "pcast" || scheme == "itpc" || scheme == "http" || scheme == "https") {
-                        openPodcastUrl(IntentUtil.getUrl(intent))
-                    }
-                    // import opml from file
-                    else if (intent.data != null) {
-                        val uri = intent.data ?: return
-                        OpmlImportTask.run(uri, this)
+                    is OpmlImportDeepLink -> {
+                        OpmlImportTask.run(deepLink.uri, this)
                     }
                 }
-                // import opml from file
-                else if (intent.data != null) {
-                    val uri = intent.data ?: return
-                    OpmlImportTask.run(uri, this)
-                }
-            } else if (action == Intent.ACTION_SEND &&
-                intent.type in listOf("text/x-opml", "application/octet-stream")
-            ) {
-                // Import opml from share sheet
-                val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
-                OpmlImportTask.run(uri, this)
             } else if (action == MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) {
                 val bundle = intent.extras ?: return
                 playbackManager.mediaSessionManager.playFromSearchExternal(bundle)

@@ -1,7 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
+import android.content.Intent.ACTION_SEND
 import android.content.Intent.ACTION_VIEW
+import android.content.Intent.EXTRA_STREAM
+import android.net.Uri
+import androidx.core.content.IntentCompat
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_LIST_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_SHORT_URL
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.WEB_BASE_HOST
@@ -46,6 +50,8 @@ class DeepLinkFactory(
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
         ShareLinkAdapter(shareHost),
+        OpmlAdapter(listOf(listHost, shareHost)),
+        PodcastUrlSchemeAdapter(listOf(listHost, shareHost)),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -378,5 +384,76 @@ private class ShareLinkAdapter(
         } else {
             null
         }
+    }
+}
+
+private class OpmlAdapter(
+    excludedHosts: List<String>,
+) : DeepLinkAdapter {
+    private val excludedHosts = EXCLUDED_HOSTS + excludedHosts
+
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_SEND) {
+            val uri = IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java)
+            uri?.let(::OpmlImportDeepLink)
+        } else if (intent.action == ACTION_VIEW && uriData != null && scheme !in EXCLUDED_SCHEMES && host !in excludedHosts) {
+            OpmlImportDeepLink(uriData)
+        } else {
+            null
+        }
+    }
+
+    private companion object {
+        val EXCLUDED_SCHEMES = listOf("rss", "feed", "pcast", "itpc", "http", "https")
+
+        val EXCLUDED_HOSTS = listOf(
+            "subscribe",
+            "subscribehttps",
+            "applink",
+            "sharelist",
+            "cloudfiles",
+            "upgrade",
+            "redeem",
+            "subscribeonandroid.com",
+            "www.subscribeonandroid.com",
+        )
+    }
+}
+
+private class PodcastUrlSchemeAdapter(
+    excludedHosts: List<String>,
+) : DeepLinkAdapter {
+    private val excludedHosts = EXCLUDED_HOSTS + excludedHosts
+
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+
+        return if (intent.action == ACTION_VIEW && uriData != null && scheme in ALLOWED_SCHEMES && host !in excludedHosts) {
+            ShowPodcastFromUrlDeepLink(uriData.toString())
+        } else {
+            null
+        }
+    }
+
+    private companion object {
+        val ALLOWED_SCHEMES = listOf("rss", "feed", "pcast", "itpc", "http", "https")
+
+        val EXCLUDED_HOSTS = listOf(
+            "subscribe",
+            "subscribehttps",
+            "applink",
+            "sharelist",
+            "cloudfiles",
+            "upgrade",
+            "redeem",
+            "subscribeonandroid.com",
+            "www.subscribeonandroid.com",
+        )
     }
 }
