@@ -28,9 +28,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingShowRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -46,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
@@ -383,14 +381,14 @@ class SyncManagerImpl @Inject constructor(
 
     // Rating
 
-    override suspend fun addPodcastRating(request: PodcastRatingAddRequest): PodcastRatingResponse =
+    override suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.addPodcastRating(request, token)
+            syncServerManager.addPodcastRating(podcastUuid, rate, token)
         }
 
-    override suspend fun getPodcastRating(request: PodcastRatingShowRequest): PodcastRatingResponse =
+    override suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.getPodcastRating(request, token)
+            syncServerManager.getPodcastRating(podcastUuid, token)
         }
 
     // Other

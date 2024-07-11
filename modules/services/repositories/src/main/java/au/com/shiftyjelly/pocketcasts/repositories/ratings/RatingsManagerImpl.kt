@@ -4,8 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingShowRequest
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -39,14 +37,14 @@ class RatingsManagerImpl @Inject constructor(
     }
 
     override suspend fun submitPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResult = try {
-        syncManager.addPodcastRating(PodcastRatingAddRequest(podcastUuid, rate))
+        syncManager.addPodcastRating(podcastUuid, rate)
         PodcastRatingResult.Success(rate.toDouble())
     } catch (e: Exception) {
         PodcastRatingResult.Error(e)
     }
 
     override suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResult = try {
-        val rate = syncManager.getPodcastRating(PodcastRatingShowRequest(podcastUuid))
+        val rate = syncManager.getPodcastRating(podcastUuid)
         PodcastRatingResult.Success(rate.podcastRating.toDouble())
     } catch (e: HttpException) {
         if (e.code() == 404) {

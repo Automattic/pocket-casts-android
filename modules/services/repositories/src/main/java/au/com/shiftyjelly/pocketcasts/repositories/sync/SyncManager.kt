@@ -15,9 +15,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingShowRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -28,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
@@ -92,8 +90,8 @@ interface SyncManager : NamedSettingsCaller {
     fun episodeSync(request: EpisodeSyncRequest): Completable
 
     // Rating
-    suspend fun addPodcastRating(request: PodcastRatingAddRequest): PodcastRatingResponse
-    suspend fun getPodcastRating(request: PodcastRatingShowRequest): PodcastRatingResponse
+    suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse
+    suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResponse
 
     // Other
     suspend fun exchangeSonos(): ExchangeSonosResponse
