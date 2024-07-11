@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -14,6 +15,7 @@ class DeepLinkFactoryTest {
     private val factory = DeepLinkFactory(
         webBaseHost = "pocketcasts.com",
         listHost = "lists.pocketcasts.com",
+        shareHost = "pca.st",
     )
 
     @Test
@@ -305,17 +307,6 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun podloveWithWrongHost() {
-        val intent = Intent()
-            .setAction(ACTION_VIEW)
-            .setData(Uri.parse("pktc://subscribehttp/mypodcast.com/rss/123"))
-
-        val deepLink = factory.create(intent)
-
-        assertNull(deepLink)
-    }
-
-    @Test
     fun podloveWithShortPath() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
@@ -536,10 +527,28 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun promoCodeWithoutPromoPath() {
+    fun nativeShare() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
-            .setData(Uri.parse("pktc://redeem/ABC-123"))
+            .setData(Uri.parse("pktc://some/link"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            NativeShareDeepLink(
+                uri = Uri.parse("pktc://some/link"),
+                startTimestamp = null,
+                endTimestamp = null,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun nativeShareWithoutPath() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://some/"))
 
         val deepLink = factory.create(intent)
 
@@ -547,13 +556,182 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun promoCodeWithoutCode() {
+    fun nativeShareWithStartTimestamp() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
-            .setData(Uri.parse("pktc://redeem/promo/"))
+            .setData(Uri.parse("pktc://some/link?t=15"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            NativeShareDeepLink(
+                uri = Uri.parse("pktc://some/link?t=15"),
+                startTimestamp = 15.seconds,
+                endTimestamp = null,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun nativeShareWithTimestamps() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://some/link?t=75,125"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            NativeShareDeepLink(
+                uri = Uri.parse("pktc://some/link?t=75,125"),
+                startTimestamp = 75.seconds,
+                endTimestamp = 125.seconds,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareAsNativeShare() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/something"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            NativeShareDeepLink(
+                uri = Uri.parse("https://pca.st/something"),
+                startTimestamp = null,
+                endTimestamp = null,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareAsNativeShareWithStartTimestamp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/something?t=11"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            NativeShareDeepLink(
+                uri = Uri.parse("https://pca.st/something?t=11"),
+                startTimestamp = 11.seconds,
+                endTimestamp = null,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareAsNativeShareWithTimestamps() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/something?t=40,90"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            NativeShareDeepLink(
+                uri = Uri.parse("https://pca.st/something?t=40,90"),
+                startTimestamp = 40.seconds,
+                endTimestamp = 90.seconds,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun sharePodcast() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/podcast/podcast-id"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://pca.st/podcast/podcast-id"), deepLink)
+    }
+
+    @Test
+    fun shareEpisode() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/episode/episode-id"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            ShowEpisodeDeepLink(
+                episodeUuid = "episode-id",
+                podcastUuid = null,
+                sourceView = null,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareEpisodeWithStartTimestamp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/episode/episode-id?t=15"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            ShowEpisodeDeepLink(
+                episodeUuid = "episode-id",
+                podcastUuid = null,
+                startTimestamp = 15.seconds,
+                sourceView = null,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareEpisodeWithTimestamps() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/episode/episode-id?t=15,55"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            ShowEpisodeDeepLink(
+                episodeUuid = "episode-id",
+                podcastUuid = null,
+                startTimestamp = 15.seconds,
+                endTimestamp = 55.seconds,
+                sourceView = null,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareUnknownItem() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/unidentified-sharing-object/object-id"))
 
         val deepLink = factory.create(intent)
 
         assertNull(deepLink)
+    }
+
+    @Test
+    fun shareHttp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("http://pca.st/podcast/podcast-id"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("http://pca.st/podcast/podcast-id"), deepLink)
     }
 }

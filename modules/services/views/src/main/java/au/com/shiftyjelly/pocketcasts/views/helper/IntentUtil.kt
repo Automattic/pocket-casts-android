@@ -7,7 +7,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.io.UnsupportedEncodingException
@@ -16,16 +15,6 @@ import java.util.Arrays
 import timber.log.Timber
 
 object IntentUtil {
-
-    fun isShareLink(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        return scheme != null && scheme == "pktc" && intent.data != null && intent.data?.path != null
-    }
-
-    fun isNativeShareLink(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        return scheme != null && scheme in listOf("http", "https") && intent.data != null && intent.data?.host in listOf("pca.st", "pcast.pocketcasts.net")
-    }
 
     fun webViewShouldOverrideUrl(url: String?, context: Context): Boolean {
         var urlFound: String = url ?: return true
@@ -126,16 +115,6 @@ object IntentUtil {
 
     fun getUrl(intent: Intent): String? {
         return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
-    }
-
-    fun isPromoCodeIntent(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        val uri = Uri.parse(Settings.INTENT_LINK_PROMO_CODE)
-        return uri.host == intent.data?.host && intent.data?.pathSegments?.firstOrNull() == uri.pathSegments.first()
     }
 
     fun openWebPage(url: String): Intent {
