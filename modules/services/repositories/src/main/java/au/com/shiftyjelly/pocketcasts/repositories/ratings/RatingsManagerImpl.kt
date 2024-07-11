@@ -2,15 +2,20 @@ package au.com.shiftyjelly.pocketcasts.repositories.ratings
 
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingShowRequest
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
+import retrofit2.HttpException
 
 class RatingsManagerImpl @Inject constructor(
     private val cacheServerManager: PodcastCacheServerManager,
+    private val syncManager: SyncManager,
     appDatabase: AppDatabase,
 ) : RatingsManager, CoroutineScope {
     private val podcastRatingsDao = appDatabase.podcastRatingsDao()
@@ -33,6 +38,26 @@ class RatingsManagerImpl @Inject constructor(
         )
     }
 
+    override suspend fun submitPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResult = try {
+        syncManager.addPodcastRating(PodcastRatingAddRequest(podcastUuid, rate))
+        PodcastRatingResult.Success(rate.toDouble())
+    } catch (e: Exception) {
+        PodcastRatingResult.Error(e)
+    }
+
+    override suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResult = try {
+        val rate = syncManager.getPodcastRating(PodcastRatingShowRequest(podcastUuid))
+        PodcastRatingResult.Success(rate.podcastRating.toDouble())
+    } catch (e: HttpException) {
+        if (e.code() == 404) {
+            PodcastRatingResult.NotFound
+        } else {
+            PodcastRatingResult.Error(e)
+        }
+    } catch (e: Exception) {
+        PodcastRatingResult.Error(e)
+    }
+
     companion object {
         private fun noRatings(podcastUuid: String) = PodcastRatings(
             podcastUuid = podcastUuid,
@@ -40,4 +65,10 @@ class RatingsManagerImpl @Inject constructor(
             total = 0,
         )
     }
+}
+
+sealed class PodcastRatingResult {
+    data class Success(val rating: Double) : PodcastRatingResult()
+    data class Error(val exception: Exception) : PodcastRatingResult()
+    data object NotFound : PodcastRatingResult()
 }

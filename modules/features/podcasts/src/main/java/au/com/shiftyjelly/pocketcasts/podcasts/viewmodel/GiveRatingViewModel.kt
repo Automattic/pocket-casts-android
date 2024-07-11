@@ -7,10 +7,9 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel.State.Loaded.Stars
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.PodcastRatingResult
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingAddRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastRatingShowRequest
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,14 +19,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class GiveRatingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val userManager: UserManager,
-    private val syncManager: SyncManager,
+    private val ratingManager: RatingsManager,
 ) : ViewModel() {
 
     companion object {
@@ -95,30 +93,29 @@ class GiveRatingViewModel @Inject constructor(
             if (podcast == null) {
                 _state.value = State.ErrorWhenLoadingPodcast
             } else {
-                try {
-                    val ratedPodcast = syncManager.getPodcastRating(PodcastRatingShowRequest(podcastUuid))
+                when (val result = ratingManager.getPodcastRating(podcastUuid)) {
+                    is PodcastRatingResult.Success -> {
+                        _state.value = State.Loaded(
+                            podcastUuid = podcast.uuid,
+                            podcastTitle = podcast.title,
+                            _currentSelectedRate = ratingToStars(result.rating),
+                            previousRate = ratingToStars(result.rating),
+                        )
+                    }
 
-                    _state.value = State.Loaded(
-                        podcastUuid = podcast.uuid,
-                        podcastTitle = podcast.title,
-                        _currentSelectedRate = ratingToStars(ratedPodcast.podcastRating.toDouble()),
-                        previousRate = ratingToStars(ratedPodcast.podcastRating.toDouble()),
-                    )
-                } catch (e: HttpException) {
-                    if (e.code() == 404) { // Does not have previous rate
+                    is PodcastRatingResult.NotFound -> {
                         _state.value = State.Loaded(
                             podcastUuid = podcast.uuid,
                             podcastTitle = podcast.title,
                             _currentSelectedRate = null,
                             previousRate = null,
                         )
-                    } else {
-                        LogBuffer.e(TAG, "HTTP error when fetching previous rating for $podcastUuid: " + e.message())
+                    }
+
+                    else -> {
+                        LogBuffer.e(TAG, "Error when fetching previous rating for: $podcastUuid")
                         _state.value = State.ErrorWhenLoadingPodcast
                     }
-                } catch (e: Exception) {
-                    LogBuffer.e(TAG, "Error when fetching previous rating for: $podcastUuid")
-                    _state.value = State.ErrorWhenLoadingPodcast
                 }
             }
         }
@@ -136,12 +133,12 @@ class GiveRatingViewModel @Inject constructor(
         }
 
         val stars = (state.value as State.Loaded).currentSelectedRate
+        val result = ratingManager.submitPodcastRating(podcastUuid, starsToRating(stars))
 
-        try {
-            val response = syncManager.addPodcastRating(PodcastRatingAddRequest(podcastUuid, starsToRating(stars)))
-            LogBuffer.i(TAG, "Submitted a rating of ${response.podcastRating} for ${response.podcastUuid}")
+        if (result is PodcastRatingResult.Success) {
+            LogBuffer.i(TAG, "Submitted a rating of ${result.rating} for $podcastUuid")
             onSuccess()
-        } catch (e: Exception) {
+        } else {
             LogBuffer.e(TAG, "Error when submitting rating for: $podcastUuid")
             onError()
         }
