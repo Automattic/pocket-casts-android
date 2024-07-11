@@ -178,9 +178,5 @@ internal class CatalogFactory(
         sourceView = source.value,
     ).toIntent(context)
 
-    private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
-        "Missing launcher intent for $packageName"
-    }
-
     private fun ApplePodcastCategory.Companion.fromCategories(categories: String) = categories.split('\n').mapNotNull(ApplePodcastCategory::valueOfSafe)
 }

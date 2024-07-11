@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
@@ -77,6 +78,7 @@ import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
@@ -132,7 +134,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.SharingUrlTimestampParser
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -193,7 +194,6 @@ class MainActivity :
     companion object {
         private const val INITIAL_KEY = "initial"
         private const val SOURCE_KEY = "source"
-        private const val SOCIAL_SHARE_PATH = "/social/share/show"
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -1274,6 +1274,8 @@ class MainActivity :
                             podcastUuid = deepLink.podcastUuid,
                             source = EpisodeViewSource.fromString(deepLink.sourceView),
                             forceDark = false,
+                            startTimestamp = deepLink.startTimestamp,
+                            endTimestamp = deepLink.endTimestamp,
                         )
                     }
                     is ShowPodcastsDeepLink -> {
@@ -1322,16 +1324,11 @@ class MainActivity :
                     is PromoCodeDeepLink -> {
                         openPromoCode(deepLink.code)
                     }
+                    is NativeShareDeepLink -> {
+                        openSharingUrl(deepLink)
+                    }
                 }
             } else if (action == Intent.ACTION_VIEW) {
-                if (IntentUtil.isShareLink(intent)) { // Must go last, catches all pktc links
-                    openSharingUrl(intent)
-                    return
-                } else if (IntentUtil.isNativeShareLink(intent)) {
-                    openNativeSharingUrl(intent)
-                    return
-                }
-
                 val scheme = intent.scheme
                 if (scheme != null) {
                     // import opml from email
@@ -1397,41 +1394,55 @@ class MainActivity :
         addFragment(PodcastFragment.newInstance(podcastUuid = uuid, sourceView = SourceView.fromString(sourceView)))
     }
 
+    @Suppress("DEPRECATION")
     override fun openEpisodeDialog(
         episodeUuid: String?,
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
-        timestamp: Duration?,
+        startTimestamp: Duration?,
+        endTimestamp: Duration?,
     ) {
         episodeUuid ?: return
 
-        launch(Dispatchers.Main.immediate) {
-            val episode =
-                withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }
-            val fragment = if (episode == null) {
-                val podcastUuidFound = podcastUuid ?: return@launch
-                // Assume it's an episode we don't know about
-                EpisodeContainerFragment.newInstance(
-                    episodeUuid = episodeUuid,
-                    source = source,
-                    podcastUuid = podcastUuidFound,
-                    forceDark = forceDark,
-                    timestamp = timestamp,
-                )
-            } else if (episode is PodcastEpisode) {
-                EpisodeContainerFragment.newInstance(
-                    episodeUuid = episodeUuid,
-                    source = source,
-                    podcastUuid = podcastUuid,
-                    forceDark = forceDark,
-                    timestamp = timestamp,
-                )
-            } else {
-                CloudFileBottomSheetFragment.newInstance(episode.uuid, forceDark = true, source)
-            }
+        // If a clip has both start and end we don't open it in the app.
+        // We do not have a capability of playing a section of an episode between some timestamps.
+        if (startTimestamp != null && endTimestamp != null) {
+            val url = "${Settings.SERVER_SHORT_URL}/episode/$episodeUuid?t=${startTimestamp.inWholeSeconds},${endTimestamp.inWholeSeconds}"
+            WebViewActivity.show(this, getString(LR.string.clip_title), url)
+            return
+        }
 
-            fragment.showAllowingStateLoss(supportFragmentManager, "episode_card")
+        launch(Dispatchers.Main.immediate) {
+            when (val localEpisode = withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }) {
+                is UserEpisode -> {
+                    CloudFileBottomSheetFragment.newInstance(localEpisode.uuid, forceDark = true, source)
+                }
+                is PodcastEpisode -> {
+                    EpisodeContainerFragment.newInstance(
+                        episodeUuid = localEpisode.uuid,
+                        source = source,
+                        podcastUuid = localEpisode.podcastUuid,
+                        forceDark = forceDark,
+                        timestamp = startTimestamp,
+                    ).showAllowingStateLoss(supportFragmentManager, "episode_card")
+                }
+                null -> {
+                    val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
+                    val searchResult = serverManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
+                    dialog.hide()
+                    val episode = searchResult?.episode
+                    if (episode != null) {
+                        EpisodeContainerFragment.newInstance(
+                            episodeUuid = episode.uuid,
+                            source = source,
+                            podcastUuid = episode.podcastUuid,
+                            forceDark = forceDark,
+                            timestamp = startTimestamp,
+                        ).showAllowingStateLoss(supportFragmentManager, "episode_card")
+                    }
+                }
+            }
         }
     }
 
@@ -1472,25 +1483,17 @@ class MainActivity :
     }
 
     @Suppress("DEPRECATION")
-    private fun openSharingUrl(intent: Intent) {
-        var sharePath = intent.data?.path ?: return
-        // Prepend social share path to native sharing path
-        if (intent.data?.pathSegments?.size == 1) {
-            sharePath = "$SOCIAL_SHARE_PATH$sharePath"
-        }
-        val parser = SharingUrlTimestampParser()
-        val timestamp = intent.data?.getQueryParameter("t")?.let { parser.parseTimestamp(it) }
-
+    private fun openSharingUrl(deepLink: NativeShareDeepLink) {
         // If a clip has both start and end we don't open it in the app.
         // We do not have a capability of playing a section of an episode between some timestamps.
-        if (timestamp?.first != null && timestamp.second != null) {
-            WebViewActivity.show(this, getString(LR.string.clip_title), intent.data.toString())
+        if (deepLink.startTimestamp != null && deepLink.endTimestamp != null) {
+            WebViewActivity.show(this, getString(LR.string.clip_title), deepLink.uri.toString())
             return
         }
 
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
         serverManager.getSharedItemDetails(
-            sharePath,
+            deepLink.sharePath,
             object : ServerCallback<au.com.shiftyjelly.pocketcasts.models.to.Share> {
                 override fun dataReturned(result: au.com.shiftyjelly.pocketcasts.models.to.Share?) {
                     UiUtil.hideProgressDialog(dialog)
@@ -1514,7 +1517,7 @@ class MainActivity :
                             source = EpisodeViewSource.SHARE,
                             podcastUuid = podcastUuid,
                             forceDark = false,
-                            timestamp = timestamp?.first, // Start time in seconds
+                            startTimestamp = deepLink.startTimestamp,
                         )
                     } else {
                         openPodcastPage(podcastUuid)
@@ -1539,25 +1542,6 @@ class MainActivity :
                 }
             },
         )
-    }
-
-    @Suppress("DEPRECATION")
-    private fun openNativeSharingUrl(intent: Intent) {
-        val urlSegments = intent.data?.pathSegments ?: return
-        if (urlSegments.size < 2) {
-            openSharingUrl(intent)
-            return
-        }
-
-        when (urlSegments[0]) {
-            "podcast" -> openPodcastUrl(IntentUtil.getUrl(intent))
-            "episode" -> openEpisodeDialog(
-                episodeUuid = urlSegments[1],
-                source = EpisodeViewSource.SHARE,
-                podcastUuid = null,
-                forceDark = false,
-            )
-        }
     }
 
     @Suppress("DEPRECATION")

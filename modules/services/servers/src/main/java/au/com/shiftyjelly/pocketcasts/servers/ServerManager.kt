@@ -124,6 +124,22 @@ open class ServerManager @Inject constructor(
         )
     }
 
+    suspend fun getSharedItemDetailsSuspend(path: String): Share? = suspendCancellableCoroutine { continuation ->
+        val call = getSharedItemDetails(
+            path,
+            object : ServerCallback<Share> {
+                override fun dataReturned(result: Share?) {
+                    continuation.resume(result)
+                }
+
+                override fun onFailed(errorCode: Int, userMessage: String?, serverMessageId: String?, serverMessage: String?, throwable: Throwable?) {
+                    continuation.resume(null)
+                }
+            },
+        )
+        continuation.invokeOnCancellation { call?.cancel() }
+    }
+
     suspend fun refreshPodcastsSync(podcasts: List<Podcast>): Result<RefreshResponse?> {
         val batchSize = settings.getRefreshPodcastsBatchSize().coerceIn(100L, Int.MAX_VALUE.toLong()).toInt()
         val batcher = RefreshPodcastBatcher(batchSize)

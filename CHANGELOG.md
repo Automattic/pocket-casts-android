@@ -1,6 +1,8 @@
 7.69
 -----
-
+*   Bug Fixes
+    *   Links to episodes with playback position shared from the app are now correctly recognized.
+        ([#2471](https://github.com/Automattic/pocket-casts-android/pull/2471))
 
 7.68
 -----
