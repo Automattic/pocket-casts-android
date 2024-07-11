@@ -113,19 +113,6 @@ object IntentUtil {
         return true
     }
 
-    fun getUrl(intent: Intent): String? {
-        return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
-    }
-
-    fun openWebPage(url: String): Intent {
-        var uri = Uri.parse(url)
-        // fix for podcast web pages that don't start with http://
-        if (uri.scheme.isNullOrBlank() && !url.contains("://")) {
-            uri = Uri.parse("http://$url")
-        }
-        return Intent(Intent.ACTION_VIEW, uri)
-    }
-
     fun sendIntent(
         context: Context,
         file: File,

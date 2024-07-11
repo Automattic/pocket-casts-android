@@ -174,6 +174,10 @@ data class NativeShareDeepLink(
     }
 }
 
+data class OpmlImportDeepLink(
+    val uri: Uri,
+) : DeepLink
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }

@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
 import android.content.Intent
+import android.content.Intent.ACTION_SEND
 import android.content.Intent.ACTION_VIEW
+import android.content.Intent.EXTRA_STREAM
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.time.Duration.Companion.seconds
@@ -545,17 +547,6 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun nativeShareWithoutPath() {
-        val intent = Intent()
-            .setAction(ACTION_VIEW)
-            .setData(Uri.parse("pktc://some/"))
-
-        val deepLink = factory.create(intent)
-
-        assertNull(deepLink)
-    }
-
-    @Test
     fun nativeShareWithStartTimestamp() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
@@ -733,5 +724,103 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(ShowPodcastFromUrlDeepLink("http://pca.st/podcast/podcast-id"), deepLink)
+    }
+
+    @Test
+    fun opmlFromSend() {
+        val intent = Intent()
+            .setAction(ACTION_SEND)
+            .putExtra(EXTRA_STREAM, Uri.parse("https://file.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(OpmlImportDeepLink(Uri.parse("https://file.com")), deepLink)
+    }
+
+    @Test
+    fun opmlFromSendWithoutExtra() {
+        val intent = Intent()
+            .setAction(ACTION_SEND)
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
+    fun opmlFromView() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("content://file.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(OpmlImportDeepLink(Uri.parse("content://file.com")), deepLink)
+    }
+
+    @Test
+    fun podcastUrlFromRss() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("rss://podcast.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("rss://podcast.com"), deepLink)
+    }
+
+    @Test
+    fun podcastUrlFromFeed() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("feed://podcast.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("feed://podcast.com"), deepLink)
+    }
+
+    @Test
+    fun podcastUrlFromPcast() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pcast://podcast.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("pcast://podcast.com"), deepLink)
+    }
+
+    @Test
+    fun podcastUrlFromItpc() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("itpc://podcast.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("itpc://podcast.com"), deepLink)
+    }
+
+    @Test
+    fun podcastUrlFromHttp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("http://podcast.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("http://podcast.com"), deepLink)
+    }
+
+    @Test
+    fun podcastUrlFromHttps() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://podcast.com"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPodcastFromUrlDeepLink("https://podcast.com"), deepLink)
     }
 }
