@@ -140,6 +140,12 @@ class GiveRatingViewModel @Inject constructor(
         shouldTrackDismissedEvent = false
 
         val stars = (state.value as State.Loaded).currentSelectedRate
+
+        analyticsTracker.track(
+            AnalyticsEvent.RATING_SCREEN_SUBMIT_TAPPED,
+            mapOf("uuid" to (state.value as State.Loaded).podcastUuid, "stars" to starsToRating(stars)),
+        )
+
         val result = ratingManager.submitPodcastRating(podcastUuid, starsToRating(stars))
 
         if (result is PodcastRatingResult.Success) {
