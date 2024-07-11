@@ -47,19 +47,17 @@ import kotlin.math.abs
 import kotlin.math.max
 
 private const val numStars = 5
-private const val zeroStarIndexInStopPoints = 0
-private const val halfStarIndexInStopPoints = 1
-private const val oneFullStarIndexInStopPoints = 2
 
 @Composable
 fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
+    initialRate: Int? = null,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
-    var stopPointType by remember { mutableStateOf(StopPointType.FullStars) }
+    var stopPointType by remember { mutableStateOf(StopPointType.InitialStars) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
     var touchX by remember { mutableStateOf(0f) }
     var iconPositions by remember { mutableStateOf(listOf<Position>()) }
@@ -69,6 +67,7 @@ fun SwipeableStars(
         touchX = touchX,
         stopPoints = stopPoints,
         stopPointType = stopPointType,
+        initialRate,
     )
     onStarsChanged(getStarsDouble(stopPoints, desiredStopPoint))
 
@@ -203,27 +202,26 @@ private fun getDesiredStopPoint(
     touchX: Float,
     stopPoints: List<Double>,
     stopPointType: StopPointType,
+    initialRate: Int?,
 ) = remember(stopPoints, touchX, stopPointType) {
     when (stopPointType) {
         StopPointType.None -> touchX // ignore stop points
 
-        StopPointType.FullAndHalfStars -> {
-            val desiredStopPoint: Float = (
-                stopPoints
-                    .minByOrNull { abs(it - touchX) }
-                    ?.toFloat()
-                    ?: 0f
-                )
+        StopPointType.InitialStars -> {
+            if (initialRate == null) return@remember touchX
+            // These stop points are in between the stars, so filling to one of them will
+            // result in every star being either entirely filled or entirely unfilled
+            val betweenStarStopPoints = stopPoints.filterIndexed { i, _ -> i % 2 == 0 }
 
-            val desiredStarIndex = stopPoints.indexOf(desiredStopPoint.toDouble())
+            val numberOfEmptyStars = numStars - initialRate // get the number of empty stars
 
-            // Verify if the user is trying to select zero star or a half star
-            if (desiredStarIndex == zeroStarIndexInStopPoints || desiredStarIndex == halfStarIndexInStopPoints) {
-                // If trying to select zero star or a half star, we will select one full star instead
-                stopPoints.getOrNull(oneFullStarIndexInStopPoints)?.toFloat() ?: 0F
+            val indexOfFullStars = betweenStarStopPoints.lastIndex - numberOfEmptyStars
+
+            // It needs this check due a race condition that sets empty stopPoints first before setting it
+            if (betweenStarStopPoints.isEmpty()) {
+                touchX // ignore stop points
             } else {
-                // Otherwise, we will select the desired star
-                desiredStopPoint
+                betweenStarStopPoints[indexOfFullStars].toFloat()
             }
         }
 
@@ -319,7 +317,7 @@ private data class Position(
 private enum class StopPointType {
     None, // No stop points
     FullStars, // stop points for full stars only
-    FullAndHalfStars, // stop points for full and half stars
+    InitialStars, // this is to set a external rate
 }
 
 private enum class ChangeType {

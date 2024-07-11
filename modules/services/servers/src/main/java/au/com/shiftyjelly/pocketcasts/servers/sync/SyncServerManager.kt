@@ -24,6 +24,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import com.pocketcasts.service.api.PodcastRatingAddRequest
+import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.PodcastRatingShowRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
@@ -269,8 +272,19 @@ open class SyncServerManager @Inject constructor(
     fun getFileUsage(token: AccessToken): Single<FileAccount> =
         server.getFilesUsage(addBearer(token))
 
-    suspend fun addPodcastRating(request: PodcastRatingAddRequest, token: AccessToken): PodcastRatingAddResponse {
+    suspend fun addPodcastRating(podcastUuid: String, rate: Int, token: AccessToken): PodcastRatingResponse {
+        val request = PodcastRatingAddRequest.newBuilder()
+            .setPodcastUuid(podcastUuid)
+            .setPodcastRating(rate)
+            .build()
         return server.addPodcastRating(addBearer(token), request)
+    }
+
+    suspend fun getPodcastRating(podcastUuid: String, token: AccessToken): PodcastRatingResponse {
+        val request = PodcastRatingShowRequest.newBuilder()
+            .setPodcastUuid(podcastUuid)
+            .build()
+        return server.getPodcastRating(addBearer(token), request)
     }
 
     fun signOut() {
