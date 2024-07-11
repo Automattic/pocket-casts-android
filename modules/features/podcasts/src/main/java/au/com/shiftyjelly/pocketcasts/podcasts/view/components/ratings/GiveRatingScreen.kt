@@ -14,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,17 +84,16 @@ fun GiveRatingScreen(
 
             Spacer(Modifier.weight(1f))
 
-            if (state.previousRate != state.currentSelectedRate) {
-                RowButton(
-                    text = stringResource(R.string.submit),
-                    onClick = submitRating,
-                    enabled = state.currentSelectedRate != GiveRatingViewModel.State.Loaded.Stars.Zero,
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.theme.colors.primaryText01,
-                        disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
-                    ),
-                )
-            }
+            RowButton(
+                text = stringResource(R.string.submit),
+                onClick = submitRating,
+                enabled = state.currentSelectedRate != GiveRatingViewModel.State.Loaded.Stars.Zero,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.theme.colors.primaryText01,
+                    disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
+                ),
+                modifier = Modifier.alpha(if (state.previousRate != state.currentSelectedRate) 1f else 0f),
+            )
         }
 
         NavigationIconButton(
