@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -32,6 +31,7 @@ class GiveRatingViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
+        const val TAG = "GiveRating"
         const val NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE = 2
     }
 
@@ -113,9 +113,11 @@ class GiveRatingViewModel @Inject constructor(
                             previousRate = null,
                         )
                     } else {
+                        LogBuffer.e(TAG, "HTTP error when fetching previous rating for $podcastUuid: " + e.message())
                         _state.value = State.ErrorWhenLoadingPodcast
                     }
                 } catch (e: Exception) {
+                    LogBuffer.e(TAG, "Error when fetching previous rating for: $podcastUuid")
                     _state.value = State.ErrorWhenLoadingPodcast
                 }
             }
@@ -124,7 +126,7 @@ class GiveRatingViewModel @Inject constructor(
 
     suspend fun submitRating(podcastUuid: String, context: Context, onSuccess: () -> Unit, onError: () -> Unit) {
         if (!Network.isConnected(context)) {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Cannot submit rating, no network connection")
+            LogBuffer.i(TAG, "Cannot submit rating, no network connection")
             Toast.makeText(
                 context,
                 context.getString(LR.string.podcast_submit_rating_no_internet),
@@ -137,9 +139,10 @@ class GiveRatingViewModel @Inject constructor(
 
         try {
             val response = syncManager.addPodcastRating(PodcastRatingAddRequest(podcastUuid, starsToRating(stars)))
-            Timber.e("Submitted a rating of ${response.podcastRating} for ${response.podcastUuid}")
+            LogBuffer.i(TAG, "Submitted a rating of ${response.podcastRating} for ${response.podcastUuid}")
             onSuccess()
         } catch (e: Exception) {
+            LogBuffer.e(TAG, "Error when submitting rating for: $podcastUuid")
             onError()
         }
     }
@@ -148,7 +151,7 @@ class GiveRatingViewModel @Inject constructor(
         val stars = ratingToStars(rating)
         val stateValue = _state.value
         if (stateValue !is State.Loaded) {
-            throw IllegalStateException("Cannot set stars when state is not CanRate")
+            throw IllegalStateException("Cannot set stars when state is not Loaded")
         }
         _state.value = stateValue.copy(_currentSelectedRate = stars)
     }
