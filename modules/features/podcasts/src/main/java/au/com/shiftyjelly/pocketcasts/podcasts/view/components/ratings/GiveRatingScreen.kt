@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -32,13 +33,17 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.starsToRating
 
 @Composable
 fun GiveRatingScreen(
+    viewModel: GiveRatingViewModel,
     state: GiveRatingViewModel.State.Loaded,
-    setRating: (Double) -> Unit,
     submitRating: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    CallOnce {
+        viewModel.trackOnGiveRatingScreenShown(state.podcastUuid)
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -75,7 +80,7 @@ fun GiveRatingScreen(
 
                 SwipeableStars(
                     initialRate = state.previousRate?.let { starsToRating(it) },
-                    onStarsChanged = setRating,
+                    onStarsChanged = viewModel::setRating,
                     modifier = Modifier
                         .height(48.dp)
                         .padding(horizontal = 16.dp),

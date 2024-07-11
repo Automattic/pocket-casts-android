@@ -28,7 +28,7 @@ fun GiveRatingPage(
     when (val currentState = state) {
         is GiveRatingViewModel.State.Loaded -> GiveRatingScreen(
             state = currentState,
-            setRating = viewModel::setRating,
+            viewModel = viewModel,
             submitRating = submitRating,
             onDismiss = onDismiss,
         )

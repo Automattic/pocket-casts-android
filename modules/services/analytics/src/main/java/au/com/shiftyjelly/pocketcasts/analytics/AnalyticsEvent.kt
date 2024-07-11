@@ -588,6 +588,7 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Ratings */
     RATING_STARS_TAPPED("rating_stars_tapped"),
+    RATING_SCREEN_SHOWN("rating_screen_shown"),
 
     /* Wear Main List Screen */
     WEAR_MAIN_LIST_SHOWN("wear_main_list_shown"),
