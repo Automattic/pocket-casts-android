@@ -34,6 +34,7 @@ fun GiveRatingPage(
         )
         is GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
         is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(
+            viewModel = viewModel,
             state = currentState,
             onDismiss = onDismiss,
         )

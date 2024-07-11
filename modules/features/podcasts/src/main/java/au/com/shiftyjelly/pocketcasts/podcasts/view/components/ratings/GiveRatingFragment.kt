@@ -92,6 +92,8 @@ class GiveRatingFragment : BaseDialogFragment() {
 
         if (state is GiveRatingViewModel.State.Loaded) {
             viewModel.trackOnDismissed(AnalyticsEvent.RATING_SCREEN_DISMISSED)
+        } else if (state is GiveRatingViewModel.State.NotAllowedToRate) {
+            viewModel.trackOnDismissed(AnalyticsEvent.NOT_ALLOWED_TO_RATE_SCREEN_DISMISSED)
         }
     }
 

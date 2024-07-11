@@ -165,6 +165,11 @@ class GiveRatingViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.RATING_SCREEN_SHOWN, mapOf("uuid" to uuid))
     }
 
+    fun trackOnNotAllowedToRateScreenShown(uuid: String) {
+        shouldTrackDismissedEvent = true
+        analyticsTracker.track(AnalyticsEvent.NOT_ALLOWED_TO_RATE_SCREEN_SHOWN, mapOf("uuid" to uuid))
+    }
+
     fun trackOnDismissed(event: AnalyticsEvent) {
         if (shouldTrackDismissedEvent) {
             analyticsTracker.track(event)
