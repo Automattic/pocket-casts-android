@@ -137,13 +137,14 @@ class FocusManager(
     }
 
     override fun onAudioFocusChange(focusChange: Int) {
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "On audio focus change: ${androidAudioFocusToString(focusChange)}")
+        val focusString = androidAudioFocusToString(focusChange)
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "On audio focus change: $focusString")
         when (focusChange) {
             in GAIN_FOCUS_LIST -> {
                 // if not transient only let it resume within 2 minutes
                 val shouldResume = (isLostTransient || System.currentTimeMillis() < timeFocusLost + 120000) && !deviceRemovedWhileFocusLost
                 audioFocus = AUDIO_FOCUSED
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus gained. Should resume: $shouldResume. Device removed: $deviceRemovedWhileFocusLost.")
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus gained. Should resume: $shouldResume. Device removed: $deviceRemovedWhileFocusLost.")
                 focusChangeListener.onFocusGain(shouldResume)
             }
             in LOSS_FOCUS_LIST -> {
@@ -155,11 +156,12 @@ class FocusManager(
                 }
                 timeFocusLost = System.currentTimeMillis()
                 deviceRemovedWhileFocusLost = false
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost.")
-                focusChangeListener.onFocusLoss(canDuck(), isLostTransient)
+                val playOverNotification = canDuck()
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost. Play over notification: $playOverNotification, is transient: $isLostTransient")
+                focusChangeListener.onFocusLoss(playOverNotification, isLostTransient)
             }
             else -> {
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Unknown focus change.")
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Unexpected audio focus change: $focusString.")
             }
         }
     }
