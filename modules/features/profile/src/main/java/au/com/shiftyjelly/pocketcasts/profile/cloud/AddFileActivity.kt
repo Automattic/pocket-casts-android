@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
-import android.Manifest.permission.INTERNET
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -90,8 +89,7 @@ private const val EXTRA_EXISTING_EPISODE_UUID = "fileUUID"
 private const val EXTRA_FILE_CHOOSER = "filechooser"
 private const val STATE_LAUNCHED_FILE_CHOOSER = "LAUNCHED_FILE_CHOOSER"
 private const val STATE_DATAURI = "DATAURI"
-private const val WRITE_STORAGE_PERMISSION_REQUEST_CODE = 50
-private const val INTERNET_PERMISSION_REQUEST_CODE = 51
+private const val READ_STORAGE_PERMISSION_REQUEST_CODE = 50
 
 @AndroidEntryPoint
 class AddFileActivity :
@@ -469,18 +467,11 @@ class AddFileActivity :
         }
     }
 
-    private fun requestInternetPermission() {
+    private fun requestReadExternalStoragePermission() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(INTERNET),
-            INTERNET_PERMISSION_REQUEST_CODE,
-        )
-    }
-    private fun requestWriteExternalStoragePermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(WRITE_EXTERNAL_STORAGE),
-            WRITE_STORAGE_PERMISSION_REQUEST_CODE,
+            arrayOf(READ_EXTERNAL_STORAGE),
+            READ_STORAGE_PERMISSION_REQUEST_CODE,
         )
     }
 
@@ -504,11 +495,8 @@ class AddFileActivity :
             if (!(intentType.startsWith("audio/") || intentType.startsWith("video/"))) {
                 return
             }
-            if (!permissionIsGranted(WRITE_EXTERNAL_STORAGE)) {
-                requestWriteExternalStoragePermission()
-            }
-            if (!permissionIsGranted(INTERNET)) {
-                requestInternetPermission()
+            if (!permissionIsGranted(READ_EXTERNAL_STORAGE)) {
+                requestReadExternalStoragePermission()
             }
             launch(Dispatchers.IO) {
                 val userEpisode = UserEpisode(uuid = uuid, publishedDate = Date(), fileType = intent.type)
