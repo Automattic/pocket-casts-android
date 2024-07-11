@@ -178,6 +178,12 @@ data class OpmlImportDeepLink(
     val uri: Uri,
 ) : DeepLink
 
+data class PlayFromSearchDeepLink(
+    val query: String,
+) : DeepLink
+
+data object AssistantDeepLink : DeepLink
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }

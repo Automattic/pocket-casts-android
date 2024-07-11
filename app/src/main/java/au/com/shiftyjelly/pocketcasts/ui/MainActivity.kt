@@ -9,7 +9,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
@@ -49,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
@@ -1239,107 +1240,106 @@ class MainActivity :
         }
 
         try {
-            val deepLink = deepLinkFactory.create(intent)
-            if (deepLink != null) {
-                when (deepLink) {
-                    is DownloadsDeepLink -> {
-                        closeToRoot()
-                        addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
+            val safeUri = intent.data?.buildUpon()?.clearQuery()?.build() // Remove query parameters from logging
+            LogBuffer.i("DeepLink", "Opening deep link: $intent. Safe URI: $safeUri")
+            when (val deepLink = deepLinkFactory.create(intent)) {
+                is DownloadsDeepLink -> {
+                    closeToRoot()
+                    addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
+                }
+                is AddBookmarkDeepLink -> {
+                    viewModel.buildBookmarkArguments { args ->
+                        bookmarkActivityLauncher.launch(args.getIntent(this))
                     }
-                    is AddBookmarkDeepLink -> {
-                        viewModel.buildBookmarkArguments { args ->
-                            bookmarkActivityLauncher.launch(args.getIntent(this))
-                        }
+                }
+                is ChangeBookmarkTitleDeepLink -> {
+                    viewModel.buildBookmarkArguments(deepLink.bookmarkUuid) { args ->
+                        bookmarkActivityLauncher.launch(args.getIntent(this))
                     }
-                    is ChangeBookmarkTitleDeepLink -> {
-                        viewModel.buildBookmarkArguments(deepLink.bookmarkUuid) { args ->
-                            bookmarkActivityLauncher.launch(args.getIntent(this))
-                        }
-                        notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
-                    }
-                    is ShowBookmarkDeepLink -> {
-                        viewModel.viewBookmark(deepLink.bookmarkUuid)
-                    }
-                    is DeleteBookmarkDeepLink -> {
-                        viewModel.deleteBookmark(deepLink.bookmarkUuid)
-                        notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
-                    }
-                    is ShowPodcastDeepLink -> {
-                        openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
-                    }
-                    is ShowEpisodeDeepLink -> {
-                        openEpisodeDialog(
-                            episodeUuid = deepLink.episodeUuid,
-                            podcastUuid = deepLink.podcastUuid,
-                            source = EpisodeViewSource.fromString(deepLink.sourceView),
-                            forceDark = false,
-                            startTimestamp = deepLink.startTimestamp,
-                            endTimestamp = deepLink.endTimestamp,
-                        )
-                    }
-                    is ShowPodcastsDeepLink -> {
-                        openTab(VR.id.navigation_podcasts)
-                    }
-                    is ShowDiscoverDeepLink -> {
-                        openTab(VR.id.navigation_discover)
-                    }
-                    is ShowUpNextDeepLink -> {
-                        // Do nothig, handled in onMiniPlayerVisible()
-                    }
-                    is ShowFilterDeepLink -> {
-                        launch(Dispatchers.Default) {
-                            playlistManager.findById(deepLink.filterId)?.let {
-                                withContext(Dispatchers.Main) {
-                                    settings.setSelectedFilter(it.uuid)
-                                    // HACK: Go diving to find if a filter fragment
-                                    openTab(VR.id.navigation_filters)
-                                    val filtersFragment = supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
-                                    filtersFragment?.openPlaylist(it)
-                                }
+                    notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
+                }
+                is ShowBookmarkDeepLink -> {
+                    viewModel.viewBookmark(deepLink.bookmarkUuid)
+                }
+                is DeleteBookmarkDeepLink -> {
+                    viewModel.deleteBookmark(deepLink.bookmarkUuid)
+                    notificationHelper.removeNotification(intent.extras, Settings.NotificationId.BOOKMARK.value)
+                }
+                is ShowPodcastDeepLink -> {
+                    openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
+                }
+                is ShowEpisodeDeepLink -> {
+                    openEpisodeDialog(
+                        episodeUuid = deepLink.episodeUuid,
+                        podcastUuid = deepLink.podcastUuid,
+                        source = EpisodeViewSource.fromString(deepLink.sourceView),
+                        forceDark = false,
+                        startTimestamp = deepLink.startTimestamp,
+                        endTimestamp = deepLink.endTimestamp,
+                    )
+                }
+                is ShowPodcastsDeepLink -> {
+                    openTab(VR.id.navigation_podcasts)
+                }
+                is ShowDiscoverDeepLink -> {
+                    openTab(VR.id.navigation_discover)
+                }
+                is ShowUpNextDeepLink -> {
+                    // Do nothig, handled in onMiniPlayerVisible()
+                }
+                is ShowFilterDeepLink -> {
+                    launch(Dispatchers.Default) {
+                        playlistManager.findById(deepLink.filterId)?.let {
+                            withContext(Dispatchers.Main) {
+                                settings.setSelectedFilter(it.uuid)
+                                // HACK: Go diving to find if a filter fragment
+                                openTab(VR.id.navigation_filters)
+                                val filtersFragment = supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
+                                filtersFragment?.openPlaylist(it)
                             }
                         }
                     }
-                    is PocketCastsWebsiteDeepLink -> {
-                        // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
-                    }
-                    is ShowPodcastFromUrlDeepLink -> {
-                        openPodcastUrl(deepLink.url)
-                    }
-                    is SonosDeepLink -> {
-                        startActivityForResult(
-                            SonosAppLinkActivity.buildIntent(deepLink.state, this),
-                            SonosAppLinkActivity.SONOS_APP_ACTIVITY_RESULT,
-                        )
-                    }
-                    is ShareListDeepLink -> {
-                        addFragment(ShareListIncomingFragment.newInstance(deepLink.path))
-                    }
-                    is CloudFilesDeepLink -> {
-                        openCloudFiles()
-                    }
-                    is UpgradeAccountDeepLink -> {
-                        showAccountUpgradeNowDialog(shouldClose = true)
-                    }
-                    is PromoCodeDeepLink -> {
-                        openPromoCode(deepLink.code)
-                    }
-                    is NativeShareDeepLink -> {
-                        openSharingUrl(deepLink)
-                    }
-                    is OpmlImportDeepLink -> {
-                        OpmlImportTask.run(deepLink.uri, this)
-                    }
                 }
-            } else if (action == MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) {
-                val bundle = intent.extras ?: return
-                playbackManager.mediaSessionManager.playFromSearchExternal(bundle)
-            } else if (intent.extras?.getBoolean(
-                    "extra_accl_intent",
-                    false,
-                ) == true || intent.extras?.getBoolean("handled_by_nga", false) == true
-            ) {
-                // This is what the assistant sends us when it doesn't know what to do and just opens the app. Assume the user wants to play.
-                playbackManager.playQueue()
+                is PocketCastsWebsiteDeepLink -> {
+                    // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
+                }
+                is ShowPodcastFromUrlDeepLink -> {
+                    openPodcastUrl(deepLink.url)
+                }
+                is SonosDeepLink -> {
+                    startActivityForResult(
+                        SonosAppLinkActivity.buildIntent(deepLink.state, this),
+                        SonosAppLinkActivity.SONOS_APP_ACTIVITY_RESULT,
+                    )
+                }
+                is ShareListDeepLink -> {
+                    addFragment(ShareListIncomingFragment.newInstance(deepLink.path))
+                }
+                is CloudFilesDeepLink -> {
+                    openCloudFiles()
+                }
+                is UpgradeAccountDeepLink -> {
+                    showAccountUpgradeNowDialog(shouldClose = true)
+                }
+                is PromoCodeDeepLink -> {
+                    openPromoCode(deepLink.code)
+                }
+                is NativeShareDeepLink -> {
+                    openSharingUrl(deepLink)
+                }
+                is OpmlImportDeepLink -> {
+                    OpmlImportTask.run(deepLink.uri, this)
+                }
+                is PlayFromSearchDeepLink -> {
+                    playbackManager.mediaSessionManager.playFromSearchExternal(deepLink.query)
+                }
+                is AssistantDeepLink -> {
+                    // This is what the assistant sends us when it doesn't know what to do and just opens the app. Assume the user wants to play.
+                    playbackManager.playQueue()
+                }
+                null -> {
+                    LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")
+                }
             }
         } catch (e: Exception) {
             Timber.e(e)

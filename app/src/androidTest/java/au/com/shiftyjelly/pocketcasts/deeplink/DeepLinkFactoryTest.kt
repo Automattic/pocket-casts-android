@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.deeplink
 
+import android.app.SearchManager
 import android.content.Intent
 import android.content.Intent.ACTION_SEND
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.EXTRA_STREAM
 import android.net.Uri
+import android.provider.MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
@@ -822,5 +824,36 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(ShowPodcastFromUrlDeepLink("https://podcast.com"), deepLink)
+    }
+
+    @Test
+    fun playFromSearch() {
+        val intent = Intent()
+            .setAction(INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)
+            .putExtra(SearchManager.QUERY, "Search term")
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(PlayFromSearchDeepLink("Search term"), deepLink)
+    }
+
+    @Test
+    fun assistant1() {
+        val intent = Intent()
+            .putExtra("extra_accl_intent", true)
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(AssistantDeepLink, deepLink)
+    }
+
+    @Test
+    fun assistant2() {
+        val intent = Intent()
+            .putExtra("handled_by_nga", true)
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(AssistantDeepLink, deepLink)
     }
 }

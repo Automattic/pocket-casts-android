@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.app.SearchManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -809,9 +808,8 @@ class MediaSessionManager(
         }
     }
 
-    fun playFromSearchExternal(extras: Bundle) {
-        val searchTerm = extras.getString(SearchManager.QUERY) ?: return
-        performPlayFromSearch(searchTerm)
+    fun playFromSearchExternal(query: String) {
+        performPlayFromSearch(query)
     }
 
     /**
