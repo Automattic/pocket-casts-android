@@ -31,6 +31,8 @@ class GiveRatingViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
+    private var shouldTrackDismissedEvent = false
+
     companion object {
         const val TAG = "GiveRating"
         const val NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE = 2
@@ -135,6 +137,8 @@ class GiveRatingViewModel @Inject constructor(
             return
         }
 
+        shouldTrackDismissedEvent = false
+
         val stars = (state.value as State.Loaded).currentSelectedRate
         val result = ratingManager.submitPodcastRating(podcastUuid, starsToRating(stars))
 
@@ -157,7 +161,14 @@ class GiveRatingViewModel @Inject constructor(
     }
 
     fun trackOnGiveRatingScreenShown(uuid: String) {
+        shouldTrackDismissedEvent = true
         analyticsTracker.track(AnalyticsEvent.RATING_SCREEN_SHOWN, mapOf("uuid" to uuid))
+    }
+
+    fun trackOnDismissed(event: AnalyticsEvent) {
+        if (shouldTrackDismissedEvent) {
+            analyticsTracker.track(event)
+        }
     }
 }
 

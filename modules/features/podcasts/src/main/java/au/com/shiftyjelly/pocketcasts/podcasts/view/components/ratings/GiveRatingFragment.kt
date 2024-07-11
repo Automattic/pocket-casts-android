@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,8 @@ import android.widget.Toast
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -23,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private const val ARG_PODCAST_UUID = "podcastUuid"
 
 class GiveRatingFragment : BaseDialogFragment() {
+
+    private val viewModel: GiveRatingViewModel by viewModels()
 
     companion object {
         fun newInstance(podcastUuid: String) = GiveRatingFragment().apply {
@@ -45,7 +49,6 @@ class GiveRatingFragment : BaseDialogFragment() {
 
         setContent {
             AppThemeWithBackground(theme.activeTheme) {
-                val viewModel = hiltViewModel<GiveRatingViewModel>()
                 val coroutineScope = rememberCoroutineScope()
                 val context = requireContext()
 
@@ -81,6 +84,14 @@ class GiveRatingFragment : BaseDialogFragment() {
                     },
                 )
             }
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        val state = viewModel.state.value
+
+        if (state is GiveRatingViewModel.State.Loaded) {
+            viewModel.trackOnDismissed(AnalyticsEvent.RATING_SCREEN_DISMISSED)
         }
     }
 
