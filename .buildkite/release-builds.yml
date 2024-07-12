@@ -8,7 +8,7 @@
 common_params:
   # Common plugin settings to use with the `plugins` key.
   - &common_plugins
-    - automattic/bash-cache#2.11.0
+    - automattic/a8c-ci-toolkit#3.4.2
 
 agents:
   queue: "android"
