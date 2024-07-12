@@ -306,7 +306,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         episode: BaseEpisode,
         timestamp: Duration,
     ) {
-        viewModelScope.launch(NonCancellable) {
+        viewModelScope.launch(Dispatchers.IO + NonCancellable) {
             playbackManager.playNowSync(episode, sourceView = source)
             playbackManager.seekToTimeMsSuspend(timestamp.toInt(DurationUnit.MILLISECONDS))
         }
