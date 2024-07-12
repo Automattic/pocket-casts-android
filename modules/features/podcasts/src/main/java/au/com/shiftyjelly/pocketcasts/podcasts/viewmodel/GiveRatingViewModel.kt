@@ -4,6 +4,8 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel.State.Loaded.Stars
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -26,7 +28,10 @@ class GiveRatingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val userManager: UserManager,
     private val ratingManager: RatingsManager,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
+
+    private var shouldTrackDismissedEvent = false
 
     companion object {
         const val TAG = "GiveRating"
@@ -132,7 +137,15 @@ class GiveRatingViewModel @Inject constructor(
             return
         }
 
+        shouldTrackDismissedEvent = false
+
         val stars = (state.value as State.Loaded).currentSelectedRate
+
+        analyticsTracker.track(
+            AnalyticsEvent.RATING_SCREEN_SUBMIT_TAPPED,
+            mapOf("uuid" to (state.value as State.Loaded).podcastUuid, "stars" to starsToRating(stars)),
+        )
+
         val result = ratingManager.submitPodcastRating(podcastUuid, starsToRating(stars))
 
         if (result is PodcastRatingResult.Success) {
@@ -151,6 +164,22 @@ class GiveRatingViewModel @Inject constructor(
             throw IllegalStateException("Cannot set stars when state is not Loaded")
         }
         _state.value = stateValue.copy(_currentSelectedRate = stars)
+    }
+
+    fun trackOnGiveRatingScreenShown(uuid: String) {
+        shouldTrackDismissedEvent = true
+        analyticsTracker.track(AnalyticsEvent.RATING_SCREEN_SHOWN, mapOf("uuid" to uuid))
+    }
+
+    fun trackOnNotAllowedToRateScreenShown(uuid: String) {
+        shouldTrackDismissedEvent = true
+        analyticsTracker.track(AnalyticsEvent.NOT_ALLOWED_TO_RATE_SCREEN_SHOWN, mapOf("uuid" to uuid))
+    }
+
+    fun trackOnDismissed(event: AnalyticsEvent) {
+        if (shouldTrackDismissedEvent) {
+            analyticsTracker.track(event)
+        }
     }
 }
 
