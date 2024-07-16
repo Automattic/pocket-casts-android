@@ -6,7 +6,7 @@ import java.net.URLEncoder
 object Gravatar {
 
     fun getGravatarChangeAvatarUrl(email: String): String =
-        "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars"
+        "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars&is_app_origin=true"
 
     /**
      * The timestamp is used to force a refresh of the gravatar image. We use it as a cache buster.
