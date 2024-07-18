@@ -314,7 +314,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val trimmedList = list.subList(0, min(Settings.MAX_DOWNLOAD, selectedList.count())).toList()
         ConfirmationDialog.downloadWarningDialog(list.count(), resources) {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, fireToast = false, source = source)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, source = source)
             }
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED, source, trimmedList)
             val snackText = resources.getStringPlural(trimmedList.size, LR.string.download_queued_singular, LR.string.download_queued_plural)

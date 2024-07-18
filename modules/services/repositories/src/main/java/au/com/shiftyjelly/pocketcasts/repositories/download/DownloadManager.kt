@@ -21,7 +21,7 @@ interface DownloadManager {
     fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playlistManager: PlaylistManager, playbackManager: PlaybackManager)
     fun beginMonitoringWorkManager(context: Context)
     fun hasPendingOrRunningDownloads(): Boolean
-    fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, fireToast: Boolean, source: SourceView)
+    fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, source: SourceView)
     fun removeEpisodeFromQueue(episode: BaseEpisode, from: String)
     fun stopAllDownloads()
     suspend fun getRequirementsAndSetStatusAsync(episode: BaseEpisode): NetworkRequirements
