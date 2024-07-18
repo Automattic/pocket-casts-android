@@ -837,4 +837,8 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun countPlayedEpisodes(podcastUuid: String): Int {
         return episodeDao.countPlayedEpisodes(podcastUuid)
     }
+
+    override suspend fun countEpisodesByPodcast(podcastUuid: String): Int {
+        return episodeDao.countEpisodesByPodcast(podcastUuid)
+    }
 }

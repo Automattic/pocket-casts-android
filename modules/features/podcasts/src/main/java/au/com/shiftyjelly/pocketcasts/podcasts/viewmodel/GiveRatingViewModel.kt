@@ -80,7 +80,12 @@ class GiveRatingViewModel @Inject constructor(
                     val countPlayedEpisodes = podcastManager.countPlayedEpisodes(podcastUuid)
 
                     if (countPlayedEpisodes < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
-                        _state.value = State.NotAllowedToRate(podcastUuid)
+                        val episodes = podcastManager.countEpisodesByPodcast(podcastUuid)
+                        if (episodes == 1 && countPlayedEpisodes == 1) {
+                            onSuccess() // This is the case an user wants to rate a podcast that has only one episode.
+                        } else {
+                            _state.value = State.NotAllowedToRate(podcastUuid)
+                        }
                     } else {
                         onSuccess()
                     }
