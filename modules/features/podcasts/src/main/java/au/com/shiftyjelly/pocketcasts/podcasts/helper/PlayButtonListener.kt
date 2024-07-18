@@ -110,7 +110,7 @@ class PlayButtonListener @Inject constructor(
                     } else {
                         it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
                     }
-                    downloadManager.addEpisodeToQueue(it, "play button", fireEvent = true, fireToast = false, source = source)
+                    downloadManager.addEpisodeToQueue(it, "play button", fireEvent = true, source = source)
                     episodeAnalytics.trackEvent(
                         AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
                         source = source,

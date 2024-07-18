@@ -283,7 +283,7 @@ class EpisodeViewModel @Inject constructor(
             } else if (!episode.isDownloaded) {
                 episode.autoDownloadStatus =
                     PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                downloadManager.addEpisodeToQueue(episode, fromString, fireEvent = true, fireToast = false, source = sourceView)
+                downloadManager.addEpisodeToQueue(episode, fromString, fireEvent = true, source = sourceView)
 
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
