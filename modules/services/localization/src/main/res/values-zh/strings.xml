@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-02 09:54:03+0000
+Translation-Revision-Date: 2024-07-16 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">出错了。 请稍后再试</string>
+    <string name="thank_you_for_rating">感谢您的评分！</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">整个播放剧集都会临时缓存，以尽可能减少流媒体传输。</string>
+    <string name="not_allowed_to_rate_description">只有听众能为此播客评分。 请先收听几集，然后再来评分。 我们期待了解您的所思所想！</string>
+    <string name="not_allowed_to_rate_title">请先收听此播客</string>
+    <string name="episode_cover_description">第 %s 集的封面</string>
+    <string name="podcast_share_clip_description">为第 %1$s 集的 %2$d 至 %3$d 秒创建片段</string>
+    <string name="error_transcript_format_not_supported">文字转录稿格式不受支持：%s</string>
+    <string name="error_transcript_failed_to_load">加载文字转录稿失败</string>
+    <string name="transcript">文字转录稿</string>
+    <string name="no_ratings">无评分</string>
+    <string name="rate_button">评分</string>
     <string name="podcast_create_clip">创建片段</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">整个播放剧集都缓存在不计流量的网络上，以尽可能减少播放时的流媒体传输。 当达到缓存大小限制时，系统会自动将剧集从缓存中删除。</string>
     <string name="settings_advanced_cache_entire_playing_episode">缓存播放剧集</string>
     <string name="playback">播放</string>
     <string name="podcast_share_clip">片段</string>
@@ -1708,5 +1719,11 @@ Language: zh_CN
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other">%1$d 集 — 剩余 %2$s</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="other">结尾片段控标：%d 秒</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="other">开头片段控标：%d 秒</item>
     </plurals>
 </resources>

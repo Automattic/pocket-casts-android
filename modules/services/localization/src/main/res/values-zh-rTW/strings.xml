@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-04 15:54:02+0000
+Translation-Revision-Date: 2024-07-16 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">發生錯誤。 請稍後再試一次</string>
+    <string name="thank_you_for_rating">謝謝你的評分！</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">系統會暫時快取播放中的完整單集，以便將串流最小化。</string>
+    <string name="not_allowed_to_rate_description">僅有此 Podcast 的聽眾才能給予評分。 先聆聽一些單集，再回來給予評分。 希望聽到你的看法！</string>
+    <string name="not_allowed_to_rate_title">請先聆聽此 Podcast</string>
+    <string name="episode_cover_description">「%s」單集封面</string>
+    <string name="podcast_share_clip_description">從 %2$d 至 %3$d 的片段建立「%1$s」單集</string>
+    <string name="error_transcript_format_not_supported">不支援逐字稿格式：%s</string>
+    <string name="error_transcript_failed_to_load">無法載入逐字稿</string>
+    <string name="transcript">逐字稿</string>
+    <string name="no_ratings">無評分</string>
+    <string name="rate_button">評分</string>
     <string name="podcast_create_clip">建立短片</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">完整播放單集會以快取形式儲存於不受限的網路，以便在播放時將流量縮減至最小。 若單集達到快取大小限制，系統會自動將其從快取移除。</string>
     <string name="settings_advanced_cache_entire_playing_episode">快取播放單集</string>
     <string name="playback">播放</string>
     <string name="podcast_share_clip">片段</string>
@@ -1708,5 +1719,11 @@ Language: zh_TW
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other">%1$d 集單集 - 剩餘 %2$s</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="other">結尾片段控點：%d 秒</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="other">開頭片段控點：%d 秒</item>
     </plurals>
 </resources>

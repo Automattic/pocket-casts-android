@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-02 09:54:03+0000
+Translation-Revision-Date: 2024-07-16 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">問題が発生しました。 後でもう一度お試しください</string>
+    <string name="thank_you_for_rating">ご評価いただきありがとうございます !</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">ストリーミングを最小限に抑えるために、再生中のエピソード全体が一時的にキャッシュされます。</string>
+    <string name="not_allowed_to_rate_description">このポッドキャストを評価できるのは、リスナーのみです。 いくつかエピソードを聴いた後、こちらで評価してください。 ご意見をお待ちしています。</string>
+    <string name="not_allowed_to_rate_title">まずこちらのポッドキャストをお聴きください</string>
+    <string name="episode_cover_description">%s件のエピソードのカバー</string>
+    <string name="podcast_share_clip_description">%1$s件のエピソードについて%2$d～%3$d秒のクリップを作成</string>
+    <string name="error_transcript_format_not_supported">トランスクリプトフォーマットがサポートされていません: %s</string>
+    <string name="error_transcript_failed_to_load">トランスクリプトの読み込みに失敗しました</string>
+    <string name="transcript">トランスクリプト</string>
+    <string name="no_ratings">評価なし</string>
+    <string name="rate_button">評価する</string>
     <string name="podcast_create_clip">クリップを作成</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">再生中のエピソード全体が無制限のネットワークにキャッシュされ、再生中のストリーミングを最小限に抑えます。 キャッシュサイズの上限に達すると、エピソードは自動的にキャッシュから削除されます。</string>
     <string name="settings_advanced_cache_entire_playing_episode">再生中のエピソードをキャッシュ</string>
     <string name="playback">再生</string>
     <string name="podcast_share_clip">クリップ</string>
@@ -1708,5 +1719,11 @@ Language: ja_JP
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other">%1$d件のエピソード - 残り%2$s</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="other">クリップハンドルを終了: %d秒</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="other">クリップハンドルを開始: %d秒</item>
     </plurals>
 </resources>

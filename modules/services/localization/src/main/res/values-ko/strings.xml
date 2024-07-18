@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-03 11:54:03+0000
+Translation-Revision-Date: 2024-07-16 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">문제가 발생했습니다. 나중에 다시 시도하세요.</string>
+    <string name="thank_you_for_rating">평가해 주셔서 감사합니다!</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">스트리밍을 최소화할 수 있도록, 재생되는 에피소드 전체가 일시적으로 캐시됩니다.</string>
+    <string name="not_allowed_to_rate_description">이 팟캐스트의 청취자만 평점을 매길 수 있습니다. 에피소드를 몇 개 청취하고 돌아와서 평점을 매기세요. 어떻게 생각하시는지 궁금합니다!</string>
+    <string name="not_allowed_to_rate_title">먼저 이 팟캐스트를 청취하세요</string>
+    <string name="episode_cover_description">%s 에피소드 커버</string>
+    <string name="podcast_share_clip_description">%1$s 에피소드에 대해 %2$d~%3$d초 분량의 클립을 제작하세요</string>
+    <string name="error_transcript_format_not_supported">대본 형식이 지원되지 않음: %s</string>
+    <string name="error_transcript_failed_to_load">대본을 로드하지 못했습니다</string>
+    <string name="transcript">대본</string>
+    <string name="no_ratings">평점 없음</string>
+    <string name="rate_button">평가</string>
     <string name="podcast_create_clip">클립 만들기</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">재생 중인 에피소드 전체가 재생 시 스트리밍을 최소화하기 위해 무제한 네트워크에 캐시됩니다. 캐시 크기 한도에 도달하면 캐시에서 에피소드가 자동으로 삭제됩니다.</string>
     <string name="settings_advanced_cache_entire_playing_episode">재생 중인 에피소드 캐시</string>
     <string name="playback">재생</string>
     <string name="podcast_share_clip">클립</string>
@@ -1708,5 +1719,11 @@ Language: ko_KR
     </plurals>
     <plurals name="player_up_next_header_title">
         <item quantity="other">%1$d 에피소드 - %2$s 남음</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="other">종료 클립 핸들: %d초</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="other">시작 클립 핸들: %d초</item>
     </plurals>
 </resources>
