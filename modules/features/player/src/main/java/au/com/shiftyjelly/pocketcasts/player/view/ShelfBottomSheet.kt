@@ -188,10 +188,6 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 openUrl(settings.getReportViolationUrl())
             }
 
-            ShelfItem.Downloading -> {
-                // do nothing
-            }
-
             ShelfItem.RemoveDownloaded -> {
                 playerViewModel.removeDownload()
                 Toast.makeText(context, episode_was_removed, Toast.LENGTH_LONG).show()
