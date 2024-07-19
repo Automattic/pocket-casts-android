@@ -59,7 +59,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/btnChangeAvatar"
                 app:layout_constraintStart_toStartOf="@id/btnChangeAvatar"
                 app:layout_constraintTop_toTopOf="@id/btnChangeAvatar"
-                app:srcCompat="@drawable/ic_avatar" />
+                app:srcCompat="@drawable/ic_profile_circle" />
 
             <TextView
                 android:id="@+id/lblChangeAvatar"
