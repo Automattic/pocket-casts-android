@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -84,6 +85,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/dividerView" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/changeAvatarGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:constraint_referenced_ids="dividerView,imgAvatar,lblChangeAvatar,btnChangeAvatar" />
 
             <View
                 android:id="@+id/dividerChangeEmail"
@@ -181,7 +189,7 @@
                 android:id="@+id/changeEmailPasswordGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="dividerView,imgMail,lblChangeEmail,btnChangeEmail,dividerView2,imgPassword,lblChangePassword,btnChangePwd" />
+                app:constraint_referenced_ids="dividerChangeEmail,imgMail,lblChangeEmail,btnChangeEmail,dividerView2,imgPassword,lblChangePassword,btnChangePwd" />
 
             <View
                 android:id="@+id/dividerViewUpgradeAccount"

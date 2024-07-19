@@ -46,8 +46,11 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
@@ -117,6 +120,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
             binding.userView.signedInState = signInState
+            binding.changeAvatarGroup?.showIf(signInState is SignInState.SignedIn && FeatureFlag.isEnabled(Feature.GRAVATAR_CHANGE_AVATAR))
 
             if (signInState is SignInState.SignedIn) {
                 binding.btnChangeAvatar?.setOnClickListener {
