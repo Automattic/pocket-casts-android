@@ -33,7 +33,7 @@ class ShareViewModel @AssistedInject constructor(
         @OptIn(ExperimentalCoroutinesApi::class)
         playbackManager.playbackStateFlow.distinctUntilChangedBy { listOf(it.podcast?.uuid, it.episodeUuid) }.flatMapLatest { playbackState ->
             combine(
-                flowOf(playbackState.podcast),
+                playbackState.podcast?.uuid?.let(podcastManager::observePodcastByUuidFlow) ?: flowOf(null),
                 episodeManager.observeEpisodeByUuid(playbackState.episodeUuid),
                 ::UiState,
             )

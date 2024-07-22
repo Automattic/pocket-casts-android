@@ -31,7 +31,13 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
-fun OptionsDialogComponent(title: String?, @ColorInt iconColor: Int?, options: List<OptionsDialogOption>, modifier: Modifier = Modifier) {
+fun OptionsDialogComponent(
+    title: String?,
+    @ColorInt iconColor: Int?,
+    options: List<OptionsDialogOption>,
+    modifier: Modifier = Modifier,
+    dividerColor: Color? = null,
+) {
     Column(
         modifier = modifier.padding(bottom = 16.dp),
     ) {
@@ -40,7 +46,7 @@ fun OptionsDialogComponent(title: String?, @ColorInt iconColor: Int?, options: L
             Column {
                 OptionsDialogRow(option = option, iconColor = option.imageColor ?: iconColor, index = index)
                 if (index != options.size - 1) {
-                    HorizontalDivider()
+                    HorizontalDivider(color = dividerColor)
                 }
             }
         }
@@ -71,7 +77,7 @@ private fun OptionsDialogRow(option: OptionsDialogOption, @ColorInt iconColor: I
             .fillMaxWidth()
             .clickable(enabled = option.click != null) { option.click?.invoke() }
             .testTag("option_$index")
-            .background(MaterialTheme.theme.colors.primaryUi01),
+            .background(option.backgroundColor ?: MaterialTheme.theme.colors.primaryUi01),
     ) {
         if (option.imageId != null) {
             Spacer(modifier = Modifier.width(20.dp))
