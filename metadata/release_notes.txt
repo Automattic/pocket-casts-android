@@ -1,7 +1,7 @@
-*   Updates:
-    *   Update Give rating view to include the average rating
-        ([#2421](https://github.com/Automattic/pocket-casts-android/pull/2421))
+* Updated
+    *   App opened from a link with an episode timestamp no longer starts playing automatically.
+        ([#2479](https://github.com/Automattic/pocket-casts-android/pull/2479))
 *   Bug Fixes
-    *   Fix playback speed label tap behavior
-        ([#2439](https://github.com/Automattic/pocket-casts-android/pull/2439))
+    *   Links to episodes with playback position shared from the app are now correctly recognized.
+        ([#2471](https://github.com/Automattic/pocket-casts-android/pull/2471))
 
