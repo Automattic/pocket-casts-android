@@ -149,9 +149,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             }
 
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Worker Downloading episode ${episode.title} ${episode.uuid}")
-            if (!Util.isWearOs(context)) {
-                setForegroundAsync(createForegroundInfo())
-            }
+            setForegroundAsync(createForegroundInfo())
 
             runBlocking {
                 episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADING)
