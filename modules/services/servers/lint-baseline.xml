@@ -8,7 +8,7 @@
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
-            line="223"
+            line="239"
             column="37"/>
     </issue>
 

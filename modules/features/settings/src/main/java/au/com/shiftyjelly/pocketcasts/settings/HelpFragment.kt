@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -31,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.HelpViewModel
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -133,6 +136,16 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         }
 
         return view
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        setupKeyboardModeResize()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        setupKeyboardModePan()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean =
