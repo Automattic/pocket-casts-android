@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
@@ -18,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangeEmailViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.DoneViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -78,17 +79,14 @@ class ChangeEmailFragment : BaseFragment() {
         }
     }
 
-    @Suppress("DEPRECATION")
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        // hack: enable scrolling upon keyboard
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        setupKeyboardModeResize()
     }
 
     override fun onDetach() {
         super.onDetach()
-        // hack: enable scrolling upon keyboard
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        setupKeyboardModePan()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

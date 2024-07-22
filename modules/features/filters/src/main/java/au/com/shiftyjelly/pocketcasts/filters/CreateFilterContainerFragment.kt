@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -19,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentCreateContaine
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themeColors
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -170,17 +171,14 @@ class CreateFilterContainerFragment : BaseFragment() {
         _binding = null
     }
 
-    @Suppress("deprecation")
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        // hack: enable scrolling upon keyboard
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        setupKeyboardModeResize()
     }
 
     override fun onDetach() {
         super.onDetach()
-        // hack: enable scrolling upon keyboard
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        setupKeyboardModePan()
 
         if (!playlistSaved) {
             viewModel.clearNewFilter()
