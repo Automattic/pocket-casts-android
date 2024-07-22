@@ -283,7 +283,7 @@ class DownloadManagerImpl @Inject constructor(
     private val addDownloadMutex = Mutex()
 
     // We only want to be able to queue one download at a time
-    override fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, fireToast: Boolean, source: SourceView) {
+    override fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, source: SourceView) {
         updateSource(source)
 
         launch(downloadsCoroutineContext) {
@@ -304,7 +304,7 @@ class DownloadManagerImpl @Inject constructor(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Added episode to downloads. ${episode.uuid} podcast: ${(episode as? PodcastEpisode)?.podcastUuid} from: $from")
                 val networkRequirements = getRequirementsAndSetStatusAsync(episode)
                 episodeManager.updateLastDownloadAttemptDate(episode)
-                addWorkManagerTask(episode, networkRequirements, fireToast)
+                addWorkManagerTask(episode, networkRequirements)
             }
 
             updateNotification()
@@ -331,7 +331,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun addWorkManagerTask(episode: BaseEpisode, networkRequirements: NetworkRequirements, fireToast: Boolean) {
+    private suspend fun addWorkManagerTask(episode: BaseEpisode, networkRequirements: NetworkRequirements) {
         try {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(networkRequirements.toWorkManagerEnum())
@@ -340,7 +340,6 @@ class DownloadManagerImpl @Inject constructor(
 
             val downloadTask = run {
                 val downloadData = Data.Builder()
-                    .putBoolean(DownloadEpisodeTask.FIRE_TOAST, fireToast)
                     .putString(DownloadEpisodeTask.INPUT_EPISODE_UUID, episode.uuid)
                     .putString(DownloadEpisodeTask.INPUT_PATH_TO_SAVE_TO, DownloadHelper.pathForEpisode(episode, fileStorage))
                     .putString(DownloadEpisodeTask.INPUT_TEMP_PATH, DownloadHelper.tempPathForEpisode(episode, fileStorage))

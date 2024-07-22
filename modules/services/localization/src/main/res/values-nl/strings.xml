@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-03 13:54:04+0000
+Translation-Revision-Date: 2024-07-16 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">Er is iets fout gegaan. Probeer het later opnieuw</string>
+    <string name="thank_you_for_rating">Bedankt voor het beoordelen!</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">De hele aflevering die wordt afgespeeld, is tijdelijk gecachet om streamen te beperken.</string>
+    <string name="not_allowed_to_rate_description">Alleen luisteraars van deze podcast kunnen hem beoordelen. Luister een paar afleveringen en kom dan terug om je beoordeling te geven. We kijken ernaar uit om te horen wat je vindt!</string>
+    <string name="not_allowed_to_rate_title">Luister eerst naar deze podcast</string>
+    <string name="episode_cover_description">Omslagafbeelding van %s aflevering</string>
+    <string name="podcast_share_clip_description">Clip maken tussen %2$d en %3$d seconden voor %1$s aflevering</string>
+    <string name="error_transcript_format_not_supported">Transcriptie format niet ondersteund: %s</string>
+    <string name="error_transcript_failed_to_load">Transcriptie kon niet geladen worden</string>
+    <string name="transcript">Transcriptie</string>
+    <string name="no_ratings">Geen beoordelingen</string>
+    <string name="rate_button">Beoordelen</string>
     <string name="podcast_create_clip">Clip maken</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">De hele aflevering die wordt afgespeeld is gecachet op een onbeperkt netwerk om streamen tijdens het afspelen te minimaliseren. De aflevering wordt automatisch verwijderd uit de cache als de cachelimiet wordt bereikt.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Cache afspelende aflevering</string>
     <string name="playback">Afspelen</string>
     <string name="podcast_share_clip">Clip</string>
@@ -1710,5 +1721,13 @@ Language: nl
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d aflevering - nog %2$s</item>
         <item quantity="other">%1$d afleveringen - nog %2$s</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="one">Handle einde clip: %d seconde</item>
+        <item quantity="other">Handle einde clip: %d seconden</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="one">Handle begin clip: %d seconde</item>
+        <item quantity="other">Handle begin clip: %d seconden</item>
     </plurals>
 </resources>

@@ -18,7 +18,6 @@ object DownloadHelper {
         downloadManager: DownloadManager,
         episodeManager: EpisodeManager,
         source: SourceView,
-        fireToast: Boolean = false,
     ) {
         if (episode.isDownloaded) {
             return
@@ -27,7 +26,7 @@ object DownloadHelper {
         runBlocking {
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED)
         }
-        downloadManager.addEpisodeToQueue(episode, from, fireEvent = true, fireToast = fireToast, source = source)
+        downloadManager.addEpisodeToQueue(episode, from, fireEvent = true, source = source)
     }
 
     fun addAutoDownloadedEpisodeToQueue(episode: BaseEpisode, from: String, downloadManager: DownloadManager, episodeManager: EpisodeManager, source: SourceView) {
@@ -41,7 +40,7 @@ object DownloadHelper {
         runBlocking {
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED)
         }
-        downloadManager.addEpisodeToQueue(episode, from, fireEvent = true, fireToast = false, source = source)
+        downloadManager.addEpisodeToQueue(episode, from, fireEvent = true, source = source)
     }
 
     fun removeEpisodeFromQueue(episode: BaseEpisode, from: String, downloadManager: DownloadManager) {

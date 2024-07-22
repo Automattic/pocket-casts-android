@@ -4,18 +4,22 @@ import android.content.Context
 import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import androidx.core.content.getSystemService
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import timber.log.Timber
 
 /**
  * Manages the focus of the player by tracking audio focus and audio noisy events.
  */
-open class FocusManager(private val settings: Settings, context: Context?) : AudioManager.OnAudioFocusChangeListener {
+class FocusManager(
+    context: Context,
+    private val settings: Settings,
+    private val focusChangeListener: FocusChangeListener,
+) : AudioManager.OnAudioFocusChangeListener {
 
     companion object {
         // we don't have audio focus, and can't duck
@@ -29,19 +33,33 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
 
         // we have full audio focus
         private const val AUDIO_FOCUSED = 3
+
+        private val GAIN_FOCUS_LIST = listOf(
+            AudioManager.AUDIOFOCUS_GAIN,
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT,
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK,
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE,
+        )
+
+        private val LOSS_FOCUS_LIST = listOf(
+            AudioManager.AUDIOFOCUS_LOSS,
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK,
+        )
     }
 
-    private val audioManager: AudioManager? = if (context == null) null else context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val audioManager: AudioManager? = context.getSystemService<AudioManager>().also { manager ->
+        if (manager == null) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No audio manager found for focus manager")
+        }
+    }
 
     // track if another app has stolen audio focus
-    private var audioFocus: Int = 0
+    private var audioFocus: Int = AUDIO_NO_FOCUS_NO_DUCK
 
     // track when the time lost as we don't want to resume if it has been too long
     private var timeFocusLost: Long = 0
     private var deviceRemovedWhileFocusLost = false
-
-    // fire events when the focus changes
-    var focusChangeListener: FocusChangeListener? = null
 
     val isFocused: Boolean
         get() = audioFocus == AUDIO_FOCUSED
@@ -80,7 +98,7 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus gained")
             return true
         } else {
-            focusChangeListener?.onFocusRequestFailed()
+            focusChangeListener.onFocusRequestFailed()
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Couldn't get audio focus")
             return false
         }
@@ -119,40 +137,32 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
     }
 
     override fun onAudioFocusChange(focusChange: Int) {
-        // map to our own focus status
-        if (focusChange == AudioManager.AUDIOFOCUS_GAIN ||
-            focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT ||
-            focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK ||
-            focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE
-        ) {
-            // focus gained
-            // if not transient only let it resume within 2 minutes
-            val shouldResume = (isLostTransient || System.currentTimeMillis() < timeFocusLost + 120000) && !deviceRemovedWhileFocusLost
-            audioFocus = AUDIO_FOCUSED
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus gained, should resume $shouldResume. Device removed: $deviceRemovedWhileFocusLost")
-            focusChangeListener?.onFocusGain(shouldResume)
-        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
-            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
-            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK
-        ) {
-            // focus lost
-            if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                audioFocus = AUDIO_NO_FOCUS_NO_DUCK
-            } else if (isFocused) {
-                if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                    audioFocus = AUDIO_NO_FOCUS_NO_DUCK_TRANSIENT
-                } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                    audioFocus = AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT
+        val focusString = androidAudioFocusToString(focusChange)
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "On audio focus change: $focusString")
+        when (focusChange) {
+            in GAIN_FOCUS_LIST -> {
+                // if not transient only let it resume within 2 minutes
+                val shouldResume = (isLostTransient || System.currentTimeMillis() < timeFocusLost + 120000) && !deviceRemovedWhileFocusLost
+                audioFocus = AUDIO_FOCUSED
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus gained. Should resume: $shouldResume. Device removed: $deviceRemovedWhileFocusLost.")
+                focusChangeListener.onFocusGain(shouldResume)
+            }
+            in LOSS_FOCUS_LIST -> {
+                audioFocus = when {
+                    focusChange == AudioManager.AUDIOFOCUS_LOSS -> AUDIO_NO_FOCUS_NO_DUCK
+                    isFocused && focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> AUDIO_NO_FOCUS_NO_DUCK_TRANSIENT
+                    isFocused && focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT
+                    else -> audioFocus
                 }
-            } // if already paused with a focus lost don't then allow the sound to play ducked
-            timeFocusLost = System.currentTimeMillis()
-            deviceRemovedWhileFocusLost = false
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost. AUDIOFOCUS_LOSS: %s AUDIOFOCUS_LOSS_TRANSIENT: %s AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: %s", focusChange == AudioManager.AUDIOFOCUS_LOSS, focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT, focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK)
-            focusChangeListener?.onFocusLoss(canDuck(), isLostTransient)
-        } else if (focusChange == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
-            focusChangeListener?.onFocusRequestFailed()
-        } else {
-            Timber.w("onAudioFocusChange: Ignoring unsupported focusChange: %d", focusChange)
+                timeFocusLost = System.currentTimeMillis()
+                deviceRemovedWhileFocusLost = false
+                val playOverNotification = canDuck()
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost. Play over notification: $playOverNotification, is transient: $isLostTransient")
+                focusChangeListener.onFocusLoss(playOverNotification, isLostTransient)
+            }
+            else -> {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Unexpected audio focus change: $focusString.")
+            }
         }
     }
 
@@ -239,5 +249,17 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
         }
 
         return typeString
+    }
+
+    private fun androidAudioFocusToString(focus: Int) = when (focus) {
+        AudioManager.AUDIOFOCUS_NONE -> "AUDIOFOCUS_NONE"
+        AudioManager.AUDIOFOCUS_GAIN -> "AUDIOFOCUS_GAIN"
+        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT -> "AUDIOFOCUS_GAIN_TRANSIENT"
+        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK -> "AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK"
+        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE -> "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE"
+        AudioManager.AUDIOFOCUS_LOSS -> "AUDIOFOCUS_LOSS"
+        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> "AUDIOFOCUS_LOSS_TRANSIENT"
+        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK"
+        else -> "AUDIO_FOCUS_UNKNOWN($focus)"
     }
 }

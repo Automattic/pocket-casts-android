@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-02 13:54:03+0000
+Translation-Revision-Date: 2024-07-16 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">Si è verificato un problema. Riprova più tardi</string>
+    <string name="thank_you_for_rating">Ti ringraziamo per la tua valutazione.</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">L\'intero episodio è temporaneamente memorizzato nella cache per ridurre al minimo lo streaming.</string>
+    <string name="not_allowed_to_rate_description">Solo gli ascoltatori di questo podcast possono dare una valutazione. Ascolta qualche episodio e poi torna per lasciare una valutazione. Non vediamo l\'ora di sapere cosa pensi!</string>
+    <string name="not_allowed_to_rate_title">Ascolta prima questo podcast</string>
+    <string name="episode_cover_description">Copertina dell\'episodio %s</string>
+    <string name="podcast_share_clip_description">Crea clip tra i secondi %2$d e %3$d dell\'episodio %1$s</string>
+    <string name="error_transcript_format_not_supported">Formato della trascrizione non supportato: %s</string>
+    <string name="error_transcript_failed_to_load">Caricamento della trascrizione non riuscito</string>
+    <string name="transcript">Trascrizione</string>
+    <string name="no_ratings">Nessuna valutazione</string>
+    <string name="rate_button">Valuta</string>
     <string name="podcast_create_clip">Crea clip</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">L\'intero episodio di gioco è memorizzato nella cache su una rete illimitata per ridurre al minimo lo streaming durante la riproduzione. L\'episodio viene rimosso automaticamente dalla cache quando viene raggiunto il limite di dimensione della cache.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Episodio di riproduzione cache</string>
     <string name="playback">Riproduzione</string>
     <string name="podcast_share_clip">Clip</string>
@@ -1710,5 +1721,13 @@ Language: it
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d episodio - %2$s rimanente</item>
         <item quantity="other">%1$d episodi - %2$s rimanenti</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="one">Fine maniglia della clip: %d secondo</item>
+        <item quantity="other">Fine maniglia della clip: %d secondi</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="one">Inizio maniglia della clip: %d secondo</item>
+        <item quantity="other">Inizio maniglia della clip: %d secondi</item>
     </plurals>
 </resources>

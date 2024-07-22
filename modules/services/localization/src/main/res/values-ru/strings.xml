@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-02 09:54:03+0000
+Translation-Revision-Date: 2024-07-16 13:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">Что-то пошло не так. Повторите попытку позже</string>
+    <string name="thank_you_for_rating">Благодарим за оценку!</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">Весь воспроизводимый выпуск временно кешируется, чтобы свести к минимуму потоковую передачу.</string>
+    <string name="not_allowed_to_rate_description">Только слушатели этого подкаста могут ставить оценки. Прослушайте несколько эпизодов и после этого поставьте оценку. Ждём ваших отзывов!</string>
+    <string name="not_allowed_to_rate_title">Сначала прослушайте подкаст</string>
+    <string name="episode_cover_description">Обложка выпуска %s</string>
+    <string name="podcast_share_clip_description">Создать клип с %2$d по %3$d сек выпуска %1$s</string>
+    <string name="error_transcript_format_not_supported">Формат расшифровки не поддерживается: %s</string>
+    <string name="error_transcript_failed_to_load">Не удалось загрузить расшифровку</string>
+    <string name="transcript">Расшифровка</string>
+    <string name="no_ratings">Нет оценок</string>
+    <string name="rate_button">Оценить</string>
     <string name="podcast_create_clip">Создать клип</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">Весь проигрываемый выпуск кешируется в сети без ограничения трафика, чтобы свести к минимуму потоковую передачу во время воспроизведения. Выпуск автоматически удаляется из кеша по достижении предела размера кеша.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Кешировать проигрываемый выпуск</string>
     <string name="playback">Воспроизведение</string>
     <string name="podcast_share_clip">Клип</string>
@@ -1712,5 +1723,15 @@ Language: ru
         <item quantity="one">%1$d выпуск — %2$s осталось</item>
         <item quantity="few">%1$d вып. — %2$s осталось</item>
         <item quantity="many">%1$d вып. — %2$s осталось</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="one">Дескриптор конца клипа: %d сек</item>
+        <item quantity="few">Дескриптор конца клипа: %d сек</item>
+        <item quantity="many">Дескриптор конца клипа: %d сек</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="one">Дескриптор начала клипа: %d сек</item>
+        <item quantity="few">Дескриптор начала клипа: %d сек</item>
+        <item quantity="many">Дескриптор начала клипа: %d сек</item>
     </plurals>
 </resources>

@@ -399,7 +399,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 if (settings.cloudAutoDownload.value && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
                     userEpisodeDao.updateAutoDownloadStatus(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
                     newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
-                    downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", fireEvent = false, fireToast = false, source = SourceView.UNKNOWN)
+                    downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", fireEvent = false, source = SourceView.UNKNOWN)
                 }
             }
         }

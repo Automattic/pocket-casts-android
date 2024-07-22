@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-03 11:54:02+0000
+Translation-Revision-Date: 2024-07-16 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">Något gick fel. Försök igen senare.</string>
+    <string name="thank_you_for_rating">Tack för ditt betyg!</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">Hela avsnittet som spelas upp cachelagras tillfälligt för att minimera streaming.</string>
+    <string name="not_allowed_to_rate_description">Det är bara lyssnare på den här podcasten som kan ge den ett betyg. Lyssna på ett par avsnitt och återkom sedan med ditt betyg. Vi ser fram emot att få höra vad du tycker.</string>
+    <string name="not_allowed_to_rate_title">Lyssna på den här podcasten först</string>
+    <string name="episode_cover_description">Omslag för avsnitt %s</string>
+    <string name="podcast_share_clip_description">Skapa klipp mellan %2$d och %3$d sekunder för avsnitt %1$s</string>
+    <string name="error_transcript_format_not_supported">Transkriptionsformatet stöds inte: %s</string>
+    <string name="error_transcript_failed_to_load">Det gick inte att läsa in transkriptionen</string>
+    <string name="transcript">Transkription</string>
+    <string name="no_ratings">Inga betyg</string>
+    <string name="rate_button">Betygsätt</string>
     <string name="podcast_create_clip">Skapa klipp</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">Hela avsnittet cachelagras på ett obegränsat nätverk för att minimera streaming under spelning. Avsnittet tas automatiskt bort från cacheminnet när gränsen för cacheminnets storlek har nåtts.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Cacheminne för uppspelning av avsnitt</string>
     <string name="playback">Uppspelning</string>
     <string name="podcast_share_clip">Klipp</string>
@@ -1710,5 +1721,13 @@ Language: sv_SE
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d avsnitt - %2$s kvar</item>
         <item quantity="other">%1$d avsnitt - %2$s kvar</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="one">Handtag för slutklipp: %d sekund</item>
+        <item quantity="other">Handtag för slutklipp: %d sekunder</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="one">Handtag för startklipp: %d sekund</item>
+        <item quantity="other">Handtag för startklipp: %d sekunder</item>
     </plurals>
 </resources>

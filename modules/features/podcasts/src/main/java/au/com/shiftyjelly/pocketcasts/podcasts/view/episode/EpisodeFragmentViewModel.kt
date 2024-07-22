@@ -186,7 +186,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                     analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED
                 } else if (!it.isDownloaded) {
                     it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                    downloadManager.addEpisodeToQueue(it, "episode card", fireEvent = true, fireToast = false, source = source)
+                    downloadManager.addEpisodeToQueue(it, "episode card", fireEvent = true, source = source)
                     analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED
                 }
                 episodeManager.clearPlaybackError(episode)

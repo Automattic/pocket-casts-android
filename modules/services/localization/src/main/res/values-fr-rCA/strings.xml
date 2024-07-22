@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-03 11:54:02+0000
+Translation-Revision-Date: 2024-07-15 12:54:02+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="something_went_wrong_to_rate_this_podcast">Un problème est survenu. Veuillez réessayer plus tard</string>
+    <string name="thank_you_for_rating">Merci pour cette note !</string>
+    <string name="settings_advanced_cache_entire_playing_episode_summary">L’intégralité de l’épisode en cours de lecture est temporairement mis en cache pour minimiser le streaming.</string>
+    <string name="not_allowed_to_rate_description">Seuls les auditeurs de ce podcast peuvent l’évaluer. Écoutez quelques épisodes et revenez l’évaluer. Nous sommes impatients de connaître votre avis !</string>
+    <string name="not_allowed_to_rate_title">Veuillez écouter ce podcast avant</string>
+    <string name="episode_cover_description">Bannière de l’épisode %s</string>
+    <string name="podcast_share_clip_description">Créer un clip entre %2$d et %3$d secondes pour l’épisode %1$s</string>
+    <string name="error_transcript_format_not_supported">Format de la transcription non pris en charge : %s</string>
+    <string name="error_transcript_failed_to_load">Échec du chargement de la transcription</string>
+    <string name="transcript">Transcription</string>
+    <string name="no_ratings">Aucune évaluation</string>
+    <string name="rate_button">Évaluer</string>
     <string name="podcast_create_clip">Créer un clip</string>
-    <string name="settings_advanced_cache_entire_playing_episode_summary">L’intégralité de l’épisode en cours de lecture est mis en cache sur un réseau illimité pour minimiser le streaming lors de la lecture. L’épisode est automatiquement supprimé du cache lorsque la taille maximale de ce dernier est atteinte.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Lecture de l’épisode en cache</string>
     <string name="playback">Écoute</string>
     <string name="podcast_share_clip">Clip</string>
@@ -1710,5 +1721,13 @@ Language: fr
     <plurals name="player_up_next_header_title">
         <item quantity="one">%1$d épisode - %2$s restant</item>
         <item quantity="other">%1$d épisodes - %2$s restant(s)</item>
+    </plurals>
+    <plurals name="podcast_share_end_handle_description">
+        <item quantity="one">Fin de la gestion du clip : %d seconde</item>
+        <item quantity="other">Fin de la gestion du clip : %d secondes</item>
+    </plurals>
+    <plurals name="podcast_share_start_handle_description">
+        <item quantity="one">Début de la gestion du clip : %d seconde</item>
+        <item quantity="other">Début de la gestion du clip : %d secondes</item>
     </plurals>
 </resources>
