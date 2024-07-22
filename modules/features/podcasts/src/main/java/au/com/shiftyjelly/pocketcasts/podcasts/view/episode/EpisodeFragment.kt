@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.sharing.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -122,8 +123,6 @@ class EpisodeFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
-
-    @Inject lateinit var shareDialogFactory: ShareDialogFactory
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
@@ -584,14 +583,12 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun share(state: EpisodeFragmentState.Loaded) {
-        shareDialogFactory.create(
+        ShareDialogFragment.newInstance(
             state.podcast,
             state.episode,
-            parentFragmentManager,
-            context,
-            shouldShowPodcast = false,
-            analyticsTracker = analyticsTracker,
-        ).show(sourceView = SourceView.EPISODE_DETAILS)
+            SourceView.EPISODE_DETAILS,
+            options = listOf(ShareDialogFragment.Options.Episode),
+        ).show(parentFragmentManager, "share_dialog")
     }
 
     interface EpisodeLoadedListener {
