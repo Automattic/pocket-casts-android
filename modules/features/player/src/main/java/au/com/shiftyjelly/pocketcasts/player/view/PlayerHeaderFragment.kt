@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -42,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.sharing.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -445,7 +447,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onShareClick() {
         trackShelfAction(ShelfItem.Share.analyticsValue)
-        ShareFragment.newInstance(SourceView.PLAYER).show(parentFragmentManager, "share_sheet")
+        val podcast = viewModel.podcast ?: return
+        val episode = viewModel.episode as? PodcastEpisode ?: return
+        ShareDialogFragment
+            .newThemedInstance(podcast, episode, theme, SourceView.PLAYER)
+            .show(parentFragmentManager, "share_dialog")
     }
 
     private fun showPodcast() {

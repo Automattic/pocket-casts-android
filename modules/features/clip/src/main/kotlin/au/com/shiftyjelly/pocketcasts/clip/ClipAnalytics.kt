@@ -13,7 +13,7 @@ class ClipAnalytics @AssistedInject constructor(
     @Assisted("clipId") private val clipId: String,
     @Assisted private val source: SourceView,
     @Assisted private val initialClipRange: Clip.Range,
-    val analyticsTracker: AnalyticsTracker,
+    private val analyticsTracker: AnalyticsTracker,
 ) {
     fun screenShown() {
         trackEvent(createBaseEvent(AnalyticsEvent.CLIP_SCREEN_SHOWN))

@@ -34,9 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
@@ -421,23 +420,12 @@ class PodcastViewModel
         }
     }
 
-    fun onShareBookmarkClick(context: Context) {
+    fun onShareBookmarkClick(shareActions: ShareActions) {
         multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
             viewModelScope.launch {
-                val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid)
-                val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
-                if (podcast != null && episode is PodcastEpisode) {
-                    SharePodcastHelper(
-                        podcast,
-                        episode,
-                        bookmark.timeSecs.seconds,
-                        null,
-                        context,
-                        ShareType.BOOKMARK_TIME,
-                        SourceView.PODCAST_SCREEN,
-                        analyticsTracker,
-                    ).showShareDialogDirect()
-                }
+                val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return@launch
+                val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return@launch
+                shareActions.shareBookmark(podcast, episode, bookmark.timeSecs.seconds)
             }
         }
     }

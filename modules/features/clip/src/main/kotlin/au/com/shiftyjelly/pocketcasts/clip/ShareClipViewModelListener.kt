@@ -1,29 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.clip
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import kotlin.time.Duration
 
 internal class ShareClipViewModelListener(
     private val fragment: ShareClipFragment,
     private val viewModel: ShareClipViewModel,
-    private val analyticsTracker: AnalyticsTracker,
 ) : ShareClipPageListener {
     override fun onClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
         viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange))
-        SharePodcastHelper(
-            podcast,
-            episode,
-            clipRange.start,
-            clipRange.end,
-            fragment.requireActivity(),
-            SharePodcastHelper.ShareType.CLIP,
-            SourceView.CLIP_SHARING,
-            analyticsTracker,
-        ).showShareDialogDirect()
+        Toast.makeText(fragment.requireActivity(), "Share clip link", Toast.LENGTH_SHORT).show()
     }
 
     override fun onClickPlay() {
