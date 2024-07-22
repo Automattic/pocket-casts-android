@@ -10,6 +10,10 @@
 *   Bug Fixes
     *   Links to episodes with playback position shared from the app are now correctly recognized.
         ([#2471](https://github.com/Automattic/pocket-casts-android/pull/2471))
+    *   Fixed Help & feedback AI assistant going under the keyboard.
+        ([#2496](https://github.com/Automattic/pocket-casts-android/pull/2496))
+    *   Fixed Wear app episode download issue.
+        ([#2495](https://github.com/Automattic/pocket-casts-android/pull/2495))
 
 7.68
 -----
