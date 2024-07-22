@@ -19,7 +19,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="558"
+            line="562"
             column="13"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="648"
+            line="652"
             column="13"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/DownloadManagerImpl.kt"
-            line="559"
+            line="561"
             column="25"/>
     </issue>
 
@@ -118,7 +118,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="176"
+            line="178"
             column="35"/>
     </issue>
 
@@ -129,7 +129,7 @@
         errorLine2="                                                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="215"
+            line="217"
             column="102"/>
     </issue>
 
@@ -140,7 +140,7 @@
         errorLine2="                                                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="218"
+            line="220"
             column="95"/>
     </issue>
 
@@ -151,7 +151,7 @@
         errorLine2="                                                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="221"
+            line="223"
             column="108"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="                                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="224"
+            line="226"
             column="107"/>
     </issue>
 
@@ -173,7 +173,7 @@
         errorLine2="                                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="227"
+            line="229"
             column="92"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="263"
+            line="265"
             column="82"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="465"
+            line="467"
             column="27"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/UpNextSyncJob.kt"
-            line="115"
+            line="116"
             column="104"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/sync/UpNextSyncJob.kt"
-            line="119"
+            line="120"
             column="98"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
-            line="211"
+            line="199"
             column="13"/>
     </issue>
 
@@ -261,7 +261,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
-            line="289"
+            line="288"
             column="13"/>
     </issue>
 
@@ -433,7 +433,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="519"
+            line="523"
             column="17"/>
     </issue>
 

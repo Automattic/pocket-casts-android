@@ -228,7 +228,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="953"
+            line="969"
             column="55"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="960"
+            line="976"
             column="55"/>
     </issue>
 
@@ -261,11 +261,11 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1583"
+            line="1533"
             column="70"/>
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1587"
+            line="1537"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -301,17 +301,6 @@
             file="src/main/AndroidManifest.xml"
             line="559"
             column="10"/>
-    </issue>
-
-    <issue
-        id="InsecureBaseConfiguration"
-        message="Insecure Base Configuration"
-        errorLine1="    &lt;base-config cleartextTrafficPermitted=&quot;true&quot;>"
-        errorLine2="                                            ~~~~">
-        <location
-            file="src/main/res/xml/network_security_config.xml"
-            line="6"
-            column="45"/>
     </issue>
 
     <issue

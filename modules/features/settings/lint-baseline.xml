@@ -24,6 +24,17 @@
     </issue>
 
     <issue
+        id="MissingSuperCall"
+        message="Overriding method should call `super.onAttach`"
+        errorLine1="    override fun onAttach(context: Context) {"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/HelpFragment.kt"
+            line="141"
+            column="18"/>
+    </issue>
+
+    <issue
         id="DefaultLocale"
         message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
         errorLine1="                log.append(String.format(&quot;Received response for %s in %.1fms%n%s&quot;, response.request.url, (endTime - startTime) / 1e6, response.headers))"
