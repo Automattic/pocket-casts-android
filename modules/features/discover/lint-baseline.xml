@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.2.2)" variant="all" version="8.2.2">
+<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
 
     <issue
         id="UnusedAttribute"
@@ -304,8 +304,8 @@
         errorLine1="    &lt;ImageButton"
         errorLine2="     ~~~~~~~~~~~">
         <location
-            file="src/main/res/layout-h560dp/item_carousel.xml"
-            line="68"
+            file="src/main/res/layout/item_carousel.xml"
+            line="69"
             column="6"/>
     </issue>
 
@@ -315,8 +315,8 @@
         errorLine1="    &lt;ImageButton"
         errorLine2="     ~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/item_carousel.xml"
-            line="68"
+            file="src/main/res/layout-h560dp/item_carousel.xml"
+            line="71"
             column="6"/>
     </issue>
 
