@@ -9,15 +9,21 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
@@ -32,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
@@ -97,13 +104,14 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
 
             if (usePodcastColors) {
                 val backgroundColor = Color(theme.playerBackgroundColor(podcast))
-                val textColor = Color(theme.playerHighlightColor(podcast))
+                val textColor = Color(ThemeColor.playerContrast01(theme.activeTheme))
                 val dividerColor = textColor.copy(alpha = 0.4f)
 
                 Box(modifier = Modifier.background(backgroundColor)) {
                     ShareDialog(
-                        createShareOptions(podcast, episode, backgroundColor, textColor),
-                        dividerColor,
+                        options = createShareOptions(podcast, episode, backgroundColor, textColor),
+                        handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
+                        dividerColor = dividerColor,
                     )
                 }
                 LaunchedEffect(backgroundColor) {
@@ -111,7 +119,10 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                 }
             } else {
                 AppTheme(theme.activeTheme) {
-                    ShareDialog(createShareOptions(podcast, episode))
+                    ShareDialog(
+                        options = createShareOptions(podcast, episode),
+                        handleColor = Color(ThemeColor.primaryIcon02(theme.activeTheme)),
+                    )
                 }
             }
         }
@@ -132,13 +143,24 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
     @Composable
     private fun ShareDialog(
         options: List<OptionsDialogOption>,
+        handleColor: Color,
         dividerColor: Color? = null,
-    ) = OptionsDialogComponent(
-        options = options,
-        dividerColor = dividerColor,
-        title = null,
-        iconColor = null,
-    )
+    ) = Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .width(48.dp)
+                .height(4.dp)
+                .background(handleColor, RoundedCornerShape(2.dp)),
+        )
+        OptionsDialogComponent(
+            options = options,
+            dividerColor = dividerColor,
+            title = null,
+            iconColor = null,
+        )
+    }
 
     private fun createShareOptions(
         podcast: Podcast,
