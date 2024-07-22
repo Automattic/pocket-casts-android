@@ -85,7 +85,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         TrendingPodcast::class,
         Transcript::class,
     ],
-    version = 98,
+    version = 99,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -825,6 +825,11 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE INDEX IF NOT EXISTS transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
         }
 
+        val MIGRATION_98_99 = addMigration(98, 99) { database ->
+            database.execSQL("DROP INDEX transcript_episode_uuid_index")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1213,6 +1218,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_95_96,
                 MIGRATION_96_97,
                 MIGRATION_97_98,
+                MIGRATION_98_99,
             )
         }
 

@@ -4,9 +4,12 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel.State.Loaded.Stars
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.PodcastRatingResult
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -16,20 +19,22 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class GiveRatingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
-    private val ratingsManager: RatingsManager,
     private val userManager: UserManager,
+    private val ratingManager: RatingsManager,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
+    private var shouldTrackDismissedEvent = false
+
     companion object {
+        const val TAG = "GiveRating"
         const val NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE = 2
     }
 
@@ -38,27 +43,22 @@ class GiveRatingViewModel @Inject constructor(
         data class Loaded(
             val podcastUuid: String,
             val podcastTitle: String,
-            private val _stars: Stars?,
+            val previousRate: Stars?,
+            private val _currentSelectedRate: Stars?,
         ) : State() {
-            val stars: Stars = _stars
-                ?: Stars.Zero
+            val currentSelectedRate: Stars = _currentSelectedRate ?: Stars.Zero
 
             enum class Stars {
                 Zero,
-                Half,
                 One,
-                OneAndHalf,
                 Two,
-                TwoAndHalf,
                 Three,
-                ThreeAndHalf,
                 Four,
-                FourAndHalf,
                 Five,
             }
         }
         data class NotAllowedToRate(val podcastUuid: String) : State()
-        data class FailedToRate(val message: String) : State()
+        data object ErrorWhenLoadingPodcast : State()
     }
 
     private val _state = MutableStateFlow<State>(State.Loading)
@@ -67,6 +67,7 @@ class GiveRatingViewModel @Inject constructor(
     fun checkIfUserCanRatePodcast(
         podcastUuid: String,
         onUserSignedOut: () -> Unit,
+        onSuccess: () -> Unit,
     ) {
         _state.value = State.Loading
 
@@ -79,46 +80,60 @@ class GiveRatingViewModel @Inject constructor(
                     val countPlayedEpisodes = podcastManager.countPlayedEpisodes(podcastUuid)
 
                     if (countPlayedEpisodes < NUMBER_OF_EPISODES_LISTENED_REQUIRED_TO_RATE) {
-                        _state.value = State.NotAllowedToRate(podcastUuid)
-                    } else {
-                        val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
-                        if (podcast == null) {
-                            _state.value = State.FailedToRate("Failed to rate")
+                        val episodes = podcastManager.countEpisodesByPodcast(podcastUuid)
+                        if (episodes == 1 && countPlayedEpisodes == 1) {
+                            onSuccess() // This is the case an user wants to rate a podcast that has only one episode.
                         } else {
-                            val rating = ratingsManager.podcastRatings(podcastUuid).first()
-                            val stars: State.Loaded.Stars? = getStarsFromRating(rating)
-
-                            _state.value = State.Loaded(
-                                podcastUuid = podcast.uuid,
-                                podcastTitle = podcast.title,
-                                _stars = stars,
-                            )
+                            _state.value = State.NotAllowedToRate(podcastUuid)
                         }
+                    } else {
+                        onSuccess()
                     }
                 }
             }
         }
     }
 
-    private fun getStarsFromRating(podcastRatings: PodcastRatings): State.Loaded.Stars? {
-        val rating = podcastRatings.average ?: 0.0
+    fun loadData(podcastUuid: String) {
+        viewModelScope.launch {
+            _state.value = State.Loading
 
-        val ratingInt = rating.toInt()
-        val half = rating % 1 >= 0.5
+            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
 
-        return when (ratingInt) {
-            0 -> State.Loaded.Stars.Zero
-            1 -> if (half) State.Loaded.Stars.OneAndHalf else State.Loaded.Stars.One
-            2 -> if (half) State.Loaded.Stars.TwoAndHalf else State.Loaded.Stars.Two
-            3 -> if (half) State.Loaded.Stars.ThreeAndHalf else State.Loaded.Stars.Three
-            4 -> if (half) State.Loaded.Stars.FourAndHalf else State.Loaded.Stars.Four
-            else -> State.Loaded.Stars.Five // if the rating is somehow higher than 5, just return 5
+            if (podcast == null) {
+                _state.value = State.ErrorWhenLoadingPodcast
+            } else {
+                when (val result = ratingManager.getPodcastRating(podcastUuid)) {
+                    is PodcastRatingResult.Success -> {
+                        _state.value = State.Loaded(
+                            podcastUuid = podcast.uuid,
+                            podcastTitle = podcast.title,
+                            _currentSelectedRate = ratingToStars(result.rating),
+                            previousRate = ratingToStars(result.rating),
+                        )
+                    }
+
+                    is PodcastRatingResult.NotFound -> {
+                        _state.value = State.Loaded(
+                            podcastUuid = podcast.uuid,
+                            podcastTitle = podcast.title,
+                            _currentSelectedRate = null,
+                            previousRate = null,
+                        )
+                    }
+
+                    else -> {
+                        LogBuffer.e(TAG, "Error when fetching previous rating for: $podcastUuid")
+                        _state.value = State.ErrorWhenLoadingPodcast
+                    }
+                }
+            }
         }
     }
 
-    fun submitRating(context: Context, onSuccess: () -> Unit) {
+    suspend fun submitRating(podcastUuid: String, context: Context, onSuccess: () -> Unit, onError: () -> Unit) {
         if (!Network.isConnected(context)) {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Cannot submit rating, no network connection")
+            LogBuffer.i(TAG, "Cannot submit rating, no network connection")
             Toast.makeText(
                 context,
                 context.getString(LR.string.podcast_submit_rating_no_internet),
@@ -126,31 +141,67 @@ class GiveRatingViewModel @Inject constructor(
             ).show()
             return
         }
-        val stars = (state.value as State.Loaded).stars
-        Timber.e("submitRating function not implemented yet, but would have submitted a rating of $stars")
-        onSuccess()
+
+        shouldTrackDismissedEvent = false
+
+        val stars = (state.value as State.Loaded).currentSelectedRate
+
+        analyticsTracker.track(
+            AnalyticsEvent.RATING_SCREEN_SUBMIT_TAPPED,
+            mapOf("uuid" to (state.value as State.Loaded).podcastUuid, "stars" to starsToRating(stars)),
+        )
+
+        val result = ratingManager.submitPodcastRating(podcastUuid, starsToRating(stars))
+
+        if (result is PodcastRatingResult.Success) {
+            LogBuffer.i(TAG, "Submitted a rating of ${result.rating} for $podcastUuid")
+            onSuccess()
+        } else {
+            LogBuffer.e(TAG, "Error when submitting rating for: $podcastUuid")
+            onError()
+        }
     }
 
     fun setRating(rating: Double) {
         val stars = ratingToStars(rating)
         val stateValue = _state.value
         if (stateValue !is State.Loaded) {
-            throw IllegalStateException("Cannot set stars when state is not CanRate")
+            throw IllegalStateException("Cannot set stars when state is not Loaded")
         }
-        _state.value = stateValue.copy(_stars = stars)
+        _state.value = stateValue.copy(_currentSelectedRate = stars)
     }
 
-    private fun ratingToStars(rating: Double) = when {
-        rating <= 0 -> State.Loaded.Stars.Zero
-        rating <= 0.5 -> State.Loaded.Stars.Half
-        rating <= 1 -> State.Loaded.Stars.One
-        rating <= 1.5 -> State.Loaded.Stars.OneAndHalf
-        rating <= 2 -> State.Loaded.Stars.Two
-        rating <= 2.5 -> State.Loaded.Stars.TwoAndHalf
-        rating <= 3 -> State.Loaded.Stars.Three
-        rating <= 3.5 -> State.Loaded.Stars.ThreeAndHalf
-        rating <= 4 -> State.Loaded.Stars.Four
-        rating <= 4.5 -> State.Loaded.Stars.FourAndHalf
-        else -> State.Loaded.Stars.Five
+    fun trackOnGiveRatingScreenShown(uuid: String) {
+        shouldTrackDismissedEvent = true
+        analyticsTracker.track(AnalyticsEvent.RATING_SCREEN_SHOWN, mapOf("uuid" to uuid))
     }
+
+    fun trackOnNotAllowedToRateScreenShown(uuid: String) {
+        shouldTrackDismissedEvent = true
+        analyticsTracker.track(AnalyticsEvent.NOT_ALLOWED_TO_RATE_SCREEN_SHOWN, mapOf("uuid" to uuid))
+    }
+
+    fun trackOnDismissed(event: AnalyticsEvent) {
+        if (shouldTrackDismissedEvent) {
+            analyticsTracker.track(event)
+        }
+    }
+}
+
+fun ratingToStars(rating: Double) = when {
+    rating <= 0 -> Stars.Zero
+    rating <= 1 -> Stars.One
+    rating <= 2 -> Stars.Two
+    rating <= 3 -> Stars.Three
+    rating <= 4 -> Stars.Four
+    else -> Stars.Five
+}
+
+fun starsToRating(star: Stars): Int = when (star) {
+    Stars.One -> { 1 }
+    Stars.Two -> { 2 }
+    Stars.Three -> { 3 }
+    Stars.Four -> { 4 }
+    Stars.Five -> { 5 }
+    else -> { 5 }
 }

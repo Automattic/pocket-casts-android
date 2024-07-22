@@ -2,11 +2,11 @@ package au.com.shiftyjelly.pocketcasts.repositories.shortcuts
 
 import android.annotation.TargetApi
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowFilterDeepLink
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.shortcutDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -15,10 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object PocketCastsShortcuts {
-
-    const val INTENT_EXTRA_PAGE = "launch-page"
-    const val INTENT_EXTRA_PLAYLIST_ID = "playlist-id"
-
     /**
      * Icon shortcuts
      * - Podcasts
@@ -51,10 +47,8 @@ object PocketCastsShortcuts {
             LogBuffer.i(PocketCastsShortcuts::class.java.simpleName, "Shortcut update from ${source.value}, top filter title: ${topPlaylist.title}")
 
             if (shortcutManager.dynamicShortcuts.isEmpty() || force) {
-                val filterIntent = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return@launch
-                filterIntent.action = Intent.ACTION_VIEW
-                filterIntent.putExtra(INTENT_EXTRA_PAGE, "playlist")
-                filterIntent.putExtra(INTENT_EXTRA_PLAYLIST_ID, topPlaylist.id)
+                val filterId = topPlaylist.id ?: return@launch
+                val filterIntent = ShowFilterDeepLink(filterId).toIntent(context)
 
                 val playlistTitle = topPlaylist.title.ifEmpty { "Top filter" }
 

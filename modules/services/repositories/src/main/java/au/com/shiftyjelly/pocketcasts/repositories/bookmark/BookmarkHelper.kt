@@ -8,14 +8,13 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_ADD_BOOKMARK
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_DELETE_BOOKMARK
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.INTENT_OPEN_APP_VIEW_BOOKMARKS
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver.Companion.INTENT_EXTRA_NOTIFICATION_TAG
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isAppForeground
@@ -40,10 +39,7 @@ class BookmarkHelper @Inject constructor(
             Util.getAppPlatform(context) == AppPlatform.Phone &&
             !isAndroidAutoConnected
         ) {
-            val bookmarkIntent =
-                context.packageManager.getLaunchIntentForPackage(context.packageName)
-                    ?.apply { action = INTENT_OPEN_APP_ADD_BOOKMARK }
-            bookmarkIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val bookmarkIntent = AddBookmarkDeepLink.toIntent(context)
             context.startActivity(bookmarkIntent)
         } else {
             if (playbackManager.getCurrentEpisode() == null) return
@@ -85,13 +81,13 @@ private fun buildAndShowNotification(
     val changeTitleAction = NotificationCompat.Action(
         IR.drawable.ic_notification_edit,
         context.getString(LR.string.bookmark_notification_action_change_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE, bookmarkUuid),
+        buildPendingIntent(context, ChangeBookmarkTitleDeepLink(bookmarkUuid).toIntent(context)),
     )
 
     val deleteAction = NotificationCompat.Action(
         R.drawable.ic_delete_black,
         context.getString(LR.string.bookmark_notification_action_delete_title),
-        buildPendingIntent(context, INTENT_OPEN_APP_DELETE_BOOKMARK, bookmarkUuid),
+        buildPendingIntent(context, DeleteBookmarkDeepLink(bookmarkUuid).toIntent(context)),
     )
 
     val notification = NotificationCompat.Builder(
@@ -104,13 +100,7 @@ private fun buildAndShowNotification(
         .setSmallIcon(IR.drawable.notification)
         .setAutoCancel(true)
         .setOnlyAlertOnce(true)
-        .setContentIntent(
-            buildPendingIntent(
-                context,
-                INTENT_OPEN_APP_VIEW_BOOKMARKS,
-                bookmarkUuid,
-            ),
-        )
+        .setContentIntent(buildPendingIntent(context, ShowBookmarkDeepLink(bookmarkUuid).toIntent(context)))
         .addAction(changeTitleAction)
         .addAction(deleteAction)
         .build()
@@ -128,21 +118,10 @@ private fun buildAndShowNotification(
 
 private fun buildPendingIntent(
     context: Context,
-    actionKey: String,
-    bookmarkUuid: String,
-): PendingIntent {
-    val appIntent = context.packageManager
-        .getLaunchIntentForPackage(context.packageName)
-        ?.apply {
-            action = actionKey
-            putExtra(Settings.BOOKMARK_UUID, bookmarkUuid)
-            putExtra(INTENT_EXTRA_NOTIFICATION_TAG, "${Settings.BOOKMARK_UUID}_$bookmarkUuid")
-        }
-
-    return PendingIntent.getActivity(
-        context,
-        0,
-        appIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
-    )
-}
+    intent: Intent?,
+) = PendingIntent.getActivity(
+    context,
+    0,
+    intent,
+    PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+)

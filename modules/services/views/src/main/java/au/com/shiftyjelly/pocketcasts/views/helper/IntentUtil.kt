@@ -7,92 +7,14 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.util.Arrays
-import java.util.regex.Matcher
 import timber.log.Timber
 
 object IntentUtil {
-
-    fun isPocketCastsWebsite(intent: Intent): Boolean {
-        return intent.data?.host == BuildConfig.WEB_BASE_HOST
-    }
-
-    fun isPodloveUrl(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc" || intent.data == null || intent.data?.host == null) {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "subscribe" || host == "subscribehttps"
-    }
-
-    fun isSonosAppLinkUrl(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc" || intent.data == null || intent.data?.host == null) {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "applink"
-    }
-
-    fun getPodloveUrl(intent: Intent): String? {
-        val uri = intent.data ?: return null
-        var path = uri.path ?: return null
-        if (path.startsWith("/")) {
-            path = path.replaceFirst(Matcher.quoteReplacement("/").toRegex(), "")
-        }
-        if (path.length < 3) {
-            return null
-        }
-        val host = uri.host
-        val params = uri.encodedQuery
-        return (if (host == "subscribehttps") "https" else "http") + "://" + path + if (!params.isNullOrEmpty()) "?${uri.encodedQuery}" else ""
-    }
-
-    fun isShareLink(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        return scheme != null && scheme == "pktc" && intent.data != null && intent.data?.path != null
-    }
-
-    fun isNativeShareLink(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        return scheme != null && scheme in listOf("http", "https") && intent.data != null && intent.data?.host in listOf("pca.st", "pcast.pocketcasts.net")
-    }
-
-    // http://subscribeonandroid.com/geeknewscentral.com/podcast.xml
-    fun isSubscribeOnAndroidUrl(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || !(scheme == "http" || scheme == "https")) {
-            return false
-        }
-
-        if (intent.data == null || intent.data?.host == null) {
-            return false
-        }
-        val host = intent.data?.host
-        return host == "subscribeonandroid.com" || host == "www.subscribeonandroid.com"
-    }
-
-    fun getSubscribeOnAndroidUrl(intent: Intent): String? {
-        val uri = intent.data ?: return null
-        var path = uri.path ?: return null
-        if (path.startsWith("/")) {
-            path = path.replaceFirst(Matcher.quoteReplacement("/").toRegex(), "")
-        }
-        if (path.length < 3) {
-            return null
-        }
-        val scheme = intent.scheme
-        return "$scheme://$path"
-    }
 
     fun webViewShouldOverrideUrl(url: String?, context: Context): Boolean {
         var urlFound: String = url ?: return true
@@ -189,71 +111,6 @@ object IntentUtil {
         }
 
         return true
-    }
-
-    fun isPodcastListShare(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || !(scheme == "http" || scheme == "https")) {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "lists.pocketcasts.com"
-    }
-
-    fun isPodcastListShareMobile(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        val host = intent.data?.host
-        return host == "sharelist"
-    }
-
-    fun getUrl(intent: Intent): String? {
-        return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
-    }
-
-    fun isItunesLink(intent: Intent): Boolean {
-        return intent.data?.host == "itunes.apple.com" || intent.data?.host == "podcasts.apple.com"
-    }
-
-    fun isCloudFilesIntent(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        return Uri.parse(Settings.INTENT_LINK_CLOUD_FILES).host == intent.data?.host
-    }
-
-    fun isUpgradeIntent(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        return Uri.parse(Settings.INTENT_LINK_UPGRADE).host == intent.data?.host
-    }
-
-    fun isPromoCodeIntent(intent: Intent): Boolean {
-        val scheme = intent.scheme
-        if (scheme == null || scheme != "pktc") {
-            return false
-        }
-
-        val uri = Uri.parse(Settings.INTENT_LINK_PROMO_CODE)
-        return uri.host == intent.data?.host && intent.data?.pathSegments?.firstOrNull() == uri.pathSegments.first()
-    }
-
-    fun openWebPage(url: String): Intent {
-        var uri = Uri.parse(url)
-        // fix for podcast web pages that don't start with http://
-        if (uri.scheme.isNullOrBlank() && !url.contains("://")) {
-            uri = Uri.parse("http://$url")
-        }
-        return Intent(Intent.ACTION_VIEW, uri)
     }
 
     fun sendIntent(

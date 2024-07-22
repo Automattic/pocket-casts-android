@@ -208,3 +208,18 @@ message PodcastFolder {
   int32 podcasts_sort_type = 5;
   google.protobuf.Timestamp date_added = 6;
 }
+
+message PodcastRatingResponse {
+    string podcast_uuid = 1;
+    google.protobuf.Timestamp modified_at = 3;
+    uint32 podcast_rating = 4;
+}
+
+message PodcastRatingAddRequest {
+    string podcast_uuid = 1;
+    uint32 podcast_rating = 2;
+}
+
+message PodcastRatingShowRequest {
+    string podcast_uuid = 1;
+}

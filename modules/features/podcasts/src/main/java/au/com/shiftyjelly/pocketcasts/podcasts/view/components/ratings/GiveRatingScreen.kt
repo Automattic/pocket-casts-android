@@ -14,29 +14,36 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.starsToRating
 
 @Composable
 fun GiveRatingScreen(
+    viewModel: GiveRatingViewModel,
     state: GiveRatingViewModel.State.Loaded,
-    setRating: (Double) -> Unit,
     submitRating: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    CallOnce {
+        viewModel.trackOnGiveRatingScreenShown(state.podcastUuid)
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -63,7 +70,7 @@ fun GiveRatingScreen(
                 Spacer(Modifier.height(40.dp))
 
                 TextH30(
-                    text = stringResource(LR.string.podcast_rate, state.podcastTitle),
+                    text = stringResource(R.string.podcast_rate, state.podcastTitle),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.W600,
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -72,7 +79,8 @@ fun GiveRatingScreen(
                 Spacer(Modifier.height(32.dp))
 
                 SwipeableStars(
-                    onStarsChanged = setRating,
+                    initialRate = state.previousRate?.let { starsToRating(it) },
+                    onStarsChanged = viewModel::setRating,
                     modifier = Modifier
                         .height(48.dp)
                         .padding(horizontal = 16.dp),
@@ -82,11 +90,14 @@ fun GiveRatingScreen(
             Spacer(Modifier.weight(1f))
 
             RowButton(
-                text = stringResource(LR.string.submit),
+                text = stringResource(R.string.submit),
                 onClick = submitRating,
+                enabled = state.currentSelectedRate != GiveRatingViewModel.State.Loaded.Stars.Zero,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = MaterialTheme.theme.colors.primaryText01,
+                    disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
                 ),
+                modifier = Modifier.alpha(if (state.previousRate != state.currentSelectedRate) 1f else 0f),
             )
         }
 

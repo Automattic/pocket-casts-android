@@ -8,7 +8,7 @@ import androidx.room.Index
     tableName = "episode_transcript",
     primaryKeys = ["episode_uuid", "url"],
     indices = [
-        Index(name = "transcript_episode_uuid_index", value = ["episode_uuid"]),
+        Index(name = "transcript_episode_uuid_index", value = ["episode_uuid"], unique = true),
     ],
 )
 data class Transcript(

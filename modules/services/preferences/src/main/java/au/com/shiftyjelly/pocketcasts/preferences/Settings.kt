@@ -105,30 +105,12 @@ interface Settings {
         const val AUTO_ARCHIVE_INCLUDE_STARRED = "autoArchiveIncludeStarred"
 
         const val INTENT_OPEN_APP_NEW_EPISODES = "INTENT_OPEN_APP_NEW_EPISODES"
-        const val INTENT_OPEN_APP_DOWNLOADING = "INTENT_OPEN_APP_DOWNLOADING"
-        const val INTENT_OPEN_APP_PODCAST_UUID = "INTENT_OPEN_APP_PODCAST_UUID"
-        const val INTENT_OPEN_APP_EPISODE_UUID = "INTENT_OPEN_APP_EPISODE_UUID"
-        const val INTENT_OPEN_APP_ADD_BOOKMARK = "INTENT_OPEN_APP_ADD_BOOKMARK"
-        const val INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE = "INTENT_OPEN_APP_CHANGE_BOOKMARK_TITLE"
-        const val INTENT_OPEN_APP_DELETE_BOOKMARK = "INTENT_OPEN_APP_DELETE_BOOKMARK"
-        const val INTENT_OPEN_APP_VIEW_BOOKMARKS = "INTENT_OPEN_APP_VIEW_BOOKMARKS"
-        const val INTENT_LINK_CLOUD_FILES = "pktc://cloudfiles"
-        const val INTENT_LINK_UPGRADE = "pktc://upgrade"
-        const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
 
         const val LOG_TAG_AUTO = "PocketCastsAuto"
 
         const val NOTIFICATIONS_DISABLED_MESSAGE_SHOWN = "notificationsDisabledMessageShown"
 
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
-
-        const val BOOKMARK_UUID = "bookmark_uuid"
-
-        const val PODCAST_UUID = "podcast_uuid"
-
-        const val EPISODE_UUID = "episode_uuid"
-
-        const val SOURCE_VIEW = "source_view"
 
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
     }

@@ -47,14 +47,14 @@ class NovaLauncherBridge @Inject constructor(
     }
 
     private fun registerNovaLauncherSync() {
-        logInfo("Unregister Nova Launcher sync")
+        logInfo("Register Nova Launcher sync")
         processLifecycle.addObserver(novaLauncherObserver)
         NovaLauncherSyncWorker.enqueuePeriodicWork(context)
         novaLauncherQueueSync.keepQueueInSync()
     }
 
     private fun unregisterNovaLauncherSync() {
-        logInfo("Register Nova Launcher sync")
+        logInfo("Unregister Nova Launcher sync")
         processLifecycle.removeObserver(novaLauncherObserver)
         NovaLauncherSyncWorker.cancelOneOffWork(context)
         NovaLauncherSyncWorker.cancelPeriodicWork(context)

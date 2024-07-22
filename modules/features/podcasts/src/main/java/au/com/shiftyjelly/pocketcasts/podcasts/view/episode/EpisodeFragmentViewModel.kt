@@ -43,6 +43,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 
@@ -75,13 +76,15 @@ class EpisodeFragmentViewModel @Inject constructor(
     var episode: PodcastEpisode? = null
     var isFragmentChangingConfigurations: Boolean = false
 
+    private var startPlaybackTimestamp: Duration? = null
+
     fun setup(
         episodeUuid: String,
         podcastUuid: String?,
         forceDark: Boolean,
         timestamp: Duration?,
     ) {
-        var playAtTimestamp = timestamp != null
+        startPlaybackTimestamp = timestamp
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
             .filter { it.episodeUuid == episodeUuid }
@@ -129,16 +132,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                     zipper,
                 )
             }
-            .doOnNext {
-                if (it is EpisodeFragmentState.Loaded) {
-                    timestamp?.let { timestamp ->
-                        if (!playAtTimestamp) return@let
-                        playAtTimestamp(it.episode, timestamp)
-                        playAtTimestamp = false
-                    }
-                    episode = it.episode
-                }
-            }
+            .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -278,22 +272,30 @@ class EpisodeFragmentViewModel @Inject constructor(
         fromListUuid: String? = null,
     ): Boolean {
         episode?.let { episode ->
-            if (isPlaying.value == true) {
-                playbackManager.pause(sourceView = source)
-                return false
-            } else {
-                fromListUuid?.let {
-                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
-                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
+            val timestamp = startPlaybackTimestamp
+            when {
+                isPlaying.value == true -> {
+                    playbackManager.pause(sourceView = source)
+                    return false
                 }
-                playbackManager.playNow(
-                    episode = episode,
-                    forceStream = force,
-                    showedStreamWarning = showedStreamWarning,
-                    sourceView = source,
-                )
-                warningsHelper.showBatteryWarningSnackbarIfAppropriate()
-                return true
+                timestamp != null -> {
+                    startPlaybackTimestamp = null
+                    playAtTimestamp(episode, timestamp)
+                    return true
+                } else -> {
+                    fromListUuid?.let {
+                        FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
+                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
+                    }
+                    playbackManager.playNow(
+                        episode = episode,
+                        forceStream = force,
+                        showedStreamWarning = showedStreamWarning,
+                        sourceView = source,
+                    )
+                    warningsHelper.showBatteryWarningSnackbarIfAppropriate()
+                    return true
+                }
             }
         }
 
@@ -304,13 +306,9 @@ class EpisodeFragmentViewModel @Inject constructor(
         episode: BaseEpisode,
         timestamp: Duration,
     ) {
-        viewModelScope.launch {
-            val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
-                playbackManager.getCurrentEpisode()?.uuid != episode.uuid
-            if (shouldLoadOrSwitchEpisode) {
-                playbackManager.playNowSync(episode, sourceView = source)
-            }
-            playbackManager.seekToTimeMs(positionMs = timestamp.toInt(DurationUnit.MILLISECONDS))
+        viewModelScope.launch(Dispatchers.IO + NonCancellable) {
+            playbackManager.playNowSync(episode, sourceView = source)
+            playbackManager.seekToTimeMsSuspend(timestamp.toInt(DurationUnit.MILLISECONDS))
         }
     }
 

@@ -49,6 +49,9 @@ abstract class EpisodeDao {
     @Query("SELECT count(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid AND played_up_to > (duration / 2)")
     abstract suspend fun countPlayedEpisodes(podcastUuid: String): Int
 
+    @Query("SELECT count(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid")
+    abstract suspend fun countEpisodesByPodcast(podcastUuid: String): Int
+
     @Query("SELECT * FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
 

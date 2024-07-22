@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
@@ -378,7 +379,19 @@ class SyncManagerImpl @Inject constructor(
             syncServerManager.episodeSync(request, token)
         }
 
-// Other
+    // Rating
+
+    override suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse =
+        getCacheTokenOrLogin { token ->
+            syncServerManager.addPodcastRating(podcastUuid, rate, token)
+        }
+
+    override suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResponse =
+        getCacheTokenOrLogin { token ->
+            syncServerManager.getPodcastRating(podcastUuid, token)
+        }
+
+    // Other
 
     override suspend fun exchangeSonos(): ExchangeSonosResponse =
         getCacheTokenOrLogin { token ->

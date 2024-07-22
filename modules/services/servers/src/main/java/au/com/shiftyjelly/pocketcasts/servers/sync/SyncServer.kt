@@ -14,6 +14,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import com.pocketcasts.service.api.BookmarkRequest
 import com.pocketcasts.service.api.BookmarksResponse
+import com.pocketcasts.service.api.PodcastRatingAddRequest
+import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.PodcastRatingShowRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListRequest
@@ -165,4 +168,12 @@ interface SyncServer {
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/bookmark/list")
     suspend fun getBookmarkList(@Header("Authorization") authorization: String, @Body request: BookmarkRequest): BookmarksResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/user/podcast_rating/add")
+    suspend fun addPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingAddRequest): PodcastRatingResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/user/podcast_rating/show")
+    suspend fun getPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingShowRequest): PodcastRatingResponse
 }

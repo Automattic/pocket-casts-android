@@ -31,7 +31,8 @@ interface FragmentHostListener {
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
-        timestamp: Duration? = null,
+        startTimestamp: Duration? = null,
+        endTimestamp: Duration? = null,
     )
     fun lockPlayerBottomSheet(locked: Boolean)
     fun updateSystemColors()

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.utils
+package au.com.shiftyjelly.pocketcasts.deeplink
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours

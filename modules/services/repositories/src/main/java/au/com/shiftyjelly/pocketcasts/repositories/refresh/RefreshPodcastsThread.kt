@@ -17,10 +17,12 @@ import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
@@ -466,10 +468,12 @@ class RefreshPodcastsThread(
             var intentId = intentId
             val manager = NotificationManagerCompat.from(context)
 
-            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                action = (System.currentTimeMillis() + intentId).toString()
-                putExtra(Settings.INTENT_OPEN_APP_EPISODE_UUID, episode.uuid)
+            val intent = ShowEpisodeDeepLink(
+                episodeUuid = episode.uuid,
+                podcastUuid = podcast.uuid,
+                sourceView = EpisodeViewSource.NOTIFICATION.value,
+            ).toIntent(context).apply {
+                action = action + System.currentTimeMillis() + intentId
             }
             val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
             intentId += 1
