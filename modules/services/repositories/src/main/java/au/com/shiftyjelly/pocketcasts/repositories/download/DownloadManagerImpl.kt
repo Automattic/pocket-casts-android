@@ -524,9 +524,6 @@ class DownloadManagerImpl @Inject constructor(
     }
 
     private fun updateNotification() {
-        // Don't show these notifications on wear os
-        if (Util.isWearOs(context)) return
-
         launch(downloadsCoroutineContext) {
             var progress = 0.0
             var max = 0.0
