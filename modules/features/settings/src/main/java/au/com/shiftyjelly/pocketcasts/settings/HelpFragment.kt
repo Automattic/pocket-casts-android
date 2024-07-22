@@ -138,7 +138,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         return view
     }
 
-    @Suppress("DEPRECATION")
     override fun onAttach(context: Context) {
         super.onAttach(context)
         setupKeyboardModeResize()
