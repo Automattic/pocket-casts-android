@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-data class SharePodcastHelper(
+data class SharePodcastHelper constructor(
     val podcast: Podcast, // Share just a podcast.
     val episode: PodcastEpisode? = null, // Share an episode of a podcast.
     val start: Duration? = null, // Share start position in an episode of a podcast.

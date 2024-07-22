@@ -665,7 +665,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                     onItemUpdated = ::notifyItemChanged,
                     defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                    context = context,
                     fragmentManager = parentFragmentManager,
                     swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
                 ),

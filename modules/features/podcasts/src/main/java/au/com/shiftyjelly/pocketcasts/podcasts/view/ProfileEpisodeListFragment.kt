@@ -148,7 +148,6 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = ::lazyNotifyItemChanged,
                 defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = when (mode) {
                     Mode.Downloaded -> EpisodeItemTouchHelper.SwipeSource.DOWNLOADS
