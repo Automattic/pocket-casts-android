@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetail
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -115,8 +114,6 @@ class EpisodeFragment : BaseFragment() {
     }
 
     override lateinit var statusBarColor: StatusBarColor
-
-    @Inject lateinit var serverManager: ServerManager
 
     @Inject lateinit var settings: Settings
 
