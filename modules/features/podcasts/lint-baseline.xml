@@ -134,6 +134,17 @@
     </issue>
 
     <issue
+        id="ModifierParameter"
+        message="Modifier parameter should be the first optional parameter"
+        errorLine1="    modifier: Modifier = Modifier,"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/components/ratings/SwipeableStars.kt"
+            line="55"
+            column="5"/>
+    </issue>
+
+    <issue
         id="SpUsage"
         message="Should use &quot;`sp`&quot; instead of &quot;`dp`&quot; for text sizes"
         errorLine1="        android:textSize=&quot;12dp&quot;/>"
@@ -558,7 +569,7 @@
         errorLine2="                             ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/components/ratings/SwipeableStars.kt"
-            line="61"
+            line="62"
             column="30"/>
     </issue>
 
@@ -569,7 +580,7 @@
         errorLine2="                                            ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/components/ratings/SwipeableStars.kt"
-            line="142"
+            line="144"
             column="45"/>
     </issue>
 
@@ -1036,7 +1047,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/view_podcast_header_bottom.xml"
-            line="87"
+            line="99"
             column="6"/>
     </issue>
 
@@ -1047,7 +1058,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/view_podcast_header_bottom.xml"
-            line="108"
+            line="120"
             column="6"/>
     </issue>
 
@@ -1058,7 +1069,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/view_podcast_header_bottom.xml"
-            line="146"
+            line="158"
             column="6"/>
     </issue>
 
@@ -1069,7 +1080,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout/view_podcast_header_bottom.xml"
-            line="183"
+            line="195"
             column="6"/>
     </issue>
 
