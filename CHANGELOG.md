@@ -1,6 +1,8 @@
 7.70
 -----
-
+* Updated
+    *   Episodes shared from the player are updated with the playback status.
+        ([#2499](https://github.com/Automattic/pocket-casts-android/pull/2499))
 
 7.69
 -----
