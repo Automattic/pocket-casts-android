@@ -357,6 +357,13 @@
                 app:tint="?attr/player_contrast_03" />
 
             <ImageButton
+                android:id="@+id/transcript"
+                android:contentDescription="@string/transcript"
+                app:srcCompat="@drawable/ic_transcript"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
                 android:id="@+id/share"
                 android:contentDescription="@string/share_podcast"
                 app:srcCompat="@drawable/ic_share_android_32"
