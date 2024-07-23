@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,13 +37,13 @@ internal fun HorizontalClipCard(
     podcast: Podcast,
     episodeCount: Int,
     useEpisodeArtwork: Boolean,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) {
     val backgroundGradient = Brush.verticalGradient(
         listOf(
-            clipColors.cardTop,
-            clipColors.cardBottom,
+            shareColors.cardTop,
+            shareColors.cardBottom,
         ),
     )
     Row(
@@ -66,7 +66,7 @@ internal fun HorizontalClipCard(
         ) {
             TextH70(
                 text = podcast.title,
-                color = clipColors.cardText.copy(alpha = 0.5f),
+                color = shareColors.cardText.copy(alpha = 0.5f),
                 maxLines = 1,
             )
             Spacer(
@@ -74,7 +74,7 @@ internal fun HorizontalClipCard(
             )
             TextH40(
                 text = episode.title,
-                color = clipColors.cardText,
+                color = shareColors.cardText,
                 maxLines = 1,
             )
             Spacer(
@@ -85,7 +85,7 @@ internal fun HorizontalClipCard(
                     pluralStringResource(LR.plurals.episode_count, count = episodeCount, episodeCount),
                     podcast.displayableFrequency(LocalContext.current.resources),
                 ).joinToString(" · "),
-                color = clipColors.cardText.copy(alpha = 0.5f),
+                color = shareColors.cardText.copy(alpha = 0.5f),
             )
         }
     }
@@ -118,6 +118,6 @@ private fun HorizontalClipCardPreview(
     ),
     episodeCount = 120,
     useEpisodeArtwork = true,
-    clipColors = ClipColors(baseColor),
+    shareColors = ShareColors(baseColor),
     modifier = Modifier.height(172.dp),
 )

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

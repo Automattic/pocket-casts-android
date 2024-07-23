@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import android.content.Context
 import androidx.annotation.OptIn
@@ -17,6 +17,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.sharing.di.ClipSimpleCache
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds

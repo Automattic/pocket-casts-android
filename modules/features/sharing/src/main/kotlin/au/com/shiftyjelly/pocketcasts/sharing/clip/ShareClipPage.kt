@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -36,6 +36,12 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
+import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelectorState
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalClipCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalClipCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.rememberClipSelectorState
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.sql.Date
 import java.time.Instant
@@ -77,7 +83,7 @@ internal fun ShareClipPage(
     episodeCount: Int,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     listener: ShareClipPageListener,
     state: ClipSelectorState = rememberClipSelectorState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
@@ -91,7 +97,7 @@ internal fun ShareClipPage(
         episodeCount = episodeCount,
         isPlaying = isPlaying,
         useEpisodeArtwork = useEpisodeArtwork,
-        clipColors = clipColors,
+        shareColors = shareColors,
         listener = listener,
         state = state,
     )
@@ -103,7 +109,7 @@ internal fun ShareClipPage(
         playbackProgress = playbackProgress,
         isPlaying = isPlaying,
         useEpisodeArtwork = useEpisodeArtwork,
-        clipColors = clipColors, listener = listener,
+        shareColors = shareColors, listener = listener,
         state = state,
     )
 }
@@ -116,7 +122,7 @@ private fun VerticalClipPage(
     playbackProgress: Duration,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     listener: ShareClipPageListener,
     state: ClipSelectorState,
 ) = Box {
@@ -124,7 +130,7 @@ private fun VerticalClipPage(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .background(clipColors.background),
+            .background(shareColors.background),
     ) {
         Spacer(
             modifier = Modifier.weight(0.5f),
@@ -132,7 +138,7 @@ private fun VerticalClipPage(
 
         TextH30(
             text = stringResource(LR.string.podcast_create_clip),
-            color = clipColors.backgroundText,
+            color = shareColors.backgroundText,
         )
 
         Spacer(
@@ -148,7 +154,7 @@ private fun VerticalClipPage(
                     episode = episode,
                     podcast = podcast,
                     useEpisodeArtwork = useEpisodeArtwork,
-                    clipColors = clipColors,
+                    shareColors = shareColors,
                 )
             }
             Spacer(
@@ -159,7 +165,7 @@ private fun VerticalClipPage(
                 clipRange = clipRange,
                 playbackProgress = playbackProgress,
                 isPlaying = isPlaying,
-                clipColors = clipColors,
+                shareColors = shareColors,
                 listener = listener,
                 modifier = Modifier.padding(horizontal = 16.dp),
                 state = state,
@@ -171,7 +177,7 @@ private fun VerticalClipPage(
                 podcast = podcast,
                 episode = episode,
                 clipRange = clipRange,
-                clipColors = clipColors,
+                shareColors = shareColors,
                 listener = listener,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -188,7 +194,7 @@ private fun VerticalClipPage(
             .wrapContentHeight(),
     ) {
         CloseButton(
-            clipColors = clipColors,
+            shareColors = shareColors,
             onClose = listener::onClose,
             modifier = Modifier.padding(top = 16.dp, end = 16.dp),
         )
@@ -204,7 +210,7 @@ private fun HorizontalClipPage(
     episodeCount: Int,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     listener: ShareClipPageListener,
     state: ClipSelectorState,
 ) {
@@ -212,7 +218,7 @@ private fun HorizontalClipPage(
         contentAlignment = Alignment.TopEnd,
         modifier = Modifier
             .fillMaxSize()
-            .background(clipColors.background),
+            .background(shareColors.background),
     ) {
         Row {
             Column(
@@ -230,7 +236,7 @@ private fun HorizontalClipPage(
                             podcast = podcast,
                             episodeCount = episodeCount,
                             useEpisodeArtwork = useEpisodeArtwork,
-                            clipColors = clipColors,
+                            shareColors = shareColors,
                             modifier = Modifier
                                 .width(minOf(maxWidth, 360.dp))
                                 .height(180.dp),
@@ -255,7 +261,7 @@ private fun HorizontalClipPage(
                         clipRange = clipRange,
                         playbackProgress = playbackProgress,
                         isPlaying = isPlaying,
-                        clipColors = clipColors,
+                        shareColors = shareColors,
                         listener = listener,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         state = state,
@@ -267,7 +273,7 @@ private fun HorizontalClipPage(
                         podcast = podcast,
                         episode = episode,
                         clipRange = clipRange,
-                        clipColors = clipColors,
+                        shareColors = shareColors,
                         listener = listener,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -279,14 +285,14 @@ private fun HorizontalClipPage(
         }
         TextH30(
             text = stringResource(LR.string.podcast_create_clip),
-            color = clipColors.backgroundText,
+            color = shareColors.backgroundText,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 28.dp),
         )
         CloseButton(
-            clipColors = clipColors,
+            shareColors = shareColors,
             onClose = listener::onClose,
             modifier = Modifier.padding(top = 24.dp, end = 16.dp),
         )
@@ -298,7 +304,7 @@ private fun ClipButton(
     podcast: Podcast,
     episode: PodcastEpisode,
     clipRange: Clip.Range,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     listener: ShareClipPageListener,
     modifier: Modifier = Modifier,
 ) = RowButton(
@@ -310,8 +316,8 @@ private fun ClipButton(
         clipRange.endInSeconds,
     ),
     onClick = { listener.onClip(podcast, episode, clipRange) },
-    colors = ButtonDefaults.buttonColors(backgroundColor = clipColors.clipButton),
-    textColor = clipColors.clipButtonText,
+    colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+    textColor = shareColors.clipButtonText,
     elevation = null,
     includePadding = false,
     modifier = modifier,
@@ -319,17 +325,17 @@ private fun ClipButton(
 
 @Composable
 private fun CloseButton(
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) = Image(
     painter = painterResource(IR.drawable.ic_close_sheet),
     contentDescription = stringResource(LR.string.close),
-    colorFilter = ColorFilter.tint(clipColors.closeButtonIcon),
+    colorFilter = ColorFilter.tint(shareColors.closeButtonIcon),
     modifier = modifier
         .clickable(onClick = onClose)
         .clip(CircleShape)
-        .background(clipColors.closeButton),
+        .background(shareColors.closeButton),
 )
 
 internal const val PreviewDevicePortrait = "spec:width=400dp,height=800dp,dpi=320"
@@ -378,7 +384,7 @@ internal fun ShareClipPagePreview(
         playbackProgress = 8.seconds, episodeCount = 120,
         isPlaying = false,
         useEpisodeArtwork = true,
-        clipColors = ClipColors(Color(color)),
+        shareColors = ShareColors(Color(color)),
         listener = ShareClipPageListener.Preview,
         state = rememberClipSelectorState(
             firstVisibleItemIndex = 0,

@@ -1,10 +1,10 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 
-internal data class ClipColors(
+internal data class ShareColors(
     val base: Color,
 ) {
     val background = ColorUtils.changeHsvValue(base, factor = 0.4f)

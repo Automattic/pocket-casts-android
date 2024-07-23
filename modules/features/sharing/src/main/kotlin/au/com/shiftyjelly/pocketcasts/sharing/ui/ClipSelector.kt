@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,6 +54,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
+import au.com.shiftyjelly.pocketcasts.sharing.clip.PreviewDevicePortrait
+import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipPageListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.ceilDiv
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import kotlin.math.absoluteValue
@@ -71,7 +74,7 @@ internal fun ClipSelector(
     clipRange: Clip.Range,
     playbackProgress: Duration,
     isPlaying: Boolean,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     listener: ShareClipPageListener,
     modifier: Modifier = Modifier,
     state: ClipSelectorState = rememberClipSelectorState(firstVisibleItemIndex = 0),
@@ -87,18 +90,18 @@ internal fun ClipSelector(
         modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
-            .background(clipColors.timeline, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
+            .background(shareColors.timeline, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
     ) {
         Image(
             painter = painterResource(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
             contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
-            colorFilter = ColorFilter.tint(clipColors.playPauseButton),
+            colorFilter = ColorFilter.tint(shareColors.playPauseButton),
             modifier = Modifier
                 .size(72.dp)
                 .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                 .clickable(
                     interactionSource = remember(::MutableInteractionSource),
-                    indication = rememberRipple(color = clipColors.base),
+                    indication = rememberRipple(color = shareColors.base),
                     onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
                     role = Role.Button,
                     onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
@@ -112,7 +115,7 @@ internal fun ClipSelector(
             episodeDuration = episodeDuration,
             clipRange = clipRange,
             playbackProgress = playbackProgress,
-            clipColors = clipColors,
+            shareColors = shareColors,
             listener = listener,
             state = state,
         )
@@ -124,7 +127,7 @@ private fun ClipSelector(
     episodeDuration: Duration,
     clipRange: Clip.Range,
     playbackProgress: Duration,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     state: ClipSelectorState,
     listener: ShareClipPageListener,
 ) {
@@ -134,7 +137,7 @@ private fun ClipSelector(
         ClipTimeline(
             episodeDuration = episodeDuration,
             clipRange = clipRange,
-            clipColors = clipColors,
+            shareColors = shareColors,
             state = state,
             listener = listener,
         )
@@ -142,7 +145,7 @@ private fun ClipSelector(
             episodeDuration = episodeDuration,
             clipRange = clipRange,
             playbackProgress = playbackProgress,
-            clipColors = clipColors,
+            shareColors = shareColors,
             state = state,
             listener = listener,
         )
@@ -153,7 +156,7 @@ private fun ClipSelector(
 private fun BoxWithConstraintsScope.ClipTimeline(
     episodeDuration: Duration,
     clipRange: Clip.Range,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     state: ClipSelectorState,
     listener: ShareClipPageListener,
 ) {
@@ -179,7 +182,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 6.dp)
-            .background(clipColors.background)
+            .background(shareColors.background)
             .transformable(transformation)
             .pointerInput(clipRange) {
                 detectTapGestures(
@@ -218,7 +221,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
                 modifier = Modifier
                     .width(state.tickWidthDp)
                     .height(heightIndex)
-                    .background(clipColors.timelineTick),
+                    .background(shareColors.timelineTick),
             )
         }
     }
@@ -229,7 +232,7 @@ private fun BoxWithConstraintsScope.ClipBox(
     episodeDuration: Duration,
     clipRange: Clip.Range,
     playbackProgress: Duration,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     listener: ShareClipPageListener,
     state: ClipSelectorState,
 ) {
@@ -278,7 +281,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                 modifier = Modifier
                     .width(2.dp)
                     .fillMaxHeight()
-                    .background(clipColors.timelineProgress),
+                    .background(shareColors.timelineProgress),
             )
         }
 
@@ -314,14 +317,14 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topStart = handleWidth / 2, bottomStart = handleWidth / 2))
-                    .background(clipColors.selector),
+                    .background(shareColors.selector),
             ) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
                         .height(this@ClipBox.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
-                        .background(clipColors.selectorHandle),
+                        .background(shareColors.selectorHandle),
                 )
             }
         }
@@ -357,14 +360,14 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topEnd = handleWidth / 2, bottomEnd = handleWidth / 2))
-                    .background(clipColors.selector),
+                    .background(shareColors.selector),
             ) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
                         .height(this@ClipBox.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
-                        .background(clipColors.selectorHandle),
+                        .background(shareColors.selectorHandle),
                 )
             }
         }
@@ -389,7 +392,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .offset { IntOffset(frameOffsetPx, 0) }
                     .requiredWidth(frameWidth)
                     .height(6.dp)
-                    .background(clipColors.selector),
+                    .background(shareColors.selector),
             )
             Spacer(
                 modifier = Modifier.weight(1f),
@@ -399,7 +402,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                     .offset { IntOffset(frameOffsetPx, 0) }
                     .requiredWidth(frameWidth)
                     .height(6.dp)
-                    .background(clipColors.selector),
+                    .background(shareColors.selector),
             )
         }
     }
@@ -464,16 +467,16 @@ private fun ClipSelectorPreview(
     firstVisibleItemIndex: Int = 0,
     scale: Float = 1f,
 ) {
-    val clipColors = ClipColors(Color(0xFFEC0404))
+    val shareColors = ShareColors(Color(0xFFEC0404))
     Box(
-        modifier = Modifier.background(clipColors.background),
+        modifier = Modifier.background(shareColors.background),
     ) {
         ClipSelector(
             episodeDuration = 5.minutes,
             clipRange = Clip.Range(clipStart, clipEnd),
             playbackProgress = progressPlayback,
             isPlaying = isPlaying,
-            clipColors = clipColors,
+            shareColors = shareColors,
             listener = ShareClipPageListener.Preview,
             state = rememberClipSelectorState(
                 firstVisibleItemIndex = firstVisibleItemIndex,

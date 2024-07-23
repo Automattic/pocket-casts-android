@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,13 +39,13 @@ internal fun VerticalClipCard(
     episode: PodcastEpisode,
     podcast: Podcast,
     useEpisodeArtwork: Boolean,
-    clipColors: ClipColors,
+    shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) {
     val backgroundGradient = Brush.verticalGradient(
         listOf(
-            clipColors.cardTop,
-            clipColors.cardBottom,
+            shareColors.cardTop,
+            shareColors.cardBottom,
         ),
     )
     Column(
@@ -74,14 +74,14 @@ internal fun VerticalClipCard(
         ) {
             TextH70(
                 text = episode.publishedDate.toLocalizedFormatMediumStyle(),
-                color = clipColors.cardText.copy(alpha = 0.5f),
+                color = shareColors.cardText.copy(alpha = 0.5f),
             )
             Spacer(
                 modifier = Modifier.height(6.dp),
             )
             TextH40(
                 text = episode.title,
-                color = clipColors.cardText,
+                color = shareColors.cardText,
                 maxLines = 2,
                 textAlign = TextAlign.Center,
             )
@@ -90,7 +90,7 @@ internal fun VerticalClipCard(
             )
             TextH70(
                 text = podcast.title,
-                color = clipColors.cardText.copy(alpha = 0.5f),
+                color = shareColors.cardText.copy(alpha = 0.5f),
                 maxLines = 1,
             )
         }
@@ -149,5 +149,5 @@ private fun VerticalClipCardPreview(
         title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     ),
     useEpisodeArtwork = true,
-    clipColors = ClipColors(baseColor),
+    shareColors = ShareColors(baseColor),
 )

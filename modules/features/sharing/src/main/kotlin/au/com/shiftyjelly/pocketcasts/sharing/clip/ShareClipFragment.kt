@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -35,7 +36,7 @@ import kotlinx.parcelize.TypeParceler
 class ShareClipFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
-    private val clipColors get() = ClipColors(args.baseColor)
+    private val shareColors get() = ShareColors(args.baseColor)
 
     private val viewModel by viewModels<ShareClipViewModel>(
         extrasProducer = {
@@ -78,7 +79,7 @@ class ShareClipFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val listener = ShareClipViewModelListener(this@ShareClipFragment, viewModel)
-        val clipColors = clipColors
+        val shareColors = shareColors
         setContent {
             val state by viewModel.uiState.collectAsState()
 
@@ -90,7 +91,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 episodeCount = state.episodeCount,
                 isPlaying = state.isPlaying,
                 useEpisodeArtwork = state.useEpisodeArtwork,
-                clipColors = clipColors,
+                shareColors = shareColors,
                 listener = listener,
             )
         }
@@ -98,16 +99,16 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val clipColors = clipColors
-        val argbColor = clipColors.background.toArgb()
+        val shareColors = shareColors
+        val argbColor = shareColors.background.toArgb()
 
         requireActivity().window?.let { activityWindow ->
             activityWindow.statusBarColor = argbColor
-            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = clipColors.background.luminance() > 0.5f
+            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = shareColors.background.luminance() > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
             dialogWindow.navigationBarColor = argbColor
-            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = clipColors.background.luminance() > 0.5f
+            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = shareColors.background.luminance() > 0.5f
         }
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(argbColor)
     }

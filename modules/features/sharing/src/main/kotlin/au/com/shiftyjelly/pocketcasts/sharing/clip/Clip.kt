@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import kotlin.time.Duration

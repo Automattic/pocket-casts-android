@@ -65,7 +65,6 @@ android {
 dependencies {
     // features
     implementation(project(":modules:features:account"))
-    implementation(project(":modules:features:clip"))
     implementation(project(":modules:features:discover"))
     implementation(project(":modules:features:endofyear"))
     implementation(project(":modules:features:filters"))
