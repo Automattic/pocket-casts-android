@@ -131,6 +131,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    GRAVATAR_CHANGE_AVATAR(
+        key = "gravatar_change_avatar",
+        title = "Gravatar change avatar",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
