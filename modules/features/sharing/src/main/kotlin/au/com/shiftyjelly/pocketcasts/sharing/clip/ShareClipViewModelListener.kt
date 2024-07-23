@@ -1,17 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
-import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
 import kotlin.time.Duration
+import kotlinx.coroutines.launch
 
 internal class ShareClipViewModelListener(
     private val fragment: ShareClipFragment,
     private val viewModel: ShareClipViewModel,
+    private val shareActions: ShareActions,
 ) : ShareClipPageListener {
     override fun onClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
         viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange))
-        Toast.makeText(fragment.requireActivity(), "Share clip link", Toast.LENGTH_SHORT).show()
+        fragment.lifecycleScope.launch {
+            shareActions.shareClipLink(podcast, episode, clipRange.start, clipRange.end)
+        }
     }
 
     override fun onClickPlay() {
