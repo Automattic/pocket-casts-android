@@ -1,5 +1,8 @@
 7.70
 -----
+*   Updates
+    *   Episodes shared from the player are updated with the playback status.
+        ([#2499](https://github.com/Automattic/pocket-casts-android/pull/2499))
 *   New Features
     *   Add an option in your account settings to modify your avatar with Gravatar
         ([#2263](https://github.com/Automattic/pocket-casts-android/pull/2263))

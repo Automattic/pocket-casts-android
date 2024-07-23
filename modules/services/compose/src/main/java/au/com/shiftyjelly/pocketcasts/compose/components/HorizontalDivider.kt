@@ -6,6 +6,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -17,10 +18,11 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun HorizontalDivider(
     modifier: Modifier = Modifier,
     startIndent: Dp = 0.dp,
+    color: Color? = null,
 ) {
     Divider(
         modifier = modifier,
-        color = MaterialTheme.theme.colors.primaryUi05,
+        color = color ?: MaterialTheme.theme.colors.primaryUi05,
         thickness = 1.dp,
         startIndent = startIndent,
     )
