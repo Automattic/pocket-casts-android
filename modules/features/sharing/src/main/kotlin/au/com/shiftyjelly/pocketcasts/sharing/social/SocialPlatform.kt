@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.sharing.social
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.images.R
 
 internal enum class SocialPlatform(
@@ -36,4 +37,8 @@ internal enum class SocialPlatform(
         logoId = R.drawable.ic_share_logo_more,
         nameId = au.com.shiftyjelly.pocketcasts.localization.R.string.share_label_more,
     ),
+}
+
+internal class SocialPlatformProvider : PreviewParameterProvider<SocialPlatform> {
+    override val values get() = SocialPlatform.entries.asSequence()
 }

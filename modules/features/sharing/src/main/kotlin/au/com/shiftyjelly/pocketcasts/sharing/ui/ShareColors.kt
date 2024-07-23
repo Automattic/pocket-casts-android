@@ -35,4 +35,7 @@ internal data class ShareColors(
         base
     }
     val selectorHandle = background.copy(alpha = 0.4f)
+
+    val socialButton = backgroundText.copy(alpha = 0.1f)
+    val socialButtonIcon = Color.White
 }
