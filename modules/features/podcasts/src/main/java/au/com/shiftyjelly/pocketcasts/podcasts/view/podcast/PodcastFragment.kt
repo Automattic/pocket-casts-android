@@ -959,7 +959,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun share() {
-        viewModel.podcast.value?.let(shareActions::sharePodcast)
+        lifecycleScope.launch {
+            viewModel.podcast.value?.let { shareActions.sharePodcast(it) }
+        }
     }
 
     private fun downloadAll() {

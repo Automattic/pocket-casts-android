@@ -29,6 +29,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.clip.ShareClipFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -53,6 +54,7 @@ import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -175,7 +177,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     textColor = textColor,
                     backgroundColor = backgroundColor,
                     onClick = {
-                        shareActions.sharePodcast(podcast)
+                        lifecycleScope.launch { shareActions.sharePodcast(podcast) }
                     },
                 ),
             )
@@ -187,7 +189,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     textColor = textColor,
                     backgroundColor = backgroundColor,
                     onClick = {
-                        shareActions.shareEpisode(podcast, episode)
+                        lifecycleScope.launch { shareActions.shareEpisode(podcast, episode) }
                     },
                 ),
             )
@@ -197,7 +199,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     textColor = textColor,
                     backgroundColor = backgroundColor,
                     onClick = {
-                        shareActions.shareEpisodePosition(podcast, episode, episode.playedUpTo.seconds)
+                        lifecycleScope.launch { shareActions.shareEpisodePosition(podcast, episode, episode.playedUpTo.seconds) }
                     },
                 ),
             )
@@ -222,7 +224,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                         textColor = textColor,
                         backgroundColor = backgroundColor,
                         onClick = {
-                            shareActions.shareEpisodeFile(episode)
+                            lifecycleScope.launch { shareActions.shareEpisodeFile(episode) }
                         },
                     ),
                 )
