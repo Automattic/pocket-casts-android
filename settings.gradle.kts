@@ -53,6 +53,7 @@ include(":modules:features:profile")
 include(":modules:features:search")
 include(":modules:features:settings")
 include(":modules:features:shared")
+include(":modules:features:sharing")
 include(":modules:features:taskerplugin")
 include(":modules:features:widgets")
 
