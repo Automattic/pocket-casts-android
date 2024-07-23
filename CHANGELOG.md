@@ -1,6 +1,8 @@
 7.70
 -----
-
+*   New Features
+    *   Add an option in your account settings to modify your avatar with Gravatar
+        ([#2263](https://github.com/Automattic/pocket-casts-android/pull/2263))
 
 7.69
 -----
