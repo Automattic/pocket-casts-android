@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -45,9 +44,9 @@ class ShareActionsTest {
 
     private val actions = ShareActions(
         context = context,
-        scope = CoroutineScope(coroutineRule.testDispatcher),
         tracker = AnalyticsTracker.test(tracker, isEnabled = true),
         source = SourceView.BOTTOM_SHELF,
+        displayPodcastCover = false,
         hostUrl = "https://pca.st",
         shareStarter = shareStarter,
     )
@@ -56,7 +55,7 @@ class ShareActionsTest {
     fun sharePodcast() = runTest {
         actions.sharePodcast(
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
-        ).join()
+        )
 
         val intent = shareStarter.shareIntent
 
@@ -72,7 +71,7 @@ class ShareActionsTest {
         actions.shareEpisode(
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-        ).join()
+        )
 
         val intent = shareStarter.shareIntent
 
@@ -89,7 +88,7 @@ class ShareActionsTest {
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
             start = 25.seconds,
-        ).join()
+        )
 
         val intent = shareStarter.shareIntent
 
@@ -106,7 +105,7 @@ class ShareActionsTest {
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
             start = 25.seconds,
-        ).join()
+        )
 
         val intent = shareStarter.shareIntent
 
@@ -124,7 +123,7 @@ class ShareActionsTest {
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
             start = 25.seconds,
             end = 85.seconds,
-        ).join()
+        )
 
         val intent = shareStarter.shareIntent
 
@@ -141,7 +140,7 @@ class ShareActionsTest {
 
         actions.shareEpisodeFile(
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", downloadedFilePath = file.path, fileType = "audio/mp3", publishedDate = Date()),
-        ).join()
+        )
 
         val intent = shareStarter.shareIntent
 
@@ -272,9 +271,9 @@ class ShareActionsTest {
     fun trackSharingWithPodcastScreenSource() = runTest {
         val actions = ShareActions(
             context = context,
-            scope = CoroutineScope(coroutineRule.testDispatcher),
             tracker = AnalyticsTracker.test(tracker, isEnabled = true),
             source = SourceView.PODCAST_SCREEN,
+            displayPodcastCover = true,
             hostUrl = "https://pca.st",
             shareStarter = shareStarter,
         )

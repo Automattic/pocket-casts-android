@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -23,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.sharing.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
@@ -151,7 +153,11 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Share -> {
-                ShareFragment.newInstance(SourceView.BOTTOM_SHELF).show(parentFragmentManager, "sleep")
+                val podcast = playerViewModel.podcast ?: return
+                val episode = playerViewModel.episode as? PodcastEpisode ?: return
+                ShareDialogFragment
+                    .newThemedInstance(podcast, episode, theme, SourceView.BOTTOM_SHELF)
+                    .show(parentFragmentManager, "share_sheet")
             }
 
             ShelfItem.Podcast -> {

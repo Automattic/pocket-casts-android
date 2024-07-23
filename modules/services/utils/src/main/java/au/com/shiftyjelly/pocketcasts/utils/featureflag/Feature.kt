@@ -24,7 +24,7 @@ enum class Feature(
         title = "Give Ratings",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     SETTINGS_SYNC(

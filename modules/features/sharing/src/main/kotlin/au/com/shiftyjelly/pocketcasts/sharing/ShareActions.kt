@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
@@ -30,92 +29,86 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.time.Duration
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ShareActions(
     private val context: Context,
-    private val scope: CoroutineScope,
     private val tracker: AnalyticsTracker,
     private val source: SourceView,
+    private val displayPodcastCover: Boolean,
     private val hostUrl: String,
     private val shareStarter: ShareStarter,
 ) {
     @AssistedInject constructor(
         @Assisted sourceView: SourceView,
         @ApplicationContext context: Context,
-        @ApplicationScope scope: CoroutineScope,
         analyticsTracker: AnalyticsTracker,
     ) : this(
         context = context,
-        scope = scope,
         tracker = analyticsTracker,
         source = sourceView,
+        displayPodcastCover = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
         hostUrl = SERVER_SHORT_URL,
         shareStarter = ShareStarter { ctx, intent -> ctx.startActivity(intent) },
     )
 
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()
 
-    fun sharePodcast(podcast: Podcast): Job {
+    suspend fun sharePodcast(podcast: Podcast) {
         trackSharing(Type.Podcast)
-        return shareUrl(
+        shareUrl(
             url = "$hostUrl/podcast/${podcast.uuid}",
             title = podcast.title,
             podcast = podcast,
         )
     }
 
-    fun shareEpisode(podcast: Podcast, episode: PodcastEpisode): Job {
+    suspend fun shareEpisode(podcast: Podcast, episode: PodcastEpisode) {
         trackSharing(Type.Episode)
-        return shareUrl(
+        shareUrl(
             url = episodeUrl(episode, start = null, end = null),
             title = episode.title,
             podcast = podcast,
         )
     }
 
-    fun shareEpisodePosition(podcast: Podcast, episode: PodcastEpisode, start: Duration): Job {
+    suspend fun shareEpisodePosition(podcast: Podcast, episode: PodcastEpisode, start: Duration) {
         trackSharing(Type.EpisodeTimestamp)
-        return shareUrl(
+        shareUrl(
             url = episodeUrl(episode, start, end = null),
             title = episode.title,
             podcast = podcast,
         )
     }
 
-    fun shareBookmark(podcast: Podcast, episode: PodcastEpisode, start: Duration): Job {
+    suspend fun shareBookmark(podcast: Podcast, episode: PodcastEpisode, start: Duration) {
         trackSharing(Type.BookmarkTimestamp)
-        return shareUrl(
+        shareUrl(
             url = episodeUrl(episode, start, end = null),
             title = episode.title,
             podcast = podcast,
         )
     }
 
-    fun shareClipLink(podcast: Podcast, episode: PodcastEpisode, start: Duration, end: Duration): Job {
+    suspend fun shareClipLink(podcast: Podcast, episode: PodcastEpisode, start: Duration, end: Duration) {
         trackSharing(Type.ClipLink)
-        return shareUrl(
+        shareUrl(
             url = episodeUrl(episode, start, end),
             title = episode.title,
             podcast = podcast,
         )
     }
 
-    fun shareEpisodeFile(episode: PodcastEpisode): Job {
+    suspend fun shareEpisodeFile(episode: PodcastEpisode) {
         trackSharing(Type.EpisodeFile)
-        return scope.launch(Dispatchers.Main) {
-            runCatching {
-                episode.downloadedFilePath?.let(::File)?.let { file ->
-                    val intent = Intent(ACTION_SEND)
-                        .setType(episode.fileType)
-                        .setExtraStream(file)
-                    shareStarter.start(context, intent.toChooserIntent())
-                }
+        runCatching {
+            episode.downloadedFilePath?.let(::File)?.let { file ->
+                val intent = Intent(ACTION_SEND)
+                    .setType(episode.fileType)
+                    .setExtraStream(file)
+                shareStarter.start(context, intent.toChooserIntent())
             }
         }
     }
@@ -125,15 +118,13 @@ class ShareActions(
         return "$hostUrl/episode/${episode.uuid}$timeMarker"
     }
 
-    private fun shareUrl(
+    private suspend fun shareUrl(
         url: String,
         title: String,
         podcast: Podcast,
-    ) = scope.launch(Dispatchers.Main) {
-        runCatching {
-            val intent = createUrlShareIntent(url, title, podcast)
-            shareStarter.start(context, intent.toChooserIntent())
-        }
+    ) = runCatching {
+        val intent = createUrlShareIntent(url, title, podcast)
+        shareStarter.start(context, intent.toChooserIntent())
     }
 
     private fun Intent.toChooserIntent() = Intent
@@ -152,7 +143,7 @@ class ShareActions(
         .setPodcastCover(podcast)
 
     private suspend fun Intent.setPodcastCover(podcast: Podcast): Intent {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (displayPodcastCover) {
             val coverUri = getPodcastCoverUri(podcast)
             if (coverUri != null) {
                 clipData = ClipData.newRawUri(null, coverUri)

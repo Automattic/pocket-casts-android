@@ -77,7 +77,7 @@ class ShareClipFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
-        val listener = ShareClipViewModelListener(this@ShareClipFragment, viewModel, clipAnalytics.analyticsTracker)
+        val listener = ShareClipViewModelListener(this@ShareClipFragment, viewModel)
         val clipColors = clipColors
         setContent {
             val state by viewModel.uiState.collectAsState()

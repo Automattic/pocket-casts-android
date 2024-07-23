@@ -200,7 +200,7 @@ class BookmarksFragment : BaseFragment() {
     }
 
     private fun onShareBookmarkClick() {
-        bookmarksViewModel.onShareClicked(requireContext())
+        bookmarksViewModel.onShareClicked(parentFragmentManager)
     }
 
     private fun onEditBookmarkClick() {

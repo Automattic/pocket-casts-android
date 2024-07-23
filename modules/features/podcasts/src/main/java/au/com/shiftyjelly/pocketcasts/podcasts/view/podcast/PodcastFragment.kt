@@ -48,16 +48,14 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.Podcas
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -140,11 +138,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     @Inject lateinit var downloadManager: DownloadManager
 
-    @Inject lateinit var serverManager: ServerManager
-
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
-
-    @Inject lateinit var castManager: CastManager
 
     @Inject lateinit var upNextQueue: UpNextQueue
 
@@ -153,6 +147,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var coilManager: CoilManager
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var shareActionsFactory: ShareActions.Factory
+
+    private lateinit var shareActions: ShareActions
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -559,6 +557,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN, mapOf(SOURCE_KEY to sourceView.analyticsValue))
             FirebaseAnalyticsTracker.openedPodcast(podcastUuid)
         }
+        shareActions = shareActionsFactory.create(SourceView.PODCAST_SCREEN)
     }
 
     override fun onResume() {
@@ -665,7 +664,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                     onItemUpdated = ::notifyItemChanged,
                     defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                    context = context,
                     fragmentManager = parentFragmentManager,
                     swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
                 ),
@@ -719,7 +717,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun onShareBookmarkClick() {
-        viewModel.onShareBookmarkClick(requireContext())
+        viewModel.onShareBookmarkClick(shareActions)
     }
 
     private fun onEditBookmarkClick() {
@@ -961,19 +959,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun share() {
-        val context = context ?: return
-        viewModel.podcast.value?.let { podcast ->
-            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
-            SharePodcastHelper(
-                podcast,
-                null,
-                null,
-                null,
-                context,
-                SharePodcastHelper.ShareType.PODCAST,
-                SourceView.PODCAST_SCREEN,
-                analyticsTracker,
-            ).showShareDialogDirect()
+        lifecycleScope.launch {
+            viewModel.podcast.value?.let { shareActions.sharePodcast(it) }
         }
     }
 
