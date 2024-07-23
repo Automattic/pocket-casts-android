@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.clip
+package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
