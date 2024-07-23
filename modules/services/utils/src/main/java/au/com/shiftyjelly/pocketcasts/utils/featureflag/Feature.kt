@@ -123,6 +123,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    REIMAGINE_SHARING(
+        key = "reimagine_sharing",
+        title = "Use new sharing designs",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     TRANSCRIPTS(
         key = "transcripts",
         title = "Transcripts",
