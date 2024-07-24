@@ -9,12 +9,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
-import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
+import au.com.shiftyjelly.pocketcasts.utils.getVersionCode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +28,7 @@ class AppLifecycleObserver constructor(
     private val defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
     private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
     private val networkConnectionWatcher: NetworkConnectionWatcherImpl,
-    private val packageUtil: PackageUtil,
+    private val versionCode: Int,
     private val preferencesFeatureProvider: PreferencesFeatureProvider,
     private val settings: Settings,
 ) : DefaultLifecycleObserver {
@@ -41,7 +41,6 @@ class AppLifecycleObserver constructor(
         defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
         networkConnectionWatcher: NetworkConnectionWatcherImpl,
         firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
-        packageUtil: PackageUtil,
         preferencesFeatureProvider: PreferencesFeatureProvider,
         settings: Settings,
     ) : this(
@@ -52,7 +51,7 @@ class AppLifecycleObserver constructor(
         defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,
         firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
         networkConnectionWatcher = networkConnectionWatcher,
-        packageUtil = packageUtil,
+        versionCode = appContext.getVersionCode(),
         preferencesFeatureProvider = preferencesFeatureProvider,
         settings = settings,
     )
@@ -95,7 +94,6 @@ class AppLifecycleObserver constructor(
 
     private fun handleNewInstallOrUpgrade() {
         // Track app upgrade and install
-        val versionCode = packageUtil.getVersionCode(appContext)
         val previousVersionCode = settings.getMigratedVersionCode()
 
         val isNewInstall = previousVersionCode == 0

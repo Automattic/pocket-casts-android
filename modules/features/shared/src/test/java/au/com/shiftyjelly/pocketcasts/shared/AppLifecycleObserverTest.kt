@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
-import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
@@ -42,8 +41,6 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
 
-    @Mock private lateinit var packageUtil: PackageUtil
-
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
 
     @Mock private lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
@@ -74,7 +71,7 @@ class AppLifecycleObserverTest {
             preferencesFeatureProvider = preferencesFeatureProvider,
             defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,
             firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
-            packageUtil = packageUtil,
+            versionCode = VERSION_CODE_AFTER_SECOND_INSTALL,
             settings = settings,
             networkConnectionWatcher = networkConnectionWatcher,
             applicationScope = CoroutineScope(Dispatchers.Default),
@@ -136,7 +133,6 @@ class AppLifecycleObserverTest {
     @Test
     fun handlesUpgrade() {
         whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
-        whenever(packageUtil.getVersionCode(context)).thenReturn(VERSION_CODE_AFTER_SECOND_INSTALL)
 
         appLifecycleObserver.setup()
 
