@@ -11,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
@@ -40,7 +42,7 @@ class ProfileViewModel @Inject constructor(
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 
-    fun shouldDisplayKidsProfileBanner() = true
+    fun shouldDisplayKidsProfileBanner() = FeatureFlag.isEnabled(Feature.KIDS_PROFILE)
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()
