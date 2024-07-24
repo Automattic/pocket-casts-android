@@ -172,8 +172,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     transcriptViewModel.uiState.collect { uiState ->
                         val transcriptAvailable = uiState !is TranscriptViewModel.UiState.Empty
-                        binding.transcript?.isEnabled = transcriptAvailable
-                        binding.transcript?.alpha = if (transcriptAvailable) 1f else 0.5f
+                        binding.transcript.isEnabled = transcriptAvailable
+                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.5f
                     }
                 }
             }
@@ -199,7 +199,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
             onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
         }
-        binding.transcript?.setOnClickListener {
+        binding.transcript.setOnClickListener {
             trackShelfAction(ShelfItem.Transcript.analyticsValue)
         }
         binding.report?.setOnClickListener {
