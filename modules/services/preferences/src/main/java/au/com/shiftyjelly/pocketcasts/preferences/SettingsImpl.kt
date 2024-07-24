@@ -97,7 +97,13 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
         fromString = { itemIdsString ->
             val decodedItems = itemIdsString.split(',').mapNotNull(ShelfItem::fromId)
-            decodedItems + (ShelfItem.entries - decodedItems)
+            val missingItems = ShelfItem.entries - decodedItems
+            if (missingItems.contains(ShelfItem.Transcript)) {
+                // Add new item Transcript to the list of items at 4th position
+                return@PrefFromString decodedItems.toMutableList()
+                    .also { it.add(3, ShelfItem.Transcript) } + (missingItems - ShelfItem.Transcript)
+            }
+            decodedItems + missingItems
         },
         toString = { items ->
             val allItems = items.distinct() + (ShelfItem.entries - items)
