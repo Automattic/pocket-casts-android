@@ -35,7 +35,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
@@ -55,7 +54,6 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -420,13 +418,11 @@ class PodcastViewModel
         }
     }
 
-    fun onShareBookmarkClick(shareActions: ShareActions) {
-        multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
-            viewModelScope.launch {
-                val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return@launch
-                val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return@launch
-                shareActions.shareBookmark(podcast, episode, bookmark.timeSecs.seconds)
-            }
+    suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
+        return multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
+            val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return null
+            val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
+            Triple(podcast, episode, bookmark)
         }
     }
 
