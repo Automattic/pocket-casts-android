@@ -12,12 +12,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel(assistedFactory = ShareViewModel.Factory::class)
@@ -30,12 +28,17 @@ class ShareViewModel @AssistedInject constructor(
     private val podcastManager: PodcastManager,
 ) : ViewModel() {
     val uiState = if (observePlayback) {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        playbackManager.playbackStateFlow.distinctUntilChangedBy { listOf(it.podcast?.uuid, it.episodeUuid) }.flatMapLatest { playbackState ->
-            combine(
-                playbackState.podcast?.uuid?.let(podcastManager::observePodcastByUuidFlow) ?: flowOf(null),
-                episodeManager.observeEpisodeByUuid(playbackState.episodeUuid),
-                ::UiState,
+        combine(
+            // This is split into 3 streams to read an episode from the database only when `episodeUuid` changes.
+            playbackManager.playbackStateFlow.map { it.podcast }.distinctUntilChanged(),
+            playbackManager.playbackStateFlow.map { it.episodeUuid }.distinctUntilChanged().map { episodeManager.findEpisodeByUuid(it) },
+            playbackManager.playbackStateFlow.map { it.positionMs }.distinctUntilChanged(),
+        ) { podcast, episode, playbackPosition ->
+            UiState(
+                podcast = podcast,
+                episode = episode?.apply {
+                    playedUpToMs = playbackPosition
+                },
             )
         }
     } else {
@@ -48,7 +51,7 @@ class ShareViewModel @AssistedInject constructor(
 
     data class UiState(
         val podcast: Podcast?,
-        val episode: BaseEpisode,
+        val episode: BaseEpisode?,
     )
 
     @AssistedFactory
