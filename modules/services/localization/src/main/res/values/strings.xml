@@ -2009,6 +2009,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
 
     <!-- Kids Profile -->
     <string name="kids_profile">Kids Profile</string>
+    <string name="kids_profile_banner">Kids Profile Banner</string>
     <string name="soon_label">Soon</string>
     <string name="kids_profile_banner_description">A new profile with only content for kids to keep your subscriptions tidy.</string>
     <string name="request_early_access">Request Early Access</string>
