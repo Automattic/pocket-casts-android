@@ -38,6 +38,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipFragment
+import au.com.shiftyjelly.pocketcasts.sharing.episode.ShareEpisodeFragment
+import au.com.shiftyjelly.pocketcasts.sharing.podcast.SharePodcastFragment
+import au.com.shiftyjelly.pocketcasts.sharing.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -177,7 +180,13 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     textColor = textColor,
                     backgroundColor = backgroundColor,
                     onClick = {
-                        lifecycleScope.launch { shareActions.sharePodcast(podcast) }
+                        if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
+                            SharePodcastFragment
+                                .newInstance(podcast, args.source)
+                                .show(parentFragmentManager, "share_screen")
+                        } else {
+                            lifecycleScope.launch { shareActions.sharePodcast(podcast) }
+                        }
                     },
                 ),
             )
@@ -189,7 +198,13 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     textColor = textColor,
                     backgroundColor = backgroundColor,
                     onClick = {
-                        lifecycleScope.launch { shareActions.shareEpisode(podcast, episode) }
+                        if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
+                            ShareEpisodeFragment
+                                .newInstance(episode, podcast.backgroundColor, args.source)
+                                .show(parentFragmentManager, "share_screen")
+                        } else {
+                            lifecycleScope.launch { shareActions.shareEpisode(podcast, episode) }
+                        }
                     },
                 ),
             )
@@ -199,11 +214,17 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     textColor = textColor,
                     backgroundColor = backgroundColor,
                     onClick = {
-                        lifecycleScope.launch { shareActions.shareEpisodePosition(podcast, episode, episode.playedUpTo.seconds) }
+                        if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
+                            ShareEpisodeTimestampFragment
+                                .forEpisodePosition(episode, podcast.backgroundColor, args.source)
+                                .show(parentFragmentManager, "share_screen")
+                        } else {
+                            lifecycleScope.launch { shareActions.shareEpisodePosition(podcast, episode, episode.playedUpTo.seconds) }
+                        }
                     },
                 ),
             )
-            if (FeatureFlag.isEnabled(Feature.SHARE_CLIPS)) {
+            if (FeatureFlag.isEnabled(Feature.SHARE_CLIPS) && FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
                 add(
                     shareOption(
                         textId = LR.string.podcast_share_clip,
@@ -212,7 +233,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                         onClick = {
                             ShareClipFragment
                                 .newInstance(episode, podcast.backgroundColor, args.source)
-                                .show(parentFragmentManager, "share_clip")
+                                .show(parentFragmentManager, "share_screen")
                         },
                     ),
                 )

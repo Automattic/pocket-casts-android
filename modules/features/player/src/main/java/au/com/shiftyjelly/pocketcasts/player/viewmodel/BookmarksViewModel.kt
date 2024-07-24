@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -11,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bookmark.BookmarkRowColors
 import au.com.shiftyjelly.pocketcasts.compose.buttons.TimePlayButtonStyle
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
@@ -29,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.sharing.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
@@ -266,18 +265,12 @@ class BookmarksViewModel
         }
     }
 
-    fun onShareClicked(fragmentManager: FragmentManager) {
-        (_uiState.value as? UiState.Loaded)?.let {
-            val bookmark = it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) }
-            bookmark?.let {
-                viewModelScope.launch {
-                    val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return@launch
-                    val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return@launch
-                    ShareDialogFragment
-                        .newInstance(podcast, episode, sourceView)
-                        .show(fragmentManager, "share_dialog")
-                }
-            }
+    suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
+        return (_uiState.value as? UiState.Loaded)?.let {
+            val bookmark = it.bookmarks.firstOrNull { bookmark -> multiSelectHelper.isSelected(bookmark) } ?: return null
+            val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return null
+            val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
+            Triple(podcast, episode, bookmark)
         }
     }
 
