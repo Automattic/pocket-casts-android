@@ -18,6 +18,10 @@ import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -32,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -50,6 +55,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -88,6 +95,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
     private var binding: AdapterPlayerHeaderBinding? = null
     private val sourceView = SourceView.PLAYER
 
@@ -150,6 +158,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Played to binding.played,
             ShelfItem.Archive to binding.archive,
             ShelfItem.Bookmark to binding.bookmark,
+            ShelfItem.Transcript to binding.transcript,
             ShelfItem.Report to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
@@ -158,6 +167,18 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 .mapNotNull(shelfViews::get)
                 .forEach { itemView -> binding.shelf += itemView }
             binding.shelf.addView(binding.playerActions)
+        }
+
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    transcriptViewModel.uiState.collect { uiState ->
+                        val transcriptAvailable = uiState !is TranscriptViewModel.UiState.Empty
+                        binding.transcript.isEnabled = transcriptAvailable
+                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.5f
+                    }
+                }
+            }
         }
 
         binding.effects.setOnClickListener { onEffectsClick() }
@@ -179,6 +200,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
             onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
+        }
+        binding.transcript.setOnClickListener {
+            trackShelfAction(ShelfItem.Transcript.analyticsValue)
         }
         binding.report?.setOnClickListener {
             trackShelfAction(ShelfItem.Report.analyticsValue)

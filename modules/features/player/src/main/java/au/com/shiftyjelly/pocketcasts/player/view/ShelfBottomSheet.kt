@@ -152,6 +152,9 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 playerViewModel.starToggle()
             }
 
+            ShelfItem.Transcript -> {
+            }
+
             ShelfItem.Share -> {
                 val podcast = playerViewModel.podcast ?: return
                 val episode = playerViewModel.episode as? PodcastEpisode ?: return

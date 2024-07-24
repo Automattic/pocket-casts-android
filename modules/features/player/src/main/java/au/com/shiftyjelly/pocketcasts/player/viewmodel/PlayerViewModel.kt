@@ -193,6 +193,7 @@ class PlayerViewModel @Inject constructor(
             items.filter { item ->
                 when (item) {
                     ShelfItem.Report -> FeatureFlag.isEnabled(Feature.REPORT_VIOLATION)
+                    ShelfItem.Transcript -> FeatureFlag.isEnabled(Feature.TRANSCRIPTS)
                     else -> true
                 }
             }
