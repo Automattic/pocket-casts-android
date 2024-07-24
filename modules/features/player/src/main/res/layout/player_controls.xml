@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
+        android:id="@+id/largePlayButton"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="24dp"
+        app:icon_height="40dp"
+        app:icon_tint="?attr/player_contrast_06"
+        app:icon_width="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/skipForward"
+        android:layout_width="103dp"
+        android:layout_height="103dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/skip_forward"
+        android:scaleType="centerInside"
+        android:scaleX="-1"
+        app:layout_constraintBottom_toBottomOf="@+id/largePlayButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/largePlayButton"
+        app:layout_constraintTop_toTopOf="@+id/largePlayButton"
+        app:lottie_rawRes="@raw/skip_button"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/jumpForwardText"
+        android:layout_width="45dp"
+        android:layout_height="53dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
+        android:paddingTop="8dp"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="@+id/skipForward"
+        app:layout_constraintEnd_toEndOf="@+id/skipForward"
+        app:layout_constraintStart_toStartOf="@+id/skipForward"
+        app:layout_constraintTop_toTopOf="@+id/skipForward"
+        tools:text="30" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/skipBack"
+        android:layout_width="103dp"
+        android:layout_height="103dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/skip_back"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="@+id/largePlayButton"
+        app:layout_constraintEnd_toStartOf="@+id/largePlayButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/largePlayButton"
+        app:lottie_rawRes="@raw/skip_button"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/skipBackText"
+        android:layout_width="45dp"
+        android:layout_height="53dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
+        android:paddingTop="8dp"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="@+id/skipBack"
+        app:layout_constraintEnd_toEndOf="@+id/skipBack"
+        app:layout_constraintStart_toStartOf="@+id/skipBack"
+        app:layout_constraintTop_toTopOf="@+id/skipBack"
+        tools:text="15" />
+</androidx.constraintlayout.widget.ConstraintLayout>

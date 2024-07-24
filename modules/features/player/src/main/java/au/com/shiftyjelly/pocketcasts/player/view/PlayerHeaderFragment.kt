@@ -62,10 +62,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
-import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -81,17 +78,23 @@ private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
-    @Inject lateinit var castManager: CastManager
+    @Inject
+    lateinit var castManager: CastManager
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject
+    lateinit var warningsHelper: WarningsHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var bookmarkFeature: BookmarkFeatureControl
+    @Inject
+    lateinit var bookmarkFeature: BookmarkFeatureControl
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
@@ -120,22 +123,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         imageRequestFactory = PocketCastsImageRequestFactory(view.context, cornerRadius = 8).themed().copy(isDarkTheme = true)
 
-        binding.skipBack.setOnClickListener {
-            onSkipBack()
-            (it as LottieAnimationView).playAnimation()
-        }
-        binding.skipForward.setOnClickListener {
-            onSkipForward()
-            (it as LottieAnimationView).playAnimation()
-        }
-        binding.skipForward.setOnLongClickListener {
-            onSkipForwardLongPress()
-            (it as LottieAnimationView).playAnimation()
-            true
-        }
-        binding.largePlayButton.setOnPlayClicked {
-            onPlayClicked()
-        }
+        binding.playerControls.initPlayerControls(
+            ::onSkipBack,
+            ::onSkipForward,
+            ::onSkipForwardLongPress,
+            ::onPlayClicked,
+        )
+
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
                 viewModel.seekToMs(progress, seekComplete)
@@ -225,17 +219,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
-
-            binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = true)
-
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
-            binding.largePlayButton.setCircleTintColor(playerContrast1)
-            binding.skipBackText.setTextColor(playerContrast1)
-            binding.jumpForwardText.setTextColor(playerContrast1)
-            binding.skipBack.post { // this only works the second time it's called unless it's in a post
-                binding.skipBack.addValueCallback(KeyPath("**"), LottieProperty.COLOR_FILTER) { SimpleColorFilter(playerContrast1) }
-                binding.skipForward.addValueCallback(KeyPath("**"), LottieProperty.COLOR_FILTER) { SimpleColorFilter(playerContrast1) }
-            }
+
+            binding.playerControls.updatePlayerControls(headerViewModel, playerContrast1)
+
             binding.episodeTitle.setTextColor(playerContrast1)
 
             headerViewModel.episode?.let { episode ->
@@ -339,10 +326,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
-            binding.skipForward.toCircle(true)
-            binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
-            binding.skipBack.toCircle(true)
-            binding.skipBackText.text = headerViewModel.skipBackwardInSecs.toString()
             binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
         }
     }
