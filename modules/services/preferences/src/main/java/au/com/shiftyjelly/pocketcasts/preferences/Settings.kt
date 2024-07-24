@@ -467,6 +467,9 @@ interface Settings {
     fun setEndOfYearShowModal(value: Boolean)
     fun getEndOfYearShowModal(): Boolean
 
+    fun setShowKidsBanner(value: Boolean)
+    fun getShowKidsBanner(): Boolean
+
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
 
