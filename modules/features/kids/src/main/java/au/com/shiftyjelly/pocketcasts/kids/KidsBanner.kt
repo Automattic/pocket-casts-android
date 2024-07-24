@@ -46,7 +46,7 @@ fun KidsProfileCard() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
             .background(MaterialTheme.theme.colors.primaryUi01Active, shape = RoundedCornerShape(8.dp)),
     ) {
         Image(

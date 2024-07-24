@@ -100,7 +100,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
 
             <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/endOfYearPromptCard"
+                android:id="@+id/bannerCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/primary_ui_02"
@@ -117,7 +117,7 @@
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/endOfYearPromptCard" />
+                app:layout_constraintTop_toBottomOf="@id/bannerCard" />
 
             <TextView
                 android:id="@+id/lblRefreshStatus"

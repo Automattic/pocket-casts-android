@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
+import au.com.shiftyjelly.pocketcasts.kids.KidsProfileCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
@@ -169,8 +170,11 @@ class ProfileFragment : BaseFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val isEligible = viewModel.isEndOfYearStoriesEligible()
-                binding.setupEndOfYearPromptCard(isEligible)
+                if (viewModel.shouldDisplayKidsProfileBanner()) {
+                    binding.setupKidsCard()
+                } else if (viewModel.isEndOfYearStoriesEligible()) {
+                    binding.setupEndOfYearPromptCard()
+                }
             }
         }
 
@@ -255,21 +259,27 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
-    private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
-        endOfYearPromptCard.setContent {
-            if (isEligible) {
-                AppTheme(theme.activeTheme) {
-                    EndOfYearPromptCard(
-                        onClick = {
-                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
-                            // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
-                            if (settings.getEndOfYearShowModal()) {
-                                settings.setEndOfYearShowModal(false)
-                            }
-                            (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
-                        },
-                    )
-                }
+    private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
+        bannerCard.setContent {
+            AppTheme(theme.activeTheme) {
+                EndOfYearPromptCard(
+                    onClick = {
+                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                        // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
+                        if (settings.getEndOfYearShowModal()) {
+                            settings.setEndOfYearShowModal(false)
+                        }
+                        (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
+                    },
+                )
+            }
+        }
+    }
+
+    private fun FragmentProfileBinding.setupKidsCard() {
+        bannerCard.setContent {
+            AppTheme(theme.activeTheme) {
+                KidsProfileCard()
             }
         }
     }

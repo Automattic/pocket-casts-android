@@ -40,6 +40,8 @@ class ProfileViewModel @Inject constructor(
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 
+    fun shouldDisplayKidsProfileBanner() = true
+
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()
         if (settings.getRefreshState() is RefreshState.Failed && lastSuccess != null) {
