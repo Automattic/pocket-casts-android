@@ -73,7 +73,6 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
@@ -201,7 +200,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
         }
         binding.transcript?.setOnClickListener {
-            Timber.d("Transcript clicked from bottom shelf")
+            trackShelfAction(ShelfItem.Transcript.analyticsValue)
         }
         binding.report?.setOnClickListener {
             trackShelfAction(ShelfItem.Report.analyticsValue)
