@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.kids
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +20,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -45,6 +48,9 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun KidsProfileCard(
     onDismiss: () -> Unit,
 ) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,7 +88,7 @@ fun KidsProfileCard(
                         modifier = Modifier
                             .background(MaterialTheme.theme.colors.primaryField01Active, shape = RoundedCornerShape(4.dp))
                             .width(40.dp)
-                            .height(22.dp),
+                            .height(24.dp),
                     ) {
                         Text(
                             text = stringResource(string.soon_label),
@@ -97,7 +103,7 @@ fun KidsProfileCard(
                     color = MaterialTheme.theme.colors.primaryUi05Selected,
                     modifier = Modifier
                         .padding(start = 24.dp, bottom = 8.dp)
-                        .width(200.dp),
+                        .then(if (isLandscape) Modifier else Modifier.width(200.dp)),
                     fontWeight = FontWeight.W600,
                 )
 
@@ -121,7 +127,8 @@ fun KidsProfileCard(
             modifier = Modifier
                 .size(116.dp)
                 .padding(top = 36.dp)
-                .align(Alignment.BottomEnd),
+                .align(Alignment.BottomEnd)
+                .clip(RoundedCornerShape(bottomEnd = 8.dp)),
         )
     }
 }
