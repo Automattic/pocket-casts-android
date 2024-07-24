@@ -359,7 +359,7 @@
             <ImageButton
                 android:id="@+id/transcript"
                 android:contentDescription="@string/transcript"
-                app:srcCompat="@drawable/ic_transcript"
+                app:srcCompat="@drawable/ic_transcript_32"
                 app:tint="?attr/player_contrast_03"
                 style="@style/shelf_item" />
 

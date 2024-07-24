@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import timber.log.Timber
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
@@ -148,6 +149,10 @@ class ShelfBottomSheet : BaseDialogFragment() {
 
             ShelfItem.Star -> {
                 playerViewModel.starToggle()
+            }
+
+            ShelfItem.Transcript -> {
+                Timber.d("Transcript clicked from bottom sheet")
             }
 
             ShelfItem.Share -> {
