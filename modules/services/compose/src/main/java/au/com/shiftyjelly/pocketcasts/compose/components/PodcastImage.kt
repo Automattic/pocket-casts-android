@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 
 fun podcastImageCornerSize(width: Dp): Dp {
@@ -33,11 +34,12 @@ fun PodcastImage(
     dropShadow: Boolean = true,
     cornerSize: Dp? = null,
     elevation: Dp? = null,
+    placeholderType: PlaceholderType = PlaceholderType.Large,
 ) {
     val context = LocalContext.current
 
     val imageRequest = remember(uuid) {
-        PocketCastsImageRequestFactory(context).themed().createForPodcast(uuid)
+        PocketCastsImageRequestFactory(context, placeholderType = placeholderType).themed().createForPodcast(uuid)
     }
 
     BoxWithConstraints(modifier = modifier) {
