@@ -234,7 +234,7 @@
             app:layout_constraintTop_toBottomOf="@id/secondaryTextBottomBarrier" />
 
         <include layout="@layout/player_controls"
-            android:id="@+id/player_controls"
+            android:id="@+id/playerControls"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -252,7 +252,7 @@
             android:orientation="horizontal"
             android:paddingHorizontal="8dp"
             android:weightSum="5"
-            app:layout_constraintTop_toBottomOf="@+id/player_controls"
+            app:layout_constraintTop_toBottomOf="@+id/playerControls"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
