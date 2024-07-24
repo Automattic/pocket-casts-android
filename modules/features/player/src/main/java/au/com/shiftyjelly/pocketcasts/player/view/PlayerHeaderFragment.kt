@@ -405,6 +405,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             requireContext(),
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                    if (binding.transcriptPage.isVisible) return false
                     val containerFragment = parentFragment as? PlayerContainerFragment ?: return false
                     val upNextBottomSheetBehavior = containerFragment.upNextBottomSheetBehavior
 
