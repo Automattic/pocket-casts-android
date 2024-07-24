@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import au.com.shiftyjelly.pocketcasts.player.databinding.PlayerControlsBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
@@ -49,4 +48,11 @@ fun PlayerControlsBinding.updatePlayerControls(
     jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
     skipBack.toCircle(true)
     skipBackText.text = headerViewModel.skipBackwardInSecs.toString()
+}
+
+fun PlayerControlsBinding.scale(
+    scaleBy: Float,
+) {
+    root.scaleX = scaleBy
+    root.scaleY = scaleBy
 }

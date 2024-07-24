@@ -238,6 +238,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val headerViewModel = it.podcastHeader
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
 
+            binding.seekBar.setSeekBarState(
+                durationMs = headerViewModel.durationMs,
+                positionMs = headerViewModel.positionMs,
+                tintColor = headerViewModel.iconTintColor,
+                bufferedUpTo = headerViewModel.bufferedUpToMs,
+                isBuffering = headerViewModel.isBuffering,
+                theme = headerViewModel.theme,
+            )
             binding.playerControls.updatePlayerControls(headerViewModel, playerContrast1)
 
             binding.episodeTitle.setTextColor(playerContrast1)
@@ -384,7 +392,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         playerGroup.layoutTransition = LayoutTransition()
         transcriptPage.isVisible = true
         shelf.isVisible = false
+        seekBar.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
         playerControls.root.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
+        playerControls.scale(0.6f)
+        (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
     }
@@ -395,7 +406,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
         shelf.isVisible = true
         transcriptPage.isVisible = false
+        seekBar.isVisible = true
         playerControls.root.isVisible = true
+        playerControls.scale(1f)
+        (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
     }
