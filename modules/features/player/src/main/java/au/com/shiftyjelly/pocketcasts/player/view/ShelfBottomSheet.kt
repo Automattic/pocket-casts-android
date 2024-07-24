@@ -153,6 +153,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Transcript -> {
+                playerViewModel.openTranscript()
             }
 
             ShelfItem.Share -> {

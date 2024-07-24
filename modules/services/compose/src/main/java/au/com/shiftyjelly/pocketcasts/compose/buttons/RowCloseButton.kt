@@ -20,11 +20,12 @@ fun RowCloseButton(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     tintColor: Color = Color.White,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.End,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = horizontalArrangement,
     ) {
         IconButton(
             onClick = onClose,

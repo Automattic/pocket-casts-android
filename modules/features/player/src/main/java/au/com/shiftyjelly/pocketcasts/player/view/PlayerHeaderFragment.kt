@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
+import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -13,6 +15,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
@@ -25,6 +32,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowCloseButton
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -39,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -72,6 +82,7 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.ui.graphics.Color as composeColor
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
@@ -197,6 +208,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         binding.transcript.setOnClickListener {
             trackShelfAction(ShelfItem.Transcript.analyticsValue)
+            viewModel.openTranscript()
         }
         binding.report?.setOnClickListener {
             trackShelfAction(ShelfItem.Report.analyticsValue)
@@ -213,6 +225,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 trackShelfAction(ShelfItem.Cast.analyticsValue)
                 chromeCastAnalytics.trackChromeCastViewShown()
             }
+        }
+
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            setupTranscriptPage()
+            observeTranscriptPageTransition()
         }
 
         setupUpNextDrag(binding)
@@ -328,6 +345,59 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             )
             binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
         }
+    }
+
+    private fun setupTranscriptPage() {
+        binding?.transcriptPage?.setContent {
+            AppThemeWithBackground(theme.activeTheme) {
+                val color = composeColor(theme.playerBackgroundColor(viewModel.podcast))
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color),
+                ) {
+                    RowCloseButton(
+                        onClose = {
+                            viewModel.closeTranscript(withTransition = true)
+                        },
+                        horizontalArrangement = Arrangement.Start,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeTranscriptPageTransition() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.transitionState.collect { transitionState ->
+                    when (transitionState) {
+                        is TransitionState.OpenTranscript -> binding?.openTranscript()
+                        is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun AdapterPlayerHeaderBinding.openTranscript() {
+        playerGroup.layoutTransition = LayoutTransition()
+        transcriptPage.isVisible = true
+        shelf.isVisible = false
+        playerControls.root.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
+        val containerFragment = parentFragment as? PlayerContainerFragment
+        containerFragment?.updateTabsVisibility(false)
+    }
+
+    private fun AdapterPlayerHeaderBinding.closeTranscript(
+        withTransition: Boolean,
+    ) {
+        playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
+        shelf.isVisible = true
+        transcriptPage.isVisible = false
+        playerControls.root.isVisible = true
+        val containerFragment = parentFragment as? PlayerContainerFragment
+        containerFragment?.updateTabsVisibility(true)
     }
 
     private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {

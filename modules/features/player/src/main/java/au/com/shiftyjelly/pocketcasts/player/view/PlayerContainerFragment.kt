@@ -265,6 +265,13 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
+    fun updateTabsVisibility(show: Boolean) {
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            binding?.tabHolder?.isVisible = show
+            binding?.viewPager?.isUserInputEnabled = show
+        }
+    }
+
     fun onPlayerOpen() {
         try {
             if (isAdded) {
@@ -277,6 +284,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun onPlayerClose() {
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            viewModel.closeTranscript()
+        }
+
         try {
             if (isAdded) {
                 ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)
