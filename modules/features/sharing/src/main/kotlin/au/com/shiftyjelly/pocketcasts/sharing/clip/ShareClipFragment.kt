@@ -95,7 +95,6 @@ class ShareClipFragment : BaseDialogFragment() {
                 podcast = state.podcast,
                 clipRange = state.clipRange,
                 playbackProgress = state.playbackProgress,
-                episodeCount = state.episodeCount,
                 isPlaying = state.isPlaying,
                 useEpisodeArtwork = state.useEpisodeArtwork,
                 shareColors = shareColors,
