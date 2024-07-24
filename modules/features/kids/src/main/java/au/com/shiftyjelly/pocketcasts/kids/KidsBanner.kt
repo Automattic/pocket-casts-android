@@ -42,7 +42,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R.string.close
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
-fun KidsProfileCard() {
+fun KidsProfileCard(
+    onDismiss: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,7 +59,7 @@ fun KidsProfileCard() {
                 .padding(11.dp)
                 .size(22.dp)
                 .align(Alignment.TopEnd)
-                .clickable { },
+                .clickable { onDismiss() },
         )
 
         Row(
@@ -128,6 +130,8 @@ fun KidsProfileCard() {
 @Composable
 fun PreviewKidsProfileCard(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
-        KidsProfileCard()
+        KidsProfileCard(
+            onDismiss = {},
+        )
     }
 }

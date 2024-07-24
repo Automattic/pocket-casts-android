@@ -35,6 +35,9 @@ class ProfileViewModel @Inject constructor(
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
+    private val _isKidsBannerVisible = MutableLiveData(settings.getShowKidsBanner())
+    val isKidsBannerVisible: LiveData<Boolean> = _isKidsBannerVisible
+
     val refreshObservable: LiveData<RefreshState> =
         settings.refreshStateObservable
             .toFlowable(BackpressureStrategy.LATEST)
@@ -42,7 +45,7 @@ class ProfileViewModel @Inject constructor(
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 
-    fun shouldDisplayKidsProfileBanner() = FeatureFlag.isEnabled(Feature.KIDS_PROFILE)
+    fun shouldDisplayKidsProfileBanner() = FeatureFlag.isEnabled(Feature.KIDS_PROFILE) && settings.getShowKidsBanner()
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()
@@ -57,5 +60,10 @@ class ProfileViewModel @Inject constructor(
 
         val daysListened = statsManager.mergedTotalListeningTimeSec
         daysListenedCount.value = daysListened
+    }
+
+    fun dismissKidsBanner() {
+        settings.setShowKidsBanner(false)
+        _isKidsBannerVisible.value = false
     }
 }
