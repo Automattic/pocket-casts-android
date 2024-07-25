@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.doOnLayout
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -28,6 +29,7 @@ class PocketCastsChampionBottomSheetDialog : BottomSheetDialogFragment() {
                 AppTheme(theme.activeTheme) {
                     ChampionDialog(
                         onRateClick = {
+                            rateUs(context)
                         },
                     )
                 }
