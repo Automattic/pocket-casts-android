@@ -56,6 +56,7 @@ interface PodcastManager {
 
     fun exists(podcastUuid: String): Boolean
     fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int>
+    fun observeEpisodeCountByPodcatUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
