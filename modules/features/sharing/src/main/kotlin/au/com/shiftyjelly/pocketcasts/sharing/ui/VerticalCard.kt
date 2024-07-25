@@ -71,29 +71,31 @@ private fun VerticalCard(
             shareColors.cardBottom,
         ),
     )
+    val height = maxHeight
+    val width = height / 1.5f
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .background(backgroundGradient, RoundedCornerShape(12.dp))
-            .width(maxWidth)
-            .height(maxWidth * 1.5f),
+            .width(width)
+            .height(height),
     ) {
         Spacer(
-            modifier = Modifier.height(this@BoxWithConstraints.maxWidth * 0.15f),
+            modifier = Modifier.height(width * 0.15f),
         )
         type.Image(
             modifier = Modifier
-                .size(this@BoxWithConstraints.maxWidth * 0.7f)
+                .size(width * 0.7f)
                 .clip(RoundedCornerShape(8.dp)),
         )
         Spacer(
-            modifier = Modifier.height(24.dp),
+            modifier = Modifier.height(height * 0.05f),
         )
         TextH70(
             text = type.topText(),
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = 64.dp),
+            modifier = Modifier.padding(horizontal = width * 0.22f),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -103,7 +105,7 @@ private fun VerticalCard(
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
-            modifier = Modifier.padding(horizontal = 42.dp),
+            modifier = Modifier.padding(horizontal = width * 0.15f),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -113,7 +115,7 @@ private fun VerticalCard(
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = 64.dp),
+            modifier = Modifier.padding(horizontal = width * 0.22f),
         )
         Spacer(
             modifier = Modifier.weight(1f),
