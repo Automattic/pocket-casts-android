@@ -129,7 +129,7 @@ class SubscriptionManagerImpl @Inject constructor(
                 }
                 cachedSubscriptionStatus = it
 
-                if (!it.isLifetimePlus && it is SubscriptionStatus.Paid && it.platform == SubscriptionPlatform.GIFT) { // This account is a trial account
+                if (!it.isPocketCastsChampion && it is SubscriptionStatus.Paid && it.platform == SubscriptionPlatform.GIFT) { // This account is a trial account
                     settings.setTrialFinishedSeen(false) // Make sure on expiry we show the trial finished dialog
                 }
             }

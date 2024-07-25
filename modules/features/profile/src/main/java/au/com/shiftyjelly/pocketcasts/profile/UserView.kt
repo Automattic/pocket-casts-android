@@ -250,7 +250,7 @@ class ExpandedUserView @JvmOverloads constructor(
             lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         } else {
             if (status.platform == SubscriptionPlatform.GIFT) {
-                if (signInState.isLifetimePlus) {
+                if (signInState.isPocketCastsChampion) {
                     lblPaymentStatus.text = context.resources.getString(LR.string.plus_thanks_for_your_support_bang)
                 } else {
                     val giftDaysString = context.resources.getStringPluralDaysMonthsOrYears(status.giftDays)
@@ -260,7 +260,7 @@ class ExpandedUserView @JvmOverloads constructor(
                 lblPaymentStatus.text = context.getString(LR.string.profile_payment_cancelled)
             }
 
-            if (signInState.isLifetimePlus) {
+            if (signInState.isPocketCastsChampion) {
                 lblSignInStatus?.text = context.resources.getString(LR.string.plus_lifetime_member)
                 lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_02))
             } else {
