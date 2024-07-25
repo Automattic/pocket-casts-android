@@ -33,12 +33,14 @@ internal fun VerticalPodcastCast(
     episodeCount: Int,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
+    useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
     type = PodcastCardType(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
+    useHeightForAspectRatio = useHeightForAspectRatio,
     modifier = modifier,
 )
 
@@ -49,6 +51,7 @@ internal fun VerticalEpisodeCard(
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
+    useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
     type = EpisodeCardType(
         episode = episode,
@@ -56,6 +59,7 @@ internal fun VerticalEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
+    useHeightForAspectRatio = useHeightForAspectRatio,
     modifier = modifier,
 )
 
@@ -63,6 +67,7 @@ internal fun VerticalEpisodeCard(
 private fun VerticalCard(
     type: CardType,
     shareColors: ShareColors,
+    useHeightForAspectRatio: Boolean,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints {
     val backgroundGradient = Brush.verticalGradient(
@@ -71,8 +76,11 @@ private fun VerticalCard(
             shareColors.cardBottom,
         ),
     )
-    val height = maxHeight
-    val width = height / 1.5f
+    val (height, width) = if (useHeightForAspectRatio) {
+        maxHeight to maxHeight / 1.5f
+    } else {
+        maxWidth * 1.5f to maxWidth
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -95,7 +103,7 @@ private fun VerticalCard(
             text = type.topText(),
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = width * 0.22f),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -105,7 +113,7 @@ private fun VerticalCard(
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
-            modifier = Modifier.padding(horizontal = width * 0.15f),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -115,7 +123,7 @@ private fun VerticalCard(
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = width * 0.22f),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
             modifier = Modifier.weight(1f),
@@ -197,4 +205,5 @@ private fun VerticalCardPreview(
 ) = VerticalCard(
     type = type,
     shareColors = ShareColors(baseColor),
+    useHeightForAspectRatio = false,
 )
