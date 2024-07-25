@@ -65,7 +65,7 @@ internal fun PlatformItem(
             text = stringResource(platform.nameId),
             textAlign = TextAlign.Center,
             color = shareColors.backgroundPrimaryText.copy(alpha = 0.5f),
-            modifier = Modifier.sizeIn(maxWidth = 64.dp),
+            modifier = Modifier.sizeIn(maxWidth = 80.dp),
         )
     }
 }
