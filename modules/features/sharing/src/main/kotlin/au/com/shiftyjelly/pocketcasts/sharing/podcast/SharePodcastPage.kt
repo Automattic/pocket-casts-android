@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface SharePodcastPageListener {
     fun onShare(podcast: Podcast, platform: SocialPlatform)
@@ -97,7 +99,7 @@ private fun VerticalSharePodcastPage(
             modifier = Modifier.fillMaxSize(),
         ) {
             TextH30(
-                text = "Share podcast",
+                text = stringResource(LR.string.share_podcast_title),
                 textAlign = TextAlign.Center,
                 color = shareColors.backgroundPrimaryText,
                 modifier = Modifier.sizeIn(maxWidth = 220.dp),
@@ -106,7 +108,7 @@ private fun VerticalSharePodcastPage(
                 modifier = Modifier.height(8.dp),
             )
             TextH40(
-                text = "Chose a format and a platform to share to",
+                text = stringResource(LR.string.share_podcast_description),
                 textAlign = TextAlign.Center,
                 color = shareColors.backgroundSecondaryText,
                 modifier = Modifier.sizeIn(maxWidth = 220.dp),
