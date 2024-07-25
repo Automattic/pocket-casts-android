@@ -117,7 +117,7 @@ private fun SquareCard(
 }
 
 @ShowkaseComposable(name = "SquarePodcastCard", group = "Sharing", styleName = "Light")
-@Preview(name = "SquarePodcastCardLight", device = "spec:width=600dp,height=640dp,dpi=320,orientation=portrait")
+@Preview(name = "SquarePodcastCardLight")
 @Composable
 fun SquarePodcastCardLightPreview() = SquarePodcastCardPreview(
     baseColor = Color(0xFFFBCB04),
