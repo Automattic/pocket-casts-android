@@ -2,9 +2,14 @@ package au.com.shiftyjelly.pocketcasts.views.fragments
 
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
+import androidx.compose.ui.graphics.luminance
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -110,5 +115,18 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
                 }
             }
         }
+    }
+
+    protected fun styleBackgroundColor(@ColorInt color: Int) {
+        val luminance = ColorUtils.calculateLuminance(color)
+        requireActivity().window?.let { activityWindow ->
+            activityWindow.statusBarColor = color
+            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = luminance > 0.5f
+        }
+        requireDialog().window?.let { dialogWindow ->
+            dialogWindow.navigationBarColor = color
+            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = luminance > 0.5f
+        }
+        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
     }
 }

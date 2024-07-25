@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -10,12 +9,10 @@ import androidx.annotation.ColorInt
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -105,18 +102,7 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val shareColors = shareColors
-        val argbColor = shareColors.background.toArgb()
-
-        requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = argbColor
-            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = shareColors.background.luminance() > 0.5f
-        }
-        requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = argbColor
-            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = shareColors.background.luminance() > 0.5f
-        }
-        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(argbColor)
+        styleBackgroundColor(shareColors.background.toArgb())
     }
 
     @Parcelize
