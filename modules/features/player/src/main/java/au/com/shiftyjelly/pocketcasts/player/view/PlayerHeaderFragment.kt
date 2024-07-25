@@ -395,7 +395,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         seekBar.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
         playerControls.root.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
         playerControls.scale(0.6f)
-        (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
+        }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
     }
@@ -409,7 +411,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         seekBar.isVisible = true
         playerControls.root.isVisible = true
         playerControls.scale(1f)
-        (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
+        }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
     }

@@ -9,7 +9,7 @@
         android:id="@+id/largePlayButton"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="@dimen/large_play_button_margin_bottom"
         app:icon_height="40dp"
         app:icon_tint="?attr/player_contrast_06"
         app:icon_width="40dp"

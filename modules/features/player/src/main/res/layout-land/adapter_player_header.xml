@@ -237,7 +237,6 @@
             android:id="@+id/playerControls"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="@+id/nextChapter"
             app:layout_constraintStart_toStartOf="@+id/previousChapter"
             app:layout_constraintTop_toBottomOf="@id/seekBar"/>

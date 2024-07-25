@@ -3,6 +3,7 @@
     <item name="seekbar_width_percentage" format="float" type="dimen">1.0</item>
     <dimen name="seekbar_margin_bottom">10dp</dimen>
     <dimen name="seekbar_margin_bottom_transcript">-25dp</dimen>
+    <dimen name="large_play_button_margin_bottom">24dp</dimen>
     <dimen name="player_fragment_start_y">69dp</dimen>
     <dimen name="player_tab_text_size">14sp</dimen>
     <dimen name="player_tab_padding">6dp</dimen>
