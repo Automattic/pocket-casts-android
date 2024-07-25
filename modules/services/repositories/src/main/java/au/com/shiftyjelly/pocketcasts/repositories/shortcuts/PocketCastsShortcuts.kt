@@ -9,6 +9,8 @@ import android.os.Build
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFilterDeepLink
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.shortcutDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +32,7 @@ object PocketCastsShortcuts {
         context: Context,
         source: Source,
     ) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1 || Util.getAppPlatform(context) != AppPlatform.Phone) {
             return
         }
         val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return
