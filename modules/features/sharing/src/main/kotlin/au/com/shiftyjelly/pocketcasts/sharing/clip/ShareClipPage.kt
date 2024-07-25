@@ -39,7 +39,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelectorState
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalClipCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.rememberClipSelectorState
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.sql.Date
@@ -147,7 +147,7 @@ private fun VerticalClipPage(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.padding(horizontal = 50.dp),
             ) {
-                VerticalClipCard(
+                VerticalEpisodeCard(
                     episode = episode,
                     podcast = podcast,
                     useEpisodeArtwork = useEpisodeArtwork,
