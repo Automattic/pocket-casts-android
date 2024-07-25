@@ -615,6 +615,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="podcast_season_x">Season %d</string>
     <string name="podcast_refresh_artwork">Refresh artwork</string>
     <string name="podcast_rate">Rate %s</string>
+    <string name="podcast_cover_description">Cover of %s podcast</string>
 
     <!-- Give Rating -->
 
