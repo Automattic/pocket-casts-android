@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
+import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -13,6 +15,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
@@ -25,6 +32,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowCloseButton
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -39,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -62,10 +72,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
-import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -75,23 +82,30 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.ui.graphics.Color as composeColor
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
-    @Inject lateinit var castManager: CastManager
+    @Inject
+    lateinit var castManager: CastManager
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject
+    lateinit var warningsHelper: WarningsHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var bookmarkFeature: BookmarkFeatureControl
+    @Inject
+    lateinit var bookmarkFeature: BookmarkFeatureControl
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
@@ -120,22 +134,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         imageRequestFactory = PocketCastsImageRequestFactory(view.context, cornerRadius = 8).themed().copy(isDarkTheme = true)
 
-        binding.skipBack.setOnClickListener {
-            onSkipBack()
-            (it as LottieAnimationView).playAnimation()
-        }
-        binding.skipForward.setOnClickListener {
-            onSkipForward()
-            (it as LottieAnimationView).playAnimation()
-        }
-        binding.skipForward.setOnLongClickListener {
-            onSkipForwardLongPress()
-            (it as LottieAnimationView).playAnimation()
-            true
-        }
-        binding.largePlayButton.setOnPlayClicked {
-            onPlayClicked()
-        }
+        binding.playerControls.initPlayerControls(
+            ::onSkipBack,
+            ::onSkipForward,
+            ::onSkipForwardLongPress,
+            ::onPlayClicked,
+        )
+
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
                 viewModel.seekToMs(progress, seekComplete)
@@ -203,6 +208,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         binding.transcript.setOnClickListener {
             trackShelfAction(ShelfItem.Transcript.analyticsValue)
+            viewModel.openTranscript()
         }
         binding.report?.setOnClickListener {
             trackShelfAction(ShelfItem.Report.analyticsValue)
@@ -221,21 +227,27 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            setupTranscriptPage()
+            observeTranscriptPageTransition()
+        }
+
         setupUpNextDrag(binding)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
-
-            binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = true)
-
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
-            binding.largePlayButton.setCircleTintColor(playerContrast1)
-            binding.skipBackText.setTextColor(playerContrast1)
-            binding.jumpForwardText.setTextColor(playerContrast1)
-            binding.skipBack.post { // this only works the second time it's called unless it's in a post
-                binding.skipBack.addValueCallback(KeyPath("**"), LottieProperty.COLOR_FILTER) { SimpleColorFilter(playerContrast1) }
-                binding.skipForward.addValueCallback(KeyPath("**"), LottieProperty.COLOR_FILTER) { SimpleColorFilter(playerContrast1) }
-            }
+
+            binding.seekBar.setSeekBarState(
+                durationMs = headerViewModel.durationMs,
+                positionMs = headerViewModel.positionMs,
+                tintColor = headerViewModel.iconTintColor,
+                bufferedUpTo = headerViewModel.bufferedUpToMs,
+                isBuffering = headerViewModel.isBuffering,
+                theme = headerViewModel.theme,
+            )
+            binding.playerControls.updatePlayerControls(headerViewModel, playerContrast1)
+
             binding.episodeTitle.setTextColor(playerContrast1)
 
             headerViewModel.episode?.let { episode ->
@@ -339,12 +351,71 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 isBuffering = headerViewModel.isBuffering,
                 theme = headerViewModel.theme,
             )
-            binding.skipForward.toCircle(true)
-            binding.jumpForwardText.text = headerViewModel.skipForwardInSecs.toString()
-            binding.skipBack.toCircle(true)
-            binding.skipBackText.text = headerViewModel.skipBackwardInSecs.toString()
             binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
         }
+    }
+
+    private fun setupTranscriptPage() {
+        binding?.transcriptPage?.setContent {
+            AppThemeWithBackground(theme.activeTheme) {
+                val color = composeColor(theme.playerBackgroundColor(viewModel.podcast))
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color),
+                ) {
+                    RowCloseButton(
+                        onClose = {
+                            viewModel.closeTranscript(withTransition = true)
+                        },
+                        horizontalArrangement = Arrangement.Start,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeTranscriptPageTransition() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.transitionState.collect { transitionState ->
+                    when (transitionState) {
+                        is TransitionState.OpenTranscript -> binding?.openTranscript()
+                        is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun AdapterPlayerHeaderBinding.openTranscript() {
+        playerGroup.layoutTransition = LayoutTransition()
+        transcriptPage.isVisible = true
+        shelf.isVisible = false
+        seekBar.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
+        playerControls.root.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
+        playerControls.scale(0.6f)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
+        }
+        val containerFragment = parentFragment as? PlayerContainerFragment
+        containerFragment?.updateTabsVisibility(false)
+    }
+
+    private fun AdapterPlayerHeaderBinding.closeTranscript(
+        withTransition: Boolean,
+    ) {
+        playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
+        shelf.isVisible = true
+        transcriptPage.isVisible = false
+        seekBar.isVisible = true
+        playerControls.root.isVisible = true
+        playerControls.scale(1f)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
+        }
+        val containerFragment = parentFragment as? PlayerContainerFragment
+        containerFragment?.updateTabsVisibility(true)
     }
 
     private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
@@ -352,6 +423,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             requireContext(),
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                    if (binding.transcriptPage.isVisible) return false
                     val containerFragment = parentFragment as? PlayerContainerFragment ?: return false
                     val upNextBottomSheetBehavior = containerFragment.upNextBottomSheetBehavior
 

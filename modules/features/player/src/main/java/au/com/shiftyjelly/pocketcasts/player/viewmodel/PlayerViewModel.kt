@@ -62,6 +62,8 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
@@ -157,6 +159,9 @@ class PlayerViewModel @Inject constructor(
     var chaptersExpanded = settings.getBooleanForKey(Settings.PREFERENCE_CHAPTERS_EXPANDED, true)
 
     private val disposables = CompositeDisposable()
+
+    private val _transitionState = MutableSharedFlow<TransitionState>()
+    val transitionState = _transitionState.asSharedFlow()
 
     private val playbackStateObservable: Observable<PlaybackState> = playbackManager.playbackStateRelay
         .observeOn(Schedulers.io())
@@ -670,5 +675,22 @@ class PlayerViewModel @Inject constructor(
 
     fun previousChapter() {
         playbackManager.skipToPreviousSelectedOrLastChapter()
+    }
+
+    fun openTranscript() {
+        viewModelScope.launch {
+            _transitionState.emit(TransitionState.OpenTranscript)
+        }
+    }
+
+    fun closeTranscript(withTransition: Boolean = false) {
+        viewModelScope.launch {
+            _transitionState.emit(TransitionState.CloseTranscript(withTransition))
+        }
+    }
+
+    sealed class TransitionState {
+        data object OpenTranscript : TransitionState()
+        data class CloseTranscript(val withTransition: Boolean) : TransitionState()
     }
 }
