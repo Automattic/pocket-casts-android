@@ -6,8 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
@@ -15,6 +18,7 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
@@ -82,21 +86,19 @@ class ShareClipFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
-        val listener = ShareClipViewModelListener(this@ShareClipFragment, viewModel, shareActions)
         val shareColors = shareColors
         setContent {
-            val state by viewModel.uiState.collectAsState()
-
-            ShareClipPage(
-                episode = state.episode,
-                podcast = state.podcast,
-                clipRange = state.clipRange,
-                playbackProgress = state.playbackProgress,
-                isPlaying = state.isPlaying,
-                useEpisodeArtwork = state.useEpisodeArtwork,
-                shareColors = shareColors,
-                listener = listener,
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .background(shareColors.background)
+                    .fillMaxSize(),
+            ) {
+                TextH30(
+                    text = "Work in progress",
+                    color = shareColors.backgroundPrimaryText,
+                )
+            }
         }
     }
 
