@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +37,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelectorState
-import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalClipCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.rememberClipSelectorState
@@ -80,7 +79,6 @@ internal fun ShareClipPage(
     podcast: Podcast?,
     clipRange: Clip.Range,
     playbackProgress: Duration,
-    episodeCount: Int,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
@@ -94,7 +92,6 @@ internal fun ShareClipPage(
         podcast = podcast,
         clipRange = clipRange,
         playbackProgress = playbackProgress,
-        episodeCount = episodeCount,
         isPlaying = isPlaying,
         useEpisodeArtwork = useEpisodeArtwork,
         shareColors = shareColors,
@@ -207,7 +204,6 @@ private fun HorizontalClipPage(
     podcast: Podcast?,
     clipRange: Clip.Range,
     playbackProgress: Duration,
-    episodeCount: Int,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
@@ -221,27 +217,20 @@ private fun HorizontalClipPage(
             .background(shareColors.background),
     ) {
         Row {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.End,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
                     .padding(start = 32.dp),
             ) {
                 if (episode != null && podcast != null) {
-                    BoxWithConstraints {
-                        HorizontalClipCard(
-                            episode = episode,
-                            podcast = podcast,
-                            episodeCount = episodeCount,
-                            useEpisodeArtwork = useEpisodeArtwork,
-                            shareColors = shareColors,
-                            modifier = Modifier
-                                .width(minOf(maxWidth, 360.dp))
-                                .height(180.dp),
-                        )
-                    }
+                    HorizontalEpisodeCard(
+                        episode = episode,
+                        podcast = podcast,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        shareColors = shareColors,
+                    )
                 }
             }
             Spacer(
@@ -381,7 +370,7 @@ internal fun ShareClipPagePreview(
             episodeFrequency = "monthly",
         ),
         clipRange = clipRange,
-        playbackProgress = 8.seconds, episodeCount = 120,
+        playbackProgress = 8.seconds,
         isPlaying = false,
         useEpisodeArtwork = true,
         shareColors = ShareColors(Color(color)),

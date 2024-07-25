@@ -50,7 +50,6 @@ class ShareClipViewModelTest {
     fun setUp() {
         whenever(episodeManager.observeByUuid("episode-id")).thenReturn(flowOf(episode))
         whenever(podcastManager.observePodcastByEpisodeUuid("episode-id")).thenReturn(flowOf(podcast))
-        whenever(podcastManager.observeEpisodeCountByEpisodeUuid("episode-id")).thenReturn(flowOf(10))
         val artworkSetting = mock<UserSetting<ArtworkConfiguration>>()
         whenever(artworkSetting.flow).thenReturn(MutableStateFlow(ArtworkConfiguration(useEpisodeArtwork = true)))
         whenever(settings.artworkConfiguration).thenReturn(artworkSetting)
