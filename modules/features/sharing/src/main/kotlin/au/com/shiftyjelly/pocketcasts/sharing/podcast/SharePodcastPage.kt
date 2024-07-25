@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -49,7 +52,13 @@ internal fun SharePodcastPage(
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
 ) = when (LocalConfiguration.current.orientation) {
-    Configuration.ORIENTATION_LANDSCAPE -> Box { }
+    Configuration.ORIENTATION_LANDSCAPE -> HorizontalSharePodcastPage(
+        podcast = podcast,
+        episodeCount = episodeCount,
+        socialPlatforms = socialPlatforms,
+        shareColors = shareColors,
+        listener = listener,
+    )
     else -> VerticalSharePodcastPage(
         podcast = podcast,
         episodeCount = episodeCount,
@@ -127,6 +136,92 @@ private fun VerticalSharePodcastPage(
                 listener.onShare(podcast, platform)
             }
         }
+    }
+}
+
+@Composable
+private fun HorizontalSharePodcastPage(
+    podcast: Podcast?,
+    episodeCount: Int,
+    socialPlatforms: Set<SocialPlatform>,
+    shareColors: ShareColors,
+    listener: SharePodcastPageListener,
+) = Column(
+    modifier = Modifier
+        .fillMaxSize()
+        .background(shareColors.background),
+) {
+    Box(
+        contentAlignment = Alignment.TopEnd,
+        modifier = Modifier
+            .weight(0.25f)
+            .fillMaxSize(),
+    ) {
+        CloseButton(
+            shareColors = shareColors,
+            onClick = listener::onClose,
+            modifier = Modifier.padding(top = 12.dp, end = 12.dp),
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            TextH30(
+                text = "Share podcast",
+                textAlign = TextAlign.Center,
+                color = shareColors.backgroundPrimaryText,
+            )
+            Spacer(
+                modifier = Modifier.height(8.dp),
+            )
+            TextH40(
+                text = "Chose a format and a platform to share to",
+                textAlign = TextAlign.Center,
+                color = shareColors.backgroundSecondaryText,
+            )
+        }
+    }
+    Row(
+        modifier = Modifier
+            .weight(0.75f)
+            .fillMaxSize(),
+    ) {
+        Spacer(
+            modifier = Modifier.weight(0.1f),
+        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+        ) {
+            if (podcast != null) {
+                HorizontalPodcastCast(
+                    podcast = podcast,
+                    episodeCount = episodeCount,
+                    shareColors = shareColors,
+                )
+            }
+        }
+        Spacer(
+            modifier = Modifier.weight(0.1f),
+        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+        ) {
+            PlatformBar(socialPlatforms, shareColors) { platform ->
+                if (podcast != null) {
+                    listener.onShare(podcast, platform)
+                }
+            }
+        }
+        Spacer(
+            modifier = Modifier.weight(0.1f),
+        )
     }
 }
 
