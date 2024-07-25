@@ -135,7 +135,7 @@ private fun VerticalClipPage(
 
         TextH30(
             text = stringResource(LR.string.podcast_create_clip),
-            color = shareColors.backgroundText,
+            color = shareColors.backgroundPrimaryText,
         )
 
         Spacer(
@@ -274,7 +274,7 @@ private fun HorizontalClipPage(
         }
         TextH30(
             text = stringResource(LR.string.podcast_create_clip),
-            color = shareColors.backgroundText,
+            color = shareColors.backgroundPrimaryText,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()

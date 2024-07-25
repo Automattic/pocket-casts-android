@@ -8,7 +8,8 @@ internal data class ShareColors(
     val base: Color,
 ) {
     val background = ColorUtils.changeHsvValue(base, factor = 0.4f)
-    val backgroundText = if (background.luminance() < 0.5f) Color.White else Color.Black
+    val backgroundPrimaryText = if (background.luminance() < 0.5f) Color.White else Color.Black
+    val backgroundSecondaryText = backgroundPrimaryText.copy(alpha = 0.5f)
 
     val cardTop = ColorUtils.changeHsvValue(base, 1.25f)
     val cardBottom = ColorUtils.changeHsvValue(base, 0.75f)
@@ -21,11 +22,11 @@ internal data class ShareColors(
     }
     val clipButtonText = if (clipButton.luminance() < 0.5f) Color.White else Color.Black
 
-    val closeButton = backgroundText.copy(alpha = 0.15f)
+    val closeButton = backgroundPrimaryText.copy(alpha = 0.15f)
     val closeButtonIcon = Color.White.copy(alpha = 0.5f)
 
-    val timeline = backgroundText.copy(alpha = 0.15f)
-    val timelineProgress = backgroundText
+    val timeline = backgroundPrimaryText.copy(alpha = 0.15f)
+    val timelineProgress = backgroundPrimaryText
     val timelineTick = timelineProgress.copy(alpha = 0.4f)
     val playPauseButton = Color.White
 
@@ -36,6 +37,6 @@ internal data class ShareColors(
     }
     val selectorHandle = background.copy(alpha = 0.4f)
 
-    val socialButton = backgroundText.copy(alpha = 0.1f)
+    val socialButton = backgroundPrimaryText.copy(alpha = 0.1f)
     val socialButtonIcon = Color.White
 }

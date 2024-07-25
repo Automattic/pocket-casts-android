@@ -60,7 +60,7 @@ internal fun PlatformItem(
         )
         TextH70(
             text = stringResource(platform.nameId),
-            color = shareColors.backgroundText.copy(alpha = 0.5f),
+            color = shareColors.backgroundPrimaryText.copy(alpha = 0.5f),
         )
     }
 }
