@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.sharing.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,13 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.PocketCastsPill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -121,26 +118,7 @@ private fun VerticalCard(
         Spacer(
             modifier = Modifier.weight(1f),
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .background(Color(0xFFF43E37), RoundedCornerShape(24.dp))
-                .height(24.dp)
-                .padding(start = 4.dp, end = 8.dp),
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_logo_foreground),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-            )
-            Spacer(
-                modifier = Modifier.width(8.dp),
-            )
-            TextH70(
-                text = "Pocket Casts",
-                color = Color.White,
-            )
-        }
+        PocketCastsPill()
         Spacer(
             modifier = Modifier.weight(1f),
         )
