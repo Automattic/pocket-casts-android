@@ -63,7 +63,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class AccountDetailsFragment : BaseFragment() {
+class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
     companion object {
         fun newInstance(): AccountDetailsFragment {
             return AccountDetailsFragment()
@@ -128,6 +128,10 @@ class AccountDetailsFragment : BaseFragment() {
                     Gravatar.refreshGravatarTimestamp()
                     context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
                 }
+            }
+
+            if (signInState.isPocketCastsChampion) {
+                binding.userView.setOnUserViewClick(this)
             }
         }
 
@@ -233,6 +237,10 @@ class AccountDetailsFragment : BaseFragment() {
             analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
             context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
         }
+    }
+
+    override fun onPocketCastsChampionClick() {
+        // to do
     }
 
     private fun signOut() {
