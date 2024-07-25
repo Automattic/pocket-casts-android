@@ -170,7 +170,7 @@ private fun HorizontalSharePodcastPage(
             modifier = Modifier.fillMaxSize(),
         ) {
             TextH30(
-                text = "Share podcast",
+                text = stringResource(LR.string.share_podcast_title),
                 textAlign = TextAlign.Center,
                 color = shareColors.backgroundPrimaryText,
             )
@@ -178,7 +178,7 @@ private fun HorizontalSharePodcastPage(
                 modifier = Modifier.height(8.dp),
             )
             TextH40(
-                text = "Chose a format and a platform to share to",
+                text = stringResource(LR.string.share_podcast_description),
                 textAlign = TextAlign.Center,
                 color = shareColors.backgroundSecondaryText,
             )
