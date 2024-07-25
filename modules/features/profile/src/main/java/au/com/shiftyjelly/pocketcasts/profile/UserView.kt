@@ -261,7 +261,7 @@ class ExpandedUserView @JvmOverloads constructor(
             }
 
             if (signInState.isPocketCastsChampion) {
-                lblSignInStatus?.text = context.resources.getString(LR.string.plus_lifetime_member)
+                lblSignInStatus?.text = context.resources.getString(LR.string.pocket_casts_champion)
                 lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_02))
             } else {
                 lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires, status.expiry.toLocalizedFormatLongStyle())
