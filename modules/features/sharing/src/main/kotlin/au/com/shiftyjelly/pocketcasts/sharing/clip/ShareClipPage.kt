@@ -1,9 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,16 +15,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelectorState
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
@@ -46,7 +41,6 @@ import java.sql.Date
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareClipPageListener {
@@ -192,7 +186,7 @@ private fun VerticalClipPage(
     ) {
         CloseButton(
             shareColors = shareColors,
-            onClose = listener::onClose,
+            onClick = listener::onClose,
             modifier = Modifier.padding(top = 16.dp, end = 16.dp),
         )
     }
@@ -282,7 +276,7 @@ private fun HorizontalClipPage(
         )
         CloseButton(
             shareColors = shareColors,
-            onClose = listener::onClose,
+            onClick = listener::onClose,
             modifier = Modifier.padding(top = 24.dp, end = 16.dp),
         )
     }
@@ -310,21 +304,6 @@ private fun ClipButton(
     elevation = null,
     includePadding = false,
     modifier = modifier,
-)
-
-@Composable
-private fun CloseButton(
-    shareColors: ShareColors,
-    onClose: () -> Unit,
-    modifier: Modifier = Modifier,
-) = Image(
-    painter = painterResource(IR.drawable.ic_close_sheet),
-    contentDescription = stringResource(LR.string.close),
-    colorFilter = ColorFilter.tint(shareColors.closeButtonIcon),
-    modifier = modifier
-        .clickable(onClick = onClose)
-        .clip(CircleShape)
-        .background(shareColors.closeButton),
 )
 
 internal const val PreviewDevicePortrait = "spec:width=400dp,height=800dp,dpi=320"
