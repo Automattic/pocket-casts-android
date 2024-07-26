@@ -19,7 +19,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="151"
+            line="150"
             column="18"/>
     </issue>
 

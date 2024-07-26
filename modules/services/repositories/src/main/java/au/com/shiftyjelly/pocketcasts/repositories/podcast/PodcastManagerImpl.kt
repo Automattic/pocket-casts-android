@@ -596,12 +596,12 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     // WARNING: only call this when NEW episodes are added, not old ones
-    private fun updateLatestEpisodeUuid(podcastUuid: String) {
+    override fun updatePodcastLatestEpisode(podcast: Podcast) {
         // get the most recent episode details
-        val episode = episodeDao.findLatest(podcastUuid) ?: return
+        val episode = episodeDao.findLatest(podcast.uuid) ?: return
         val latestEpisodeUuid = episode.uuid
         val latestEpisodeDate = episode.publishedDate
-        podcastDao.updateLatestEpisode(episodeUuid = latestEpisodeUuid, publishedDate = latestEpisodeDate, podcastUuid = podcastUuid)
+        podcastDao.updateLatestEpisode(episodeUuid = latestEpisodeUuid, publishedDate = latestEpisodeDate, podcastUuid = podcast.uuid)
     }
 
     override fun addFolderPodcast(podcast: Podcast) {

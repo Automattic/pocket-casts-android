@@ -222,7 +222,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = this::clearViewAtPosition,
                 defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                context = context,
                 fragmentManager = parentFragmentManager,
                 swipeSource = SwipeSource.UP_NEXT,
             ),

@@ -105,11 +105,9 @@ fun SwipeableStars(
                     // Check onPress so we can jump to the touch point as soon as a drag
                     // starts. We're using onPress instead of onDragStart because it seems better
                     // to update touchX immediately when the screen is touched instead of
-                    // waiting for the drag to start. But set this as a dragging touch state
-                    // so that the position stays at the touch point instead of jumping to a
-                    // stop point.
+                    // waiting for the drag to start.
                     onPress = {
-                        stopPointType = StopPointType.None
+                        stopPointType = StopPointType.FullStars
                         changeType = ChangeType.Animated
                         touchX = it.x
                     },
