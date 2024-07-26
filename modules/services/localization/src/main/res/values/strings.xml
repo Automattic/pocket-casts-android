@@ -1997,7 +1997,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
 
     <!--  Sharing  -->
     <string name="share_podcast_title" translatable="false">@string/share_podcast</string>
-    <string name="share_podcast_description">Chose a format and a platform to share to</string>
+    <string name="share_podcast_description">Choose a format and a platform to share to</string>
     <string name="share_via">Share via %s</string>
     <string name="share_label_instagram_stories">Stories</string>
     <string name="share_label_whats_app" translatable="false">WhatsApp</string>
