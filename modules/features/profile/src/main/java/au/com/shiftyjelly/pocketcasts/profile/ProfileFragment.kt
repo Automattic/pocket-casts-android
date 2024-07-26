@@ -264,7 +264,7 @@ class ProfileFragment : BaseFragment() {
     }
 
     private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
-        bannerCard.setContent {
+        endOfYearPromptCard.setContent {
             AppTheme(theme.activeTheme) {
                 EndOfYearPromptCard(
                     onClick = {
@@ -281,7 +281,7 @@ class ProfileFragment : BaseFragment() {
     }
 
     private fun FragmentProfileBinding.setupKidsBanner() {
-        bannerCard.setContent {
+        kidsBannerCard.setContent {
             AppTheme(theme.activeTheme) {
                 val showKidsBanner by viewModel.showKidsBanner.collectAsState()
                 val isKidsBannerVisible = showKidsBanner && FeatureFlag.isEnabled(Feature.KIDS_PROFILE)

@@ -100,13 +100,22 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
 
             <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/bannerCard"
+                android:id="@+id/kidsBannerCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/primary_ui_02"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/userView" />
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/endOfYearPromptCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="?attr/primary_ui_02"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/kidsBannerCard" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -117,7 +126,7 @@
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bannerCard" />
+                app:layout_constraintTop_toBottomOf="@id/endOfYearPromptCard" />
 
             <TextView
                 android:id="@+id/lblRefreshStatus"
