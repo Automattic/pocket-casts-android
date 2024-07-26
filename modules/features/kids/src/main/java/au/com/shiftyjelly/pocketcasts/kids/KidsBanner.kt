@@ -84,13 +84,13 @@ fun KidsProfileCard(
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .background(MaterialTheme.theme.colors.primaryField01Active, shape = RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.theme.colors.primaryInteractive01, shape = RoundedCornerShape(4.dp))
                             .width(40.dp)
                             .height(24.dp),
                     ) {
                         Text(
                             text = stringResource(LR.string.soon_label),
-                            color = MaterialTheme.theme.colors.primaryUi05Selected,
+                            color = MaterialTheme.theme.colors.primaryInteractive02,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.W600,
                         )
@@ -98,7 +98,7 @@ fun KidsProfileCard(
                 }
                 TextH70(
                     text = stringResource(LR.string.kids_profile_banner_description),
-                    color = MaterialTheme.theme.colors.primaryUi05Selected,
+                    color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier
                         .padding(start = 24.dp, end = 116.dp, bottom = 8.dp),
                     fontWeight = FontWeight.W600,
@@ -109,7 +109,7 @@ fun KidsProfileCard(
                     onClick = { },
                     modifier = Modifier.padding(start = 24.dp, bottom = 14.dp),
                     style = TextStyle(
-                        color = MaterialTheme.theme.colors.primaryIcon01,
+                        color = MaterialTheme.theme.colors.primaryInteractive01,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.W600,
                         textAlign = TextAlign.Start,
