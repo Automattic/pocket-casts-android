@@ -1,36 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.sharing.podcast
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
-import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -77,50 +60,18 @@ private fun VerticalSharePodcastPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
-) = Column(
-    modifier = Modifier
-        .fillMaxSize()
-        .background(shareColors.background),
-) {
-    Box(
-        contentAlignment = Alignment.TopEnd,
-        modifier = Modifier
-            .weight(0.2f)
-            .fillMaxSize(),
-    ) {
-        CloseButton(
-            shareColors = shareColors,
-            onClick = listener::onClose,
-            modifier = Modifier.padding(top = 12.dp, end = 12.dp),
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            TextH30(
-                text = stringResource(LR.string.share_podcast_title),
-                textAlign = TextAlign.Center,
-                color = shareColors.backgroundPrimaryText,
-                modifier = Modifier.sizeIn(maxWidth = 220.dp),
-            )
-            Spacer(
-                modifier = Modifier.height(8.dp),
-            )
-            TextH40(
-                text = stringResource(LR.string.share_podcast_description),
-                textAlign = TextAlign.Center,
-                color = shareColors.backgroundSecondaryText,
-                modifier = Modifier.sizeIn(maxWidth = 220.dp),
-            )
+) = VerticalSharePage(
+    shareTitle = stringResource(LR.string.share_podcast_title),
+    shareDescription = stringResource(LR.string.share_podcast_description),
+    shareColors = shareColors,
+    socialPlatforms = socialPlatforms,
+    onClose = listener::onClose,
+    onShareToPlatform = { platfrom ->
+        if (podcast != null) {
+            listener.onShare(podcast, platfrom)
         }
-    }
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .weight(0.6f)
-            .fillMaxSize(),
-    ) {
+    },
+    middleContent = {
         if (podcast != null) {
             VerticalPodcastCast(
                 podcast = podcast,
@@ -128,18 +79,8 @@ private fun VerticalSharePodcastPage(
                 shareColors = shareColors,
             )
         }
-    }
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.weight(0.18f),
-    ) {
-        PlatformBar(socialPlatforms, shareColors) { platform ->
-            if (podcast != null) {
-                listener.onShare(podcast, platform)
-            }
-        }
-    }
-}
+    },
+)
 
 @Composable
 private fun HorizontalSharePodcastPage(
@@ -148,117 +89,60 @@ private fun HorizontalSharePodcastPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
-) = Column(
-    modifier = Modifier
-        .fillMaxSize()
-        .background(shareColors.background),
-) {
-    Box(
-        contentAlignment = Alignment.TopEnd,
-        modifier = Modifier
-            .weight(0.25f)
-            .fillMaxSize(),
-    ) {
-        CloseButton(
-            shareColors = shareColors,
-            onClick = listener::onClose,
-            modifier = Modifier.padding(top = 12.dp, end = 12.dp),
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            TextH30(
-                text = stringResource(LR.string.share_podcast_title),
-                textAlign = TextAlign.Center,
-                color = shareColors.backgroundPrimaryText,
-            )
-            Spacer(
-                modifier = Modifier.height(8.dp),
-            )
-            TextH40(
-                text = stringResource(LR.string.share_podcast_description),
-                textAlign = TextAlign.Center,
-                color = shareColors.backgroundSecondaryText,
+) = HorizontalSharePage(
+    shareTitle = stringResource(LR.string.share_podcast_title),
+    shareDescription = stringResource(LR.string.share_podcast_description),
+    shareColors = shareColors,
+    socialPlatforms = socialPlatforms,
+    onClose = listener::onClose,
+    onShareToPlatform = { platfrom ->
+        if (podcast != null) {
+            listener.onShare(podcast, platfrom)
+        }
+    },
+    middleContent = {
+        if (podcast != null) {
+            HorizontalPodcastCast(
+                podcast = podcast,
+                episodeCount = episodeCount,
+                shareColors = shareColors,
             )
         }
-    }
-    Row(
-        modifier = Modifier
-            .weight(0.75f)
-            .fillMaxSize(),
-    ) {
-        Spacer(
-            modifier = Modifier.weight(0.1f),
-        )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-        ) {
-            if (podcast != null) {
-                HorizontalPodcastCast(
-                    podcast = podcast,
-                    episodeCount = episodeCount,
-                    shareColors = shareColors,
-                )
-            }
-        }
-        Spacer(
-            modifier = Modifier.weight(0.1f),
-        )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-        ) {
-            PlatformBar(socialPlatforms, shareColors) { platform ->
-                if (podcast != null) {
-                    listener.onShare(podcast, platform)
-                }
-            }
-        }
-        Spacer(
-            modifier = Modifier.weight(0.1f),
-        )
-    }
-}
+    },
+)
 
-@ShowkaseComposable(name = "SharePodcastVerticalRegularPreview", group = "Podcast")
+@ShowkaseComposable(name = "SharePodcastVerticalRegularPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalRegularPreview", device = Devices.PortraitRegular)
 @Composable
 fun SharePodcastVerticalRegularPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastVerticalSmallPreview", group = "Podcast")
+@ShowkaseComposable(name = "SharePodcastVerticalSmallPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalSmallPreview", device = Devices.PortraitSmall)
 @Composable
 fun SharePodcastVerticalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastVerticalTabletPreview", group = "Podcast")
+@ShowkaseComposable(name = "SharePodcastVerticalTabletPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalTabletPreview", device = Devices.PortraitTablet)
 @Composable
 fun SharePodcastVerticalTabletPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalRegularPreview", group = "Podcast")
+@ShowkaseComposable(name = "SharePodcastHorizontalRegularPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalRegularPreview", device = Devices.LandscapeRegular)
 @Composable
 fun SharePodcastHorizontalRegularPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalSmallPreview", group = "Podcast")
+@ShowkaseComposable(name = "SharePodcastHorizontalSmallPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalSmallPreview", device = Devices.LandscapeSmall)
 @Composable
 fun SharePodcastHorizontalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalTabletPreview", group = "Podcast")
+@ShowkaseComposable(name = "SharePodcastHorizontalTabletPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalTabletPreview", device = Devices.LandscapeTablet)
 @Composable
 fun SharePodcastHorizontalTabletPreview() = SharePodcastPagePreview()
 
 @Composable
-internal fun SharePodcastPagePreview(
+private fun SharePodcastPagePreview(
     color: Long = 0xFFEC0404,
 ) = SharePodcastPage(
     podcast = Podcast(
