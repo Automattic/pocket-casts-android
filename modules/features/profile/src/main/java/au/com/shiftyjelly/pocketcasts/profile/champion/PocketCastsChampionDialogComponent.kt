@@ -4,8 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -30,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun ChampionDialog(
+internal fun ChampionDialog(
     modifier: Modifier = Modifier,
     onRateClick: () -> Unit,
 ) {
@@ -44,18 +45,19 @@ fun ChampionDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                painterResource(IR.drawable.ic_rounded_gray),
+                painterResource(IR.drawable.crown),
                 contentDescription = stringResource(LR.string.pocket_casts_logo),
                 contentScale = ContentScale.Fit,
                 modifier = modifier
-                    .size(88.dp)
-                    .padding(bottom = 16.dp),
+                    .width(122.dp)
+                    .height(132.dp)
+                    .padding(bottom = 32.dp),
             )
 
             TextH20(
                 text = stringResource(LR.string.pocket_casts_champion_dialog_title),
                 textAlign = TextAlign.Center,
-                modifier = modifier.padding(bottom = 8.dp),
+                modifier = modifier.padding(bottom = 16.dp),
             )
 
             TextP40(
@@ -71,9 +73,9 @@ fun ChampionDialog(
                 contentDescription = stringResource(LR.string.rate_pocket_casts),
                 onClick = { onRateClick() },
                 includePadding = false,
+                textColor = MaterialTheme.theme.colors.primaryInteractive02,
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.theme.colors.primaryText01,
-                    disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
+                    backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
             )
         }
