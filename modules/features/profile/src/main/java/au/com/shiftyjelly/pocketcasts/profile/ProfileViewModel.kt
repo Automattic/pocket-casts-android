@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -11,11 +12,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -35,8 +36,7 @@ class ProfileViewModel @Inject constructor(
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
-    private val _isKidsBannerVisible = MutableLiveData(settings.getShowKidsBanner())
-    val isKidsBannerVisible: LiveData<Boolean> = _isKidsBannerVisible
+    val showKidsBanner = settings.showKidsBanner.flow.stateIn(viewModelScope, Lazily, initialValue = true)
 
     val refreshObservable: LiveData<RefreshState> =
         settings.refreshStateObservable
@@ -44,8 +44,6 @@ class ProfileViewModel @Inject constructor(
             .toLiveData()
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
-
-    fun shouldDisplayKidsProfileBanner() = FeatureFlag.isEnabled(Feature.KIDS_PROFILE) && settings.getShowKidsBanner()
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()
@@ -63,7 +61,6 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun dismissKidsBanner() {
-        settings.setShowKidsBanner(false)
-        _isKidsBannerVisible.value = false
+        settings.showKidsBanner.set(value = false, updateModifiedAt = true)
     }
 }

@@ -80,7 +80,6 @@ class SettingsImpl @Inject constructor(
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
         private const val END_OF_YEAR_SHOW_BADGE_2023_KEY = "EndOfYearShowBadge2023Key"
         private const val END_OF_YEAR_SHOW_MODAL_2023_KEY = "EndOfYearModalShowModal2023Key"
-        private const val SHOW_KIDS_BANNER_KEY = "ShowKidsBanner"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
@@ -1287,12 +1286,11 @@ class SettingsImpl @Inject constructor(
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
     }
 
-    override fun setShowKidsBanner(value: Boolean) {
-        setBoolean(SHOW_KIDS_BANNER_KEY, value)
-    }
-
-    override fun getShowKidsBanner(): Boolean =
-        getBoolean(SHOW_KIDS_BANNER_KEY, true)
+    override var showKidsBanner: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "ShowKidsBannerKey",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun getEndOfYearShowModal(): Boolean =
         getBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, true)

@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -51,6 +51,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -172,13 +174,13 @@ class ProfileFragment : BaseFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                if (viewModel.shouldDisplayKidsProfileBanner()) {
-                    binding.setupKidsCard()
-                } else if (viewModel.isEndOfYearStoriesEligible()) {
+                if (viewModel.isEndOfYearStoriesEligible()) {
                     binding.setupEndOfYearPromptCard()
                 }
             }
         }
+
+        binding.setupKidsBanner()
 
         viewModel.podcastCount.observe(viewLifecycleOwner) {
             binding.lblPodcastCount.text = it.toString()
@@ -278,10 +280,11 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
-    private fun FragmentProfileBinding.setupKidsCard() {
+    private fun FragmentProfileBinding.setupKidsBanner() {
         bannerCard.setContent {
             AppTheme(theme.activeTheme) {
-                val isKidsBannerVisible by viewModel.isKidsBannerVisible.observeAsState(viewModel.settings.getShowKidsBanner())
+                val showKidsBanner by viewModel.showKidsBanner.collectAsState()
+                val isKidsBannerVisible = showKidsBanner && FeatureFlag.isEnabled(Feature.KIDS_PROFILE)
 
                 if (isKidsBannerVisible) {
                     KidsProfileCard(
