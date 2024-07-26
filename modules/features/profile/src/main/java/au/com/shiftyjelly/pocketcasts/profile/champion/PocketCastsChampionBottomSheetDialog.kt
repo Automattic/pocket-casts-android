@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.doOnLayout
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -19,16 +22,21 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PocketCastsChampionBottomSheetDialog : BottomSheetDialogFragment() {
 
-    @Inject
-    lateinit var theme: Theme
+    @Inject lateinit var theme: Theme
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = context ?: throw Exception("Context not found")
         return ComposeView(context).apply {
             setContent {
                 AppTheme(theme.activeTheme) {
+                    CallOnce {
+                        analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_SHOWN)
+                    }
                     ChampionDialog(
                         onRateClick = {
+                            analyticsTracker.track(AnalyticsEvent.POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED)
                             rateUs(context)
                         },
                     )
