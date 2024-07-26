@@ -33,12 +33,14 @@ internal fun VerticalPodcastCast(
     episodeCount: Int,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
+    useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
     type = PodcastCardType(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
+    useHeightForAspectRatio = useHeightForAspectRatio,
     modifier = modifier,
 )
 
@@ -49,6 +51,7 @@ internal fun VerticalEpisodeCard(
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
+    useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
     type = EpisodeCardType(
         episode = episode,
@@ -56,6 +59,7 @@ internal fun VerticalEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
+    useHeightForAspectRatio = useHeightForAspectRatio,
     modifier = modifier,
 )
 
@@ -63,6 +67,7 @@ internal fun VerticalEpisodeCard(
 private fun VerticalCard(
     type: CardType,
     shareColors: ShareColors,
+    useHeightForAspectRatio: Boolean,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints {
     val backgroundGradient = Brush.verticalGradient(
@@ -71,29 +76,34 @@ private fun VerticalCard(
             shareColors.cardBottom,
         ),
     )
+    val (height, width) = if (useHeightForAspectRatio) {
+        maxHeight to maxHeight / 1.5f
+    } else {
+        maxWidth * 1.5f to maxWidth
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .background(backgroundGradient, RoundedCornerShape(12.dp))
-            .width(maxWidth)
-            .height(maxWidth * 1.5f),
+            .width(width)
+            .height(height),
     ) {
         Spacer(
-            modifier = Modifier.height(this@BoxWithConstraints.maxWidth * 0.15f),
+            modifier = Modifier.height(width * 0.15f),
         )
         type.Image(
             modifier = Modifier
-                .size(this@BoxWithConstraints.maxWidth * 0.7f)
+                .size(width * 0.7f)
                 .clip(RoundedCornerShape(8.dp)),
         )
         Spacer(
-            modifier = Modifier.height(24.dp),
+            modifier = Modifier.height(height * 0.05f),
         )
         TextH70(
             text = type.topText(),
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = 64.dp),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -103,7 +113,7 @@ private fun VerticalCard(
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
-            modifier = Modifier.padding(horizontal = 42.dp),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -113,7 +123,7 @@ private fun VerticalCard(
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = 64.dp),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
             modifier = Modifier.weight(1f),
@@ -195,4 +205,5 @@ private fun VerticalCardPreview(
 ) = VerticalCard(
     type = type,
     shareColors = ShareColors(baseColor),
+    useHeightForAspectRatio = false,
 )

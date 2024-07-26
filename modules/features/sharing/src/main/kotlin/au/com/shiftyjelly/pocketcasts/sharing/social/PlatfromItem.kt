@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -20,13 +21,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlatformItem(
     platform: SocialPlatform,
@@ -38,7 +40,7 @@ internal fun PlatformItem(
         modifier = Modifier.clickable(
             interactionSource = remember(::MutableInteractionSource),
             indication = rememberRipple(color = shareColors.base),
-            onClickLabel = stringResource(platform.nameId),
+            onClickLabel = stringResource(LR.string.share_via, stringResource(platform.nameId)),
             role = Role.Button,
             onClick = { onClick(platform) },
         ),
@@ -52,7 +54,8 @@ internal fun PlatformItem(
             Image(
                 painter = painterResource(platform.logoId),
                 colorFilter = ColorFilter.tint(shareColors.socialButtonIcon),
-                contentDescription = stringResource(platform.nameId),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
             )
         }
         Spacer(
@@ -60,7 +63,9 @@ internal fun PlatformItem(
         )
         TextH70(
             text = stringResource(platform.nameId),
-            color = shareColors.backgroundText.copy(alpha = 0.5f),
+            textAlign = TextAlign.Center,
+            color = shareColors.backgroundPrimaryText.copy(alpha = 0.5f),
+            modifier = Modifier.sizeIn(maxWidth = 80.dp),
         )
     }
 }
