@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.PagerDotIndicator
+import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar

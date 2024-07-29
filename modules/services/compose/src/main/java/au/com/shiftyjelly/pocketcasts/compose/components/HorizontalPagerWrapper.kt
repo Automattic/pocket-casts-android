@@ -1,22 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -86,42 +78,12 @@ fun HorizontalPagerWrapper(
         }
 
         if (showPageIndicator) {
-            PageIndicator(
-                pageCount = pageCount,
-                pagerState = pagerState,
-                color = pageIndicatorColor,
+            PagerDotIndicator(
+                state = pagerState,
+                activeDotColor = pageIndicatorColor,
             )
         } else {
             Spacer(modifier = Modifier.height(16.dp))
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun PageIndicator(
-    pageCount: Int,
-    pagerState: PagerState,
-    modifier: Modifier = Modifier,
-    color: Color = Color.White,
-) {
-    Row(
-        Modifier
-            .height(40.dp)
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        repeat(pageCount) { iteration ->
-            val circleColor =
-                if (pagerState.currentPage == iteration) color else color.copy(alpha = 0.5f)
-            Box(
-                modifier = modifier
-                    .padding(4.dp)
-                    .clip(CircleShape)
-                    .background(circleColor)
-                    .size(8.dp),
-            )
         }
     }
 }

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.compose
+package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
