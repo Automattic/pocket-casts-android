@@ -77,9 +77,9 @@ private fun VerticalShareEpisodePage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, cardType ->
+    onShareToPlatform = { platform, cardType ->
         if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, platfrom, cardType)
+            listener.onShare(podcast, episode, platform, cardType)
         }
     },
     middleContent = { cardType, modifier ->
@@ -125,9 +125,9 @@ private fun HorizontalShareEpisodePage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, cardType ->
+    onShareToPlatform = { platform, cardType ->
         if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, platfrom, cardType)
+            listener.onShare(podcast, episode, platform, cardType)
         }
     },
     middleContent = {

@@ -68,9 +68,9 @@ private fun VerticalSharePodcastPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, cardType ->
+    onShareToPlatform = { platform, cardType ->
         if (podcast != null) {
-            listener.onShare(podcast, platfrom, cardType)
+            listener.onShare(podcast, platform, cardType)
         }
     },
     middleContent = { cardType, modifier ->
@@ -112,9 +112,9 @@ private fun HorizontalSharePodcastPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, cardType ->
+    onShareToPlatform = { platform, cardType ->
         if (podcast != null) {
-            listener.onShare(podcast, platfrom, cardType)
+            listener.onShare(podcast, platform, cardType)
         }
     },
     middleContent = {

@@ -27,12 +27,12 @@ import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareEpisodeTimestampPageListener {
-    fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform)
+    fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: CardType)
     fun onClose()
 
     companion object {
         val Preview = object : ShareEpisodeTimestampPageListener {
-            override fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform) = Unit
+            override fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: CardType) = Unit
             override fun onClose() = Unit
         }
     }
@@ -83,9 +83,9 @@ private fun VerticalShareEpisodeTimestampPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, _ ->
+    onShareToPlatform = { platform, cardType ->
         if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, timestamp, platfrom)
+            listener.onShare(podcast, episode, timestamp, platform, cardType)
         }
     },
     middleContent = { cardType, modifier ->
@@ -132,9 +132,9 @@ private fun HorizontalShareEpisodeTimestampPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, _ ->
+    onShareToPlatform = { platform, cardType ->
         if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, timestamp, platfrom)
+            listener.onShare(podcast, episode, timestamp, platform, cardType)
         }
     },
     middleContent = {
