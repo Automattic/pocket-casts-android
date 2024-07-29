@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun KidsProfileCard(
     onDismiss: () -> Unit,
+    onRequestEarlyAccess: () -> Unit,
 ) {
     val bannerContentDescription = stringResource(LR.string.kids_profile_banner)
 
@@ -106,7 +107,7 @@ fun KidsProfileCard(
 
                 ClickableText(
                     text = AnnotatedString(text = stringResource(LR.string.request_early_access)),
-                    onClick = { },
+                    onClick = { onRequestEarlyAccess() },
                     modifier = Modifier.padding(start = 24.dp, bottom = 14.dp),
                     style = TextStyle(
                         color = MaterialTheme.theme.colors.primaryInteractive01,
@@ -136,6 +137,7 @@ fun PreviewKidsProfileCard(@PreviewParameter(ThemePreviewParameterProvider::clas
     AppThemeWithBackground(themeType) {
         KidsProfileCard(
             onDismiss = {},
+            onRequestEarlyAccess = {},
         )
     }
 }
