@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.kids
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +39,9 @@ fun KidsDialog(
     onSendFeedbackClick: () -> Unit,
     onNoThankYouClick: () -> Unit,
 ) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -47,14 +52,16 @@ fun KidsDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxWidth(),
         ) {
-            Image(
-                painterResource(IR.drawable.kids_face_with_background),
-                contentDescription = stringResource(LR.string.kids_profile_face_image),
-                modifier = modifier
-                    .width(242.dp)
-                    .height(160.dp)
-                    .padding(bottom = 12.dp),
-            )
+            if (!isLandscape) {
+                Image(
+                    painterResource(IR.drawable.kids_face_with_background),
+                    contentDescription = stringResource(LR.string.kids_profile_face_image),
+                    modifier = modifier
+                        .width(242.dp)
+                        .height(160.dp)
+                        .padding(bottom = 12.dp),
+                )
+            }
 
             TextH30(
                 text = stringResource(LR.string.thank_you_for_your_interest),
@@ -87,6 +94,7 @@ fun KidsDialog(
                 text = stringResource(LR.string.no_thank_you),
                 onClick = { onNoThankYouClick() },
                 includePadding = false,
+                modifier = modifier.padding(bottom = 12.dp),
                 border = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryInteractive01),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryInteractive01),
             )
