@@ -1,7 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.sharing.episode
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -13,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -59,6 +68,7 @@ internal fun ShareEpisodePage(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun VerticalShareEpisodePage(
     podcast: Podcast?,
@@ -79,13 +89,44 @@ private fun VerticalShareEpisodePage(
         }
     },
     middleContent = {
+        val pagerState = rememberPagerState(pageCount = { 3 })
         if (podcast != null && episode != null) {
-            VerticalEpisodeCard(
-                podcast = podcast,
-                episode = episode,
-                useEpisodeArtwork = useEpisodeArtwork,
-                shareColors = shareColors,
-            )
+            BoxWithConstraints {
+                val expectedVerticalCardPadding = remember(maxWidth, maxHeight) { (maxWidth - maxHeight / 1.5f) / 2 }
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                ) { pageIndex ->
+                    when (pageIndex) {
+                        0 -> VerticalEpisodeCard(
+                            podcast = podcast,
+                            episode = episode,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            shareColors = shareColors,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        1 -> HorizontalEpisodeCard(
+                            podcast = podcast,
+                            episode = episode,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            shareColors = shareColors,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = expectedVerticalCardPadding),
+                        )
+                        2 -> SquareEpisodeCard(
+                            podcast = podcast,
+                            episode = episode,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                            shareColors = shareColors,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = expectedVerticalCardPadding),
+                        )
+                        else -> error("Unexpected card page index: $pageIndex")
+                    }
+                }
+            }
         }
     },
 )
