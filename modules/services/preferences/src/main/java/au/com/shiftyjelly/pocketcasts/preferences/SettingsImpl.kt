@@ -1286,6 +1286,12 @@ class SettingsImpl @Inject constructor(
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
     }
 
+    override var showKidsBanner: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "ShowKidsBannerKey",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override fun getEndOfYearShowModal(): Boolean =
         getBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, true)
 

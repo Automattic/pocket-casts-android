@@ -55,6 +55,7 @@ include(":modules:features:shared")
 include(":modules:features:sharing")
 include(":modules:features:taskerplugin")
 include(":modules:features:widgets")
+include(":modules:features:kids")
 
 // services
 include(":modules:services:analytics")
