@@ -10,6 +10,9 @@
         ([#2263](https://github.com/Automattic/pocket-casts-android/pull/2263))
     *   Add the ability to rate podcasts
         ([#2506](https://github.com/Automattic/pocket-casts-android/pull/2506))
+*   Bug Fixes
+    *   Fix autoplay for Android Auto
+        ([#2528](https://github.com/Automattic/pocket-casts-android/pull/2528))
 
 7.69
 -----
