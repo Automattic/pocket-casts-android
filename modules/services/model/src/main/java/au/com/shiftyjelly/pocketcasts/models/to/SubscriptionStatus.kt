@@ -51,6 +51,6 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
             get() = !autoRenewing && expiryDate?.before(Date()) ?: false
     }
 
-    val isLifetimePlus: Boolean
+    val isPocketCastsChampion: Boolean
         get() = this is Paid && this.platform == SubscriptionPlatform.GIFT && this.giftDays > giftDaysCutOver
 }

@@ -5,6 +5,8 @@
         ([#2499](https://github.com/Automattic/pocket-casts-android/pull/2499))
     *   Improved the podcast refresh performance.
         ([#2500](https://github.com/Automattic/pocket-casts-android/pull/2500))
+    *   Rename Lifetime member to Pocket Casts Champion
+        ([#2527](https://github.com/Automattic/pocket-casts-android/pull/2527))
 *   New Features
     *   Add an option in your account settings to modify your avatar with Gravatar
         ([#2263](https://github.com/Automattic/pocket-casts-android/pull/2263))

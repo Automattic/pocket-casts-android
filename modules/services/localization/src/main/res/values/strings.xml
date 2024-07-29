@@ -1054,7 +1054,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="plus_desktop_apps">Desktop Apps</string>
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_learn_more_button">Learn More</string>
-    <string name="plus_lifetime_member">Lifetime Member</string>
+    <string name="pocket_casts_champion" translatable="false">Pocket Casts Champion</string>
     <string name="plus_trial_duration_free">%s FREE</string>
     <string name="plus_trial_duration_free_trial">%s free trial</string>
     <string name="plus_offer_duration">%s offer</string>
@@ -2010,6 +2010,12 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_label_tumblr" translatable="false">Tumblr</string>
     <string name="share_label_copy_link">Copy link</string>
     <string name="share_label_more" translatable="false">@string/more</string>
+
+    <!-- Pocket Casts Champion -->
+    <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
+    <string name="pocket_casts_champion_dialog_description">Thanks for being with us since the beginning! If you enjoy using our app, we’d love to hear your feedback.</string>
+    <string name="rate_pocket_casts">Rate Pocket Casts</string>
+    <string name="pocket_casts_logo">Pocket Casts logo</string>
 
     <!-- Kids Profile -->
     <string name="kids_profile">Kids Profile</string>
