@@ -6,11 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -88,6 +86,8 @@ fun TranscriptPage(
             TranscriptError(
                 state = errorState,
                 colors = DefaultColors(theme, errorState.podcastAndEpisode?.podcast),
+                scrollState = scrollState,
+                modifier = modifier,
             )
         }
     }
@@ -231,6 +231,8 @@ private fun TextLayoutResult.findHighlightedTextLineOffset(
 private fun TranscriptError(
     state: UiState.Error,
     colors: DefaultColors,
+    scrollState: ScrollState,
+    modifier: Modifier,
 ) {
     val errorMessage = when (val error = state.error) {
         is TranscriptError.NotSupported ->
@@ -241,10 +243,10 @@ private fun TranscriptError(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
+            .padding(top = 32.dp)
             .background(colors.backgroundColor())
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(scrollState),
     ) {
         Box(
             modifier = Modifier
