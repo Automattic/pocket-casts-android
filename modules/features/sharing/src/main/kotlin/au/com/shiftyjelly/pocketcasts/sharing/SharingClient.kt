@@ -206,7 +206,7 @@ data class SharingRequest internal constructor(
 
             override fun linkDescription() = LR.string.share_link_episode
 
-            override fun toString() = "Podcast(title=${episode.title},uuid=${episode.uuid})"
+            override fun toString() = "Episode(title=${episode.title},uuid=${episode.uuid})"
         }
     }
 }
