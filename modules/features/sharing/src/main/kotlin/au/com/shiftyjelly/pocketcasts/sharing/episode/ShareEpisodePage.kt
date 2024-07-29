@@ -24,12 +24,12 @@ import java.time.Instant
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareEpisodePageListener {
-    fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform)
+    fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: CardType)
     fun onClose()
 
     companion object {
         val Preview = object : ShareEpisodePageListener {
-            override fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform) = Unit
+            override fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: CardType) = Unit
             override fun onClose() = Unit
         }
     }
@@ -77,9 +77,9 @@ private fun VerticalShareEpisodePage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, _ ->
+    onShareToPlatform = { platfrom, cardType ->
         if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, platfrom)
+            listener.onShare(podcast, episode, platfrom, cardType)
         }
     },
     middleContent = { cardType, modifier ->
@@ -125,9 +125,9 @@ private fun HorizontalShareEpisodePage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom, _ ->
+    onShareToPlatform = { platfrom, cardType ->
         if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, platfrom)
+            listener.onShare(podcast, episode, platfrom, cardType)
         }
     },
     middleContent = {

@@ -21,10 +21,13 @@ import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
+@AndroidEntryPoint
 class ShareEpisodeFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
@@ -38,13 +41,15 @@ class ShareEpisodeFragment : BaseDialogFragment() {
         },
     )
 
+    @Inject internal lateinit var shareListenerFactory: ShareEpisodeListener.Factory
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val listener = ShareEpisodeListener(this@ShareEpisodeFragment)
+        val listener = shareListenerFactory.create(this@ShareEpisodeFragment, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareEpisodePage(
