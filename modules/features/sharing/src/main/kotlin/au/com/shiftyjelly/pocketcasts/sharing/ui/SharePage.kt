@@ -100,6 +100,8 @@ internal fun VerticalSharePage(
                 }
                 PagerDotIndicator(
                     state = pagerState,
+                    activeDotColor = shareColors.pagerIndicatorActive,
+                    inactiveDotColor = shareColors.pagerIndicatorInactive,
                     modifier = Modifier.weight(0.08f),
                 )
             }
