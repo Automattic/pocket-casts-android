@@ -55,6 +55,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun TranscriptPage(
     viewModel: TranscriptViewModel,
     theme: Theme,
+    scrollState: ScrollState,
+    modifier: Modifier,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
     when (state.value) {
@@ -71,6 +73,8 @@ fun TranscriptPage(
             TranscriptContent(
                 state = loadedState,
                 colors = DefaultColors(theme, loadedState.podcastAndEpisode?.podcast),
+                scrollState = scrollState,
+                modifier = modifier,
             )
         }
 
@@ -83,27 +87,33 @@ fun TranscriptPage(
         }
     }
 
-    LaunchedEffect(state.value.podcastAndEpisode?.episodeUuid) {
+    LaunchedEffect(state.value.transcript) {
         viewModel.parseAndLoadTranscript()
     }
 }
 
 @OptIn(UnstableApi::class)
 @Composable
-private fun TranscriptContent(state: UiState.TranscriptLoaded, colors: DefaultColors) {
+private fun TranscriptContent(
+    state: UiState.TranscriptLoaded,
+    colors: DefaultColors,
+    scrollState: ScrollState,
+    modifier: Modifier,
+) {
     val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
     val highlightedTextStyle = SpanStyle(fontSize = 18.sp, color = Color.White)
 
     var highlightedText: CharSequence? by remember { mutableStateOf(null) }
     var contentSize by remember { mutableStateOf(IntSize.Zero) }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-
-    val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
 
     val annotatedString = buildAnnotatedString {
         withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
             with(state.cuesWithTimingSubtitle) {
+                /* Blank lines are appended to add content padding */
+                append("\n")
+                append("\n")
                 (0 until eventTimeCount).forEach { index ->
                     getCues(getEventTime(index)).forEach { cue ->
                         if (shouldHighlightCueAtIndex(index, state.playbackPosition)) {
@@ -115,13 +125,13 @@ private fun TranscriptContent(state: UiState.TranscriptLoaded, colors: DefaultCo
                         append(" ")
                     }
                 }
+                append("\n")
             }
         }
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
             .background(colors.backgroundColor())
             .onGloballyPositioned { contentSize = it.size },
     ) {

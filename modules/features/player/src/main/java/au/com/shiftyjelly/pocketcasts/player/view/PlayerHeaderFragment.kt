@@ -15,11 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
@@ -32,8 +27,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -45,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -68,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -82,7 +77,6 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.compose.ui.graphics.Color as composeColor
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
@@ -357,19 +351,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun setupTranscriptPage() {
         binding?.transcriptPage?.setContent {
-            AppThemeWithBackground(theme.activeTheme) {
-                val color = composeColor(theme.playerBackgroundColor(viewModel.podcast))
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color),
-                ) {
-                    CloseButton(
-                        modifier = Modifier.align(Alignment.TopStart),
-                        onClick = { viewModel.closeTranscript(withTransition = true) },
-                    )
-                }
-            }
+            TranscriptPageWrapper(
+                viewModel = viewModel,
+                transcriptViewModel = transcriptViewModel,
+                theme = theme,
+                onScrollingEnabled = { enabled ->
+                    binding?.root?.setScrollingEnabled(enabled)
+                },
+            )
         }
     }
 
@@ -398,6 +387,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(false)
+        (root as? LockableNestedScrollView)?.setScrollingEnabled(false)
     }
 
     private fun AdapterPlayerHeaderBinding.closeTranscript(
@@ -414,6 +404,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
+        (root as? LockableNestedScrollView)?.setScrollingEnabled(true)
     }
 
     private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
