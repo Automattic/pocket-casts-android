@@ -2,24 +2,15 @@ package au.com.shiftyjelly.pocketcasts.sharing.episode
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import au.com.shiftyjelly.pocketcasts.compose.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
@@ -91,53 +82,29 @@ private fun VerticalShareEpisodePage(
             listener.onShare(podcast, episode, platfrom)
         }
     },
-    middleContent = {
-        val pagerState = rememberPagerState(pageCount = { 3 })
+    middleContent = { cardType, modifier ->
         if (podcast != null && episode != null) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                BoxWithConstraints(
-                    modifier = Modifier.weight(0.92f),
-                ) {
-                    val expectedVerticalCardPadding = remember(maxWidth, maxHeight) { (maxWidth - maxHeight / 1.5f) / 2 }
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize(),
-                    ) { pageIndex ->
-                        when (pageIndex) {
-                            0 -> VerticalEpisodeCard(
-                                podcast = podcast,
-                                episode = episode,
-                                useEpisodeArtwork = useEpisodeArtwork,
-                                shareColors = shareColors,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                            1 -> HorizontalEpisodeCard(
-                                podcast = podcast,
-                                episode = episode,
-                                useEpisodeArtwork = useEpisodeArtwork,
-                                shareColors = shareColors,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = expectedVerticalCardPadding),
-                            )
-                            2 -> SquareEpisodeCard(
-                                podcast = podcast,
-                                episode = episode,
-                                useEpisodeArtwork = useEpisodeArtwork,
-                                shareColors = shareColors,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = expectedVerticalCardPadding),
-                            )
-                            else -> error("Unexpected card page index: $pageIndex")
-                        }
-                    }
-                }
-                PagerDotIndicator(
-                    state = pagerState,
-                    modifier = Modifier.weight(0.08f),
+            when (cardType) {
+                CardType.Vertical -> VerticalEpisodeCard(
+                    podcast = podcast,
+                    episode = episode,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                    modifier = modifier,
+                )
+                CardType.Horiozntal -> HorizontalEpisodeCard(
+                    podcast = podcast,
+                    episode = episode,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                    modifier = modifier,
+                )
+                CardType.Square -> SquareEpisodeCard(
+                    podcast = podcast,
+                    episode = episode,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                    modifier = modifier,
                 )
             }
         }

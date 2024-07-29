@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.sharing.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,16 +14,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun VerticalSharePage(
     shareTitle: String,
@@ -30,7 +37,7 @@ internal fun VerticalSharePage(
     socialPlatforms: Set<SocialPlatform>,
     onClose: () -> Unit,
     onShareToPlatform: (SocialPlatform) -> Unit,
-    middleContent: @Composable BoxScope.() -> Unit,
+    middleContent: @Composable (CardType, Modifier) -> Unit,
 ) = Column(
     modifier = Modifier
         .fillMaxSize()
@@ -71,7 +78,32 @@ internal fun VerticalSharePage(
     }
     Box(
         contentAlignment = Alignment.Center,
-        content = middleContent,
+        content = {
+            val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                BoxWithConstraints(
+                    modifier = Modifier.weight(0.92f),
+                ) {
+                    val expectedVerticalCardPadding = remember(maxWidth, maxHeight) { (maxWidth - maxHeight / 1.5f) / 2 }
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize(),
+                    ) { pageIndex ->
+                        val cardType = CardType.entries[pageIndex]
+                        val modifier = Modifier
+                            .fillMaxSize()
+                            .then(if (cardType != CardType.Vertical) Modifier.padding(horizontal = expectedVerticalCardPadding) else Modifier)
+                        middleContent(cardType, modifier)
+                    }
+                }
+                PagerDotIndicator(
+                    state = pagerState,
+                    modifier = Modifier.weight(0.08f),
+                )
+            }
+        },
         modifier = Modifier
             .weight(0.65f)
             .fillMaxSize(),
