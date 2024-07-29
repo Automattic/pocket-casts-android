@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -15,8 +14,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
-import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -36,7 +33,7 @@ class ProfileViewModel @Inject constructor(
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
-    val showKidsBanner = settings.showKidsBanner.flow.stateIn(viewModelScope, Lazily, initialValue = true)
+    val showKidsBanner = settings.showKidsBanner.flow
 
     val refreshObservable: LiveData<RefreshState> =
         settings.refreshStateObservable
