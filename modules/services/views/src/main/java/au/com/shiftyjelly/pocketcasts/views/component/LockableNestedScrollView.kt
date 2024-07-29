@@ -6,6 +6,11 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.core.widget.NestedScrollView
 
+/**
+ * A [NestedScrollView] that can be locked to prevent scrolling.
+ * This is useful when a scrollable compose view is nested inside a scroll view in a bottom sheet.
+ * Locking the scroll view, allows scrolling within the compose view.
+ */
 class LockableNestedScrollView(
     context: Context,
     attrs: AttributeSet?,
