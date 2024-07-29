@@ -55,7 +55,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
-import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
+import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.podcast.SharePodcastFragment
 import au.com.shiftyjelly.pocketcasts.sharing.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -151,9 +152,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var shareActionsFactory: ShareActions.Factory
-
-    private lateinit var shareActions: ShareActions
+    @Inject lateinit var sharingClient: SharingClient
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
@@ -560,7 +559,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN, mapOf(SOURCE_KEY to sourceView.analyticsValue))
             FirebaseAnalyticsTracker.openedPodcast(podcastUuid)
         }
-        shareActions = shareActionsFactory.create(SourceView.PODCAST_SCREEN)
     }
 
     override fun onResume() {
@@ -728,7 +726,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     .forBookmark(episode, timestamp, podcast.backgroundColor, SourceView.PODCAST_SCREEN)
                     .show(parentFragmentManager, "share_screen")
             } else {
-                shareActions.shareBookmark(podcast, episode, timestamp)
+                val request = SharingRequest.bookmark(podcast, episode, timestamp)
+                    .setSourceView(SourceView.PODCAST_SCREEN)
+                    .build()
+                sharingClient.share(request)
             }
         }
     }
@@ -979,7 +980,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 .show(parentFragmentManager, "share_screen")
         } else {
             lifecycleScope.launch {
-                shareActions.sharePodcast(podcast)
+                val request = SharingRequest.podcast(podcast)
+                    .setSourceView(SourceView.PODCAST_SCREEN)
+                    .build()
+                sharingClient.share(request)
             }
         }
     }
