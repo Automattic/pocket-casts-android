@@ -33,12 +33,14 @@ internal fun HorizontalPodcastCast(
     episodeCount: Int,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
+    useWidthForAspectRatio: Boolean = true,
 ) = HorizontalCard(
     data = PodcastCardData(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
+    useWidthForAspectRatio = useWidthForAspectRatio,
     modifier = modifier,
 )
 
@@ -49,6 +51,7 @@ internal fun HorizontalEpisodeCard(
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
+    useWidthForAspectRatio: Boolean = true,
 ) = HorizontalCard(
     data = EpisodeCardData(
         episode = episode,
@@ -56,6 +59,7 @@ internal fun HorizontalEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
+    useWidthForAspectRatio = useWidthForAspectRatio,
     modifier = modifier,
 )
 
@@ -63,6 +67,7 @@ internal fun HorizontalEpisodeCard(
 private fun HorizontalCard(
     data: CardData,
     shareColors: ShareColors,
+    useWidthForAspectRatio: Boolean,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints {
     val backgroundGradient = Brush.verticalGradient(
@@ -71,28 +76,32 @@ private fun HorizontalCard(
             shareColors.cardBottom,
         ),
     )
-    val cardHeight = maxWidth * 0.52f
+    val (width, height) = if (useWidthForAspectRatio) {
+        maxWidth to maxWidth * 0.52f
+    } else {
+        maxHeight / 0.52f to maxHeight
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .background(backgroundGradient, RoundedCornerShape(12.dp))
-            .width(maxWidth)
-            .height(cardHeight),
+            .width(width)
+            .height(height),
     ) {
         Spacer(
-            modifier = Modifier.width(cardHeight * 0.15f),
+            modifier = Modifier.width(height * 0.15f),
         )
         data.Image(
             modifier = Modifier
-                .size(cardHeight * 0.7f)
+                .size(height * 0.7f)
                 .clip(RoundedCornerShape(8.dp)),
         )
         Spacer(
-            modifier = Modifier.width(cardHeight * 0.15f),
+            modifier = Modifier.width(height * 0.15f),
         )
         Column(
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(end = cardHeight * 0.15f),
+            modifier = Modifier.padding(end = height * 0.15f),
         ) {
             TextH70(
                 text = data.topText(),
@@ -189,4 +198,5 @@ private fun HorizontalCardPreview(
 ) = HorizontalCard(
     data = data,
     shareColors = ShareColors(baseColor),
+    useWidthForAspectRatio = true,
 )
