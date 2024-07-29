@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
@@ -41,6 +44,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTimingSubtitle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
+import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -142,6 +147,20 @@ private fun TranscriptContent(
                 .verticalScroll(scrollState),
             onTextLayout = { textLayoutResult = it },
         )
+
+        GradientView(
+            baseColor = colors.backgroundColor(),
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            fadeDirection = FadeDirection.TopToBottom,
+        )
+
+        GradientView(
+            baseColor = colors.backgroundColor(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter),
+            fadeDirection = FadeDirection.BottomToTop,
+        )
     }
 
     LaunchedEffect(state.playbackPosition) {
@@ -152,6 +171,28 @@ private fun TranscriptContent(
                 }
         }
     }
+}
+
+@Composable
+private fun GradientView(
+    baseColor: Color,
+    modifier: Modifier = Modifier,
+    fadeDirection: FadeDirection,
+) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height((screenHeight * 0.1).dp)
+            .gradientBackground(
+                baseColor = baseColor,
+                colorStops = listOf(
+                    Color.Black,
+                    Color.Transparent,
+                ),
+                direction = fadeDirection,
+            ),
+    )
 }
 
 private suspend fun scrollToVisibleRange(
