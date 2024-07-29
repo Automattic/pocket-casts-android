@@ -32,7 +32,7 @@ internal fun SquarePodcastCast(
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) = SquareCard(
-    type = PodcastCardType(
+    data = PodcastCardData(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
@@ -48,7 +48,7 @@ internal fun SquareEpisodeCard(
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) = SquareCard(
-    type = EpisodeCardType(
+    data = EpisodeCardData(
         episode = episode,
         podcast = podcast,
         useEpisodeArtwork = useEpisodeArtwork,
@@ -59,7 +59,7 @@ internal fun SquareEpisodeCard(
 
 @Composable
 private fun SquareCard(
-    type: CardType,
+    data: CardData,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints {
@@ -79,7 +79,7 @@ private fun SquareCard(
         Spacer(
             modifier = Modifier.height(42.dp),
         )
-        type.Image(
+        data.Image(
             modifier = Modifier
                 .size(size * 0.4f)
                 .clip(RoundedCornerShape(8.dp)),
@@ -88,7 +88,7 @@ private fun SquareCard(
             modifier = Modifier.height(24.dp),
         )
         TextH70(
-            text = type.topText(),
+            text = data.topText(),
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
             modifier = Modifier.padding(horizontal = 64.dp),
@@ -97,7 +97,7 @@ private fun SquareCard(
             modifier = Modifier.height(6.dp),
         )
         TextH40(
-            text = type.middleText(),
+            text = data.middleText(),
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
@@ -107,7 +107,7 @@ private fun SquareCard(
             modifier = Modifier.height(6.dp),
         )
         TextH70(
-            text = type.bottomText(),
+            text = data.bottomText(),
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),
@@ -148,7 +148,7 @@ fun SquareEpisodeCardDarkPreview() = SquareEpisodeCardPreview(
 private fun SquarePodcastCardPreview(
     baseColor: Color,
 ) = SquareCardPreview(
-    type = PodcastCardType(
+    data = PodcastCardData(
         podcast = Podcast(
             uuid = "podcast-id",
             title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -163,7 +163,7 @@ private fun SquarePodcastCardPreview(
 private fun SquareEpisodeCardPreview(
     baseColor: Color,
 ) = SquareCardPreview(
-    type = EpisodeCardType(
+    data = EpisodeCardData(
         episode = PodcastEpisode(
             uuid = "episode-id",
             podcastUuid = "podcast-id",
@@ -181,9 +181,9 @@ private fun SquareEpisodeCardPreview(
 
 @Composable
 private fun SquareCardPreview(
-    type: CardType,
+    data: CardData,
     baseColor: Color,
 ) = SquareCard(
-    type = type,
+    data = data,
     shareColors = ShareColors(baseColor),
 )

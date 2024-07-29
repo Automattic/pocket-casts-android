@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatMediumStyle
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-internal sealed interface CardType {
+internal sealed interface CardData {
     @Composable
     fun topText(): String
 
@@ -28,10 +28,10 @@ internal sealed interface CardType {
     fun Image(modifier: Modifier)
 }
 
-internal data class PodcastCardType(
+internal data class PodcastCardData(
     val podcast: Podcast,
     val episodeCount: Int,
-) : CardType {
+) : CardData {
     @Composable
     override fun topText() = podcast.title
 
@@ -53,11 +53,11 @@ internal data class PodcastCardType(
     )
 }
 
-internal data class EpisodeCardType(
+internal data class EpisodeCardData(
     val episode: PodcastEpisode,
     val podcast: Podcast,
     val useEpisodeArtwork: Boolean,
-) : CardType {
+) : CardData {
     @Composable
     override fun topText() = episode.publishedDate.toLocalizedFormatMediumStyle()
 

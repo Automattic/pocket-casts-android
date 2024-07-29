@@ -34,7 +34,7 @@ internal fun HorizontalPodcastCast(
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) = HorizontalCard(
-    type = PodcastCardType(
+    data = PodcastCardData(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
@@ -50,7 +50,7 @@ internal fun HorizontalEpisodeCard(
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) = HorizontalCard(
-    type = EpisodeCardType(
+    data = EpisodeCardData(
         episode = episode,
         podcast = podcast,
         useEpisodeArtwork = useEpisodeArtwork,
@@ -61,7 +61,7 @@ internal fun HorizontalEpisodeCard(
 
 @Composable
 private fun HorizontalCard(
-    type: CardType,
+    data: CardData,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints {
@@ -82,7 +82,7 @@ private fun HorizontalCard(
         Spacer(
             modifier = Modifier.width(cardHeight * 0.15f),
         )
-        type.Image(
+        data.Image(
             modifier = Modifier
                 .size(cardHeight * 0.7f)
                 .clip(RoundedCornerShape(8.dp)),
@@ -95,7 +95,7 @@ private fun HorizontalCard(
             modifier = Modifier.padding(end = cardHeight * 0.15f),
         ) {
             TextH70(
-                text = type.topText(),
+                text = data.topText(),
                 color = shareColors.cardText.copy(alpha = 0.5f),
                 maxLines = 1,
             )
@@ -103,7 +103,7 @@ private fun HorizontalCard(
                 modifier = Modifier.height(6.dp),
             )
             TextH40(
-                text = type.middleText(),
+                text = data.middleText(),
                 color = shareColors.cardText,
                 maxLines = 3,
             )
@@ -111,7 +111,7 @@ private fun HorizontalCard(
                 modifier = Modifier.height(6.dp),
             )
             TextH70(
-                text = type.bottomText(),
+                text = data.bottomText(),
                 maxLines = 2,
                 color = shareColors.cardText.copy(alpha = 0.5f),
             )
@@ -151,7 +151,7 @@ fun HorizontalEpisodeCardDarkPreview() = HorizontalEpisodeCardPreview(
 private fun HorizontalPodcastCardPreview(
     baseColor: Color,
 ) = HorizontalCardPreview(
-    type = PodcastCardType(
+    data = PodcastCardData(
         podcast = Podcast(
             uuid = "podcast-id",
             title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -166,7 +166,7 @@ private fun HorizontalPodcastCardPreview(
 private fun HorizontalEpisodeCardPreview(
     baseColor: Color,
 ) = HorizontalCardPreview(
-    type = EpisodeCardType(
+    data = EpisodeCardData(
         episode = PodcastEpisode(
             uuid = "episode-id",
             podcastUuid = "podcast-id",
@@ -184,9 +184,9 @@ private fun HorizontalEpisodeCardPreview(
 
 @Composable
 private fun HorizontalCardPreview(
-    type: CardType,
+    data: CardData,
     baseColor: Color,
 ) = HorizontalCard(
-    type = type,
+    data = data,
     shareColors = ShareColors(baseColor),
 )

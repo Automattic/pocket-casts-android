@@ -35,7 +35,7 @@ internal fun VerticalPodcastCast(
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
-    type = PodcastCardType(
+    data = PodcastCardData(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
@@ -53,7 +53,7 @@ internal fun VerticalEpisodeCard(
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
-    type = EpisodeCardType(
+    data = EpisodeCardData(
         episode = episode,
         podcast = podcast,
         useEpisodeArtwork = useEpisodeArtwork,
@@ -65,7 +65,7 @@ internal fun VerticalEpisodeCard(
 
 @Composable
 private fun VerticalCard(
-    type: CardType,
+    data: CardData,
     shareColors: ShareColors,
     useHeightForAspectRatio: Boolean,
     modifier: Modifier = Modifier,
@@ -91,7 +91,7 @@ private fun VerticalCard(
         Spacer(
             modifier = Modifier.height(width * 0.15f),
         )
-        type.Image(
+        data.Image(
             modifier = Modifier
                 .size(width * 0.7f)
                 .clip(RoundedCornerShape(8.dp)),
@@ -100,7 +100,7 @@ private fun VerticalCard(
             modifier = Modifier.height(height * 0.05f),
         )
         TextH70(
-            text = type.topText(),
+            text = data.topText(),
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
             modifier = Modifier.padding(horizontal = width * 0.1f),
@@ -109,7 +109,7 @@ private fun VerticalCard(
             modifier = Modifier.height(6.dp),
         )
         TextH40(
-            text = type.middleText(),
+            text = data.middleText(),
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
@@ -119,7 +119,7 @@ private fun VerticalCard(
             modifier = Modifier.height(6.dp),
         )
         TextH70(
-            text = type.bottomText(),
+            text = data.bottomText(),
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),
@@ -167,7 +167,7 @@ fun VerticalEpisodeCardDarkPreview() = VerticalEpisodeCardPreview(
 private fun VerticalPodcastCardPreview(
     baseColor: Color,
 ) = VerticalCardPreview(
-    type = PodcastCardType(
+    data = PodcastCardData(
         podcast = Podcast(
             uuid = "podcast-id",
             title = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -182,7 +182,7 @@ private fun VerticalPodcastCardPreview(
 private fun VerticalEpisodeCardPreview(
     baseColor: Color,
 ) = VerticalCardPreview(
-    type = EpisodeCardType(
+    data = EpisodeCardData(
         episode = PodcastEpisode(
             uuid = "episode-id",
             podcastUuid = "podcast-id",
@@ -200,10 +200,10 @@ private fun VerticalEpisodeCardPreview(
 
 @Composable
 private fun VerticalCardPreview(
-    type: CardType,
+    data: CardData,
     baseColor: Color,
 ) = VerticalCard(
-    type = type,
+    data = data,
     shareColors = ShareColors(baseColor),
     useHeightForAspectRatio = false,
 )
