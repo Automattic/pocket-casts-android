@@ -69,7 +69,10 @@ private fun HorizontalCard(
     shareColors: ShareColors,
     useWidthForAspectRatio: Boolean,
     modifier: Modifier = Modifier,
-) = BoxWithConstraints {
+) = BoxWithConstraints(
+    contentAlignment = Alignment.Center,
+    modifier = modifier,
+) {
     val backgroundGradient = Brush.verticalGradient(
         listOf(
             shareColors.cardTop,
@@ -83,7 +86,7 @@ private fun HorizontalCard(
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = Modifier
             .background(backgroundGradient, RoundedCornerShape(12.dp))
             .width(width)
             .height(height),
