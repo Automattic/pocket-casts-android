@@ -73,12 +73,12 @@ internal fun VerticalSharePage(
         contentAlignment = Alignment.Center,
         content = middleContent,
         modifier = Modifier
-            .weight(0.6f)
+            .weight(0.65f)
             .fillMaxSize(),
     )
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.weight(0.2f),
+        modifier = Modifier.weight(0.15f),
     ) {
         PlatformBar(
             platforms = socialPlatforms,
