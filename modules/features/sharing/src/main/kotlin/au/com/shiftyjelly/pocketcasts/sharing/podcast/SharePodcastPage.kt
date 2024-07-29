@@ -20,12 +20,12 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface SharePodcastPageListener {
-    fun onShare(podcast: Podcast, platform: SocialPlatform)
+    fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType)
     fun onClose()
 
     companion object {
         val Preview = object : SharePodcastPageListener {
-            override fun onShare(podcast: Podcast, platform: SocialPlatform) = Unit
+            override fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType) = Unit
             override fun onClose() = Unit
         }
     }
@@ -68,9 +68,9 @@ private fun VerticalSharePodcastPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom ->
+    onShareToPlatform = { platfrom, cardType ->
         if (podcast != null) {
-            listener.onShare(podcast, platfrom)
+            listener.onShare(podcast, platfrom, cardType)
         }
     },
     middleContent = { cardType, modifier ->
@@ -112,9 +112,9 @@ private fun HorizontalSharePodcastPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom ->
+    onShareToPlatform = { platfrom, cardType ->
         if (podcast != null) {
-            listener.onShare(podcast, platfrom)
+            listener.onShare(podcast, platfrom, cardType)
         }
     },
     middleContent = {
