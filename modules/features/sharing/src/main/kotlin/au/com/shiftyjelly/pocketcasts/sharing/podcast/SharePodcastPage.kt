@@ -8,10 +8,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -71,13 +73,28 @@ private fun VerticalSharePodcastPage(
             listener.onShare(podcast, platfrom)
         }
     },
-    middleContent = {
+    middleContent = { cardType, modifier ->
         if (podcast != null) {
-            VerticalPodcastCast(
-                podcast = podcast,
-                episodeCount = episodeCount,
-                shareColors = shareColors,
-            )
+            when (cardType) {
+                CardType.Vertical -> VerticalPodcastCast(
+                    podcast = podcast,
+                    episodeCount = episodeCount,
+                    shareColors = shareColors,
+                    modifier = modifier,
+                )
+                CardType.Horiozntal -> HorizontalPodcastCast(
+                    podcast = podcast,
+                    episodeCount = episodeCount,
+                    shareColors = shareColors,
+                    modifier = modifier,
+                )
+                CardType.Square -> SquarePodcastCast(
+                    podcast = podcast,
+                    episodeCount = episodeCount,
+                    shareColors = shareColors,
+                    modifier = modifier,
+                )
+            }
         }
     },
 )
