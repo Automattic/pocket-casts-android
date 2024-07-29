@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -550,10 +551,17 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     suspend fun loadEpisodeChildren(parentId: String): List<MediaBrowserCompat.MediaItem> {
         // user tapped on a playlist or podcast, show the episodes
         val episodeItems = mutableListOf<MediaBrowserCompat.MediaItem>()
+        val autoPlaySource: AutoPlaySource
 
         val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuidSync(parentId)
         if (playlist != null) {
-            val episodeList = if (DOWNLOADS_ROOT == parentId) episodeManager.observeDownloadedEpisodes().blockingFirst() else playlistManager.findEpisodes(playlist, episodeManager, playbackManager)
+            val episodeList = if (DOWNLOADS_ROOT == parentId) {
+                autoPlaySource = AutoPlaySource.Downloads
+                episodeManager.observeDownloadedEpisodes().blockingFirst()
+            } else {
+                autoPlaySource = AutoPlaySource.fromId(parentId)
+                playlistManager.findEpisodes(playlist, episodeManager, playbackManager)
+            }
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
             if (topEpisodes.isNotEmpty()) {
                 for (episode in topEpisodes) {
@@ -563,6 +571,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 }
             }
         } else {
+            autoPlaySource = AutoPlaySource.fromId(parentId)
             val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
 
@@ -581,16 +590,24 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             }
         }
 
+        setAutoPlaySource(autoPlaySource)
+
         return episodeItems
     }
 
+    private fun setAutoPlaySource(autoPlaySource: AutoPlaySource) {
+        settings.trackingAutoPlaySource.set(autoPlaySource, updateModifiedAt = false)
+    }
+
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
+        setAutoPlaySource(AutoPlaySource.Files)
         return userEpisodeManager.findUserEpisodes().map {
             AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
         }
     }
 
     protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
+        setAutoPlaySource(AutoPlaySource.Starred)
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
@@ -600,6 +617,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     protected suspend fun loadListeningHistoryChildren(): List<MediaBrowserCompat.MediaItem> {
         return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
+            setAutoPlaySource(AutoPlaySource.fromId(episode.podcastUuid))
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
