@@ -1,4 +1,4 @@
-* Updated
+* Updates
     *   App opened from a link with an episode timestamp no longer starts playing automatically.
         ([#2479](https://github.com/Automattic/pocket-casts-android/pull/2479))
 *   Bug Fixes

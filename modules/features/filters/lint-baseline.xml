@@ -151,7 +151,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="300"
+            line="301"
             column="21"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="488"
+            line="489"
             column="13"/>
     </issue>
 
@@ -173,7 +173,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="497"
+            line="498"
             column="21"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="505"
+            line="506"
             column="21"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="518"
+            line="519"
             column="21"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="530"
+            line="531"
             column="25"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="543"
+            line="544"
             column="25"/>
     </issue>
 
@@ -228,7 +228,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/filters/FilterEpisodeListFragment.kt"
-            line="557"
+            line="558"
             column="21"/>
     </issue>
 
