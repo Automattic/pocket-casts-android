@@ -16,9 +16,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowCloseButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
@@ -364,11 +364,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         .fillMaxSize()
                         .background(color),
                 ) {
-                    RowCloseButton(
-                        onClose = {
-                            viewModel.closeTranscript(withTransition = true)
-                        },
-                        horizontalArrangement = Arrangement.Start,
+                    CloseButton(
+                        modifier = Modifier.align(Alignment.TopStart),
+                        onClick = { viewModel.closeTranscript(withTransition = true) },
                     )
                 }
             }
