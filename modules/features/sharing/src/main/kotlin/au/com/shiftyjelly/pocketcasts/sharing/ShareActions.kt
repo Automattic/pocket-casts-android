@@ -51,7 +51,13 @@ class ShareActions(
         source = sourceView,
         displayPodcastCover = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
         hostUrl = SERVER_SHORT_URL,
-        shareStarter = ShareStarter { ctx, intent -> ctx.startActivity(intent) },
+        shareStarter = object : ShareStarter {
+            override fun start(context: Context, intent: Intent) {
+                context.startActivity(intent)
+            }
+
+            override fun copyLink(context: Context, data: ClipData) = Unit
+        },
     )
 
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()

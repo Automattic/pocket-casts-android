@@ -2010,6 +2010,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_label_tumblr" translatable="false">Tumblr</string>
     <string name="share_label_copy_link">Copy link</string>
     <string name="share_label_more" translatable="false">@string/more</string>
+    <string name="share_link_copied_feedback">Link copied to clipboard</string>
+    <string name="share_link_podcast">Podcast link</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
