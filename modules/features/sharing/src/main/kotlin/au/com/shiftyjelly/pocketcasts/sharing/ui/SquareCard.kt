@@ -62,7 +62,10 @@ private fun SquareCard(
     data: CardData,
     shareColors: ShareColors,
     modifier: Modifier = Modifier,
-) = BoxWithConstraints {
+) = BoxWithConstraints(
+    contentAlignment = Alignment.Center,
+    modifier = modifier,
+) {
     val size = minOf(maxWidth, maxHeight)
     val backgroundGradient = Brush.verticalGradient(
         listOf(
@@ -72,7 +75,7 @@ private fun SquareCard(
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = Modifier
             .background(backgroundGradient, RoundedCornerShape(12.dp))
             .size(size),
     ) {
