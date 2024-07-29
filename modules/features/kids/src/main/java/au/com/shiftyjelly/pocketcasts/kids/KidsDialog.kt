@@ -67,7 +67,7 @@ fun KidsDialog(
                 text = stringResource(LR.string.thank_you_for_your_interest),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.W600,
-                modifier = modifier.padding(bottom = 12.dp),
+                modifier = modifier.padding(bottom = 12.dp, start = 21.dp, end = 21.dp),
             )
 
             TextH50(
@@ -75,7 +75,7 @@ fun KidsDialog(
                 fontWeight = FontWeight.W500,
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
-                modifier = modifier.padding(bottom = 12.dp),
+                modifier = modifier.padding(bottom = 12.dp, start = 21.dp, end = 21.dp),
             )
 
             RowButton(

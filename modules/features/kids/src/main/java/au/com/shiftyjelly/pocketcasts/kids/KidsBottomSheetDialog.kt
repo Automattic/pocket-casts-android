@@ -5,9 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.doOnLayout
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.kids.viewmodel.KidsSendFeedbackViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -21,15 +25,29 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
     @Inject
     lateinit var theme: Theme
 
+    private val viewModel: KidsSendFeedbackViewModel by viewModels()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val context = context ?: throw Exception("Context not found")
-        return ComposeView(context).apply {
+        return ComposeView(requireContext()).apply {
             setContent {
+                val showFeedbackDialog by viewModel.showFeedbackDialog.collectAsState()
+
                 AppTheme(theme.activeTheme) {
-                    KidsDialog(
-                        onSendFeedbackClick = {},
-                        onNoThankYouClick = { dismiss() },
-                    )
+                    if (showFeedbackDialog) {
+                        KidsSendFeedbackDialog(
+                            onSubmitFeedback = {},
+                        )
+                    } else {
+                        KidsDialog(
+                            onSendFeedbackClick = {
+                                viewModel.onSendFeedbackClick()
+                            },
+                            onNoThankYouClick = {
+                                viewModel.onNoThankYouClick()
+                                dismiss()
+                            },
+                        )
+                    }
                 }
             }
         }
