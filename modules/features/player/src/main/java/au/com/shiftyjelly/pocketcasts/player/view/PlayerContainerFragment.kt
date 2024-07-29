@@ -320,7 +320,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     override fun getBackstackCount(): Int {
         return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
-            bookmarksViewModel.multiSelectHelper.isMultiSelecting
+            bookmarksViewModel.multiSelectHelper.isMultiSelecting ||
+            isTranscriptVisible
         ) {
             1
         } else {
@@ -341,9 +342,18 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 true
             }
 
+            isTranscriptVisible -> {
+                updateTabsVisibility(true)
+                viewModel.closeTranscript(withTransition = true)
+                true
+            }
+
             else -> false
         }
     }
+
+    private val isTranscriptVisible: Boolean
+        get() = binding?.tabHolder?.isVisible == false
 
     companion object {
         private const val INVALID_TAB_POSITION = -1

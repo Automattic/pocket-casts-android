@@ -355,9 +355,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 viewModel = viewModel,
                 transcriptViewModel = transcriptViewModel,
                 theme = theme,
-                onScrollingEnabled = { enabled ->
-                    binding?.root?.setScrollingEnabled(enabled)
-                },
             )
         }
     }

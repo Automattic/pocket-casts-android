@@ -11,10 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
@@ -28,23 +26,12 @@ fun TranscriptPageWrapper(
     viewModel: PlayerViewModel,
     transcriptViewModel: TranscriptViewModel,
     theme: Theme,
-    onScrollingEnabled: (Boolean) -> Unit,
 ) {
     AppTheme(theme.activeTheme) {
         val color = Color(theme.playerBackgroundColor(viewModel.podcast))
         val scrollState = rememberScrollState()
         val configuration = LocalConfiguration.current
-
-        val connection = remember {
-            object : NestedScrollConnection {
-                override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                    if (scrollState.value == 0) {
-                        onScrollingEnabled(true)
-                    }
-                    return super.onPostScroll(consumed, available, source)
-                }
-            }
-        }
+        val connection = remember { object : NestedScrollConnection {} }
 
         Box(
             modifier = Modifier
