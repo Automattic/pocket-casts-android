@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.sharing
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_SEND
@@ -306,6 +307,8 @@ class ShareActionsTest {
         override fun start(context: Context, intent: Intent) {
             _intent = intent
         }
+
+        override fun copyLink(context: Context, data: ClipData) = Unit
     }
 
     private class TestTracker : Tracker {

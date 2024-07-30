@@ -83,7 +83,7 @@ private fun VerticalShareEpisodeTimestampPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom ->
+    onShareToPlatform = { platfrom, _ ->
         if (podcast != null && episode != null) {
             listener.onShare(podcast, episode, timestamp, platfrom)
         }
@@ -132,7 +132,7 @@ private fun HorizontalShareEpisodeTimestampPage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom ->
+    onShareToPlatform = { platfrom, _ ->
         if (podcast != null && episode != null) {
             listener.onShare(podcast, episode, timestamp, platfrom)
         }

@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.utils.getPackageInfo
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-internal enum class SocialPlatform(
+enum class SocialPlatform(
     @DrawableRes val logoId: Int,
     @StringRes val nameId: Int,
     val packageId: String?,

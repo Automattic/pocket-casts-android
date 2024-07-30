@@ -36,7 +36,7 @@ internal fun VerticalSharePage(
     shareColors: ShareColors,
     socialPlatforms: Set<SocialPlatform>,
     onClose: () -> Unit,
-    onShareToPlatform: (SocialPlatform) -> Unit,
+    onShareToPlatform: (SocialPlatform, CardType) -> Unit,
     middleContent: @Composable (CardType, Modifier) -> Unit,
 ) = Column(
     modifier = Modifier
@@ -76,10 +76,10 @@ internal fun VerticalSharePage(
             )
         }
     }
+    val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
     Box(
         contentAlignment = Alignment.Center,
         content = {
-            val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -117,7 +117,9 @@ internal fun VerticalSharePage(
         PlatformBar(
             platforms = socialPlatforms,
             shareColors = shareColors,
-            onClick = onShareToPlatform,
+            onClick = { platform ->
+                onShareToPlatform(platform, CardType.entries[pagerState.currentPage])
+            },
         )
     }
 }
@@ -129,7 +131,7 @@ internal fun HorizontalSharePage(
     shareColors: ShareColors,
     socialPlatforms: Set<SocialPlatform>,
     onClose: () -> Unit,
-    onShareToPlatform: (SocialPlatform) -> Unit,
+    onShareToPlatform: (SocialPlatform, CardType) -> Unit,
     middleContent: @Composable BoxScope.() -> Unit,
 ) = Column(
     modifier = Modifier
@@ -196,7 +198,9 @@ internal fun HorizontalSharePage(
             PlatformBar(
                 platforms = socialPlatforms,
                 shareColors = shareColors,
-                onClick = onShareToPlatform,
+                onClick = { platform ->
+                    onShareToPlatform(platform, CardType.Horiozntal)
+                },
             )
         }
         Spacer(

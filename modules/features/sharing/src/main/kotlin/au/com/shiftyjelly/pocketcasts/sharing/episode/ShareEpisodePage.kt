@@ -77,7 +77,7 @@ private fun VerticalShareEpisodePage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom ->
+    onShareToPlatform = { platfrom, _ ->
         if (podcast != null && episode != null) {
             listener.onShare(podcast, episode, platfrom)
         }
@@ -125,7 +125,7 @@ private fun HorizontalShareEpisodePage(
     shareColors = shareColors,
     socialPlatforms = socialPlatforms,
     onClose = listener::onClose,
-    onShareToPlatform = { platfrom ->
+    onShareToPlatform = { platfrom, _ ->
         if (podcast != null && episode != null) {
             listener.onShare(podcast, episode, platfrom)
         }

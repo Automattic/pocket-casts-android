@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
@@ -38,13 +39,15 @@ class SharePodcastFragment : BaseDialogFragment() {
         },
     )
 
+    @Inject internal lateinit var shareListenerFactory: SharePodcastListener.Factory
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val listener = SharePodcastListener(this@SharePodcastFragment)
+        val listener = shareListenerFactory.create(this@SharePodcastFragment, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             SharePodcastPage(
