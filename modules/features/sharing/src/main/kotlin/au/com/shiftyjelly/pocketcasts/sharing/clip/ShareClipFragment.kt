@@ -7,10 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
@@ -18,9 +16,7 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
@@ -61,11 +57,6 @@ class ShareClipFragment : BaseDialogFragment() {
 
     private lateinit var clipAnalytics: ClipAnalytics
 
-    @Inject
-    lateinit var shareActionsFactory: ShareActions.Factory
-
-    private lateinit var shareActions: ShareActions
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         clipAnalytics = clipAnalyticsFactory.create(
@@ -75,7 +66,6 @@ class ShareClipFragment : BaseDialogFragment() {
             sourceView = args.source,
             initialClipRange = args.clipRange,
         )
-        shareActions = shareActionsFactory.create(args.source)
         if (savedInstanceState == null) {
             viewModel.onClipScreenShown()
         }
@@ -87,18 +77,19 @@ class ShareClipFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val shareColors = shareColors
+        val listener = ShareClipListener(this@ShareClipFragment, viewModel)
         setContent {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .background(shareColors.background)
-                    .fillMaxSize(),
-            ) {
-                TextH30(
-                    text = "Work in progress",
-                    color = shareColors.backgroundPrimaryText,
-                )
-            }
+            val uiState by viewModel.uiState.collectAsState()
+            ShareClipPage(
+                episode = uiState.episode,
+                podcast = uiState.podcast,
+                clipRange = uiState.clipRange,
+                playbackProgress = uiState.playbackProgress,
+                isPlaying = uiState.isPlaying,
+                useEpisodeArtwork = uiState.useEpisodeArtwork,
+                shareColors = shareColors,
+                listener = listener,
+            )
         }
     }
 

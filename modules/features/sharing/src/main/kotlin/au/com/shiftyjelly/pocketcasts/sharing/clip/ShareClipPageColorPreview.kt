@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 
 private class PodcastColorProvider : PreviewParameterProvider<Long> {
     override val values = sequenceOf(
@@ -29,7 +30,7 @@ private class PodcastColorProvider : PreviewParameterProvider<Long> {
     ).map { Color.parseColor("#$it").toLong() }
 }
 
-@Preview(device = PreviewDevicePortrait)
+@Preview(device = Devices.PortraitRegular)
 @Composable
 private fun VerticalCardPreview(
     @PreviewParameter(PodcastColorProvider::class) color: Long,
