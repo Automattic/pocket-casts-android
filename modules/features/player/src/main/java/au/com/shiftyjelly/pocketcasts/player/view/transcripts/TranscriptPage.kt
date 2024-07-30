@@ -131,6 +131,7 @@ private fun TranscriptContent(
                     }
                 }
                 append("\n")
+                append("\n")
             }
         }
     }
