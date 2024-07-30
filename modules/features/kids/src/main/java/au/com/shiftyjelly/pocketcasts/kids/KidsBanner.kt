@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
@@ -86,8 +84,7 @@ fun KidsProfileCard(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
                             .background(MaterialTheme.theme.colors.primaryInteractive01, shape = RoundedCornerShape(4.dp))
-                            .width(40.dp)
-                            .height(24.dp),
+                            .padding(horizontal = 6.dp, vertical = 2.dp),
                     ) {
                         Text(
                             text = stringResource(LR.string.soon_label),
