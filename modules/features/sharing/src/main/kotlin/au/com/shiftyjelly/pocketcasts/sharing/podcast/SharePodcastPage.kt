@@ -1,12 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.sharing.podcast
 
 import android.content.res.Configuration
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
@@ -17,15 +21,19 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface SharePodcastPageListener {
-    fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType)
+    suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType): SharingResponse
     fun onClose()
 
     companion object {
         val Preview = object : SharePodcastPageListener {
-            override fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType) = Unit
+            override suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType) = SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+            )
             override fun onClose() = Unit
         }
     }
@@ -38,21 +46,26 @@ internal fun SharePodcastPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
-) = when (LocalConfiguration.current.orientation) {
-    Configuration.ORIENTATION_LANDSCAPE -> HorizontalSharePodcastPage(
-        podcast = podcast,
-        episodeCount = episodeCount,
-        socialPlatforms = socialPlatforms,
-        shareColors = shareColors,
-        listener = listener,
-    )
-    else -> VerticalSharePodcastPage(
-        podcast = podcast,
-        episodeCount = episodeCount,
-        socialPlatforms = socialPlatforms,
-        shareColors = shareColors,
-        listener = listener,
-    )
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> HorizontalSharePodcastPage(
+            podcast = podcast,
+            episodeCount = episodeCount,
+            socialPlatforms = socialPlatforms,
+            shareColors = shareColors,
+            listener = listener,
+            snackbarHostState = snackbarHostState,
+        )
+        else -> VerticalSharePodcastPage(
+            podcast = podcast,
+            episodeCount = episodeCount,
+            socialPlatforms = socialPlatforms,
+            shareColors = shareColors,
+            listener = listener,
+            snackbarHostState = snackbarHostState,
+        )
+    }
 }
 
 @Composable
@@ -62,42 +75,50 @@ private fun VerticalSharePodcastPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
-) = VerticalSharePage(
-    shareTitle = stringResource(LR.string.share_podcast_title),
-    shareDescription = stringResource(LR.string.share_podcast_description),
-    shareColors = shareColors,
-    socialPlatforms = socialPlatforms,
-    onClose = listener::onClose,
-    onShareToPlatform = { platform, cardType ->
-        if (podcast != null) {
-            listener.onShare(podcast, platform, cardType)
-        }
-    },
-    middleContent = { cardType, modifier ->
-        if (podcast != null) {
-            when (cardType) {
-                CardType.Vertical -> VerticalPodcastCast(
-                    podcast = podcast,
-                    episodeCount = episodeCount,
-                    shareColors = shareColors,
-                    modifier = modifier,
-                )
-                CardType.Horiozntal -> HorizontalPodcastCast(
-                    podcast = podcast,
-                    episodeCount = episodeCount,
-                    shareColors = shareColors,
-                    modifier = modifier,
-                )
-                CardType.Square -> SquarePodcastCast(
-                    podcast = podcast,
-                    episodeCount = episodeCount,
-                    shareColors = shareColors,
-                    modifier = modifier,
-                )
+    snackbarHostState: SnackbarHostState,
+) {
+    val scope = rememberCoroutineScope()
+    VerticalSharePage(
+        shareTitle = stringResource(LR.string.share_podcast_title),
+        shareDescription = stringResource(LR.string.share_podcast_description),
+        shareColors = shareColors,
+        socialPlatforms = socialPlatforms,
+        onClose = listener::onClose,
+        snackbarHostState = snackbarHostState,
+        onShareToPlatform = { platform, cardType ->
+            if (podcast != null) {
+                scope.launch {
+                    val response = listener.onShare(podcast, platform, cardType)
+                    response.feedbackMessage?.let { snackbarHostState.showSnackbar(it) }
+                }
             }
-        }
-    },
-)
+        },
+        middleContent = { cardType, modifier ->
+            if (podcast != null) {
+                when (cardType) {
+                    CardType.Vertical -> VerticalPodcastCast(
+                        podcast = podcast,
+                        episodeCount = episodeCount,
+                        shareColors = shareColors,
+                        modifier = modifier,
+                    )
+                    CardType.Horiozntal -> HorizontalPodcastCast(
+                        podcast = podcast,
+                        episodeCount = episodeCount,
+                        shareColors = shareColors,
+                        modifier = modifier,
+                    )
+                    CardType.Square -> SquarePodcastCast(
+                        podcast = podcast,
+                        episodeCount = episodeCount,
+                        shareColors = shareColors,
+                        modifier = modifier,
+                    )
+                }
+            }
+        },
+    )
+}
 
 @Composable
 private fun HorizontalSharePodcastPage(
@@ -106,27 +127,35 @@ private fun HorizontalSharePodcastPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
-) = HorizontalSharePage(
-    shareTitle = stringResource(LR.string.share_podcast_title),
-    shareDescription = stringResource(LR.string.share_podcast_description),
-    shareColors = shareColors,
-    socialPlatforms = socialPlatforms,
-    onClose = listener::onClose,
-    onShareToPlatform = { platform, cardType ->
-        if (podcast != null) {
-            listener.onShare(podcast, platform, cardType)
-        }
-    },
-    middleContent = {
-        if (podcast != null) {
-            HorizontalPodcastCast(
-                podcast = podcast,
-                episodeCount = episodeCount,
-                shareColors = shareColors,
-            )
-        }
-    },
-)
+    snackbarHostState: SnackbarHostState,
+) {
+    val scope = rememberCoroutineScope()
+    HorizontalSharePage(
+        shareTitle = stringResource(LR.string.share_podcast_title),
+        shareDescription = stringResource(LR.string.share_podcast_description),
+        shareColors = shareColors,
+        socialPlatforms = socialPlatforms,
+        snackbarHostState = snackbarHostState,
+        onClose = listener::onClose,
+        onShareToPlatform = { platform, cardType ->
+            if (podcast != null) {
+                scope.launch {
+                    val response = listener.onShare(podcast, platform, cardType)
+                    response.feedbackMessage?.let { snackbarHostState.showSnackbar(it) }
+                }
+            }
+        },
+        middleContent = {
+            if (podcast != null) {
+                HorizontalPodcastCast(
+                    podcast = podcast,
+                    episodeCount = episodeCount,
+                    shareColors = shareColors,
+                )
+            }
+        },
+    )
+}
 
 @ShowkaseComposable(name = "SharePodcastVerticalRegularPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalRegularPreview", device = Devices.PortraitRegular)

@@ -18,6 +18,9 @@ internal data class ShareColors(
     val pagerIndicatorActive = if (background.luminance() < 0.5f) Color.White else Color.Black
     val pagerIndicatorInactive = pagerIndicatorActive.copy(alpha = 0.3f)
 
+    val snackbar = if (background.luminance() < 0.5f) Color.White else Color.Black
+    val snackbarText = if (snackbar.luminance() < 0.5f) Color.White else Color.Black
+
     val clipButton = if (background.luminance() < 0.25) {
         ColorUtils.changeHsvValue(base, 2f)
     } else {
