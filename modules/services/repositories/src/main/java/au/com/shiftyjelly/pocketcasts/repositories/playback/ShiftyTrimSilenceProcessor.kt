@@ -77,6 +77,7 @@ class ShiftyTrimSilenceProcessor(
         return if (enabled) inputAudioFormat else AudioFormat.NOT_SET
     }
 
+    /* Suppressing the warning as calling super breaks trim silence functionality. */
     @SuppressLint("MissingSuperCall")
     override fun isActive(): Boolean = enabled
 
