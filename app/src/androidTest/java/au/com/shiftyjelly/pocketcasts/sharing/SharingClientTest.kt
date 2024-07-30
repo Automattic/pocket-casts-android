@@ -5,21 +5,29 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_SEND
 import android.content.Intent.EXTRA_INTENT
+import android.content.Intent.EXTRA_STREAM
 import android.content.Intent.EXTRA_TEXT
 import android.content.Intent.EXTRA_TITLE
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.net.Uri
 import androidx.core.content.IntentCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import java.io.File
 import java.util.Date
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -303,10 +311,44 @@ class SharingClientTest {
         assertNull(response.feedbackMessage)
     }
 
+    @Test
+    fun shareEpisodeFile() = runTest {
+        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        val request = SharingRequest.episodeFile(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", downloadedFilePath = file.path, fileType = "audio/mp3", publishedDate = Date()),
+        ).build()
+
+        val response = client.share(request)
+        assertTrue(response.isSuccsessful)
+        assertNull(response.feedbackMessage)
+
+        val intent = shareStarter.requireShareIntent
+
+        assertEquals(ACTION_SEND, intent.action)
+        assertEquals("audio/mp3", intent.type)
+        assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
+    }
+
+    @Test
+    fun shareEpisodeFileWhenFileDoesNotExist() = runTest {
+        val request = SharingRequest.episodeFile(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", downloadedFilePath = null, publishedDate = Date()),
+        ).build()
+
+        val response = client.share(request)
+        assertFalse(response.isSuccsessful)
+        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+
+        assertNull(shareStarter.shareIntent)
+    }
+
     private fun createClient(
         showCustomCopyFeedback: Boolean = false,
     ) = SharingClient(
         context = context,
+        tracker = AnalyticsTracker.test(),
         displayPodcastCover = false,
         showCustomCopyFeedback = showCustomCopyFeedback,
         hostUrl = "https://pca.st",

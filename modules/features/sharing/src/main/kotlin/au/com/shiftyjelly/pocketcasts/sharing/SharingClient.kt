@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.EXTRA_STREAM
 import android.content.Intent.EXTRA_TEXT
 import android.content.Intent.EXTRA_TITLE
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -13,6 +14,7 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -45,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeMod
 
 class SharingClient(
     private val context: Context,
+    tracker: AnalyticsTracker,
     private val displayPodcastCover: Boolean,
     private val showCustomCopyFeedback: Boolean,
     private val hostUrl: String,
@@ -52,8 +55,10 @@ class SharingClient(
 ) {
     @Inject constructor(
         @ApplicationContext context: Context,
+        tracker: AnalyticsTracker,
     ) : this(
         context = context,
+        tracker = tracker,
         displayPodcastCover = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
         showCustomCopyFeedback = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
         hostUrl = SERVER_SHORT_URL,
@@ -70,8 +75,11 @@ class SharingClient(
 
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()
 
+    private val analytics = SharingAnalytics(tracker)
+
     suspend fun share(request: SharingRequest) = try {
         Timber.tag("SharingClient").i("Share: $request")
+        analytics.logPodcastSharedEvent(request)
         request.tryShare()
     } catch (t: Throwable) {
         Timber.tag("SharingClient").e(t, "Failed to share a request: $request")
@@ -81,33 +89,52 @@ class SharingClient(
         )
     }
 
-    private suspend fun SharingRequest.tryShare(): SharingResponse = when (platform) {
-        Instagram -> {
-            error("Not implemented yet")
+    private suspend fun SharingRequest.tryShare(): SharingResponse = when (data) {
+        is SharingRequest.Sociable -> when (platform) {
+            Instagram -> {
+                error("Not implemented yet")
+            }
+            PocketCasts -> {
+                shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
+                )
+            }
+            WhatsApp, Telegram, X, Tumblr, More -> {
+                Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .setType("text/plain")
+                    .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
+                    .putExtra(EXTRA_TITLE, data.sharingTitle())
+                    .setPackage(platform.packageId)
+                    .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                    .setPodcastCover(data.podcast)
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                )
+            }
         }
-
-        PocketCasts -> {
-            shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
-            SharingResponse(
-                isSuccsessful = true,
-                feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
-            )
-        }
-
-        WhatsApp, Telegram, X, Tumblr, More -> {
-            Intent()
-                .setAction(Intent.ACTION_SEND)
-                .setType("text/plain")
-                .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
-                .putExtra(EXTRA_TITLE, data.sharingTitle())
-                .setPackage(platform.packageId)
-                .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-                .setPodcastCover(data.podcast)
-                .share()
-            SharingResponse(
-                isSuccsessful = true,
-                feedbackMessage = null,
-            )
+        is SharingRequest.Data.EpisodeFile -> {
+            val file = data.episode.downloadedFilePath?.let(::File)
+            if (file?.exists() == true) {
+                Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .setType(data.episode.fileType)
+                    .setExtraStream(file)
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                )
+            } else {
+                SharingResponse(
+                    isSuccsessful = false,
+                    feedbackMessage = context.getString(LR.string.error),
+                )
+            }
         }
     }
 
@@ -136,6 +163,8 @@ class SharingClient(
             }
         }
     }
+
+    private fun Intent.setExtraStream(file: File) = putExtra(EXTRA_STREAM, FileUtil.createUriWithReadPermissions(context, file, this))
 }
 
 data class SharingRequest internal constructor(
@@ -152,6 +181,8 @@ data class SharingRequest internal constructor(
         fun episodePosition(podcast: PodcastModel, episode: PodcastEpisode, position: Duration) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Episode))
 
         fun bookmark(podcast: PodcastModel, episode: PodcastEpisode, position: Duration) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark))
+
+        fun episodeFile(podcast: Podcast, episode: PodcastEpisode) = Builder(Data.EpisodeFile(podcast, episode))
     }
 
     class Builder internal constructor(
@@ -181,18 +212,20 @@ data class SharingRequest internal constructor(
         )
     }
 
-    internal sealed interface Data {
-        val podcast: PodcastModel
-
+    internal sealed interface Sociable {
         fun sharingUrl(host: String): String
 
         fun sharingTitle(): String
 
         @StringRes fun linkDescription(): Int
+    }
+
+    internal sealed interface Data {
+        val podcast: PodcastModel
 
         data class Podcast(
             override val podcast: PodcastModel,
-        ) : Data {
+        ) : Data, Sociable {
             override fun sharingUrl(host: String) = "$host/podcast/${podcast.uuid}"
 
             override fun sharingTitle() = podcast.title
@@ -205,7 +238,7 @@ data class SharingRequest internal constructor(
         data class Episode(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
-        ) : Data {
+        ) : Data, Sociable {
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}"
 
             override fun sharingTitle() = episode.title
@@ -220,7 +253,7 @@ data class SharingRequest internal constructor(
             val episode: EpisodeModel,
             val position: Duration,
             val type: TimestampType,
-        ) : Data {
+        ) : Data, Sociable {
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${position.inWholeSeconds}"
 
             override fun sharingTitle() = episode.title
@@ -231,6 +264,13 @@ data class SharingRequest internal constructor(
             }
 
             override fun toString() = "EpisodePosition(title=${episode.title}, uuid=${episode.uuid}, position=$position, type=$type)"
+        }
+
+        data class EpisodeFile(
+            override val podcast: PodcastModel,
+            val episode: EpisodeModel,
+        ) : Data {
+            override fun toString() = "EpisodeFile(title=${episode.title}, uuid=${episode.uuid}"
         }
     }
 }

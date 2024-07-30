@@ -32,7 +32,8 @@ import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
+import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.timestamp.ShareEpisodeTimestampFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -78,9 +79,7 @@ class BookmarksFragment : BaseFragment() {
     lateinit var settings: Settings
 
     @Inject
-    lateinit var shareActionsFactory: ShareActions.Factory
-
-    private lateinit var shareActions: ShareActions
+    lateinit var sharingClient: SharingClient
 
     private val sourceView: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE_VIEW))
@@ -96,11 +95,6 @@ class BookmarksFragment : BaseFragment() {
             SourceView.PLAYER -> if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
             else -> if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        shareActions = shareActionsFactory.create(sourceView)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -225,7 +219,10 @@ class BookmarksFragment : BaseFragment() {
                     .forBookmark(episode, timestamp, podcast.backgroundColor, sourceView)
                     .show(parentFragmentManager, "share_screen")
             } else {
-                shareActions.shareBookmark(podcast, episode, timestamp)
+                val request = SharingRequest.bookmark(podcast, episode, timestamp)
+                    .setSourceView(sourceView)
+                    .build()
+                sharingClient.share(request)
             }
         }
     }

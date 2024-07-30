@@ -57,6 +57,7 @@ import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
@@ -69,9 +70,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
     lateinit var theme: Theme
 
     @Inject
-    lateinit var shareActionsFactory: ShareActions.Factory
-
-    private lateinit var shareActions: ShareActions
+    lateinit var sharingClient: SharingClient
 
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
@@ -84,11 +83,6 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
             }
         },
     )
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        shareActions = shareActionsFactory.create(args.source)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -185,7 +179,12 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                                 .newInstance(podcast, args.source)
                                 .show(parentFragmentManager, "share_screen")
                         } else {
-                            lifecycleScope.launch { shareActions.sharePodcast(podcast) }
+                            lifecycleScope.launch(NonCancellable) {
+                                val request = SharingRequest.podcast(podcast)
+                                    .setSourceView(args.source)
+                                    .build()
+                                sharingClient.share(request)
+                            }
                         }
                     },
                 ),
@@ -203,7 +202,12 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                                 .newInstance(episode, podcast.backgroundColor, args.source)
                                 .show(parentFragmentManager, "share_screen")
                         } else {
-                            lifecycleScope.launch { shareActions.shareEpisode(podcast, episode) }
+                            lifecycleScope.launch(NonCancellable) {
+                                val request = SharingRequest.episode(podcast, episode)
+                                    .setSourceView(args.source)
+                                    .build()
+                                sharingClient.share(request)
+                            }
                         }
                     },
                 ),
@@ -219,7 +223,12 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                                 .forEpisodePosition(episode, podcast.backgroundColor, args.source)
                                 .show(parentFragmentManager, "share_screen")
                         } else {
-                            lifecycleScope.launch { shareActions.shareEpisodePosition(podcast, episode, episode.playedUpTo.seconds) }
+                            lifecycleScope.launch(NonCancellable) {
+                                val request = SharingRequest.episodePosition(podcast, episode, episode.playedUpTo.seconds)
+                                    .setSourceView(args.source)
+                                    .build()
+                                sharingClient.share(request)
+                            }
                         }
                     },
                 ),
@@ -245,7 +254,12 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                         textColor = textColor,
                         backgroundColor = backgroundColor,
                         onClick = {
-                            lifecycleScope.launch { shareActions.shareEpisodeFile(episode) }
+                            lifecycleScope.launch(NonCancellable) {
+                                val request = SharingRequest.episodeFile(podcast, episode)
+                                    .setSourceView(args.source)
+                                    .build()
+                                sharingClient.share(request)
+                            }
                         },
                     ),
                 )
