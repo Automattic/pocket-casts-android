@@ -341,7 +341,6 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="player_star" translatable="false">@string/star</string>
     <string name="player_tab_bookmarks" translatable="false">@string/bookmarks</string>
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
-    <string name="player_tab_transcript" translatable="false">@string/transcript</string>
     <string name="player_tab_notes">Details</string>
     <string name="player_tab_playing">Playing</string>
     <string name="player_tab_playing_wide">Now Playing</string>

@@ -31,8 +31,6 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersFragment
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode.Player
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptFragment
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -78,7 +76,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             }
         },
     )
-    private val transcriptViewModel by viewModels<TranscriptViewModel>()
     private var binding: FragmentPlayerContainerBinding? = null
 
     val overrideTheme: Theme.ThemeType
@@ -226,16 +223,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             }
         }
 
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    transcriptViewModel.uiState.collect { uiState ->
-                        adapter.updateTranscript(uiState !is TranscriptViewModel.UiState.Empty)
-                    }
-                }
-            }
-        }
-
         binding.btnClosePlayer.setOnClickListener { (activity as? FragmentHostListener)?.closePlayer() }
         view.doOnLayout {
             val tourView = binding.tourView
@@ -333,7 +320,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     override fun getBackstackCount(): Int {
         return if (upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
-            bookmarksViewModel.multiSelectHelper.isMultiSelecting
+            bookmarksViewModel.multiSelectHelper.isMultiSelecting ||
+            isTranscriptVisible
         ) {
             1
         } else {
@@ -354,9 +342,18 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 true
             }
 
+            isTranscriptVisible -> {
+                updateTabsVisibility(true)
+                viewModel.closeTranscript(withTransition = true)
+                true
+            }
+
             else -> false
         }
     }
+
+    private val isTranscriptVisible: Boolean
+        get() = binding?.tabHolder?.isVisible == false
 
     companion object {
         private const val INVALID_TAB_POSITION = -1
@@ -371,7 +368,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         data object Notes : Section(LR.string.player_tab_notes)
         data object Bookmarks : Section(LR.string.player_tab_bookmarks)
         data object Chapters : Section(LR.string.player_tab_chapters)
-        data object Transcript : Section(LR.string.player_tab_transcript)
     }
 
     private var sections = listOf(Section.Player, Section.Bookmarks)
@@ -388,7 +384,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     fun updateNotes(addNotes: Boolean) {
         val currentSections = sections
         val hasChapters = sections.contains(Section.Chapters)
-        val hasTranscript = sections.contains(Section.Transcript)
 
         val newSections = buildList {
             add(Section.Player)
@@ -400,10 +395,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
                 add(Section.Chapters)
             }
             add(Section.Bookmarks)
-
-            if (hasTranscript) {
-                add(Section.Transcript)
-            }
         }
 
         if (currentSections != newSections) {
@@ -419,7 +410,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     fun updateChapters(addChapters: Boolean) {
         val currentSections = sections
         val hasNotes = sections.contains(Section.Notes)
-        val hasTranscript = sections.contains(Section.Transcript)
 
         val newSections = buildList {
             add(Section.Player)
@@ -431,47 +421,12 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
                 add(Section.Chapters)
             }
             add(Section.Bookmarks)
-
-            if (hasTranscript) {
-                add(Section.Transcript)
-            }
         }
 
         if (currentSections != newSections) {
             sections = newSections
             val position = if (hasNotes) 2 else 1
             if (addChapters) {
-                notifyItemInserted(position)
-            } else {
-                notifyItemRemoved(position)
-            }
-        }
-    }
-
-    fun updateTranscript(addTranscript: Boolean) {
-        val currentSections = sections
-        val hasNotes = sections.contains(Section.Notes)
-        val hasChapters = sections.contains(Section.Chapters)
-
-        val newSections = buildList {
-            add(Section.Player)
-            if (hasNotes) {
-                add(Section.Notes)
-            }
-
-            if (hasChapters) {
-                add(Section.Chapters)
-            }
-            add(Section.Bookmarks)
-            if (addTranscript) {
-                add(Section.Transcript)
-            }
-        }
-
-        if (currentSections != newSections) {
-            sections = newSections
-            val position = sections.size - 1
-            if (addTranscript) {
                 notifyItemInserted(position)
             } else {
                 notifyItemRemoved(position)
@@ -497,7 +452,6 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
             is Section.Notes -> NotesFragment()
             is Section.Bookmarks -> BookmarksFragment.newInstance(SourceView.PLAYER)
             is Section.Chapters -> ChaptersFragment.forPlayer()
-            is Section.Transcript -> TranscriptFragment.newInstance()
         }
     }
 
