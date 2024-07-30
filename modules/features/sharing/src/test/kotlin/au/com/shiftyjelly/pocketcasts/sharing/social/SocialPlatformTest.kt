@@ -5,8 +5,8 @@ import org.junit.Test
 
 class SocialPlatformTest {
     @Test
-    fun `social platfrom are correctly prioritzed`() {
-        val sortedPlatfroms = SocialPlatform.entries
+    fun `social platform are correctly prioritzed`() {
+        val sortedplatforms = SocialPlatform.entries
 
         assertEquals(
             listOf(
@@ -18,7 +18,7 @@ class SocialPlatformTest {
                 SocialPlatform.PocketCasts,
                 SocialPlatform.More,
             ),
-            sortedPlatfroms,
+            sortedplatforms,
         )
     }
 }

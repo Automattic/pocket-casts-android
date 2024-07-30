@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.Telegram
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.Tumblr
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.WhatsApp
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.X
+import au.com.shiftyjelly.pocketcasts.sharing.timestamp.TimestampType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import coil.executeBlocking
@@ -34,6 +35,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
+import kotlin.time.Duration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -146,6 +148,10 @@ data class SharingRequest internal constructor(
         fun podcast(podcast: PodcastModel) = Builder(Data.Podcast(podcast))
 
         fun episode(podcast: PodcastModel, episode: PodcastEpisode) = Builder(Data.Episode(podcast, episode))
+
+        fun episodePosition(podcast: PodcastModel, episode: PodcastEpisode, position: Duration) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Episode))
+
+        fun bookmark(podcast: PodcastModel, episode: PodcastEpisode, position: Duration) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark))
     }
 
     class Builder internal constructor(
@@ -193,7 +199,7 @@ data class SharingRequest internal constructor(
 
             override fun linkDescription() = LR.string.share_link_podcast
 
-            override fun toString() = "Podcast(title=${podcast.title},uuid=${podcast.uuid})"
+            override fun toString() = "Podcast(title=${podcast.title}, uuid=${podcast.uuid})"
         }
 
         data class Episode(
@@ -206,7 +212,25 @@ data class SharingRequest internal constructor(
 
             override fun linkDescription() = LR.string.share_link_episode
 
-            override fun toString() = "Episode(title=${episode.title},uuid=${episode.uuid})"
+            override fun toString() = "Episode(title=${episode.title}, uuid=${episode.uuid})"
+        }
+
+        data class EpisodePosition(
+            override val podcast: PodcastModel,
+            val episode: EpisodeModel,
+            val position: Duration,
+            val type: TimestampType,
+        ) : Data {
+            override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${position.inWholeSeconds}"
+
+            override fun sharingTitle() = episode.title
+
+            override fun linkDescription() = when (type) {
+                TimestampType.Episode -> LR.string.share_link_episode_position
+                TimestampType.Bookmark -> LR.string.share_link_bookmark
+            }
+
+            override fun toString() = "EpisodePosition(title=${episode.title}, uuid=${episode.uuid}, position=$position, type=$type)"
         }
     }
 }

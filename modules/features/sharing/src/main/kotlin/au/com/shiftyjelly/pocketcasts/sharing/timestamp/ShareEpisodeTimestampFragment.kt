@@ -22,12 +22,15 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 
+@AndroidEntryPoint
 class ShareEpisodeTimestampFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
@@ -41,13 +44,15 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         },
     )
 
+    @Inject internal lateinit var shareListenerFactory: ShareEpisodeTimestampListener.Factory
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val listener = ShareEpisodeTimestampListener(args.timestampType, this@ShareEpisodeTimestampFragment)
+        val listener = shareListenerFactory.create(this@ShareEpisodeTimestampFragment, args.timestampType, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareEpisodeTimestampPage(

@@ -2012,6 +2012,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_link_copied_feedback">Link copied to clipboard</string>
     <string name="share_link_podcast">Podcast link</string>
     <string name="share_link_episode">Episode link</string>
+    <string name="share_link_episode_position">Episode position link</string>
+    <string name="share_link_bookmark">Bookmark link</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
