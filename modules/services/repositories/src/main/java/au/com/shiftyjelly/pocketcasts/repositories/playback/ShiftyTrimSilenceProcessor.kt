@@ -76,7 +76,7 @@ class ShiftyTrimSilenceProcessor(
         return if (enabled) inputAudioFormat else AudioFormat.NOT_SET
     }
 
-    override fun isActive(): Boolean = enabled
+    override fun isActive(): Boolean = super.isActive() && enabled
 
     override fun queueInput(inputBuffer: ByteBuffer) {
         while (inputBuffer.hasRemaining() && !hasPendingOutput()) {
