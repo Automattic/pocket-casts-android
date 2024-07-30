@@ -1,22 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
-import androidx.lifecycle.lifecycleScope
+import android.widget.Toast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.sharing.ShareActions
 import kotlin.time.Duration
-import kotlinx.coroutines.launch
 
-internal class ShareClipViewModelListener(
+internal class ShareClipListener(
     private val fragment: ShareClipFragment,
     private val viewModel: ShareClipViewModel,
-    private val shareActions: ShareActions,
 ) : ShareClipPageListener {
-    override fun onClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
-        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange))
-        fragment.lifecycleScope.launch {
-            shareActions.shareClipLink(podcast, episode, clipRange.start, clipRange.end)
-        }
+    override suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
+        Toast.makeText(fragment.context, "Share link", Toast.LENGTH_SHORT).show()
+    }
+
+    override suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
+        Toast.makeText(fragment.context, "Share audio", Toast.LENGTH_SHORT).show()
+    }
+
+    override suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
+        Toast.makeText(fragment.context, "Share video", Toast.LENGTH_SHORT).show()
     }
 
     override fun onClickPlay() {

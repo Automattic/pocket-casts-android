@@ -55,7 +55,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
-import au.com.shiftyjelly.pocketcasts.sharing.clip.PreviewDevicePortrait
 import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipPageListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.ceilDiv
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -408,24 +407,23 @@ private fun BoxWithConstraintsScope.ClipBox(
     }
 }
 
-@ShowkaseComposable(name = "ClipSelectorPaused", group = "Clip")
-@Preview(name = "Paused", device = PreviewDevicePortrait)
+@ShowkaseComposable(name = "ClipSelector", group = "Sharing")
+@Preview(name = "Paused", device = Devices.PortraitRegular)
 @Composable
 fun ClipSelectorPausedPreview() = ClipSelectorPreview()
 
-@ShowkaseComposable(name = "ClipSelectorPlaying", group = "Clip")
-@Preview(name = "Playing", device = PreviewDevicePortrait)
+@Preview(name = "Playing", device = Devices.PortraitRegular)
 @Composable
-fun ClipSelectorPlayingPreview() = ClipSelectorPreview(isPlaying = true)
+private fun ClipSelectorPlayingPreview() = ClipSelectorPreview(isPlaying = true)
 
-@Preview(name = "Zoomed in", device = PreviewDevicePortrait)
+@Preview(name = "Zoomed in", device = Devices.PortraitRegular)
 @Composable
 private fun ClipSelectorZoomedPreview() = ClipSelectorPreview(
     clipEnd = 10.seconds,
     scale = 5f,
 )
 
-@Preview(name = "Scrolled", device = PreviewDevicePortrait)
+@Preview(name = "Scrolled", device = Devices.PortraitRegular)
 @Composable
 private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
@@ -433,26 +431,26 @@ private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
     firstVisibleItemIndex = 25,
 )
 
-@Preview(name = "No start handle", device = PreviewDevicePortrait)
+@Preview(name = "No start handle", device = Devices.PortraitRegular)
 @Composable
 private fun ClipSelectorNoStartHandlePreview() = ClipSelectorPreview(
     firstVisibleItemIndex = 5,
 )
 
-@Preview(name = "No end handle", device = PreviewDevicePortrait)
+@Preview(name = "No end handle", device = Devices.PortraitRegular)
 @Composable
 private fun ClipSelectorNoEndHandlePreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
     clipEnd = 75.seconds,
 )
 
-@Preview(name = "Playback in middle", device = PreviewDevicePortrait)
+@Preview(name = "Playback in middle", device = Devices.PortraitRegular)
 @Composable
 private fun ClipSelectorInProgressPreview() = ClipSelectorPreview(
     progressPlayback = 10.seconds,
 )
 
-@Preview(name = "Playback at end", device = PreviewDevicePortrait)
+@Preview(name = "Playback at end", device = Devices.PortraitRegular)
 @Composable
 private fun ClipSelectorPlayedPreview() = ClipSelectorPreview(
     progressPlayback = 15.seconds,
