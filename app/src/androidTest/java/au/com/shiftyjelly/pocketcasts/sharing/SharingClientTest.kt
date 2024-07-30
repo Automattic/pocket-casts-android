@@ -12,7 +12,9 @@ import androidx.core.content.IntentCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -84,6 +86,73 @@ class SharingClientTest {
 
         val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
             .setPlatform(SocialPlatform.PocketCasts)
+            .build()
+
+        val response = client.share(request)
+
+        assertNull(response.feedbackMessage)
+    }
+
+    @Test
+    fun shareEpisodeToRegularPlatforms() = runTest {
+        regularPlatforms.forEach { platform ->
+            val request = SharingRequest.episode(
+                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            ).setPlatform(platform)
+                .build()
+
+            client.share(request)
+            val intent = shareStarter.requireShareIntent
+
+            assertEquals(ACTION_SEND, intent.action)
+            assertEquals("text/plain", intent.type)
+            assertEquals("https://pca.st/episode/episode-uuid", intent.getStringExtra(EXTRA_TEXT))
+            assertEquals("Episode Title", intent.getStringExtra(EXTRA_TITLE))
+            assertEquals(platform.packageId, intent.`package`)
+            assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    }
+
+    @Test
+    fun copyEpisodeLink() = runTest {
+        val request = SharingRequest.episode(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        ).setPlatform(SocialPlatform.PocketCasts)
+            .build()
+
+        client.share(request)
+        val clipData = shareStarter.requireShareLink
+
+        assertEquals("https://pca.st/episode/episode-uuid", clipData.getItemAt(0).text)
+        assertEquals(context.getString(LR.string.share_link_episode), clipData.description.label)
+        assertNull(shareStarter.shareIntent)
+    }
+
+    @Test
+    fun copyEpisodeLinkWithFeedback() = runTest {
+        val client = createClient(showCustomCopyFeedback = true)
+
+        val request = SharingRequest.episode(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        ).setPlatform(SocialPlatform.PocketCasts)
+            .build()
+
+        val response = client.share(request)
+
+        assertEquals(context.getString(LR.string.share_link_copied_feedback), response.feedbackMessage)
+    }
+
+    @Test
+    fun copyEpisodeLinkWithoutFeedback() = runTest {
+        val client = createClient(showCustomCopyFeedback = false)
+
+        val request = SharingRequest.episode(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        ).setPlatform(SocialPlatform.PocketCasts)
             .build()
 
         val response = client.share(request)

@@ -10,10 +10,12 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
@@ -37,6 +39,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastModel
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeModel
 
 class SharingClient(
     private val context: Context,
@@ -76,35 +79,33 @@ class SharingClient(
         )
     }
 
-    private suspend fun SharingRequest.tryShare(): SharingResponse = when (data) {
-        is SharingRequest.Data.Podcast -> when (platform) {
-            Instagram -> {
-                error("Not implemented yet")
-            }
+    private suspend fun SharingRequest.tryShare(): SharingResponse = when (platform) {
+        Instagram -> {
+            error("Not implemented yet")
+        }
 
-            PocketCasts -> {
-                shareStarter.copyLink(context, ClipData.newPlainText(context.getString(LR.string.share_link_podcast), data.sharingUrl(hostUrl)))
-                SharingResponse(
-                    isSuccsessful = true,
-                    feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
-                )
-            }
+        PocketCasts -> {
+            shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
+            SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
+            )
+        }
 
-            WhatsApp, Telegram, X, Tumblr, More -> {
-                Intent()
-                    .setAction(Intent.ACTION_SEND)
-                    .setType("text/plain")
-                    .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
-                    .putExtra(EXTRA_TITLE, data.sharingTitle())
-                    .setPackage(platform.packageId)
-                    .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-                    .setPodcastCover(data.podcast)
-                    .share()
-                SharingResponse(
-                    isSuccsessful = true,
-                    feedbackMessage = null,
-                )
-            }
+        WhatsApp, Telegram, X, Tumblr, More -> {
+            Intent()
+                .setAction(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
+                .putExtra(EXTRA_TITLE, data.sharingTitle())
+                .setPackage(platform.packageId)
+                .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                .setPodcastCover(data.podcast)
+                .share()
+            SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+            )
         }
     }
 
@@ -143,6 +144,8 @@ data class SharingRequest internal constructor(
 ) {
     companion object {
         fun podcast(podcast: PodcastModel) = Builder(Data.Podcast(podcast))
+
+        fun episode(podcast: PodcastModel, episode: PodcastEpisode) = Builder(Data.Episode(podcast, episode))
     }
 
     class Builder internal constructor(
@@ -173,18 +176,37 @@ data class SharingRequest internal constructor(
     }
 
     internal sealed interface Data {
+        val podcast: PodcastModel
+
         fun sharingUrl(host: String): String
 
         fun sharingTitle(): String
 
+        @StringRes fun linkDescription(): Int
+
         data class Podcast(
-            val podcast: PodcastModel,
+            override val podcast: PodcastModel,
         ) : Data {
             override fun sharingUrl(host: String) = "$host/podcast/${podcast.uuid}"
 
             override fun sharingTitle() = podcast.title
 
+            override fun linkDescription() = LR.string.share_link_podcast
+
             override fun toString() = "Podcast(title=${podcast.title},uuid=${podcast.uuid})"
+        }
+
+        data class Episode(
+            override val podcast: PodcastModel,
+            val episode: EpisodeModel,
+        ) : Data {
+            override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}"
+
+            override fun sharingTitle() = episode.title
+
+            override fun linkDescription() = LR.string.share_link_episode
+
+            override fun toString() = "Episode(title=${episode.title},uuid=${episode.uuid})"
         }
     }
 }
