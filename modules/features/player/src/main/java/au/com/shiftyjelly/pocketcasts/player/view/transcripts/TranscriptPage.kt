@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
+import android.content.res.Configuration
 import androidx.annotation.OptIn
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -107,7 +108,8 @@ private fun TranscriptContent(
 ) {
     val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
     val highlightedTextStyle = SpanStyle(fontSize = 18.sp, color = Color.White)
-
+    val configuration = LocalConfiguration.current
+    val bottomPadding = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 125.dp
     var highlightedText: CharSequence? by remember { mutableStateOf(null) }
     var contentSize by remember { mutableStateOf(IntSize.Zero) }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -138,6 +140,7 @@ private fun TranscriptContent(
 
     Box(
         modifier = modifier
+            .fillMaxWidth()
             .background(colors.backgroundColor())
             .onGloballyPositioned { contentSize = it.size },
     ) {
@@ -145,6 +148,7 @@ private fun TranscriptContent(
             annotatedString,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
+                .padding(bottom = bottomPadding)
                 .verticalScroll(scrollState),
             onTextLayout = { textLayoutResult = it },
         )
@@ -159,7 +163,8 @@ private fun TranscriptContent(
         GradientView(
             baseColor = colors.backgroundColor(),
             modifier = Modifier
-                .align(Alignment.BottomCenter),
+                .align(Alignment.BottomCenter)
+                .padding(bottom = bottomPadding),
             fadeDirection = FadeDirection.BottomToTop,
         )
     }
@@ -245,12 +250,14 @@ private fun TranscriptError(
 
     Column(
         modifier = modifier
+            .fillMaxWidth()
             .padding(top = 32.dp)
             .background(colors.backgroundColor())
             .verticalScroll(scrollState),
     ) {
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp)
                 .background(
                     color = colors.contentColor(),
@@ -261,11 +268,13 @@ private fun TranscriptError(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(16.dp),
             ) {
                 TextH30(
                     text = stringResource(LR.string.error),
                     color = colors.titleColor(),
+                    textAlign = TextAlign.Center,
                 )
                 TextP40(
                     text = errorMessage,
