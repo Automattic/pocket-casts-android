@@ -1,13 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.sharing.timestamp
 
 import android.content.res.Configuration
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
@@ -24,15 +28,19 @@ import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareEpisodeTimestampPageListener {
-    fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: CardType)
+    suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: CardType): SharingResponse
     fun onClose()
 
     companion object {
         val Preview = object : ShareEpisodeTimestampPageListener {
-            override fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: CardType) = Unit
+            override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: CardType) = SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+            )
             override fun onClose() = Unit
         }
     }
@@ -47,25 +55,30 @@ internal fun ShareEpisodeTimestampPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: ShareEpisodeTimestampPageListener,
-) = when (LocalConfiguration.current.orientation) {
-    Configuration.ORIENTATION_LANDSCAPE -> HorizontalShareEpisodeTimestampPage(
-        podcast = podcast,
-        episode = episode,
-        timestamp = timestamp,
-        useEpisodeArtwork = useEpisodeArtwork,
-        socialPlatforms = socialPlatforms,
-        shareColors = shareColors,
-        listener = listener,
-    )
-    else -> VerticalShareEpisodeTimestampPage(
-        podcast = podcast,
-        episode = episode,
-        timestamp = timestamp,
-        useEpisodeArtwork = useEpisodeArtwork,
-        socialPlatforms = socialPlatforms,
-        shareColors = shareColors,
-        listener = listener,
-    )
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> HorizontalShareEpisodeTimestampPage(
+            podcast = podcast,
+            episode = episode,
+            timestamp = timestamp,
+            useEpisodeArtwork = useEpisodeArtwork,
+            socialPlatforms = socialPlatforms,
+            shareColors = shareColors,
+            listener = listener,
+            snackbarHostState = snackbarHostState,
+        )
+        else -> VerticalShareEpisodeTimestampPage(
+            podcast = podcast,
+            episode = episode,
+            timestamp = timestamp,
+            useEpisodeArtwork = useEpisodeArtwork,
+            socialPlatforms = socialPlatforms,
+            shareColors = shareColors,
+            listener = listener,
+            snackbarHostState = snackbarHostState,
+        )
+    }
 }
 
 @Composable
@@ -77,45 +90,53 @@ private fun VerticalShareEpisodeTimestampPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: ShareEpisodeTimestampPageListener,
-) = VerticalSharePage(
-    shareTitle = stringResource(LR.string.share_episode_timestamp_title, timestamp.toHhMmSs()),
-    shareDescription = stringResource(LR.string.share_episode_timestamp_description),
-    shareColors = shareColors,
-    socialPlatforms = socialPlatforms,
-    onClose = listener::onClose,
-    onShareToPlatform = { platform, cardType ->
-        if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, timestamp, platform, cardType)
-        }
-    },
-    middleContent = { cardType, modifier ->
-        if (podcast != null && episode != null) {
-            when (cardType) {
-                CardType.Vertical -> VerticalEpisodeCard(
-                    podcast = podcast,
-                    episode = episode,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    modifier = modifier,
-                )
-                CardType.Horiozntal -> HorizontalEpisodeCard(
-                    podcast = podcast,
-                    episode = episode,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    modifier = modifier,
-                )
-                CardType.Square -> SquareEpisodeCard(
-                    podcast = podcast,
-                    episode = episode,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    modifier = modifier,
-                )
+    snackbarHostState: SnackbarHostState,
+) {
+    val scope = rememberCoroutineScope()
+    VerticalSharePage(
+        shareTitle = stringResource(LR.string.share_episode_timestamp_title, timestamp.toHhMmSs()),
+        shareDescription = stringResource(LR.string.share_episode_timestamp_description),
+        shareColors = shareColors,
+        socialPlatforms = socialPlatforms,
+        snackbarHostState = snackbarHostState,
+        onClose = listener::onClose,
+        onShareToPlatform = { platform, cardType ->
+            if (podcast != null && episode != null) {
+                scope.launch {
+                    val response = listener.onShare(podcast, episode, timestamp, platform, cardType)
+                    response.feedbackMessage?.let { snackbarHostState.showSnackbar(it) }
+                }
             }
-        }
-    },
-)
+        },
+        middleContent = { cardType, modifier ->
+            if (podcast != null && episode != null) {
+                when (cardType) {
+                    CardType.Vertical -> VerticalEpisodeCard(
+                        podcast = podcast,
+                        episode = episode,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        shareColors = shareColors,
+                        modifier = modifier,
+                    )
+                    CardType.Horiozntal -> HorizontalEpisodeCard(
+                        podcast = podcast,
+                        episode = episode,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        shareColors = shareColors,
+                        modifier = modifier,
+                    )
+                    CardType.Square -> SquareEpisodeCard(
+                        podcast = podcast,
+                        episode = episode,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        shareColors = shareColors,
+                        modifier = modifier,
+                    )
+                }
+            }
+        },
+    )
+}
 
 @Composable
 private fun HorizontalShareEpisodeTimestampPage(
@@ -126,28 +147,36 @@ private fun HorizontalShareEpisodeTimestampPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: ShareEpisodeTimestampPageListener,
-) = HorizontalSharePage(
-    shareTitle = stringResource(LR.string.share_episode_timestamp_title, timestamp.toHhMmSs()),
-    shareDescription = stringResource(LR.string.share_episode_timestamp_description),
-    shareColors = shareColors,
-    socialPlatforms = socialPlatforms,
-    onClose = listener::onClose,
-    onShareToPlatform = { platform, cardType ->
-        if (podcast != null && episode != null) {
-            listener.onShare(podcast, episode, timestamp, platform, cardType)
-        }
-    },
-    middleContent = {
-        if (podcast != null && episode != null) {
-            HorizontalEpisodeCard(
-                podcast = podcast,
-                episode = episode,
-                useEpisodeArtwork = useEpisodeArtwork,
-                shareColors = shareColors,
-            )
-        }
-    },
-)
+    snackbarHostState: SnackbarHostState,
+) {
+    val scope = rememberCoroutineScope()
+    HorizontalSharePage(
+        shareTitle = stringResource(LR.string.share_episode_timestamp_title, timestamp.toHhMmSs()),
+        shareDescription = stringResource(LR.string.share_episode_timestamp_description),
+        shareColors = shareColors,
+        socialPlatforms = socialPlatforms,
+        snackbarHostState = snackbarHostState,
+        onClose = listener::onClose,
+        onShareToPlatform = { platform, cardType ->
+            if (podcast != null && episode != null) {
+                scope.launch {
+                    val response = listener.onShare(podcast, episode, timestamp, platform, cardType)
+                    response.feedbackMessage?.let { snackbarHostState.showSnackbar(it) }
+                }
+            }
+        },
+        middleContent = {
+            if (podcast != null && episode != null) {
+                HorizontalEpisodeCard(
+                    podcast = podcast,
+                    episode = episode,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                )
+            }
+        },
+    )
+}
 
 private fun Duration.toHhMmSs() = toComponents { hours, minutes, seconds, _ ->
     if (hours == 0L) {
