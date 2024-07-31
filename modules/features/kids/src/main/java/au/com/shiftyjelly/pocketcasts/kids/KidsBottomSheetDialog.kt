@@ -66,6 +66,7 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
                         ),
                     ) {
                         KidsDialog(
+                            onSeen = viewModel::onThankYouForYourInterestSeen,
                             onSendFeedbackClick = {
                                 viewModel.onSendFeedbackClick()
                             },
