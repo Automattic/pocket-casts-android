@@ -52,6 +52,7 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
                         ),
                     ) {
                         KidsSendFeedbackDialog(
+                            onSeen = viewModel::onFeedbackFormSeen,
                             onSubmitFeedback = {
                                 viewModel.onSubmitFeedback()
                                 dismiss()

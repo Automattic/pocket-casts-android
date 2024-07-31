@@ -22,6 +22,10 @@ class KidsSendFeedbackViewModel @Inject constructor() : ViewModel() {
         analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_THANK_YOU_FOR_YOUR_INTEREST_SEEN)
     }
 
+    fun onFeedbackFormSeen() {
+        analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_FEEDBACK_FORM_SEEN)
+    }
+
     fun onSendFeedbackClick() {
         analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_SEND_FEEDBACK_TAPPED)
         viewModelScope.launch {

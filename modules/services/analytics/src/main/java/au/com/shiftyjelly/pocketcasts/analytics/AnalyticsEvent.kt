@@ -649,4 +649,5 @@ enum class AnalyticsEvent(val key: String) {
     KIDS_PROFILE_SEND_FEEDBACK_TAPPED("kids_profile_send_feedback_tapped"),
     KIDS_PROFILE_NO_THANK_YOU_TAPPED("kids_profile_no_thank_you_tapped"),
     KIDS_PROFILE_THANK_YOU_FOR_YOUR_INTEREST_SEEN("kids_profile_thank_you_for_your_interest_seen"),
+    KIDS_PROFILE_FEEDBACK_FORM_SEEN("kids_profile_feedback_form_seen"),
 }
