@@ -52,7 +52,10 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
                         ),
                     ) {
                         KidsSendFeedbackDialog(
-                            onSubmitFeedback = {},
+                            onSubmitFeedback = {
+                                viewModel.onSubmitFeedback()
+                                dismiss()
+                            },
                         )
                     }
                     AnimatedVisibility(
