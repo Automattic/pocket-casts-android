@@ -293,7 +293,10 @@ class ProfileFragment : BaseFragment() {
                         analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_SEEN)
                     }
                     KidsProfileCard(
-                        onDismiss = { viewModel.dismissKidsBanner() },
+                        onDismiss = {
+                            analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_DISMISSED)
+                            viewModel.dismissKidsBanner()
+                        },
                         onRequestEarlyAccess = {
                             analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_EARLY_ACCESS_REQUESTED)
                             KidsBottomSheetDialog().show(childFragmentManager, "KidsBottomSheetDialog")
