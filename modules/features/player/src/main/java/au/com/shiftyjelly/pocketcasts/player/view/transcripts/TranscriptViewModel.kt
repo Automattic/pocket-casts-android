@@ -18,16 +18,11 @@ import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -64,40 +59,30 @@ class TranscriptViewModel @Inject constructor(
 
     private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
         transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
+            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid }
             .map { transcript ->
                 transcript?.let {
                     UiState.TranscriptFound(podcastAndEpisode, transcript)
                 } ?: UiState.Empty(podcastAndEpisode)
             }
 
-    fun parseAndLoadTranscript() {
+    fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean) {
+        if (isTranscriptViewOpen.not()) return
         _uiState.value.transcript?.let { transcript ->
+            val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
-                val podcastAndEpisode = _uiState.value.podcastAndEpisode
-                playbackManager.playbackStateFlow
-                    .filter { it.episodeUuid == podcastAndEpisode?.episodeUuid }
-                    .map {
-                        val playbackPosition = it.positionMs.toDuration(DurationUnit.MILLISECONDS)
-                        try {
-                            (_uiState.value as? UiState.TranscriptLoaded)?.copy(playbackPosition = playbackPosition) ?: run {
-                                val result = parseTranscript(transcript)
-                                UiState.TranscriptLoaded(
-                                    transcript = transcript,
-                                    podcastAndEpisode = podcastAndEpisode,
-                                    cuesWithTimingSubtitle = result,
-                                    playbackPosition = playbackPosition,
-                                )
-                            }
-                        } catch (e: UnsupportedOperationException) {
-                            UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode)
-                        } catch (e: Exception) {
-                            UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode)
-                        }
-                    }
-                    .stateIn(viewModelScope)
-                    .collectLatest {
-                        _uiState.value = it
-                    }
+                _uiState.value = try {
+                    val result = parseTranscript(transcript)
+                    UiState.TranscriptLoaded(
+                        transcript = transcript,
+                        podcastAndEpisode = podcastAndEpisode,
+                        cuesWithTimingSubtitle = result,
+                    )
+                } catch (e: UnsupportedOperationException) {
+                    UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode)
+                } catch (e: Exception) {
+                    UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode)
+                }
             }
         }
     }
@@ -169,7 +154,6 @@ class TranscriptViewModel @Inject constructor(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
             val cuesWithTimingSubtitle: CuesWithTimingSubtitle,
-            val playbackPosition: Duration,
         ) : UiState()
 
         data class Error(
