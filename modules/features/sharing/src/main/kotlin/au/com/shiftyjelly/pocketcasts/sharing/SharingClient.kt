@@ -34,10 +34,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import coil.executeBlocking
 import coil.imageLoader
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
-import javax.inject.Inject
 import kotlin.time.Duration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -46,7 +44,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastModel
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeModel
 
-class SharingClient(
+class SharingClient internal constructor(
     private val context: Context,
     tracker: AnalyticsTracker,
     private val displayPodcastCover: Boolean,
@@ -54,8 +52,8 @@ class SharingClient(
     private val hostUrl: String,
     private val shareStarter: ShareStarter,
 ) {
-    @Inject constructor(
-        @ApplicationContext context: Context,
+    internal constructor(
+        context: Context,
         tracker: AnalyticsTracker,
     ) : this(
         context = context,
