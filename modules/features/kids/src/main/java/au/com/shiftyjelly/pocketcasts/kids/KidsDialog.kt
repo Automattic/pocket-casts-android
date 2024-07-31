@@ -45,13 +45,20 @@ fun KidsDialog(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(24.dp),
+            .padding(horizontal = 24.dp),
         contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxWidth(),
         ) {
+            Image(
+                painterResource(IR.drawable.swipe_affordance),
+                contentDescription = stringResource(LR.string.swipe_affordance_icon),
+                modifier = modifier
+                    .width(56.dp)
+                    .padding(top = 8.dp, bottom = 32.dp),
+            )
             if (!isLandscape) {
                 Image(
                     painterResource(IR.drawable.kids_face_with_background),
