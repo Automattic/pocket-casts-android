@@ -37,8 +37,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetail
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
+import au.com.shiftyjelly.pocketcasts.sharing.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -52,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormatt
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -116,8 +115,6 @@ class EpisodeFragment : BaseFragment() {
 
     override lateinit var statusBarColor: StatusBarColor
 
-    @Inject lateinit var serverManager: ServerManager
-
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var warningsHelper: WarningsHelper
@@ -125,8 +122,6 @@ class EpisodeFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
-
-    @Inject lateinit var shareDialogFactory: ShareDialogFactory
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
@@ -587,14 +582,12 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun share(state: EpisodeFragmentState.Loaded) {
-        shareDialogFactory.create(
+        ShareDialogFragment.newInstance(
             state.podcast,
             state.episode,
-            parentFragmentManager,
-            context,
-            shouldShowPodcast = false,
-            analyticsTracker = analyticsTracker,
-        ).show(sourceView = SourceView.EPISODE_DETAILS)
+            SourceView.EPISODE_DETAILS,
+            options = listOf(ShareDialogFragment.Options.Episode),
+        ).show(parentFragmentManager, "share_dialog")
     }
 
     interface EpisodeLoadedListener {

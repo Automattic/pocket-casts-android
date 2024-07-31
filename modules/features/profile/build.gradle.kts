@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":modules:features:player"))
     implementation(project(":modules:features:podcasts"))
     implementation(project(":modules:features:settings"))
+    implementation(project(":modules:features:kids"))
 
     // services
     implementation(project(":modules:services:analytics"))

@@ -232,6 +232,10 @@ class SubscribeManager @Inject constructor(
         podcast.isShowNotifications = foundEpisodes && allSendingNotifications
         podcast.sortPosition = count
         podcast.episodesSortType = if (podcast.episodesSortType.ordinal == 0) EpisodesSortType.EPISODES_SORT_BY_DATE_DESC else podcast.episodesSortType
+        podcast.episodes.firstOrNull()?.let { episode ->
+            podcast.latestEpisodeUuid = episode.uuid
+            podcast.latestEpisodeDate = episode.publishedDate
+        }
         // give the podcasts and episodes the same added date so we can tell which are new episodes or added with podcast when calculating notifications
         podcast.addedDate = Date()
         // copy colors

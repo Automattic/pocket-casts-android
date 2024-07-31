@@ -93,6 +93,7 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_DETAILS_CANCEL_TAPPED("account_details_cancel_tapped"),
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
+    ACCOUNT_DETAILS_CHANGE_AVATAR("account_details_change_avatar"),
 
     /* Podcasts List */
     PODCASTS_LIST_SHOWN("podcasts_list_shown"),
@@ -635,4 +636,8 @@ enum class AnalyticsEvent(val key: String) {
     CLIP_SCREEN_PLAY_TAPPED("clip_screen_play_tapped"),
     CLIP_SCREEN_PAUSE_TAPPED("clip_screen_pause_tapped"),
     CLIP_SCREEN_LINK_SHARED("clip_screen_link_shared"),
+
+    /* Pocket Casts Champion */
+    POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),
+    POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED("pocket_casts_champion_dialog_rate_button_tapped"),
 }

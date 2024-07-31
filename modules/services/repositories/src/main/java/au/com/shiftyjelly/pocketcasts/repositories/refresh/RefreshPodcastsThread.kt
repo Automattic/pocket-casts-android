@@ -317,8 +317,13 @@ class RefreshPodcastsThread(
             }
             episodes = episodeManager.add(episodes, podcast.uuid, downloadMetaData)
 
-            // we now have some new episodes, update the latest episode uuid on the podcast row
-            if (episodes.isNotEmpty()) {
+            if (episodes.isEmpty()) {
+                // the server returned episodes, but none were added to the database. Update the podcast when it doesn't have the latest episode information.
+                if (podcast.latestEpisodeUuid == null) {
+                    podcastManager.updatePodcastLatestEpisode(podcast)
+                }
+            } else {
+                // we now have some new episodes, update the latest episode uuid on the podcast row
                 podcastManager.updateLatestEpisode(podcast, episodes[0])
                 for ((uuid) in episodes) {
                     episodeUuidsAdded.add(uuid)

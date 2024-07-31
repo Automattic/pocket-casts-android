@@ -20,7 +20,7 @@ android {
 dependencies {
     // features
     implementation(project(":modules:features:settings"))
-    implementation(project(":modules:features:clip"))
+    implementation(project(":modules:features:sharing"))
     // services
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))

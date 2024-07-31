@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -44,9 +45,13 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,7 +64,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class AccountDetailsFragment : BaseFragment() {
+class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
     companion object {
         fun newInstance(): AccountDetailsFragment {
             return AccountDetailsFragment()
@@ -116,6 +121,19 @@ class AccountDetailsFragment : BaseFragment() {
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
             binding.userView.signedInState = signInState
+            binding.changeAvatarGroup?.showIf(signInState is SignInState.SignedIn && FeatureFlag.isEnabled(Feature.GRAVATAR_CHANGE_AVATAR))
+
+            if (signInState is SignInState.SignedIn) {
+                binding.btnChangeAvatar?.setOnClickListener {
+                    analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+                    Gravatar.refreshGravatarTimestamp()
+                    context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
+                }
+            }
+
+            if (signInState.isPocketCastsChampion) {
+                binding.userView.setOnUserViewClick(this)
+            }
         }
 
         viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->
@@ -220,6 +238,10 @@ class AccountDetailsFragment : BaseFragment() {
             analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
             context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
         }
+    }
+
+    override fun onPocketCastsChampionClick() {
+        PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
     }
 
     private fun signOut() {

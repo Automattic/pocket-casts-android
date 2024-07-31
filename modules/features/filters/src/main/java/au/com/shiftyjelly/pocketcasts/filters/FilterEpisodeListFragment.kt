@@ -127,7 +127,6 @@ class FilterEpisodeListFragment : BaseFragment() {
                 swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
                 onItemUpdated = this::lazyNotifyAdapterChanged,
                 defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                context = requireContext(),
                 fragmentManager = parentFragmentManager,
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
             ),

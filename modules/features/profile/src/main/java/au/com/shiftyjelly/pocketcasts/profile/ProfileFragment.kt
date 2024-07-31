@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -28,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
+import au.com.shiftyjelly.pocketcasts.kids.KidsBottomSheetDialog
+import au.com.shiftyjelly.pocketcasts.kids.KidsProfileCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
@@ -48,6 +52,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -169,10 +175,13 @@ class ProfileFragment : BaseFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val isEligible = viewModel.isEndOfYearStoriesEligible()
-                binding.setupEndOfYearPromptCard(isEligible)
+                if (viewModel.isEndOfYearStoriesEligible()) {
+                    binding.setupEndOfYearPromptCard()
+                }
             }
         }
+
+        binding.setupKidsBanner()
 
         viewModel.podcastCount.observe(viewLifecycleOwner) {
             binding.lblPodcastCount.text = it.toString()
@@ -255,18 +264,34 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
-    private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
+    private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
         endOfYearPromptCard.setContent {
-            if (isEligible) {
-                AppTheme(theme.activeTheme) {
-                    EndOfYearPromptCard(
-                        onClick = {
-                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
-                            // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
-                            if (settings.getEndOfYearShowModal()) {
-                                settings.setEndOfYearShowModal(false)
-                            }
-                            (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
+            AppTheme(theme.activeTheme) {
+                EndOfYearPromptCard(
+                    onClick = {
+                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                        // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
+                        if (settings.getEndOfYearShowModal()) {
+                            settings.setEndOfYearShowModal(false)
+                        }
+                        (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
+                    },
+                )
+            }
+        }
+    }
+
+    private fun FragmentProfileBinding.setupKidsBanner() {
+        kidsBannerCard.setContent {
+            AppTheme(theme.activeTheme) {
+                val showKidsBanner by viewModel.showKidsBanner.collectAsState()
+                val isKidsBannerVisible = showKidsBanner && FeatureFlag.isEnabled(Feature.KIDS_PROFILE)
+
+                if (isKidsBannerVisible) {
+                    KidsProfileCard(
+                        onDismiss = { viewModel.dismissKidsBanner() },
+                        onRequestEarlyAccess = {
+                            KidsBottomSheetDialog().show(childFragmentManager, "KidsBottomSheetDialog")
                         },
                     )
                 }

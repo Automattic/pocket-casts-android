@@ -586,10 +586,9 @@ open class PlaybackManager @Inject constructor(
             -> null
 
             SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
-            SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
             SourceView.NOTIFICATION,
             -> {
-                val source = (episode as? PodcastEpisode)?.let { AutoPlaySource.fromId(it.uuid) }
+                val source = (episode as? PodcastEpisode)?.let { AutoPlaySource.fromId(it.podcastUuid) }
                 if (source != null) {
                     settings.trackingAutoPlaySource.set(source, updateModifiedAt = false)
                 }
@@ -606,6 +605,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.FILTERS,
             SourceView.PODCAST_SCREEN,
             SourceView.STARRED,
+            SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
             -> settings.trackingAutoPlaySource.value
         }
 

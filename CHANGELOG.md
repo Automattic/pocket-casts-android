@@ -1,6 +1,20 @@
 7.70
 -----
-
+*   Updates
+    *   Episodes shared from the player are updated with the playback status.
+        ([#2499](https://github.com/Automattic/pocket-casts-android/pull/2499))
+    *   Improved the podcast refresh performance.
+        ([#2500](https://github.com/Automattic/pocket-casts-android/pull/2500))
+    *   Rename Lifetime member to Pocket Casts Champion
+        ([#2527](https://github.com/Automattic/pocket-casts-android/pull/2527))
+*   New Features
+    *   Add an option in your account settings to modify your avatar with Gravatar
+        ([#2263](https://github.com/Automattic/pocket-casts-android/pull/2263))
+    *   Add the ability to rate podcasts
+        ([#2506](https://github.com/Automattic/pocket-casts-android/pull/2506))
+*   Bug Fixes
+    *   Fix autoplay for Android Auto
+        ([#2528](https://github.com/Automattic/pocket-casts-android/pull/2528))
 
 7.69
 -----
@@ -10,6 +24,10 @@
 *   Bug Fixes
     *   Links to episodes with playback position shared from the app are now correctly recognized.
         ([#2471](https://github.com/Automattic/pocket-casts-android/pull/2471))
+    *   Fixed Help & feedback AI assistant going under the keyboard.
+        ([#2496](https://github.com/Automattic/pocket-casts-android/pull/2496))
+    *   Fixed Wear app episode download issue.
+        ([#2495](https://github.com/Automattic/pocket-casts-android/pull/2495))
 
 7.68
 -----
