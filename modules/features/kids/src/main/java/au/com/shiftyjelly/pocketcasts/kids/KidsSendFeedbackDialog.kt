@@ -1,11 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.kids
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
@@ -13,6 +17,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -34,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -42,19 +51,39 @@ fun KidsSendFeedbackDialog(
     modifier: Modifier = Modifier,
     onSubmitFeedback: () -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     var feedbackText by remember { mutableStateOf(TextFieldValue(text = "")) }
     val focusRequester = remember { FocusRequester() }
 
+    val onFeedbackTapped = {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+        onSubmitFeedback()
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(24.dp)
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
             .imePadding(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.fillMaxSize(),
         ) {
+            Image(
+                painterResource(R.drawable.swipe_affordance),
+                contentDescription = stringResource(LR.string.swipe_affordance_icon),
+                modifier = modifier
+                    .width(56.dp)
+                    .padding(top = 8.dp, bottom = 32.dp),
+            )
             TextH30(
                 text = stringResource(LR.string.send_feedback_title),
                 textAlign = TextAlign.Center,
@@ -99,7 +128,7 @@ fun KidsSendFeedbackDialog(
                 RowButton(
                     text = stringResource(LR.string.send_feedback),
                     contentDescription = stringResource(LR.string.send_feedback),
-                    onClick = { onSubmitFeedback() },
+                    onClick = { onFeedbackTapped() },
                     includePadding = false,
                     textColor = MaterialTheme.theme.colors.primaryInteractive02,
                     modifier = Modifier.padding(bottom = 12.dp),
