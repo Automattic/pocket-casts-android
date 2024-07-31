@@ -31,6 +31,7 @@ internal class SharingAnalytics(
             TimestampType.Bookmark -> "bookmark_time"
         }
         is SharingRequest.Data.EpisodeFile -> "episode_file"
+        is SharingRequest.Data.ClipLink -> "clip_link"
     }
 
     private val SocialPlatform.analyticsValue get() = when (this) {

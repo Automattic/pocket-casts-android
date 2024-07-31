@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
+import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.Instagram
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.More
@@ -136,6 +137,13 @@ class SharingClient(
                 )
             }
         }
+        is SharingRequest.Data.ClipLink -> {
+            shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
+            SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
+            )
+        }
     }
 
     private fun Intent.share() {
@@ -183,6 +191,8 @@ data class SharingRequest internal constructor(
         fun bookmark(podcast: PodcastModel, episode: PodcastEpisode, position: Duration) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark))
 
         fun episodeFile(podcast: Podcast, episode: PodcastEpisode) = Builder(Data.EpisodeFile(podcast, episode))
+
+        fun clipLink(podcast: Podcast, episode: PodcastEpisode, range: Clip.Range) = Builder(Data.ClipLink(podcast, episode, range))
     }
 
     class Builder internal constructor(
@@ -271,6 +281,18 @@ data class SharingRequest internal constructor(
             val episode: EpisodeModel,
         ) : Data {
             override fun toString() = "EpisodeFile(title=${episode.title}, uuid=${episode.uuid}"
+        }
+
+        data class ClipLink(
+            override val podcast: PodcastModel,
+            val episode: EpisodeModel,
+            val range: Clip.Range,
+        ) : Data {
+            fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${range.startInSeconds},${range.endInSeconds}"
+
+            fun linkDescription() = LR.string.share_link_clip
+
+            override fun toString() = "ClipLink(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }
     }
 }

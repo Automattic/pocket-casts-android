@@ -16,6 +16,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
@@ -342,6 +343,52 @@ class SharingClientTest {
         assertEquals(context.getString(LR.string.error), response.feedbackMessage)
 
         assertNull(shareStarter.shareIntent)
+    }
+
+    @Test
+    fun copyClipLink() = runTest {
+        val request = SharingRequest.clipLink(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+        ).build()
+
+        client.share(request)
+        val clipData = shareStarter.requireShareLink
+
+        assertEquals("https://pca.st/episode/episode-uuid?t=15,28", clipData.getItemAt(0).text)
+        assertEquals(context.getString(LR.string.share_link_clip), clipData.description.label)
+        assertNull(shareStarter.shareIntent)
+    }
+
+    @Test
+    fun copyClipLinkWithFeedback() = runTest {
+        val client = createClient(showCustomCopyFeedback = true)
+
+        val request = SharingRequest.clipLink(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+        ).build()
+
+        val response = client.share(request)
+
+        assertEquals(context.getString(LR.string.share_link_copied_feedback), response.feedbackMessage)
+    }
+
+    @Test
+    fun copyClipLinkWithoutFeedback() = runTest {
+        val client = createClient(showCustomCopyFeedback = false)
+
+        val request = SharingRequest.clipLink(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+        ).build()
+
+        val response = client.share(request)
+
+        assertNull(response.feedbackMessage)
     }
 
     private fun createClient(

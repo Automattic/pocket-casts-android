@@ -17,6 +17,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
@@ -53,6 +54,9 @@ class ShareClipFragment : BaseDialogFragment() {
     lateinit var clipPlayerFactory: ClipPlayer.Factory
 
     @Inject
+    lateinit var sharingClient: SharingClient
+
+    @Inject
     lateinit var clipAnalyticsFactory: ClipAnalytics.Factory
 
     private lateinit var clipAnalytics: ClipAnalytics
@@ -77,7 +81,7 @@ class ShareClipFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val shareColors = shareColors
-        val listener = ShareClipListener(this@ShareClipFragment, viewModel)
+        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareClipPage(
