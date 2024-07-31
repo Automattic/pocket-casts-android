@@ -295,6 +295,7 @@ class ProfileFragment : BaseFragment() {
                     KidsProfileCard(
                         onDismiss = { viewModel.dismissKidsBanner() },
                         onRequestEarlyAccess = {
+                            analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_EARLY_ACCESS_REQUESTED)
                             KidsBottomSheetDialog().show(childFragmentManager, "KidsBottomSheetDialog")
                         },
                     )
