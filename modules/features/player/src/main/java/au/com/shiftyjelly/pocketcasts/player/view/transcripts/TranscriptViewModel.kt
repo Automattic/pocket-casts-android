@@ -59,19 +59,21 @@ class TranscriptViewModel @Inject constructor(
 
     private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
         transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
+            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid }
             .map { transcript ->
                 transcript?.let {
                     UiState.TranscriptFound(podcastAndEpisode, transcript)
                 } ?: UiState.Empty(podcastAndEpisode)
             }
 
-    fun parseAndLoadTranscript() {
+    fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean) {
+        if (isTranscriptViewOpen.not()) return
         _uiState.value.transcript?.let { transcript ->
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
-                try {
+                _uiState.value = try {
                     val result = parseTranscript(transcript)
-                    _uiState.value = UiState.TranscriptLoaded(
+                    UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
                         cuesWithTimingSubtitle = result,

@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,7 +23,6 @@ fun TranscriptPageWrapper(
     theme: Theme,
 ) {
     AppTheme(theme.activeTheme) {
-        val scrollState = rememberScrollState()
         val configuration = LocalConfiguration.current
         val connection = remember { object : NestedScrollConnection {} }
 
@@ -34,9 +32,9 @@ fun TranscriptPageWrapper(
                 .nestedScroll(connection),
         ) {
             TranscriptPage(
-                viewModel = transcriptViewModel,
+                playerViewModel = viewModel,
+                transcriptViewModel = transcriptViewModel,
                 theme = theme,
-                scrollState = scrollState,
                 modifier = Modifier
                     .height(configuration.screenHeightDp.dp),
             )

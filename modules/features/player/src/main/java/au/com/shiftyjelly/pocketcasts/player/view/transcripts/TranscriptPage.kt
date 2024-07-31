@@ -2,14 +2,15 @@ package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import android.content.res.Configuration
 import androidx.annotation.OptIn
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -39,50 +40,62 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TranscriptPage(
-    viewModel: TranscriptViewModel,
+    playerViewModel: PlayerViewModel,
+    transcriptViewModel: TranscriptViewModel,
     theme: Theme,
-    scrollState: ScrollState,
     modifier: Modifier,
 ) {
-    val state = viewModel.uiState.collectAsStateWithLifecycle()
-    when (state.value) {
-        is UiState.Empty -> Unit
+    val uiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
+    val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+    when (uiState.value) {
+        is UiState.Empty -> {
+            val emptyState = uiState.value as UiState.Empty
+            val colors = DefaultColors(theme, emptyState.podcastAndEpisode?.podcast)
+            EmptyView(Modifier.background(colors.backgroundColor()))
+        }
 
         is UiState.TranscriptFound -> {
-            val transcriptFoundState = state.value as UiState.TranscriptFound
+            val transcriptFoundState = uiState.value as UiState.TranscriptFound
             val colors = DefaultColors(theme, transcriptFoundState.podcastAndEpisode?.podcast)
             LoadingView(Modifier.background(colors.backgroundColor()))
         }
 
         is UiState.TranscriptLoaded -> {
-            val loadedState = state.value as UiState.TranscriptLoaded
+            val loadedState = uiState.value as UiState.TranscriptLoaded
             TranscriptContent(
                 state = loadedState,
                 colors = DefaultColors(theme, loadedState.podcastAndEpisode?.podcast),
-                scrollState = scrollState,
                 modifier = modifier,
             )
         }
 
         is UiState.Error -> {
-            val errorState = state.value as UiState.Error
+            val errorState = uiState.value as UiState.Error
             TranscriptError(
                 state = errorState,
                 colors = DefaultColors(theme, errorState.podcastAndEpisode?.podcast),
-                scrollState = scrollState,
                 modifier = modifier,
             )
         }
     }
 
-    LaunchedEffect(state.value.transcript) {
-        viewModel.parseAndLoadTranscript()
+    LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
+        transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
     }
+}
+
+@Composable
+private fun EmptyView(
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.fillMaxSize())
 }
 
 @OptIn(UnstableApi::class)
@@ -90,7 +103,6 @@ fun TranscriptPage(
 private fun TranscriptContent(
     state: UiState.TranscriptLoaded,
     colors: DefaultColors,
-    scrollState: ScrollState,
     modifier: Modifier,
 ) {
     val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
@@ -125,7 +137,7 @@ private fun TranscriptContent(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = bottomPadding)
-                .verticalScroll(scrollState),
+                .verticalScroll(rememberScrollState()),
         )
 
         GradientView(
@@ -171,7 +183,6 @@ private fun GradientView(
 private fun TranscriptError(
     state: UiState.Error,
     colors: DefaultColors,
-    scrollState: ScrollState,
     modifier: Modifier,
 ) {
     val errorMessage = when (val error = state.error) {
@@ -187,7 +198,7 @@ private fun TranscriptError(
             .fillMaxWidth()
             .padding(top = 32.dp)
             .background(colors.backgroundColor())
-            .verticalScroll(scrollState),
+            .verticalScroll(rememberScrollState()),
     ) {
         Box(
             modifier = Modifier
