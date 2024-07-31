@@ -34,7 +34,7 @@ internal class FFmpegMediaService(
             }
 
             append("-i $audioSource ") // Audio stream source
-            val coverFile = convertCoverToJpeg(episode).getOrNull()
+            val coverFile = convertCoverToJpeg(episode).getOrNull() // Convert covers to JPEG because MP3 doesn't support embedding WebP
             if (coverFile != null) {
                 append("-i $coverFile ")
             }
@@ -47,7 +47,7 @@ internal class FFmpegMediaService(
                 append("-c:1 copy ") // Copy codec for the cover stream
             }
             append("-y ") // Overwrite output file if it already exists
-            append("$ffmpegFile")
+            append("$ffmpegFile") // Output file
         }
 
         Timber.i("Execute command: $command")

@@ -157,6 +157,28 @@ class SharingAnalyticsTest {
     }
 
     @Test
+    fun `log clip audio sharing`() {
+        val request = SharingRequest.audioClip(podcast, episode, clipRange)
+            .setPlatform(SocialPlatform.PocketCasts)
+            .setCardType(CardType.Vertical)
+            .setSourceView(SourceView.PLAYER)
+            .build()
+
+        analytics.logPodcastSharedEvent(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.PODCAST_SHARED)
+        event.assertProperties(
+            mapOf(
+                "type" to "clip_audio",
+                "action" to "url",
+                "card_type" to "vertical",
+                "source" to "player",
+            ),
+        )
+    }
+
+    @Test
     fun `log source property`() {
         SourceView.entries.forEach { source ->
             val request = SharingRequest.podcast(podcast)
@@ -228,6 +250,16 @@ class SharingAnalyticsTest {
         val event = tracker.events.single()
 
         event.assertProperty("type", "clip_link")
+    }
+
+    @Test
+    fun `log clip audio type property`() {
+        val request = SharingRequest.audioClip(podcast, episode, clipRange).build()
+
+        analytics.logPodcastSharedEvent(request)
+        val event = tracker.events.single()
+
+        event.assertProperty("type", "clip_audio")
     }
 
     @Test

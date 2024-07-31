@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.FFmpegMediaService
 import au.com.shiftyjelly.pocketcasts.sharing.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
@@ -51,6 +52,7 @@ object SharingModule {
         analyticsTracker: AnalyticsTracker,
     ): SharingClient = SharingClient(
         context,
+        FFmpegMediaService(context),
         analyticsTracker,
     )
 }
