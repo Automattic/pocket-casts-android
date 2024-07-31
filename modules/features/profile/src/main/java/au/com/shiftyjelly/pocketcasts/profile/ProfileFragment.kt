@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.kids.KidsBottomSheetDialog
@@ -288,6 +289,9 @@ class ProfileFragment : BaseFragment() {
                 val isKidsBannerVisible = showKidsBanner && FeatureFlag.isEnabled(Feature.KIDS_PROFILE)
 
                 if (isKidsBannerVisible) {
+                    CallOnce {
+                        analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_SEEN)
+                    }
                     KidsProfileCard(
                         onDismiss = { viewModel.dismissKidsBanner() },
                         onRequestEarlyAccess = {

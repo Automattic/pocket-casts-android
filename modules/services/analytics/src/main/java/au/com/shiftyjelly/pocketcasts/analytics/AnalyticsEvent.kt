@@ -640,4 +640,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Pocket Casts Champion */
     POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),
     POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED("pocket_casts_champion_dialog_rate_button_tapped"),
+
+    /* Kids */
+    KIDS_PROFILE_BANNER_SEEN("kids_profile_banner_seen"),
 }
