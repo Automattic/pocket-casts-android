@@ -5,6 +5,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Format
+import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
 import androidx.media3.extractor.text.CuesWithTimingSubtitle
@@ -13,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
 import com.google.common.collect.ImmutableList
@@ -72,7 +74,7 @@ class TranscriptViewModel @Inject constructor(
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
-                    val result = parseTranscript(transcript)
+                    val result = buildSubtitleCues(transcript)
                     UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
@@ -87,32 +89,48 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    private suspend fun parseTranscript(transcript: Transcript) = withContext(ioDispatcher) {
-        val format = Format.Builder()
-            .setSampleMimeType(transcript.type)
-            .build()
-        if (subtitleParserFactory.supportsFormat(format).not()) {
-            throw UnsupportedOperationException("Unsupported MIME type: ${transcript.type}")
-        } else {
-            val result = ImmutableList.builder<CuesWithTiming>()
-            urlUtil.contentBytes(transcript.url)?.let { data ->
-                val parser = subtitleParserFactory.create(format)
-                parser.parse(
-                    data,
-                    SubtitleParser.OutputOptions.allCues(),
-                ) { element: CuesWithTiming? ->
-                    element?.let {
-                        result.add(
-                            CuesWithTiming(
-                                modifiedCues(it),
-                                it.startTimeUs,
-                                it.endTimeUs,
-                            ),
-                        )
+    private suspend fun buildSubtitleCues(transcript: Transcript) = withContext(ioDispatcher) {
+        when (transcript.type) {
+            TranscriptFormat.HTML.mimeType -> {
+                // Html content is added as single large cue
+                CuesWithTimingSubtitle(
+                    ImmutableList.of(
+                        CuesWithTiming(
+                            ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
+                            0,
+                            0,
+                        ),
+                    ),
+                )
+            }
+            else -> {
+                val format = Format.Builder()
+                    .setSampleMimeType(transcript.type)
+                    .build()
+                if (subtitleParserFactory.supportsFormat(format).not()) {
+                    throw UnsupportedOperationException("Unsupported MIME type: ${transcript.type}")
+                } else {
+                    val result = ImmutableList.builder<CuesWithTiming>()
+                    urlUtil.contentBytes(transcript.url)?.let { data ->
+                        val parser = subtitleParserFactory.create(format)
+                        parser.parse(
+                            data,
+                            SubtitleParser.OutputOptions.allCues(),
+                        ) { element: CuesWithTiming? ->
+                            element?.let {
+                                result.add(
+                                    CuesWithTiming(
+                                        modifiedCues(it),
+                                        it.startTimeUs,
+                                        it.endTimeUs,
+                                    ),
+                                )
+                            }
+                        }
                     }
+                    CuesWithTimingSubtitle(result.build())
                 }
             }
-            CuesWithTimingSubtitle(result.build())
         }
     }
 
