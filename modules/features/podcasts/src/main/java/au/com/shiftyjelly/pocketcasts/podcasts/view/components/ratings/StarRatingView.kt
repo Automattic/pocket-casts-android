@@ -80,7 +80,7 @@ private fun Content(
 
         if (!state.noRatings) {
             TextP40(
-                text = state.roundedAverage,
+                text = state.roundedAverage.toString(),
                 modifier = Modifier
                     .padding(start = 4.dp),
                 fontWeight = FontWeight.W700,

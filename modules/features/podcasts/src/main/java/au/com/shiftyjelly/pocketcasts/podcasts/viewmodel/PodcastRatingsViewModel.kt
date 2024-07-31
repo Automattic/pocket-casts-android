@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -104,28 +103,21 @@ class PodcastRatingsViewModel
 
             val stars: List<Star> = starsList()
 
-            val roundedAverage: String
+            val roundedAverage: Double
                 get() {
                     val rating = average ?: 0.0
-                    return (Math.round(rating * 10) / 10.0).toString()
+                    return Math.round(rating).toDouble()
                 }
 
             private fun starsList(): List<Star> {
-                val rating = average ?: 0.0
-                // truncate the floating points off without rounding
-                val ratingInt = rating.toInt()
-                // Get the float value
-                val half = rating % 1
-
                 val stars = (0 until MAX_STARS).map { index ->
-                    starFor(index, ratingInt, half)
+                    starFor(index, roundedAverage)
                 }
                 return stars
             }
 
-            private fun starFor(index: Int, rating: Int, half: Double) = when {
+            private fun starFor(index: Int, rating: Double) = when {
                 index < rating -> Star.FilledStar
-                (index == rating) && (half >= 0.5) -> Star.HalfStar
                 else -> Star.BorderedStar
             }
         }
@@ -135,7 +127,6 @@ class PodcastRatingsViewModel
 
     enum class Star(val icon: ImageVector) {
         FilledStar(Icons.Filled.Star),
-        HalfStar(Icons.AutoMirrored.Filled.StarHalf),
         BorderedStar(Icons.Filled.StarBorder),
     }
 
