@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class KidsSendFeedbackViewModel @Inject constructor() : ViewModel() {
-
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+class KidsSendFeedbackViewModel @Inject constructor(
+    private val analyticsTracker: AnalyticsTracker,
+) : ViewModel() {
 
     private val _showFeedbackDialog = MutableStateFlow(false)
     val showFeedbackDialog: StateFlow<Boolean> = _showFeedbackDialog
