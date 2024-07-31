@@ -21,10 +21,10 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
+import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.sql.Date
 import java.time.Instant
-import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -176,14 +176,6 @@ private fun HorizontalShareEpisodeTimestampPage(
             }
         },
     )
-}
-
-private fun Duration.toHhMmSs() = toComponents { hours, minutes, seconds, _ ->
-    if (hours == 0L) {
-        String.format(Locale.ROOT, "%02d:%02d", minutes, seconds)
-    } else {
-        String.format(Locale.ROOT, "%02d:%02d:%02d", hours, minutes, seconds)
-    }
 }
 
 @ShowkaseComposable(name = "ShareEpisodeTimestampVerticalRegularPreview", group = "Sharing")
