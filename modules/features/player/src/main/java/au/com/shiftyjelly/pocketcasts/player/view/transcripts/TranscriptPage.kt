@@ -44,9 +44,9 @@ import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewMode
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
-import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun TranscriptPage(
@@ -144,7 +144,7 @@ private fun TranscriptContent(
             HtmlText(
                 html = displayString.toString(),
                 color = colors.textColor(),
-                textStyleResId = R.style.H40,
+                textStyleResId = UR.style.H40,
                 modifier = modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = bottomPadding)
