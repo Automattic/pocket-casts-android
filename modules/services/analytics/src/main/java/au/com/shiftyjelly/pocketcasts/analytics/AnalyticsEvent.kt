@@ -646,4 +646,6 @@ enum class AnalyticsEvent(val key: String) {
     KIDS_PROFILE_EARLY_ACCESS_REQUESTED("kids_profile_early_access_requested"),
     KIDS_PROFILE_BANNER_DISMISSED("kids_profile_banner_dismissed"),
     KIDS_PROFILE_FEEDBACK_SENT("kids_profile_feedback_sent"),
+    KIDS_PROFILE_SEND_FEEDBACK_TAPPED("kids_profile_send_feedback_tapped"),
+    KIDS_PROFILE_NO_THANK_YOU_TAPPED("kids_profile_no_thank_you_tapped"),
 }

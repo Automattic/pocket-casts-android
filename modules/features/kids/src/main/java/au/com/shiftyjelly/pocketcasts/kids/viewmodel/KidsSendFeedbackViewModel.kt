@@ -19,12 +19,14 @@ class KidsSendFeedbackViewModel @Inject constructor() : ViewModel() {
     val showFeedbackDialog: StateFlow<Boolean> = _showFeedbackDialog
 
     fun onSendFeedbackClick() {
+        analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_SEND_FEEDBACK_TAPPED)
         viewModelScope.launch {
             _showFeedbackDialog.value = true
         }
     }
 
     fun onNoThankYouClick() {
+        analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_NO_THANK_YOU_TAPPED)
         viewModelScope.launch {
             _showFeedbackDialog.value = false
         }
