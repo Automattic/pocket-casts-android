@@ -5,9 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.IntSize
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -27,17 +33,35 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
 
     private val viewModel: KidsSendFeedbackViewModel by viewModels()
 
+    private val animationSpec = tween<IntSize>(
+        durationMillis = 400,
+        easing = EaseInOut,
+    )
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
                 val showFeedbackDialog by viewModel.showFeedbackDialog.collectAsState()
 
                 AppTheme(theme.activeTheme) {
-                    if (showFeedbackDialog) {
+                    AnimatedVisibility(
+                        visible = showFeedbackDialog,
+                        enter = expandVertically(
+                            expandFrom = Alignment.Top,
+                            animationSpec = animationSpec,
+                        ),
+                    ) {
                         KidsSendFeedbackDialog(
                             onSubmitFeedback = {},
                         )
-                    } else {
+                    }
+                    AnimatedVisibility(
+                        visible = !showFeedbackDialog,
+                        enter = expandVertically(
+                            expandFrom = Alignment.Top,
+                            animationSpec = animationSpec,
+                        ),
+                    ) {
                         KidsDialog(
                             onSendFeedbackClick = {
                                 viewModel.onSendFeedbackClick()
