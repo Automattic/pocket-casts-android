@@ -138,6 +138,22 @@ class TranscriptViewModelTest {
     }
 
     @Test
+    fun `given mimetype html, when transcript load invoked, then transcript is not parsed and url content is returned in single cue`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        val htmlText = "<html>content</html>"
+        whenever(urlUtil.contentString(anyOrNull())).thenReturn(htmlText)
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            verifyNoInteractions(subtitleParserFactory)
+            assertTrue((awaitItem() as UiState.TranscriptLoaded).cuesWithTimingSubtitle.getCues(0).first().text == htmlText)
+        }
+    }
+
+    @Test
     fun `speaker is trimmed from cue text`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
