@@ -20,4 +20,6 @@ dependencies {
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:ui"))
+
+    testImplementation(project(":modules:services:sharedtest"))
 }

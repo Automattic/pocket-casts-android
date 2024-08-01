@@ -1387,7 +1387,7 @@ class MainActivity :
         }
 
         launch(Dispatchers.Main.immediate) {
-            when (val localEpisode = withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }) {
+            val fragment = when (val localEpisode = withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }) {
                 is UserEpisode -> {
                     CloudFileBottomSheetFragment.newInstance(localEpisode.uuid, forceDark = true, source)
                 }
@@ -1398,24 +1398,24 @@ class MainActivity :
                         podcastUuid = localEpisode.podcastUuid,
                         forceDark = forceDark,
                         timestamp = startTimestamp,
-                    ).showAllowingStateLoss(supportFragmentManager, "episode_card")
+                    )
                 }
                 null -> {
                     val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
                     val searchResult = serverManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
                     dialog.hide()
-                    val episode = searchResult?.episode
-                    if (episode != null) {
+                    searchResult?.episode?.let {
                         EpisodeContainerFragment.newInstance(
-                            episodeUuid = episode.uuid,
+                            episodeUuid = it.uuid,
                             source = source,
-                            podcastUuid = episode.podcastUuid,
+                            podcastUuid = it.podcastUuid,
                             forceDark = forceDark,
                             timestamp = startTimestamp,
-                        ).showAllowingStateLoss(supportFragmentManager, "episode_card")
+                        )
                     }
                 }
             }
+            fragment?.showAllowingStateLoss(supportFragmentManager, "episode_card")
         }
     }
 

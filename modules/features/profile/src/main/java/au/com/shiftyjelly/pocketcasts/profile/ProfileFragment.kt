@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
+import au.com.shiftyjelly.pocketcasts.kids.KidsBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.kids.KidsProfileCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -289,6 +290,9 @@ class ProfileFragment : BaseFragment() {
                 if (isKidsBannerVisible) {
                     KidsProfileCard(
                         onDismiss = { viewModel.dismissKidsBanner() },
+                        onRequestEarlyAccess = {
+                            KidsBottomSheetDialog().show(childFragmentManager, "KidsBottomSheetDialog")
+                        },
                     )
                 }
             }
