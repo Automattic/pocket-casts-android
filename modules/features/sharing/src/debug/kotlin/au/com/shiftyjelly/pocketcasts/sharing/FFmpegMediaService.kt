@@ -20,7 +20,8 @@ internal class FFmpegMediaService(
     private val context: Context,
 ) : MediaService {
     override suspend fun clipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Result<File> = withContext(Dispatchers.IO) {
-        val outputFile = File(context.cacheDir, "${podcast.title} - ${episode.title} - ${clipRange.start.toHhMmSs()}–${clipRange.end.toHhMmSs()}.mp3")
+        val fileName = "${podcast.title} - ${episode.title} - ${clipRange.start.toHhMmSs()}–${clipRange.end.toHhMmSs()}".replace("""\W+""".toRegex(), "_")
+        val outputFile = File(context.cacheDir, "$fileName.mp3")
         if (outputFile.exists()) {
             return@withContext Result.success(outputFile)
         }
