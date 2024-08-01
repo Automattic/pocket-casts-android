@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import java.util.Date
@@ -20,7 +21,8 @@ class SharingAnalyticsTest {
 
     private val podcast = Podcast()
     private val episode = PodcastEpisode(uuid = "uuid", publishedDate = Date())
-    private val startTimestamp = 10.seconds
+    private val position = 10.seconds
+    private val clipRange = Clip.Range(15.seconds, 33.seconds)
 
     @Test
     fun `log podcast sharing`() {
@@ -68,7 +70,7 @@ class SharingAnalyticsTest {
 
     @Test
     fun `log episode position sharing`() {
-        val request = SharingRequest.episodePosition(podcast, episode, startTimestamp)
+        val request = SharingRequest.episodePosition(podcast, episode, position)
             .setPlatform(SocialPlatform.PocketCasts)
             .setCardType(CardType.Vertical)
             .setSourceView(SourceView.PLAYER)
@@ -90,7 +92,7 @@ class SharingAnalyticsTest {
 
     @Test
     fun `log bookmark sharing`() {
-        val request = SharingRequest.bookmark(podcast, episode, startTimestamp)
+        val request = SharingRequest.bookmark(podcast, episode, position)
             .setPlatform(SocialPlatform.PocketCasts)
             .setCardType(CardType.Vertical)
             .setSourceView(SourceView.PLAYER)
@@ -125,6 +127,28 @@ class SharingAnalyticsTest {
         event.assertProperties(
             mapOf(
                 "type" to "episode_file",
+                "action" to "url",
+                "card_type" to "vertical",
+                "source" to "player",
+            ),
+        )
+    }
+
+    @Test
+    fun `log clip link sharing`() {
+        val request = SharingRequest.clipLink(podcast, episode, clipRange)
+            .setPlatform(SocialPlatform.PocketCasts)
+            .setCardType(CardType.Vertical)
+            .setSourceView(SourceView.PLAYER)
+            .build()
+
+        analytics.logPodcastSharedEvent(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.PODCAST_SHARED)
+        event.assertProperties(
+            mapOf(
+                "type" to "clip_link",
                 "action" to "url",
                 "card_type" to "vertical",
                 "source" to "player",
@@ -168,7 +192,7 @@ class SharingAnalyticsTest {
 
     @Test
     fun `log epiosde position type property`() {
-        val request = SharingRequest.episodePosition(podcast, episode, startTimestamp).build()
+        val request = SharingRequest.episodePosition(podcast, episode, position).build()
 
         analytics.logPodcastSharedEvent(request)
         val event = tracker.events.single()
@@ -178,7 +202,7 @@ class SharingAnalyticsTest {
 
     @Test
     fun `log bookmark type property`() {
-        val request = SharingRequest.bookmark(podcast, episode, startTimestamp).build()
+        val request = SharingRequest.bookmark(podcast, episode, position).build()
 
         analytics.logPodcastSharedEvent(request)
         val event = tracker.events.single()
@@ -194,6 +218,16 @@ class SharingAnalyticsTest {
         val event = tracker.events.single()
 
         event.assertProperty("type", "episode_file")
+    }
+
+    @Test
+    fun `log clip link type property`() {
+        val request = SharingRequest.clipLink(podcast, episode, clipRange).build()
+
+        analytics.logPodcastSharedEvent(request)
+        val event = tracker.events.single()
+
+        event.assertProperty("type", "clip_link")
     }
 
     @Test
