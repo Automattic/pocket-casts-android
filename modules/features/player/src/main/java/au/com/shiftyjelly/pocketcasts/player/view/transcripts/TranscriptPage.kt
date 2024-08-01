@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -145,19 +146,22 @@ private fun TranscriptContent(
                 html = displayString.toString(),
                 color = colors.textColor(),
                 textStyleResId = UR.style.H40,
+                selectable = true,
                 modifier = modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = bottomPadding)
                     .verticalScroll(rememberScrollState()),
             )
         } else {
-            Text(
-                displayString,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = bottomPadding)
-                    .verticalScroll(rememberScrollState()),
-            )
+            SelectionContainer {
+                Text(
+                    displayString,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = bottomPadding)
+                        .verticalScroll(rememberScrollState()),
+                )
+            }
         }
 
         GradientView(
