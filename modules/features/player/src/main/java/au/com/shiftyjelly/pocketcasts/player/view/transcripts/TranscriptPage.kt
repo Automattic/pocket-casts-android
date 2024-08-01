@@ -17,11 +17,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
@@ -39,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
@@ -153,14 +157,20 @@ private fun TranscriptContent(
                     .verticalScroll(rememberScrollState()),
             )
         } else {
-            SelectionContainer {
-                Text(
-                    displayString,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = bottomPadding)
-                        .verticalScroll(rememberScrollState()),
+            CompositionLocalProvider(
+                LocalTextToolbar provides CustomTextToolbar(
+                    LocalView.current,
                 )
+            ) {
+                SelectionContainer {
+                    Text(
+                        displayString,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = bottomPadding)
+                            .verticalScroll(rememberScrollState()),
+                    )
+                }
             }
         }
 
