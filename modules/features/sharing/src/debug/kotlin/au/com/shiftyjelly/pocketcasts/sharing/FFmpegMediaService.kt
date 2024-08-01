@@ -15,7 +15,6 @@ import kotlin.coroutines.resume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 internal class FFmpegMediaService(
     private val context: Context,
@@ -34,7 +33,7 @@ internal class FFmpegMediaService(
             }
 
             append("-i $audioSource ") // Audio stream source
-            val coverFile = convertCoverToJpeg(episode).getOrNull() // Convert covers to JPEG because MP3 doesn't support embedding WebP
+            val coverFile = convertCoverToJpeg(episode) // Convert covers to JPEG because MP3 doesn't support embedding WebP
             if (coverFile != null) {
                 append("-i $coverFile ")
             }
@@ -58,11 +57,11 @@ internal class FFmpegMediaService(
         }
     }
 
-    private suspend fun convertCoverToJpeg(episode: PodcastEpisode): Result<File> {
+    private suspend fun convertCoverToJpeg(episode: PodcastEpisode): File? {
         val outputFile = File(context.cacheDir, "ffmpeg-converted-cover.jpeg")
         val coverPath = episode.imageUrl ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/960/${episode.podcastUuid}.jpg"
         val command = "-i $coverPath -y $outputFile"
-        return executeAsyncCommand(command).map { outputFile }
+        return executeAsyncCommand(command).map { outputFile }.getOrNull()
     }
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->
