@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import android.content.res.Configuration
+import android.os.Build
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
@@ -42,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
@@ -157,10 +160,19 @@ private fun TranscriptContent(
                     .verticalScroll(rememberScrollState()),
             )
         } else {
+            val customMenu = buildList {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    add(CustomMenuItemOption.Share)
+                }
+                add(CustomMenuItemOption.SelectAll)
+            }
             CompositionLocalProvider(
                 LocalTextToolbar provides CustomTextToolbar(
                     LocalView.current,
-                )
+                    customMenu,
+                    LocalClipboardManager.current,
+                    displayString,
+                ),
             ) {
                 SelectionContainer {
                     Text(

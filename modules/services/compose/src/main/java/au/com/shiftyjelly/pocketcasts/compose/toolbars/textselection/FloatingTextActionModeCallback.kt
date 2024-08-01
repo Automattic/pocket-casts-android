@@ -7,7 +7,7 @@ import android.view.MenuItem
 import android.view.View
 
 internal class FloatingTextActionModeCallback(
-    private val callback: TextActionModeCallback
+    private val callback: TextActionModeCallback,
 ) : ActionMode.Callback2() {
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         return callback.onActionItemClicked(mode, item)
@@ -28,14 +28,14 @@ internal class FloatingTextActionModeCallback(
     override fun onGetContentRect(
         mode: ActionMode?,
         view: View?,
-        outRect: Rect?
+        outRect: Rect?,
     ) {
         val rect = callback.rect
         outRect?.set(
             rect.left.toInt(),
             rect.top.toInt(),
             rect.right.toInt(),
-            rect.bottom.toInt()
+            rect.bottom.toInt(),
         )
     }
 }

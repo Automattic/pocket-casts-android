@@ -1,11 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection
 
+import android.content.Intent
+import android.content.Intent.createChooser
 import android.view.ActionMode
 import android.view.View
 import androidx.annotation.DoNotInline
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
+import androidx.compose.ui.text.AnnotatedString
+import au.com.shiftyjelly.pocketcasts.localization.R
 
 /**
  * Custom implementation for [TextToolbar].
@@ -13,12 +18,15 @@ import androidx.compose.ui.platform.TextToolbarStatus
  */
 class CustomTextToolbar(
     private val view: View,
+    private val customMenuItems: List<CustomMenuItemOption>,
+    private val clipboardManager: ClipboardManager,
+    private val displayString: AnnotatedString,
 ) : TextToolbar {
     private var actionMode: ActionMode? = null
     private val textActionModeCallback = TextActionModeCallback(
         onActionModeDestroy = {
             actionMode = null
-        }
+        },
     )
     override var status: TextToolbarStatus = TextToolbarStatus.Hidden
         private set
@@ -28,22 +36,23 @@ class CustomTextToolbar(
         onCopyRequested: (() -> Unit)?,
         onPasteRequested: (() -> Unit)?,
         onCutRequested: (() -> Unit)?,
-        onSelectAllRequested: (() -> Unit)?
+        onSelectAllRequested: (() -> Unit)?,
     ) {
         textActionModeCallback.rect = rect
         textActionModeCallback.onCopyRequested = onCopyRequested
         textActionModeCallback.onCutRequested = onCutRequested
         textActionModeCallback.onPasteRequested = onPasteRequested
         textActionModeCallback.onSelectAllRequested = onSelectAllRequested
+        textActionModeCallback.customMenuItems = customMenuItems
+        textActionModeCallback.onCustomMenuActionRequested = { onCustomMenuItemClicked(it) }
         if (actionMode == null) {
             status = TextToolbarStatus.Shown
             actionMode =
                 TextToolbarHelperMethods.startActionMode(
                     view,
                     FloatingTextActionModeCallback(textActionModeCallback),
-                    ActionMode.TYPE_FLOATING
+                    ActionMode.TYPE_FLOATING,
                 )
-
         } else {
             actionMode?.invalidate()
         }
@@ -53,6 +62,29 @@ class CustomTextToolbar(
         status = TextToolbarStatus.Hidden
         actionMode?.finish()
         actionMode = null
+    }
+
+    private fun onCustomMenuItemClicked(item: CustomMenuItemOption) {
+        try {
+            val text = clipboardManager.getText()
+            when (item) {
+                CustomMenuItemOption.Share -> {
+                    val context = view.context
+                    val shareIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, text)
+                        type = "text/plain"
+                    }
+                    context.startActivity(createChooser(shareIntent, context.getString(R.string.share)))
+                }
+
+                CustomMenuItemOption.SelectAll -> {
+                    clipboardManager.setText(displayString)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
 
@@ -66,14 +98,11 @@ internal object TextToolbarHelperMethods {
     fun startActionMode(
         view: View,
         actionModeCallback: ActionMode.Callback,
-        type: Int
+        type: Int,
     ): ActionMode? {
         return view.startActionMode(
             actionModeCallback,
-            type
+            type,
         )
     }
 }
-
-
-
