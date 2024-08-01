@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -66,10 +66,7 @@ fun WhatsNewPage(
                                 fullModal = uiState.fullModel,
                             )
                         is WhatsNewFeature.NewGiveRating ->
-                            NewWidgetsHeader(
-                                onClose = onClose,
-                                fullModal = uiState.fullModel,
-                            )
+                            NewGiveRatingHeader()
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -157,10 +154,11 @@ private fun WhatsNewPageLoaded(
                     Spacer(modifier = Modifier.weight(0.1f))
                 }
 
-                TextH20(
+                TextH10(
                     text = stringResource(id = state.feature.title),
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.theme.colors.primaryText01,
+                    modifier = Modifier.padding(horizontal = 32.dp),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -211,8 +209,8 @@ private fun Message(
     is WhatsNewFeature.NewGiveRating -> TextP40(
         text = stringResource(state.feature.message),
         textAlign = TextAlign.Center,
-        color = MaterialTheme.theme.colors.primaryText02,
-        modifier = Modifier.padding(horizontal = 16.dp),
+        color = MaterialTheme.theme.colors.primaryText01,
+        modifier = Modifier.padding(horizontal = 32.dp),
     )
 }
 
@@ -232,11 +230,11 @@ private fun WhatsNewNewWidgetsPreview(
     AppThemeWithBackground(themeType) {
         WhatsNewPageLoaded(
             state = UiState.Loaded(
-                feature = WhatsNewFeature.NewWidgets,
+                feature = WhatsNewFeature.NewGiveRating,
                 tier = UserTier.Plus,
                 fullModel = true,
             ),
-            header = { NewWidgetsHeader(onClose = {}) },
+            header = { NewGiveRatingHeader() },
             onConfirm = {},
             onClose = {},
         )

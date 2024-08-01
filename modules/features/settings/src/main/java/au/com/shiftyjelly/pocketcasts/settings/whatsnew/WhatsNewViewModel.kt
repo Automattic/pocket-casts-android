@@ -28,7 +28,7 @@ class WhatsNewViewModel @Inject constructor(
 
     init {
         _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.NewWidgets,
+            feature = WhatsNewFeature.NewGiveRating,
             fullModel = true,
             tier = UserTier.Free,
         )
