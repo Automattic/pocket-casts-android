@@ -20,9 +20,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -41,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -146,6 +153,21 @@ private fun TranscriptContent(
             .fillMaxWidth()
             .background(colors.backgroundColor()),
     ) {
+        val scrollState = rememberScrollState()
+        var viewportHeight by rememberSaveable { mutableFloatStateOf(0f) }
+        val textModifier = Modifier
+            .padding(horizontal = 16.dp)
+            .padding(bottom = bottomPadding)
+            .verticalScroll(scrollState)
+            .verticalScrollBar(
+                thumbColor = colors.textColor(),
+                scrollState = scrollState,
+                viewPortHeight = viewportHeight,
+            )
+            .onGloballyPositioned {
+                viewportHeight = it.boundsInParent().height
+            }
+
         if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
             /* Display html content using Android text view.
                Html rendering in Compose text view is available in Compose 1.7.0 beta which is not yet production ready: https://rb.gy/ev7182 */
@@ -154,10 +176,7 @@ private fun TranscriptContent(
                 color = colors.textColor(),
                 textStyleResId = UR.style.H40,
                 selectable = true,
-                modifier = modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = bottomPadding)
-                    .verticalScroll(rememberScrollState()),
+                modifier = textModifier,
             )
         } else {
             val customMenu = buildList {
@@ -176,11 +195,8 @@ private fun TranscriptContent(
             ) {
                 SelectionContainer {
                     Text(
-                        displayString,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = bottomPadding)
-                            .verticalScroll(rememberScrollState()),
+                        text = displayString,
+                        modifier = textModifier,
                     )
                 }
             }

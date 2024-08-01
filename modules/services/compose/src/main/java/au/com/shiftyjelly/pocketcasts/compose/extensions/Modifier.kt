@@ -1,12 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.compose.extensions
 
 import android.view.KeyEvent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ScrollState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -15,6 +21,8 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 private const val Black60 = 0x99000000
 
@@ -85,4 +93,38 @@ fun Modifier.gradientBackground(
 enum class FadeDirection {
     TopToBottom,
     BottomToTop,
+}
+
+fun Modifier.verticalScrollBar(
+    scrollState: ScrollState,
+    viewPortHeight: Float,
+    width: Dp = 4.dp,
+    thumbColor: Color,
+) = composed {
+    val thumbAlphaAnimated by animateFloatAsState(
+        targetValue = if (scrollState.isScrollInProgress) 0.8f else 0f,
+        animationSpec = tween(
+            durationMillis = if (scrollState.isScrollInProgress) 150 else 1000,
+            delayMillis = if (scrollState.isScrollInProgress) 0 else 500,
+        ),
+        label = "",
+    )
+
+    drawWithContent {
+        drawContent()
+        if (scrollState.maxValue == 0) {
+            return@drawWithContent
+        }
+        val contentHeight = size.height
+        val scrollBarHeight = viewPortHeight * viewPortHeight / contentHeight
+        val scrollHeight = viewPortHeight - scrollBarHeight
+        val scrollOffset = scrollHeight * scrollState.value / scrollState.maxValue
+
+        drawRect(
+            thumbColor,
+            Offset(size.width - width.toPx(), scrollState.value.toFloat() + scrollOffset),
+            Size(width.toPx(), scrollBarHeight),
+            thumbAlphaAnimated,
+        )
+    }
 }
