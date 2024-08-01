@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -96,7 +97,9 @@ private fun VerticalCard(
         maxWidth * 1.5f to maxWidth
     }
     Box(
-        modifier = modifier.background(backgroundGradient, RoundedCornerShape(12.dp)),
+        modifier = modifier
+            .wrapContentSize()
+            .background(backgroundGradient, RoundedCornerShape(12.dp)),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
