@@ -307,7 +307,7 @@ data class SharingRequest internal constructor(
             val episode: EpisodeModel,
             val range: Clip.Range,
         ) : Data {
-            override fun toString() = "ClipLink(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
+            override fun toString() = "ClipAudio(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }
     }
 }
