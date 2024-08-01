@@ -83,7 +83,7 @@ class ShareClipFragment : BaseDialogFragment() {
     ) = ComposeView(requireActivity()).apply {
         val shareColors = shareColors
         val videoBackgroundController = VideoBackgroundController(requireContext(), shareColors)
-        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient)
+        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient, videoBackgroundController)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareClipPage(

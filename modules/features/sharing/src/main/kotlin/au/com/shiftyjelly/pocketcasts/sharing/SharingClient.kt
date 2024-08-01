@@ -149,6 +149,24 @@ class SharingClient(
                 )
             }
         }
+        is SharingRequest.Data.ClipVideo -> when (platform) {
+            Instagram -> {
+                error("Not implemented yet")
+            }
+            WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
+                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, data.backgroundImage).getOrThrow()
+                Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .setType("video/mp4")
+                    .setExtraStream(file)
+                    .setPackage(platform.packageId)
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                )
+            }
+        }
     }
 
     private fun Intent.share() {
@@ -187,19 +205,50 @@ data class SharingRequest internal constructor(
     internal val source: SourceView,
 ) {
     companion object {
-        fun podcast(podcast: PodcastModel) = Builder(Data.Podcast(podcast))
+        fun podcast(
+            podcast: PodcastModel,
+        ) = Builder(Data.Podcast(podcast))
 
-        fun episode(podcast: PodcastModel, episode: PodcastEpisode) = Builder(Data.Episode(podcast, episode))
+        fun episode(
+            podcast: PodcastModel,
+            episode: PodcastEpisode,
+        ) = Builder(Data.Episode(podcast, episode))
 
-        fun episodePosition(podcast: PodcastModel, episode: PodcastEpisode, position: Duration) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Episode))
+        fun episodePosition(
+            podcast: PodcastModel,
+            episode: PodcastEpisode,
+            position: Duration,
+        ) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Episode))
 
-        fun bookmark(podcast: PodcastModel, episode: PodcastEpisode, position: Duration) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark))
+        fun bookmark(
+            podcast: PodcastModel,
+            episode: PodcastEpisode,
+            position: Duration,
+        ) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark))
 
-        fun episodeFile(podcast: Podcast, episode: PodcastEpisode) = Builder(Data.EpisodeFile(podcast, episode))
+        fun episodeFile(
+            podcast: Podcast,
+            episode: PodcastEpisode,
+        ) = Builder(Data.EpisodeFile(podcast, episode))
 
-        fun clipLink(podcast: Podcast, episode: PodcastEpisode, range: Clip.Range) = Builder(Data.ClipLink(podcast, episode, range))
+        fun clipLink(
+            podcast: Podcast,
+            episode: PodcastEpisode,
+            range: Clip.Range,
+        ) = Builder(Data.ClipLink(podcast, episode, range))
 
-        fun audioClip(podcast: Podcast, episode: PodcastEpisode, range: Clip.Range) = Builder(Data.ClipAudio(podcast, episode, range))
+        fun audioClip(
+            podcast: Podcast,
+            episode: PodcastEpisode,
+            range: Clip.Range,
+        ) = Builder(Data.ClipAudio(podcast, episode, range))
+
+        fun videoClip(
+            podcast: Podcast,
+            episode: PodcastEpisode,
+            range: Clip.Range,
+            backgroundImage: File,
+        ) = Builder(Data.ClipVideo(podcast, episode, range, backgroundImage))
     }
 
     class Builder internal constructor(
@@ -308,6 +357,15 @@ data class SharingRequest internal constructor(
             val range: Clip.Range,
         ) : Data {
             override fun toString() = "ClipAudio(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
+        }
+
+        data class ClipVideo(
+            override val podcast: PodcastModel,
+            val episode: EpisodeModel,
+            val range: Clip.Range,
+            val backgroundImage: File,
+        ) : Data {
+            override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }
     }
 }
