@@ -98,6 +98,10 @@ class WhatsNewFragment : BaseFragment() {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
+            is NavigationState.NewGiveRatingClose -> {
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
+            }
             is NavigationState.ForceClose -> {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()

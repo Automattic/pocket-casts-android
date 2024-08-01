@@ -39,6 +39,7 @@ class WhatsNewViewModel @Inject constructor(
             val currentState = state.value as? UiState.Loaded ?: return@launch
             val target = when (currentState.feature) {
                 is WhatsNewFeature.NewWidgets -> NavigationState.NewWidgetsClose
+                is WhatsNewFeature.NewGiveRating -> NavigationState.NewGiveRatingClose
             }
             _navigationState.emit(target)
         }
@@ -73,6 +74,15 @@ class WhatsNewViewModel @Inject constructor(
             override val isUserEntitled = true
             override val subscriptionTier = null
         }
+
+        data object NewGiveRating : WhatsNewFeature {
+            override val title = LR.string.whats_new_new_rating_title
+            override val message = LR.string.whats_new_new_rating_message
+            override val confirmButtonTitle = LR.string.whats_new_got_it_button
+            override val hasOffer = false
+            override val isUserEntitled = true
+            override val subscriptionTier = null
+        }
     }
 
     sealed class NavigationState(
@@ -84,6 +94,7 @@ class WhatsNewViewModel @Inject constructor(
         ) : NavigationState()
 
         data object NewWidgetsClose : NavigationState()
+        data object NewGiveRatingClose : NavigationState()
         data object ForceClose : NavigationState()
     }
 }

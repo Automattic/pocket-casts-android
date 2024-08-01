@@ -65,6 +65,11 @@ fun WhatsNewPage(
                                 onClose = onClose,
                                 fullModal = uiState.fullModel,
                             )
+                        is WhatsNewFeature.NewGiveRating ->
+                            NewWidgetsHeader(
+                                onClose = onClose,
+                                fullModal = uiState.fullModel,
+                            )
                     }
                 },
                 onConfirm = { viewModel.onConfirm() },
@@ -203,6 +208,12 @@ private fun Message(
         color = MaterialTheme.theme.colors.primaryText02,
         modifier = Modifier.padding(horizontal = 16.dp),
     )
+    is WhatsNewFeature.NewGiveRating -> TextP40(
+        text = stringResource(state.feature.message),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.theme.colors.primaryText02,
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
 }
 
 @Composable
@@ -210,6 +221,7 @@ private fun getButtonTitle(
     state: UiState.Loaded,
 ): String = when (state.feature) {
     is WhatsNewFeature.NewWidgets -> stringResource(state.feature.confirmButtonTitle)
+    is WhatsNewFeature.NewGiveRating -> stringResource(state.feature.confirmButtonTitle)
 }
 
 @Composable
