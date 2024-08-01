@@ -50,7 +50,6 @@ internal class FFmpegMediaService(
             append("$ffmpegFile") // Output file
         }
 
-        Timber.i("Execute command: $command")
         executeAsyncCommand(command).mapCatching {
             if (!ffmpegFile.renameTo(outputFile)) {
                 throw IOException("Failed to rename clip file to output file")
@@ -68,7 +67,7 @@ internal class FFmpegMediaService(
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->
         val session = FFmpegKit.executeAsync(
-            command,
+            "-user_agent 'Pocket Casts' $command",
             object : FFmpegSessionCompleteCallback {
                 override fun apply(session: FFmpegSession) {
                     when {
