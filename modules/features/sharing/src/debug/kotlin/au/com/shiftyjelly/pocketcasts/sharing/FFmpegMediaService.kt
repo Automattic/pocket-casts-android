@@ -60,7 +60,7 @@ internal class FFmpegMediaService(
 
     private suspend fun convertCoverToJpeg(episode: PodcastEpisode): Result<File> {
         val outputFile = File(context.cacheDir, "ffmpeg-converted-cover.jpeg")
-        val coverPath = episode.imageUrl ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/webp/960/${episode.podcastUuid}.webp"
+        val coverPath = episode.imageUrl ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/960/${episode.podcastUuid}.jpg"
         val command = "-i $coverPath -y $outputFile"
         return executeAsyncCommand(command).map { outputFile }
     }
