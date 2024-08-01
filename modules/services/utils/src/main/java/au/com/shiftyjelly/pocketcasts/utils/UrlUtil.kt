@@ -21,4 +21,11 @@ class UrlUtil @Inject constructor() {
         }
         bytes
     }
+
+    suspend fun contentString(url: String) = withContext(Dispatchers.IO) {
+        buildString {
+            append(URL(url).readText())
+            append(System.lineSeparator())
+        }
+    }
 }

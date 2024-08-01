@@ -8,7 +8,7 @@ import javax.inject.Inject
 class TranscriptsManagerImpl @Inject constructor(
     private val transcriptDao: TranscriptDao,
 ) : TranscriptsManager {
-    private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT)
+    private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT, TranscriptFormat.HTML)
 
     override suspend fun updateTranscripts(
         episodeUuid: String,
@@ -38,4 +38,5 @@ class TranscriptsManagerImpl @Inject constructor(
 enum class TranscriptFormat(val mimeType: String) {
     SRT("application/srt"),
     VTT("text/vtt"),
+    HTML("text/html"),
 }

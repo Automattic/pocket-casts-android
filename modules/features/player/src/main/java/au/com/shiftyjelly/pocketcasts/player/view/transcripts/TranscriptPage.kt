@@ -36,14 +36,17 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun TranscriptPage(
@@ -109,20 +112,23 @@ private fun TranscriptContent(
     val configuration = LocalConfiguration.current
     val bottomPadding = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 125.dp
 
-    val annotatedString = buildAnnotatedString {
+    /* Blank lines are appended to add content padding */
+    val blankLines = if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
+        "<br><br>"
+    } else {
+        "\n\n"
+    }
+    val displayString = buildAnnotatedString {
         withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
             with(state.cuesWithTimingSubtitle) {
-                /* Blank lines are appended to add content padding */
-                append("\n")
-                append("\n")
+                append(blankLines)
                 (0 until eventTimeCount).forEach { index ->
                     getCues(getEventTime(index)).forEach { cue ->
                         withStyle(style = defaultTextStyle) { append(cue.text) }
                         append(" ")
                     }
                 }
-                append("\n")
-                append("\n")
+                append(blankLines)
             }
         }
     }
@@ -132,13 +138,27 @@ private fun TranscriptContent(
             .fillMaxWidth()
             .background(colors.backgroundColor()),
     ) {
-        Text(
-            annotatedString,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .padding(bottom = bottomPadding)
-                .verticalScroll(rememberScrollState()),
-        )
+        if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
+            /* Display html content using Android text view.
+               Html rendering in Compose text view is available in Compose 1.7.0 beta which is not yet production ready: https://rb.gy/ev7182 */
+            HtmlText(
+                html = displayString.toString(),
+                color = colors.textColor(),
+                textStyleResId = UR.style.H40,
+                modifier = modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = bottomPadding)
+                    .verticalScroll(rememberScrollState()),
+            )
+        } else {
+            Text(
+                displayString,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = bottomPadding)
+                    .verticalScroll(rememberScrollState()),
+            )
+        }
 
         GradientView(
             baseColor = colors.backgroundColor(),
