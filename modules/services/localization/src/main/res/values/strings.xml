@@ -626,6 +626,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="not_allowed_to_rate_description">Only listeners of this podcast can give it a rating. Have a listen to a few episodes and then come back to give your rating. We look forward to hearing what you think!</string>
     <string name="thank_you_for_rating">Thank you for rating!</string>
     <string name="something_went_wrong_to_rate_this_podcast">Something went wrong. Please try again later</string>
+    <string name="whats_new_new_rating_title">Rating podcasts  available now!</string>
+    <string name="whats_new_new_rating_message">You can start rating any show in Pocket Casts. Make sure you give it a few listens first and go support your favorite creators!</string>
 
     <!-- Episodes -->
 
