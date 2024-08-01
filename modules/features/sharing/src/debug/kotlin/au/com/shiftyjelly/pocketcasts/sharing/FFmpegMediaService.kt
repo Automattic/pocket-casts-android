@@ -22,8 +22,7 @@ internal class FFmpegMediaService(
     private val sessionFiles = LinkedHashSet<File>()
 
     override suspend fun clipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Result<File> = withContext(Dispatchers.IO) {
-        val fileName = "${podcast.title} - ${episode.title} - ${clipRange.start.toHhMmSs()}–${clipRange.end.toHhMmSs()}".replace("""\W+""".toRegex(), "_")
-        val outputFile = File(context.cacheDir, "$fileName.mp3")
+        val outputFile = File(context.cacheDir, "${sanitizedFileName(podcast, episode, clipRange)}.mp3")
         if (outputFile in sessionFiles && outputFile.exists()) {
             return@withContext Result.success(outputFile)
         }
@@ -38,8 +37,7 @@ internal class FFmpegMediaService(
     }
 
     override suspend fun clipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, backgroundFile: File): Result<File> = withContext(Dispatchers.IO) {
-        val fileName = "${podcast.title} - ${episode.title} - ${clipRange.start.toHhMmSs()}–${clipRange.end.toHhMmSs()}".replace("""\W+""".toRegex(), "_")
-        val outputFile = File(context.cacheDir, "$fileName.mp4")
+        val outputFile = File(context.cacheDir, "${sanitizedFileName(podcast, episode, clipRange)}.mp4")
         if (outputFile in sessionFiles && outputFile.exists()) {
             return@withContext Result.success(outputFile)
         }
@@ -112,6 +110,10 @@ internal class FFmpegMediaService(
         val coverPath = episode.imageUrl ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/960/${episode.podcastUuid}.jpg"
         val command = "-i $coverPath -user_agent 'Pocket Casts' -y $outputFile"
         return executeAsyncCommand(command).map { outputFile }.getOrNull()
+    }
+
+    private fun sanitizedFileName(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): String {
+        return "${podcast.title} - ${episode.title} - ${clipRange.start.toHhMmSs()}–${clipRange.end.toHhMmSs()}".replace("""\W+""".toRegex(), "_")
     }
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->
