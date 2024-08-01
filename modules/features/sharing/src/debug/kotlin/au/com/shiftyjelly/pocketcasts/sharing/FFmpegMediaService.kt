@@ -46,6 +46,7 @@ internal class FFmpegMediaService(
                 append("-map 1:0 ") // Include the cover stream
                 append("-c:1 copy ") // Copy codec for the cover stream
             }
+            append("-user_agent 'Pocket Casts'") // Add User-Agent
             append("-y ") // Overwrite output file if it already exists
             append("$ffmpegFile") // Output file
         }
@@ -61,13 +62,13 @@ internal class FFmpegMediaService(
     private suspend fun convertCoverToJpeg(episode: PodcastEpisode): File? {
         val outputFile = File(context.cacheDir, "ffmpeg-converted-cover.jpeg")
         val coverPath = episode.imageUrl ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/960/${episode.podcastUuid}.jpg"
-        val command = "-i $coverPath -y $outputFile"
+        val command = "-i $coverPath -user_agent 'Pocket Casts' -y $outputFile"
         return executeAsyncCommand(command).map { outputFile }.getOrNull()
     }
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->
         val session = FFmpegKit.executeAsync(
-            "-user_agent 'Pocket Casts' $command",
+            command,
             object : FFmpegSessionCompleteCallback {
                 override fun apply(session: FFmpegSession) {
                     when {
