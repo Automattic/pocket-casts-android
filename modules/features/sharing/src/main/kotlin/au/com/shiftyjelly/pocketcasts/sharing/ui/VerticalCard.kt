@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -24,6 +26,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 
@@ -32,6 +37,7 @@ internal fun VerticalPodcastCast(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
@@ -41,6 +47,7 @@ internal fun VerticalPodcastCast(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
+    captureController = captureController,
     modifier = modifier,
 )
 
@@ -50,6 +57,7 @@ internal fun VerticalEpisodeCard(
     podcast: Podcast,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
 ) = VerticalCard(
@@ -60,14 +68,17 @@ internal fun VerticalEpisodeCard(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
+    captureController = captureController,
     modifier = modifier,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun VerticalCard(
     data: CardData,
     shareColors: ShareColors,
     useHeightForAspectRatio: Boolean,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
@@ -84,57 +95,61 @@ private fun VerticalCard(
     } else {
         maxWidth * 1.5f to maxWidth
     }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .background(backgroundGradient, RoundedCornerShape(12.dp))
-            .width(width)
-            .height(height),
+    Box(
+        modifier = modifier.background(backgroundGradient, RoundedCornerShape(12.dp)),
     ) {
-        Spacer(
-            modifier = Modifier.height(width * 0.15f),
-        )
-        data.Image(
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .size(width * 0.7f)
-                .clip(RoundedCornerShape(8.dp)),
-        )
-        Spacer(
-            modifier = Modifier.height(height * 0.05f),
-        )
-        TextH70(
-            text = data.topText(),
-            maxLines = 1,
-            color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = width * 0.1f),
-        )
-        Spacer(
-            modifier = Modifier.height(6.dp),
-        )
-        TextH40(
-            text = data.middleText(),
-            maxLines = 2,
-            textAlign = TextAlign.Center,
-            color = shareColors.cardText,
-            modifier = Modifier.padding(horizontal = width * 0.1f),
-        )
-        Spacer(
-            modifier = Modifier.height(6.dp),
-        )
-        TextH70(
-            text = data.bottomText(),
-            maxLines = 2,
-            textAlign = TextAlign.Center,
-            color = shareColors.cardText.copy(alpha = 0.5f),
-            modifier = Modifier.padding(horizontal = width * 0.1f),
-        )
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
-        PocketCastsPill()
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
+                .width(width)
+                .height(height)
+                .capturable(captureController),
+        ) {
+            Spacer(
+                modifier = Modifier.height(width * 0.15f),
+            )
+            data.Image(
+                modifier = Modifier
+                    .size(width * 0.7f)
+                    .clip(RoundedCornerShape(8.dp)),
+            )
+            Spacer(
+                modifier = Modifier.height(height * 0.05f),
+            )
+            TextH70(
+                text = data.topText(),
+                maxLines = 1,
+                color = shareColors.cardText.copy(alpha = 0.5f),
+                modifier = Modifier.padding(horizontal = width * 0.1f),
+            )
+            Spacer(
+                modifier = Modifier.height(6.dp),
+            )
+            TextH40(
+                text = data.middleText(),
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+                color = shareColors.cardText,
+                modifier = Modifier.padding(horizontal = width * 0.1f),
+            )
+            Spacer(
+                modifier = Modifier.height(6.dp),
+            )
+            TextH70(
+                text = data.bottomText(),
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+                color = shareColors.cardText.copy(alpha = 0.5f),
+                modifier = Modifier.padding(horizontal = width * 0.1f),
+            )
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+            PocketCastsPill()
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+        }
     }
 }
 
@@ -209,4 +224,5 @@ private fun VerticalCardPreview(
     data = data,
     shareColors = ShareColors(baseColor),
     useHeightForAspectRatio = false,
+    captureController = rememberCaptureController(),
 )

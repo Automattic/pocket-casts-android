@@ -23,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 import kotlinx.coroutines.launch
@@ -51,6 +53,7 @@ internal fun ShareEpisodePage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: ShareEpisodePageListener,
+    captureController: CaptureController,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     when (LocalConfiguration.current.orientation) {
@@ -71,6 +74,7 @@ internal fun ShareEpisodePage(
             shareColors = shareColors,
             listener = listener,
             snackbarHostState = snackbarHostState,
+            captureController = captureController,
         )
     }
 }
@@ -85,6 +89,7 @@ private fun VerticalShareEpisodePage(
     shareColors: ShareColors,
     listener: ShareEpisodePageListener,
     snackbarHostState: SnackbarHostState,
+    captureController: CaptureController,
 ) {
     val scope = rememberCoroutineScope()
     VerticalSharePage(
@@ -110,6 +115,7 @@ private fun VerticalShareEpisodePage(
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Horiozntal -> HorizontalEpisodeCard(
@@ -219,4 +225,5 @@ private fun ShareEpisodePagePreview(
     socialPlatforms = SocialPlatform.entries.toSet(),
     shareColors = ShareColors(Color(color)),
     listener = ShareEpisodePageListener.Preview,
+    captureController = rememberCaptureController(),
 )

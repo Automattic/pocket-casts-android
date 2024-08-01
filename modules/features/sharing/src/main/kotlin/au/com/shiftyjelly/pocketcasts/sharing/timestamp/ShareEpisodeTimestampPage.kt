@@ -23,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 import kotlin.time.Duration
@@ -55,6 +57,7 @@ internal fun ShareEpisodeTimestampPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: ShareEpisodeTimestampPageListener,
+    captureController: CaptureController,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     when (LocalConfiguration.current.orientation) {
@@ -77,6 +80,7 @@ internal fun ShareEpisodeTimestampPage(
             shareColors = shareColors,
             listener = listener,
             snackbarHostState = snackbarHostState,
+            captureController = captureController,
         )
     }
 }
@@ -91,6 +95,7 @@ private fun VerticalShareEpisodeTimestampPage(
     shareColors: ShareColors,
     listener: ShareEpisodeTimestampPageListener,
     snackbarHostState: SnackbarHostState,
+    captureController: CaptureController,
 ) {
     val scope = rememberCoroutineScope()
     VerticalSharePage(
@@ -116,6 +121,7 @@ private fun VerticalShareEpisodeTimestampPage(
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Horiozntal -> HorizontalEpisodeCard(
@@ -227,4 +233,5 @@ private fun ShareEpisodeTimestampPagePreview(
     socialPlatforms = SocialPlatform.entries.toSet(),
     shareColors = ShareColors(Color(color)),
     listener = ShareEpisodeTimestampPageListener.Preview,
+    captureController = rememberCaptureController(),
 )

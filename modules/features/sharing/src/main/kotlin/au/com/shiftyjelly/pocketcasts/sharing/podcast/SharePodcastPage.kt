@@ -21,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -46,6 +48,7 @@ internal fun SharePodcastPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
+    captureController: CaptureController,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     when (LocalConfiguration.current.orientation) {
@@ -64,6 +67,7 @@ internal fun SharePodcastPage(
             shareColors = shareColors,
             listener = listener,
             snackbarHostState = snackbarHostState,
+            captureController = captureController,
         )
     }
 }
@@ -76,6 +80,7 @@ private fun VerticalSharePodcastPage(
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
     snackbarHostState: SnackbarHostState,
+    captureController: CaptureController,
 ) {
     val scope = rememberCoroutineScope()
     VerticalSharePage(
@@ -100,6 +105,7 @@ private fun VerticalSharePodcastPage(
                         podcast = podcast,
                         episodeCount = episodeCount,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Horiozntal -> HorizontalPodcastCast(
@@ -200,4 +206,5 @@ private fun SharePodcastPagePreview(
     socialPlatforms = SocialPlatform.entries.toSet(),
     shareColors = ShareColors(Color(color)),
     listener = SharePodcastPageListener.Preview,
+    captureController = rememberCaptureController(),
 )
