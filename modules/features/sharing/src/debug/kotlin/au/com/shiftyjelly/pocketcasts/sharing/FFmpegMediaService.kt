@@ -19,10 +19,12 @@ import kotlinx.coroutines.withContext
 internal class FFmpegMediaService(
     private val context: Context,
 ) : MediaService {
+    private val sessionFiles = LinkedHashSet<File>()
+
     override suspend fun clipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Result<File> = withContext(Dispatchers.IO) {
         val fileName = "${podcast.title} - ${episode.title} - ${clipRange.start.toHhMmSs()}–${clipRange.end.toHhMmSs()}".replace("""\W+""".toRegex(), "_")
         val outputFile = File(context.cacheDir, "$fileName.mp3")
-        if (outputFile.exists()) {
+        if (outputFile in sessionFiles && outputFile.exists()) {
             return@withContext Result.success(outputFile)
         }
 
@@ -51,12 +53,13 @@ internal class FFmpegMediaService(
             append("$ffmpegFile") // Output file
         }
 
-        executeAsyncCommand(command).mapCatching {
-            if (!ffmpegFile.renameTo(outputFile)) {
-                throw IOException("Failed to rename clip file to output file")
-            }
-            outputFile
-        }
+        executeAsyncCommand(command)
+            .mapCatching {
+                if (!ffmpegFile.renameTo(outputFile)) {
+                    throw IOException("Failed to rename clip file to output file")
+                }
+                outputFile
+            }.onSuccess { sessionFiles.add(it) }
     }
 
     private suspend fun convertCoverToJpeg(episode: PodcastEpisode): File? {
