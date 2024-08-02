@@ -4,6 +4,7 @@ import android.view.KeyEvent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -105,9 +106,14 @@ fun Modifier.verticalScrollBar(
     scrollState: ScrollState,
     width: Dp = 4.dp,
     thumbColor: Color,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) = composed {
     var viewPortHeight by remember { mutableFloatStateOf(0f) }
-    val miScrollBarHeight = LocalDensity.current.run { 24.dp.toPx() }
+    val density = LocalDensity.current
+    val miScrollBarHeight = density.run { 50.dp.toPx() }
+    val topPaddingPx = density.run { contentPadding.calculateTopPadding().toPx() }
+    val bottomPaddingPx = density.run { contentPadding.calculateBottomPadding().toPx() }
+
     val thumbAlphaAnimated by animateFloatAsState(
         targetValue = if (scrollState.isScrollInProgress) 0.8f else 0f,
         animationSpec = tween(
@@ -122,10 +128,10 @@ fun Modifier.verticalScrollBar(
         if (scrollState.maxValue == 0) {
             return@drawWithContent
         }
-        val contentHeight = size.height
-        val scrollBarHeight = viewPortHeight * viewPortHeight / contentHeight
-        val scrollHeight = (viewPortHeight - scrollBarHeight).coerceAtLeast(miScrollBarHeight)
-        val scrollOffset = scrollHeight * scrollState.value / scrollState.maxValue
+        val contentHeight = size.height - (topPaddingPx + bottomPaddingPx)
+        val scrollBarHeight = (viewPortHeight * viewPortHeight / contentHeight).coerceAtLeast(miScrollBarHeight)
+        val scrollHeight = viewPortHeight - scrollBarHeight - bottomPaddingPx
+        val scrollOffset = scrollHeight * scrollState.value / scrollState.maxValue + topPaddingPx
 
         drawRect(
             thumbColor,
