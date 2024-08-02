@@ -35,13 +35,13 @@ internal class FFmpegMediaService(
                 return@withContext Result.failure(IOException("No stream found for ${episode.uuid} episode"))
             }
 
+            append("-ss ${clipRange.startInSeconds} ") // Clip start, must be in seconds or HH:MM:SS.xxx
+            append("-to ${clipRange.endInSeconds} ") // Clip end, must be in seconds or HH:MM:SS.xxx
             append("-i $audioSource ") // Audio stream source
             val coverFile = convertCoverToJpeg(episode) // Convert covers to JPEG because MP3 doesn't support embedding WebP
             if (coverFile != null) {
                 append("-i $coverFile ")
             }
-            append("-ss ${clipRange.startInSeconds} ") // Clip start, must be in seconds or HH:MM:SS.xxx
-            append("-to ${clipRange.endInSeconds} ") // Clip end, must be in seconds or HH:MM:SS.xxx
             append("-q:a 0 ") // Max audio quality
             append("-map 0:a:0 ") // Include only the first audio stream, videos can have multiple audio streams
             if (coverFile != null) {
