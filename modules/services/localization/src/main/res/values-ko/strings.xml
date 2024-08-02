@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 09:54:05+0000
+Translation-Revision-Date: 2024-08-01 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="send_feedback">피드백 보내기</string>
+    <string name="share_episode_timestamp_title">%s에서 에피소드 공유</string>
+    <string name="share_via">%s(으)로 공유</string>
+    <string name="share_podcast_description">공유할 형식과 플랫폼을 선택하세요</string>
+    <string name="podcast_cover_description">%s 팟캐스트 커버</string>
+    <string name="share_label_copy_link">링크 복사</string>
+    <string name="share_label_instagram_stories">스토리</string>
+    <string name="profile_change_avatar">아바타 변경</string>
     <string name="something_went_wrong_to_rate_this_podcast">문제가 발생했습니다. 나중에 다시 시도하세요.</string>
     <string name="thank_you_for_rating">평가해 주셔서 감사합니다!</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">스트리밍을 최소화할 수 있도록, 재생되는 에피소드 전체가 일시적으로 캐시됩니다.</string>
@@ -22,10 +30,6 @@ Language: ko_KR
     <string name="settings_advanced_cache_entire_playing_episode">재생 중인 에피소드 캐시</string>
     <string name="playback">재생</string>
     <string name="podcast_share_clip">클립</string>
-    <string name="download_completed_for_episode">%1$s 다운로드 완료됨</string>
-    <string name="episode_queued_for_download">다운로드 대기 중인 에피소드</string>
-    <string name="episode_was_removed">에피소드 삭제됨</string>
-    <string name="remove_downloaded_file">다운로드한 파일 제거</string>
     <string name="settings_export_database_failed">데이터베이스 내보내기 실패</string>
     <string name="settings_export_database">데이터베이스 내보내기</string>
     <string name="settings_sleep_timer_auto_restart_summary">이 기능을 켜면 마지막 일시 중지 후 5분 이내에 에피소드를 재생하는 경우 절전 타이머가 자동으로 재시작됩니다.</string>
@@ -1057,7 +1061,6 @@ Language: ko_KR
     <string name="plus_themes_icons">테마 및 아이콘</string>
     <string name="plus_thanks_for_your_support_bang">후원해 주셔서 감사합니다!</string>
     <string name="plus_slash_month">%s/월</string>
-    <string name="plus_lifetime_member">평생회원</string>
     <string name="plus_learn_more_button">더 알아보기</string>
     <string name="plus_learn_more_about_plus">Pocket Casts Plus 더 알아보기</string>
     <string name="plus_desktop_apps">데스크톱 앱</string>
@@ -1718,7 +1721,7 @@ Language: ko_KR
         <item quantity="other">에피소드 %d개</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="other">%1$d 에피소드 - %2$s 남음</item>
+        <item quantity="other" formatted="true">%1$d 에피소드 - %2$s 남음</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="other">종료 클립 핸들: %d초</item>
