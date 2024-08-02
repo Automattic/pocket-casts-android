@@ -39,6 +39,7 @@
     <string name="download">Download</string>
     <string name="downloads">Downloads</string>
     <string name="edit">Edit</string>
+    <string name="error_no_network">No network connection detected. Please try again later.</string>
     <string name="effects">Effects</string>
     <string name="episode_not_found">Episode not found</string>
     <string name="go_to_podcast">Go to podcast</string>
@@ -1785,7 +1786,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
-    <string name="log_in_no_network">No network connection detected. Please try again later.</string>
+    <string name="log_in_no_network" translatable="false">@string/error_no_network</string>
     <string name="log_in_with_google">Log in with Google</string>
     <string name="log_in_on_phone">Log in on phone</string>
     <string name="log_in_with_email">Log in with email</string>

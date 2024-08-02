@@ -70,6 +70,7 @@ class TranscriptViewModel @Inject constructor(
     fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean) {
         if (isTranscriptViewOpen.not()) return
         _uiState.value.transcript?.let { transcript ->
+            clearErrorsIfFound(transcript)
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
@@ -80,9 +81,11 @@ class TranscriptViewModel @Inject constructor(
                         cuesWithTimingSubtitle = result,
                     )
                 } catch (e: UnsupportedOperationException) {
-                    UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode)
+                    UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
+                } catch (e: UrlUtil.NoNetworkException) {
+                    UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
                 } catch (e: Exception) {
-                    UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode)
+                    UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
                 }
             }
         }
@@ -131,6 +134,15 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
+    private fun clearErrorsIfFound(transcript: Transcript) {
+        if (_uiState.value is UiState.Error) {
+            _uiState.value = UiState.TranscriptFound(
+                podcastAndEpisode = _uiState.value.podcastAndEpisode,
+                transcript = transcript,
+            )
+        }
+    }
+
     /**
      * Modifies the cues in the given [CuesWithTiming] object.
      * - Removes speaker names from the cue text using the [SpeakerRegex].
@@ -173,6 +185,7 @@ class TranscriptViewModel @Inject constructor(
 
         data class Error(
             val error: TranscriptError,
+            override val transcript: Transcript,
             override val podcastAndEpisode: PodcastAndEpisode? = null,
         ) : UiState()
     }
@@ -180,5 +193,6 @@ class TranscriptViewModel @Inject constructor(
     sealed class TranscriptError {
         data class NotSupported(val format: String) : TranscriptError()
         data object FailedToLoad : TranscriptError()
+        data object NoNetwork : TranscriptError()
     }
 }

@@ -100,7 +100,7 @@ fun TranscriptPage(
     }
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
-        transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
+        transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript,)
     }
 }
 
@@ -241,7 +241,8 @@ private fun TranscriptError(
     val errorMessage = when (val error = state.error) {
         is TranscriptError.NotSupported ->
             stringResource(LR.string.error_transcript_format_not_supported, error.format)
-
+        is TranscriptError.NoNetwork ->
+            stringResource(LR.string.error_no_network)
         is TranscriptError.FailedToLoad ->
             stringResource(LR.string.error_transcript_failed_to_load)
     }
