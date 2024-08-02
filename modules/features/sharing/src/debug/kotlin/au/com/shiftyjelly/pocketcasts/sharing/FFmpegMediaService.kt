@@ -53,9 +53,10 @@ internal class FFmpegMediaService(
                     append("-c:a copy ") // Copy audio codec
                     append("-c:v mpeg4 ") // Use mpeg4 video codec
                     append("-pix_fmt yuv420p ") // Use 4:2:0 pixel format
-                    append("-vf \"loop=${clipRange.durationInSeconds}:1\" ") // Loop the first frame to match clip's length
+                    val loopCount = (clipRange.durationInSeconds - 1).coerceAtLeast(1)
+                    append("-vf \"loop=$loopCount:1\" ") // Loop the first frame to match clip's length
                     append("-movflags faststart ") // Move metadata to the file's start for faster playback
-                    append("-y ")
+                    append("-y ") // Overwrite output file if it already exists
                     append("$ffmpegFile") // Output file
                 }
                 executeAsyncCommand(command).getOrThrow()
