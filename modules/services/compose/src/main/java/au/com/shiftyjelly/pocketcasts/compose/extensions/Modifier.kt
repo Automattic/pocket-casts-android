@@ -5,6 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -20,6 +23,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -97,10 +102,10 @@ enum class FadeDirection {
 
 fun Modifier.verticalScrollBar(
     scrollState: ScrollState,
-    viewPortHeight: Float,
     width: Dp = 4.dp,
     thumbColor: Color,
 ) = composed {
+    var viewPortHeight by remember { mutableFloatStateOf(0f) }
     val thumbAlphaAnimated by animateFloatAsState(
         targetValue = if (scrollState.isScrollInProgress) 0.8f else 0f,
         animationSpec = tween(
@@ -126,5 +131,5 @@ fun Modifier.verticalScrollBar(
             Size(width.toPx(), scrollBarHeight),
             thumbAlphaAnimated,
         )
-    }
+    }.onGloballyPositioned { viewPortHeight = it.boundsInParent().height }
 }

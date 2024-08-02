@@ -20,15 +20,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -154,7 +148,6 @@ private fun TranscriptContent(
             .background(colors.backgroundColor()),
     ) {
         val scrollState = rememberScrollState()
-        var viewportHeight by rememberSaveable { mutableFloatStateOf(0f) }
         val textModifier = Modifier
             .padding(horizontal = 16.dp)
             .padding(bottom = bottomPadding)
@@ -162,11 +155,7 @@ private fun TranscriptContent(
             .verticalScrollBar(
                 thumbColor = colors.textColor(),
                 scrollState = scrollState,
-                viewPortHeight = viewportHeight,
             )
-            .onGloballyPositioned {
-                viewportHeight = it.boundsInParent().height
-            }
 
         if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
             /* Display html content using Android text view.
