@@ -8,7 +8,6 @@ import androidx.media3.common.Format
 import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
-import androidx.media3.extractor.text.CuesWithTimingSubtitle
 import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -93,13 +92,11 @@ class TranscriptViewModel @Inject constructor(
         when (transcript.type) {
             TranscriptFormat.HTML.mimeType -> {
                 // Html content is added as single large cue
-                CuesWithTimingSubtitle(
-                    ImmutableList.of(
-                        CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
-                            0,
-                            0,
-                        ),
+                ImmutableList.of(
+                    CuesWithTiming(
+                        ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
+                        0,
+                        0,
                     ),
                 )
             }
@@ -128,7 +125,7 @@ class TranscriptViewModel @Inject constructor(
                             }
                         }
                     }
-                    CuesWithTimingSubtitle(result.build())
+                    result.build()
                 }
             }
         }
@@ -171,7 +168,7 @@ class TranscriptViewModel @Inject constructor(
         data class TranscriptLoaded(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
-            val cuesWithTimingSubtitle: CuesWithTimingSubtitle,
+            val cuesWithTimingSubtitle: List<CuesWithTiming>,
         ) : UiState()
 
         data class Error(

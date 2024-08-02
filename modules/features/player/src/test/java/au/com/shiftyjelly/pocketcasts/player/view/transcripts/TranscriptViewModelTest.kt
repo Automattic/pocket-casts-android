@@ -25,7 +25,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -149,7 +148,7 @@ class TranscriptViewModelTest {
 
         viewModel.uiState.test {
             verifyNoInteractions(subtitleParserFactory)
-            assertTrue((awaitItem() as UiState.TranscriptLoaded).cuesWithTimingSubtitle.getCues(0).first().text == htmlText)
+            assertTrue((awaitItem() as UiState.TranscriptLoaded).cuesWithTimingSubtitle.first().cues.first().text == htmlText)
         }
     }
 

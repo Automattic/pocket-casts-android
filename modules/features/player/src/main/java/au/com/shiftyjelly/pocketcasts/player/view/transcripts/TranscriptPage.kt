@@ -132,8 +132,8 @@ private fun TranscriptContent(
         withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
             with(state.cuesWithTimingSubtitle) {
                 append(blankLines)
-                (0 until eventTimeCount).forEach { index ->
-                    getCues(getEventTime(index)).forEach { cue ->
+                (0 until count()).forEach { index ->
+                    get(index).cues.forEach { cue ->
                         withStyle(style = defaultTextStyle) { append(cue.text) }
                         append(" ")
                     }
