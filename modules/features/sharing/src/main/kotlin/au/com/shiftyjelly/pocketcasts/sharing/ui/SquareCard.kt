@@ -119,32 +119,30 @@ private fun SquareCard(
     }
 }
 
-@ShowkaseComposable(name = "SquarePodcastCard", group = "Sharing", styleName = "Light")
-@Preview(name = "SquarePodcastCardLight")
-@Composable
-fun SquarePodcastCardLightPreview() = SquarePodcastCardPreview(
-    baseColor = Color(0xFFFBCB04),
-)
-
-@ShowkaseComposable(name = "SquarePodcastCard", group = "Sharing", styleName = "Dark")
+@ShowkaseComposable(name = "Square podcast card", group = "Sharing")
 @Preview(name = "SquarePodcastCardDark")
 @Composable
 fun SquarePodcastCardDarkPreview() = SquarePodcastCardPreview(
     baseColor = Color(0xFFEC0404),
 )
 
-@ShowkaseComposable(name = "SquareEpisodeCard", group = "Sharing", styleName = "Light")
-@Preview(name = "SquareEpisodeCardLight")
+@Preview(name = "SquarePodcastCardLight")
 @Composable
-fun SquareEpisodeCardLightPreview() = SquareEpisodeCardPreview(
+private fun SquarePodcastCardLightPreview() = SquarePodcastCardPreview(
     baseColor = Color(0xFFFBCB04),
 )
 
-@ShowkaseComposable(name = "SquareEpisodeCard", group = "Sharing", styleName = "Dark")
+@ShowkaseComposable(name = "Square episode card", group = "Sharing")
 @Preview(name = "SquareEpisodeCardDark")
 @Composable
 fun SquareEpisodeCardDarkPreview() = SquareEpisodeCardPreview(
     baseColor = Color(0xFFEC0404),
+)
+
+@Preview(name = "SquareEpisodeCardLight")
+@Composable
+private fun SquareEpisodeCardLightPreview() = SquareEpisodeCardPreview(
+    baseColor = Color(0xFFFBCB04),
 )
 
 @Composable

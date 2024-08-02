@@ -407,7 +407,7 @@ private fun BoxWithConstraintsScope.ClipBox(
     }
 }
 
-@ShowkaseComposable(name = "ClipSelector", group = "Sharing")
+@ShowkaseComposable(name = "Clip selector", group = "Sharing")
 @Preview(name = "Paused", device = Devices.PortraitRegular)
 @Composable
 fun ClipSelectorPausedPreview() = ClipSelectorPreview()
@@ -467,7 +467,10 @@ private fun ClipSelectorPreview(
 ) {
     val shareColors = ShareColors(Color(0xFFEC0404))
     Box(
-        modifier = Modifier.background(shareColors.background),
+        modifier = Modifier.background(
+            color = shareColors.background,
+            shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
+        ),
     ) {
         ClipSelector(
             episodeDuration = 5.minutes,

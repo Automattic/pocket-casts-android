@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import dev.shreyaspatil.capturable.controller.CaptureController
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
@@ -177,35 +176,29 @@ private fun HorizontalShareEpisodePage(
     )
 }
 
-@ShowkaseComposable(name = "ShareEpisodeVerticalRegularPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeVerticalRegularPreview", device = Devices.PortraitRegular)
 @Composable
-fun ShareEpisodeVerticalRegularPreview() = ShareEpisodePagePreview()
+private fun ShareEpisodeVerticalRegularPreview() = ShareEpisodePagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeVerticalSmallPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeVerticalSmallPreview", device = Devices.PortraitSmall)
 @Composable
-fun ShareEpisodeVerticalSmallPreviewPreview() = ShareEpisodePagePreview()
+private fun ShareEpisodeVerticalSmallPreviewPreview() = ShareEpisodePagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeVerticalTabletPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeVerticalTabletPreview", device = Devices.PortraitTablet)
 @Composable
-fun ShareEpisodeVerticalTabletPreview() = ShareEpisodePagePreview()
+private fun ShareEpisodeVerticalTabletPreview() = ShareEpisodePagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeHorizontalRegularPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeHorizontalRegularPreview", device = Devices.LandscapeRegular)
 @Composable
-fun ShareEpisodeHorizontalRegularPreview() = ShareEpisodePagePreview()
+private fun ShareEpisodeHorizontalRegularPreview() = ShareEpisodePagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeHorizontalSmallPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeHorizontalSmallPreview", device = Devices.LandscapeSmall)
 @Composable
-fun ShareEpisodeHorizontalSmallPreviewPreview() = ShareEpisodePagePreview()
+private fun ShareEpisodeHorizontalSmallPreviewPreview() = ShareEpisodePagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeHorizontalTabletPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeHorizontalTabletPreview", device = Devices.LandscapeTablet)
 @Composable
-fun ShareEpisodeHorizontalTabletPreview() = ShareEpisodePagePreview()
+private fun ShareEpisodeHorizontalTabletPreview() = ShareEpisodePagePreview()
 
 @Composable
 private fun ShareEpisodePagePreview(
