@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 13:54:03+0000
+Translation-Revision-Date: 2024-08-02 10:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="send_feedback">Skicka feedback</string>
+    <string name="share_episode_timestamp_title">Dela avsnitt vid %s</string>
+    <string name="share_via">Dela via %s</string>
+    <string name="share_podcast_description">Välj ett format och en plattform att dela till</string>
+    <string name="podcast_cover_description">Omslag till %s-podcasten</string>
+    <string name="share_label_copy_link">Kopiera länk</string>
+    <string name="share_label_instagram_stories">Berättelser</string>
+    <string name="profile_change_avatar">Ändra profilbild</string>
     <string name="something_went_wrong_to_rate_this_podcast">Något gick fel. Försök igen senare.</string>
     <string name="thank_you_for_rating">Tack för ditt betyg!</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">Hela avsnittet som spelas upp cachelagras tillfälligt för att minimera streaming.</string>
@@ -22,10 +30,6 @@ Language: sv_SE
     <string name="settings_advanced_cache_entire_playing_episode">Cacheminne för uppspelning av avsnitt</string>
     <string name="playback">Uppspelning</string>
     <string name="podcast_share_clip">Klipp</string>
-    <string name="download_completed_for_episode">Ladda ner helt för %1$s</string>
-    <string name="episode_queued_for_download">Avsnitt placerat i kö för nedladdning</string>
-    <string name="episode_was_removed">Avsnittet togs bort</string>
-    <string name="remove_downloaded_file">Ta bort nedladdad fil</string>
     <string name="settings_export_database_failed">Export av databas misslyckades</string>
     <string name="settings_export_database">Exportera databas</string>
     <string name="settings_sleep_timer_auto_restart_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om automatiskt om du spelar upp ett avsnitt inom 5 minuter efter den senaste pausen.</string>
@@ -1057,7 +1061,6 @@ Language: sv_SE
     <string name="plus_themes_icons">Teman och ikoner</string>
     <string name="plus_thanks_for_your_support_bang">Tack för ditt stöd!</string>
     <string name="plus_slash_month">%s/månad</string>
-    <string name="plus_lifetime_member">Livstidsmedlem</string>
     <string name="plus_learn_more_button">Lär dig mer</string>
     <string name="plus_learn_more_about_plus">Läs mer om Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Dator-appar</string>
@@ -1719,8 +1722,8 @@ Language: sv_SE
         <item quantity="other">%d avsnitt</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="one">%1$d avsnitt - %2$s kvar</item>
-        <item quantity="other">%1$d avsnitt - %2$s kvar</item>
+        <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>
+        <item quantity="other" formatted="true">%1$d avsnitt - %2$s kvar</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handtag för slutklipp: %d sekund</item>

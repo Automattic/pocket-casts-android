@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 11:54:03+0000
+Translation-Revision-Date: 2024-08-01 13:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="send_feedback">傳送意見回饋</string>
+    <string name="share_episode_timestamp_title">分享從「%s」開始的單集</string>
+    <string name="share_via">分享管道：%s</string>
+    <string name="share_podcast_description">選擇要分享的格式和平台</string>
+    <string name="podcast_cover_description">「%s」Podcast 的封面</string>
+    <string name="share_label_copy_link">複製連結</string>
+    <string name="share_label_instagram_stories">限時動態</string>
+    <string name="profile_change_avatar">變更個人頭像</string>
     <string name="something_went_wrong_to_rate_this_podcast">發生錯誤。 請稍後再試一次</string>
     <string name="thank_you_for_rating">謝謝你的評分！</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">系統會暫時快取播放中的完整單集，以便將串流最小化。</string>
@@ -22,10 +30,6 @@ Language: zh_TW
     <string name="settings_advanced_cache_entire_playing_episode">快取播放單集</string>
     <string name="playback">播放</string>
     <string name="podcast_share_clip">片段</string>
-    <string name="download_completed_for_episode">「%1$s」已下載完成</string>
-    <string name="episode_queued_for_download">單集已排入下載佇列</string>
-    <string name="episode_was_removed">單集已移除</string>
-    <string name="remove_downloaded_file">移除已下載的檔案</string>
     <string name="settings_export_database_failed">資料庫匯出失敗</string>
     <string name="settings_export_database">匯出資料庫</string>
     <string name="settings_sleep_timer_auto_restart_summary">在睡眠計時器開啟的狀態下，若你在最後暫停的 5 分鐘內播放一集單集，計時器就會自動重新啟動。</string>
@@ -1057,7 +1061,6 @@ Language: zh_TW
     <string name="plus_themes_icons">佈景主題與圖示</string>
     <string name="plus_thanks_for_your_support_bang">感謝你的支持！</string>
     <string name="plus_slash_month">%s /月</string>
-    <string name="plus_lifetime_member">終身會員</string>
     <string name="plus_learn_more_button">進一步了解</string>
     <string name="plus_learn_more_about_plus">深入了解 Pocket Casts Plus</string>
     <string name="plus_desktop_apps">桌上型電腦應用程式</string>
@@ -1718,7 +1721,7 @@ Language: zh_TW
         <item quantity="other">%d 集</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="other">%1$d 集單集 - 剩餘 %2$s</item>
+        <item quantity="other" formatted="true">%1$d 集單集 - 剩餘 %2$s</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="other">結尾片段控點：%d 秒</item>
