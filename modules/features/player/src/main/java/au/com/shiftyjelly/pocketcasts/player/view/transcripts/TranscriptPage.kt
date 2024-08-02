@@ -34,6 +34,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -100,7 +101,7 @@ fun TranscriptPage(
     }
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
-        transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript,)
+        transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
     }
 }
 
@@ -111,17 +112,60 @@ private fun EmptyView(
     Box(modifier = modifier.fillMaxSize())
 }
 
-@OptIn(UnstableApi::class)
 @Composable
 private fun TranscriptContent(
     state: UiState.TranscriptLoaded,
     colors: DefaultColors,
     modifier: Modifier,
 ) {
-    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
     val configuration = LocalConfiguration.current
     val bottomPadding = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 125.dp
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(colors.backgroundColor()),
+    ) {
+        if (state.isTranscriptEmpty) {
+            TextP40(
+                text = stringResource(LR.string.transcript_empty),
+                color = colors.textColor(),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 60.dp),
+            )
+        } else {
+            ScrollableTranscriptTextView(
+                state,
+                colors,
+                bottomPadding,
+            )
+        }
 
+        GradientView(
+            baseColor = colors.backgroundColor(),
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            fadeDirection = FadeDirection.TopToBottom,
+        )
+
+        GradientView(
+            baseColor = colors.backgroundColor(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = bottomPadding),
+            fadeDirection = FadeDirection.BottomToTop,
+        )
+    }
+}
+
+@OptIn(UnstableApi::class)
+@Composable
+private fun ScrollableTranscriptTextView(
+    state: UiState.TranscriptLoaded,
+    colors: DefaultColors,
+    bottomPadding: Dp,
+) {
+    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
     /* Blank lines are appended to add content padding */
     val blankLines = if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
         "<br><br>"
@@ -142,71 +186,49 @@ private fun TranscriptContent(
             }
         }
     }
+    val scrollState = rememberScrollState()
+    val textModifier = Modifier
+        .padding(horizontal = 16.dp)
+        .padding(bottom = bottomPadding)
+        .verticalScroll(scrollState)
+        .verticalScrollBar(
+            thumbColor = colors.textColor(),
+            scrollState = scrollState,
+            contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
+        )
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(colors.backgroundColor()),
-    ) {
-        val scrollState = rememberScrollState()
-        val textModifier = Modifier
-            .padding(horizontal = 16.dp)
-            .padding(bottom = bottomPadding)
-            .verticalScroll(scrollState)
-            .verticalScrollBar(
-                thumbColor = colors.textColor(),
-                scrollState = scrollState,
-                contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
-            )
-
-        if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
-            /* Display html content using Android text view.
+    if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
+        /* Display html content using Android text view.
                Html rendering in Compose text view is available in Compose 1.7.0 beta which is not yet production ready: https://rb.gy/ev7182 */
-            HtmlText(
-                html = displayString.toString(),
-                color = colors.textColor(),
-                textStyleResId = UR.style.H40,
-                selectable = true,
-                modifier = textModifier,
-            )
-        } else {
-            val customMenu = buildList {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    add(CustomMenuItemOption.Share)
-                }
-                add(CustomMenuItemOption.SelectAll)
+        HtmlText(
+            html = displayString.toString(),
+            color = colors.textColor(),
+            textStyleResId = UR.style.H40,
+            selectable = true,
+            modifier = textModifier,
+        )
+    } else {
+        val customMenu = buildList {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                add(CustomMenuItemOption.Share)
             }
-            CompositionLocalProvider(
-                LocalTextToolbar provides CustomTextToolbar(
-                    LocalView.current,
-                    customMenu,
-                    LocalClipboardManager.current,
-                    displayString,
-                ),
-            ) {
-                SelectionContainer {
-                    Text(
-                        text = displayString,
-                        modifier = textModifier,
-                    )
-                }
+            add(CustomMenuItemOption.SelectAll)
+        }
+        CompositionLocalProvider(
+            LocalTextToolbar provides CustomTextToolbar(
+                LocalView.current,
+                customMenu,
+                LocalClipboardManager.current,
+                displayString,
+            ),
+        ) {
+            SelectionContainer {
+                Text(
+                    text = displayString,
+                    modifier = textModifier,
+                )
             }
         }
-
-        GradientView(
-            baseColor = colors.backgroundColor(),
-            modifier = Modifier
-                .align(Alignment.TopCenter),
-            fadeDirection = FadeDirection.TopToBottom,
-        )
-
-        GradientView(
-            baseColor = colors.backgroundColor(),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = bottomPadding),
-            fadeDirection = FadeDirection.BottomToTop,
-        )
     }
 }
 
@@ -241,8 +263,10 @@ private fun TranscriptError(
     val errorMessage = when (val error = state.error) {
         is TranscriptError.NotSupported ->
             stringResource(LR.string.error_transcript_format_not_supported, error.format)
+
         is TranscriptError.NoNetwork ->
             stringResource(LR.string.error_no_network)
+
         is TranscriptError.FailedToLoad ->
             stringResource(LR.string.error_transcript_failed_to_load)
     }

@@ -94,14 +94,19 @@ class TranscriptViewModel @Inject constructor(
     private suspend fun buildSubtitleCues(transcript: Transcript) = withContext(ioDispatcher) {
         when (transcript.type) {
             TranscriptFormat.HTML.mimeType -> {
-                // Html content is added as single large cue
-                ImmutableList.of(
-                    CuesWithTiming(
-                        ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
-                        0,
-                        0,
-                    ),
-                )
+                val content = urlUtil.contentString(transcript.url)
+                if (content.trim().isEmpty()) {
+                    emptyList<CuesWithTiming>()
+                } else {
+                    // Html content is added as single large cue
+                    ImmutableList.of(
+                        CuesWithTiming(
+                            ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
+                            0,
+                            0,
+                        ),
+                    )
+                }
             }
             else -> {
                 val format = Format.Builder()
@@ -181,7 +186,9 @@ class TranscriptViewModel @Inject constructor(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
             val cuesWithTimingSubtitle: List<CuesWithTiming>,
-        ) : UiState()
+        ) : UiState() {
+            val isTranscriptEmpty: Boolean = cuesWithTimingSubtitle.isEmpty()
+        }
 
         data class Error(
             val error: TranscriptError,
