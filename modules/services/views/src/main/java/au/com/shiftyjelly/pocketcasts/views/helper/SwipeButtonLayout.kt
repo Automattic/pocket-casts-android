@@ -141,7 +141,6 @@ sealed interface SwipeButton {
     class ShareButton(
         swipeSource: EpisodeItemTouchHelper.SwipeSource,
         fragmentManager: FragmentManager,
-        context: Context,
         viewModel: SwipeButtonLayoutViewModel,
     ) : SwipeButton {
 
@@ -154,7 +153,7 @@ sealed interface SwipeButton {
             if (episode !is PodcastEpisode) {
                 throw IllegalStateException("Can only share podcast episodes: $episode")
             }
-            viewModel.share(episode, fragmentManager, context, swipeSource)
+            viewModel.share(episode, fragmentManager, swipeSource)
         }
     }
 }
@@ -164,7 +163,6 @@ class SwipeButtonLayoutFactory(
     private val onItemUpdated: (BaseEpisode, RowIndex) -> Unit,
     private val showShareButton: Boolean = true,
     private val defaultUpNextSwipeAction: () -> Settings.UpNextAction,
-    private val context: Context,
     private val fragmentManager: FragmentManager,
     private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
 ) {
@@ -205,7 +203,6 @@ class SwipeButtonLayoutFactory(
                 share = SwipeButton.ShareButton(
                     swipeSource = swipeSource,
                     fragmentManager = fragmentManager,
-                    context = context,
                     viewModel = swipeButtonLayoutViewModel,
                 ),
             ),

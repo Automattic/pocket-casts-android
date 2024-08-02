@@ -41,7 +41,6 @@ class SwipeButtonLayoutViewModel @Inject constructor(
     fun share(
         episode: PodcastEpisode,
         fragmentManager: FragmentManager,
-        context: Context,
         swipeSource: EpisodeItemTouchHelper.SwipeSource,
     ) {
         viewModelScope.launch {
@@ -52,14 +51,9 @@ class SwipeButtonLayoutViewModel @Inject constructor(
 
             val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) ?: return@launch
 
-            shareDialogFactory.create(
-                episode = episode,
-                podcast = podcast,
-                fragmentManager = fragmentManager,
-                context = context,
-                shouldShowPodcast = false,
-                analyticsTracker = analyticsTracker,
-            ).show(sourceView = SourceView.EPISODE_SWIPE_ACTION)
+            shareDialogFactory
+                .shareEpisode(podcast, episode, SourceView.EPISODE_SWIPE_ACTION)
+                .show(fragmentManager, "share_dialog")
         }
     }
 

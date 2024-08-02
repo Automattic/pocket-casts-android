@@ -56,6 +56,7 @@ interface PodcastManager {
 
     fun exists(podcastUuid: String): Boolean
     fun observeEpisodeCountByEpisodeUuid(uuid: String): Flow<Int>
+    fun observeEpisodeCountByPodcatUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
@@ -158,4 +159,6 @@ interface PodcastManager {
     suspend fun updateArchiveAfterPlaying(uuid: String, value: AutoArchiveAfterPlaying)
     suspend fun updateArchiveAfterInactive(uuid: String, value: AutoArchiveInactive)
     suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit)
+
+    fun updatePodcastLatestEpisode(podcast: Podcast)
 }

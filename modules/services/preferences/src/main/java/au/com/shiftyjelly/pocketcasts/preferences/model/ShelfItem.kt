@@ -34,6 +34,13 @@ enum class ShelfItem(
         showIf = { it is PodcastEpisode },
         analyticsValue = "star_episode",
     ),
+    Transcript(
+        id = "transcript",
+        titleId = { LR.string.transcript },
+        iconId = { IR.drawable.ic_transcript_24 },
+        showIf = { it is PodcastEpisode },
+        analyticsValue = "transcript",
+    ),
     Share(
         id = "share",
         titleId = { LR.string.podcast_share_episode },

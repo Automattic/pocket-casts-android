@@ -209,8 +209,11 @@ class ExpandedUserView @JvmOverloads constructor(
 ) : UserView(context, attrs, defStyleAttr) {
     override val layoutResource: Int
         get() = R.layout.view_expanded_user
+
     val lblPaymentStatus: TextView
         get() = findViewById(R.id.lblPaymentStatus)
+
+    private var onUserViewClickListener: OnUserViewClickListener? = null
 
     override fun update(signInState: SignInState?) {
         super.update(signInState)
@@ -237,6 +240,10 @@ class ExpandedUserView @JvmOverloads constructor(
         }
     }
 
+    fun setOnUserViewClick(onUserViewClickListener: OnUserViewClickListener?) {
+        this.onUserViewClickListener = onUserViewClickListener
+    }
+
     private fun setupLabelsForPaidUser(status: SubscriptionStatus.Paid, signInState: SignInState) {
         if (status.autoRenew) {
             val strMonthly = context.getString(LR.string.profile_monthly)
@@ -250,7 +257,7 @@ class ExpandedUserView @JvmOverloads constructor(
             lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         } else {
             if (status.platform == SubscriptionPlatform.GIFT) {
-                if (signInState.isLifetimePlus) {
+                if (signInState.isPocketCastsChampion) {
                     lblPaymentStatus.text = context.resources.getString(LR.string.plus_thanks_for_your_support_bang)
                 } else {
                     val giftDaysString = context.resources.getStringPluralDaysMonthsOrYears(status.giftDays)
@@ -260,9 +267,12 @@ class ExpandedUserView @JvmOverloads constructor(
                 lblPaymentStatus.text = context.getString(LR.string.profile_payment_cancelled)
             }
 
-            if (signInState.isLifetimePlus) {
-                lblSignInStatus?.text = context.resources.getString(LR.string.plus_lifetime_member)
+            if (signInState.isPocketCastsChampion) {
+                lblSignInStatus?.text = context.resources.getString(LR.string.pocket_casts_champion)
                 lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_02))
+                lblSignInStatus?.setOnClickListener {
+                    onUserViewClickListener?.onPocketCastsChampionClick()
+                }
             } else {
                 lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires, status.expiry.toLocalizedFormatLongStyle())
                 lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
@@ -286,4 +296,8 @@ class ExpandedUserView @JvmOverloads constructor(
             lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         }
     }
+}
+
+interface OnUserViewClickListener {
+    fun onPocketCastsChampionClick()
 }

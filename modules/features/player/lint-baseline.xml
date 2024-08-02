@@ -261,7 +261,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/UpNextFragment.kt"
-            line="348"
+            line="347"
             column="13"/>
     </issue>
 

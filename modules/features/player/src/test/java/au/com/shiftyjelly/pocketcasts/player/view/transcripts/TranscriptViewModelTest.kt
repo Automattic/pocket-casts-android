@@ -23,7 +23,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class TranscriptViewModelTest {
@@ -62,12 +66,44 @@ class TranscriptViewModelTest {
     }
 
     @Test
+    fun `given transcript view is not open, when transcript load invoked, then transcript is not parsed and loaded`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = false)
+
+        viewModel.uiState.test {
+            verifyNoInteractions(subtitleParserFactory)
+            assertEquals(transcript, (awaitItem() as UiState.TranscriptFound).transcript)
+        }
+    }
+
+    @Test
+    fun `given transcript view is open, when transcript load invoked, then transcript is parsed`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        whenever(urlUtil.contentBytes(anyOrNull())).thenReturn(byteArrayOf())
+        val parser = mock<SubtitleParser>()
+        whenever(subtitleParserFactory.create(anyOrNull())).thenReturn(parser)
+
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            verify(parser).parse(any(), any(), any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun `given transcript is supported, when transcript load invoked, then loaded state is returned`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         initViewModel()
 
-        viewModel.parseAndLoadTranscript()
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
         viewModel.uiState.test {
             assertEquals(transcript, (awaitItem() as UiState.TranscriptLoaded).transcript)
@@ -80,7 +116,7 @@ class TranscriptViewModelTest {
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(false)
         initViewModel()
 
-        viewModel.parseAndLoadTranscript()
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.NotSupported)
@@ -94,10 +130,26 @@ class TranscriptViewModelTest {
         whenever(urlUtil.contentBytes(any())).thenThrow(RuntimeException())
         initViewModel()
 
-        viewModel.parseAndLoadTranscript()
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
         viewModel.uiState.test {
             assertTrue((awaitItem() as UiState.Error).error is TranscriptError.FailedToLoad)
+        }
+    }
+
+    @Test
+    fun `given mimetype html, when transcript load invoked, then transcript is not parsed and url content is returned in single cue`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        val htmlText = "<html>content</html>"
+        whenever(urlUtil.contentString(anyOrNull())).thenReturn(htmlText)
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            verifyNoInteractions(subtitleParserFactory)
+            assertTrue((awaitItem() as UiState.TranscriptLoaded).cuesWithTimingSubtitle.getCues(0).first().text == htmlText)
         }
     }
 

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.annotation.SuppressLint
 import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.audio.AudioProcessor.AudioFormat
@@ -76,6 +77,8 @@ class ShiftyTrimSilenceProcessor(
         return if (enabled) inputAudioFormat else AudioFormat.NOT_SET
     }
 
+    /* Suppressing the warning as calling super breaks trim silence functionality. */
+    @SuppressLint("MissingSuperCall")
     override fun isActive(): Boolean = enabled
 
     override fun queueInput(inputBuffer: ByteBuffer) {

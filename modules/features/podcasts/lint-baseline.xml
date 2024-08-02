@@ -8,7 +8,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/episode/EpisodeFragment.kt"
-            line="198"
+            line="193"
             column="18"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="181"
+            line="180"
             column="18"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/episode/EpisodeFragment.kt"
-            line="345"
+            line="340"
             column="29"/>
     </issue>
 
@@ -283,7 +283,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="249"
+            line="247"
             column="9"/>
     </issue>
 
@@ -294,7 +294,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="748"
+            line="746"
             column="13"/>
     </issue>
 
@@ -305,7 +305,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="757"
+            line="755"
             column="17"/>
     </issue>
 
@@ -316,7 +316,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="762"
+            line="760"
             column="17"/>
     </issue>
 
@@ -327,7 +327,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="767"
+            line="765"
             column="17"/>
     </issue>
 
@@ -338,7 +338,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="772"
+            line="770"
             column="17"/>
     </issue>
 
@@ -349,7 +349,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="777"
+            line="775"
             column="17"/>
     </issue>
 
@@ -360,7 +360,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="782"
+            line="780"
             column="17"/>
     </issue>
 
@@ -371,7 +371,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="812"
+            line="810"
             column="21"/>
     </issue>
 
@@ -382,7 +382,7 @@
         errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/podcast/PodcastFragment.kt"
-            line="869"
+            line="867"
             column="29"/>
     </issue>
 
@@ -393,7 +393,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="238"
+            line="237"
             column="21"/>
     </issue>
 
@@ -404,7 +404,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="271"
+            line="270"
             column="13"/>
     </issue>
 
@@ -415,7 +415,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="278"
+            line="277"
             column="21"/>
     </issue>
 
@@ -426,7 +426,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="287"
+            line="286"
             column="21"/>
     </issue>
 
@@ -437,7 +437,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="301"
+            line="300"
             column="21"/>
     </issue>
 
@@ -448,7 +448,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="314"
+            line="313"
             column="21"/>
     </issue>
 
@@ -459,7 +459,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="325"
+            line="324"
             column="25"/>
     </issue>
 
@@ -470,7 +470,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
-            line="337"
+            line="336"
             column="25"/>
     </issue>
 
@@ -503,7 +503,7 @@
         errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/episode/EpisodeFragment.kt"
-            line="343"
+            line="338"
             column="29"/>
     </issue>
 

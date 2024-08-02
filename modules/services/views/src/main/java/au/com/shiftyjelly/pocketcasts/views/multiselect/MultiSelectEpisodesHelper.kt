@@ -438,14 +438,9 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 return@launch
             }
 
-            shareDialogFactory.create(
-                episode = episode,
-                podcast = podcast,
-                fragmentManager = fragmentManager,
-                context = context,
-                shouldShowPodcast = false,
-                analyticsTracker = analyticsTracker,
-            ).show(sourceView = SourceView.MULTI_SELECT)
+            shareDialogFactory
+                .shareEpisode(podcast, episode, SourceView.MULTI_SELECT)
+                .show(fragmentManager, "share_dialog")
         }
 
         closeMultiSelect()
