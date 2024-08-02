@@ -46,10 +46,12 @@ fun NewGiveRatingHeader() {
 fun Star(index: Int, starDrawable: Painter) {
     var cycleCount by remember { mutableIntStateOf(0) }
 
-    val offsetY = remember { Animatable(0f) }
-    val alpha = remember { Animatable(1f) }
+    val offsetY = remember { Animatable(-10f) }
+    val alpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
+        delay(2000)
+
         while (cycleCount < timesToRepeatAnimation) {
             delay(index * 50L)
 
@@ -64,7 +66,6 @@ fun Star(index: Int, starDrawable: Painter) {
                 animationSpec = offsetYAnimationSpec,
             )
 
-            // Pause
             delay(2000)
 
             // Fade out and move up
@@ -82,8 +83,8 @@ fun Star(index: Int, starDrawable: Painter) {
         }
 
         // Ensure the star remains visible after the loop
-        alpha.snapTo(1f)
         offsetY.snapTo(0f)
+        alpha.snapTo(1f)
     }
 
     Image(
@@ -92,17 +93,17 @@ fun Star(index: Int, starDrawable: Painter) {
         modifier = Modifier
             .offset(y = offsetY.value.dp)
             .alpha(alpha.value)
-            .size(33.dp),
+            .size(40.dp),
     )
 }
 
 private val alphaAnimationSpec = tween<Float>(
-    durationMillis = 300,
+    durationMillis = 200,
     easing = LinearOutSlowInEasing,
 )
 
 private val offsetYAnimationSpec = spring(
-    dampingRatio = 1f,
+    dampingRatio = 0.2f,
     stiffness = 381.47f,
     visibilityThreshold = 0.01f,
 )
