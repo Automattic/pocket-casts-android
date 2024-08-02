@@ -25,6 +25,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -106,6 +107,7 @@ fun Modifier.verticalScrollBar(
     thumbColor: Color,
 ) = composed {
     var viewPortHeight by remember { mutableFloatStateOf(0f) }
+    val miScrollBarHeight = LocalDensity.current.run { 24.dp.toPx() }
     val thumbAlphaAnimated by animateFloatAsState(
         targetValue = if (scrollState.isScrollInProgress) 0.8f else 0f,
         animationSpec = tween(
@@ -122,7 +124,7 @@ fun Modifier.verticalScrollBar(
         }
         val contentHeight = size.height
         val scrollBarHeight = viewPortHeight * viewPortHeight / contentHeight
-        val scrollHeight = viewPortHeight - scrollBarHeight
+        val scrollHeight = (viewPortHeight - scrollBarHeight).coerceAtLeast(miScrollBarHeight)
         val scrollOffset = scrollHeight * scrollState.value / scrollState.maxValue
 
         drawRect(
