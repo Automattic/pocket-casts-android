@@ -11,7 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowLoadingButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -167,6 +172,7 @@ private fun VerticalClipPage(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.padding(horizontal = 16.dp),
                     ) {
+                        var isClippingAudio by remember { mutableStateOf(false) }
                         RowButton(
                             text = "Link",
                             onClick = {
@@ -180,19 +186,34 @@ private fun VerticalClipPage(
                             includePadding = false,
                             modifier = Modifier.weight(1f),
                         )
-                        RowButton(
-                            text = "Audio",
-                            onClick = {
-                                scope.launch {
-                                    listener.onShareClipAudio(podcast, episode, clipRange)
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
-                            textColor = shareColors.clipButtonText,
-                            elevation = null,
-                            includePadding = false,
-                            modifier = Modifier.weight(1f),
-                        )
+                        if (isClippingAudio) {
+                            RowLoadingButton(
+                                text = "",
+                                isLoading = isClippingAudio,
+                                onClick = {},
+                                colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+                                textColor = shareColors.clipButtonText,
+                                includePadding = false,
+                                modifier = Modifier.weight(1f),
+                            )
+                        } else {
+                            RowButton(
+                                text = "Audio",
+                                enabled = !isClippingAudio,
+                                onClick = {
+                                    isClippingAudio = true
+                                    scope.launch {
+                                        listener.onShareClipAudio(podcast, episode, clipRange)
+                                        isClippingAudio = false
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+                                textColor = shareColors.clipButtonText,
+                                elevation = null,
+                                includePadding = false,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
                         RowButton(
                             text = "Video",
                             onClick = {

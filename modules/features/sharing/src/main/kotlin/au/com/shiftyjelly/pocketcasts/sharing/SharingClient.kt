@@ -34,10 +34,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import coil.executeBlocking
 import coil.imageLoader
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
-import javax.inject.Inject
 import kotlin.time.Duration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -48,32 +46,21 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeMod
 
 class SharingClient(
     private val context: Context,
+    private val mediaService: MediaService,
     tracker: AnalyticsTracker,
-    private val displayPodcastCover: Boolean,
-    private val showCustomCopyFeedback: Boolean,
-    private val hostUrl: String,
-    private val shareStarter: ShareStarter,
+    private val displayPodcastCover: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
+    private val showCustomCopyFeedback: Boolean = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
+    private val hostUrl: String = SERVER_SHORT_URL,
+    private val shareStarter: ShareStarter = object : ShareStarter {
+        override fun start(context: Context, intent: Intent) {
+            context.startActivity(intent)
+        }
+
+        override fun copyLink(context: Context, data: ClipData) {
+            requireNotNull(context.getSystemService<ClipboardManager>()).setPrimaryClip(data)
+        }
+    },
 ) {
-    @Inject constructor(
-        @ApplicationContext context: Context,
-        tracker: AnalyticsTracker,
-    ) : this(
-        context = context,
-        tracker = tracker,
-        displayPodcastCover = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
-        showCustomCopyFeedback = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
-        hostUrl = SERVER_SHORT_URL,
-        shareStarter = object : ShareStarter {
-            override fun start(context: Context, intent: Intent) {
-                context.startActivity(intent)
-            }
-
-            override fun copyLink(context: Context, data: ClipData) {
-                requireNotNull(context.getSystemService<ClipboardManager>()).setPrimaryClip(data)
-            }
-        },
-    )
-
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()
 
     private val analytics = SharingAnalytics(tracker)
@@ -86,7 +73,7 @@ class SharingClient(
         Timber.tag("SharingClient").e(t, "Failed to share a request: $request")
         SharingResponse(
             isSuccsessful = false,
-            feedbackMessage = t.message,
+            feedbackMessage = context.getString(LR.string.error),
         )
     }
 
@@ -144,6 +131,24 @@ class SharingClient(
                 feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
             )
         }
+        is SharingRequest.Data.ClipAudio -> when (platform) {
+            Instagram -> {
+                error("Not implemented yet")
+            }
+            WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
+                val file = mediaService.clipAudio(data.podcast, data.episode, data.range).getOrThrow()
+                Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .setType("audio/mp3")
+                    .setExtraStream(file)
+                    .setPackage(platform.packageId)
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                )
+            }
+        }
     }
 
     private fun Intent.share() {
@@ -193,6 +198,8 @@ data class SharingRequest internal constructor(
         fun episodeFile(podcast: Podcast, episode: PodcastEpisode) = Builder(Data.EpisodeFile(podcast, episode))
 
         fun clipLink(podcast: Podcast, episode: PodcastEpisode, range: Clip.Range) = Builder(Data.ClipLink(podcast, episode, range))
+
+        fun audioClip(podcast: Podcast, episode: PodcastEpisode, range: Clip.Range) = Builder(Data.ClipAudio(podcast, episode, range))
     }
 
     class Builder internal constructor(
@@ -293,6 +300,14 @@ data class SharingRequest internal constructor(
             fun linkDescription() = LR.string.share_link_clip
 
             override fun toString() = "ClipLink(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
+        }
+
+        data class ClipAudio(
+            override val podcast: PodcastModel,
+            val episode: EpisodeModel,
+            val range: Clip.Range,
+        ) : Data {
+            override fun toString() = "ClipAudio(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }
     }
 }

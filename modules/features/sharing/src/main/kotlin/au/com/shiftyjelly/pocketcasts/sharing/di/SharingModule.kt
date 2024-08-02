@@ -6,10 +6,13 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.FFmpegMediaService
 import au.com.shiftyjelly.pocketcasts.sharing.ShareDialogFragment
+import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
 import dagger.Module
 import dagger.Provides
@@ -41,5 +44,15 @@ object SharingModule {
         File(context.cacheDir, "pocketcasts-exoplayer-clips-cache"),
         LeastRecentlyUsedCacheEvictor(25 * 1024 * 1024L),
         StandaloneDatabaseProvider(context),
+    )
+
+    @Provides
+    fun provideSharingClient(
+        @ApplicationContext context: Context,
+        analyticsTracker: AnalyticsTracker,
+    ): SharingClient = SharingClient(
+        context,
+        FFmpegMediaService(context),
+        analyticsTracker,
     )
 }
