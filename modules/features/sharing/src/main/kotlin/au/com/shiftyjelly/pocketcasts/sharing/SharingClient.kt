@@ -14,7 +14,6 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -39,7 +38,6 @@ import java.io.FileOutputStream
 import kotlin.time.Duration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastModel
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeModel
@@ -47,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeMod
 class SharingClient(
     private val context: Context,
     private val mediaService: MediaService,
-    tracker: AnalyticsTracker,
+    private val listeners: Set<SharingClient.Listener>,
     private val displayPodcastCover: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
     private val showCustomCopyFeedback: Boolean = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
     private val hostUrl: String = SERVER_SHORT_URL,
@@ -63,18 +61,19 @@ class SharingClient(
 ) {
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()
 
-    private val analytics = SharingAnalytics(tracker)
-
-    suspend fun share(request: SharingRequest) = try {
-        Timber.tag("SharingClient").i("Share: $request")
-        analytics.logPodcastSharedEvent(request)
-        request.tryShare()
-    } catch (t: Throwable) {
-        Timber.tag("SharingClient").e(t, "Failed to share a request: $request")
-        SharingResponse(
-            isSuccsessful = false,
-            feedbackMessage = context.getString(LR.string.error),
-        )
+    suspend fun share(request: SharingRequest): SharingResponse {
+        listeners.forEach { it.onShare(request) }
+        val response = try {
+            request.tryShare()
+        } catch (error: Throwable) {
+            SharingResponse(
+                isSuccsessful = false,
+                feedbackMessage = context.getString(LR.string.error),
+                error = error,
+            )
+        }
+        listeners.forEach { it.onShared(request, response) }
+        return response
     }
 
     private suspend fun SharingRequest.tryShare(): SharingResponse = when (data) {
@@ -87,6 +86,7 @@ class SharingClient(
                 SharingResponse(
                     isSuccsessful = true,
                     feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
+                    error = null,
                 )
             }
             WhatsApp, Telegram, X, Tumblr, More -> {
@@ -102,6 +102,7 @@ class SharingClient(
                 SharingResponse(
                     isSuccsessful = true,
                     feedbackMessage = null,
+                    error = null,
                 )
             }
         }
@@ -116,11 +117,13 @@ class SharingClient(
                 SharingResponse(
                     isSuccsessful = true,
                     feedbackMessage = null,
+                    error = null,
                 )
             } else {
                 SharingResponse(
                     isSuccsessful = false,
                     feedbackMessage = context.getString(LR.string.error),
+                    error = null,
                 )
             }
         }
@@ -129,6 +132,7 @@ class SharingClient(
             SharingResponse(
                 isSuccsessful = true,
                 feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
+                error = null,
             )
         }
         is SharingRequest.Data.ClipAudio -> when (platform) {
@@ -146,6 +150,7 @@ class SharingClient(
                 SharingResponse(
                     isSuccsessful = true,
                     feedbackMessage = null,
+                    error = null,
                 )
             }
         }
@@ -164,6 +169,7 @@ class SharingClient(
                 SharingResponse(
                     isSuccsessful = true,
                     feedbackMessage = null,
+                    error = null,
                 )
             }
         }
@@ -196,13 +202,18 @@ class SharingClient(
     }
 
     private fun Intent.setExtraStream(file: File) = putExtra(EXTRA_STREAM, FileUtil.createUriWithReadPermissions(context, file, this))
+
+    interface Listener {
+        fun onShare(request: SharingRequest) = Unit
+        fun onShared(request: SharingRequest, response: SharingResponse) = Unit
+    }
 }
 
 data class SharingRequest internal constructor(
-    internal val data: SharingRequest.Data,
-    internal val platform: SocialPlatform,
-    internal val cardType: CardType?,
-    internal val source: SourceView,
+    val data: SharingRequest.Data,
+    val platform: SocialPlatform,
+    val cardType: CardType?,
+    val source: SourceView,
 ) {
     companion object {
         fun podcast(
@@ -286,10 +297,10 @@ data class SharingRequest internal constructor(
         @StringRes fun linkDescription(): Int
     }
 
-    internal sealed interface Data {
+    sealed interface Data {
         val podcast: PodcastModel
 
-        data class Podcast(
+        class Podcast internal constructor(
             override val podcast: PodcastModel,
         ) : Data, Sociable {
             override fun sharingUrl(host: String) = "$host/podcast/${podcast.uuid}"
@@ -301,7 +312,7 @@ data class SharingRequest internal constructor(
             override fun toString() = "Podcast(title=${podcast.title}, uuid=${podcast.uuid})"
         }
 
-        data class Episode(
+        class Episode internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
         ) : Data, Sociable {
@@ -314,7 +325,7 @@ data class SharingRequest internal constructor(
             override fun toString() = "Episode(title=${episode.title}, uuid=${episode.uuid})"
         }
 
-        data class EpisodePosition(
+        class EpisodePosition internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
             val position: Duration,
@@ -332,14 +343,14 @@ data class SharingRequest internal constructor(
             override fun toString() = "EpisodePosition(title=${episode.title}, uuid=${episode.uuid}, position=$position, type=$type)"
         }
 
-        data class EpisodeFile(
+        class EpisodeFile internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
         ) : Data {
             override fun toString() = "EpisodeFile(title=${episode.title}, uuid=${episode.uuid}"
         }
 
-        data class ClipLink(
+        class ClipLink internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
             val range: Clip.Range,
@@ -351,7 +362,7 @@ data class SharingRequest internal constructor(
             override fun toString() = "ClipLink(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }
 
-        data class ClipAudio(
+        class ClipAudio internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
             val range: Clip.Range,
@@ -359,7 +370,7 @@ data class SharingRequest internal constructor(
             override fun toString() = "ClipAudio(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }
 
-        data class ClipVideo(
+        class ClipVideo internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
             val range: Clip.Range,
@@ -373,4 +384,5 @@ data class SharingRequest internal constructor(
 data class SharingResponse(
     val isSuccsessful: Boolean,
     val feedbackMessage: String?,
+    val error: Throwable?,
 )

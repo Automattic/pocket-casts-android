@@ -8,8 +8,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 
 internal class SharingAnalytics(
     private val tracker: AnalyticsTracker,
-) {
-    fun logPodcastSharedEvent(request: SharingRequest) {
+) : SharingClient.Listener {
+    override fun onShare(request: SharingRequest) {
         tracker.track(
             AnalyticsEvent.PODCAST_SHARED,
             buildMap {

@@ -13,7 +13,6 @@ import android.net.Uri
 import androidx.core.content.IntentCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
@@ -535,7 +534,7 @@ class SharingClientTest {
     ) = SharingClient(
         context = context,
         mediaService = testMediaService,
-        tracker = AnalyticsTracker.test(),
+        listeners = emptySet(),
         displayPodcastCover = false,
         showCustomCopyFeedback = showCustomCopyFeedback,
         hostUrl = "https://pca.st",
