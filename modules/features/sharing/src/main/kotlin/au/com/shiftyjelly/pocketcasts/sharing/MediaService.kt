@@ -6,5 +6,16 @@ import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import java.io.File
 
 interface MediaService {
-    suspend fun clipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Result<File>
+    suspend fun clipAudio(
+        podcast: Podcast,
+        episode: PodcastEpisode,
+        clipRange: Clip.Range,
+    ): Result<File>
+
+    suspend fun clipVideo(
+        podcast: Podcast,
+        episode: PodcastEpisode,
+        clipRange: Clip.Range,
+        backgroundFile: File,
+    ): Result<File>
 }

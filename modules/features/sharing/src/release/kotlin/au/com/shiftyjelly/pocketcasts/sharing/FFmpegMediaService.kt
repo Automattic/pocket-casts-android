@@ -12,4 +12,8 @@ internal class FFmpegMediaService(
     override suspend fun clipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Result<File> {
         throw AssertionError("Not supported in release")
     }
+
+    override suspend fun clipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, backgroundFile: File): Result<File> {
+        throw AssertionError("Not supported in release")
+    }
 }

@@ -12,9 +12,14 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 class SharingAnalyticsTest {
+    @get:Rule
+    val tempFolder = TemporaryFolder()
+
     private val tracker = TestTracker()
 
     private val analytics = SharingAnalytics(AnalyticsTracker.test(tracker, isEnabled = true))
@@ -179,6 +184,28 @@ class SharingAnalyticsTest {
     }
 
     @Test
+    fun `log clip video sharing`() {
+        val request = SharingRequest.videoClip(podcast, episode, clipRange, tempFolder.newFile())
+            .setPlatform(SocialPlatform.PocketCasts)
+            .setCardType(CardType.Vertical)
+            .setSourceView(SourceView.PLAYER)
+            .build()
+
+        analytics.logPodcastSharedEvent(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.PODCAST_SHARED)
+        event.assertProperties(
+            mapOf(
+                "type" to "clip_video",
+                "action" to "url",
+                "card_type" to "vertical",
+                "source" to "player",
+            ),
+        )
+    }
+
+    @Test
     fun `log source property`() {
         SourceView.entries.forEach { source ->
             val request = SharingRequest.podcast(podcast)
@@ -260,6 +287,16 @@ class SharingAnalyticsTest {
         val event = tracker.events.single()
 
         event.assertProperty("type", "clip_audio")
+    }
+
+    @Test
+    fun `log clip video type property`() {
+        val request = SharingRequest.videoClip(podcast, episode, clipRange, tempFolder.newFile()).build()
+
+        analytics.logPodcastSharedEvent(request)
+        val event = tracker.events.single()
+
+        event.assertProperty("type", "clip_video")
     }
 
     @Test
