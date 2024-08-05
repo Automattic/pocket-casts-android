@@ -82,11 +82,12 @@ class SharingClient(
         is SharingRequest.Sociable -> when (platform) {
             Instagram -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing to Instagram requires a background image" }
-                val intent = Intent("com.instagram.share.ADD_TO_STORY")
+                Intent()
+                    .setAction("com.instagram.share.ADD_TO_STORY")
                     .putExtra("source_application", metaAppId)
                     .setDataAndType(FileUtil.getUriForFile(context, backgroundImage), "image/png")
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION or FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+                    .share()
                 SharingResponse(
                     isSuccsessful = true,
                     feedbackMessage = null,
@@ -110,6 +111,7 @@ class SharingClient(
                     .setPackage(platform.packageId)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
                     .setPodcastCover(data.podcast)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -125,6 +127,7 @@ class SharingClient(
                     .setAction(Intent.ACTION_SEND)
                     .setType(data.episode.fileType)
                     .setExtraStream(file)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -158,6 +161,7 @@ class SharingClient(
                     .setType("audio/mp3")
                     .setExtraStream(file)
                     .setPackage(platform.packageId)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -178,6 +182,7 @@ class SharingClient(
                     .setType("video/mp4")
                     .setExtraStream(file)
                     .setPackage(platform.packageId)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -189,7 +194,7 @@ class SharingClient(
     }
 
     private fun Intent.share() {
-        shareStarter.start(context, toChooserIntent())
+        shareStarter.start(context, this)
     }
 
     private fun Intent.toChooserIntent() = Intent
