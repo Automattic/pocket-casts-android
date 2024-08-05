@@ -56,6 +56,7 @@ internal fun SharePodcastPage(
             episodeCount = episodeCount,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
@@ -112,6 +113,7 @@ private fun VerticalSharePodcastPage(
                         podcast = podcast,
                         episodeCount = episodeCount,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Square -> SquarePodcastCast(
@@ -132,6 +134,7 @@ private fun HorizontalSharePodcastPage(
     episodeCount: Int,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: SharePodcastPageListener,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -157,6 +160,7 @@ private fun HorizontalSharePodcastPage(
                     podcast = podcast,
                     episodeCount = episodeCount,
                     shareColors = shareColors,
+                    captureController = assetController.captureController(CardType.Horiozntal),
                 )
             }
         },

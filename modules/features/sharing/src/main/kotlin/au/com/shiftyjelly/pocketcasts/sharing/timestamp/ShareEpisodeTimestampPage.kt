@@ -67,6 +67,7 @@ internal fun ShareEpisodeTimestampPage(
             useEpisodeArtwork = useEpisodeArtwork,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
@@ -129,6 +130,7 @@ private fun VerticalShareEpisodeTimestampPage(
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Square -> SquareEpisodeCard(
@@ -152,6 +154,7 @@ private fun HorizontalShareEpisodeTimestampPage(
     useEpisodeArtwork: Boolean,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: ShareEpisodeTimestampPageListener,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -178,6 +181,7 @@ private fun HorizontalShareEpisodeTimestampPage(
                     episode = episode,
                     useEpisodeArtwork = useEpisodeArtwork,
                     shareColors = shareColors,
+                    captureController = assetController.captureController(CardType.Horiozntal),
                 )
             }
         },

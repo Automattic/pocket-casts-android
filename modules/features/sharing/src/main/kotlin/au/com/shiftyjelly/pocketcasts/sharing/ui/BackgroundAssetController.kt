@@ -46,8 +46,9 @@ internal interface BackgroundAssetController {
                 val controller = captureController(type)
                 val capturedBitmap = controller.captureAsync().await()
                 val backgroundBitmap = withContext(Dispatchers.Default) {
+                    val scaledWidth = type.targetWidth
                     val scaledBitmap = capturedBitmap.asAndroidBitmap()
-                        .scale(width = BITMAP_WIDTH, height = (capturedBitmap.height.toDouble() * BITMAP_WIDTH / capturedBitmap.width).roundToInt())
+                        .scale(width = scaledWidth, height = (capturedBitmap.height.toDouble() * scaledWidth / capturedBitmap.width).roundToInt())
                         .copy(Bitmap.Config.ARGB_8888, false)
                     createBackgroundBitmap(scaledBitmap, type)
                 }
@@ -66,6 +67,11 @@ internal interface BackgroundAssetController {
             ) = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Bitmap.Config.ARGB_8888).applyCanvas {
                 drawRect(0f, 0f, BITMAP_HEIGHT.toFloat(), BITMAP_HEIGHT.toFloat(), type.backgroundPaint)
                 drawBitmap(foregroundBitmap, (BITMAP_WIDTH.toFloat() - foregroundBitmap.width) / 2, (BITMAP_HEIGHT.toFloat() - foregroundBitmap.height) / 2, null)
+            }
+
+            private val CardType.targetWidth get() = when (this) {
+                Vertical -> BITMAP_WIDTH
+                Horiozntal, Square -> (BITMAP_WIDTH * 0.9).roundToInt()
             }
 
             private val CardType.backgroundPaint get() = when (this) {

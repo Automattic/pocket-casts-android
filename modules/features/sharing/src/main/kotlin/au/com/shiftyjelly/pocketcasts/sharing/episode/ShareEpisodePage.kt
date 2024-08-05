@@ -62,6 +62,7 @@ internal fun ShareEpisodePage(
             useEpisodeArtwork = useEpisodeArtwork,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
@@ -123,6 +124,7 @@ private fun VerticalShareEpisodePage(
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Square -> SquareEpisodeCard(
@@ -145,6 +147,7 @@ private fun HorizontalShareEpisodePage(
     useEpisodeArtwork: Boolean,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: ShareEpisodePageListener,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -171,6 +174,7 @@ private fun HorizontalShareEpisodePage(
                     episode = episode,
                     useEpisodeArtwork = useEpisodeArtwork,
                     shareColors = shareColors,
+                    captureController = assetController.captureController(CardType.Horiozntal),
                 )
             }
         },
