@@ -20,10 +20,14 @@ class TranscriptsManagerImpl @Inject constructor(
     override suspend fun updateTranscripts(
         episodeUuid: String,
         transcripts: List<Transcript>,
+        loadTranscriptSource: LoadTranscriptSource,
     ) {
         if (transcripts.isEmpty()) return
         findBestTranscript(transcripts)?.let { bestTranscript ->
             transcriptDao.insert(bestTranscript)
+            if (loadTranscriptSource == LoadTranscriptSource.DOWNLOAD_EPISODE) {
+                loadTranscript(bestTranscript.url, loadTranscriptSource)
+            }
         }
     }
 
@@ -51,10 +55,10 @@ class TranscriptsManagerImpl @Inject constructor(
             }
         } catch (e: UnknownHostException) {
             LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load transcript from $url", e)
-            throw NoNetworkException()
+            if (source == LoadTranscriptSource.DOWNLOAD_EPISODE) null else throw NoNetworkException() // fail silently if loaded as part of episode download
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load transcript from $url", e)
-            throw e
+            if (source == LoadTranscriptSource.DOWNLOAD_EPISODE) null else throw e // fail silently if loaded as part of episode download
         }
     }
 }
@@ -66,5 +70,6 @@ enum class TranscriptFormat(val mimeType: String) {
 }
 
 enum class LoadTranscriptSource {
+    DOWNLOAD_EPISODE, // When transcript is downloaded as part of episode download
     DEFAULT,
 }

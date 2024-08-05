@@ -8,6 +8,7 @@ interface TranscriptsManager {
     suspend fun updateTranscripts(
         episodeUuid: String,
         transcripts: List<Transcript>,
+        loadTranscriptSource: LoadTranscriptSource,
     )
 
     fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>

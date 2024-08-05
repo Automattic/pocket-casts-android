@@ -2,16 +2,19 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 class TranscriptsManagerImplTest {
     private val transcriptDao: TranscriptDao = mock()
-    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao)
+    private val podcastCacheServer: PodcastCacheServer = mock()
+    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao, podcastCacheServer)
 
     @Test
     fun `findBestTranscript returns first supported transcript`() = runTest {
@@ -53,8 +56,30 @@ class TranscriptsManagerImplTest {
             Transcript("1", "url_2", "text/vtt"),
         )
 
-        transcriptsManager.updateTranscripts("1", transcripts)
+        transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DEFAULT)
 
         verify(transcriptDao).insert(transcripts[0])
+    }
+
+    @Test
+    fun `updateTranscripts loads transcript if the source is download episode`() = runTest {
+        val transcripts = listOf(
+            Transcript("1", "url_1", "application/srt"),
+        )
+
+        transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DOWNLOAD_EPISODE)
+
+        verify(podcastCacheServer).getTranscript("url_1")
+    }
+
+    @Test
+    fun `updateTranscripts does not load transcript if the source is not download episode`() = runTest {
+        val transcripts = listOf(
+            Transcript("1", "url_1", "application/srt"),
+        )
+
+        transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DEFAULT)
+
+        verifyNoInteractions(podcastCacheServer)
     }
 }
