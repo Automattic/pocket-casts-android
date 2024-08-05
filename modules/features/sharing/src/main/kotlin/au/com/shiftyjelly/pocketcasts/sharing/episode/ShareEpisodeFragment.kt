@@ -50,7 +50,7 @@ class ShareEpisodeFragment : BaseDialogFragment() {
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
         val assetController = BackgroundAssetController.create(requireContext(), shareColors)
-        val listener = shareListenerFactory.create(this@ShareEpisodeFragment, args.source)
+        val listener = shareListenerFactory.create(this@ShareEpisodeFragment, assetController, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareEpisodePage(
