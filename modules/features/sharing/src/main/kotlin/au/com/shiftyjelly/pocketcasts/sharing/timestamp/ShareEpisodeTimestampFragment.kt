@@ -53,7 +53,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
         val assetController = BackgroundAssetController.create(requireContext(), shareColors)
-        val listener = shareListenerFactory.create(this@ShareEpisodeTimestampFragment, args.timestampType, args.source)
+        val listener = shareListenerFactory.create(this@ShareEpisodeTimestampFragment, assetController, args.timestampType, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareEpisodeTimestampPage(
