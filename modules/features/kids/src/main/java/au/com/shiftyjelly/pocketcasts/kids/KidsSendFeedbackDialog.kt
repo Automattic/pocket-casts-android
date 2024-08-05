@@ -136,6 +136,7 @@ fun KidsSendFeedbackDialog(
                     contentDescription = stringResource(LR.string.send_feedback),
                     onClick = { onFeedbackTapped() },
                     includePadding = false,
+                    enabled = feedbackText.text.isNotEmpty(),
                     textColor = MaterialTheme.theme.colors.primaryInteractive02,
                     modifier = Modifier.padding(bottom = 12.dp),
                     colors = ButtonDefaults.buttonColors(
