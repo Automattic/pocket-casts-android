@@ -81,9 +81,13 @@ internal class FFmpegMediaService(
             if (audioSource == null) {
                 return@withContext Result.failure(IOException("No stream found for ${episode.uuid} episode"))
             }
+            val isWebSource = audioSource == episode.downloadUrl
 
             append("-ss ${clipRange.startInSeconds} ") // Clip start, must be in seconds or HH:MM:SS.xxx
             append("-to ${clipRange.endInSeconds} ") // Clip end, must be in seconds or HH:MM:SS.xxx
+            if (isWebSource) {
+                append("-user_agent 'Pocket Casts' ")
+            }
             append("-i $audioSource ") // Audio stream source
             val coverFile = if (addCover) {
                 createJpegCover(episode) // Convert covers to JPEG because MP3 doesn't support embedding WebP
@@ -99,7 +103,6 @@ internal class FFmpegMediaService(
                 append("-map 1:0 ") // Include the cover stream
                 append("-c:1 copy ") // Copy codec for the cover stream
             }
-            append("-user_agent 'Pocket Casts' ")
             append("-y ") // Overwrite output file if it already exists
             append("$ffmpegFile") // Output file
         }
@@ -109,7 +112,7 @@ internal class FFmpegMediaService(
     private suspend fun createJpegCover(episode: PodcastEpisode): File? {
         val outputFile = File(context.cacheDir, "ffmpeg-converted-cover.jpeg")
         val coverPath = episode.imageUrl ?: "${BuildConfig.SERVER_STATIC_URL}/discover/images/960/${episode.podcastUuid}.jpg"
-        val command = "-i $coverPath -user_agent 'Pocket Casts' -y $outputFile"
+        val command = "-user_agent 'Pocket Casts' -i $coverPath -y $outputFile"
         return executeAsyncCommand(command).map { outputFile }.getOrNull()
     }
 
