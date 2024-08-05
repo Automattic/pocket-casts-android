@@ -223,3 +223,10 @@ message PodcastRatingAddRequest {
 message PodcastRatingShowRequest {
     string podcast_uuid = 1;
 }
+
+message SupportFeedbackRequest {
+     string subject = 1;
+      string inbox = 2;
+      string message = 3;
+      string debug = 4;
+}

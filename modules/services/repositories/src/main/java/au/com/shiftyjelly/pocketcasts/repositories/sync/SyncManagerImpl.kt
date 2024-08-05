@@ -409,6 +409,12 @@ class SyncManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun sendSupportFeedback(subject: String, inbox: String, message: String): Single<Response<Void>> {
+        return getCacheTokenOrLogin { token ->
+            syncServerManager.sendSupportFeedback(subject, inbox, message, token)
+        }
+    }
+
     override suspend fun loadStats(): StatsBundle =
         getCacheTokenOrLogin { token ->
             syncServerManager.loadStats(token)

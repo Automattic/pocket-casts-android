@@ -17,6 +17,7 @@ import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
+import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListRequest
@@ -176,4 +177,8 @@ interface SyncServer {
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/podcast_rating/show")
     suspend fun getPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingShowRequest): PodcastRatingResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/support/feedback")
+    suspend fun sendSupportFeedback(@Header("Authorization") authorization: String, @Body request: SupportFeedbackRequest): Single<Response<Void>>
 }
