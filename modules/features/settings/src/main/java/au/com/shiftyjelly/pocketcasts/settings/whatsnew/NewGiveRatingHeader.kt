@@ -1,9 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.settings.whatsnew
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -12,110 +13,163 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
-fun NewGiveRatingHeader() {
+fun NewGiveRatingHeader() = NewGiveRatingHeader(initialState = AnimationState.Out)
+
+@Composable
+private fun NewGiveRatingHeader(
+    initialState: AnimationState,
+) {
+    val states = animationStates(
+        initialState,
+        size = 5,
+    )
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        repeat(5) { index ->
-            Star(index = index, starDrawable = painterResource(id = IR.drawable.star_filled_whats_new))
-        }
+        states.forEach { Star(it) }
     }
 }
 
 @Composable
-fun Star(index: Int, starDrawable: Painter) {
-    var cycleCount by remember { mutableIntStateOf(0) }
-
-    val offsetY = remember { Animatable(-10f) }
-    val alpha = remember { Animatable(0f) }
-
-    LaunchedEffect(Unit) {
-        delay(2000)
-
-        while (cycleCount < timesToRepeatAnimation) {
-            delay(index * 50L)
-
-            // Fade in and bounce
-            alpha.animateTo(
-                targetValue = 1f,
-                animationSpec = alphaAnimationSpec,
-            )
-
-            offsetY.animateTo(
-                targetValue = 0f,
-                animationSpec = offsetYAnimationSpec,
-            )
-
-            delay(2000)
-
-            // Fade out and move up
-            alpha.animateTo(
-                targetValue = 0f,
-                animationSpec = alphaAnimationSpec,
-            )
-            offsetY.animateTo(
-                targetValue = -10f,
-                animationSpec = offsetYAnimationSpec,
-            )
-
-            // Increment the cycle count
-            cycleCount++
-        }
-
-        // Ensure the star remains visible after the loop
-        offsetY.snapTo(0f)
-        alpha.snapTo(1f)
-    }
+private fun Star(
+    animationState: AnimationState,
+) {
+    val transitionData = updateTransitionData(animationState)
 
     Image(
-        painter = starDrawable,
+        painter = painterResource(id = IR.drawable.star_filled_whats_new),
         contentDescription = null,
         modifier = Modifier
-            .offset(y = offsetY.value.dp)
-            .alpha(alpha.value)
+            .offset { transitionData.offset }
+            .alpha(transitionData.alpha)
             .size(40.dp),
     )
 }
 
-private val alphaAnimationSpec = tween<Float>(
-    durationMillis = 200,
-    easing = LinearOutSlowInEasing,
-)
+private enum class AnimationState {
+    In,
+    Out,
+}
 
-private val offsetYAnimationSpec = spring(
-    dampingRatio = 0.2f,
-    stiffness = 381.47f,
-    visibilityThreshold = 0.01f,
-)
+private class TransitionData(
+    alpha: State<Float>,
+    offset: State<IntOffset>,
+) {
+    val alpha by alpha
+    val offset by offset
+}
 
-private const val timesToRepeatAnimation = 4
+@Composable
+private fun animationStates(
+    initialState: AnimationState,
+    size: Int,
+): List<AnimationState> {
+    var isAnimatingIn by remember { mutableStateOf(initialState == AnimationState.Out) }
+    val states = remember { List(size) { initialState }.toMutableStateList() }
+    LaunchedEffect(Unit) {
+        var isFirstRun = true
+        while (isActive) {
+            delay(
+                when {
+                    isFirstRun -> 1.seconds
+                    isAnimatingIn -> 2.seconds
+                    else -> 5.seconds
+                },
+            )
+            repeat(states.size) { index ->
+                states[index] = if (isAnimatingIn) AnimationState.In else AnimationState.Out
+                delay(50.milliseconds)
+            }
+            isAnimatingIn = !isAnimatingIn
+            isFirstRun = false
+        }
+    }
+    return states
+}
+
+@Composable
+private fun updateTransitionData(
+    animationState: AnimationState,
+): TransitionData {
+    val offsetValue = LocalDensity.current.run { 16.dp.roundToPx() }
+    val transition = updateTransition(animationState, "star transition")
+    val alpha = transition.animateFloat(
+        label = "star alpha",
+        transitionSpec = {
+            when {
+                AnimationState.In isTransitioningTo AnimationState.Out -> spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = 150f,
+                )
+                else -> spring()
+            }
+        },
+        targetValueByState = { state ->
+            when (state) {
+                AnimationState.In -> 1f
+                AnimationState.Out -> 0f
+            }
+        },
+    )
+    val offset = transition.animateIntOffset(
+        label = "star offset",
+        transitionSpec = {
+            when {
+                AnimationState.Out isTransitioningTo AnimationState.In -> spring(
+                    dampingRatio = 0.25f,
+                    stiffness = 600f,
+                    visibilityThreshold = IntOffset(1, 1),
+                )
+                AnimationState.In isTransitioningTo AnimationState.Out -> spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = 150f,
+                    visibilityThreshold = IntOffset(1, 1),
+                )
+                else -> spring()
+            }
+        },
+        targetValueByState = { state ->
+            when (state) {
+                AnimationState.In -> IntOffset(0, 0)
+                AnimationState.Out -> IntOffset(0, -offsetValue)
+            }
+        },
+    )
+    return remember(transition) { TransitionData(alpha, offset) }
+}
 
 @Preview
 @Composable
 private fun NewGiveRatingHeaderPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         Surface {
-            NewGiveRatingHeader()
+            NewGiveRatingHeader(initialState = AnimationState.In)
         }
     }
 }
