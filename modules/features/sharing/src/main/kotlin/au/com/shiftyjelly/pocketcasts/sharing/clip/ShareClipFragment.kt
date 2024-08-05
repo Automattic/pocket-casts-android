@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.compose.foundation.background
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -18,8 +17,9 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VideoBackgroundController
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -82,8 +82,8 @@ class ShareClipFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val shareColors = shareColors
-        val videoBackgroundController = VideoBackgroundController(requireContext(), shareColors)
-        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient, videoBackgroundController)
+        val assetController = BackgroundAssetController.create(requireContext(), shareColors)
+        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient, assetController)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareClipPage(
@@ -95,7 +95,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 shareColors = shareColors,
                 listener = listener,
-                captureController = videoBackgroundController.verticalCardController,
+                captureController = assetController.captureController(CardType.Vertical),
             )
         }
     }
