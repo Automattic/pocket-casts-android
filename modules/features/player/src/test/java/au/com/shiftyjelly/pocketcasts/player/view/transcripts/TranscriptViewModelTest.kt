@@ -12,18 +12,21 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
+import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -37,7 +40,6 @@ class TranscriptViewModelTest {
 
     private val transcriptsManager: TranscriptsManager = mock()
     private val playbackManager: PlaybackManager = mock()
-    private val urlUtil: UrlUtil = mock()
     private val subtitleParserFactory: SubtitleParser.Factory = mock()
     private val transcript: Transcript = Transcript("episode_id", "url", "type")
     private val playbackStateFlow = MutableStateFlow(PlaybackState(podcast = Podcast("podcast_id"), episodeUuid = "episode_id"))
@@ -83,7 +85,6 @@ class TranscriptViewModelTest {
     fun `given transcript view is open, when transcript load invoked, then transcript is parsed`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
-        whenever(urlUtil.contentBytes(anyOrNull())).thenReturn(byteArrayOf())
         val parser = mock<SubtitleParser>()
         whenever(subtitleParserFactory.create(anyOrNull())).thenReturn(parser)
 
@@ -101,6 +102,9 @@ class TranscriptViewModelTest {
     fun `given transcript is supported, when transcript load invoked, then loaded state is returned`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        val parser = mock<SubtitleParser>()
+        doNothing().whenever(parser).parse(anyOrNull(), eq(SubtitleParser.OutputOptions.allCues()), anyOrNull())
+        whenever(subtitleParserFactory.create(anyOrNull())).thenReturn(parser)
         initViewModel()
 
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
@@ -127,8 +131,7 @@ class TranscriptViewModelTest {
     fun `given transcript type supported but content not valid, then FailedToLoad error is returned`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
-        whenever(urlUtil.contentBytes(any())).thenThrow(RuntimeException())
-        initViewModel()
+        initViewModel(transcriptLoadException = RuntimeException())
 
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
@@ -141,8 +144,7 @@ class TranscriptViewModelTest {
     fun `given error due to no internet, then NoNetwork error is returned`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
-        given(urlUtil.contentBytes(any())).willAnswer { throw UrlUtil.NoNetworkException() }
-        initViewModel()
+        initViewModel(transcriptLoadException = NoNetworkException())
 
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
@@ -156,8 +158,7 @@ class TranscriptViewModelTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         val htmlText = "<html>content</html>"
-        whenever(urlUtil.contentString(anyOrNull())).thenReturn(htmlText)
-        initViewModel()
+        initViewModel(htmlText)
 
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
@@ -214,12 +215,26 @@ class TranscriptViewModelTest {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun initViewModel() {
+    private fun initViewModel(
+        htmlContent: String? = null,
+        transcriptLoadException: Exception? = null,
+    ) = runTest {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
+        if (transcriptLoadException != null) {
+            given(transcriptsManager.loadTranscript(anyOrNull(), anyOrNull())).willAnswer { throw transcriptLoadException }
+        } else {
+            val response = mock<ResponseBody>()
+            if (htmlContent != null) {
+                whenever(response.string()).thenReturn(htmlContent)
+            } else {
+                whenever(response.bytes()).thenReturn(byteArrayOf())
+            }
+            whenever(transcriptsManager.loadTranscript(anyOrNull(), anyOrNull())).thenReturn(response)
+        }
+
         viewModel = TranscriptViewModel(
             transcriptsManager = transcriptsManager,
             playbackManager = playbackManager,
-            urlUtil = urlUtil,
             subtitleParserFactory = subtitleParserFactory,
             ioDispatcher = UnconfinedTestDispatcher(),
         )

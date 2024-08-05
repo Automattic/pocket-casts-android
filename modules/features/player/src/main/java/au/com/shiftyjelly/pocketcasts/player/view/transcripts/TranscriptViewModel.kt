@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
+import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -40,7 +40,6 @@ private val NewLineRegex = """[.?!]$""".toRegex()
 class TranscriptViewModel @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
     private val playbackManager: PlaybackManager,
-    private val urlUtil: UrlUtil,
     private val subtitleParserFactory: SubtitleParser.Factory,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -82,7 +81,7 @@ class TranscriptViewModel @Inject constructor(
                     )
                 } catch (e: UnsupportedOperationException) {
                     UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
-                } catch (e: UrlUtil.NoNetworkException) {
+                } catch (e: NoNetworkException) {
                     UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
                 } catch (e: Exception) {
                     UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
@@ -94,14 +93,14 @@ class TranscriptViewModel @Inject constructor(
     private suspend fun buildSubtitleCues(transcript: Transcript) = withContext(ioDispatcher) {
         when (transcript.type) {
             TranscriptFormat.HTML.mimeType -> {
-                val content = urlUtil.contentString(transcript.url)
+                val content = transcriptsManager.loadTranscript(transcript.url)?.string() ?: ""
                 if (content.trim().isEmpty()) {
                     emptyList<CuesWithTiming>()
                 } else {
                     // Html content is added as single large cue
                     ImmutableList.of(
                         CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
+                            ImmutableList.of(Cue.Builder().setText(content).build()),
                             0,
                             0,
                         ),
@@ -116,7 +115,7 @@ class TranscriptViewModel @Inject constructor(
                     throw UnsupportedOperationException("Unsupported MIME type: ${transcript.type}")
                 } else {
                     val result = ImmutableList.builder<CuesWithTiming>()
-                    urlUtil.contentBytes(transcript.url)?.let { data ->
+                    transcriptsManager.loadTranscript(transcript.url)?.bytes()?.let { data ->
                         val parser = subtitleParserFactory.create(format)
                         parser.parse(
                             data,

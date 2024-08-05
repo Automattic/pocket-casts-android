@@ -80,6 +80,10 @@ interface PodcastCacheServer {
     @GET
     suspend fun getShowNotesChapters(@Url url: String): RawChaptersResponse
 
+    @GET
+    @Headers("Cache-Control: max-stale=7776000") // Use cache available for 90 days, if not cached use network
+    suspend fun getTranscript(@Url url: String): Response<ResponseBody>
+
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
     fun getPodcastAndEpisodeSingle(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>
 
