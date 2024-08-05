@@ -111,6 +111,7 @@ fun KidsSendFeedbackDialog(
                         feedbackText = it
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = MaterialTheme.theme.colors.primaryText01,
                         placeholderColor = MaterialTheme.theme.colors.primaryText02,
                         backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                         focusedBorderColor = MaterialTheme.theme.colors.primaryUi05,
