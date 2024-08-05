@@ -132,6 +132,7 @@ private fun VerticalShareEpisodePage(
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                 }

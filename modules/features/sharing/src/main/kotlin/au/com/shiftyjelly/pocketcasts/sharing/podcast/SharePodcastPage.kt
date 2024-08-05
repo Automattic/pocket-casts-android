@@ -120,6 +120,7 @@ private fun VerticalSharePodcastPage(
                         podcast = podcast,
                         episodeCount = episodeCount,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                 }

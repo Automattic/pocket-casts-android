@@ -71,6 +71,13 @@ internal fun HorizontalEpisodeCard(
     modifier = modifier,
 )
 
+@ShowkaseComposable(name = "Horizontal podcast card", group = "Sharing")
+@Preview(name = "HorizontalPodcastCardDark")
+@Composable
+fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
+    baseColor = Color(0xFFEC0404),
+)
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun HorizontalCard(
@@ -141,13 +148,6 @@ private fun HorizontalCard(
         }
     }
 }
-
-@ShowkaseComposable(name = "Horizontal podcast card", group = "Sharing")
-@Preview(name = "HorizontalPodcastCardDark")
-@Composable
-fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
-    baseColor = Color(0xFFEC0404),
-)
 
 @Preview(name = "HorizontalPodcastCardLight")
 @Composable
