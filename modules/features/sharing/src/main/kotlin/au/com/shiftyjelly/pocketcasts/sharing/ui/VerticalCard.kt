@@ -156,32 +156,30 @@ private fun VerticalCard(
     }
 }
 
-@ShowkaseComposable(name = "VerticalPodcastCard", group = "Sharing", styleName = "Light")
-@Preview(name = "VerticalPodcastCardLight")
-@Composable
-fun VerticalPodcastCardLightPreview() = VerticalPodcastCardPreview(
-    baseColor = Color(0xFFFBCB04),
-)
-
-@ShowkaseComposable(name = "VerticalPodcastCard", group = "Sharing", styleName = "Dark")
+@ShowkaseComposable(name = "Vertical podcast card", group = "Sharing")
 @Preview(name = "VerticalPodcastCardDark")
 @Composable
 fun VerticalPodcastCardDarkPreview() = VerticalPodcastCardPreview(
     baseColor = Color(0xFFEC0404),
 )
 
-@ShowkaseComposable(name = "VerticalEpisodeCard", group = "Sharing", styleName = "Light")
-@Preview(name = "VerticalEpisodeCardLight")
+@Preview(name = "VerticalPodcastCardLight")
 @Composable
-fun VerticalEpisodeCardLightPreview() = VerticalEpisodeCardPreview(
+private fun VerticalPodcastCardLightPreview() = VerticalPodcastCardPreview(
     baseColor = Color(0xFFFBCB04),
 )
 
-@ShowkaseComposable(name = "VerticalEpisodeCard", group = "Sharing", styleName = "Dark")
+@ShowkaseComposable(name = "Vertical episode card", group = "Sharing")
 @Preview(name = "VerticalEpisodeCardDark")
 @Composable
 fun VerticalEpisodeCardDarkPreview() = VerticalEpisodeCardPreview(
     baseColor = Color(0xFFEC0404),
+)
+
+@Preview(name = "VerticalEpisodeCardLight")
+@Composable
+private fun VerticalEpisodeCardLightPreview() = VerticalEpisodeCardPreview(
+    baseColor = Color(0xFFFBCB04),
 )
 
 @Composable

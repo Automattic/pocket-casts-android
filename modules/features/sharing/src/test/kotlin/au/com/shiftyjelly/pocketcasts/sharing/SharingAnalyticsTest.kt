@@ -37,7 +37,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -59,7 +59,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -81,7 +81,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -103,7 +103,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -125,7 +125,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -147,7 +147,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -169,7 +169,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -191,7 +191,7 @@ class SharingAnalyticsTest {
             .setSourceView(SourceView.PLAYER)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertType(AnalyticsEvent.PODCAST_SHARED)
@@ -212,7 +212,7 @@ class SharingAnalyticsTest {
                 .setSourceView(source)
                 .build()
 
-            analytics.logPodcastSharedEvent(request)
+            analytics.onShare(request)
             val event = tracker.events.last()
 
             event.assertProperty("source", source.analyticsValue)
@@ -223,7 +223,7 @@ class SharingAnalyticsTest {
     fun `log podcast type property`() {
         val request = SharingRequest.podcast(podcast).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "podcast")
@@ -233,7 +233,7 @@ class SharingAnalyticsTest {
     fun `log epiosde type property`() {
         val request = SharingRequest.episode(podcast, episode).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "episode")
@@ -243,7 +243,7 @@ class SharingAnalyticsTest {
     fun `log epiosde position type property`() {
         val request = SharingRequest.episodePosition(podcast, episode, position).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "current_time")
@@ -253,7 +253,7 @@ class SharingAnalyticsTest {
     fun `log bookmark type property`() {
         val request = SharingRequest.bookmark(podcast, episode, position).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "bookmark_time")
@@ -263,7 +263,7 @@ class SharingAnalyticsTest {
     fun `log episode file type property`() {
         val request = SharingRequest.episodeFile(podcast, episode).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "episode_file")
@@ -273,7 +273,7 @@ class SharingAnalyticsTest {
     fun `log clip link type property`() {
         val request = SharingRequest.clipLink(podcast, episode, clipRange).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "clip_link")
@@ -283,7 +283,7 @@ class SharingAnalyticsTest {
     fun `log clip audio type property`() {
         val request = SharingRequest.audioClip(podcast, episode, clipRange).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "clip_audio")
@@ -293,7 +293,7 @@ class SharingAnalyticsTest {
     fun `log clip video type property`() {
         val request = SharingRequest.videoClip(podcast, episode, clipRange, tempFolder.newFile()).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("type", "clip_video")
@@ -305,7 +305,7 @@ class SharingAnalyticsTest {
             .setPlatform(SocialPlatform.Instagram)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("action", "ig_story")
@@ -317,7 +317,7 @@ class SharingAnalyticsTest {
             .setPlatform(SocialPlatform.WhatsApp)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("action", "whats_app")
@@ -329,7 +329,7 @@ class SharingAnalyticsTest {
             .setPlatform(SocialPlatform.Telegram)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("action", "telegram")
@@ -341,7 +341,7 @@ class SharingAnalyticsTest {
             .setPlatform(SocialPlatform.X)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("action", "twitter")
@@ -353,7 +353,7 @@ class SharingAnalyticsTest {
             .setPlatform(SocialPlatform.Tumblr)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("action", "tumblr")
@@ -365,7 +365,7 @@ class SharingAnalyticsTest {
             .setPlatform(SocialPlatform.PocketCasts)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("action", "url")
@@ -377,7 +377,7 @@ class SharingAnalyticsTest {
             .setPlatform(SocialPlatform.More)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("action", "system_sheet")
@@ -389,7 +389,7 @@ class SharingAnalyticsTest {
             .setCardType(CardType.Vertical)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("card_type", "vertical")
@@ -401,7 +401,7 @@ class SharingAnalyticsTest {
             .setCardType(CardType.Horiozntal)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("card_type", "horizontal")
@@ -413,7 +413,7 @@ class SharingAnalyticsTest {
             .setCardType(CardType.Square)
             .build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("card_type", "square")
@@ -423,7 +423,7 @@ class SharingAnalyticsTest {
     fun `log no card type property`() {
         val request = SharingRequest.podcast(podcast).build()
 
-        analytics.logPodcastSharedEvent(request)
+        analytics.onShare(request)
         val event = tracker.events.single()
 
         event.assertProperty("card_type", null)

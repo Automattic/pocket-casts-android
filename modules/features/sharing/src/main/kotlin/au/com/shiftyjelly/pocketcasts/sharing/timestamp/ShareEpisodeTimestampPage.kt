@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import dev.shreyaspatil.capturable.controller.CaptureController
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
@@ -42,6 +41,7 @@ internal interface ShareEpisodeTimestampPageListener {
             override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, timestamp: Duration, platform: SocialPlatform, cardType: CardType) = SharingResponse(
                 isSuccsessful = true,
                 feedbackMessage = null,
+                error = null,
             )
             override fun onClose() = Unit
         }
@@ -184,35 +184,29 @@ private fun HorizontalShareEpisodeTimestampPage(
     )
 }
 
-@ShowkaseComposable(name = "ShareEpisodeTimestampVerticalRegularPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeTimestampVerticalRegularPreview", device = Devices.PortraitRegular)
 @Composable
-fun ShareEpisodeTimestampVerticalRegularPreview() = ShareEpisodeTimestampPagePreview()
+private fun ShareEpisodeTimestampVerticalRegularPreview() = ShareEpisodeTimestampPagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeTimestampVerticalSmallPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeTimestampVerticalSmallPreview", device = Devices.PortraitSmall)
 @Composable
-fun ShareEpisodeTimestampVerticalSmallPreviewPreview() = ShareEpisodeTimestampPagePreview()
+private fun ShareEpisodeTimestampVerticalSmallPreviewPreview() = ShareEpisodeTimestampPagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeTimestampVerticalTabletPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeTimestampVerticalTabletPreview", device = Devices.PortraitTablet)
 @Composable
-fun ShareEpisodeTimestampVerticalTabletPreview() = ShareEpisodeTimestampPagePreview()
+private fun ShareEpisodeTimestampVerticalTabletPreview() = ShareEpisodeTimestampPagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeTimestampHorizontalRegularPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeTimestampHorizontalRegularPreview", device = Devices.LandscapeRegular)
 @Composable
-fun ShareEpisodeTimestampHorizontalRegularPreview() = ShareEpisodeTimestampPagePreview()
+private fun ShareEpisodeTimestampHorizontalRegularPreview() = ShareEpisodeTimestampPagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeTimestampHorizontalSmallPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeTimestampHorizontalSmallPreview", device = Devices.LandscapeSmall)
 @Composable
-fun ShareEpisodeTimestampHorizontalSmallPreviewPreview() = ShareEpisodeTimestampPagePreview()
+private fun ShareEpisodeTimestampHorizontalSmallPreviewPreview() = ShareEpisodeTimestampPagePreview()
 
-@ShowkaseComposable(name = "ShareEpisodeTimestampHorizontalTabletPreview", group = "Sharing")
 @Preview(name = "ShareEpisodeTimestampHorizontalTabletPreview", device = Devices.LandscapeTablet)
 @Composable
-fun ShareEpisodeTimestampHorizontalTabletPreview() = ShareEpisodeTimestampPagePreview()
+private fun ShareEpisodeTimestampHorizontalTabletPreview() = ShareEpisodeTimestampPagePreview()
 
 @Composable
 private fun ShareEpisodeTimestampPagePreview(
