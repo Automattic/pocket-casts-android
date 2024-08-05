@@ -159,7 +159,8 @@ class SharingClient(
                 error("Not implemented yet")
             }
             WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
-                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, data.backgroundImage).getOrThrow()
+                val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
+                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, backgroundImage).getOrThrow()
                 Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("video/mp4")
@@ -213,6 +214,7 @@ data class SharingRequest internal constructor(
     val data: SharingRequest.Data,
     val platform: SocialPlatform,
     val cardType: CardType?,
+    val backgroundImage: File?,
     val source: SourceView,
 ) {
     companion object {
@@ -259,7 +261,7 @@ data class SharingRequest internal constructor(
             episode: PodcastEpisode,
             range: Clip.Range,
             backgroundImage: File,
-        ) = Builder(Data.ClipVideo(podcast, episode, range, backgroundImage))
+        ) = Builder(Data.ClipVideo(podcast, episode, range)).setBackgroundImage(backgroundImage)
     }
 
     class Builder internal constructor(
@@ -268,6 +270,7 @@ data class SharingRequest internal constructor(
         private var platform = More
         private var cardType: CardType? = null
         private var source = SourceView.UNKNOWN
+        private var backgroundImage: File? = null
 
         fun setPlatform(platform: SocialPlatform) = apply {
             this.platform = platform
@@ -281,10 +284,15 @@ data class SharingRequest internal constructor(
             this.source = source
         }
 
+        fun setBackgroundImage(backgroundImage: File) = apply {
+            this.backgroundImage = backgroundImage
+        }
+
         fun build() = SharingRequest(
             data = data,
             platform = platform,
             cardType = cardType,
+            backgroundImage = backgroundImage,
             source = source,
         )
     }
@@ -374,7 +382,6 @@ data class SharingRequest internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
             val range: Clip.Range,
-            val backgroundImage: File,
         ) : Data {
             override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }
