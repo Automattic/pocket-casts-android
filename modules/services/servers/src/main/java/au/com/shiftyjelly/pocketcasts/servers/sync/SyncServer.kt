@@ -179,6 +179,6 @@ interface SyncServer {
     suspend fun getPodcastRating(@Header("Authorization") authorization: String, @Body request: PodcastRatingShowRequest): PodcastRatingResponse
 
     @Headers("Content-Type: application/octet-stream")
-    @POST("/support/feedback")
-    suspend fun sendSupportFeedback(@Header("Authorization") authorization: String, @Body request: SupportFeedbackRequest): Single<Response<Void>>
+    @POST("/anonymous/feedback")
+    fun sendAnonymousFeedback(@Body request: SupportFeedbackRequest): Single<Response<Void>>
 }

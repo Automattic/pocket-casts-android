@@ -288,14 +288,13 @@ open class SyncServerManager @Inject constructor(
         return server.getPodcastRating(addBearer(token), request)
     }
 
-    suspend fun sendSupportFeedback(subject: String, inbox: String, message: String, token: AccessToken): Single<Response<Void>> {
+    fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Single<Response<Void>> {
         val request = SupportFeedbackRequest.newBuilder()
             .setSubject(subject)
             .setInbox(inbox)
             .setMessage(message)
-            .setDebug("string")
             .build()
-        return server.sendSupportFeedback(addBearer(token), request)
+        return server.sendAnonymousFeedback(request)
     }
 
     fun signOut() {
