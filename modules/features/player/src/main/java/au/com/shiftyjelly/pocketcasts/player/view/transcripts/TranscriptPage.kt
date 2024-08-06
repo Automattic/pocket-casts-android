@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -146,6 +148,17 @@ private fun TranscriptContent(
             .fillMaxWidth()
             .background(colors.backgroundColor()),
     ) {
+        val scrollState = rememberScrollState()
+        val textModifier = Modifier
+            .padding(horizontal = 16.dp)
+            .padding(bottom = bottomPadding)
+            .verticalScroll(scrollState)
+            .verticalScrollBar(
+                thumbColor = colors.textColor(),
+                scrollState = scrollState,
+                contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
+            )
+
         if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
             /* Display html content using Android text view.
                Html rendering in Compose text view is available in Compose 1.7.0 beta which is not yet production ready: https://rb.gy/ev7182 */
@@ -154,10 +167,7 @@ private fun TranscriptContent(
                 color = colors.textColor(),
                 textStyleResId = UR.style.H40,
                 selectable = true,
-                modifier = modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = bottomPadding)
-                    .verticalScroll(rememberScrollState()),
+                modifier = textModifier,
             )
         } else {
             val customMenu = buildList {
@@ -174,11 +184,8 @@ private fun TranscriptContent(
             ) {
                 SelectionContainer {
                     Text(
-                        displayString,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = bottomPadding)
-                            .verticalScroll(rememberScrollState()),
+                        text = displayString,
+                        modifier = textModifier,
                     )
                 }
             }
