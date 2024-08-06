@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-21 14:54:03+0000
+Translation-Revision-Date: 2024-07-31 14:10:05+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="send_feedback">إرسال ملاحظات</string>
     <string name="support">الدعم</string>
     <string name="bookmark">إشارة مرجعية</string>
     <string name="details">تفاصيل</string>
@@ -871,7 +872,6 @@ Language: ar
     <string name="plus_themes_icons_body">أظهر معدنك الحقيقي. أيقونات وقوالب حصرية لنادي plus فقط.</string>
     <string name="plus_themes_icons">القوالب والأيقونات</string>
     <string name="plus_thanks_for_your_support_bang">شكرًا لك على دعمك!</string>
-    <string name="plus_lifetime_member">عضو مدى الحياة</string>
     <string name="plus_learn_more_button">أعرف أكثر</string>
     <string name="plus_learn_more_about_plus">معرفة المزيد حول Pocket Casts Plus</string>
     <string name="plus_desktop_apps">تطبيقات سطح المكتب</string>

@@ -13,7 +13,6 @@ import android.net.Uri
 import androidx.core.content.IntentCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
@@ -39,6 +38,8 @@ class SharingClientTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val shareStarter = TestShareStarter()
+
+    private val testMediaService = TestMediaService()
 
     private val client = createClient()
 
@@ -391,11 +392,149 @@ class SharingClientTest {
         assertNull(response.feedbackMessage)
     }
 
+    @Test
+    fun shareAudioClipToRegularPlatforms() = runTest {
+        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        testMediaService.audioClip = file
+
+        regularPlatforms.forEach { platform ->
+            val request = SharingRequest.audioClip(
+                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+                range = Clip.Range(15.seconds, 28.seconds),
+            ).setPlatform(platform)
+                .build()
+
+            val response = client.share(request)
+            assertTrue(response.isSuccsessful)
+            assertNull(response.feedbackMessage)
+
+            val intent = shareStarter.requireShareIntent
+
+            assertEquals(ACTION_SEND, intent.action)
+            assertEquals("audio/mp3", intent.type)
+            assertEquals(platform.packageId, intent.`package`)
+            assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
+        }
+    }
+
+    @Test
+    fun shareAudioClipToPocketCastsAsMore() = runTest {
+        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        testMediaService.audioClip = file
+
+        val request = SharingRequest.audioClip(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+        ).setPlatform(SocialPlatform.PocketCasts)
+            .build()
+
+        val response = client.share(request)
+        assertTrue(response.isSuccsessful)
+        assertNull(response.feedbackMessage)
+
+        val intent = shareStarter.requireShareIntent
+
+        assertEquals(ACTION_SEND, intent.action)
+        assertEquals("audio/mp3", intent.type)
+        assertNull(intent.`package`)
+        assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
+    }
+
+    @Test
+    fun failToShareAudioClip() = runTest {
+        testMediaService.audioClip = null
+
+        val request = SharingRequest.audioClip(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+        ).build()
+
+        val response = client.share(request)
+        assertFalse(response.isSuccsessful)
+        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+
+        assertNull(shareStarter.shareIntent)
+    }
+
+    @Test
+    fun shareVideoClipToRegularPlatforms() = runTest {
+        val file = File(context.cacheDir, "file.mp4").also { it.writeBytes(Random.nextBytes(8)) }
+        testMediaService.videoClip = file
+
+        regularPlatforms.forEach { platform ->
+            val request = SharingRequest.videoClip(
+                podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+                episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+                range = Clip.Range(15.seconds, 28.seconds),
+                backgroundImage = File(context.cacheDir, "image.png"),
+            ).setPlatform(platform)
+                .build()
+
+            val response = client.share(request)
+            assertTrue(response.isSuccsessful)
+            assertNull(response.feedbackMessage)
+
+            val intent = shareStarter.requireShareIntent
+
+            assertEquals(ACTION_SEND, intent.action)
+            assertEquals("video/mp4", intent.type)
+            assertEquals(platform.packageId, intent.`package`)
+            assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
+        }
+    }
+
+    @Test
+    fun shareVideoClipToPocketCastsAsMore() = runTest {
+        val file = File(context.cacheDir, "file.mp4").also { it.writeBytes(Random.nextBytes(8)) }
+        testMediaService.videoClip = file
+
+        val request = SharingRequest.videoClip(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+            backgroundImage = File(context.cacheDir, "image.png"),
+        ).setPlatform(SocialPlatform.PocketCasts)
+            .build()
+
+        val response = client.share(request)
+        assertTrue(response.isSuccsessful)
+        assertNull(response.feedbackMessage)
+
+        val intent = shareStarter.requireShareIntent
+
+        assertEquals(ACTION_SEND, intent.action)
+        assertEquals("video/mp4", intent.type)
+        assertNull(intent.`package`)
+        assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
+    }
+
+    @Test
+    fun failToShareVideoClip() = runTest {
+        testMediaService.videoClip = null
+
+        val request = SharingRequest.videoClip(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+            backgroundImage = File(context.cacheDir, "image.png"),
+        ).build()
+
+        val response = client.share(request)
+        assertFalse(response.isSuccsessful)
+        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+
+        assertNull(shareStarter.shareIntent)
+    }
+
     private fun createClient(
         showCustomCopyFeedback: Boolean = false,
     ) = SharingClient(
         context = context,
-        tracker = AnalyticsTracker.test(),
+        mediaService = testMediaService,
+        listeners = emptySet(),
         displayPodcastCover = false,
         showCustomCopyFeedback = showCustomCopyFeedback,
         hostUrl = "https://pca.st",
@@ -417,6 +556,19 @@ class SharingClientTest {
 
         override fun copyLink(context: Context, data: ClipData) {
             shareLink = data
+        }
+    }
+
+    private class TestMediaService : MediaService {
+        var audioClip: File? = null
+        var videoClip: File? = null
+
+        override suspend fun clipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Result<File> = runCatching {
+            requireNotNull(audioClip)
+        }
+
+        override suspend fun clipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, backgroundFile: File) = runCatching {
+            requireNotNull(videoClip)
         }
     }
 }

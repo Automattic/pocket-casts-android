@@ -20,7 +20,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,6 +34,7 @@ internal interface SharePodcastPageListener {
             override suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType) = SharingResponse(
                 isSuccsessful = true,
                 feedbackMessage = null,
+                error = null,
             )
             override fun onClose() = Unit
         }
@@ -46,6 +48,7 @@ internal fun SharePodcastPage(
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
+    captureController: CaptureController,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     when (LocalConfiguration.current.orientation) {
@@ -64,6 +67,7 @@ internal fun SharePodcastPage(
             shareColors = shareColors,
             listener = listener,
             snackbarHostState = snackbarHostState,
+            captureController = captureController,
         )
     }
 }
@@ -76,6 +80,7 @@ private fun VerticalSharePodcastPage(
     shareColors: ShareColors,
     listener: SharePodcastPageListener,
     snackbarHostState: SnackbarHostState,
+    captureController: CaptureController,
 ) {
     val scope = rememberCoroutineScope()
     VerticalSharePage(
@@ -100,6 +105,7 @@ private fun VerticalSharePodcastPage(
                         podcast = podcast,
                         episodeCount = episodeCount,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Horiozntal -> HorizontalPodcastCast(
@@ -157,35 +163,29 @@ private fun HorizontalSharePodcastPage(
     )
 }
 
-@ShowkaseComposable(name = "SharePodcastVerticalRegularPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalRegularPreview", device = Devices.PortraitRegular)
 @Composable
-fun SharePodcastVerticalRegularPreview() = SharePodcastPagePreview()
+private fun SharePodcastVerticalRegularPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastVerticalSmallPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalSmallPreview", device = Devices.PortraitSmall)
 @Composable
-fun SharePodcastVerticalSmallPreviewPreview() = SharePodcastPagePreview()
+private fun SharePodcastVerticalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastVerticalTabletPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalTabletPreview", device = Devices.PortraitTablet)
 @Composable
-fun SharePodcastVerticalTabletPreview() = SharePodcastPagePreview()
+private fun SharePodcastVerticalTabletPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalRegularPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalRegularPreview", device = Devices.LandscapeRegular)
 @Composable
-fun SharePodcastHorizontalRegularPreview() = SharePodcastPagePreview()
+private fun SharePodcastHorizontalRegularPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalSmallPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalSmallPreview", device = Devices.LandscapeSmall)
 @Composable
-fun SharePodcastHorizontalSmallPreviewPreview() = SharePodcastPagePreview()
+private fun SharePodcastHorizontalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalTabletPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalTabletPreview", device = Devices.LandscapeTablet)
 @Composable
-fun SharePodcastHorizontalTabletPreview() = SharePodcastPagePreview()
+private fun SharePodcastHorizontalTabletPreview() = SharePodcastPagePreview()
 
 @Composable
 private fun SharePodcastPagePreview(
@@ -200,4 +200,5 @@ private fun SharePodcastPagePreview(
     socialPlatforms = SocialPlatform.entries.toSet(),
     shareColors = ShareColors(Color(color)),
     listener = SharePodcastPageListener.Preview,
+    captureController = rememberCaptureController(),
 )

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 11:54:03+0000
+Translation-Revision-Date: 2024-08-01 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="send_feedback">Enviar comentarios</string>
+    <string name="share_episode_timestamp_title">Compartir episodio en %s</string>
+    <string name="share_via">Compartir en %s</string>
+    <string name="share_podcast_description">Elegir un formato y una plataforma a la que compartir</string>
+    <string name="podcast_cover_description">Portada del podcast %s</string>
+    <string name="share_label_copy_link">Copiar enlace</string>
+    <string name="share_label_instagram_stories">Historias</string>
+    <string name="profile_change_avatar">Cambiar avatar</string>
     <string name="something_went_wrong_to_rate_this_podcast">Se ha producido un error. Inténtalo de nuevo más tarde.</string>
     <string name="thank_you_for_rating">¡Gracias por la valoración!</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">El episodio completo se almacena temporalmente en caché para minimizar la reproducción en streaming.</string>
@@ -22,10 +30,6 @@ Language: es
     <string name="settings_advanced_cache_entire_playing_episode">Episodio reproduciéndose en la caché</string>
     <string name="playback">Reproducción</string>
     <string name="podcast_share_clip">Clip</string>
-    <string name="download_completed_for_episode">Descarga de %1$s completada</string>
-    <string name="episode_queued_for_download">Episodio en cola para descargar</string>
-    <string name="episode_was_removed">Se ha eliminado el episodio</string>
-    <string name="remove_downloaded_file">Eliminar el archivo descargado</string>
     <string name="settings_export_database_failed">Se ha producido un error al exportar la base de datos</string>
     <string name="settings_export_database">Exportar base de datos</string>
     <string name="settings_sleep_timer_auto_restart_summary">Si está activado, el temporizador se reiniciará automáticamente si reproduces un episodio en los 5 minutos siguientes a la última pausa.</string>
@@ -1057,7 +1061,6 @@ Language: es
     <string name="plus_themes_icons">Temas e iconos</string>
     <string name="plus_thanks_for_your_support_bang">¡Gracias por tu apoyo!</string>
     <string name="plus_slash_month">%s/mes</string>
-    <string name="plus_lifetime_member">Miembro vitalicio</string>
     <string name="plus_learn_more_button">Aprender más</string>
     <string name="plus_learn_more_about_plus">Obtén más información sobre Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Aplicaciones para ordenadores</string>
@@ -1719,8 +1722,8 @@ Language: es
         <item quantity="other">%d episodios</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="one">%1$d episodio - quedan %2$s</item>
-        <item quantity="other">%1$d episodios - quedan %2$s</item>
+        <item quantity="one" formatted="true">%1$d episodio - quedan %2$s</item>
+        <item quantity="other" formatted="true">%1$d episodios - quedan %2$s</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Control de clip final: %d segundo</item>

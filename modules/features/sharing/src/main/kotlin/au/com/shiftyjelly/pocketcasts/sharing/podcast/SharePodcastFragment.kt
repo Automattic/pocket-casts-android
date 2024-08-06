@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
@@ -56,6 +57,7 @@ class SharePodcastFragment : BaseDialogFragment() {
                 socialPlatforms = platforms,
                 shareColors = shareColors,
                 listener = listener,
+                rememberCaptureController(),
             )
         }
     }

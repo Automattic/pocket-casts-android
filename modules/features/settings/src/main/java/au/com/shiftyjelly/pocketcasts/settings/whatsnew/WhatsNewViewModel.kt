@@ -28,7 +28,7 @@ class WhatsNewViewModel @Inject constructor(
 
     init {
         _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.NewWidgets,
+            feature = WhatsNewFeature.NewGiveRating,
             fullModel = true,
             tier = UserTier.Free,
         )
@@ -38,7 +38,7 @@ class WhatsNewViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = state.value as? UiState.Loaded ?: return@launch
             val target = when (currentState.feature) {
-                is WhatsNewFeature.NewWidgets -> NavigationState.NewWidgetsClose
+                is WhatsNewFeature.NewGiveRating -> NavigationState.NewGiveRatingClose
             }
             _navigationState.emit(target)
         }
@@ -65,9 +65,9 @@ class WhatsNewViewModel @Inject constructor(
         val isUserEntitled: Boolean
         val subscriptionTier: SubscriptionTier? // To show subscription when user is not entitled to the feature
 
-        data object NewWidgets : WhatsNewFeature {
-            override val title = LR.string.whats_new_new_widgets_title
-            override val message = LR.string.whats_new_new_widgets_message
+        data object NewGiveRating : WhatsNewFeature {
+            override val title = LR.string.whats_new_new_rating_title
+            override val message = LR.string.whats_new_new_rating_message
             override val confirmButtonTitle = LR.string.whats_new_got_it_button
             override val hasOffer = false
             override val isUserEntitled = true
@@ -83,7 +83,7 @@ class WhatsNewViewModel @Inject constructor(
             override val shouldCloseOnConfirm: Boolean = true,
         ) : NavigationState()
 
-        data object NewWidgetsClose : NavigationState()
+        data object NewGiveRatingClose : NavigationState()
         data object ForceClose : NavigationState()
     }
 }

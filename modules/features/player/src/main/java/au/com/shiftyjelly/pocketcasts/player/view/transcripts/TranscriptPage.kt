@@ -232,14 +232,12 @@ private fun ScrollableTranscriptTextView(
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                 add(CustomMenuItemOption.Share)
             }
-            add(CustomMenuItemOption.SelectAll)
         }
         CompositionLocalProvider(
             LocalTextToolbar provides CustomTextToolbar(
                 LocalView.current,
                 customMenu,
                 LocalClipboardManager.current,
-                displayString,
             ),
         ) {
             SelectionContainer {
@@ -369,12 +367,12 @@ private fun TranscriptContentPreview() {
                         ImmutableList.of(
                             Cue.Builder().setText(
                                 "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed. Laoreet justo orci luctus venenatis taciti lobortis sapien. Torquent quis dignissim curabitur magna molestie lectus pretium litora. Urna sodales rutrum posuere fusce velit turpis sollicitudin iaculis. Imperdiet turpis natoque vehicula cursus quisque congue.<br>" +
-                                    "<br>" +
-                                    "Quis etiam torquent feugiat penatibus curabitur. Facilisi inceptos egestas dolor mauris eget; rutrum facilisis nam. Ipsum mollis auctor mollis libero facilisi, sed posuere tristique lectus. Morbi erat suscipit eu feugiat nisi mauris. Convallis nostra condimentum est turpis ornare egestas lorem euismod at. Est nec eleifend leo proin vel hendrerit. Sem ipsum duis nam bibendum faucibus vestibulum class. Leo iaculis magna dignissim sit tristique porttitor dapibus non.<br>" +
-                                    "<br>" +
-                                    "Dis etiam suspendisse rhoncus, a class nisi porttitor. Ornare velit imperdiet natoque elit lacinia suscipit. Feugiat phasellus vestibulum sapien posuere rhoncus. Massa hendrerit purus taciti elit, maecenas non lobortis. Potenti class condimentum consectetur convallis, lacus habitasse praesent. Potenti risus mi neque volutpat vivamus taciti.<br>",
+                                        "<br>" +
+                                        "Quis etiam torquent feugiat penatibus curabitur. Facilisi inceptos egestas dolor mauris eget; rutrum facilisis nam. Ipsum mollis auctor mollis libero facilisi, sed posuere tristique lectus. Morbi erat suscipit eu feugiat nisi mauris. Convallis nostra condimentum est turpis ornare egestas lorem euismod at. Est nec eleifend leo proin vel hendrerit. Sem ipsum duis nam bibendum faucibus vestibulum class. Leo iaculis magna dignissim sit tristique porttitor dapibus non.<br>" +
+                                        "<br>" +
+                                        "Dis etiam suspendisse rhoncus, a class nisi porttitor. Ornare velit imperdiet natoque elit lacinia suscipit. Feugiat phasellus vestibulum sapien posuere rhoncus. Massa hendrerit purus taciti elit, maecenas non lobortis. Potenti class condimentum consectetur convallis, lacus habitasse praesent. Potenti risus mi neque volutpat vivamus taciti.<br>",
 
-                            ).build(),
+                                ).build(),
                         ),
                         0,
                         0,
