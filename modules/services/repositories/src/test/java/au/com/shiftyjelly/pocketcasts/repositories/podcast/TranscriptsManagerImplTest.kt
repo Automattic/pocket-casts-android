@@ -73,7 +73,8 @@ class TranscriptsManagerImplTest {
     }
 
     @Test
-    fun `if force refresh is true, loadTranscript loads transcript from network `() = runTest {
+    fun `if force refresh is true, and internet available, loadTranscript loads transcript from network `() = runTest {
+        whenever(networkWrapper.isConnected()).thenReturn(true)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
         whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
@@ -81,6 +82,18 @@ class TranscriptsManagerImplTest {
         transcriptsManager.loadTranscript("url_1", forceRefresh = true)
 
         verify(podcastCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+    }
+
+    @Test
+    fun `if force refresh is true, and internet not available, loadTranscript loads transcript from cache `() = runTest {
+        whenever(networkWrapper.isConnected()).thenReturn(false)
+        val response = mock<Response<ResponseBody>>()
+        whenever(response.isSuccessful).thenReturn(true)
+        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+
+        transcriptsManager.loadTranscript("url_1", forceRefresh = true)
+
+        verify(podcastCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
 
     @Test

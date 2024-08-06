@@ -55,7 +55,7 @@ class TranscriptsManagerImpl @Inject constructor(
         forceRefresh: Boolean,
     ) = withContext(Dispatchers.IO) {
         try {
-            var response = if (forceRefresh) {
+            var response = if (forceRefresh && networkWrapper.isConnected()) {
                 service.getTranscript(url, CacheControl.FORCE_NETWORK)
             } else {
                 service.getTranscript(url, CacheControl.parse(Headers.headersOf("Cache-Control", "only-if-cached, max-stale=7776000")))
