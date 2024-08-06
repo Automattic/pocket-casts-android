@@ -12,11 +12,12 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelectorState
 @Composable
 internal fun rememberClipPageState(
     firstVisibleItemIndex: Int,
+    step: SharingStep = SharingStep.Creating,
 ) = rememberSaveable(
     saver = ClipPageState.Saver,
     init = {
         ClipPageState(
-            step = SharingStep.Creating,
+            step = step,
             selectorState = ClipSelectorState(
                 firstVisibleItemIndex = firstVisibleItemIndex,
                 firstVisibleItemScrollOffset = 0,

@@ -312,21 +312,28 @@ private fun ClipControls(
     }
 }
 
-@Preview(name = "ShareClipVerticalRegularPreview", device = Devices.PortraitRegular)
+@Preview(name = "Regular device", device = Devices.PortraitRegular)
 @Composable
 private fun ShareClipVerticalRegularPreview() = ShareClipPagePreview()
 
-@Preview(name = "ShareClipVerticalSmallPreview", device = Devices.PortraitSmall)
+@Preview(name = "Regular device sharing", device = Devices.PortraitRegular)
+@Composable
+private fun ShareClipVerticalRegularEditingPreview() = ShareClipPagePreview(
+    step = SharingStep.Sharing,
+)
+
+@Preview(name = "Small device", device = Devices.PortraitSmall)
 @Composable
 private fun ShareClipVerticalSmallPreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "ShareClipVerticalTabletPreview", device = Devices.PortraitTablet)
+@Preview(name = "Tablet device", device = Devices.PortraitTablet)
 @Composable
 private fun ShareClipVerticalTabletPreview() = ShareClipPagePreview()
 
 @Composable
 internal fun ShareClipPagePreview(
     color: Long = 0xFFEC0404,
+    step: SharingStep = SharingStep.Creating,
 ) {
     val clipRange = Clip.Range(0.seconds, 15.seconds)
     ShareClipPage(
@@ -352,6 +359,7 @@ internal fun ShareClipPagePreview(
         listener = ShareClipPageListener.Preview,
         state = rememberClipPageState(
             firstVisibleItemIndex = 0,
+            step = step,
         ),
     )
 }
