@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import kotlinx.coroutines.test.runTest
@@ -23,9 +23,9 @@ import retrofit2.Response
 
 class TranscriptsManagerImplTest {
     private val transcriptDao: TranscriptDao = mock()
-    private val podcastCacheServer: PodcastCacheServer = mock()
+    private val transcriptCacheServer: TranscriptCacheServer = mock()
     private val networkWrapper: NetworkWrapper = mock()
-    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao, podcastCacheServer, networkWrapper)
+    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao, transcriptCacheServer, networkWrapper)
 
     @Test
     fun `findBestTranscript returns first supported transcript`() = runTest {
@@ -77,11 +77,11 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(true)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
-        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscript("url_1", forceRefresh = true)
 
-        verify(podcastCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+        verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
 
     @Test
@@ -89,22 +89,22 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(false)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
-        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscript("url_1", forceRefresh = true)
 
-        verify(podcastCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
+        verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
 
     @Test
     fun `if force refresh is false, loadTranscript loads transcript from cache`() = runTest {
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
-        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscript("url_1")
 
-        verify(podcastCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
+        verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
 
     @Test
@@ -112,11 +112,11 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(true)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(false)
-        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscript("url_1")
 
-        verify(podcastCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+        verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
 
     @Test
@@ -124,7 +124,7 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(false)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(false)
-        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
         try {
             transcriptsManager.loadTranscript("url_1")
@@ -142,7 +142,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DOWNLOAD_EPISODE)
 
-        verify(podcastCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+        verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
 
     @Test
@@ -154,6 +154,6 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DEFAULT)
 
-        verifyNoInteractions(podcastCacheServer)
+        verifyNoInteractions(transcriptCacheServer)
     }
 }
