@@ -69,8 +69,10 @@ class ServersModule {
             val request = chain.request()
             val originalResponse = chain.proceed(request)
             var responseBuilder = originalResponse.newBuilder()
-            if (request.url.host == SERVER_CACHE_HOST) {
+            if (request.url.host == SERVER_CACHE_HOST || request.cacheControl.noCache) {
                 responseBuilder = responseBuilder.header(HEADER_CACHE_CONTROL, "public, max-age=$CACHE_FIVE_MINUTES")
+            } else if (request.cacheControl.onlyIfCached) {
+                responseBuilder.header(HEADER_CACHE_CONTROL, "public, only-if-cached, max-stale=${request.cacheControl.maxStaleSeconds}")
             }
             responseBuilder.build()
         }
@@ -159,6 +161,7 @@ class ServersModule {
         @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
     ): OkHttpClient.Builder {
         var builder = OkHttpClient.Builder()
+            .addNetworkInterceptor(INTERCEPTOR_CACHE_MODIFIER)
             .addInterceptor(INTERCEPTOR_CACHE_MODIFIER)
             .addInterceptor(INTERCEPTOR_USER_AGENT)
             .addInterceptor(crashLoggingInterceptor)
