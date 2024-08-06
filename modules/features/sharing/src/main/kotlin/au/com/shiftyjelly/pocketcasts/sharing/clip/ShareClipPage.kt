@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -43,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
-import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
