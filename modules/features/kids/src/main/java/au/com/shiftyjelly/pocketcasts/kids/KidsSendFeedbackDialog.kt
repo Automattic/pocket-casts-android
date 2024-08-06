@@ -51,7 +51,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun KidsSendFeedbackDialog(
     modifier: Modifier = Modifier,
     onSeen: () -> Unit,
-    onSubmitFeedback: () -> Unit,
+    onSubmitFeedback: (String) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -61,7 +61,7 @@ fun KidsSendFeedbackDialog(
     val onFeedbackTapped = {
         keyboardController?.hide()
         focusManager.clearFocus()
-        onSubmitFeedback()
+        onSubmitFeedback(feedbackText.text)
     }
 
     CallOnce {

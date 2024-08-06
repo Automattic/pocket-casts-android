@@ -20,8 +20,8 @@ class KidsSendFeedbackViewModel @Inject constructor(
     private val _showFeedbackDialog = MutableStateFlow(false)
     val showFeedbackDialog: StateFlow<Boolean> = _showFeedbackDialog
 
-    private val _feedbackSent = MutableStateFlow(false)
-    val feedbackSent: StateFlow<Boolean> = _feedbackSent
+    private val _sendFeedbackState = MutableStateFlow<SendFeedbackState>(SendFeedbackState.None)
+    val sendFeedbackState: StateFlow<SendFeedbackState> = _sendFeedbackState
 
     fun onThankYouForYourInterestSeen() {
         analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_THANK_YOU_FOR_YOUR_INTEREST_SEEN)
@@ -50,7 +50,17 @@ class KidsSendFeedbackViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result: FeedbackResult = feedbackManager.sendAnonymousFeedback(feedback)
-            _feedbackSent.value = result is FeedbackResult.Success
+            if (result is FeedbackResult.Success) {
+                _sendFeedbackState.value = SendFeedbackState.Success
+            } else {
+                _sendFeedbackState.value = SendFeedbackState.Error
+            }
         }
     }
+}
+
+sealed class SendFeedbackState {
+    data object None : SendFeedbackState()
+    data object Success : SendFeedbackState()
+    data object Error : SendFeedbackState()
 }

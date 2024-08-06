@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.kids.feedback.FeedbackManager
 import au.com.shiftyjelly.pocketcasts.kids.feedback.FeedbackResult
 import au.com.shiftyjelly.pocketcasts.kids.viewmodel.KidsSendFeedbackViewModel
+import au.com.shiftyjelly.pocketcasts.kids.viewmodel.SendFeedbackState
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -64,7 +65,7 @@ class KidsSendFeedbackViewModelTest {
 
         viewModel.sendFeedback(feedback)
 
-        assertEquals(true, viewModel.feedbackSent.value)
+        assertEquals(SendFeedbackState.Success, viewModel.sendFeedbackState.value)
     }
 
     @Test
@@ -76,7 +77,7 @@ class KidsSendFeedbackViewModelTest {
 
         viewModel.sendFeedback(feedback)
 
-        assertEquals(false, viewModel.feedbackSent.value)
+        assertEquals(SendFeedbackState.Error, viewModel.sendFeedbackState.value)
     }
 
     @Test
