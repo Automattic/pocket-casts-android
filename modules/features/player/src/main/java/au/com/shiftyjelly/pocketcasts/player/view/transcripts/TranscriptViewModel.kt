@@ -45,6 +45,8 @@ class TranscriptViewModel @Inject constructor(
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty())
     val uiState: StateFlow<UiState> = _uiState
+    private var _isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     init {
         viewModelScope.launch {
@@ -66,14 +68,15 @@ class TranscriptViewModel @Inject constructor(
                 } ?: UiState.Empty(podcastAndEpisode)
             }
 
-    fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean) {
+    fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean, forceRefresh: Boolean = false) {
         if (isTranscriptViewOpen.not()) return
+        if (forceRefresh) _isRefreshing.value = true
         _uiState.value.transcript?.let { transcript ->
             clearErrorsIfFound(transcript)
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
-                    val result = buildSubtitleCues(transcript)
+                    val result = buildSubtitleCues(transcript, forceRefresh)
                     UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
@@ -86,14 +89,15 @@ class TranscriptViewModel @Inject constructor(
                 } catch (e: Exception) {
                     UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
                 }
+                if (forceRefresh) _isRefreshing.value = false
             }
         }
     }
 
-    private suspend fun buildSubtitleCues(transcript: Transcript) = withContext(ioDispatcher) {
+    private suspend fun buildSubtitleCues(transcript: Transcript, forceRefresh: Boolean) = withContext(ioDispatcher) {
         when (transcript.type) {
             TranscriptFormat.HTML.mimeType -> {
-                val content = transcriptsManager.loadTranscript(transcript.url)?.string() ?: ""
+                val content = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
                 if (content.trim().isEmpty()) {
                     emptyList<CuesWithTiming>()
                 } else {
@@ -115,7 +119,7 @@ class TranscriptViewModel @Inject constructor(
                     throw UnsupportedOperationException("Unsupported MIME type: ${transcript.type}")
                 } else {
                     val result = ImmutableList.builder<CuesWithTiming>()
-                    transcriptsManager.loadTranscript(transcript.url)?.bytes()?.let { data ->
+                    transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.bytes()?.let { data ->
                         val parser = subtitleParserFactory.create(format)
                         parser.parse(
                             data,

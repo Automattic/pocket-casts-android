@@ -214,6 +214,28 @@ class TranscriptViewModelTest {
         assertTrue(result[0].text == "Text1.!? Text2")
     }
 
+    @Test
+    fun `given force refresh, when transcript load invoked, then transcript is refreshed`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
+
+        verify(transcriptsManager).loadTranscript(transcript.url, forceRefresh = true)
+    }
+
+    @Test
+    fun `given no force refresh, when transcript load invoked, then transcript is not refreshed`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = false)
+
+        verify(transcriptsManager).loadTranscript(transcript.url, forceRefresh = false)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun initViewModel(
         htmlContent: String? = null,
@@ -221,7 +243,7 @@ class TranscriptViewModelTest {
     ) = runTest {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
         if (transcriptLoadException != null) {
-            given(transcriptsManager.loadTranscript(anyOrNull(), anyOrNull())).willAnswer { throw transcriptLoadException }
+            given(transcriptsManager.loadTranscript(anyOrNull(), anyOrNull(), anyOrNull())).willAnswer { throw transcriptLoadException }
         } else {
             val response = mock<ResponseBody>()
             if (htmlContent != null) {
@@ -229,7 +251,7 @@ class TranscriptViewModelTest {
             } else {
                 whenever(response.bytes()).thenReturn(byteArrayOf())
             }
-            whenever(transcriptsManager.loadTranscript(anyOrNull(), anyOrNull())).thenReturn(response)
+            whenever(transcriptsManager.loadTranscript(anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(response)
         }
 
         viewModel = TranscriptViewModel(

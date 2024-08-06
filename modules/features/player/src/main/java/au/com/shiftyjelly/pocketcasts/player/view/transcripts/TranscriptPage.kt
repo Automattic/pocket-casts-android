@@ -16,8 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -64,6 +68,7 @@ import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TranscriptPage(
     playerViewModel: PlayerViewModel,
@@ -73,35 +78,46 @@ fun TranscriptPage(
 ) {
     val uiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+    val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullRefreshState(refreshing.value, {
+        transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
+    })
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.value.podcastAndEpisode?.podcast))
     val colors = DefaultColors(playerBackgroundColor)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .pullRefresh(pullRefreshState),
+    ) {
+        when (uiState.value) {
+            is UiState.Empty -> {
+                EmptyView(Modifier.background(colors.backgroundColor()))
+            }
 
-    when (uiState.value) {
-        is UiState.Empty -> {
-            EmptyView(Modifier.background(colors.backgroundColor()))
-        }
+            is UiState.TranscriptFound -> {
+                LoadingView(Modifier.background(colors.backgroundColor()))
+            }
 
-        is UiState.TranscriptFound -> {
-            LoadingView(Modifier.background(colors.backgroundColor()))
-        }
+            is UiState.TranscriptLoaded -> {
+                val loadedState = uiState.value as UiState.TranscriptLoaded
 
-        is UiState.TranscriptLoaded -> {
-            val loadedState = uiState.value as UiState.TranscriptLoaded
-            TranscriptContent(
-                state = loadedState,
-                colors = colors,
-                modifier = modifier,
-            )
-        }
+                TranscriptContent(
+                    state = loadedState,
+                    colors = colors,
+                    modifier = modifier,
+                )
+            }
 
-        is UiState.Error -> {
-            val errorState = uiState.value as UiState.Error
-            TranscriptError(
-                state = errorState,
-                colors = colors,
-                modifier = modifier,
-            )
+            is UiState.Error -> {
+                val errorState = uiState.value as UiState.Error
+                TranscriptError(
+                    state = errorState,
+                    colors = colors,
+                    modifier = modifier,
+                )
+            }
         }
+        PullRefreshIndicator(refreshing.value, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
