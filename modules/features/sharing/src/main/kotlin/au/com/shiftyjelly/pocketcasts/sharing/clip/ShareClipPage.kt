@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
-import au.com.shiftyjelly.pocketcasts.sharing.ui.rememberClipSelectorState
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
 import java.sql.Date
 import java.time.Instant
@@ -83,7 +82,7 @@ internal fun ShareClipPage(
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
-    state: ClipSelectorState = rememberClipSelectorState(
+    state: ClipPageState = rememberClipPageState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
     ),
 ) = VerticalClipPage(
@@ -109,7 +108,7 @@ private fun VerticalClipPage(
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
-    state: ClipSelectorState,
+    state: ClipPageState,
 ) {
     Box {
         Column(
@@ -154,7 +153,7 @@ private fun VerticalClipPage(
                     isPlaying = isPlaying,
                     shareColors = shareColors,
                     listener = listener,
-                    state = state,
+                    state = state.selectorState,
                 )
             }
         }
@@ -285,7 +284,7 @@ internal fun ShareClipPagePreview(
         shareColors = ShareColors(Color(color)),
         assetController = BackgroundAssetController.preview(),
         listener = ShareClipPageListener.Preview,
-        state = rememberClipSelectorState(
+        state = rememberClipPageState(
             firstVisibleItemIndex = 0,
         ),
     )
