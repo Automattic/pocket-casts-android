@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
-import androidx.compose.ui.graphics.luminance
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
@@ -117,16 +116,18 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         }
     }
 
-    protected fun styleBackgroundColor(@ColorInt color: Int) {
-        val luminance = ColorUtils.calculateLuminance(color)
+    protected fun styleBackgroundColor(
+        @ColorInt background: Int,
+        @ColorInt navigationBar: Int,
+    ) {
         requireActivity().window?.let { activityWindow ->
-            activityWindow.statusBarColor = color
-            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = luminance > 0.5f
+            activityWindow.statusBarColor = navigationBar
+            WindowInsetsControllerCompat(activityWindow, activityWindow.decorView).isAppearanceLightStatusBars = ColorUtils.calculateLuminance(navigationBar) > 0.5f
         }
         requireDialog().window?.let { dialogWindow ->
-            dialogWindow.navigationBarColor = color
-            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = luminance > 0.5f
+            dialogWindow.navigationBarColor = background
+            WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).isAppearanceLightNavigationBars = ColorUtils.calculateLuminance(background) > 0.5f
         }
-        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
+        bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(background)
     }
 }
