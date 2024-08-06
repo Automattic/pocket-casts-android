@@ -2022,6 +2022,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_clip_start_position">%s Start</string>
     <!--  The duration of a shared clip. It is in HH:MM:SS format.  -->
     <string name="share_clip_duration">%s Duration</string>
+    <string name="share_clip_create_label" translatable="false">@string/podcast_create_clip</string>
+    <string name="share_clip_share_label">Share clip</string>
+    <string name="share_clip_edit_label">Edit clip</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,10 +29,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
+import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
-import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelectorState
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
@@ -79,6 +81,7 @@ internal fun ShareClipPage(
     playbackProgress: Duration,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
+    platforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
@@ -92,8 +95,10 @@ internal fun ShareClipPage(
     playbackProgress = playbackProgress,
     isPlaying = isPlaying,
     useEpisodeArtwork = useEpisodeArtwork,
+    platforms = platforms,
+    shareColors = shareColors,
     assetController = assetController,
-    shareColors = shareColors, listener = listener,
+    listener = listener,
     state = state,
 )
 
@@ -105,6 +110,7 @@ private fun VerticalClipPage(
     playbackProgress: Duration,
     isPlaying: Boolean,
     useEpisodeArtwork: Boolean,
+    platforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
@@ -146,15 +152,28 @@ private fun VerticalClipPage(
                 }
             }
             if (podcast != null && episode != null) {
-                ClipControls(
-                    episode = episode,
-                    clipRange = clipRange,
-                    playbackProgress = playbackProgress,
-                    isPlaying = isPlaying,
-                    shareColors = shareColors,
-                    listener = listener,
-                    state = state.selectorState,
-                )
+                AnimatedContent(state.step) { step ->
+                    when (step) {
+                        SharingStep.Creating -> ClipControls(
+                            episode = episode,
+                            clipRange = clipRange,
+                            playbackProgress = playbackProgress,
+                            isPlaying = isPlaying,
+                            shareColors = shareColors,
+                            listener = listener,
+                            state = state,
+                        )
+                        SharingStep.Sharing -> Box(
+                            modifier = Modifier.padding(vertical = 24.dp),
+                        ) {
+                            PlatformBar(
+                                platforms = platforms,
+                                shareColors = shareColors,
+                                onClick = {},
+                            )
+                        }
+                    }
+                }
             }
         }
         CloseButton(
@@ -213,7 +232,7 @@ private fun ClipControls(
     isPlaying: Boolean,
     shareColors: ShareColors,
     listener: ShareClipPageListener,
-    state: ClipSelectorState,
+    state: ClipPageState,
 ) {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -228,14 +247,14 @@ private fun ClipControls(
             isPlaying = isPlaying,
             shareColors = shareColors,
             listener = listener,
-            state = state,
+            state = state.selectorState,
         )
         Spacer(
             modifier = Modifier.height(12.dp),
         )
         RowButton(
             text = stringResource(LR.string.next),
-            onClick = {},
+            onClick = { state.step = SharingStep.Sharing },
             colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
             textColor = shareColors.clipButtonText,
             elevation = null,
@@ -281,6 +300,7 @@ internal fun ShareClipPagePreview(
         playbackProgress = 8.seconds,
         isPlaying = false,
         useEpisodeArtwork = true,
+        platforms = SocialPlatform.entries.toSet(),
         shareColors = ShareColors(Color(color)),
         assetController = BackgroundAssetController.preview(),
         listener = ShareClipPageListener.Preview,

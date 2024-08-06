@@ -47,7 +47,7 @@ internal class ClipPageState(
             restore = {
                 ClipPageState(
                     step = it[0] as SharingStep,
-                    selectorState = requireNotNull(ClipSelectorState.Saver.restore(it.drop(1))) {
+                    selectorState = requireNotNull(ClipSelectorState.Saver.restore(it[1] as Any)) {
                         "ClipSelectorState.Saver should never return null"
                     },
                 )
