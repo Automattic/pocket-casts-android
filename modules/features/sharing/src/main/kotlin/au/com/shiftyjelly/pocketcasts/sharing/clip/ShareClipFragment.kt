@@ -18,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
-import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
@@ -94,8 +93,8 @@ class ShareClipFragment : BaseDialogFragment() {
                 isPlaying = uiState.isPlaying,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 shareColors = shareColors,
+                assetController = assetController,
                 listener = listener,
-                captureController = assetController.captureController(CardType.Vertical),
             )
         }
     }
