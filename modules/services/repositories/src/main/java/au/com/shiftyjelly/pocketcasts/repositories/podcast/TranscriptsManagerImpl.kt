@@ -90,8 +90,3 @@ enum class TranscriptFormat(val mimeType: String) {
     VTT("text/vtt"),
     HTML("text/html"),
 }
-
-enum class LoadTranscriptSource {
-    DOWNLOAD_EPISODE, // When transcript is downloaded as part of episode download
-    DEFAULT,
-}

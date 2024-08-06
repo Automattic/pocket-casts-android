@@ -19,3 +19,8 @@ interface TranscriptsManager {
         forceRefresh: Boolean = false,
     ): ResponseBody?
 }
+
+enum class LoadTranscriptSource {
+    DOWNLOAD_EPISODE, // When transcript is downloaded as part of episode download
+    DEFAULT,
+}
