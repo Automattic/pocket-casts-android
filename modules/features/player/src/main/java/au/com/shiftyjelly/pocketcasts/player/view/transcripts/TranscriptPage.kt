@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import android.content.res.Configuration
+import android.os.Build
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,15 +13,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
@@ -38,6 +44,8 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
+import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
@@ -145,19 +153,35 @@ private fun TranscriptContent(
                 html = displayString.toString(),
                 color = colors.textColor(),
                 textStyleResId = UR.style.H40,
+                selectable = true,
                 modifier = modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = bottomPadding)
                     .verticalScroll(rememberScrollState()),
             )
         } else {
-            Text(
-                displayString,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = bottomPadding)
-                    .verticalScroll(rememberScrollState()),
-            )
+            val customMenu = buildList {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    add(CustomMenuItemOption.Share)
+                }
+            }
+            CompositionLocalProvider(
+                LocalTextToolbar provides CustomTextToolbar(
+                    LocalView.current,
+                    customMenu,
+                    LocalClipboardManager.current,
+                ),
+            ) {
+                SelectionContainer {
+                    Text(
+                        displayString,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = bottomPadding)
+                            .verticalScroll(rememberScrollState()),
+                    )
+                }
+            }
         }
 
         GradientView(
