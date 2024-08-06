@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -16,7 +16,7 @@ import okhttp3.Headers
 
 class TranscriptsManagerImpl @Inject constructor(
     private val transcriptDao: TranscriptDao,
-    private val service: PodcastCacheServer,
+    private val service: TranscriptCacheServer,
     private val networkWrapper: NetworkWrapper,
 ) : TranscriptsManager {
     private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT, TranscriptFormat.HTML)

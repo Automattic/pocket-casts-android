@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
@@ -69,7 +70,17 @@ class ServersModule {
             val request = chain.request()
             val originalResponse = chain.proceed(request)
             var responseBuilder = originalResponse.newBuilder()
-            if (request.url.host == SERVER_CACHE_HOST || request.cacheControl.noCache) {
+            if (request.url.host == SERVER_CACHE_HOST) {
+                responseBuilder = responseBuilder.header(HEADER_CACHE_CONTROL, "public, max-age=$CACHE_FIVE_MINUTES")
+            }
+            responseBuilder.build()
+        }
+
+        val INTERCEPTOR_CACHE_TRANSCRIPT_MODIFIER = Interceptor { chain ->
+            val request = chain.request()
+            val originalResponse = chain.proceed(request)
+            var responseBuilder = originalResponse.newBuilder()
+            if (request.cacheControl.noCache) {
                 responseBuilder = responseBuilder.header(HEADER_CACHE_CONTROL, "public, max-age=$CACHE_FIVE_MINUTES")
             } else if (request.cacheControl.onlyIfCached) {
                 responseBuilder.header(HEADER_CACHE_CONTROL, "public, only-if-cached, max-stale=${request.cacheControl.maxStaleSeconds}")
@@ -156,12 +167,19 @@ class ServersModule {
     }
 
     @Provides
+    @TranscriptCache
+    @Singleton
+    internal fun provideTranscriptCache(@ApplicationContext context: Context): Cache {
+        return provideCache(folder = "TranscriptCache", context = context)
+    }
+
+    @Provides
+    @CachedOkHttpBuilder
     internal fun provideOkHttpClientBuilder(
         @SyncServerCache cache: Cache,
         @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
     ): OkHttpClient.Builder {
         var builder = OkHttpClient.Builder()
-            .addNetworkInterceptor(INTERCEPTOR_CACHE_MODIFIER)
             .addInterceptor(INTERCEPTOR_CACHE_MODIFIER)
             .addInterceptor(INTERCEPTOR_USER_AGENT)
             .addInterceptor(crashLoggingInterceptor)
@@ -180,9 +198,41 @@ class ServersModule {
     }
 
     @Provides
+    @TranscriptOkHttpBuilder
+    internal fun provideTranscriptOkHttpBuilder(
+        @TranscriptCache cache: Cache,
+        @CrashLoggingInterceptor crashLoggingInterceptor: Interceptor,
+    ): OkHttpClient.Builder {
+        var builder = OkHttpClient.Builder()
+            .addNetworkInterceptor(INTERCEPTOR_CACHE_TRANSCRIPT_MODIFIER)
+            .addInterceptor(INTERCEPTOR_CACHE_TRANSCRIPT_MODIFIER)
+            .addInterceptor(INTERCEPTOR_USER_AGENT)
+            .addInterceptor(crashLoggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .cache(cache)
+
+        if (BuildConfig.DEBUG) {
+            val logging = HttpLoggingInterceptor()
+            logging.level = HttpLoggingInterceptor.Level.BODY
+            builder = builder.addInterceptor(logging)
+        }
+
+        return builder
+    }
+
+    @Provides
     @CachedOkHttpClient
     @Singleton
-    internal fun provideOkHttpClientCache(okHttpClientBuilder: OkHttpClient.Builder): OkHttpClient {
+    internal fun provideOkHttpClientCache(@CachedOkHttpBuilder okHttpClientBuilder: OkHttpClient.Builder): OkHttpClient {
+        return okHttpClientBuilder.build()
+    }
+
+    @Provides
+    @TranscriptOkHttpClient
+    @Singleton
+    internal fun provideTranscriptOkHttpClientCache(@TranscriptOkHttpBuilder okHttpClientBuilder: OkHttpClient.Builder): OkHttpClient {
         return okHttpClientBuilder.build()
     }
 
@@ -363,6 +413,16 @@ class ServersModule {
     }
 
     @Provides
+    @TranscriptRetrofit
+    @Singleton
+    internal fun provideTranscriptRetrofit(@TranscriptOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("http://localhost/") // Base URL is required but will be set using the annotation @Url
+            .build()
+    }
+
+    @Provides
     @Singleton
     internal fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
         return AccountManager.get(context)
@@ -371,11 +431,27 @@ class ServersModule {
     @Provides
     @Singleton
     fun provideCacheServer(@PodcastCacheServerRetrofit retrofit: Retrofit): PodcastCacheServer = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideTranscriptCacheServer(@TranscriptRetrofit retrofit: Retrofit): TranscriptCacheServer = retrofit.create()
 }
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class SyncServerCache
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class TranscriptCache
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class CachedOkHttpBuilder
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class TranscriptOkHttpBuilder
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -396,6 +472,10 @@ annotation class NoCacheTokenedOkHttpClient
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class CachedTokenedOkHttpClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class TranscriptOkHttpClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -424,6 +504,10 @@ annotation class ListUploadServerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class SyncServerRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class TranscriptRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

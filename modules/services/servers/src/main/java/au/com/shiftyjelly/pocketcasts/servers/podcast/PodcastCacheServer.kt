@@ -6,12 +6,10 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import io.reactivex.Single
 import java.util.Date
-import okhttp3.CacheControl
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -81,12 +79,6 @@ interface PodcastCacheServer {
 
     @GET
     suspend fun getShowNotesChapters(@Url url: String): RawChaptersResponse
-
-    @GET
-    suspend fun getTranscript(
-        @Url url: String,
-        @Header("Cache-Control") cacheControl: CacheControl,
-    ): Response<ResponseBody>
 
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
     fun getPodcastAndEpisodeSingle(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>
