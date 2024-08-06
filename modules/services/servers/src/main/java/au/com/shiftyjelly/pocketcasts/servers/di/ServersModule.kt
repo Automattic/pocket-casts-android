@@ -119,8 +119,8 @@ class ServersModule {
             return builder.build()
         }
 
-        fun provideCache(folder: String, context: Context): Cache {
-            val cacheSize = 50 * 1024 * 1024 // 50 MB
+        fun provideCache(folder: String, context: Context, cacheSizeInMB: Int): Cache {
+            val cacheSize = cacheSizeInMB * 1024 * 1024
             val cacheDirectory = File(context.cacheDir.absolutePath, folder)
             return Cache(cacheDirectory, cacheSize.toLong())
         }
@@ -163,14 +163,14 @@ class ServersModule {
     @SyncServerCache
     @Singleton
     internal fun provideSyncServerCache(@ApplicationContext context: Context): Cache {
-        return provideCache(folder = "HttpCache", context = context)
+        return provideCache(folder = "HttpCache", context = context, cacheSizeInMB = 10)
     }
 
     @Provides
     @TranscriptCache
     @Singleton
     internal fun provideTranscriptCache(@ApplicationContext context: Context): Cache {
-        return provideCache(folder = "TranscriptCache", context = context)
+        return provideCache(folder = "TranscriptCache", context = context, cacheSizeInMB = 50)
     }
 
     @Provides
