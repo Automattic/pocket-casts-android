@@ -20,6 +20,8 @@ android {
 dependencies {
     val debugProdImplementation by configurations
 
+    implementation(libs.capturable)
+
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))
     implementation(project(":modules:services:images"))

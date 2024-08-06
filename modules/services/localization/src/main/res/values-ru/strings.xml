@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 13:54:03+0000
+Translation-Revision-Date: 2024-08-01 13:54:06+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="send_feedback">Отправить отзыв</string>
+    <string name="share_episode_timestamp_title">Поделиться выпуском в %s</string>
+    <string name="share_via">Поделиться в %s</string>
+    <string name="share_podcast_description">Выбрать формат и платформу для публикации</string>
+    <string name="podcast_cover_description">Обложка подкаста %s</string>
+    <string name="share_label_copy_link">Копировать ссылку</string>
+    <string name="share_label_instagram_stories">Истории</string>
+    <string name="profile_change_avatar">Изменить аватар</string>
     <string name="something_went_wrong_to_rate_this_podcast">Что-то пошло не так. Повторите попытку позже</string>
     <string name="thank_you_for_rating">Благодарим за оценку!</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">Весь воспроизводимый выпуск временно кешируется, чтобы свести к минимуму потоковую передачу.</string>
@@ -22,10 +30,6 @@ Language: ru
     <string name="settings_advanced_cache_entire_playing_episode">Кешировать проигрываемый выпуск</string>
     <string name="playback">Воспроизведение</string>
     <string name="podcast_share_clip">Клип</string>
-    <string name="download_completed_for_episode">Скачивание %1$s завершено</string>
-    <string name="episode_queued_for_download">Выпуск в очереди на скачивание</string>
-    <string name="episode_was_removed">Выпуск удалён</string>
-    <string name="remove_downloaded_file">Удалить скачанный файл</string>
     <string name="settings_export_database_failed">Не удалось экспортировать базу данных</string>
     <string name="settings_export_database">Экспортировать базу данных</string>
     <string name="settings_sleep_timer_auto_restart_summary">В режиме «Включено» таймер сна будет автоматически перезапущен, если вы воспроизведёте выпуск в течение 5 минут после последней остановки.</string>
@@ -1057,7 +1061,6 @@ Language: ru
     <string name="plus_themes_icons">Темы и значки</string>
     <string name="plus_thanks_for_your_support_bang">Спасибо за вашу поддержку!</string>
     <string name="plus_slash_month">%s в месяц</string>
-    <string name="plus_lifetime_member">Пожизненное членство</string>
     <string name="plus_learn_more_button">Подробнее</string>
     <string name="plus_learn_more_about_plus">Подробнее о Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Приложения для настольных систем</string>
@@ -1720,7 +1723,7 @@ Language: ru
         <item quantity="many">%d вып.</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="one">%1$d выпуск — %2$s осталось</item>
+        <item quantity="one" formatted="true">%1$d выпуск — %2$s осталось</item>
         <item quantity="few">%1$d вып. — %2$s осталось</item>
         <item quantity="many">%1$d вып. — %2$s осталось</item>
     </plurals>

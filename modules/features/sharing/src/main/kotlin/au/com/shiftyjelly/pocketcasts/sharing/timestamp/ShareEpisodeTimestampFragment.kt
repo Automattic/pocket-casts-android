@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -63,6 +64,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
                 socialPlatforms = platforms,
                 shareColors = shareColors,
                 listener = listener,
+                captureController = rememberCaptureController(),
             )
         }
     }

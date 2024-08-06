@@ -9,7 +9,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
-import androidx.compose.ui.text.AnnotatedString
 import au.com.shiftyjelly.pocketcasts.localization.R
 
 /**
@@ -20,7 +19,6 @@ class CustomTextToolbar(
     private val view: View,
     private val customMenuItems: List<CustomMenuItemOption>,
     private val clipboardManager: ClipboardManager,
-    private val displayString: AnnotatedString,
 ) : TextToolbar {
     private var actionMode: ActionMode? = null
     private val textActionModeCallback = TextActionModeCallback(
@@ -76,10 +74,6 @@ class CustomTextToolbar(
                         type = "text/plain"
                     }
                     context.startActivity(createChooser(shareIntent, context.getString(R.string.share)))
-                }
-
-                CustomMenuItemOption.SelectAll -> {
-                    clipboardManager.setText(displayString)
                 }
             }
         } catch (e: Exception) {

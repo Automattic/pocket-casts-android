@@ -974,6 +974,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun share() {
         val podcast = viewModel.podcast.value ?: return
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
         if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
             SharePodcastFragment
                 .newInstance(podcast, SourceView.PODCAST_SCREEN)

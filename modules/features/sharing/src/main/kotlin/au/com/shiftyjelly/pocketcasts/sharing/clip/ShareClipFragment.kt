@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VideoBackgroundController
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -81,7 +82,8 @@ class ShareClipFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val shareColors = shareColors
-        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient)
+        val videoBackgroundController = VideoBackgroundController(requireContext(), shareColors)
+        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient, videoBackgroundController)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareClipPage(
@@ -93,6 +95,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 shareColors = shareColors,
                 listener = listener,
+                captureController = videoBackgroundController.verticalCardController,
             )
         }
     }
