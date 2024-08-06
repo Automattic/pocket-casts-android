@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -24,6 +25,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 
@@ -32,6 +36,7 @@ internal fun HorizontalPodcastCast(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
     useWidthForAspectRatio: Boolean = true,
 ) = HorizontalCard(
@@ -41,6 +46,7 @@ internal fun HorizontalPodcastCast(
     ),
     shareColors = shareColors,
     useWidthForAspectRatio = useWidthForAspectRatio,
+    captureController = captureController,
     modifier = modifier,
 )
 
@@ -50,6 +56,7 @@ internal fun HorizontalEpisodeCard(
     podcast: Podcast,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
     useWidthForAspectRatio: Boolean = true,
 ) = HorizontalCard(
@@ -60,14 +67,24 @@ internal fun HorizontalEpisodeCard(
     ),
     shareColors = shareColors,
     useWidthForAspectRatio = useWidthForAspectRatio,
+    captureController = captureController,
     modifier = modifier,
 )
 
+@ShowkaseComposable(name = "Horizontal podcast card", group = "Sharing")
+@Preview(name = "HorizontalPodcastCardDark")
+@Composable
+fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
+    baseColor = Color(0xFFEC0404),
+)
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun HorizontalCard(
     data: CardData,
     shareColors: ShareColors,
     useWidthForAspectRatio: Boolean,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
@@ -87,6 +104,7 @@ private fun HorizontalCard(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .capturable(captureController)
             .background(backgroundGradient, RoundedCornerShape(12.dp))
             .width(width)
             .height(height),
@@ -130,13 +148,6 @@ private fun HorizontalCard(
         }
     }
 }
-
-@ShowkaseComposable(name = "Horizontal podcast card", group = "Sharing")
-@Preview(name = "HorizontalPodcastCardDark")
-@Composable
-fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
-    baseColor = Color(0xFFEC0404),
-)
 
 @Preview(name = "HorizontalPodcastCardLight")
 @Composable
@@ -200,4 +211,5 @@ private fun HorizontalCardPreview(
     data = data,
     shareColors = ShareColors(baseColor),
     useWidthForAspectRatio = true,
+    captureController = rememberCaptureController(),
 )

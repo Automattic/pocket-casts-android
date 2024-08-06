@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -22,6 +23,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 
@@ -30,6 +34,7 @@ internal fun SquarePodcastCast(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
 ) = SquareCard(
     data = PodcastCardData(
@@ -37,6 +42,7 @@ internal fun SquarePodcastCast(
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
+    captureController = captureController,
     modifier = modifier,
 )
 
@@ -46,6 +52,7 @@ internal fun SquareEpisodeCard(
     podcast: Podcast,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
 ) = SquareCard(
     data = EpisodeCardData(
@@ -54,13 +61,16 @@ internal fun SquareEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
+    captureController = captureController,
     modifier = modifier,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SquareCard(
     data: CardData,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
@@ -76,6 +86,7 @@ private fun SquareCard(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .capturable(captureController)
             .background(backgroundGradient, RoundedCornerShape(12.dp))
             .size(size),
     ) {
@@ -187,4 +198,5 @@ private fun SquareCardPreview(
 ) = SquareCard(
     data = data,
     shareColors = ShareColors(baseColor),
+    captureController = rememberCaptureController(),
 )

@@ -30,6 +30,7 @@ android {
         buildConfigField "String", "BUILD_PLATFORM", "\"${project.buildPlatform}\""
         buildConfigField "String", "ENCRYPTION_KEY", "\"${project.encryptionKey}\""
         buildConfigField "String", "APP_SECRET", "\"${project.appSecret}\""
+        buildConfigField "String", "META_APP_ID", "\"${project.metaAppId}\""
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")

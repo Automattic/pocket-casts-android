@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -96,63 +94,58 @@ private fun VerticalCard(
     } else {
         maxWidth * 1.5f to maxWidth
     }
-    Box(
-        modifier = modifier
-            .wrapContentSize()
-            .background(backgroundGradient, RoundedCornerShape(12.dp)),
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .background(backgroundGradient, RoundedCornerShape(12.dp))
+            .capturable(captureController)
+            .width(width)
+            .height(height),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Spacer(
+            modifier = Modifier.height(width * 0.15f),
+        )
+        data.Image(
             modifier = Modifier
-                .width(width)
-                .height(height)
-                .capturable(captureController),
-        ) {
-            Spacer(
-                modifier = Modifier.height(width * 0.15f),
-            )
-            data.Image(
-                modifier = Modifier
-                    .size(width * 0.7f)
-                    .clip(RoundedCornerShape(8.dp)),
-            )
-            Spacer(
-                modifier = Modifier.height(height * 0.05f),
-            )
-            TextH70(
-                text = data.topText(),
-                maxLines = 1,
-                color = shareColors.cardText.copy(alpha = 0.5f),
-                modifier = Modifier.padding(horizontal = width * 0.1f),
-            )
-            Spacer(
-                modifier = Modifier.height(6.dp),
-            )
-            TextH40(
-                text = data.middleText(),
-                maxLines = 2,
-                textAlign = TextAlign.Center,
-                color = shareColors.cardText,
-                modifier = Modifier.padding(horizontal = width * 0.1f),
-            )
-            Spacer(
-                modifier = Modifier.height(6.dp),
-            )
-            TextH70(
-                text = data.bottomText(),
-                maxLines = 2,
-                textAlign = TextAlign.Center,
-                color = shareColors.cardText.copy(alpha = 0.5f),
-                modifier = Modifier.padding(horizontal = width * 0.1f),
-            )
-            Spacer(
-                modifier = Modifier.weight(1f),
-            )
-            PocketCastsPill()
-            Spacer(
-                modifier = Modifier.weight(1f),
-            )
-        }
+                .size(width * 0.7f)
+                .clip(RoundedCornerShape(8.dp)),
+        )
+        Spacer(
+            modifier = Modifier.height(height * 0.05f),
+        )
+        TextH70(
+            text = data.topText(),
+            maxLines = 1,
+            color = shareColors.cardText.copy(alpha = 0.5f),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
+        )
+        Spacer(
+            modifier = Modifier.height(6.dp),
+        )
+        TextH40(
+            text = data.middleText(),
+            maxLines = 2,
+            textAlign = TextAlign.Center,
+            color = shareColors.cardText,
+            modifier = Modifier.padding(horizontal = width * 0.1f),
+        )
+        Spacer(
+            modifier = Modifier.height(6.dp),
+        )
+        TextH70(
+            text = data.bottomText(),
+            maxLines = 2,
+            textAlign = TextAlign.Center,
+            color = shareColors.cardText.copy(alpha = 0.5f),
+            modifier = Modifier.padding(horizontal = width * 0.1f),
+        )
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
+        PocketCastsPill()
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
