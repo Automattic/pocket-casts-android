@@ -28,6 +28,8 @@
         ([#2496](https://github.com/Automattic/pocket-casts-android/pull/2496))
     *   Fixed Wear app episode download issue.
         ([#2495](https://github.com/Automattic/pocket-casts-android/pull/2495))
+    *   Fix redirects to the app through https://pocketcasts.com/get links.
+        ([#2559](https://github.com/Automattic/pocket-casts-android/pull/2559))
 
 7.68
 -----

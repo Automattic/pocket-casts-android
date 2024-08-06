@@ -11,7 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowLoadingButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -30,6 +35,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.rememberClipSelectorState
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 import kotlin.time.Duration
@@ -75,6 +82,7 @@ internal fun ShareClipPage(
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
     listener: ShareClipPageListener,
+    captureController: CaptureController,
     state: ClipSelectorState = rememberClipSelectorState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
     ),
@@ -86,6 +94,7 @@ internal fun ShareClipPage(
     isPlaying = isPlaying,
     useEpisodeArtwork = useEpisodeArtwork,
     shareColors = shareColors, listener = listener,
+    captureController = captureController,
     state = state,
 )
 
@@ -99,6 +108,7 @@ private fun VerticalClipPage(
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
     listener: ShareClipPageListener,
+    captureController: CaptureController,
     state: ClipSelectorState,
 ) {
     val scope = rememberCoroutineScope()
@@ -144,6 +154,7 @@ private fun VerticalClipPage(
                         podcast = podcast,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                     )
                 }
                 Column(
@@ -167,6 +178,8 @@ private fun VerticalClipPage(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.padding(horizontal = 16.dp),
                     ) {
+                        var isClippingAudio by remember { mutableStateOf(false) }
+                        var isClippingVideo by remember { mutableStateOf(false) }
                         RowButton(
                             text = "Link",
                             onClick = {
@@ -180,32 +193,62 @@ private fun VerticalClipPage(
                             includePadding = false,
                             modifier = Modifier.weight(1f),
                         )
-                        RowButton(
-                            text = "Audio",
-                            onClick = {
-                                scope.launch {
-                                    listener.onShareClipAudio(podcast, episode, clipRange)
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
-                            textColor = shareColors.clipButtonText,
-                            elevation = null,
-                            includePadding = false,
-                            modifier = Modifier.weight(1f),
-                        )
-                        RowButton(
-                            text = "Video",
-                            onClick = {
-                                scope.launch {
-                                    listener.onShareClipVideo(podcast, episode, clipRange)
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
-                            textColor = shareColors.clipButtonText,
-                            elevation = null,
-                            includePadding = false,
-                            modifier = Modifier.weight(1f),
-                        )
+                        if (isClippingAudio) {
+                            RowLoadingButton(
+                                text = "",
+                                isLoading = isClippingAudio,
+                                onClick = {},
+                                colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+                                textColor = shareColors.clipButtonText,
+                                includePadding = false,
+                                modifier = Modifier.weight(1f),
+                            )
+                        } else {
+                            RowButton(
+                                text = "Audio",
+                                enabled = !isClippingAudio,
+                                onClick = {
+                                    isClippingAudio = true
+                                    scope.launch {
+                                        listener.onShareClipAudio(podcast, episode, clipRange)
+                                        isClippingAudio = false
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+                                textColor = shareColors.clipButtonText,
+                                elevation = null,
+                                includePadding = false,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        if (isClippingVideo) {
+                            RowLoadingButton(
+                                text = "",
+                                isLoading = isClippingVideo,
+                                onClick = {},
+                                colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+                                textColor = shareColors.clipButtonText,
+                                includePadding = false,
+                                modifier = Modifier.weight(1f),
+                            )
+                        } else {
+                            RowButton(
+                                text = "Video",
+                                enabled = !isClippingVideo,
+                                onClick = {
+                                    isClippingVideo = true
+                                    scope.launch {
+                                        listener.onShareClipVideo(podcast, episode, clipRange)
+                                        isClippingVideo = false
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+                                textColor = shareColors.clipButtonText,
+                                elevation = null,
+                                includePadding = false,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
                     }
                 }
             }
@@ -241,6 +284,7 @@ internal fun ShareClipPagePreview(
         useEpisodeArtwork = true,
         shareColors = ShareColors(Color(color)),
         listener = ShareClipPageListener.Preview,
+        captureController = rememberCaptureController(),
         state = rememberClipSelectorState(
             firstVisibleItemIndex = 0,
         ),

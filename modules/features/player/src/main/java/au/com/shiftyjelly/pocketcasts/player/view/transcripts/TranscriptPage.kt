@@ -174,14 +174,12 @@ private fun TranscriptContent(
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                     add(CustomMenuItemOption.Share)
                 }
-                add(CustomMenuItemOption.SelectAll)
             }
             CompositionLocalProvider(
                 LocalTextToolbar provides CustomTextToolbar(
                     LocalView.current,
                     customMenu,
                     LocalClipboardManager.current,
-                    displayString,
                 ),
             ) {
                 SelectionContainer {

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-15 12:54:02+0000
+Translation-Revision-Date: 2024-07-31 14:10:05+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="send_feedback">Envoyer un commentaire</string>
+    <string name="share_episode_timestamp_title">Partager l’épisode à partir de %s</string>
+    <string name="share_via">Partager via %s</string>
+    <string name="share_podcast_description">Choisir un format et une plateforme pour le partage</string>
+    <string name="podcast_cover_description">Bannière du podcast %s</string>
+    <string name="share_label_copy_link">Copier le lien</string>
+    <string name="share_label_instagram_stories">Histoires</string>
+    <string name="profile_change_avatar">Modifier l’avatar</string>
     <string name="something_went_wrong_to_rate_this_podcast">Un problème est survenu. Veuillez réessayer plus tard</string>
     <string name="thank_you_for_rating">Merci pour cette note !</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">L’intégralité de l’épisode en cours de lecture est temporairement mis en cache pour minimiser le streaming.</string>
@@ -22,10 +30,6 @@ Language: fr
     <string name="settings_advanced_cache_entire_playing_episode">Lecture de l’épisode en cache</string>
     <string name="playback">Écoute</string>
     <string name="podcast_share_clip">Clip</string>
-    <string name="download_completed_for_episode">Téléchargement terminé pour %1$s</string>
-    <string name="episode_queued_for_download">Épisode mis en file d’attente pour téléchargement</string>
-    <string name="episode_was_removed">Épisode supprimé</string>
-    <string name="remove_downloaded_file">Supprimer le fichier téléchargé</string>
     <string name="settings_export_database_failed">Échec de l’exportation de la base de données</string>
     <string name="settings_export_database">Exporter la base de données</string>
     <string name="settings_sleep_timer_auto_restart_summary">Si cette fonction est activée, la mise en veille redémarrera automatiquement si vous écoutez un épisode dans les 5 minutes suivant la dernière pause.</string>
@@ -1057,7 +1061,6 @@ Language: fr
     <string name="plus_themes_icons">Thèmes et icônes</string>
     <string name="plus_thanks_for_your_support_bang">Merci pour votre soutien !</string>
     <string name="plus_slash_month">%s /mois</string>
-    <string name="plus_lifetime_member">Membre à vie</string>
     <string name="plus_learn_more_button">En savoir plus</string>
     <string name="plus_learn_more_about_plus">En savoir plus sur Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Applications de bureau</string>
@@ -1719,8 +1722,8 @@ Language: fr
         <item quantity="other">%d épisodes</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="one">%1$d épisode - %2$s restant</item>
-        <item quantity="other">%1$d épisodes - %2$s restant(s)</item>
+        <item quantity="one" formatted="true">%1$d épisode - %2$s restant</item>
+        <item quantity="other" formatted="true">%1$d épisodes - %2$s restant(s)</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Fin de la gestion du clip : %d seconde</item>
