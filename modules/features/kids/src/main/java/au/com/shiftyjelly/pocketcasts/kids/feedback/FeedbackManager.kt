@@ -7,8 +7,13 @@ import kotlinx.coroutines.rx2.await
 class FeedbackManager @Inject constructor(
     private val syncManager: SyncManager,
 ) {
-    suspend fun sendFeedback(subject: String, inbox: String, message: String): FeedbackResult = try {
-        val response = syncManager.sendSupportFeedback(subject, inbox, message).await()
+    companion object {
+        const val SUBJECT = "Pocket Casts - Kids Profile Ideas"
+        const val INBOX = "research"
+    }
+
+    suspend fun sendAnonymousFeedback(message: String): FeedbackResult = try {
+        val response = syncManager.sendAnonymousFeedback(SUBJECT, INBOX, message).await()
         if (response.isSuccessful) {
             FeedbackResult.Success
         } else {
