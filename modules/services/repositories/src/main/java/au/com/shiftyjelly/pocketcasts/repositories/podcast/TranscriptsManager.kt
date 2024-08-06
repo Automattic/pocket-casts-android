@@ -13,5 +13,9 @@ interface TranscriptsManager {
 
     fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
 
-    suspend fun loadTranscript(url: String, source: LoadTranscriptSource = LoadTranscriptSource.DEFAULT): ResponseBody?
+    suspend fun loadTranscript(
+        url: String,
+        source: LoadTranscriptSource = LoadTranscriptSource.DEFAULT,
+        forceRefresh: Boolean = false,
+    ): ResponseBody?
 }

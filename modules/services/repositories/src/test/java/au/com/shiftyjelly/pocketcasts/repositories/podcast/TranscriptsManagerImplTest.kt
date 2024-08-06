@@ -3,18 +3,29 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
+import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
+import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import kotlinx.coroutines.test.runTest
+import okhttp3.CacheControl
+import okhttp3.ResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argWhere
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
+import retrofit2.Response
 
 class TranscriptsManagerImplTest {
     private val transcriptDao: TranscriptDao = mock()
     private val podcastCacheServer: PodcastCacheServer = mock()
-    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao, podcastCacheServer)
+    private val networkWrapper: NetworkWrapper = mock()
+    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao, podcastCacheServer, networkWrapper)
 
     @Test
     fun `findBestTranscript returns first supported transcript`() = runTest {
@@ -62,18 +73,68 @@ class TranscriptsManagerImplTest {
     }
 
     @Test
+    fun `if force refresh is true, loadTranscript loads transcript from network `() = runTest {
+        val response = mock<Response<ResponseBody>>()
+        whenever(response.isSuccessful).thenReturn(true)
+        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+
+        transcriptsManager.loadTranscript("url_1", forceRefresh = true)
+
+        verify(podcastCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+    }
+
+    @Test
+    fun `if force refresh is false, loadTranscript loads transcript from cache`() = runTest {
+        val response = mock<Response<ResponseBody>>()
+        whenever(response.isSuccessful).thenReturn(true)
+        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+
+        transcriptsManager.loadTranscript("url_1")
+
+        verify(podcastCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
+    }
+
+    @Test
+    fun `if cache response not found, and internet available, loadTranscript loads transcript from network`() = runTest {
+        whenever(networkWrapper.isConnected()).thenReturn(true)
+        val response = mock<Response<ResponseBody>>()
+        whenever(response.isSuccessful).thenReturn(false)
+        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+
+        transcriptsManager.loadTranscript("url_1")
+
+        verify(podcastCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+    }
+
+    @Test
+    fun `if cache response not found, and internet not available, loadTranscript returns no network exception`() = runTest {
+        whenever(networkWrapper.isConnected()).thenReturn(false)
+        val response = mock<Response<ResponseBody>>()
+        whenever(response.isSuccessful).thenReturn(false)
+        whenever(podcastCacheServer.getTranscript(any(), any())).thenReturn(response)
+
+        try {
+            transcriptsManager.loadTranscript("url_1")
+        } catch (e: Exception) {
+            assertTrue(e is NoNetworkException)
+        }
+    }
+
+    @Test
     fun `updateTranscripts loads transcript if the source is download episode`() = runTest {
+        whenever(networkWrapper.isConnected()).thenReturn(true)
         val transcripts = listOf(
             Transcript("1", "url_1", "application/srt"),
         )
 
         transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DOWNLOAD_EPISODE)
 
-        verify(podcastCacheServer).getTranscript("url_1")
+        verify(podcastCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
 
     @Test
     fun `updateTranscripts does not load transcript if the source is not download episode`() = runTest {
+        whenever(networkWrapper.isConnected()).thenReturn(true)
         val transcripts = listOf(
             Transcript("1", "url_1", "application/srt"),
         )
