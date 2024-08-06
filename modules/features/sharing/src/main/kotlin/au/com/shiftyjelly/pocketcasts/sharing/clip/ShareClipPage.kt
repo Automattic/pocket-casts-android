@@ -326,6 +326,10 @@ private fun ShareClipVerticalRegularEditingPreview() = ShareClipPagePreview(
 @Composable
 private fun ShareClipVerticalSmallPreviewPreview() = ShareClipPagePreview()
 
+@Preview(name = "Foldable device", device = Devices.PortraitFoldable)
+@Composable
+private fun ShareClipVerticalFoldablePreviewPreview() = ShareClipPagePreview()
+
 @Preview(name = "Tablet device", device = Devices.PortraitTablet)
 @Composable
 private fun ShareClipVerticalTabletPreview() = ShareClipPagePreview()
