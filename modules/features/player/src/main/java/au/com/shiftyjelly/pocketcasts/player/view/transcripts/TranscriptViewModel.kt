@@ -8,7 +8,6 @@ import androidx.media3.common.Format
 import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
-import androidx.media3.extractor.text.CuesWithTimingSubtitle
 import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -71,6 +70,7 @@ class TranscriptViewModel @Inject constructor(
     fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean) {
         if (isTranscriptViewOpen.not()) return
         _uiState.value.transcript?.let { transcript ->
+            clearErrorsIfFound(transcript)
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
@@ -81,9 +81,11 @@ class TranscriptViewModel @Inject constructor(
                         cuesWithTimingSubtitle = result,
                     )
                 } catch (e: UnsupportedOperationException) {
-                    UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode)
+                    UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
+                } catch (e: UrlUtil.NoNetworkException) {
+                    UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
                 } catch (e: Exception) {
-                    UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode)
+                    UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
                 }
             }
         }
@@ -92,16 +94,19 @@ class TranscriptViewModel @Inject constructor(
     private suspend fun buildSubtitleCues(transcript: Transcript) = withContext(ioDispatcher) {
         when (transcript.type) {
             TranscriptFormat.HTML.mimeType -> {
-                // Html content is added as single large cue
-                CuesWithTimingSubtitle(
+                val content = urlUtil.contentString(transcript.url)
+                if (content.trim().isEmpty()) {
+                    emptyList<CuesWithTiming>()
+                } else {
+                    // Html content is added as single large cue
                     ImmutableList.of(
                         CuesWithTiming(
                             ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
                             0,
                             0,
                         ),
-                    ),
-                )
+                    )
+                }
             }
             else -> {
                 val format = Format.Builder()
@@ -128,9 +133,18 @@ class TranscriptViewModel @Inject constructor(
                             }
                         }
                     }
-                    CuesWithTimingSubtitle(result.build())
+                    result.build()
                 }
             }
+        }
+    }
+
+    private fun clearErrorsIfFound(transcript: Transcript) {
+        if (_uiState.value is UiState.Error) {
+            _uiState.value = UiState.TranscriptFound(
+                podcastAndEpisode = _uiState.value.podcastAndEpisode,
+                transcript = transcript,
+            )
         }
     }
 
@@ -171,11 +185,14 @@ class TranscriptViewModel @Inject constructor(
         data class TranscriptLoaded(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
-            val cuesWithTimingSubtitle: CuesWithTimingSubtitle,
-        ) : UiState()
+            val cuesWithTimingSubtitle: List<CuesWithTiming>,
+        ) : UiState() {
+            val isTranscriptEmpty: Boolean = cuesWithTimingSubtitle.isEmpty()
+        }
 
         data class Error(
             val error: TranscriptError,
+            override val transcript: Transcript,
             override val podcastAndEpisode: PodcastAndEpisode? = null,
         ) : UiState()
     }
@@ -183,5 +200,6 @@ class TranscriptViewModel @Inject constructor(
     sealed class TranscriptError {
         data class NotSupported(val format: String) : TranscriptError()
         data object FailedToLoad : TranscriptError()
+        data object NoNetwork : TranscriptError()
     }
 }

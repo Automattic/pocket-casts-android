@@ -24,8 +24,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -138,6 +138,20 @@ class TranscriptViewModelTest {
     }
 
     @Test
+    fun `given error due to no internet, then NoNetwork error is returned`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
+        whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
+        given(urlUtil.contentBytes(any())).willAnswer { throw UrlUtil.NoNetworkException() }
+        initViewModel()
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            assertTrue((awaitItem() as UiState.Error).error is TranscriptError.NoNetwork)
+        }
+    }
+
+    @Test
     fun `given mimetype html, when transcript load invoked, then transcript is not parsed and url content is returned in single cue`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
@@ -149,7 +163,7 @@ class TranscriptViewModelTest {
 
         viewModel.uiState.test {
             verifyNoInteractions(subtitleParserFactory)
-            assertTrue((awaitItem() as UiState.TranscriptLoaded).cuesWithTimingSubtitle.getCues(0).first().text == htmlText)
+            assertTrue((awaitItem() as UiState.TranscriptLoaded).cuesWithTimingSubtitle.first().cues.first().text == htmlText)
         }
     }
 
