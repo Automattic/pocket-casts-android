@@ -2,18 +2,24 @@ package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +27,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -134,6 +142,7 @@ private fun VerticalClipPage(
             ) {
                 TopInfo(
                     shareColors = shareColors,
+                    state = state,
                 )
                 if (podcast != null && episode != null) {
                     val cardPadding = maxOf(
@@ -189,38 +198,75 @@ private fun VerticalClipPage(
 @Composable
 private fun TopInfo(
     shareColors: ShareColors,
+    state: ClipPageState,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Spacer(
-            modifier = Modifier.height(40.dp),
-        )
-        TextH30(
-            text = stringResource(LR.string.podcast_create_clip),
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            color = shareColors.backgroundPrimaryText,
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .align(Alignment.CenterHorizontally),
-        )
-        Spacer(
-            modifier = Modifier.height(8.dp),
-        )
-        // Placeholder until audio clips are added
-        TextH40(
-            text = " ",
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            color = shareColors.backgroundSecondaryText,
-            modifier = Modifier.padding(horizontal = 24.dp),
-        )
-        Spacer(
-            modifier = Modifier.height(12.dp),
-        )
+    AnimatedContent(state.step) { step ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Spacer(
+                modifier = Modifier.height(
+                    when (step) {
+                        SharingStep.Creating -> 40.dp
+                        SharingStep.Sharing -> 24.dp
+                    },
+                ),
+            )
+            TextH30(
+                text = stringResource(
+                    when (step) {
+                        SharingStep.Creating -> LR.string.share_clip_create_label
+                        SharingStep.Sharing -> LR.string.share_clip_share_label
+                    },
+                ),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                color = shareColors.backgroundPrimaryText,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .align(Alignment.CenterHorizontally),
+            )
+            Spacer(
+                modifier = Modifier.height(8.dp),
+            )
+            when (step) {
+                SharingStep.Creating -> TextH40(
+                    text = " ", // Placeholder until audio clips are added
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    color = shareColors.backgroundSecondaryText,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                )
+                SharingStep.Sharing -> TextH40(
+                    text = stringResource(LR.string.share_clip_edit_label),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    color = shareColors.backgroundPrimaryText,
+                    fontWeight = FontWeight.W400,
+                    modifier = Modifier
+                        .background(shareColors.closeButton, CircleShape)
+                        .defaultMinSize(minHeight = 24.dp)
+                        .clickable(
+                            interactionSource = remember(::MutableInteractionSource),
+                            indication = rememberRipple(color = shareColors.base),
+                            onClickLabel = stringResource(LR.string.share_clip_edit_label),
+                            role = Role.Button,
+                            onClick = { state.step = SharingStep.Creating },
+                        )
+                        .padding(vertical = 4.dp, horizontal = 16.dp),
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(
+                    when (step) {
+                        SharingStep.Creating -> 12.dp
+                        SharingStep.Sharing -> 48.dp
+                    },
+                ),
+            )
+        }
     }
 }
 
