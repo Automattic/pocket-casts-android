@@ -28,7 +28,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class KidsBottomSheetDialog : BottomSheetDialogFragment() {
+class KidsBottomSheetDialog(
+    private val onFeedbackSentSuccess: () -> Unit,
+    private val onFeedbackSentError: () -> Unit,
+) : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var theme: Theme
@@ -48,8 +51,10 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
 
                 LaunchedEffect(sendFeedbackState) {
                     if (sendFeedbackState is SendFeedbackState.Success) {
+                        onFeedbackSentSuccess.invoke()
                         dismiss()
                     } else if (sendFeedbackState is SendFeedbackState.Error) {
+                        onFeedbackSentError.invoke()
                         dismiss()
                     }
                 }
