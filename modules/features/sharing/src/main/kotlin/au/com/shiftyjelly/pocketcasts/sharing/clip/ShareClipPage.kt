@@ -163,6 +163,7 @@ private fun VerticalClipPage(
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
                         assetController = assetController,
+                        state = state,
                     )
                 }
                 BottomContent(
@@ -270,6 +271,7 @@ private fun MiddleContent(
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
+    state: ClipPageState,
 ) {
     val cardPadding = maxOf(
         LocalConfiguration.current.screenWidthDp.dp / 8,
@@ -278,18 +280,21 @@ private fun MiddleContent(
     val verticalCardWidth = (LocalConfiguration.current.screenWidthDp.dp - cardPadding * 2).coerceAtMost(300.dp)
     val verticalCardHeight = verticalCardWidth * 1.5f
     val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
-    ) {
-        PagerDotIndicator(
-            state = pagerState,
-        )
+    AnimatedVisibility(visible = state.step == SharingStep.Creating) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        ) {
+            PagerDotIndicator(
+                state = pagerState,
+            )
+        }
     }
     HorizontalPager(
         state = pagerState,
+        userScrollEnabled = state.step == SharingStep.Creating,
         modifier = Modifier.height(verticalCardHeight),
     ) { pageIndex ->
         val cardType = CardType.entries[pageIndex]
