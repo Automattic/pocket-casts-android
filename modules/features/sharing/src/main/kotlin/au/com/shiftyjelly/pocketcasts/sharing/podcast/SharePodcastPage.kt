@@ -17,9 +17,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
+import au.com.shiftyjelly.pocketcasts.sharing.ui.PodcastCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import kotlinx.coroutines.launch
@@ -102,29 +101,14 @@ private fun VerticalSharePodcastPage(
         middleContent = { cardType, modifier ->
             if (podcast != null) {
                 val captureController = assetController.captureController(cardType)
-                when (cardType) {
-                    CardType.Vertical -> VerticalPodcastCast(
-                        podcast = podcast,
-                        episodeCount = episodeCount,
-                        shareColors = shareColors,
-                        captureController = captureController,
-                        modifier = modifier,
-                    )
-                    CardType.Horizontal -> HorizontalPodcastCast(
-                        podcast = podcast,
-                        episodeCount = episodeCount,
-                        shareColors = shareColors,
-                        captureController = captureController,
-                        modifier = modifier,
-                    )
-                    CardType.Square -> SquarePodcastCast(
-                        podcast = podcast,
-                        episodeCount = episodeCount,
-                        shareColors = shareColors,
-                        captureController = captureController,
-                        modifier = modifier,
-                    )
-                }
+                PodcastCard(
+                    cardType = cardType,
+                    podcast = podcast,
+                    episodeCount = episodeCount,
+                    shareColors = shareColors,
+                    captureController = captureController,
+                    modifier = modifier,
+                )
             }
         },
     )
