@@ -51,7 +51,7 @@ internal fun estimateCardCoordinates(
         in 0f..1.35f -> 300.dp
         else -> 360.dp
     }
-    val cardPadding = screenWidth / 10
+    val cardPadding = screenWidth / 8
     val availableWidth = (screenWidth - cardPadding * 2).coerceAtMost(maxWidth)
     val availableHeight = availableWidth * 1.5f // Vertical card has the most height so we calculate the size for it
 
