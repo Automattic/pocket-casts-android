@@ -88,6 +88,7 @@ class GiveRatingFragment : BaseDialogFragment() {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
         val state = viewModel.state.value
 
         if (state is GiveRatingViewModel.State.Loaded) {
