@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -276,8 +278,18 @@ private fun MiddleContent(
     val verticalCardWidth = (LocalConfiguration.current.screenWidthDp.dp - cardPadding * 2).coerceAtMost(300.dp)
     val verticalCardHeight = verticalCardWidth * 1.5f
     val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+    ) {
+        PagerDotIndicator(
+            state = pagerState,
+        )
+    }
     HorizontalPager(
-        pagerState,
+        state = pagerState,
         modifier = Modifier.height(verticalCardHeight),
     ) { pageIndex ->
         val cardType = CardType.entries[pageIndex]
