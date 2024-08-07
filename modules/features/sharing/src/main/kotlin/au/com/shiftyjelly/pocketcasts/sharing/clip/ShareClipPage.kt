@@ -34,6 +34,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -265,14 +267,18 @@ private fun MiddleContent(
         LocalConfiguration.current.screenWidthDp.dp / 8,
         42.dp, // Close button start edge position
     )
+    val verticalCardWidth = (LocalConfiguration.current.screenWidthDp.dp - cardPadding * 2).coerceAtMost(300.dp)
+    val verticalCardHeight = verticalCardWidth * 1.5f
     VerticalEpisodeCard(
         episode = episode,
         podcast = podcast,
         useEpisodeArtwork = useEpisodeArtwork,
         shareColors = shareColors,
         captureController = assetController.captureController(CardType.Vertical),
-        useHeightForAspectRatio = false,
-        modifier = Modifier.padding(horizontal = cardPadding),
+        customSize = DpSize(verticalCardWidth, verticalCardHeight),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = cardPadding),
     )
 }
 
