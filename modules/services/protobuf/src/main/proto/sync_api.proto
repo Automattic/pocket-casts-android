@@ -225,7 +225,9 @@ message PodcastRatingShowRequest {
 }
 
 message SupportFeedbackRequest {
-     string subject = 1;
-      string inbox = 2;
-      string message = 3;
+    string message = 1;
+    string email = 2;
+    string subject = 3;
+    string debug = 4;
+    string inbox = 5;
 }
