@@ -7,7 +7,16 @@ sealed interface CardType {
     data object Audio : CardType
 
     companion object {
-        val visualEntries by lazy {
+        val entires by lazy(LazyThreadSafetyMode.NONE) {
+            listOf(
+                CardType.Vertical,
+                CardType.Horizontal,
+                CardType.Square,
+                CardType.Audio,
+            )
+        }
+
+        val visualEntries by lazy(LazyThreadSafetyMode.NONE) {
             listOf(
                 CardType.Vertical,
                 CardType.Horizontal,

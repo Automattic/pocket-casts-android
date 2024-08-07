@@ -271,7 +271,7 @@ data class SharingRequest internal constructor(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipAudio(podcast, episode, range))
+        ) = Builder(Data.ClipAudio(podcast, episode, range)).setCardType(CardType.Audio)
 
         fun videoClip(
             podcast: Podcast,
