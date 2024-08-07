@@ -420,6 +420,18 @@ class SharingAnalyticsTest {
     }
 
     @Test
+    fun `log square audio type property`() {
+        val request = SharingRequest.podcast(podcast)
+            .setCardType(CardType.Audio)
+            .build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertProperty("card_type", "audio")
+    }
+
+    @Test
     fun `log no card type property`() {
         val request = SharingRequest.podcast(podcast).build()
 
