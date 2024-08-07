@@ -2,10 +2,10 @@ package au.com.shiftyjelly.pocketcasts.kids.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.kids.feedback.FeedbackManager
-import au.com.shiftyjelly.pocketcasts.kids.feedback.FeedbackResult
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.kids.feedback.FeedbackManager
+import au.com.shiftyjelly.pocketcasts.kids.feedback.FeedbackResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +45,7 @@ class KidsSendFeedbackViewModel @Inject constructor(
         }
     }
 
-    fun sendFeedback(feedback: String) {
+    fun submitFeedback(feedback: String) {
         analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_FEEDBACK_SENT)
 
         viewModelScope.launch {

@@ -15,8 +15,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.whenever
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class KidsSendFeedbackViewModelTest {
@@ -28,7 +28,6 @@ class KidsSendFeedbackViewModelTest {
 
     @Mock
     private lateinit var feedbackManager: FeedbackManager
-
 
     @Mock
     private lateinit var tracker: AnalyticsTracker
@@ -63,9 +62,10 @@ class KidsSendFeedbackViewModelTest {
 
         whenever(feedbackManager.sendAnonymousFeedback(feedback)).thenReturn(feedbackResult)
 
-        viewModel.sendFeedback(feedback)
+        viewModel.submitFeedback(feedback)
 
         assertEquals(SendFeedbackState.Success, viewModel.sendFeedbackState.value)
+        verify(tracker).track(AnalyticsEvent.KIDS_PROFILE_FEEDBACK_SENT)
     }
 
     @Test
@@ -75,14 +75,9 @@ class KidsSendFeedbackViewModelTest {
 
         whenever(feedbackManager.sendAnonymousFeedback(feedback)).thenReturn(feedbackResult)
 
-        viewModel.sendFeedback(feedback)
+        viewModel.submitFeedback(feedback)
 
         assertEquals(SendFeedbackState.Error, viewModel.sendFeedbackState.value)
-    }
-
-    @Test
-    fun `should track event for when feedback was submitted`() {
-        viewModel.onSubmitFeedback()
         verify(tracker).track(AnalyticsEvent.KIDS_PROFILE_FEEDBACK_SENT)
     }
 
