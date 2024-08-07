@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -273,29 +274,25 @@ private fun MiddleContent(
     assetController: BackgroundAssetController,
     state: ClipPageState,
 ) {
-    val cardPadding = maxOf(
-        LocalConfiguration.current.screenWidthDp.dp / 8,
-        42.dp, // Close button start edge position
-    )
-    val verticalCardWidth = (LocalConfiguration.current.screenWidthDp.dp - cardPadding * 2).coerceAtMost(300.dp)
-    val verticalCardHeight = verticalCardWidth * 1.5f
     val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
     AnimatedVisibility(visible = state.step == SharingStep.Creating) {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
         ) {
             PagerDotIndicator(
                 state = pagerState,
             )
         }
     }
+
+    val (size, padding) = estimateCardSizing()
     HorizontalPager(
         state = pagerState,
         userScrollEnabled = state.step == SharingStep.Creating,
-        modifier = Modifier.height(verticalCardHeight),
+        modifier = Modifier.height(size.height),
     ) { pageIndex ->
         val cardType = CardType.entries[pageIndex]
         val captureController = assetController.captureController(cardType)
@@ -306,10 +303,10 @@ private fun MiddleContent(
                 useEpisodeArtwork = useEpisodeArtwork,
                 shareColors = shareColors,
                 captureController = captureController,
-                customSize = DpSize(verticalCardWidth, verticalCardHeight),
+                customSize = size,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = cardPadding),
+                    .padding(padding),
             )
             CardType.Horiozntal -> HorizontalEpisodeCard(
                 episode = episode,
@@ -317,10 +314,10 @@ private fun MiddleContent(
                 useEpisodeArtwork = useEpisodeArtwork,
                 shareColors = shareColors,
                 captureController = captureController,
-                customSize = DpSize(verticalCardWidth, verticalCardHeight),
+                customSize = size,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = cardPadding),
+                    .padding(padding),
             )
             CardType.Square -> SquareEpisodeCard(
                 episode = episode,
@@ -328,13 +325,28 @@ private fun MiddleContent(
                 useEpisodeArtwork = useEpisodeArtwork,
                 shareColors = shareColors,
                 captureController = captureController,
-                customSize = DpSize(verticalCardWidth, verticalCardHeight),
+                customSize = size,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = cardPadding),
+                    .padding(padding),
             )
         }
     }
+}
+
+@Composable
+private fun estimateCardSizing(): Pair<DpSize, PaddingValues> {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+    val maxWidth = when (screenHeight / screenWidth) {
+        in 0f..1.35f -> 300.dp
+        else -> 360.dp
+    }
+    val cardPadding = screenWidth / 10
+    val availableWidth = (screenWidth - cardPadding * 2).coerceAtMost(maxWidth)
+    val availableHeight = availableWidth * 1.5f // Vertical card has the most height so we calculate the size for it
+    return DpSize(availableWidth, availableHeight) to PaddingValues(horizontal = cardPadding)
 }
 
 @Composable
