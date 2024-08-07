@@ -8,6 +8,7 @@ import android.content.Intent.EXTRA_INTENT
 import android.content.Intent.EXTRA_STREAM
 import android.content.Intent.EXTRA_TEXT
 import android.content.Intent.EXTRA_TITLE
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.net.Uri
 import androidx.core.content.IntentCompat
@@ -53,7 +54,7 @@ class SharingClientTest {
                 .build()
 
             client.share(request)
-            val intent = shareStarter.requireShareIntent
+            val intent = shareStarter.requireChooserIntent
 
             assertEquals(ACTION_SEND, intent.action)
             assertEquals("text/plain", intent.type)
@@ -62,6 +63,39 @@ class SharingClientTest {
             assertEquals(platform.packageId, intent.`package`)
             assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         }
+    }
+
+    @Test
+    fun sharePodcastToInstagram() = runTest {
+        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
+            .setPlatform(SocialPlatform.Instagram)
+            .setBackgroundImage(file)
+            .build()
+
+        client.share(request)
+        val intent = shareStarter.requireIntent
+
+        assertEquals("com.instagram.share.ADD_TO_STORY", intent.action)
+        assertEquals("Meta ID", intent.getStringExtra("source_application"))
+        assertEquals("image/png", intent.type)
+        assertEquals(FileUtil.getUriForFile(context, file), intent.data)
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FLAG_ACTIVITY_NEW_TASK, intent.flags and FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    @Test
+    fun failToSharePodcastToInstagramWithoutBackgroundFile() = runTest {
+        val request = SharingRequest.podcast(Podcast(uuid = "podcast-uuid", title = "Podcast Title"))
+            .setPlatform(SocialPlatform.Instagram)
+            .build()
+
+        val response = client.share(request)
+
+        assertNull(shareStarter.intent)
+        assertFalse(response.isSuccsessful)
+        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
     @Test
@@ -75,7 +109,7 @@ class SharingClientTest {
 
         assertEquals("https://pca.st/podcast/podcast-uuid", clipData.getItemAt(0).text)
         assertEquals(context.getString(LR.string.share_link_podcast), clipData.description.label)
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     @Test
@@ -114,7 +148,7 @@ class SharingClientTest {
                 .build()
 
             client.share(request)
-            val intent = shareStarter.requireShareIntent
+            val intent = shareStarter.requireChooserIntent
 
             assertEquals(ACTION_SEND, intent.action)
             assertEquals("text/plain", intent.type)
@@ -123,6 +157,43 @@ class SharingClientTest {
             assertEquals(platform.packageId, intent.`package`)
             assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         }
+    }
+
+    @Test
+    fun shareEpisodeToInstagram() = runTest {
+        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        val request = SharingRequest.episode(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        ).setPlatform(SocialPlatform.Instagram)
+            .setBackgroundImage(file)
+            .build()
+
+        client.share(request)
+        val intent = shareStarter.requireIntent
+
+        assertEquals("com.instagram.share.ADD_TO_STORY", intent.action)
+        assertEquals("Meta ID", intent.getStringExtra("source_application"))
+        assertEquals("image/png", intent.type)
+        assertEquals(FileUtil.getUriForFile(context, file), intent.data)
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FLAG_ACTIVITY_NEW_TASK, intent.flags and FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    @Test
+    fun failToShareEpisodeToInstagramWithoutBackgroundFile() = runTest {
+        val request = SharingRequest.episode(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        ).setPlatform(SocialPlatform.Instagram)
+            .build()
+
+        val response = client.share(request)
+
+        assertNull(shareStarter.intent)
+        assertFalse(response.isSuccsessful)
+        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
     @Test
@@ -138,7 +209,7 @@ class SharingClientTest {
 
         assertEquals("https://pca.st/episode/episode-uuid", clipData.getItemAt(0).text)
         assertEquals(context.getString(LR.string.share_link_episode), clipData.description.label)
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     @Test
@@ -182,7 +253,7 @@ class SharingClientTest {
                 .build()
 
             client.share(request)
-            val intent = shareStarter.requireShareIntent
+            val intent = shareStarter.requireChooserIntent
 
             assertEquals(ACTION_SEND, intent.action)
             assertEquals("text/plain", intent.type)
@@ -191,6 +262,45 @@ class SharingClientTest {
             assertEquals(platform.packageId, intent.`package`)
             assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         }
+    }
+
+    @Test
+    fun shareEpisodePositionToInstagram() = runTest {
+        val file = File(context.cacheDir, "file.mp3").also { it.writeBytes(Random.nextBytes(8)) }
+        val request = SharingRequest.episodePosition(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            position = 10.seconds,
+        ).setPlatform(SocialPlatform.Instagram)
+            .setBackgroundImage(file)
+            .build()
+
+        client.share(request)
+        val intent = shareStarter.requireIntent
+
+        assertEquals("com.instagram.share.ADD_TO_STORY", intent.action)
+        assertEquals("Meta ID", intent.getStringExtra("source_application"))
+        assertEquals("image/png", intent.type)
+        assertEquals(FileUtil.getUriForFile(context, file), intent.data)
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FLAG_ACTIVITY_NEW_TASK, intent.flags and FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    @Test
+    fun failToShareEpisodePositionToInstagramWithoutBackgroundFile() = runTest {
+        val request = SharingRequest.episodePosition(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            position = 10.seconds,
+        ).setPlatform(SocialPlatform.Instagram)
+            .build()
+
+        val response = client.share(request)
+
+        assertNull(shareStarter.intent)
+        assertFalse(response.isSuccsessful)
+        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
     @Test
@@ -207,7 +317,7 @@ class SharingClientTest {
 
         assertEquals("https://pca.st/episode/episode-uuid?t=10", clipData.getItemAt(0).text)
         assertEquals(context.getString(LR.string.share_link_episode_position), clipData.description.label)
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     @Test
@@ -253,7 +363,7 @@ class SharingClientTest {
                 .build()
 
             client.share(request)
-            val intent = shareStarter.requireShareIntent
+            val intent = shareStarter.requireChooserIntent
 
             assertEquals(ACTION_SEND, intent.action)
             assertEquals("text/plain", intent.type)
@@ -278,7 +388,7 @@ class SharingClientTest {
 
         assertEquals("https://pca.st/episode/episode-uuid?t=10", clipData.getItemAt(0).text)
         assertEquals(context.getString(LR.string.share_link_bookmark), clipData.description.label)
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     @Test
@@ -325,7 +435,7 @@ class SharingClientTest {
         assertTrue(response.isSuccsessful)
         assertNull(response.feedbackMessage)
 
-        val intent = shareStarter.requireShareIntent
+        val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
         assertEquals("audio/mp3", intent.type)
@@ -343,7 +453,7 @@ class SharingClientTest {
         assertFalse(response.isSuccsessful)
         assertEquals(context.getString(LR.string.error), response.feedbackMessage)
 
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     @Test
@@ -359,7 +469,7 @@ class SharingClientTest {
 
         assertEquals("https://pca.st/episode/episode-uuid?t=15,28", clipData.getItemAt(0).text)
         assertEquals(context.getString(LR.string.share_link_clip), clipData.description.label)
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     @Test
@@ -409,7 +519,7 @@ class SharingClientTest {
             assertTrue(response.isSuccsessful)
             assertNull(response.feedbackMessage)
 
-            val intent = shareStarter.requireShareIntent
+            val intent = shareStarter.requireChooserIntent
 
             assertEquals(ACTION_SEND, intent.action)
             assertEquals("audio/mp3", intent.type)
@@ -434,7 +544,7 @@ class SharingClientTest {
         assertTrue(response.isSuccsessful)
         assertNull(response.feedbackMessage)
 
-        val intent = shareStarter.requireShareIntent
+        val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
         assertEquals("audio/mp3", intent.type)
@@ -456,7 +566,7 @@ class SharingClientTest {
         assertFalse(response.isSuccsessful)
         assertEquals(context.getString(LR.string.error), response.feedbackMessage)
 
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     @Test
@@ -477,7 +587,7 @@ class SharingClientTest {
             assertTrue(response.isSuccsessful)
             assertNull(response.feedbackMessage)
 
-            val intent = shareStarter.requireShareIntent
+            val intent = shareStarter.requireChooserIntent
 
             assertEquals(ACTION_SEND, intent.action)
             assertEquals("video/mp4", intent.type)
@@ -503,7 +613,7 @@ class SharingClientTest {
         assertTrue(response.isSuccsessful)
         assertNull(response.feedbackMessage)
 
-        val intent = shareStarter.requireShareIntent
+        val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
         assertEquals("video/mp4", intent.type)
@@ -526,7 +636,7 @@ class SharingClientTest {
         assertFalse(response.isSuccsessful)
         assertEquals(context.getString(LR.string.error), response.feedbackMessage)
 
-        assertNull(shareStarter.shareIntent)
+        assertNull(shareStarter.chooserIntent)
     }
 
     private fun createClient(
@@ -538,20 +648,23 @@ class SharingClientTest {
         displayPodcastCover = false,
         showCustomCopyFeedback = showCustomCopyFeedback,
         hostUrl = "https://pca.st",
+        metaAppId = "Meta ID",
         shareStarter = shareStarter,
     )
 
     private class TestShareStarter : ShareStarter {
-        private var _intent: Intent? = null
-        val shareIntent get() = _intent?.let { intent -> IntentCompat.getParcelableExtra(intent, EXTRA_INTENT, Intent::class.java) }
-        val requireShareIntent get() = requireNotNull(shareIntent)
+        var intent: Intent? = null
+            private set
+        val requireIntent get() = requireNotNull(intent)
+        val chooserIntent get() = intent?.let { intent -> IntentCompat.getParcelableExtra(intent, EXTRA_INTENT, Intent::class.java) }
+        val requireChooserIntent get() = requireNotNull(chooserIntent)
 
         var shareLink: ClipData? = null
             private set
         val requireShareLink get() = requireNotNull(shareLink)
 
         override fun start(context: Context, intent: Intent) {
-            _intent = intent
+            this.intent = intent
         }
 
         override fun copyLink(context: Context, data: ClipData) {

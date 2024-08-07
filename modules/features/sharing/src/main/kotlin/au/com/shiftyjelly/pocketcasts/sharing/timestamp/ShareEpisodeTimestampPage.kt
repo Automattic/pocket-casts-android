@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
@@ -22,8 +23,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
-import dev.shreyaspatil.capturable.controller.CaptureController
-import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 import kotlin.time.Duration
@@ -56,8 +55,8 @@ internal fun ShareEpisodeTimestampPage(
     useEpisodeArtwork: Boolean,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: ShareEpisodeTimestampPageListener,
-    captureController: CaptureController,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     when (LocalConfiguration.current.orientation) {
@@ -68,6 +67,7 @@ internal fun ShareEpisodeTimestampPage(
             useEpisodeArtwork = useEpisodeArtwork,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
@@ -78,9 +78,9 @@ internal fun ShareEpisodeTimestampPage(
             useEpisodeArtwork = useEpisodeArtwork,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
-            captureController = captureController,
         )
     }
 }
@@ -93,9 +93,9 @@ private fun VerticalShareEpisodeTimestampPage(
     timestamp: Duration,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: ShareEpisodeTimestampPageListener,
     snackbarHostState: SnackbarHostState,
-    captureController: CaptureController,
 ) {
     val scope = rememberCoroutineScope()
     VerticalSharePage(
@@ -115,6 +115,7 @@ private fun VerticalShareEpisodeTimestampPage(
         },
         middleContent = { cardType, modifier ->
             if (podcast != null && episode != null) {
+                val captureController = assetController.captureController(cardType)
                 when (cardType) {
                     CardType.Vertical -> VerticalEpisodeCard(
                         podcast = podcast,
@@ -129,6 +130,7 @@ private fun VerticalShareEpisodeTimestampPage(
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Square -> SquareEpisodeCard(
@@ -136,6 +138,7 @@ private fun VerticalShareEpisodeTimestampPage(
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                 }
@@ -152,6 +155,7 @@ private fun HorizontalShareEpisodeTimestampPage(
     useEpisodeArtwork: Boolean,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: ShareEpisodeTimestampPageListener,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -178,6 +182,7 @@ private fun HorizontalShareEpisodeTimestampPage(
                     episode = episode,
                     useEpisodeArtwork = useEpisodeArtwork,
                     shareColors = shareColors,
+                    captureController = assetController.captureController(CardType.Horiozntal),
                 )
             }
         },
@@ -226,6 +231,6 @@ private fun ShareEpisodeTimestampPagePreview(
     useEpisodeArtwork = false,
     socialPlatforms = SocialPlatform.entries.toSet(),
     shareColors = ShareColors(Color(color)),
+    assetController = BackgroundAssetController.preview(),
     listener = ShareEpisodeTimestampPageListener.Preview,
-    captureController = rememberCaptureController(),
 )

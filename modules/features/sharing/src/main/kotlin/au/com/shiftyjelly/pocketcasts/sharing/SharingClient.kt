@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.META_APP_ID
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
@@ -49,6 +50,7 @@ class SharingClient(
     private val displayPodcastCover: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
     private val showCustomCopyFeedback: Boolean = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
     private val hostUrl: String = SERVER_SHORT_URL,
+    private val metaAppId: String = META_APP_ID,
     private val shareStarter: ShareStarter = object : ShareStarter {
         override fun start(context: Context, intent: Intent) {
             context.startActivity(intent)
@@ -79,7 +81,18 @@ class SharingClient(
     private suspend fun SharingRequest.tryShare(): SharingResponse = when (data) {
         is SharingRequest.Sociable -> when (platform) {
             Instagram -> {
-                error("Not implemented yet")
+                val backgroundImage = requireNotNull(backgroundImage) { "Sharing to Instagram requires a background image" }
+                Intent()
+                    .setAction("com.instagram.share.ADD_TO_STORY")
+                    .putExtra("source_application", metaAppId)
+                    .setDataAndType(FileUtil.getUriForFile(context, backgroundImage), "image/png")
+                    .addFlags(FLAG_GRANT_READ_URI_PERMISSION or FLAG_ACTIVITY_NEW_TASK)
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                    error = null,
+                )
             }
             PocketCasts -> {
                 shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
@@ -98,6 +111,7 @@ class SharingClient(
                     .setPackage(platform.packageId)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
                     .setPodcastCover(data.podcast)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -113,6 +127,7 @@ class SharingClient(
                     .setAction(Intent.ACTION_SEND)
                     .setType(data.episode.fileType)
                     .setExtraStream(file)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -146,6 +161,7 @@ class SharingClient(
                     .setType("audio/mp3")
                     .setExtraStream(file)
                     .setPackage(platform.packageId)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -159,12 +175,14 @@ class SharingClient(
                 error("Not implemented yet")
             }
             WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
-                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, data.backgroundImage).getOrThrow()
+                val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
+                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, backgroundImage).getOrThrow()
                 Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("video/mp4")
                     .setExtraStream(file)
                     .setPackage(platform.packageId)
+                    .toChooserIntent()
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -176,7 +194,7 @@ class SharingClient(
     }
 
     private fun Intent.share() {
-        shareStarter.start(context, toChooserIntent())
+        shareStarter.start(context, this)
     }
 
     private fun Intent.toChooserIntent() = Intent
@@ -213,6 +231,7 @@ data class SharingRequest internal constructor(
     val data: SharingRequest.Data,
     val platform: SocialPlatform,
     val cardType: CardType?,
+    val backgroundImage: File?,
     val source: SourceView,
 ) {
     companion object {
@@ -259,7 +278,7 @@ data class SharingRequest internal constructor(
             episode: PodcastEpisode,
             range: Clip.Range,
             backgroundImage: File,
-        ) = Builder(Data.ClipVideo(podcast, episode, range, backgroundImage))
+        ) = Builder(Data.ClipVideo(podcast, episode, range)).setBackgroundImage(backgroundImage)
     }
 
     class Builder internal constructor(
@@ -268,6 +287,7 @@ data class SharingRequest internal constructor(
         private var platform = More
         private var cardType: CardType? = null
         private var source = SourceView.UNKNOWN
+        private var backgroundImage: File? = null
 
         fun setPlatform(platform: SocialPlatform) = apply {
             this.platform = platform
@@ -281,10 +301,15 @@ data class SharingRequest internal constructor(
             this.source = source
         }
 
+        fun setBackgroundImage(backgroundImage: File) = apply {
+            this.backgroundImage = backgroundImage
+        }
+
         fun build() = SharingRequest(
             data = data,
             platform = platform,
             cardType = cardType,
+            backgroundImage = backgroundImage,
             source = source,
         )
     }
@@ -374,7 +399,6 @@ data class SharingRequest internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
             val range: Clip.Range,
-            val backgroundImage: File,
         ) : Data {
             override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
         }

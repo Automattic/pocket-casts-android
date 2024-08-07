@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.compose.foundation.background
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -18,13 +17,13 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -53,7 +52,8 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val listener = shareListenerFactory.create(this@ShareEpisodeTimestampFragment, args.timestampType, args.source)
+        val assetController = BackgroundAssetController.create(requireContext(), shareColors)
+        val listener = shareListenerFactory.create(this@ShareEpisodeTimestampFragment, assetController, args.timestampType, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareEpisodeTimestampPage(
@@ -63,15 +63,18 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 socialPlatforms = platforms,
                 shareColors = shareColors,
+                assetController = assetController,
                 listener = listener,
-                captureController = rememberCaptureController(),
             )
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        styleBackgroundColor(shareColors.background.toArgb())
+        styleBackgroundColor(
+            background = shareColors.background.toArgb(),
+            navigationBar = shareColors.navigationBar.toArgb(),
+        )
     }
 
     @Parcelize

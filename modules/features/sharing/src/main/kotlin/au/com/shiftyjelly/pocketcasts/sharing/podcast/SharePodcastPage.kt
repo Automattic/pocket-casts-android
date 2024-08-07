@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
@@ -20,8 +21,6 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
-import dev.shreyaspatil.capturable.controller.CaptureController
-import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -47,8 +46,8 @@ internal fun SharePodcastPage(
     episodeCount: Int,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: SharePodcastPageListener,
-    captureController: CaptureController,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     when (LocalConfiguration.current.orientation) {
@@ -57,6 +56,7 @@ internal fun SharePodcastPage(
             episodeCount = episodeCount,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
@@ -65,9 +65,9 @@ internal fun SharePodcastPage(
             episodeCount = episodeCount,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
-            captureController = captureController,
         )
     }
 }
@@ -78,9 +78,9 @@ private fun VerticalSharePodcastPage(
     episodeCount: Int,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: SharePodcastPageListener,
     snackbarHostState: SnackbarHostState,
-    captureController: CaptureController,
 ) {
     val scope = rememberCoroutineScope()
     VerticalSharePage(
@@ -100,6 +100,7 @@ private fun VerticalSharePodcastPage(
         },
         middleContent = { cardType, modifier ->
             if (podcast != null) {
+                val captureController = assetController.captureController(cardType)
                 when (cardType) {
                     CardType.Vertical -> VerticalPodcastCast(
                         podcast = podcast,
@@ -112,12 +113,14 @@ private fun VerticalSharePodcastPage(
                         podcast = podcast,
                         episodeCount = episodeCount,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                     CardType.Square -> SquarePodcastCast(
                         podcast = podcast,
                         episodeCount = episodeCount,
                         shareColors = shareColors,
+                        captureController = captureController,
                         modifier = modifier,
                     )
                 }
@@ -132,6 +135,7 @@ private fun HorizontalSharePodcastPage(
     episodeCount: Int,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: SharePodcastPageListener,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -157,6 +161,7 @@ private fun HorizontalSharePodcastPage(
                     podcast = podcast,
                     episodeCount = episodeCount,
                     shareColors = shareColors,
+                    captureController = assetController.captureController(CardType.Horiozntal),
                 )
             }
         },
@@ -199,6 +204,6 @@ private fun SharePodcastPagePreview(
     episodeCount = 120,
     socialPlatforms = SocialPlatform.entries.toSet(),
     shareColors = ShareColors(Color(color)),
+    assetController = BackgroundAssetController.preview(),
     listener = SharePodcastPageListener.Preview,
-    captureController = rememberCaptureController(),
 )

@@ -39,6 +39,7 @@
     <string name="download">Download</string>
     <string name="downloads">Downloads</string>
     <string name="edit">Edit</string>
+    <string name="error_no_network">No network connection detected. Please try again later.</string>
     <string name="effects">Effects</string>
     <string name="episode_not_found">Episode not found</string>
     <string name="go_to_podcast">Go to podcast</string>
@@ -1786,7 +1787,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
-    <string name="log_in_no_network">No network connection detected. Please try again later.</string>
+    <string name="log_in_no_network" translatable="false">@string/error_no_network</string>
     <string name="log_in_with_google">Log in with Google</string>
     <string name="log_in_on_phone">Log in on phone</string>
     <string name="log_in_with_email">Log in with email</string>
@@ -1906,6 +1907,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <!-- Transcripts -->
     <string name="error_transcript_failed_to_load">Transcript failed to load</string>
     <string name="error_transcript_format_not_supported">Transcript format not supported: %s</string>
+    <string name="transcript_empty">Transcript is empty.</string>
 
     <!--    Tasker Plugin-->
 
@@ -2016,6 +2018,13 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_link_episode_position">Episode position link</string>
     <string name="share_link_bookmark">Bookmark link</string>
     <string name="share_link_clip">Clip link</string>
+    <!--  The start position of a shared clip. It is in HH:MM:SS format.  -->
+    <string name="share_clip_start_position">%s Start</string>
+    <!--  The duration of a shared clip. It is in HH:MM:SS format.  -->
+    <string name="share_clip_duration">%s Duration</string>
+    <string name="share_clip_create_label" translatable="false">@string/podcast_create_clip</string>
+    <string name="share_clip_share_label">Share clip</string>
+    <string name="share_clip_edit_label">Edit clip</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
