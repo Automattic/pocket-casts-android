@@ -100,4 +100,5 @@ interface SyncManager : NamedSettingsCaller {
     fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse>
     suspend fun getBookmarks(): List<Bookmark>
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void>
+    suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void>
 }
