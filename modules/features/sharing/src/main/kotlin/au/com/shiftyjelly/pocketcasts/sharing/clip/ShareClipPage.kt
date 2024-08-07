@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -49,7 +52,9 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
 import java.sql.Date
@@ -255,6 +260,7 @@ private fun TopContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MiddleContent(
     episode: PodcastEpisode,
@@ -269,17 +275,49 @@ private fun MiddleContent(
     )
     val verticalCardWidth = (LocalConfiguration.current.screenWidthDp.dp - cardPadding * 2).coerceAtMost(300.dp)
     val verticalCardHeight = verticalCardWidth * 1.5f
-    VerticalEpisodeCard(
-        episode = episode,
-        podcast = podcast,
-        useEpisodeArtwork = useEpisodeArtwork,
-        shareColors = shareColors,
-        captureController = assetController.captureController(CardType.Vertical),
-        customSize = DpSize(verticalCardWidth, verticalCardHeight),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = cardPadding),
-    )
+    val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
+    HorizontalPager(
+        pagerState,
+        modifier = Modifier.height(verticalCardHeight),
+    ) { pageIndex ->
+        val cardType = CardType.entries[pageIndex]
+        val captureController = assetController.captureController(cardType)
+        when (cardType) {
+            CardType.Vertical -> VerticalEpisodeCard(
+                episode = episode,
+                podcast = podcast,
+                useEpisodeArtwork = useEpisodeArtwork,
+                shareColors = shareColors,
+                captureController = captureController,
+                customSize = DpSize(verticalCardWidth, verticalCardHeight),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = cardPadding),
+            )
+            CardType.Horiozntal -> HorizontalEpisodeCard(
+                episode = episode,
+                podcast = podcast,
+                useEpisodeArtwork = useEpisodeArtwork,
+                shareColors = shareColors,
+                captureController = captureController,
+                customSize = DpSize(verticalCardWidth, verticalCardHeight),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = cardPadding),
+            )
+            CardType.Square -> SquareEpisodeCard(
+                episode = episode,
+                podcast = podcast,
+                useEpisodeArtwork = useEpisodeArtwork,
+                shareColors = shareColors,
+                captureController = captureController,
+                customSize = DpSize(verticalCardWidth, verticalCardHeight),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = cardPadding),
+            )
+        }
+    }
 }
 
 @Composable
