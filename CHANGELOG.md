@@ -1,6 +1,8 @@
 7.71
 -----
-
+*   New Features
+    *   Adds the kids banner in profile
+        ([#2591](https://github.com/Automattic/pocket-casts-android/pull/2591))
 
 7.70
 -----
