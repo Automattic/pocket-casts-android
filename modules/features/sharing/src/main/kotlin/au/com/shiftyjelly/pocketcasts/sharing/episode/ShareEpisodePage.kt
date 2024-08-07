@@ -23,18 +23,19 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import java.sql.Date
 import java.time.Instant
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareEpisodePageListener {
-    suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: CardType): SharingResponse
+    suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: VisualCardType): SharingResponse
     fun onClose()
 
     companion object {
         val Preview = object : ShareEpisodePageListener {
-            override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: CardType) = SharingResponse(
+            override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: VisualCardType) = SharingResponse(
                 isSuccsessful = true,
                 feedbackMessage = null,
                 error = null,
@@ -119,7 +120,7 @@ private fun VerticalShareEpisodePage(
                         captureController = captureController,
                         modifier = modifier,
                     )
-                    CardType.Horiozntal -> HorizontalEpisodeCard(
+                    CardType.Horizontal -> HorizontalEpisodeCard(
                         podcast = podcast,
                         episode = episode,
                         useEpisodeArtwork = useEpisodeArtwork,
@@ -175,7 +176,7 @@ private fun HorizontalShareEpisodePage(
                     episode = episode,
                     useEpisodeArtwork = useEpisodeArtwork,
                     shareColors = shareColors,
-                    captureController = assetController.captureController(CardType.Horiozntal),
+                    captureController = assetController.captureController(CardType.Horizontal),
                 )
             }
         },

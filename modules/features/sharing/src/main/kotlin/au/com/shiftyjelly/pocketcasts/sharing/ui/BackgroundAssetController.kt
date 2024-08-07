@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.scale
-import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType.Horiozntal
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType.Horizontal
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType.Square
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType.Vertical
 import dev.shreyaspatil.capturable.controller.CaptureController
@@ -22,9 +22,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 internal interface BackgroundAssetController {
-    fun captureController(type: CardType): CaptureController
+    fun captureController(type: VisualCardType): CaptureController
 
-    suspend fun capture(type: CardType): Result<File>
+    suspend fun capture(type: VisualCardType): Result<File>
 
     companion object {
         private const val BITMAP_WIDTH = 1080
@@ -35,14 +35,14 @@ internal interface BackgroundAssetController {
             private val horizontalCardController = CaptureController()
             private val squareCardController = CaptureController()
 
-            override fun captureController(type: CardType) = when (type) {
+            override fun captureController(type: VisualCardType) = when (type) {
                 Vertical -> verticalCardController
-                Horiozntal -> horizontalCardController
+                Horizontal -> horizontalCardController
                 Square -> squareCardController
             }
 
             @OptIn(ExperimentalComposeApi::class)
-            override suspend fun capture(type: CardType) = runCatching {
+            override suspend fun capture(type: VisualCardType) = runCatching {
                 val controller = captureController(type)
                 val capturedBitmap = controller.captureAsync().await()
                 val backgroundBitmap = withContext(Dispatchers.Default) {
@@ -63,23 +63,23 @@ internal interface BackgroundAssetController {
 
             private fun createBackgroundBitmap(
                 foregroundBitmap: Bitmap,
-                type: CardType,
+                type: VisualCardType,
             ) = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, Bitmap.Config.ARGB_8888).applyCanvas {
                 drawRect(0f, 0f, BITMAP_HEIGHT.toFloat(), BITMAP_HEIGHT.toFloat(), type.backgroundPaint)
                 drawBitmap(foregroundBitmap, (BITMAP_WIDTH.toFloat() - foregroundBitmap.width) / 2, (BITMAP_HEIGHT.toFloat() - foregroundBitmap.height) / 2, null)
             }
 
-            private val CardType.targetWidth get() = when (this) {
+            private val VisualCardType.targetWidth get() = when (this) {
                 Vertical -> BITMAP_WIDTH
-                Horiozntal, Square -> (BITMAP_WIDTH * 0.9).roundToInt()
+                Horizontal, Square -> (BITMAP_WIDTH * 0.9).roundToInt()
             }
 
-            private val CardType.backgroundPaint get() = when (this) {
+            private val VisualCardType.backgroundPaint get() = when (this) {
                 Vertical -> Paint().apply {
                     isDither = true
                     shader = LinearGradient(0f, 0f, 0f, BITMAP_HEIGHT.toFloat(), shareColors.cardBottom.toArgb(), shareColors.cardTop.toArgb(), Shader.TileMode.CLAMP)
                 }
-                Horiozntal, Square -> Paint().apply {
+                Horizontal, Square -> Paint().apply {
                     isDither = true
                     color = shareColors.background.toArgb()
                 }
@@ -90,9 +90,9 @@ internal interface BackgroundAssetController {
         fun preview() = object : BackgroundAssetController {
             private val controller = rememberCaptureController()
 
-            override fun captureController(type: CardType) = controller
+            override fun captureController(type: VisualCardType) = controller
 
-            override suspend fun capture(type: CardType): Result<File> {
+            override suspend fun capture(type: VisualCardType): Result<File> {
                 throw UnsupportedOperationException("Preview controller")
             }
         }

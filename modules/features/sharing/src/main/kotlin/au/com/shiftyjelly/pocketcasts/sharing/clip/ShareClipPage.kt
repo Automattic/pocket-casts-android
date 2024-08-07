@@ -66,6 +66,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
 import java.sql.Date
 import java.time.Instant
@@ -286,7 +287,7 @@ private fun MiddleContent(
     state: ClipPageState,
     scrollState: ScrollState,
 ) {
-    val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
+    val pagerState = rememberPagerState(pageCount = { CardType.visualEntries.size })
     AnimatedVisibility(
         visible = state.step == SharingStep.Creating,
         modifier = Modifier.onGloballyPositioned { coordinates -> state.pagerIndicatorHeight = coordinates.size.height },
@@ -309,7 +310,7 @@ private fun MiddleContent(
         userScrollEnabled = state.step == SharingStep.Creating,
         modifier = Modifier.height(coordiantes.size.height),
     ) { pageIndex ->
-        val cardType = CardType.entries[pageIndex]
+        val cardType = CardType.visualEntries[pageIndex]
         val captureController = assetController.captureController(cardType)
         val offset by animateIntOffsetAsState(
             targetValue = coordiantes.offset(cardType),
@@ -329,7 +330,7 @@ private fun MiddleContent(
                 customSize = coordiantes.size,
                 modifier = modifier,
             )
-            CardType.Horiozntal -> HorizontalEpisodeCard(
+            CardType.Horizontal -> HorizontalEpisodeCard(
                 episode = episode,
                 podcast = podcast,
                 useEpisodeArtwork = useEpisodeArtwork,
@@ -378,7 +379,7 @@ private fun estimateCardCoordinates(
         offset = { type ->
             when (type) {
                 CardType.Vertical -> IntOffset(0, 0)
-                CardType.Horiozntal, CardType.Square -> {
+                CardType.Horizontal, CardType.Square -> {
                     val viewPortHeight = scrollState.viewportSize
                     val topContentHeight = state.topContentHeight
                     val dotIndicatorHeight = state.pagerIndicatorHeight
@@ -400,7 +401,7 @@ private fun estimateCardCoordinates(
 private class CardCoordinates(
     val size: DpSize,
     val padding: PaddingValues,
-    val offset: (CardType) -> IntOffset,
+    val offset: (VisualCardType) -> IntOffset,
 )
 
 @Composable

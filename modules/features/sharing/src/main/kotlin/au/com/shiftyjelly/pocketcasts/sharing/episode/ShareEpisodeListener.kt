@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
-import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -20,7 +20,7 @@ internal class ShareEpisodeListener @AssistedInject constructor(
     @Assisted private val sourceView: SourceView,
     private val sharingClient: SharingClient,
 ) : ShareEpisodePageListener {
-    override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: CardType): SharingResponse {
+    override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: VisualCardType): SharingResponse {
         val builder = SharingRequest.episode(podcast, episode)
             .setPlatform(platform)
             .setCardType(cardType)

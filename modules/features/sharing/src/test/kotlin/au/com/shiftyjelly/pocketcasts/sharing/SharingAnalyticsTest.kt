@@ -398,7 +398,7 @@ class SharingAnalyticsTest {
     @Test
     fun `log horizontal card type property`() {
         val request = SharingRequest.podcast(podcast)
-            .setCardType(CardType.Horiozntal)
+            .setCardType(CardType.Horizontal)
             .build()
 
         analytics.onShare(request)
