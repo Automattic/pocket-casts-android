@@ -140,7 +140,7 @@ private fun VerticalClipPage(
                     .nestedScroll(rememberNestedScrollInteropConnection())
                     .verticalScroll(scrollState),
             ) {
-                TopInfo(
+                TopContent(
                     shareColors = shareColors,
                     state = state,
                 )
@@ -196,7 +196,7 @@ private fun VerticalClipPage(
 }
 
 @Composable
-private fun TopInfo(
+private fun TopContent(
     shareColors: ShareColors,
     state: ClipPageState,
 ) {
