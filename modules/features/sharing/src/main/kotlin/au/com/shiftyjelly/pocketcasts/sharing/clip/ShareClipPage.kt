@@ -160,29 +160,17 @@ private fun VerticalClipPage(
                     )
                 }
             }
-            if (podcast != null && episode != null) {
-                AnimatedContent(state.step) { step ->
-                    when (step) {
-                        SharingStep.Creating -> ClipControls(
-                            episode = episode,
-                            clipRange = clipRange,
-                            playbackProgress = playbackProgress,
-                            isPlaying = isPlaying,
-                            shareColors = shareColors,
-                            listener = listener,
-                            state = state,
-                        )
-                        SharingStep.Sharing -> Box(
-                            modifier = Modifier.padding(vertical = 24.dp),
-                        ) {
-                            PlatformBar(
-                                platforms = platforms,
-                                shareColors = shareColors,
-                                onClick = {},
-                            )
-                        }
-                    }
-                }
+            if (episode != null) {
+                BottomContent(
+                    episode = episode,
+                    clipRange = clipRange,
+                    playbackProgress = playbackProgress,
+                    isPlaying = isPlaying,
+                    platforms = platforms,
+                    shareColors = shareColors,
+                    listener = listener,
+                    state = state,
+                )
             }
         }
         CloseButton(
@@ -266,6 +254,41 @@ private fun TopContent(
                     },
                 ),
             )
+        }
+    }
+}
+
+@Composable
+private fun BottomContent(
+    episode: PodcastEpisode,
+    clipRange: Clip.Range,
+    playbackProgress: Duration,
+    isPlaying: Boolean,
+    platforms: Set<SocialPlatform>,
+    shareColors: ShareColors,
+    listener: ShareClipPageListener,
+    state: ClipPageState,
+) {
+    AnimatedContent(state.step) { step ->
+        when (step) {
+            SharingStep.Creating -> ClipControls(
+                episode = episode,
+                clipRange = clipRange,
+                playbackProgress = playbackProgress,
+                isPlaying = isPlaying,
+                shareColors = shareColors,
+                listener = listener,
+                state = state,
+            )
+            SharingStep.Sharing -> Box(
+                modifier = Modifier.padding(vertical = 24.dp),
+            ) {
+                PlatformBar(
+                    platforms = platforms,
+                    shareColors = shareColors,
+                    onClick = {},
+                )
+            }
         }
     }
 }
