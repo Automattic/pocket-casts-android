@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,11 +43,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -81,6 +84,7 @@ import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareClipPageListener {
@@ -374,10 +378,10 @@ private fun MiddleContent(
                 contentAlignment = Alignment.Center,
                 modifier = modifier,
             ) {
-                Box(
-                    modifier = Modifier
-                        .background(Color.Magenta)
-                        .size(200.dp, 200.dp),
+                Image(
+                    painter = painterResource(IR.drawable.ic_audio_card),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(shareColors.backgroundPrimaryText),
                 )
             }
         }
