@@ -16,8 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -64,6 +68,7 @@ import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TranscriptPage(
     playerViewModel: PlayerViewModel,
@@ -73,35 +78,46 @@ fun TranscriptPage(
 ) {
     val uiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+    val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullRefreshState(refreshing.value, {
+        transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
+    })
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.value.podcastAndEpisode?.podcast))
     val colors = DefaultColors(playerBackgroundColor)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .pullRefresh(pullRefreshState),
+    ) {
+        when (uiState.value) {
+            is UiState.Empty -> {
+                EmptyView(Modifier.background(colors.backgroundColor()))
+            }
 
-    when (uiState.value) {
-        is UiState.Empty -> {
-            EmptyView(Modifier.background(colors.backgroundColor()))
-        }
+            is UiState.TranscriptFound -> {
+                LoadingView(Modifier.background(colors.backgroundColor()))
+            }
 
-        is UiState.TranscriptFound -> {
-            LoadingView(Modifier.background(colors.backgroundColor()))
-        }
+            is UiState.TranscriptLoaded -> {
+                val loadedState = uiState.value as UiState.TranscriptLoaded
 
-        is UiState.TranscriptLoaded -> {
-            val loadedState = uiState.value as UiState.TranscriptLoaded
-            TranscriptContent(
-                state = loadedState,
-                colors = colors,
-                modifier = modifier,
-            )
-        }
+                TranscriptContent(
+                    state = loadedState,
+                    colors = colors,
+                    modifier = modifier,
+                )
+            }
 
-        is UiState.Error -> {
-            val errorState = uiState.value as UiState.Error
-            TranscriptError(
-                state = errorState,
-                colors = colors,
-                modifier = modifier,
-            )
+            is UiState.Error -> {
+                val errorState = uiState.value as UiState.Error
+                TranscriptError(
+                    state = errorState,
+                    colors = colors,
+                    modifier = modifier,
+                )
+            }
         }
+        PullRefreshIndicator(refreshing.value, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
@@ -351,12 +367,12 @@ private fun TranscriptContentPreview() {
                         ImmutableList.of(
                             Cue.Builder().setText(
                                 "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed. Laoreet justo orci luctus venenatis taciti lobortis sapien. Torquent quis dignissim curabitur magna molestie lectus pretium litora. Urna sodales rutrum posuere fusce velit turpis sollicitudin iaculis. Imperdiet turpis natoque vehicula cursus quisque congue.<br>" +
-                                        "<br>" +
-                                        "Quis etiam torquent feugiat penatibus curabitur. Facilisi inceptos egestas dolor mauris eget; rutrum facilisis nam. Ipsum mollis auctor mollis libero facilisi, sed posuere tristique lectus. Morbi erat suscipit eu feugiat nisi mauris. Convallis nostra condimentum est turpis ornare egestas lorem euismod at. Est nec eleifend leo proin vel hendrerit. Sem ipsum duis nam bibendum faucibus vestibulum class. Leo iaculis magna dignissim sit tristique porttitor dapibus non.<br>" +
-                                        "<br>" +
-                                        "Dis etiam suspendisse rhoncus, a class nisi porttitor. Ornare velit imperdiet natoque elit lacinia suscipit. Feugiat phasellus vestibulum sapien posuere rhoncus. Massa hendrerit purus taciti elit, maecenas non lobortis. Potenti class condimentum consectetur convallis, lacus habitasse praesent. Potenti risus mi neque volutpat vivamus taciti.<br>",
+                                    "<br>" +
+                                    "Quis etiam torquent feugiat penatibus curabitur. Facilisi inceptos egestas dolor mauris eget; rutrum facilisis nam. Ipsum mollis auctor mollis libero facilisi, sed posuere tristique lectus. Morbi erat suscipit eu feugiat nisi mauris. Convallis nostra condimentum est turpis ornare egestas lorem euismod at. Est nec eleifend leo proin vel hendrerit. Sem ipsum duis nam bibendum faucibus vestibulum class. Leo iaculis magna dignissim sit tristique porttitor dapibus non.<br>" +
+                                    "<br>" +
+                                    "Dis etiam suspendisse rhoncus, a class nisi porttitor. Ornare velit imperdiet natoque elit lacinia suscipit. Feugiat phasellus vestibulum sapien posuere rhoncus. Massa hendrerit purus taciti elit, maecenas non lobortis. Potenti class condimentum consectetur convallis, lacus habitasse praesent. Potenti risus mi neque volutpat vivamus taciti.<br>",
 
-                                ).build(),
+                            ).build(),
                         ),
                         0,
                         0,
