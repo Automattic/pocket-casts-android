@@ -11,9 +11,15 @@ import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 
 sealed interface CardType {
-    data object Vertical : VisualCardType
-    data object Horizontal : VisualCardType
-    data object Square : VisualCardType
+    data object Vertical : VisualCardType {
+        override val aspectRatio = 1.5f
+    }
+    data object Horizontal : VisualCardType {
+        override val aspectRatio = 0.52f
+    }
+    data object Square : VisualCardType {
+        override val aspectRatio = 1f
+    }
     data object Audio : CardType
 
     companion object {
@@ -36,7 +42,9 @@ sealed interface CardType {
     }
 }
 
-sealed interface VisualCardType : CardType
+sealed interface VisualCardType : CardType {
+    val aspectRatio: Float
+}
 
 @Composable
 internal fun estimateCardCoordinates(
@@ -53,7 +61,7 @@ internal fun estimateCardCoordinates(
     }
     val cardPadding = screenWidth / 8
     val availableWidth = (screenWidth - cardPadding * 2).coerceAtMost(maxWidth)
-    val availableHeight = availableWidth * 1.5f // Vertical card has the most height so we calculate the size for it
+    val availableHeight = availableWidth * CardType.Vertical.aspectRatio // Vertical card has the most height so we calculate the size for it
 
     val density = LocalDensity.current
 

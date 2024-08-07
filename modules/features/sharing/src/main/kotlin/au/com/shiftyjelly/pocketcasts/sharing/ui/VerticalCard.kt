@@ -97,9 +97,9 @@ private fun VerticalCard(
     )
     val size = customSize ?: DpSize(maxWidth, maxHeight)
     val (height, width) = if (useHeightForAspectRatio) {
-        size.height to size.height / 1.5f
+        size.height to size.height / CardType.Vertical.aspectRatio
     } else {
-        size.width * 1.5f to size.width
+        size.width * CardType.Vertical.aspectRatio to size.width
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
