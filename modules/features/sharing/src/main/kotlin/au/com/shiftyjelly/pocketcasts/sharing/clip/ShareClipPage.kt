@@ -132,7 +132,7 @@ private fun VerticalClipPage(
             .background(shareColors.background)
             .fillMaxSize(),
     ) {
-        AnimatedPodcastVisiblity(podcast = podcast, episode = episode) { podcast, episode ->
+        AnimatedVisiblity(podcast = podcast, episode = episode) { podcast, episode ->
             Column {
                 val scrollState = rememberScrollState()
                 Column(
@@ -354,7 +354,7 @@ private fun ClipControls(
 }
 
 @Composable
-private fun AnimatedPodcastVisiblity(
+private fun AnimatedVisiblity(
     podcast: Podcast?,
     episode: PodcastEpisode?,
     content: @Composable (Podcast, PodcastEpisode) -> Unit,
