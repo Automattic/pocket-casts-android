@@ -31,7 +31,7 @@ import java.sql.Date
 import java.time.Instant
 
 @Composable
-internal fun SquarePodcastCast(
+internal fun SquarePodcastCard(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,

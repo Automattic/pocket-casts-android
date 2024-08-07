@@ -17,7 +17,7 @@ internal fun PodcastCard(
     useHeightForAspectRatio: Boolean = cardType == CardType.Vertical,
     customSize: DpSize? = null,
 ) = when (cardType) {
-    CardType.Vertical -> VerticalPodcastCast(
+    CardType.Vertical -> VerticalPodcastCard(
         podcast = podcast,
         episodeCount = episodeCount,
         shareColors = shareColors,
@@ -26,7 +26,7 @@ internal fun PodcastCard(
         customSize = customSize,
         modifier = modifier,
     )
-    CardType.Horizontal -> HorizontalPodcastCast(
+    CardType.Horizontal -> HorizontalPodcastCard(
         podcast = podcast,
         episodeCount = episodeCount,
         shareColors = shareColors,
@@ -35,7 +35,7 @@ internal fun PodcastCard(
         customSize = customSize,
         modifier = modifier,
     )
-    CardType.Square -> SquarePodcastCast(
+    CardType.Square -> SquarePodcastCard(
         podcast = podcast,
         episodeCount = episodeCount,
         shareColors = shareColors,

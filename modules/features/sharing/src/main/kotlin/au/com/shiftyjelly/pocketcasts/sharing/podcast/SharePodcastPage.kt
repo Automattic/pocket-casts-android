@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
-import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
 import au.com.shiftyjelly.pocketcasts.sharing.ui.PodcastCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
@@ -142,7 +142,7 @@ private fun HorizontalSharePodcastPage(
         },
         middleContent = {
             if (podcast != null) {
-                HorizontalPodcastCast(
+                HorizontalPodcastCard(
                     podcast = podcast,
                     episodeCount = episodeCount,
                     shareColors = shareColors,

@@ -33,7 +33,7 @@ import java.sql.Date
 import java.time.Instant
 
 @Composable
-internal fun HorizontalPodcastCast(
+internal fun HorizontalPodcastCard(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
