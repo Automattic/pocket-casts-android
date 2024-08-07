@@ -640,4 +640,14 @@ enum class AnalyticsEvent(val key: String) {
     /* Pocket Casts Champion */
     POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),
     POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED("pocket_casts_champion_dialog_rate_button_tapped"),
+
+    /* Kids */
+    KIDS_PROFILE_BANNER_SEEN("kids_profile_banner_seen"),
+    KIDS_PROFILE_EARLY_ACCESS_REQUESTED("kids_profile_early_access_requested"),
+    KIDS_PROFILE_BANNER_DISMISSED("kids_profile_banner_dismissed"),
+    KIDS_PROFILE_FEEDBACK_SENT("kids_profile_feedback_sent"),
+    KIDS_PROFILE_SEND_FEEDBACK_TAPPED("kids_profile_send_feedback_tapped"),
+    KIDS_PROFILE_NO_THANK_YOU_TAPPED("kids_profile_no_thank_you_tapped"),
+    KIDS_PROFILE_THANK_YOU_FOR_YOUR_INTEREST_SEEN("kids_profile_thank_you_for_your_interest_seen"),
+    KIDS_PROFILE_FEEDBACK_FORM_SEEN("kids_profile_feedback_form_seen"),
 }

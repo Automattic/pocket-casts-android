@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -36,11 +37,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun KidsDialog(
     modifier: Modifier = Modifier,
+    onSeen: () -> Unit,
     onSendFeedbackClick: () -> Unit,
     onNoThankYouClick: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    CallOnce {
+        onSeen()
+    }
 
     Box(
         modifier = modifier
@@ -114,6 +120,7 @@ fun KidsDialog(
 fun PreviewKidsDialogDialog(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         KidsDialog(
+            onSeen = {},
             onSendFeedbackClick = {},
             onNoThankYouClick = {},
         )

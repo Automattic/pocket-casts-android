@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -49,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun KidsSendFeedbackDialog(
     modifier: Modifier = Modifier,
+    onSeen: () -> Unit,
     onSubmitFeedback: () -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -60,6 +62,10 @@ fun KidsSendFeedbackDialog(
         keyboardController?.hide()
         focusManager.clearFocus()
         onSubmitFeedback()
+    }
+
+    CallOnce {
+        onSeen()
     }
 
     LaunchedEffect(Unit) {
@@ -146,6 +152,7 @@ fun KidsSendFeedbackDialog(
 fun PreviewKidsSendFeedbackDialog(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         KidsSendFeedbackDialog(
+            onSeen = {},
             onSubmitFeedback = {},
         )
     }

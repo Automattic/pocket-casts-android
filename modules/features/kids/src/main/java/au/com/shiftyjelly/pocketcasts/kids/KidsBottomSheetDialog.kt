@@ -52,7 +52,11 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
                         ),
                     ) {
                         KidsSendFeedbackDialog(
-                            onSubmitFeedback = {},
+                            onSeen = viewModel::onFeedbackFormSeen,
+                            onSubmitFeedback = {
+                                viewModel.onSubmitFeedback()
+                                dismiss()
+                            },
                         )
                     }
                     AnimatedVisibility(
@@ -63,6 +67,7 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
                         ),
                     ) {
                         KidsDialog(
+                            onSeen = viewModel::onThankYouForYourInterestSeen,
                             onSendFeedbackClick = {
                                 viewModel.onSendFeedbackClick()
                             },
