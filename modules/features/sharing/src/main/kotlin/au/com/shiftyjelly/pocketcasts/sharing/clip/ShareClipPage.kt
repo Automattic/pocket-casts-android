@@ -148,18 +148,12 @@ private fun VerticalClipPage(
                         shareColors = shareColors,
                         state = state,
                     )
-                    val cardPadding = maxOf(
-                        LocalConfiguration.current.screenWidthDp.dp / 8,
-                        42.dp, // Close button start edge position
-                    )
-                    VerticalEpisodeCard(
+                    MiddleContent(
                         episode = episode,
                         podcast = podcast,
                         useEpisodeArtwork = useEpisodeArtwork,
                         shareColors = shareColors,
-                        captureController = assetController.captureController(CardType.Vertical),
-                        useHeightForAspectRatio = false,
-                        modifier = Modifier.padding(horizontal = cardPadding),
+                        assetController = assetController,
                     )
                 }
                 BottomContent(
@@ -257,6 +251,29 @@ private fun TopContent(
             )
         }
     }
+}
+
+@Composable
+private fun MiddleContent(
+    episode: PodcastEpisode,
+    podcast: Podcast,
+    useEpisodeArtwork: Boolean,
+    shareColors: ShareColors,
+    assetController: BackgroundAssetController,
+) {
+    val cardPadding = maxOf(
+        LocalConfiguration.current.screenWidthDp.dp / 8,
+        42.dp, // Close button start edge position
+    )
+    VerticalEpisodeCard(
+        episode = episode,
+        podcast = podcast,
+        useEpisodeArtwork = useEpisodeArtwork,
+        shareColors = shareColors,
+        captureController = assetController.captureController(CardType.Vertical),
+        useHeightForAspectRatio = false,
+        modifier = Modifier.padding(horizontal = cardPadding),
+    )
 }
 
 @Composable
