@@ -2,9 +2,11 @@ package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -27,12 +30,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -40,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
@@ -165,6 +172,7 @@ private fun VerticalClipPage(
                         shareColors = shareColors,
                         assetController = assetController,
                         state = state,
+                        scrollState = scrollState,
                     )
                 }
                 BottomContent(
@@ -194,7 +202,10 @@ private fun TopContent(
     shareColors: ShareColors,
     state: ClipPageState,
 ) {
-    AnimatedContent(state.step) { step ->
+    AnimatedContent(
+        targetState = state.step,
+        modifier = Modifier.onGloballyPositioned { coordinates -> state.topContentHeight = coordinates.size.height },
+    ) { step ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -273,9 +284,13 @@ private fun MiddleContent(
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
     state: ClipPageState,
+    scrollState: ScrollState,
 ) {
     val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
-    AnimatedVisibility(visible = state.step == SharingStep.Creating) {
+    AnimatedVisibility(
+        visible = state.step == SharingStep.Creating,
+        modifier = Modifier.onGloballyPositioned { coordinates -> state.pagerIndicatorHeight = coordinates.size.height },
+    ) {
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
@@ -288,14 +303,22 @@ private fun MiddleContent(
         }
     }
 
-    val (size, padding) = estimateCardSizing()
+    val coordiantes = estimateCardCoordinates(state, scrollState)
     HorizontalPager(
         state = pagerState,
         userScrollEnabled = state.step == SharingStep.Creating,
-        modifier = Modifier.height(size.height),
+        modifier = Modifier.height(coordiantes.size.height),
     ) { pageIndex ->
         val cardType = CardType.entries[pageIndex]
         val captureController = assetController.captureController(cardType)
+        val offset by animateIntOffsetAsState(
+            targetValue = coordiantes.offset(cardType),
+        )
+        val modifier = Modifier
+            .offset { offset }
+            .fillMaxSize()
+            .padding(coordiantes.padding)
+
         when (cardType) {
             CardType.Vertical -> VerticalEpisodeCard(
                 episode = episode,
@@ -303,10 +326,8 @@ private fun MiddleContent(
                 useEpisodeArtwork = useEpisodeArtwork,
                 shareColors = shareColors,
                 captureController = captureController,
-                customSize = size,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                customSize = coordiantes.size,
+                modifier = modifier,
             )
             CardType.Horiozntal -> HorizontalEpisodeCard(
                 episode = episode,
@@ -314,10 +335,8 @@ private fun MiddleContent(
                 useEpisodeArtwork = useEpisodeArtwork,
                 shareColors = shareColors,
                 captureController = captureController,
-                customSize = size,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                customSize = coordiantes.size,
+                modifier = modifier,
             )
             CardType.Square -> SquareEpisodeCard(
                 episode = episode,
@@ -325,17 +344,18 @@ private fun MiddleContent(
                 useEpisodeArtwork = useEpisodeArtwork,
                 shareColors = shareColors,
                 captureController = captureController,
-                customSize = size,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                customSize = coordiantes.size,
+                modifier = modifier,
             )
         }
     }
 }
 
 @Composable
-private fun estimateCardSizing(): Pair<DpSize, PaddingValues> {
+private fun estimateCardCoordinates(
+    state: ClipPageState,
+    scrollState: ScrollState,
+): CardCoordinates {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
@@ -346,8 +366,42 @@ private fun estimateCardSizing(): Pair<DpSize, PaddingValues> {
     val cardPadding = screenWidth / 10
     val availableWidth = (screenWidth - cardPadding * 2).coerceAtMost(maxWidth)
     val availableHeight = availableWidth * 1.5f // Vertical card has the most height so we calculate the size for it
-    return DpSize(availableWidth, availableHeight) to PaddingValues(horizontal = cardPadding)
+
+    val density = LocalDensity.current
+
+    return CardCoordinates(
+        size = DpSize(availableWidth, availableHeight),
+        padding = PaddingValues(horizontal = cardPadding),
+        // Offset is helpful for scenrarios when card doesn't fit on the screen.
+        // This way we can center horizontal and square cards in the view port
+        // and not in the pager which can have content outside of the view port.
+        offset = { type ->
+            when (type) {
+                CardType.Vertical -> IntOffset(0, 0)
+                CardType.Horiozntal, CardType.Square -> {
+                    val viewPortHeight = scrollState.viewportSize
+                    val topContentHeight = state.topContentHeight
+                    val dotIndicatorHeight = state.pagerIndicatorHeight
+                    val isMeasured = viewPortHeight != 0
+
+                    if (isMeasured && (scrollState.canScrollForward || scrollState.canScrollBackward)) {
+                        val viewPortPagerPortion = density.run { (viewPortHeight - topContentHeight - dotIndicatorHeight).toDp() }
+                        val offsetValue = (viewPortPagerPortion - availableHeight) / 2
+                        IntOffset(x = 0, y = density.run { offsetValue.roundToPx() })
+                    } else {
+                        IntOffset(0, 0)
+                    }
+                }
+            }
+        },
+    )
 }
+
+private class CardCoordinates(
+    val size: DpSize,
+    val padding: PaddingValues,
+    val offset: (CardType) -> IntOffset,
+)
 
 @Composable
 private fun BottomContent(
@@ -371,6 +425,7 @@ private fun BottomContent(
                 listener = listener,
                 state = state,
             )
+
             SharingStep.Sharing -> Box(
                 modifier = Modifier.padding(vertical = 24.dp),
             ) {
