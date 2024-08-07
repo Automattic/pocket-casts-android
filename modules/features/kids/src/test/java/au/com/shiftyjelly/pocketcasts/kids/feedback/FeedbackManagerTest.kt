@@ -25,48 +25,101 @@ class FeedbackManagerTest {
     }
 
     @Test
-    fun `should return success when response is successful`() = runTest {
+    fun `should return success when send anonymous feedback`() = runTest {
         val subject = FeedbackManager.SUBJECT
         val inbox = FeedbackManager.INBOX
         val message = "Message"
 
         val response: Response<Void> = Response.success(null)
+        `when`(syncManager.isLoggedIn()).thenReturn(false)
         `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenReturn(response)
 
         val feedbackManager = FeedbackManager(syncManager)
 
-        val result = feedbackManager.sendAnonymousFeedback(message)
+        val result = feedbackManager.sendFeedback(message)
 
         assertEquals(FeedbackResult.Success, result)
     }
 
     @Test
-    fun `should return error when throws an exception`() = runTest {
+    fun `should return error when throws an exception while sending anonymous feedback`() = runTest {
         val subject = FeedbackManager.SUBJECT
         val inbox = FeedbackManager.INBOX
         val message = "Message"
 
         `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenThrow(RuntimeException("Test Exception"))
+        `when`(syncManager.isLoggedIn()).thenReturn(false)
 
         val feedbackManager = FeedbackManager(syncManager)
 
-        val result = feedbackManager.sendAnonymousFeedback(message)
+        val result = feedbackManager.sendFeedback(message)
 
         assertEquals(FeedbackResult.Error, result)
     }
 
     @Test
-    fun `should return error when response is not successful`() = runTest {
+    fun `should return error when response is not successful while sending anonymous feedback`() = runTest {
         val subject = FeedbackManager.SUBJECT
         val inbox = FeedbackManager.INBOX
         val message = "Message"
 
         val response: Response<Void> = Response.error(400, "".toResponseBody(null))
         `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenReturn(response)
+        `when`(syncManager.isLoggedIn()).thenReturn(false)
 
         val feedbackManager = FeedbackManager(syncManager)
 
-        val result = feedbackManager.sendAnonymousFeedback(message)
+        val result = feedbackManager.sendFeedback(message)
+
+        assertEquals(FeedbackResult.Error, result)
+    }
+
+    @Test
+    fun `should return success when send feedback`() = runTest {
+        val subject = FeedbackManager.SUBJECT
+        val inbox = FeedbackManager.INBOX
+        val message = "Message"
+
+        val response: Response<Void> = Response.success(null)
+        `when`(syncManager.sendFeedback(subject, inbox, message)).thenReturn(response)
+        `when`(syncManager.isLoggedIn()).thenReturn(true)
+
+        val feedbackManager = FeedbackManager(syncManager)
+
+        val result = feedbackManager.sendFeedback(message)
+
+        assertEquals(FeedbackResult.Success, result)
+    }
+
+    @Test
+    fun `should return error when throws an exception while sending feedback`() = runTest {
+        val subject = FeedbackManager.SUBJECT
+        val inbox = FeedbackManager.INBOX
+        val message = "Message"
+
+        `when`(syncManager.sendFeedback(subject, inbox, message)).thenThrow(RuntimeException("Test Exception"))
+        `when`(syncManager.isLoggedIn()).thenReturn(true)
+
+        val feedbackManager = FeedbackManager(syncManager)
+
+        val result = feedbackManager.sendFeedback(message)
+
+        assertEquals(FeedbackResult.Error, result)
+    }
+
+    @Test
+    fun `should return error when response is not successful while sending feedback`() = runTest {
+        val subject = FeedbackManager.SUBJECT
+        val inbox = FeedbackManager.INBOX
+        val message = "Message"
+
+        val response: Response<Void> = Response.error(400, "".toResponseBody(null))
+        `when`(syncManager.sendFeedback(subject, inbox, message)).thenReturn(response)
+        `when`(syncManager.isLoggedIn()).thenReturn(true)
+
+        val feedbackManager = FeedbackManager(syncManager)
+
+        val result = feedbackManager.sendFeedback(message)
 
         assertEquals(FeedbackResult.Error, result)
     }

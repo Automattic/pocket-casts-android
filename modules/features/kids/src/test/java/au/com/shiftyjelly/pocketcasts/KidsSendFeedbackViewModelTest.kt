@@ -60,7 +60,7 @@ class KidsSendFeedbackViewModelTest {
         val feedback = "Great app!"
         val feedbackResult = FeedbackResult.Success
 
-        whenever(feedbackManager.sendAnonymousFeedback(feedback)).thenReturn(feedbackResult)
+        whenever(feedbackManager.sendFeedback(feedback)).thenReturn(feedbackResult)
 
         viewModel.submitFeedback(feedback)
 
@@ -73,7 +73,7 @@ class KidsSendFeedbackViewModelTest {
         val feedback = "Great app!"
         val feedbackResult = FeedbackResult.Error
 
-        whenever(feedbackManager.sendAnonymousFeedback(feedback)).thenReturn(feedbackResult)
+        whenever(feedbackManager.sendFeedback(feedback)).thenReturn(feedbackResult)
 
         viewModel.submitFeedback(feedback)
 
