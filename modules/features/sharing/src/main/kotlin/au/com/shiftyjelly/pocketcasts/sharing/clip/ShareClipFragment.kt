@@ -17,6 +17,7 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
+import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
@@ -80,7 +81,7 @@ class ShareClipFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
-        val shareColors = shareColors
+        val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
         val assetController = BackgroundAssetController.create(requireContext(), shareColors)
         val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient, assetController)
         setContent {
@@ -92,6 +93,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 playbackProgress = uiState.playbackProgress,
                 isPlaying = uiState.isPlaying,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
+                platforms = platforms,
                 shareColors = shareColors,
                 assetController = assetController,
                 listener = listener,
