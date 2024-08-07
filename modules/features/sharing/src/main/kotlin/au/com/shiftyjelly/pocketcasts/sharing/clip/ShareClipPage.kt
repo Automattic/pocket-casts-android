@@ -73,10 +73,8 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
-import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.EpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
 import java.sql.Date
@@ -345,35 +343,16 @@ private fun MiddleContent(
             .padding(coordiantes.padding)
 
         when (cardType) {
-            is VisualCardType -> when (cardType) {
-                CardType.Vertical -> VerticalEpisodeCard(
-                    episode = episode,
-                    podcast = podcast,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    captureController = assetController.captureController(cardType),
-                    customSize = coordiantes.size,
-                    modifier = modifier,
-                )
-                CardType.Horizontal -> HorizontalEpisodeCard(
-                    episode = episode,
-                    podcast = podcast,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    captureController = assetController.captureController(cardType),
-                    customSize = coordiantes.size,
-                    modifier = modifier,
-                )
-                CardType.Square -> SquareEpisodeCard(
-                    episode = episode,
-                    podcast = podcast,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    captureController = assetController.captureController(cardType),
-                    customSize = coordiantes.size,
-                    modifier = modifier,
-                )
-            }
+            is VisualCardType -> EpisodeCard(
+                cardType = cardType,
+                episode = episode,
+                podcast = podcast,
+                useEpisodeArtwork = useEpisodeArtwork,
+                shareColors = shareColors,
+                captureController = assetController.captureController(cardType),
+                customSize = coordiantes.size,
+                modifier = modifier,
+            )
             is CardType.Audio -> Box(
                 contentAlignment = Alignment.Center,
                 modifier = modifier,

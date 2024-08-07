@@ -39,7 +39,7 @@ internal fun HorizontalPodcastCast(
     shareColors: ShareColors,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
-    useHeightForAspectRatio: Boolean = true,
+    useHeightForAspectRatio: Boolean = false,
     customSize: DpSize? = null,
 ) = HorizontalCard(
     data = PodcastCardData(
@@ -61,7 +61,7 @@ internal fun HorizontalEpisodeCard(
     shareColors: ShareColors,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
-    useHeightForAspectRatio: Boolean = true,
+    useHeightForAspectRatio: Boolean = false,
     customSize: DpSize? = null,
 ) = HorizontalCard(
     data = EpisodeCardData(
@@ -217,6 +217,6 @@ private fun HorizontalCardPreview(
 ) = HorizontalCard(
     data = data,
     shareColors = ShareColors(baseColor),
-    useHeightForAspectRatio = true,
+    useHeightForAspectRatio = false,
     captureController = rememberCaptureController(),
 )
