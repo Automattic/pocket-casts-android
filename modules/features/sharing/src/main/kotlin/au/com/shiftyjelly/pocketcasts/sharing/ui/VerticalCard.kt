@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PocketCastsPill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -39,6 +40,7 @@ internal fun VerticalPodcastCast(
     captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
+    customSize: DpSize? = null,
 ) = VerticalCard(
     data = PodcastCardData(
         podcast = podcast,
@@ -46,6 +48,7 @@ internal fun VerticalPodcastCast(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
+    customSize = customSize,
     captureController = captureController,
     modifier = modifier,
 )
@@ -59,6 +62,7 @@ internal fun VerticalEpisodeCard(
     captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
+    customSize: DpSize? = null,
 ) = VerticalCard(
     data = EpisodeCardData(
         episode = episode,
@@ -67,6 +71,7 @@ internal fun VerticalEpisodeCard(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
+    customSize = customSize,
     captureController = captureController,
     modifier = modifier,
 )
@@ -79,6 +84,7 @@ private fun VerticalCard(
     useHeightForAspectRatio: Boolean,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
     modifier = modifier,
@@ -89,10 +95,11 @@ private fun VerticalCard(
             shareColors.cardBottom,
         ),
     )
+    val size = customSize ?: DpSize(maxWidth, maxHeight)
     val (height, width) = if (useHeightForAspectRatio) {
-        maxHeight to maxHeight / 1.5f
+        size.height to size.height / 1.5f
     } else {
-        maxWidth * 1.5f to maxWidth
+        size.width * 1.5f to size.width
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
