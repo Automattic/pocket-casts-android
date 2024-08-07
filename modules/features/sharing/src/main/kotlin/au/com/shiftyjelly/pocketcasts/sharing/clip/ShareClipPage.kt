@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +31,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,10 +57,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowLoadingButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.BaseRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
@@ -215,6 +218,7 @@ private fun TopContent(
     state: ClipPageState,
 ) {
     AnimatedContent(
+        label = "TopContent",
         targetState = state.step,
         modifier = Modifier.onGloballyPositioned { coordinates -> state.topContentHeight = coordinates.size.height },
     ) { step ->
@@ -300,6 +304,7 @@ private fun MiddleContent(
     pagerState: PagerState,
 ) {
     AnimatedVisibility(
+        label = "DotPagerIndicator",
         visible = state.step == SharingStep.Creating,
         modifier = Modifier.onGloballyPositioned { coordinates -> state.pagerIndicatorHeight = coordinates.size.height },
     ) {
@@ -439,7 +444,10 @@ private fun BottomContent(
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
-    AnimatedContent(state.step) { step ->
+    AnimatedContent(
+        label = "BottomContent",
+        targetState = state.step,
+    ) { step ->
         when (step) {
             SharingStep.Creating -> ClipControls(
                 podcast = podcast,
@@ -497,32 +505,54 @@ private fun ClipControls(
         Spacer(
             modifier = Modifier.height(12.dp),
         )
-        RowLoadingButton(
-            text = stringResource(LR.string.next),
-            isLoading = isLoading,
+        BaseRowButton(
             onClick = {
-                when (selectedCard) {
-                    CardType.Vertical, CardType.Horizontal, CardType.Square -> {
-                        state.step = SharingStep.Sharing
-                    }
-                    CardType.Audio -> {
-                        isLoading = true
-                        scope.launch {
-                            listener.onShareClipAudio(
-                                podcast = podcast,
-                                episode = episode,
-                                clipRange = clipRange,
-                            )
-                            isLoading = false
+                if (!isLoading) {
+                    when (selectedCard) {
+                        CardType.Vertical, CardType.Horizontal, CardType.Square -> {
+                            state.step = SharingStep.Sharing
+                        }
+                        CardType.Audio -> {
+                            isLoading = true
+                            scope.launch {
+                                listener.onShareClipAudio(podcast, episode, clipRange)
+                                isLoading = false
+                            }
                         }
                     }
                 }
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
-            textColor = shareColors.clipButtonText,
             elevation = null,
             includePadding = false,
-        )
+            modifier = Modifier.heightIn(min = 48.dp),
+        ) {
+            val buttonText = stringResource(if (selectedCard is CardType.Audio) LR.string.share else LR.string.next)
+            AnimatedContent(
+                label = "ButtonText",
+                targetState = buttonText to isLoading,
+            ) { (buttonText, isLoading) ->
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextP40(
+                        // Keep in the UI for to keep correct button size
+                        text = if (isLoading) " " else buttonText,
+                        textAlign = TextAlign.Center,
+                        color = shareColors.clipButtonText,
+                        modifier = Modifier.padding(6.dp),
+                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            color = shareColors.clipButtonText,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+            }
+        }
         Spacer(
             modifier = Modifier.height(12.dp),
         )
@@ -535,6 +565,7 @@ private fun AnimatedVisiblity(
     episode: PodcastEpisode?,
     content: @Composable (Podcast, PodcastEpisode) -> Unit,
 ) = AnimatedVisibility(
+    label = "ScreenContent",
     visible = podcast != null && episode != null,
     enter = fadeIn(),
     exit = fadeOut(),
