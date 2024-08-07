@@ -53,7 +53,8 @@ class ShareClipFragment : BaseDialogFragment() {
     @Inject
     lateinit var clipPlayerFactory: ClipPlayer.Factory
 
-    @Inject internal lateinit var shareListenerFactory: ShareClipListener.Factory
+    @Inject
+    internal lateinit var shareListenerFactory: ShareClipListener.Factory
 
     @Inject
     lateinit var clipAnalyticsFactory: ClipAnalytics.Factory
