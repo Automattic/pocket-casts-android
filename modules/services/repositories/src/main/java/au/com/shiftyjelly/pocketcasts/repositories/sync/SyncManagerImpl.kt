@@ -409,6 +409,10 @@ class SyncManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
+        return syncServerManager.sendAnonymousFeedback(subject, inbox, message)
+    }
+
     override suspend fun loadStats(): StatsBundle =
         getCacheTokenOrLogin { token ->
             syncServerManager.loadStats(token)

@@ -9,6 +9,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import androidx.core.view.doOnLayout
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.kids.viewmodel.KidsSendFeedbackViewModel
+import au.com.shiftyjelly.pocketcasts.kids.viewmodel.SendFeedbackState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -42,6 +44,15 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val showFeedbackDialog by viewModel.showFeedbackDialog.collectAsState()
+                val sendFeedbackState by viewModel.sendFeedbackState.collectAsState()
+
+                LaunchedEffect(sendFeedbackState) {
+                    if (sendFeedbackState is SendFeedbackState.Success) {
+                        dismiss()
+                    } else if (sendFeedbackState is SendFeedbackState.Error) {
+                        dismiss()
+                    }
+                }
 
                 AppTheme(theme.activeTheme) {
                     AnimatedVisibility(
@@ -53,9 +64,8 @@ class KidsBottomSheetDialog : BottomSheetDialogFragment() {
                     ) {
                         KidsSendFeedbackDialog(
                             onSeen = viewModel::onFeedbackFormSeen,
-                            onSubmitFeedback = {
-                                viewModel.onSubmitFeedback()
-                                dismiss()
+                            onSubmitFeedback = { feedback ->
+                                viewModel.submitFeedback(feedback)
                             },
                         )
                     }

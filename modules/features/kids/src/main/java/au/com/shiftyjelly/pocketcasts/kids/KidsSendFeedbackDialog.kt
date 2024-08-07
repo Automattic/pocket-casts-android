@@ -51,7 +51,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun KidsSendFeedbackDialog(
     modifier: Modifier = Modifier,
     onSeen: () -> Unit,
-    onSubmitFeedback: () -> Unit,
+    onSubmitFeedback: (String) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -61,7 +61,7 @@ fun KidsSendFeedbackDialog(
     val onFeedbackTapped = {
         keyboardController?.hide()
         focusManager.clearFocus()
-        onSubmitFeedback()
+        onSubmitFeedback(feedbackText.text)
     }
 
     CallOnce {
@@ -111,6 +111,7 @@ fun KidsSendFeedbackDialog(
                         feedbackText = it
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = MaterialTheme.theme.colors.primaryText01,
                         placeholderColor = MaterialTheme.theme.colors.primaryText02,
                         backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                         focusedBorderColor = MaterialTheme.theme.colors.primaryUi05,
@@ -136,6 +137,7 @@ fun KidsSendFeedbackDialog(
                     contentDescription = stringResource(LR.string.send_feedback),
                     onClick = { onFeedbackTapped() },
                     includePadding = false,
+                    enabled = feedbackText.text.isNotEmpty(),
                     textColor = MaterialTheme.theme.colors.primaryInteractive02,
                     modifier = Modifier.padding(bottom = 12.dp),
                     colors = ButtonDefaults.buttonColors(
