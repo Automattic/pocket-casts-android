@@ -288,7 +288,7 @@ open class SyncServerManager @Inject constructor(
         return server.getPodcastRating(addBearer(token), request)
     }
 
-    fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Single<Response<Void>> {
+    suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
         val request = SupportFeedbackRequest.newBuilder()
             .setSubject(subject)
             .setInbox(inbox)

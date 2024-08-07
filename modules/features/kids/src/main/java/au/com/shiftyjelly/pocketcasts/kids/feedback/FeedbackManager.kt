@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.kids.feedback
 
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.await
+import retrofit2.Response
 
 class FeedbackManager @Inject constructor(
     private val syncManager: SyncManager,
@@ -13,7 +13,7 @@ class FeedbackManager @Inject constructor(
     }
 
     suspend fun sendAnonymousFeedback(message: String): FeedbackResult = try {
-        val response = syncManager.sendAnonymousFeedback(SUBJECT, INBOX, message).await()
+        val response: Response<Void> = syncManager.sendAnonymousFeedback(SUBJECT, INBOX, message)
         if (response.isSuccessful) {
             FeedbackResult.Success
         } else {

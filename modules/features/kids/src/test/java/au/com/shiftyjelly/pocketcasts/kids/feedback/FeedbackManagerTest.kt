@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.kids.feedback
 
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import io.reactivex.Single
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -26,14 +25,13 @@ class FeedbackManagerTest {
     }
 
     @Test
-    fun `should return success when send support feedback`() = runTest {
+    fun `should return success when response is successful`() = runTest {
         val subject = FeedbackManager.SUBJECT
         val inbox = FeedbackManager.INBOX
         val message = "Message"
 
         val response: Response<Void> = Response.success(null)
-
-        `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenReturn(Single.just(response))
+        `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenReturn(response)
 
         val feedbackManager = FeedbackManager(syncManager)
 
@@ -48,7 +46,7 @@ class FeedbackManagerTest {
         val inbox = FeedbackManager.INBOX
         val message = "Message"
 
-        `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenReturn(Single.error(Exception()))
+        `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenThrow(RuntimeException("Test Exception"))
 
         val feedbackManager = FeedbackManager(syncManager)
 
@@ -62,9 +60,9 @@ class FeedbackManagerTest {
         val subject = FeedbackManager.SUBJECT
         val inbox = FeedbackManager.INBOX
         val message = "Message"
-        val responseError: Response<Void> = Response.error(400, "".toResponseBody(null))
 
-        `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenReturn(Single.just(responseError))
+        val response: Response<Void> = Response.error(400, "".toResponseBody(null))
+        `when`(syncManager.sendAnonymousFeedback(subject, inbox, message)).thenReturn(response)
 
         val feedbackManager = FeedbackManager(syncManager)
 

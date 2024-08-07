@@ -409,7 +409,7 @@ class SyncManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Single<Response<Void>> {
+    override suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
         return syncServerManager.sendAnonymousFeedback(subject, inbox, message)
     }
 

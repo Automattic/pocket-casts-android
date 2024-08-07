@@ -180,5 +180,5 @@ interface SyncServer {
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/anonymous/feedback")
-    fun sendAnonymousFeedback(@Body request: SupportFeedbackRequest): Single<Response<Void>>
+    suspend fun sendAnonymousFeedback(@Body request: SupportFeedbackRequest): Response<Void>
 }
