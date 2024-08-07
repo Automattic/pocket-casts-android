@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -124,27 +127,27 @@ private fun VerticalClipPage(
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
-    Box {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(shareColors.background),
-        ) {
-            val scrollState = rememberScrollState()
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .scrollBottomFade(scrollState)
-                    .nestedScroll(rememberNestedScrollInteropConnection())
-                    .verticalScroll(scrollState),
-            ) {
-                TopContent(
-                    shareColors = shareColors,
-                    state = state,
-                )
-                if (podcast != null && episode != null) {
+    Box(
+        modifier = Modifier
+            .background(shareColors.background)
+            .fillMaxSize(),
+    ) {
+        AnimatedPodcastVisiblity(podcast = podcast, episode = episode) { podcast, episode ->
+            Column {
+                val scrollState = rememberScrollState()
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .scrollBottomFade(scrollState)
+                        .nestedScroll(rememberNestedScrollInteropConnection())
+                        .verticalScroll(scrollState),
+                ) {
+                    TopContent(
+                        shareColors = shareColors,
+                        state = state,
+                    )
                     val cardPadding = maxOf(
                         LocalConfiguration.current.screenWidthDp.dp / 8,
                         42.dp, // Close button start edge position
@@ -159,8 +162,6 @@ private fun VerticalClipPage(
                         modifier = Modifier.padding(horizontal = cardPadding),
                     )
                 }
-            }
-            if (episode != null) {
                 BottomContent(
                     episode = episode,
                     clipRange = clipRange,
@@ -332,6 +333,21 @@ private fun ClipControls(
         Spacer(
             modifier = Modifier.height(12.dp),
         )
+    }
+}
+
+@Composable
+private fun AnimatedPodcastVisiblity(
+    podcast: Podcast?,
+    episode: PodcastEpisode?,
+    content: @Composable (Podcast, PodcastEpisode) -> Unit,
+) = AnimatedVisibility(
+    visible = podcast != null && episode != null,
+    enter = fadeIn(),
+    exit = fadeOut(),
+) {
+    if (podcast != null && episode != null) {
+        content(podcast, episode)
     }
 }
 
