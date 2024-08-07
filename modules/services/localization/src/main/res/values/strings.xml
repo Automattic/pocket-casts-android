@@ -7,6 +7,7 @@
     <string name="pocket_casts_patron_short" translatable="false">Patron</string>
 
     <string name="empty" translatable="false" />
+    <string name="single_space" translatable="false"> </string>
 
     <string name="account">Account</string>
     <string name="add_bookmark">Add bookmark</string>
@@ -2025,6 +2026,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_clip_create_label" translatable="false">@string/podcast_create_clip</string>
     <string name="share_clip_share_label">Share clip</string>
     <string name="share_clip_edit_label">Edit clip</string>
+    <string name="share_clip_create_audio_label">Create audio file</string>
+    <string name="share_clip_create_audio_description">Generate an .mp3 audio file</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>

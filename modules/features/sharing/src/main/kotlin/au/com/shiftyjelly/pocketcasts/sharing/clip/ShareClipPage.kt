@@ -164,6 +164,7 @@ private fun VerticalClipPage(
             Column {
                 val pagerState = rememberPagerState(pageCount = { CardType.entires.size })
                 val scrollState = rememberScrollState()
+                val selectedCard = CardType.entires[pagerState.currentPage]
                 Column(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
@@ -176,6 +177,7 @@ private fun VerticalClipPage(
                     TopContent(
                         shareColors = shareColors,
                         state = state,
+                        selectedCard = selectedCard,
                     )
                     MiddleContent(
                         episode = episode,
@@ -196,7 +198,7 @@ private fun VerticalClipPage(
                     isPlaying = isPlaying,
                     platforms = platforms,
                     shareColors = shareColors,
-                    selectedCard = CardType.entires[pagerState.currentPage],
+                    selectedCard = selectedCard,
                     listener = listener,
                     state = state,
                 )
@@ -216,12 +218,15 @@ private fun VerticalClipPage(
 private fun TopContent(
     shareColors: ShareColors,
     state: ClipPageState,
+    selectedCard: CardType,
 ) {
+    val titleId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_label else LR.string.share_clip_create_label
+    val descriptionId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_description else LR.string.single_space
     AnimatedContent(
         label = "TopContent",
-        targetState = state.step,
+        targetState = Triple(state.step, titleId, descriptionId),
         modifier = Modifier.onGloballyPositioned { coordinates -> state.topContentHeight = coordinates.size.height },
-    ) { step ->
+    ) { (step, titleId, descriptionId) ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -238,7 +243,7 @@ private fun TopContent(
             TextH30(
                 text = stringResource(
                     when (step) {
-                        SharingStep.Creating -> LR.string.share_clip_create_label
+                        SharingStep.Creating -> titleId
                         SharingStep.Sharing -> LR.string.share_clip_share_label
                     },
                 ),
@@ -254,7 +259,7 @@ private fun TopContent(
             )
             when (step) {
                 SharingStep.Creating -> TextH40(
-                    text = " ", // Placeholder until audio clips are added
+                    text = stringResource(descriptionId),
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     color = shareColors.backgroundSecondaryText,
