@@ -49,7 +49,6 @@ sealed interface VisualCardType : CardType {
 @Composable
 internal fun estimateCardCoordinates(
     topContentHeight: Int,
-    indicatorHeight: Int,
     scrollState: ScrollState,
 ): CardCoordinates {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -79,7 +78,7 @@ internal fun estimateCardCoordinates(
                     val isMeasured = viewPortHeight != 0
 
                     if (isMeasured && (scrollState.canScrollForward || scrollState.canScrollBackward)) {
-                        val viewPortPagerPortion = density.run { (viewPortHeight - topContentHeight - indicatorHeight).toDp() }
+                        val viewPortPagerPortion = density.run { (viewPortHeight - topContentHeight).toDp() }
                         val offsetValue = (viewPortPagerPortion - availableHeight) / 2
                         IntOffset(x = 0, y = density.run { offsetValue.roundToPx() })
                     } else {

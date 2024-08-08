@@ -168,8 +168,7 @@ private fun MiddleContent(
     }
 
     val coordiantes = estimateCardCoordinates(
-        topContentHeight = topContentHeight,
-        indicatorHeight = indicatorHeight,
+        topContentHeight = topContentHeight + indicatorHeight,
         scrollState = scrollState,
     )
     HorizontalPager(
