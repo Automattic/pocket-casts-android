@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
@@ -36,12 +37,14 @@ internal fun SquarePodcastCast(
     shareColors: ShareColors,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = SquareCard(
     data = PodcastCardData(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
+    customSize = customSize,
     captureController = captureController,
     modifier = modifier,
 )
@@ -54,6 +57,7 @@ internal fun SquareEpisodeCard(
     shareColors: ShareColors,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = SquareCard(
     data = EpisodeCardData(
         episode = episode,
@@ -61,6 +65,7 @@ internal fun SquareEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
+    customSize = customSize,
     captureController = captureController,
     modifier = modifier,
 )
@@ -72,30 +77,32 @@ private fun SquareCard(
     shareColors: ShareColors,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
     modifier = modifier,
 ) {
-    val size = minOf(maxWidth, maxHeight)
     val backgroundGradient = Brush.verticalGradient(
         listOf(
             shareColors.cardTop,
             shareColors.cardBottom,
         ),
     )
+    val size = customSize ?: DpSize(maxWidth, maxHeight)
+    val minDimension = minOf(size.width, size.height)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .capturable(captureController)
             .background(backgroundGradient, RoundedCornerShape(12.dp))
-            .size(size),
+            .size(minDimension),
     ) {
         Spacer(
             modifier = Modifier.height(42.dp),
         )
         data.Image(
             modifier = Modifier
-                .size(size * 0.4f)
+                .size(minDimension * 0.4f)
                 .clip(RoundedCornerShape(8.dp)),
         )
         Spacer(
