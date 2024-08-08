@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.sharing.clip
+package au.com.shiftyjelly.pocketcasts.sharing
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker

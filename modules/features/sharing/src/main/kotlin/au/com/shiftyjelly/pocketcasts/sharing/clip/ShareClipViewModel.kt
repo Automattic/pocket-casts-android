@@ -103,14 +103,9 @@ class ShareClipViewModel @AssistedInject constructor(
         clipPlayer.stop()
     }
 
-    fun onClipScreenShown() {
+    fun onScreenShown() {
         Timber.tag(TAG).d("Clip screen shown")
         clipAnalytics.screenShown()
-    }
-
-    fun onClipLinkShared(clip: Clip) {
-        Timber.tag(TAG).d("Clip shared: $clip")
-        clipAnalytics.linkShared(clip)
     }
 
     fun updateClipProgress(progress: Duration) {
@@ -170,18 +165,21 @@ class ShareClipViewModel @AssistedInject constructor(
         return when (cardType) {
             is VisualCardType -> when (platform) {
                 SocialPlatform.PocketCasts -> {
+                    clipAnalytics.clipShared(clipRange, ClipShareType.Link, cardType)
                     Result.success(clipLinkRequest(podcast, episode, clipRange, cardType, sourceView))
                 }
 
                 SocialPlatform.Instagram, SocialPlatform.WhatsApp, SocialPlatform.Telegram,
                 SocialPlatform.X, SocialPlatform.Tumblr, SocialPlatform.More,
                 -> {
+                    clipAnalytics.clipShared(clipRange, ClipShareType.Video, cardType)
                     createBackgroundAsset(cardType).map { asset ->
                         videoClipReequest(podcast, episode, clipRange, platform, cardType, asset, sourceView)
                     }
                 }
             }
             is CardType.Audio -> {
+                clipAnalytics.clipShared(clipRange, ClipShareType.Audio, cardType)
                 Result.success(audioClipRequest(podcast, episode, clipRange, sourceView))
             }
         }

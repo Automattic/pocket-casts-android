@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.sharing.timestamp
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -9,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharing.FakeTracker
+import au.com.shiftyjelly.pocketcasts.sharing.TrackEvent
 import au.com.shiftyjelly.pocketcasts.sharing.timestamp.ShareEpisodeTimestampViewModel.UiState
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,6 +32,7 @@ class ShareEpisodeTimestampViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    private val tracker = FakeTracker()
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
     private val settings = mock<Settings>()
@@ -45,10 +51,13 @@ class ShareEpisodeTimestampViewModelTest {
         whenever(settings.artworkConfiguration).thenReturn(artworkSetting)
 
         viewModel = ShareEpisodeTimestampViewModel(
+            podcast.uuid,
             episode.uuid,
+            SourceView.PLAYER,
             episodeManager,
             podcastManager,
             settings,
+            AnalyticsTracker.test(tracker, isEnabled = true),
         )
     }
 
@@ -64,5 +73,25 @@ class ShareEpisodeTimestampViewModelTest {
                 awaitItem(),
             )
         }
+    }
+
+    @Test
+    fun `track screen show event`() = runTest {
+        viewModel.onScreenShown()
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.SHARE_SCREEN_SHOWN,
+                mapOf(
+                    "type" to "episode_timestamp",
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "source" to "player",
+                ),
+            ),
+            event,
+        )
     }
 }
