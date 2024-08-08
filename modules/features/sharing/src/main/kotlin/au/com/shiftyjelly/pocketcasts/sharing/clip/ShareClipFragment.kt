@@ -115,7 +115,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 viewModel.snackbarMessages.collect { message ->
                     val text = when (message) {
                         is SnackbarMessage.SharingResponse -> message.message
-                        is SnackbarMessage.PlayerIssue -> getString(LR.string.error)
+                        is SnackbarMessage.PlayerIssue -> getString(LR.string.podcast_episode_playback_error)
                         is SnackbarMessage.GenericIssue -> getString(LR.string.error)
                     }
                     snackbarHostState.showSnackbar(text)

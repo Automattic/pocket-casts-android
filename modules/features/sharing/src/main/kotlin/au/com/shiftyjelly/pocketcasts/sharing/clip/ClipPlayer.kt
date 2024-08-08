@@ -90,7 +90,7 @@ private class ExoPlayerClipPlayer(
     private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
 
     override val isPlayingState = MutableStateFlow(false)
-    override val errors = MutableSharedFlow<Exception>()
+    override val errors = MutableSharedFlow<Exception>(extraBufferCapacity = 1)
     override val playbackProgress = channelFlow {
         while (currentCoroutineContext().isActive) {
             // Instead of simple delay loop we use inner job that we join.
@@ -125,6 +125,7 @@ private class ExoPlayerClipPlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                exoPlayer.clearMediaItems()
                 errors.tryEmit(error)
             }
         })
