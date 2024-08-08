@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -123,21 +125,42 @@ internal fun ShareClipPage(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
     ),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-) = VerticalClipPage(
-    episode = episode,
-    podcast = podcast,
-    clipRange = clipRange,
-    playbackProgress = playbackProgress,
-    isPlaying = isPlaying,
-    isSharing = isSharing,
-    useEpisodeArtwork = useEpisodeArtwork,
-    platforms = platforms,
-    shareColors = shareColors,
-    assetController = assetController,
-    listener = listener,
-    state = state,
-    snackbarHostState = snackbarHostState,
-)
+) {
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
+            episode = episode,
+            podcast = podcast,
+            clipRange = clipRange,
+            playbackProgress = playbackProgress,
+            isPlaying = isPlaying,
+            isSharing = isSharing,
+            useEpisodeArtwork = useEpisodeArtwork,
+            platforms = platforms,
+            shareColors = shareColors,
+            assetController = assetController,
+            listener = listener,
+            state = state,
+            snackbarHostState = snackbarHostState,
+        )
+        else -> VerticalClipPage(
+            episode = episode,
+            podcast = podcast,
+            clipRange = clipRange,
+            playbackProgress = playbackProgress,
+            isPlaying = isPlaying,
+            isSharing = isSharing,
+            useEpisodeArtwork = useEpisodeArtwork,
+            platforms = platforms,
+            shareColors = shareColors,
+            assetController = assetController,
+            listener = listener,
+            state = state,
+            snackbarHostState = snackbarHostState,
+        )
+    }
+
+
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -579,6 +602,31 @@ private fun SharingControls(
 }
 
 @Composable
+private fun HorizontalClipPage(
+    episode: PodcastEpisode?,
+    podcast: Podcast?,
+    clipRange: Clip.Range,
+    playbackProgress: Duration,
+    isPlaying: Boolean,
+    isSharing: Boolean,
+    useEpisodeArtwork: Boolean,
+    platforms: Set<SocialPlatform>,
+    shareColors: ShareColors,
+    assetController: BackgroundAssetController,
+    listener: ShareClipPageListener,
+    state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
+) {
+    Box(
+        modifier = Modifier
+            .background(shareColors.background)
+            .fillMaxSize()
+    ) {
+        println(listOf(episode, podcast, clipRange, playbackProgress, isPlaying, isSharing, useEpisodeArtwork, platforms, assetController, listener, state, snackbarHostState))
+    }
+}
+
+@Composable
 private fun AnimatedVisiblity(
     podcast: Podcast?,
     episode: PodcastEpisode?,
@@ -594,34 +642,55 @@ private fun AnimatedVisiblity(
     }
 }
 
-@Preview(name = "Regular device", device = Devices.PortraitRegular)
+@Preview(name = "Regular device", device = Devices.PortraitRegular, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularPreview() = ShareClipPagePreview()
 
-@Preview(name = "Regular device sharing", device = Devices.PortraitRegular)
+@Preview(name = "Regular device sharing", device = Devices.PortraitRegular, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularSharingPreview() = ShareClipPagePreview(
     step = SharingStep.Sharing,
 )
 
-@Preview(name = "Regular device clipping", device = Devices.PortraitRegular)
+@Preview(name = "Regular device clipping", device = Devices.PortraitRegular, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularClippingPreview() = ShareClipPagePreview(
     step = SharingStep.Sharing,
     isSharing = true,
 )
 
-@Preview(name = "Small device", device = Devices.PortraitSmall)
+@Preview(name = "Small device", device = Devices.PortraitSmall, group = "vertical")
 @Composable
 private fun ShareClipVerticalSmallPreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Foldable device", device = Devices.PortraitFoldable)
+@Preview(name = "Foldable device", device = Devices.PortraitFoldable, group = "irregular")
 @Composable
 private fun ShareClipVerticalFoldablePreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Tablet device", device = Devices.PortraitTablet)
+@Preview(name = "Tablet device", device = Devices.PortraitTablet, group = "irregular")
 @Composable
 private fun ShareClipVerticalTabletPreview() = ShareClipPagePreview()
+
+@Preview(name = "Regular device horizontal sharing", device = Devices.LandscapeRegular, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalRegularPreview() = ShareClipPagePreview()
+
+@Preview(name = "Regular device horizontal clipping", device = Devices.LandscapeRegular, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalRegularSharingPreview() = ShareClipPagePreview(
+    step = SharingStep.Sharing,
+)
+
+@Preview(name = "Regular device horizontal", device = Devices.LandscapeRegular, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalRegularClippingPreview() = ShareClipPagePreview(
+    step = SharingStep.Sharing,
+    isSharing = true,
+)
+
+@Preview(name = "Small device horizontal", device = Devices.LandscapeSmall, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalSmallPreviewPreview() = ShareClipPagePreview()
 
 @Composable
 internal fun ShareClipPagePreview(
