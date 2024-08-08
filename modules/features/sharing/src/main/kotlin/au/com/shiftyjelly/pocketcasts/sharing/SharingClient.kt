@@ -260,7 +260,7 @@ data class SharingRequest internal constructor(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipLink(podcast, episode, range))
+        ) = Builder(Data.ClipLink(podcast, episode, range)).setPlatform(SocialPlatform.PocketCasts)
 
         fun audioClip(
             podcast: Podcast,

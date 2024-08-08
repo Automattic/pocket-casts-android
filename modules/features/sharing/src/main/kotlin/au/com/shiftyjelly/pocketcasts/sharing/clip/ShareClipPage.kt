@@ -61,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
@@ -81,9 +82,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareClipPageListener {
-    suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range)
-    suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range)
-    suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range)
+    suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: CardType): SharingResponse
+    suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): SharingResponse
+    suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: VisualCardType): SharingResponse
     fun onClickPlay()
     fun onClickPause()
     fun onUpdateClipStart(duration: Duration)
@@ -94,9 +95,21 @@ internal interface ShareClipPageListener {
 
     companion object {
         val Preview = object : ShareClipPageListener {
-            override suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = Unit
-            override suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = Unit
-            override suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = Unit
+            override suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: CardType) = SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
+            override suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
+            override suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: VisualCardType) = SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
             override fun onClickPlay() = Unit
             override fun onClickPause() = Unit
             override fun onUpdateClipStart(duration: Duration) = Unit
@@ -378,6 +391,8 @@ private fun BottomContent(
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
+    val scope = rememberCoroutineScope()
+    var isLoading by remember { mutableStateOf(false) }
     AnimatedContent(
         label = "BottomContent",
         targetState = state.step,
@@ -400,7 +415,15 @@ private fun BottomContent(
                 PlatformBar(
                     platforms = platforms,
                     shareColors = shareColors,
-                    onClick = {},
+                    onClick = { platform ->
+                        if (!isLoading) {
+                            isLoading = true
+                            scope.launch {
+                                shareClip(podcast, episode, clipRange, selectedCard, platform, listener)
+                                isLoading = false
+                            }
+                        }
+                    },
                 )
             }
         }
@@ -449,7 +472,7 @@ private fun ClipControls(
                         CardType.Audio -> {
                             isLoading = true
                             scope.launch {
-                                listener.onShareClipAudio(podcast, episode, clipRange)
+                                shareClip(podcast, episode, clipRange, CardType.Audio, SocialPlatform.More, listener)
                                 isLoading = false
                             }
                         }
@@ -490,6 +513,29 @@ private fun ClipControls(
         Spacer(
             modifier = Modifier.height(12.dp),
         )
+    }
+}
+
+private suspend fun shareClip(
+    podcast: Podcast,
+    episode: PodcastEpisode,
+    clipRange: Clip.Range,
+    cardType: CardType,
+    platform: SocialPlatform,
+    listener: ShareClipPageListener,
+): SharingResponse = when (cardType) {
+    is VisualCardType -> when (platform) {
+        SocialPlatform.PocketCasts -> {
+            listener.onShareClipLink(podcast, episode, clipRange, cardType)
+        }
+        SocialPlatform.Instagram, SocialPlatform.WhatsApp, SocialPlatform.Telegram,
+        SocialPlatform.X, SocialPlatform.Tumblr, SocialPlatform.More,
+        -> {
+            listener.onShareClipVideo(podcast, episode, clipRange, platform, cardType)
+        }
+    }
+    is CardType.Audio -> {
+        listener.onShareClipAudio(podcast, episode, clipRange)
     }
 }
 

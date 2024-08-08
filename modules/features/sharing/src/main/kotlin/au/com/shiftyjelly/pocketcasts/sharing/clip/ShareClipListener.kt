@@ -1,14 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
-import android.widget.Toast
-import androidx.compose.runtime.ExperimentalComposeApi
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
+import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -17,6 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal class ShareClipListener @AssistedInject constructor(
     @Assisted private val fragment: ShareClipFragment,
@@ -25,12 +27,12 @@ internal class ShareClipListener @AssistedInject constructor(
     @Assisted private val sourceView: SourceView,
     private val sharingClient: SharingClient,
 ) : ShareClipPageListener {
-    override suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) {
-        val request = SharingRequest.clipLink(podcast, episode, clipRange).build()
-        val response = sharingClient.share(request)
-        if (response.feedbackMessage != null) {
-            Toast.makeText(fragment.requireContext(), response.feedbackMessage, Toast.LENGTH_SHORT).show()
-        }
+    override suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: CardType): SharingResponse {
+        val request = SharingRequest.clipLink(podcast, episode, clipRange)
+            .setCardType(cardType)
+            .setSourceView(sourceView)
+            .build()
+        return sharingClient.share(request)
     }
 
     override suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = coroutineScope {
@@ -38,25 +40,27 @@ internal class ShareClipListener @AssistedInject constructor(
         val request = SharingRequest.audioClip(podcast, episode, clipRange)
             .setSourceView(sourceView)
             .build()
-        val response = sharingClient.share(request)
-        if (response.feedbackMessage != null) {
-            Toast.makeText(fragment.requireContext(), response.feedbackMessage, Toast.LENGTH_SHORT).show()
-        }
+        sharingClient.share(request)
     }
 
-    @OptIn(ExperimentalComposeApi::class)
-    override suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = coroutineScope {
+    override suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: VisualCardType) = coroutineScope {
         launch { delay(1.seconds) } // Launch a delay job to allow the loading animation to run even if clipping happens faster
-        val backgroundImage = assetController.capture(CardType.Vertical).getOrNull()
-        if (backgroundImage == null) {
-            Toast.makeText(fragment.requireContext(), "Error", Toast.LENGTH_SHORT).show()
-        } else {
-            val request = SharingRequest.videoClip(podcast, episode, clipRange, backgroundImage).build()
-            val response = sharingClient.share(request)
-            if (response.feedbackMessage != null) {
-                Toast.makeText(fragment.requireContext(), response.feedbackMessage, Toast.LENGTH_SHORT).show()
+        assetController.capture(cardType)
+            .map { backgroundImage ->
+                SharingRequest.videoClip(podcast, episode, clipRange, backgroundImage)
+                    .setPlatform(platform)
+                    .setCardType(cardType)
+                    .setSourceView(sourceView)
+                    .build()
             }
-        }
+            .map { sharingClient.share(it) }
+            .getOrElse { error ->
+                SharingResponse(
+                    isSuccsessful = false,
+                    feedbackMessage = fragment.getString(LR.string.error),
+                    error = error,
+                )
+            }
     }
 
     override fun onClickPlay() {
