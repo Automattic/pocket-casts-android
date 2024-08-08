@@ -625,11 +625,11 @@ enum class AnalyticsEvent(val key: String) {
     WIDGET_INSTALLED("widget_installed"),
     WIDGET_UNINSTALLED("widget_uninstalled"),
 
-    /* Clips */
-    CLIP_SCREEN_SHOWN("clip_screen_shown"),
-    CLIP_SCREEN_PLAY_TAPPED("clip_screen_play_tapped"),
-    CLIP_SCREEN_PAUSE_TAPPED("clip_screen_pause_tapped"),
-    CLIP_SCREEN_LINK_SHARED("clip_screen_link_shared"),
+    /* Sharing */
+    SHARE_SCREEN_SHOWN("share_screen_shown"),
+    SHARE_SCREEN_PLAY_TAPPED("share_screen_play_tapped"),
+    SHARE_SCREEN_PAUSE_TAPPED("share_screen_pause_tapped"),
+    SHARE_SCREEN_CLIP_SHARED("share_screen_clip_shared"),
 
     /* Pocket Casts Champion */
     POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),
