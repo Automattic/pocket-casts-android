@@ -56,7 +56,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.BaseRowButton
@@ -203,10 +202,6 @@ private fun VerticalClipPage(
                         shareColors = shareColors,
                         selectedCard = selectedCard,
                         state = state,
-                        bottomSpace = when (state.step) {
-                            SharingStep.Creating -> 12.dp
-                            SharingStep.Sharing -> 48.dp
-                        },
                     )
                     MiddleContent(
                         episode = episode,
@@ -256,10 +251,10 @@ private fun TopContent(
     shareColors: ShareColors,
     selectedCard: CardType,
     state: ClipPageState,
-    bottomSpace: Dp,
 ) {
     val titleId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_label else LR.string.share_clip_create_label
     val descriptionId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_description else LR.string.single_space
+    val orientation = LocalConfiguration.current.orientation
     AnimatedContent(
         label = "TopContent",
         targetState = Triple(state.step, titleId, descriptionId),
@@ -297,13 +292,16 @@ private fun TopContent(
             )
             val alpha by animateFloatAsState(targetValue = if (isSharing) 0.3f else 1f)
             when (step) {
-                SharingStep.Creating -> TextH40(
-                    text = stringResource(descriptionId),
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    color = shareColors.backgroundSecondaryText,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
+                SharingStep.Creating -> when (orientation) {
+                    Configuration.ORIENTATION_LANDSCAPE -> Unit
+                    else -> TextH40(
+                        text = stringResource(descriptionId),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        color = shareColors.backgroundSecondaryText,
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                    )
+                }
                 SharingStep.Sharing -> TextH40(
                     text = stringResource(LR.string.share_clip_edit_label),
                     textAlign = TextAlign.Center,
@@ -327,6 +325,13 @@ private fun TopContent(
                         )
                         .padding(vertical = 4.dp, horizontal = 16.dp),
                 )
+            }
+            val bottomSpace = when (orientation) {
+                Configuration.ORIENTATION_LANDSCAPE -> 0.dp
+                else -> when (step) {
+                    SharingStep.Creating -> 12.dp
+                    SharingStep.Sharing -> 48.dp
+                }
             }
             Spacer(
                 modifier = Modifier.height(bottomSpace),
@@ -633,7 +638,6 @@ private fun HorizontalClipPage(
                     shareColors = shareColors,
                     selectedCard = CardType.Horizontal,
                     state = state,
-                    bottomSpace = 0.dp,
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
