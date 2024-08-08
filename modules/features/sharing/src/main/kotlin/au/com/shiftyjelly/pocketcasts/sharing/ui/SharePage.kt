@@ -21,13 +21,8 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarData
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 
@@ -294,35 +288,5 @@ internal fun HorizontalSharePage(
         hostState = snackbarHostState,
         modifier = Modifier.align(Alignment.BottomCenter),
         snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
-    )
-}
-
-@Composable
-private fun SharingThemedSnackbar(
-    snackbarData: SnackbarData,
-    shareColors: ShareColors,
-    modifier: Modifier = Modifier,
-) {
-    val actionLabel = snackbarData.actionLabel
-    val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
-        @Composable {
-            TextButton(
-                colors = ButtonDefaults.textButtonColors(contentColor = shareColors.snackbarText),
-                onClick = { snackbarData.performAction() },
-                content = { TextH50(actionLabel) },
-            )
-        }
-    } else {
-        null
-    }
-    Snackbar(
-        modifier = modifier.padding(12.dp),
-        content = { TextH50(snackbarData.message, color = shareColors.snackbarText) },
-        action = actionComposable,
-        actionOnNewLine = false,
-        shape = MaterialTheme.shapes.small,
-        backgroundColor = shareColors.snackbar,
-        contentColor = shareColors.snackbar,
-        elevation = 0.dp,
     )
 }

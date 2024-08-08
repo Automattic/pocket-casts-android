@@ -34,6 +34,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.EpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.sharing.ui.SharingThemedSnackbar
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.estimateCardCoordinates
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
@@ -137,6 +140,7 @@ internal fun ShareClipPage(
     assetController = assetController,
     listener = listener,
     state = state,
+    snackbarHostState = remember { SnackbarHostState() }
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -153,6 +157,7 @@ private fun VerticalClipPage(
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
     state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
 ) {
     Box(
         modifier = Modifier
@@ -200,6 +205,7 @@ private fun VerticalClipPage(
                     selectedCard = selectedCard,
                     listener = listener,
                     state = state,
+                    snackbarHostState = snackbarHostState,
                 )
             }
         }
@@ -209,6 +215,11 @@ private fun VerticalClipPage(
             modifier = Modifier
                 .padding(top = 12.dp, end = 12.dp)
                 .align(Alignment.TopEnd),
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
         )
     }
 }
@@ -385,6 +396,7 @@ private fun BottomContent(
     selectedCard: CardType,
     listener: ShareClipPageListener,
     state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
 ) {
     AnimatedContent(
         label = "BottomContent",
@@ -401,6 +413,7 @@ private fun BottomContent(
                 selectedCard = selectedCard,
                 listener = listener,
                 state = state,
+                snackbarHostState = snackbarHostState,
             )
             SharingStep.Sharing -> SharingControls(
                 podcast = podcast,
@@ -411,6 +424,7 @@ private fun BottomContent(
                 selectedCard = selectedCard,
                 listener = listener,
                 state = state,
+                snackbarHostState = snackbarHostState,
             )
         }
     }
@@ -427,6 +441,7 @@ private fun ClipControls(
     selectedCard: CardType,
     listener: ShareClipPageListener,
     state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
 ) {
     val scope = rememberCoroutineScope()
     Column(
@@ -456,7 +471,16 @@ private fun ClipControls(
                         }
                         CardType.Audio -> {
                             scope.launch {
-                                shareClip(podcast, episode, clipRange, CardType.Audio, SocialPlatform.More, listener, state)
+                                shareClip(
+                                    podcast = podcast,
+                                    episode = episode,
+                                    clipRange = clipRange,
+                                    cardType = CardType.Audio,
+                                    platform = SocialPlatform.More,
+                                    listener = listener,
+                                    state = state,
+                                    snackbarHostState = snackbarHostState
+                                )
                             }
                         }
                     }
@@ -509,6 +533,7 @@ private fun SharingControls(
     selectedCard: CardType,
     listener: ShareClipPageListener,
     state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
 ) {
     val scope = rememberCoroutineScope()
     AnimatedContent(
@@ -528,7 +553,16 @@ private fun SharingControls(
                     onClick = { platform ->
                         if (!state.isSharing) {
                             scope.launch {
-                                shareClip(podcast, episode, clipRange, selectedCard, platform, listener, state)
+                                shareClip(
+                                    podcast = podcast,
+                                    episode = episode,
+                                    clipRange = clipRange,
+                                    cardType = selectedCard,
+                                    platform = platform,
+                                    listener = listener,
+                                    state = state,
+                                    snackbarHostState = snackbarHostState,
+                                )
                             }
                         }
                     },
@@ -565,10 +599,12 @@ private suspend fun shareClip(
     platform: SocialPlatform,
     listener: ShareClipPageListener,
     state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
 ): SharingResponse {
     // Do not start loading animation if we're simply sharing a link
     state.isSharing = platform != SocialPlatform.PocketCasts
     val response = listener.onShareClip(podcast, episode, clipRange, platform, cardType)
+    response.feedbackMessage?.let { snackbarHostState.showSnackbar(it) }
     state.isSharing = false
     return response
 }
