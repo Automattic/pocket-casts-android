@@ -2028,6 +2028,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_clip_edit_label">Edit clip</string>
     <string name="share_clip_create_audio_label">Create audio file</string>
     <string name="share_clip_create_audio_description">Generate an .mp3 audio file</string>
+    <!-- Description while the clip is being created and a progress bar is shown -->
     <string name="share_clip_sharing_clip">Sharing clip…</string>
 
     <!-- Pocket Casts Champion -->
