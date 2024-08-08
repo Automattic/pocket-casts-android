@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.sharing.clip
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -16,27 +17,37 @@ class ClipAnalytics @AssistedInject constructor(
     private val analyticsTracker: AnalyticsTracker,
 ) {
     fun screenShown() {
-        trackEvent(createBaseEvent(AnalyticsEvent.CLIP_SCREEN_SHOWN))
+        val event = createBaseEvent(
+            AnalyticsEvent.SHARE_SCREEN_SHOWN,
+            mapOf("type" to "clip"),
+        )
+        trackEvent(event)
     }
 
     fun playTapped() {
-        trackEvent(createBaseEvent(AnalyticsEvent.CLIP_SCREEN_PLAY_TAPPED))
+        trackEvent(createBaseEvent(AnalyticsEvent.SHARE_SCREEN_PLAY_TAPPED))
     }
 
     fun pauseTapped() {
-        trackEvent(createBaseEvent(AnalyticsEvent.CLIP_SCREEN_PAUSE_TAPPED))
+        trackEvent(createBaseEvent(AnalyticsEvent.SHARE_SCREEN_PAUSE_TAPPED))
     }
 
-    fun linkShared(clip: Clip) {
-        val isStartModified = initialClipRange.startInSeconds != clip.range.startInSeconds
-        val isEndMofidied = initialClipRange.endInSeconds != clip.range.endInSeconds
+    fun clipShared(
+        clipRange: Clip.Range,
+        shareType: ClipShareType,
+        cardType: CardType,
+    ) {
+        val isStartModified = initialClipRange.startInSeconds != clipRange.startInSeconds
+        val isEndMofidied = initialClipRange.endInSeconds != clipRange.endInSeconds
         val event = createBaseEvent(
-            AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+            AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
             mapOf(
-                "start" to clip.range.startInSeconds,
-                "end" to clip.range.endInSeconds,
+                "start" to clipRange.startInSeconds,
+                "end" to clipRange.endInSeconds,
                 "start_modified" to isStartModified,
                 "end_modified" to isEndMofidied,
+                "type" to shareType.analyticsValue,
+                "card_type" to cardType.analyticsValue,
             ),
         )
         trackEvent(event)
@@ -55,6 +66,19 @@ class ClipAnalytics @AssistedInject constructor(
             "source" to source.analyticsValue,
         ) + properties,
     )
+
+    private val ClipShareType.analyticsValue get() = when (this) {
+        ClipShareType.Audio -> "audio"
+        ClipShareType.Video -> "video"
+        ClipShareType.Link -> "link"
+    }
+
+    private val CardType.analyticsValue get() = when (this) {
+        CardType.Audio -> "audio"
+        CardType.Horizontal -> "horizontal"
+        CardType.Square -> "square"
+        CardType.Vertical -> "vertical"
+    }
 
     private class Event(
         val type: AnalyticsEvent,

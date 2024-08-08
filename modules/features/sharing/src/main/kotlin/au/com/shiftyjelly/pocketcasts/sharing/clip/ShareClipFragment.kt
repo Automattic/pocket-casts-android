@@ -33,7 +33,6 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.flow.collect
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -79,7 +78,7 @@ class ShareClipFragment : BaseDialogFragment() {
             initialClipRange = args.clipRange,
         )
         if (savedInstanceState == null) {
-            viewModel.onClipScreenShown()
+            viewModel.onScreenShown()
         }
     }
 
