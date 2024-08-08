@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelectorState
 internal fun rememberClipPageState(
     firstVisibleItemIndex: Int,
     step: SharingStep = SharingStep.Creating,
+    isSharing: Boolean = false,
 ) = rememberSaveable(
     saver = ClipPageState.Saver,
     init = {
@@ -28,6 +29,7 @@ internal fun rememberClipPageState(
                 startOffset = 0f,
                 endOffset = 0f,
             ),
+            isSharing = isSharing,
         )
     },
 )
@@ -35,10 +37,12 @@ internal fun rememberClipPageState(
 internal class ClipPageState(
     step: SharingStep,
     val selectorState: ClipSelectorState,
+    isSharing: Boolean,
 ) {
     var step by mutableStateOf(step)
     var topContentHeight by mutableIntStateOf(0)
     var pagerIndicatorHeight by mutableIntStateOf(0)
+    var isSharing by mutableStateOf(isSharing)
 
     companion object {
         val Saver: Saver<ClipPageState, Any> = listSaver(
@@ -54,6 +58,10 @@ internal class ClipPageState(
                     selectorState = requireNotNull(ClipSelectorState.Saver.restore(it[1] as Any)) {
                         "ClipSelectorState.Saver should never return null"
                     },
+                    // isSharing is a transient state that shouldn't survive configuration changes
+                    // because clip sharing is launched in the rememberCoroutineScope() of
+                    // a Composable UI
+                    isSharing = false,
                 )
             },
         )

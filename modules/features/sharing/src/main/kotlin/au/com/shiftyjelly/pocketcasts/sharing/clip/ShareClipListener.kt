@@ -27,7 +27,26 @@ internal class ShareClipListener @AssistedInject constructor(
     @Assisted private val sourceView: SourceView,
     private val sharingClient: SharingClient,
 ) : ShareClipPageListener {
-    override suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: CardType): SharingResponse {
+    override suspend fun onShareClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: CardType): SharingResponse {
+        return when (cardType) {
+            is VisualCardType -> when (platform) {
+                SocialPlatform.PocketCasts -> {
+                    shareClipLink(podcast, episode, clipRange, cardType)
+                }
+
+                SocialPlatform.Instagram, SocialPlatform.WhatsApp, SocialPlatform.Telegram,
+                SocialPlatform.X, SocialPlatform.Tumblr, SocialPlatform.More,
+                -> {
+                    shareVideoClip(podcast, episode, clipRange, platform, cardType)
+                }
+            }
+            is CardType.Audio -> {
+                shareAudioClip(podcast, episode, clipRange)
+            }
+        }
+    }
+
+    private suspend fun shareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: CardType): SharingResponse {
         val request = SharingRequest.clipLink(podcast, episode, clipRange)
             .setCardType(cardType)
             .setSourceView(sourceView)
@@ -35,7 +54,7 @@ internal class ShareClipListener @AssistedInject constructor(
         return sharingClient.share(request)
     }
 
-    override suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = coroutineScope {
+    private suspend fun shareAudioClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = coroutineScope {
         launch { delay(1.seconds) } // Launch a delay job to allow the loading animation to run even if clipping happens faster
         val request = SharingRequest.audioClip(podcast, episode, clipRange)
             .setSourceView(sourceView)
@@ -43,7 +62,7 @@ internal class ShareClipListener @AssistedInject constructor(
         sharingClient.share(request)
     }
 
-    override suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: VisualCardType) = coroutineScope {
+    private suspend fun shareVideoClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: VisualCardType) = coroutineScope {
         launch { delay(1.seconds) } // Launch a delay job to allow the loading animation to run even if clipping happens faster
         assetController.capture(cardType)
             .map { backgroundImage ->
