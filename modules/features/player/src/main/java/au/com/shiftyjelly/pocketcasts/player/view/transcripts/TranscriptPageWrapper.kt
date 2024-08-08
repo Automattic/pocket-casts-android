@@ -8,11 +8,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,7 +47,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
@@ -142,10 +138,18 @@ fun TranscriptToolbar(
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
-            SearchButton(
+            IconButton(
                 onClick = onSearchClicked,
-                modifier = Modifier.align(Alignment.TopEnd),
-            )
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(SearchViewCornerRadius))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = stringResource(LR.string.search),
+                    tint = Color.White,
+                )
+            }
         }
         transition.AnimatedVisibility(
             visible = { it },
@@ -178,34 +182,6 @@ fun TranscriptToolbar(
         } else {
             focusManager.clearFocus()
         }
-    }
-}
-
-@Composable
-private fun SearchButton(
-    onClick: () -> Unit,
-    modifier: Modifier,
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .padding(end = 16.dp)
-            .defaultMinSize(
-                minHeight = 48.dp,
-            )
-            .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(SearchViewCornerRadius))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = Color.White, radius = SearchViewCornerRadius),
-                onClick = onClick,
-            ),
-    ) {
-        TextH50(
-            text = stringResource(LR.string.search),
-            color = Color.White,
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-        )
     }
 }
 
