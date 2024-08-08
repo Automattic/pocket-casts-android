@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,26 +21,35 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -50,10 +60,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.BaseRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.social.PlatformBar
@@ -66,11 +77,14 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
 import java.sql.Date
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareClipPageListener {
@@ -130,6 +144,7 @@ internal fun ShareClipPage(
     state = state,
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun VerticalClipPage(
     episode: PodcastEpisode?,
@@ -151,7 +166,9 @@ private fun VerticalClipPage(
     ) {
         AnimatedVisiblity(podcast = podcast, episode = episode) { podcast, episode ->
             Column {
+                val pagerState = rememberPagerState(pageCount = { CardType.entires.size })
                 val scrollState = rememberScrollState()
+                val selectedCard = CardType.entires[pagerState.currentPage]
                 Column(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
@@ -164,6 +181,7 @@ private fun VerticalClipPage(
                     TopContent(
                         shareColors = shareColors,
                         state = state,
+                        selectedCard = selectedCard,
                     )
                     MiddleContent(
                         episode = episode,
@@ -173,15 +191,18 @@ private fun VerticalClipPage(
                         assetController = assetController,
                         state = state,
                         scrollState = scrollState,
+                        pagerState = pagerState,
                     )
                 }
                 BottomContent(
+                    podcast = podcast,
                     episode = episode,
                     clipRange = clipRange,
                     playbackProgress = playbackProgress,
                     isPlaying = isPlaying,
                     platforms = platforms,
                     shareColors = shareColors,
+                    selectedCard = selectedCard,
                     listener = listener,
                     state = state,
                 )
@@ -201,11 +222,15 @@ private fun VerticalClipPage(
 private fun TopContent(
     shareColors: ShareColors,
     state: ClipPageState,
+    selectedCard: CardType,
 ) {
+    val titleId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_label else LR.string.share_clip_create_label
+    val descriptionId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_description else LR.string.single_space
     AnimatedContent(
-        targetState = state.step,
+        label = "TopContent",
+        targetState = Triple(state.step, titleId, descriptionId),
         modifier = Modifier.onGloballyPositioned { coordinates -> state.topContentHeight = coordinates.size.height },
-    ) { step ->
+    ) { (step, titleId, descriptionId) ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -222,7 +247,7 @@ private fun TopContent(
             TextH30(
                 text = stringResource(
                     when (step) {
-                        SharingStep.Creating -> LR.string.share_clip_create_label
+                        SharingStep.Creating -> titleId
                         SharingStep.Sharing -> LR.string.share_clip_share_label
                     },
                 ),
@@ -238,7 +263,7 @@ private fun TopContent(
             )
             when (step) {
                 SharingStep.Creating -> TextH40(
-                    text = " ", // Placeholder until audio clips are added
+                    text = stringResource(descriptionId),
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     color = shareColors.backgroundSecondaryText,
@@ -285,9 +310,10 @@ private fun MiddleContent(
     assetController: BackgroundAssetController,
     state: ClipPageState,
     scrollState: ScrollState,
+    pagerState: PagerState,
 ) {
-    val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
     AnimatedVisibility(
+        label = "DotPagerIndicator",
         visible = state.step == SharingStep.Creating,
         modifier = Modifier.onGloballyPositioned { coordinates -> state.pagerIndicatorHeight = coordinates.size.height },
     ) {
@@ -309,8 +335,7 @@ private fun MiddleContent(
         userScrollEnabled = state.step == SharingStep.Creating,
         modifier = Modifier.height(coordiantes.size.height),
     ) { pageIndex ->
-        val cardType = CardType.entries[pageIndex]
-        val captureController = assetController.captureController(cardType)
+        val cardType = CardType.entires[pageIndex]
         val offset by animateIntOffsetAsState(
             targetValue = coordiantes.offset(cardType),
         )
@@ -320,33 +345,45 @@ private fun MiddleContent(
             .padding(coordiantes.padding)
 
         when (cardType) {
-            CardType.Vertical -> VerticalEpisodeCard(
-                episode = episode,
-                podcast = podcast,
-                useEpisodeArtwork = useEpisodeArtwork,
-                shareColors = shareColors,
-                captureController = captureController,
-                customSize = coordiantes.size,
+            is VisualCardType -> when (cardType) {
+                CardType.Vertical -> VerticalEpisodeCard(
+                    episode = episode,
+                    podcast = podcast,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                    captureController = assetController.captureController(cardType),
+                    customSize = coordiantes.size,
+                    modifier = modifier,
+                )
+                CardType.Horizontal -> HorizontalEpisodeCard(
+                    episode = episode,
+                    podcast = podcast,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                    captureController = assetController.captureController(cardType),
+                    customSize = coordiantes.size,
+                    modifier = modifier,
+                )
+                CardType.Square -> SquareEpisodeCard(
+                    episode = episode,
+                    podcast = podcast,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                    captureController = assetController.captureController(cardType),
+                    customSize = coordiantes.size,
+                    modifier = modifier,
+                )
+            }
+            is CardType.Audio -> Box(
+                contentAlignment = Alignment.Center,
                 modifier = modifier,
-            )
-            CardType.Horiozntal -> HorizontalEpisodeCard(
-                episode = episode,
-                podcast = podcast,
-                useEpisodeArtwork = useEpisodeArtwork,
-                shareColors = shareColors,
-                captureController = captureController,
-                customSize = coordiantes.size,
-                modifier = modifier,
-            )
-            CardType.Square -> SquareEpisodeCard(
-                episode = episode,
-                podcast = podcast,
-                useEpisodeArtwork = useEpisodeArtwork,
-                shareColors = shareColors,
-                captureController = captureController,
-                customSize = coordiantes.size,
-                modifier = modifier,
-            )
+            ) {
+                Image(
+                    painter = painterResource(IR.drawable.ic_audio_card),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(shareColors.backgroundPrimaryText),
+                )
+            }
         }
     }
 }
@@ -378,7 +415,7 @@ private fun estimateCardCoordinates(
         offset = { type ->
             when (type) {
                 CardType.Vertical -> IntOffset(0, 0)
-                CardType.Horiozntal, CardType.Square -> {
+                CardType.Horizontal, CardType.Square, CardType.Audio -> {
                     val viewPortHeight = scrollState.viewportSize
                     val topContentHeight = state.topContentHeight
                     val dotIndicatorHeight = state.pagerIndicatorHeight
@@ -405,27 +442,33 @@ private class CardCoordinates(
 
 @Composable
 private fun BottomContent(
+    podcast: Podcast,
     episode: PodcastEpisode,
     clipRange: Clip.Range,
     playbackProgress: Duration,
     isPlaying: Boolean,
     platforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    selectedCard: CardType,
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
-    AnimatedContent(state.step) { step ->
+    AnimatedContent(
+        label = "BottomContent",
+        targetState = state.step,
+    ) { step ->
         when (step) {
             SharingStep.Creating -> ClipControls(
+                podcast = podcast,
                 episode = episode,
                 clipRange = clipRange,
                 playbackProgress = playbackProgress,
                 isPlaying = isPlaying,
                 shareColors = shareColors,
+                selectedCard = selectedCard,
                 listener = listener,
                 state = state,
             )
-
             SharingStep.Sharing -> Box(
                 modifier = Modifier.padding(vertical = 24.dp),
             ) {
@@ -441,14 +484,18 @@ private fun BottomContent(
 
 @Composable
 private fun ClipControls(
+    podcast: Podcast,
     episode: PodcastEpisode,
     clipRange: Clip.Range,
     playbackProgress: Duration,
     isPlaying: Boolean,
     shareColors: ShareColors,
+    selectedCard: CardType,
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
+    val scope = rememberCoroutineScope()
+    var isLoading by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.padding(horizontal = 16.dp),
     ) {
@@ -467,14 +514,54 @@ private fun ClipControls(
         Spacer(
             modifier = Modifier.height(12.dp),
         )
-        RowButton(
-            text = stringResource(LR.string.next),
-            onClick = { state.step = SharingStep.Sharing },
+        BaseRowButton(
+            onClick = {
+                if (!isLoading) {
+                    when (selectedCard) {
+                        CardType.Vertical, CardType.Horizontal, CardType.Square -> {
+                            state.step = SharingStep.Sharing
+                        }
+                        CardType.Audio -> {
+                            isLoading = true
+                            scope.launch {
+                                listener.onShareClipAudio(podcast, episode, clipRange)
+                                isLoading = false
+                            }
+                        }
+                    }
+                }
+            },
             colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
-            textColor = shareColors.clipButtonText,
             elevation = null,
             includePadding = false,
-        )
+            modifier = Modifier.heightIn(min = 48.dp),
+        ) {
+            val buttonText = stringResource(if (selectedCard is CardType.Audio) LR.string.share else LR.string.next)
+            AnimatedContent(
+                label = "ButtonText",
+                targetState = buttonText to isLoading,
+            ) { (buttonText, isLoading) ->
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextP40(
+                        // Keep in the UI for to keep correct button size
+                        text = if (isLoading) " " else buttonText,
+                        textAlign = TextAlign.Center,
+                        color = shareColors.clipButtonText,
+                        modifier = Modifier.padding(6.dp),
+                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            color = shareColors.clipButtonText,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+            }
+        }
         Spacer(
             modifier = Modifier.height(12.dp),
         )
@@ -487,6 +574,7 @@ private fun AnimatedVisiblity(
     episode: PodcastEpisode?,
     content: @Composable (Podcast, PodcastEpisode) -> Unit,
 ) = AnimatedVisibility(
+    label = "ScreenContent",
     visible = podcast != null && episode != null,
     enter = fadeIn(),
     exit = fadeOut(),

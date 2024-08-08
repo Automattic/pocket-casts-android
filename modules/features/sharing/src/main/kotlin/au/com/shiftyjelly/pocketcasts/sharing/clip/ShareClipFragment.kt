@@ -16,7 +16,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
@@ -55,7 +54,7 @@ class ShareClipFragment : BaseDialogFragment() {
     lateinit var clipPlayerFactory: ClipPlayer.Factory
 
     @Inject
-    lateinit var sharingClient: SharingClient
+    internal lateinit var shareListenerFactory: ShareClipListener.Factory
 
     @Inject
     lateinit var clipAnalyticsFactory: ClipAnalytics.Factory
@@ -83,7 +82,7 @@ class ShareClipFragment : BaseDialogFragment() {
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
         val assetController = BackgroundAssetController.create(requireContext(), shareColors)
-        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient, assetController)
+        val listener = shareListenerFactory.create(this@ShareClipFragment, viewModel, assetController, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareClipPage(

@@ -150,25 +150,20 @@ class SharingClient(
                 error = null,
             )
         }
-        is SharingRequest.Data.ClipAudio -> when (platform) {
-            Instagram -> {
-                error("Not implemented yet")
-            }
-            WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
-                val file = mediaService.clipAudio(data.podcast, data.episode, data.range).getOrThrow()
-                Intent()
-                    .setAction(Intent.ACTION_SEND)
-                    .setType("audio/mp3")
-                    .setExtraStream(file)
-                    .setPackage(platform.packageId)
-                    .toChooserIntent()
-                    .share()
-                SharingResponse(
-                    isSuccsessful = true,
-                    feedbackMessage = null,
-                    error = null,
-                )
-            }
+        is SharingRequest.Data.ClipAudio -> {
+            val file = mediaService.clipAudio(data.podcast, data.episode, data.range).getOrThrow()
+            Intent()
+                .setAction(Intent.ACTION_SEND)
+                .setType("audio/mp3")
+                .setExtraStream(file)
+                .setPackage(platform.packageId)
+                .toChooserIntent()
+                .share()
+            SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
         }
         is SharingRequest.Data.ClipVideo -> when (platform) {
             Instagram -> {
@@ -271,7 +266,7 @@ data class SharingRequest internal constructor(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipAudio(podcast, episode, range))
+        ) = Builder(Data.ClipAudio(podcast, episode, range)).setCardType(CardType.Audio)
 
         fun videoClip(
             podcast: Podcast,

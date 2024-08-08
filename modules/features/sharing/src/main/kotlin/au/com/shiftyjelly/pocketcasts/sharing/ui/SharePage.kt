@@ -45,8 +45,8 @@ internal fun VerticalSharePage(
     socialPlatforms: Set<SocialPlatform>,
     snackbarHostState: SnackbarHostState,
     onClose: () -> Unit,
-    onShareToPlatform: (SocialPlatform, CardType) -> Unit,
-    middleContent: @Composable (CardType, Modifier) -> Unit,
+    onShareToPlatform: (SocialPlatform, VisualCardType) -> Unit,
+    middleContent: @Composable (VisualCardType, Modifier) -> Unit,
 ) = Box {
     Column(
         modifier = Modifier
@@ -86,7 +86,7 @@ internal fun VerticalSharePage(
                 )
             }
         }
-        val pagerState = rememberPagerState(pageCount = { CardType.entries.size })
+        val pagerState = rememberPagerState(pageCount = { CardType.visualEntries.size })
         Box(
             contentAlignment = Alignment.Center,
             content = {
@@ -101,7 +101,7 @@ internal fun VerticalSharePage(
                             state = pagerState,
                             modifier = Modifier.fillMaxSize(),
                         ) { pageIndex ->
-                            val cardType = CardType.entries[pageIndex]
+                            val cardType = CardType.visualEntries[pageIndex]
                             val modifier = Modifier
                                 .fillMaxSize()
                                 .then(if (cardType != CardType.Vertical) Modifier.padding(horizontal = expectedVerticalCardPadding) else Modifier)
@@ -128,7 +128,7 @@ internal fun VerticalSharePage(
                 platforms = socialPlatforms,
                 shareColors = shareColors,
                 onClick = { platform ->
-                    onShareToPlatform(platform, CardType.entries[pagerState.currentPage])
+                    onShareToPlatform(platform, CardType.visualEntries[pagerState.currentPage])
                 },
             )
         }
@@ -148,7 +148,7 @@ internal fun HorizontalSharePage(
     socialPlatforms: Set<SocialPlatform>,
     snackbarHostState: SnackbarHostState,
     onClose: () -> Unit,
-    onShareToPlatform: (SocialPlatform, CardType) -> Unit,
+    onShareToPlatform: (SocialPlatform, VisualCardType) -> Unit,
     middleContent: @Composable BoxScope.() -> Unit,
 ) = Box {
     Column(
@@ -217,7 +217,7 @@ internal fun HorizontalSharePage(
                     platforms = socialPlatforms,
                     shareColors = shareColors,
                     onClick = { platform ->
-                        onShareToPlatform(platform, CardType.Horiozntal)
+                        onShareToPlatform(platform, CardType.Horizontal)
                     },
                 )
             }

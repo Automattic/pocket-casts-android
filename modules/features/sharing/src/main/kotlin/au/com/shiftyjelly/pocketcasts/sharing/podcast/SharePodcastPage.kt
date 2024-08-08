@@ -21,16 +21,17 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface SharePodcastPageListener {
-    suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType): SharingResponse
+    suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: VisualCardType): SharingResponse
     fun onClose()
 
     companion object {
         val Preview = object : SharePodcastPageListener {
-            override suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType) = SharingResponse(
+            override suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: VisualCardType) = SharingResponse(
                 isSuccsessful = true,
                 feedbackMessage = null,
                 error = null,
@@ -109,7 +110,7 @@ private fun VerticalSharePodcastPage(
                         captureController = captureController,
                         modifier = modifier,
                     )
-                    CardType.Horiozntal -> HorizontalPodcastCast(
+                    CardType.Horizontal -> HorizontalPodcastCast(
                         podcast = podcast,
                         episodeCount = episodeCount,
                         shareColors = shareColors,
@@ -161,7 +162,7 @@ private fun HorizontalSharePodcastPage(
                     podcast = podcast,
                     episodeCount = episodeCount,
                     shareColors = shareColors,
-                    captureController = assetController.captureController(CardType.Horiozntal),
+                    captureController = assetController.captureController(CardType.Horizontal),
                 )
             }
         },
