@@ -6,8 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
@@ -16,6 +19,8 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
+import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
@@ -28,8 +33,10 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.collect
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ShareClipFragment : BaseDialogFragment() {
@@ -44,6 +51,7 @@ class ShareClipFragment : BaseDialogFragment() {
                     args.episodeUuid,
                     args.clipRange,
                     clipPlayerFactory.create(requireActivity().applicationContext),
+                    sharingClient.asClipClient(),
                     clipAnalytics,
                 )
             }
@@ -54,7 +62,7 @@ class ShareClipFragment : BaseDialogFragment() {
     lateinit var clipPlayerFactory: ClipPlayer.Factory
 
     @Inject
-    internal lateinit var shareListenerFactory: ShareClipListener.Factory
+    lateinit var sharingClient: SharingClient
 
     @Inject
     lateinit var clipAnalyticsFactory: ClipAnalytics.Factory
@@ -81,22 +89,38 @@ class ShareClipFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val assetController = BackgroundAssetController.create(requireContext(), shareColors)
-        val listener = shareListenerFactory.create(this@ShareClipFragment, viewModel, assetController, args.source)
+        val assetController = BackgroundAssetController.create(requireContext().applicationContext, shareColors)
+        val listener = ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source)
+
         setContent {
             val uiState by viewModel.uiState.collectAsState()
+            val snackbarHostState = remember { SnackbarHostState() }
+
             ShareClipPage(
                 episode = uiState.episode,
                 podcast = uiState.podcast,
                 clipRange = uiState.clipRange,
                 playbackProgress = uiState.playbackProgress,
                 isPlaying = uiState.isPlaying,
+                isSharing = uiState.isSharing,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 platforms = platforms,
                 shareColors = shareColors,
                 assetController = assetController,
                 listener = listener,
+                snackbarHostState = snackbarHostState,
             )
+
+            LaunchedEffect(Unit) {
+                viewModel.snackbarMessages.collect { message ->
+                    val text = when (message) {
+                        is SnackbarMessage.SharingResponse -> message.message
+                        is SnackbarMessage.PlayerIssue -> getString(LR.string.error)
+                        is SnackbarMessage.GenericIssue -> getString(LR.string.error)
+                    }
+                    snackbarHostState.showSnackbar(text)
+                }
+            }
         }
     }
 
