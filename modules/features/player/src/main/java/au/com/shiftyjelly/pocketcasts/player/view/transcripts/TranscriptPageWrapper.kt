@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -59,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private val SearchBarMaxWidth = 500.dp
 private val SearchViewCornerRadius = 38.dp
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TranscriptPageWrapper(
     playerViewModel: PlayerViewModel,
@@ -72,19 +72,13 @@ fun TranscriptPageWrapper(
         val configuration = LocalConfiguration.current
         val connection = remember { object : NestedScrollConnection {} }
 
-        val focusRequester = remember { FocusRequester() }
-        val focusManager = LocalFocusManager.current
         var expandSearch by remember { mutableStateOf(false) }
-
-        var searchFieldValue by remember { mutableStateOf(TextFieldValue()) }
-
-        val onTextChanged = { text: String ->
-            searchFieldValue = TextFieldValue(text)
+        val onSearchClicked = {
+            expandSearch = true
         }
         val onSearchDoneClicked = {
             expandSearch = false
         }
-
         when (transitionState.value) {
             is TransitionState.CloseTranscript -> {
                 if (expandSearch) expandSearch = false
@@ -94,7 +88,6 @@ fun TranscriptPageWrapper(
         }
 
         Box(
-            contentAlignment = Alignment.TopEnd,
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(connection),
@@ -107,52 +100,83 @@ fun TranscriptPageWrapper(
                     .height(configuration.screenHeightDp.dp),
             )
 
-            CloseButton(
-                modifier = Modifier.align(Alignment.TopStart),
-                onClick = { playerViewModel.closeTranscript(withTransition = true) },
+            TranscriptToolbar(
+                onCloseClick = { playerViewModel.closeTranscript(withTransition = true) },
+                onSearchDoneClicked = onSearchDoneClicked,
+                onSearchClicked = onSearchClicked,
+                expandSearch = expandSearch,
             )
-            val transition = updateTransition(expandSearch, label = "search transition")
-            transition.AnimatedVisibility(
-                visible = { !it },
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                SearchButton(
-                    onClick = { expandSearch = true },
-                    modifier = Modifier.align(Alignment.TopEnd),
-                )
-            }
-            transition.AnimatedVisibility(
-                visible = { it },
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally(targetWidth = { 50 }) + fadeOut(),
-            ) {
-                SearchBar(
-                    text = searchFieldValue.text,
-                    leadingIcon = {
-                        SearchBarLeadingIcons(onTextChanged, onSearchDoneClicked)
-                    },
-                    trailingIcon = {
-                        SearchBarTrailingIcons(searchFieldValue.text, onTextChanged)
-                    },
-                    placeholder = stringResource(LR.string.search),
-                    onTextChanged = onTextChanged,
-                    onSearch = {},
-                    cornerRadius = SearchViewCornerRadius,
-                    modifier = Modifier
-                        .width(SearchBarMaxWidth)
-                        .focusRequester(focusRequester)
-                        .padding(start = 56.dp, end = 16.dp),
-                )
-            }
         }
+    }
+}
 
-        LaunchedEffect(expandSearch) {
-            if (expandSearch) {
-                focusRequester.requestFocus()
-            } else {
-                focusManager.clearFocus()
-            }
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun TranscriptToolbar(
+    onCloseClick: () -> Unit,
+    onSearchDoneClicked: () -> Unit,
+    onSearchClicked: () -> Unit,
+    expandSearch: Boolean,
+) {
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    var searchFieldValue by remember { mutableStateOf(TextFieldValue()) }
+
+    val onTextChanged = { text: String ->
+        searchFieldValue = TextFieldValue(text)
+    }
+
+    Box(
+        contentAlignment = Alignment.TopEnd,
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        CloseButton(
+            modifier = Modifier.align(Alignment.TopStart),
+            onClick = onCloseClick,
+        )
+        val transition = updateTransition(expandSearch, label = "search transition")
+        transition.AnimatedVisibility(
+            visible = { !it },
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            SearchButton(
+                onClick = onSearchClicked,
+                modifier = Modifier.align(Alignment.TopEnd),
+            )
+        }
+        transition.AnimatedVisibility(
+            visible = { it },
+            enter = expandHorizontally(),
+            exit = shrinkHorizontally(targetWidth = { 50 }) + fadeOut(),
+        ) {
+            SearchBar(
+                text = searchFieldValue.text,
+                leadingIcon = {
+                    SearchBarLeadingIcons(onTextChanged, onSearchDoneClicked)
+                },
+                trailingIcon = {
+                    SearchBarTrailingIcons(searchFieldValue.text, onTextChanged)
+                },
+                placeholder = stringResource(LR.string.search),
+                onTextChanged = onTextChanged,
+                onSearch = {},
+                cornerRadius = SearchViewCornerRadius,
+                modifier = Modifier
+                    .width(SearchBarMaxWidth)
+                    .focusRequester(focusRequester)
+                    .padding(start = 56.dp, end = 16.dp),
+            )
+        }
+    }
+
+    LaunchedEffect(expandSearch) {
+        if (expandSearch) {
+            focusRequester.requestFocus()
+        } else {
+            focusManager.clearFocus()
         }
     }
 }
@@ -250,4 +274,26 @@ private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit
             )
         }
     }
+}
+
+@Preview("Collapsed search bar", heightDp = 100)
+@Composable
+private fun TranscriptToolbarPreview() {
+    TranscriptToolbar(
+        onCloseClick = {},
+        onSearchDoneClicked = {},
+        onSearchClicked = {},
+        expandSearch = false,
+    )
+}
+
+@Preview("Expanded search bar", heightDp = 100)
+@Composable
+private fun TranscriptToolbarExpandedSearchPreview() {
+    TranscriptToolbar(
+        onCloseClick = {},
+        onSearchDoneClicked = {},
+        onSearchClicked = {},
+        expandSearch = true,
+    )
 }
