@@ -16,11 +16,10 @@ import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import au.com.shiftyjelly.pocketcasts.sharing.ui.EpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
@@ -117,32 +116,15 @@ private fun VerticalShareEpisodeTimestampPage(
         middleContent = { cardType, modifier ->
             if (podcast != null && episode != null) {
                 val captureController = assetController.captureController(cardType)
-                when (cardType) {
-                    CardType.Vertical -> VerticalEpisodeCard(
-                        podcast = podcast,
-                        episode = episode,
-                        useEpisodeArtwork = useEpisodeArtwork,
-                        shareColors = shareColors,
-                        captureController = captureController,
-                        modifier = modifier,
-                    )
-                    CardType.Horizontal -> HorizontalEpisodeCard(
-                        podcast = podcast,
-                        episode = episode,
-                        useEpisodeArtwork = useEpisodeArtwork,
-                        shareColors = shareColors,
-                        captureController = captureController,
-                        modifier = modifier,
-                    )
-                    CardType.Square -> SquareEpisodeCard(
-                        podcast = podcast,
-                        episode = episode,
-                        useEpisodeArtwork = useEpisodeArtwork,
-                        shareColors = shareColors,
-                        captureController = captureController,
-                        modifier = modifier,
-                    )
-                }
+                EpisodeCard(
+                    cardType = cardType,
+                    podcast = podcast,
+                    episode = episode,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    shareColors = shareColors,
+                    captureController = captureController,
+                    modifier = modifier,
+                )
             }
         },
     )

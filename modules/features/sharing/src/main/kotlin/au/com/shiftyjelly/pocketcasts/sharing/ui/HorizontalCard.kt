@@ -33,13 +33,13 @@ import java.sql.Date
 import java.time.Instant
 
 @Composable
-internal fun HorizontalPodcastCast(
+internal fun HorizontalPodcastCard(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
-    useWidthForAspectRatio: Boolean = true,
+    useHeightForAspectRatio: Boolean = false,
     customSize: DpSize? = null,
 ) = HorizontalCard(
     data = PodcastCardData(
@@ -47,7 +47,7 @@ internal fun HorizontalPodcastCast(
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
-    useWidthForAspectRatio = useWidthForAspectRatio,
+    useHeightForAspectRatio = useHeightForAspectRatio,
     customSize = customSize,
     captureController = captureController,
     modifier = modifier,
@@ -61,7 +61,7 @@ internal fun HorizontalEpisodeCard(
     shareColors: ShareColors,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
-    useWidthForAspectRatio: Boolean = true,
+    useHeightForAspectRatio: Boolean = false,
     customSize: DpSize? = null,
 ) = HorizontalCard(
     data = EpisodeCardData(
@@ -70,7 +70,7 @@ internal fun HorizontalEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
-    useWidthForAspectRatio = useWidthForAspectRatio,
+    useHeightForAspectRatio = useHeightForAspectRatio,
     customSize = customSize,
     captureController = captureController,
     modifier = modifier,
@@ -88,7 +88,7 @@ fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
 private fun HorizontalCard(
     data: CardData,
     shareColors: ShareColors,
-    useWidthForAspectRatio: Boolean,
+    useHeightForAspectRatio: Boolean,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
     customSize: DpSize? = null,
@@ -103,10 +103,10 @@ private fun HorizontalCard(
         ),
     )
     val size = customSize ?: DpSize(maxWidth, maxHeight)
-    val (width, height) = if (useWidthForAspectRatio) {
-        size.width to size.width * 0.52f
+    val (width, height) = if (useHeightForAspectRatio) {
+        size.height / CardType.Horizontal.aspectRatio to size.height
     } else {
-        size.height / 0.52f to size.height
+        size.width to size.width * CardType.Horizontal.aspectRatio
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -217,6 +217,6 @@ private fun HorizontalCardPreview(
 ) = HorizontalCard(
     data = data,
     shareColors = ShareColors(baseColor),
-    useWidthForAspectRatio = true,
+    useHeightForAspectRatio = false,
     captureController = rememberCaptureController(),
 )

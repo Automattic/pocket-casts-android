@@ -14,7 +14,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -46,8 +45,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,9 +52,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.BaseRowButton
@@ -73,11 +67,10 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
-import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.EpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.SquareEpisodeCard
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
+import au.com.shiftyjelly.pocketcasts.sharing.ui.estimateCardCoordinates
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
 import java.sql.Date
 import java.time.Instant
@@ -329,7 +322,10 @@ private fun MiddleContent(
         }
     }
 
-    val coordiantes = estimateCardCoordinates(state, scrollState)
+    val coordiantes = estimateCardCoordinates(
+        topContentHeight = state.topContentHeight + state.pagerIndicatorHeight,
+        scrollState = scrollState,
+    )
     HorizontalPager(
         state = pagerState,
         userScrollEnabled = state.step == SharingStep.Creating,
@@ -345,35 +341,16 @@ private fun MiddleContent(
             .padding(coordiantes.padding)
 
         when (cardType) {
-            is VisualCardType -> when (cardType) {
-                CardType.Vertical -> VerticalEpisodeCard(
-                    episode = episode,
-                    podcast = podcast,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    captureController = assetController.captureController(cardType),
-                    customSize = coordiantes.size,
-                    modifier = modifier,
-                )
-                CardType.Horizontal -> HorizontalEpisodeCard(
-                    episode = episode,
-                    podcast = podcast,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    captureController = assetController.captureController(cardType),
-                    customSize = coordiantes.size,
-                    modifier = modifier,
-                )
-                CardType.Square -> SquareEpisodeCard(
-                    episode = episode,
-                    podcast = podcast,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    shareColors = shareColors,
-                    captureController = assetController.captureController(cardType),
-                    customSize = coordiantes.size,
-                    modifier = modifier,
-                )
-            }
+            is VisualCardType -> EpisodeCard(
+                cardType = cardType,
+                episode = episode,
+                podcast = podcast,
+                useEpisodeArtwork = useEpisodeArtwork,
+                shareColors = shareColors,
+                captureController = assetController.captureController(cardType),
+                customSize = coordiantes.size,
+                modifier = modifier,
+            )
             is CardType.Audio -> Box(
                 contentAlignment = Alignment.Center,
                 modifier = modifier,
@@ -387,58 +364,6 @@ private fun MiddleContent(
         }
     }
 }
-
-@Composable
-private fun estimateCardCoordinates(
-    state: ClipPageState,
-    scrollState: ScrollState,
-): CardCoordinates {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
-    val maxWidth = when (screenHeight / screenWidth) {
-        in 0f..1.35f -> 300.dp
-        else -> 360.dp
-    }
-    val cardPadding = screenWidth / 10
-    val availableWidth = (screenWidth - cardPadding * 2).coerceAtMost(maxWidth)
-    val availableHeight = availableWidth * 1.5f // Vertical card has the most height so we calculate the size for it
-
-    val density = LocalDensity.current
-
-    return CardCoordinates(
-        size = DpSize(availableWidth, availableHeight),
-        padding = PaddingValues(horizontal = cardPadding),
-        // Offset is helpful for scenrarios when card doesn't fit on the screen.
-        // This way we can center horizontal and square cards in the view port
-        // and not in the pager which can have content outside of the view port.
-        offset = { type ->
-            when (type) {
-                CardType.Vertical -> IntOffset(0, 0)
-                CardType.Horizontal, CardType.Square, CardType.Audio -> {
-                    val viewPortHeight = scrollState.viewportSize
-                    val topContentHeight = state.topContentHeight
-                    val dotIndicatorHeight = state.pagerIndicatorHeight
-                    val isMeasured = viewPortHeight != 0
-
-                    if (isMeasured && (scrollState.canScrollForward || scrollState.canScrollBackward)) {
-                        val viewPortPagerPortion = density.run { (viewPortHeight - topContentHeight - dotIndicatorHeight).toDp() }
-                        val offsetValue = (viewPortPagerPortion - availableHeight) / 2
-                        IntOffset(x = 0, y = density.run { offsetValue.roundToPx() })
-                    } else {
-                        IntOffset(0, 0)
-                    }
-                }
-            }
-        },
-    )
-}
-
-private class CardCoordinates(
-    val size: DpSize,
-    val padding: PaddingValues,
-    val offset: (CardType) -> IntOffset,
-)
 
 @Composable
 private fun BottomContent(
