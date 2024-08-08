@@ -197,13 +197,13 @@ private fun VerticalClipPage(
                         .nestedScroll(rememberNestedScrollInteropConnection())
                         .verticalScroll(scrollState),
                 ) {
-                    TopContent(
+                    DescriptionContent(
                         isSharing = isSharing,
                         shareColors = shareColors,
                         selectedCard = selectedCard,
                         state = state,
                     )
-                    MiddleContent(
+                    PagingContent(
                         episode = episode,
                         podcast = podcast,
                         useEpisodeArtwork = useEpisodeArtwork,
@@ -215,7 +215,7 @@ private fun VerticalClipPage(
                         pagerState = pagerState,
                     )
                 }
-                BottomContent(
+                PageControlsContent(
                     podcast = podcast,
                     episode = episode,
                     clipRange = clipRange,
@@ -246,7 +246,91 @@ private fun VerticalClipPage(
 }
 
 @Composable
-private fun TopContent(
+private fun HorizontalClipPage(
+    episode: PodcastEpisode?,
+    podcast: Podcast?,
+    clipRange: Clip.Range,
+    playbackProgress: Duration,
+    isPlaying: Boolean,
+    isSharing: Boolean,
+    useEpisodeArtwork: Boolean,
+    platforms: Set<SocialPlatform>,
+    shareColors: ShareColors,
+    assetController: BackgroundAssetController,
+    listener: ShareClipPageListener,
+    state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
+) {
+    Box(
+        modifier = Modifier
+            .background(shareColors.background)
+            .fillMaxSize(),
+    ) {
+        AnimatedVisiblity(podcast, episode) { podcast, episode ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                DescriptionContent(
+                    isSharing = isSharing,
+                    shareColors = shareColors,
+                    selectedCard = CardType.Horizontal,
+                    state = state,
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    Spacer(
+                        modifier = Modifier.weight(0.1f),
+                    )
+                    HorizontalEpisodeCard(
+                        episode = episode,
+                        podcast = podcast,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        shareColors = shareColors,
+                        captureController = assetController.captureController(CardType.Horizontal),
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.05f),
+                    )
+                    PageControlsContent(
+                        podcast = podcast,
+                        episode = episode,
+                        clipRange = clipRange,
+                        playbackProgress = playbackProgress,
+                        isPlaying = isPlaying,
+                        isSharing = isSharing,
+                        platforms = platforms,
+                        shareColors = shareColors,
+                        selectedCard = CardType.Horizontal,
+                        listener = listener,
+                        state = state,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f),
+                    )
+                }
+            }
+        }
+        CloseButton(
+            shareColors = shareColors,
+            onClick = listener::onClose,
+            modifier = Modifier
+                .padding(top = 12.dp, end = 12.dp)
+                .align(Alignment.TopEnd),
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
+        )
+    }
+}
+
+@Composable
+private fun DescriptionContent(
     isSharing: Boolean,
     shareColors: ShareColors,
     selectedCard: CardType,
@@ -342,7 +426,7 @@ private fun TopContent(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MiddleContent(
+private fun PagingContent(
     episode: PodcastEpisode,
     podcast: Podcast,
     isSharing: Boolean,
@@ -414,7 +498,7 @@ private fun MiddleContent(
 }
 
 @Composable
-private fun BottomContent(
+private fun PageControlsContent(
     podcast: Podcast,
     episode: PodcastEpisode,
     clipRange: Clip.Range,
@@ -605,90 +689,6 @@ private fun SharingControls(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun HorizontalClipPage(
-    episode: PodcastEpisode?,
-    podcast: Podcast?,
-    clipRange: Clip.Range,
-    playbackProgress: Duration,
-    isPlaying: Boolean,
-    isSharing: Boolean,
-    useEpisodeArtwork: Boolean,
-    platforms: Set<SocialPlatform>,
-    shareColors: ShareColors,
-    assetController: BackgroundAssetController,
-    listener: ShareClipPageListener,
-    state: ClipPageState,
-    snackbarHostState: SnackbarHostState,
-) {
-    Box(
-        modifier = Modifier
-            .background(shareColors.background)
-            .fillMaxSize(),
-    ) {
-        AnimatedVisiblity(podcast, episode) { podcast, episode ->
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                TopContent(
-                    isSharing = isSharing,
-                    shareColors = shareColors,
-                    selectedCard = CardType.Horizontal,
-                    state = state,
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Spacer(
-                        modifier = Modifier.weight(0.1f),
-                    )
-                    HorizontalEpisodeCard(
-                        episode = episode,
-                        podcast = podcast,
-                        useEpisodeArtwork = useEpisodeArtwork,
-                        shareColors = shareColors,
-                        captureController = assetController.captureController(CardType.Horizontal),
-                        modifier = Modifier.weight(1f),
-                    )
-                    Spacer(
-                        modifier = Modifier.weight(0.05f),
-                    )
-                    BottomContent(
-                        podcast = podcast,
-                        episode = episode,
-                        clipRange = clipRange,
-                        playbackProgress = playbackProgress,
-                        isPlaying = isPlaying,
-                        isSharing = isSharing,
-                        platforms = platforms,
-                        shareColors = shareColors,
-                        selectedCard = CardType.Horizontal,
-                        listener = listener,
-                        state = state,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Spacer(
-                        modifier = Modifier.weight(0.1f),
-                    )
-                }
-            }
-        }
-        CloseButton(
-            shareColors = shareColors,
-            onClick = listener::onClose,
-            modifier = Modifier
-                .padding(top = 12.dp, end = 12.dp)
-                .align(Alignment.TopEnd),
-        )
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter),
-            snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
-        )
     }
 }
 
