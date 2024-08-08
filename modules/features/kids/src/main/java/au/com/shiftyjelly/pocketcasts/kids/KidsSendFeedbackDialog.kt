@@ -30,12 +30,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -125,6 +127,9 @@ fun KidsSendFeedbackDialog(
                             color = MaterialTheme.theme.colors.primaryText02,
                         )
                     },
+                    textStyle = TextStyle(
+                        fontSize = 13.sp,
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
