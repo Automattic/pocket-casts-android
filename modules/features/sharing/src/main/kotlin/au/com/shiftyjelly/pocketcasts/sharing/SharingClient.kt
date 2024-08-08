@@ -167,7 +167,19 @@ class SharingClient(
         }
         is SharingRequest.Data.ClipVideo -> when (platform) {
             Instagram -> {
-                error("Not implemented yet")
+                val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
+                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, backgroundImage).getOrThrow()
+                Intent()
+                    .setAction("com.instagram.share.ADD_TO_STORY")
+                    .putExtra("source_application", metaAppId)
+                    .setDataAndType(FileUtil.getUriForFile(context, file), "video/mp4")
+                    .addFlags(FLAG_GRANT_READ_URI_PERMISSION or FLAG_ACTIVITY_NEW_TASK)
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                    error = null,
+                )
             }
             WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }

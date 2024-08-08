@@ -597,6 +597,30 @@ class SharingClientTest {
     }
 
     @Test
+    fun shareVideoClipToInstagram() = runTest {
+        val file = File(context.cacheDir, "file.mp4").also { it.writeBytes(Random.nextBytes(8)) }
+        testMediaService.videoClip = file
+
+        val request = SharingRequest.videoClip(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+            backgroundImage = File(context.cacheDir, "image.png"),
+        ).setPlatform(SocialPlatform.Instagram)
+            .build()
+
+        client.share(request)
+        val intent = shareStarter.requireIntent
+
+        assertEquals("com.instagram.share.ADD_TO_STORY", intent.action)
+        assertEquals("Meta ID", intent.getStringExtra("source_application"))
+        assertEquals("video/mp4", intent.type)
+        assertEquals(FileUtil.getUriForFile(context, file), intent.data)
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FLAG_ACTIVITY_NEW_TASK, intent.flags and FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    @Test
     fun shareVideoClipToPocketCastsAsMore() = runTest {
         val file = File(context.cacheDir, "file.mp4").also { it.writeBytes(Random.nextBytes(8)) }
         testMediaService.videoClip = file
