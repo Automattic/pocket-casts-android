@@ -35,12 +35,22 @@ class SharePodcastFragment : BaseDialogFragment() {
     private val viewModel by viewModels<SharePodcastViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<SharePodcastViewModel.Factory> { factory ->
-                factory.create(args.podcastUuid)
+                factory.create(
+                    podcastUuid = args.podcastUuid,
+                    sourceView = args.source,
+                )
             }
         },
     )
 
     @Inject internal lateinit var shareListenerFactory: SharePodcastListener.Factory
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.onScreenShown()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
