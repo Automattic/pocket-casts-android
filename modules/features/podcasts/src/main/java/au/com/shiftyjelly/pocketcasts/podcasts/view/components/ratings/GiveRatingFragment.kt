@@ -15,8 +15,10 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,6 +29,8 @@ private const val ARG_PODCAST_UUID = "podcastUuid"
 class GiveRatingFragment : BaseDialogFragment() {
 
     private val viewModel: GiveRatingViewModel by viewModels()
+
+    private var snackBarCoordinatorLayout: View? = null
 
     companion object {
         fun newInstance(podcastUuid: String) = GiveRatingFragment().apply {
@@ -61,11 +65,11 @@ class GiveRatingFragment : BaseDialogFragment() {
                                 podcastUuid = podcastUuid,
                                 context = context,
                                 onSuccess = {
-                                    Toast.makeText(context, getString(LR.string.thank_you_for_rating), Toast.LENGTH_LONG).show()
+                                    displayMessage(getString(LR.string.thank_you_for_rating))
                                     dismiss()
                                 },
                                 onError = {
-                                    Toast.makeText(context, getString(LR.string.something_went_wrong_to_rate_this_podcast), Toast.LENGTH_LONG).show()
+                                    displayMessage(getString(LR.string.something_went_wrong_to_rate_this_podcast))
                                     dismiss()
                                 },
                             )
@@ -87,6 +91,11 @@ class GiveRatingFragment : BaseDialogFragment() {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        snackBarCoordinatorLayout = (activity as? FragmentHostListener)?.snackBarView()
+    }
+
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         val state = viewModel.state.value
@@ -95,6 +104,16 @@ class GiveRatingFragment : BaseDialogFragment() {
             viewModel.trackOnDismissed(AnalyticsEvent.RATING_SCREEN_DISMISSED)
         } else if (state is GiveRatingViewModel.State.NotAllowedToRate) {
             viewModel.trackOnDismissed(AnalyticsEvent.NOT_ALLOWED_TO_RATE_SCREEN_DISMISSED)
+        }
+    }
+
+    private fun displayMessage(message: String) {
+        snackBarCoordinatorLayout?.let {
+            Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
+        } ?: run {
+            context?.let { context ->
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
