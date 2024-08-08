@@ -297,6 +297,15 @@ open class SyncServerManager @Inject constructor(
         return server.sendAnonymousFeedback(request)
     }
 
+    suspend fun sendFeedback(subject: String, inbox: String, message: String, token: AccessToken): Response<Void> {
+        val request = SupportFeedbackRequest.newBuilder()
+            .setSubject(subject)
+            .setInbox(inbox)
+            .setMessage(message)
+            .build()
+        return server.sendFeedback(addBearer(token), request)
+    }
+
     fun signOut() {
         cache.evictAll()
     }

@@ -49,7 +49,7 @@ class KidsSendFeedbackViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_FEEDBACK_SENT)
 
         viewModelScope.launch {
-            val result: FeedbackResult = feedbackManager.sendAnonymousFeedback(feedback)
+            val result: FeedbackResult = feedbackManager.sendFeedback(feedback)
             if (result is FeedbackResult.Success) {
                 _sendFeedbackState.value = SendFeedbackState.Success
             } else {
