@@ -267,7 +267,7 @@ private fun TopContent(
             Spacer(
                 modifier = Modifier.height(8.dp),
             )
-            val alpha by animateFloatAsState(targetValue = if (isSharing) 0.5f else 1f)
+            val alpha by animateFloatAsState(targetValue = if (isSharing) 0.3f else 1f)
             when (step) {
                 SharingStep.Creating -> TextH40(
                     text = stringResource(descriptionId),
