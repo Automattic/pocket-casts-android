@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,7 +55,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
@@ -78,8 +76,6 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: ProfileViewModel by viewModels()
-
-    private var snackBarCoordinatorLayout: View? = null
 
     private var binding: FragmentProfileBinding? = null
     private val sections = arrayListOf(
@@ -115,8 +111,6 @@ class ProfileFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        snackBarCoordinatorLayout = (activity as FragmentHostListener).snackBarView()
 
         val binding = binding ?: return
 
@@ -302,14 +296,7 @@ class ProfileFragment : BaseFragment() {
                         },
                         onRequestEarlyAccess = {
                             analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_EARLY_ACCESS_REQUESTED)
-                            KidsBottomSheetDialog(
-                                onFeedbackSentSuccess = {
-                                    showSnackBar(getString(LR.string.thank_you_for_your_feedback))
-                                },
-                                onFeedbackSentError = {
-                                    showSnackBar(getString(LR.string.something_went_wrong_when_sending_feedback))
-                                },
-                            ).show(childFragmentManager, "KidsBottomSheetDialog")
+                            KidsBottomSheetDialog().show(childFragmentManager, "KidsBottomSheetDialog")
                         },
                     )
                 }
@@ -376,16 +363,6 @@ class ProfileFragment : BaseFragment() {
     override fun onBackPressed(): Boolean {
         viewModel.updateState()
         return super.onBackPressed()
-    }
-
-    private fun showSnackBar(message: String) {
-        snackBarCoordinatorLayout?.let {
-            Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
-        } ?: run {
-            context?.let { context ->
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            }
-        }
     }
 
     private fun convertSecsToTimeAndUnit(seconds: Long): TimeAndUnit {

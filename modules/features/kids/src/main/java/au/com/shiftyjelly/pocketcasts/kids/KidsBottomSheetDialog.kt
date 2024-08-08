@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
@@ -20,18 +21,18 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.kids.viewmodel.KidsSendFeedbackViewModel
 import au.com.shiftyjelly.pocketcasts.kids.viewmodel.SendFeedbackState
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class KidsBottomSheetDialog(
-    private val onFeedbackSentSuccess: () -> Unit,
-    private val onFeedbackSentError: () -> Unit,
-) : BottomSheetDialogFragment() {
+class KidsBottomSheetDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var theme: Theme
@@ -43,6 +44,8 @@ class KidsBottomSheetDialog(
         easing = EaseInOut,
     )
 
+    private var snackBarCoordinatorLayout: View? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
@@ -51,10 +54,10 @@ class KidsBottomSheetDialog(
 
                 LaunchedEffect(sendFeedbackState) {
                     if (sendFeedbackState is SendFeedbackState.Success) {
-                        onFeedbackSentSuccess.invoke()
+                        displayMessage(getString(LR.string.thank_you_for_your_feedback))
                         dismiss()
                     } else if (sendFeedbackState is SendFeedbackState.Error) {
-                        onFeedbackSentError.invoke()
+                        displayMessage(getString(LR.string.something_went_wrong_when_sending_feedback))
                         dismiss()
                     }
                 }
@@ -109,6 +112,17 @@ class KidsBottomSheetDialog(
                     peekHeight = 0
                     skipCollapsed = true
                 }
+            }
+        }
+        snackBarCoordinatorLayout = (activity as? FragmentHostListener)?.snackBarView()
+    }
+
+    private fun displayMessage(message: String) {
+        snackBarCoordinatorLayout?.let {
+            Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
+        } ?: run {
+            context?.let { context ->
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
         }
     }
