@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -19,6 +21,8 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
@@ -85,6 +89,7 @@ private const val EXTRA_EXISTING_EPISODE_UUID = "fileUUID"
 private const val EXTRA_FILE_CHOOSER = "filechooser"
 private const val STATE_LAUNCHED_FILE_CHOOSER = "LAUNCHED_FILE_CHOOSER"
 private const val STATE_DATAURI = "DATAURI"
+private const val READ_STORAGE_PERMISSION_REQUEST_CODE = 50
 
 @AndroidEntryPoint
 class AddFileActivity :
@@ -462,6 +467,17 @@ class AddFileActivity :
         }
     }
 
+    private fun requestReadExternalStoragePermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(READ_EXTERNAL_STORAGE),
+            READ_STORAGE_PERMISSION_REQUEST_CODE,
+        )
+    }
+
+    private fun permissionIsGranted(permission: String) =
+        ContextCompat.checkSelfPermission(this, permission) == PERMISSION_GRANTED
+
     private fun saveFile() {
         if (binding.txtFilename.text.isNullOrEmpty()) {
             return
@@ -478,6 +494,9 @@ class AddFileActivity :
             val intentType = intent.type ?: getMimetypeOfContent(uri) ?: uriToFileType(binding.lblFilename.text.toString())
             if (!(intentType.startsWith("audio/") || intentType.startsWith("video/"))) {
                 return
+            }
+            if (!permissionIsGranted(READ_EXTERNAL_STORAGE)) {
+                requestReadExternalStoragePermission()
             }
             launch(Dispatchers.IO) {
                 val userEpisode = UserEpisode(uuid = uuid, publishedDate = Date(), fileType = intent.type)
