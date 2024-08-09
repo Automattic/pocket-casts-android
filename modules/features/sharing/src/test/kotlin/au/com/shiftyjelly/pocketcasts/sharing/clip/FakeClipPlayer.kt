@@ -6,9 +6,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class FakeClipPlayer : ClipPlayer {
-    override val isPlayingState = MutableStateFlow(false)
+    override val playbackState = MutableStateFlow(ClipPlayer.PlaybackState(isPlaying = false, isLoading = false))
     override val errors = MutableSharedFlow<Exception>()
     override val playbackProgress = MutableStateFlow(0.seconds)
 
@@ -17,29 +18,29 @@ class FakeClipPlayer : ClipPlayer {
     val pollingPeriods = Turbine<Duration>()
 
     override fun play(clip: Clip): Boolean {
-        if (isPlayingState.value) {
+        if (!playbackState.value.allowPlaying) {
             return false
         }
         clips += clip
-        isPlayingState.value = true
+        playbackState.update { it.copy(isPlaying = true) }
         playbackStates += PlaybackState.Playing
         return true
     }
 
     override fun stop(): Boolean {
-        if (!isPlayingState.value) {
+        if (!playbackState.value.allowPausing) {
             return false
         }
-        isPlayingState.value = false
+        playbackState.update { it.copy(isPlaying = false) }
         playbackStates += PlaybackState.Stopped
         return true
     }
 
     override fun pause(): Boolean {
-        if (!isPlayingState.value) {
+        if (!playbackState.value.allowPausing) {
             return false
         }
-        isPlayingState.value = false
+        playbackState.update { it.copy(isPlaying = false) }
         playbackStates += PlaybackState.Paused
         return true
     }
