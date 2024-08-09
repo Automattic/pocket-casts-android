@@ -89,7 +89,7 @@ private class ExoPlayerClipPlayer(
 ) : ClipPlayer {
     private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
 
-    override val isPlayingState = MutableStateFlow(false)
+    override val isPlayingState = MutableStateFlow(exoPlayer.isPlaying)
     override val errors = MutableSharedFlow<Exception>(extraBufferCapacity = 1)
     override val playbackProgress = channelFlow {
         while (currentCoroutineContext().isActive) {
@@ -116,15 +116,19 @@ private class ExoPlayerClipPlayer(
 
     init {
         exoPlayer.addListener(object : Player.Listener {
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                super.onPlaybackStateChanged(playbackState)
-            }
-
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                isPlayingState.value = isPlaying
+                // We manage `isPlayingState` mostly manually to improve UI responsivness.
+                // ExoPlayer has some dealys with this statys because there is loading state
+                // in between playing and pausing.
+                // This dispatches only `false` state because it can come at any time
+                // while `true` is triggered only by us.
+                if (!isPlaying) {
+                    isPlayingState.value = false
+                }
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                isPlayingState.value = false
                 exoPlayer.clearMediaItems()
                 errors.tryEmit(error)
             }
@@ -132,9 +136,10 @@ private class ExoPlayerClipPlayer(
     }
 
     override fun play(clip: Clip): Boolean {
-        if (exoPlayer.isLoading || exoPlayer.isPlaying) {
+        if (isPlayingState.value) {
             return false
         }
+        isPlayingState.value = true
         if (playbackManager.isPlaying()) {
             playbackManager.pause()
         }
@@ -168,10 +173,11 @@ private class ExoPlayerClipPlayer(
     }
 
     override fun stop(): Boolean {
-        if (!exoPlayer.isPlaying) {
+        if (!isPlayingState.value) {
             exoPlayer.clearMediaItems()
             return false
         }
+        isPlayingState.value = false
         exoPlayer.stop()
         isPlaybackProgressDispatchEnabled = true
         exoPlayer.clearMediaItems()
@@ -179,9 +185,10 @@ private class ExoPlayerClipPlayer(
     }
 
     override fun pause(): Boolean {
-        if (!exoPlayer.isPlaying) {
+        if (!isPlayingState.value) {
             return false
         }
+        isPlayingState.value = false
         exoPlayer.pause()
         isPlaybackProgressDispatchEnabled = true
         return true
@@ -189,7 +196,7 @@ private class ExoPlayerClipPlayer(
 
     override fun seekTo(duration: Duration) {
         isPlaybackProgressDispatchEnabled = false
-        if (exoPlayer.isPlaying) {
+        if (isPlayingState.value) {
             exoPlayer.pause()
         }
         currentSeekToDuration = duration
