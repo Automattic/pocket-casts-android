@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
@@ -47,7 +48,10 @@ fun HorizontalPagerWrapper(
     }
 
     var pagerHeight by remember { mutableStateOf(0) }
-    Column(modifier = modifier) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier,
+    ) {
         HorizontalPager(
             state = pagerState,
             pageSize = pageSize,
@@ -81,6 +85,7 @@ fun HorizontalPagerWrapper(
             PagerDotIndicator(
                 state = pagerState,
                 activeDotColor = pageIndicatorColor,
+                modifier = Modifier.height(40.dp),
             )
         } else {
             Spacer(modifier = Modifier.height(16.dp))
