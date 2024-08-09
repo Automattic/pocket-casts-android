@@ -122,6 +122,7 @@ private fun VerticalCard(
         )
         TextH70(
             text = data.topText(),
+            disableScale = true,
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
             modifier = Modifier.padding(horizontal = width * 0.1f),
@@ -131,6 +132,7 @@ private fun VerticalCard(
         )
         TextH40(
             text = data.middleText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
@@ -141,6 +143,7 @@ private fun VerticalCard(
         )
         TextH70(
             text = data.bottomText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),
@@ -149,7 +152,9 @@ private fun VerticalCard(
         Spacer(
             modifier = Modifier.weight(1f),
         )
-        PocketCastsPill()
+        PocketCastsPill(
+            disableScale = true,
+        )
         Spacer(
             modifier = Modifier.weight(1f),
         )

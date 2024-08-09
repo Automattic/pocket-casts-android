@@ -110,6 +110,7 @@ private fun SquareCard(
         )
         TextH70(
             text = data.topText(),
+            disableScale = true,
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
             modifier = Modifier.padding(horizontal = 64.dp),
@@ -119,6 +120,7 @@ private fun SquareCard(
         )
         TextH40(
             text = data.middleText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
@@ -129,6 +131,7 @@ private fun SquareCard(
         )
         TextH70(
             text = data.bottomText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),

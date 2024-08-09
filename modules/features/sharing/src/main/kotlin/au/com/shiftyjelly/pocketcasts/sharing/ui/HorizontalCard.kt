@@ -133,6 +133,7 @@ private fun HorizontalCard(
         ) {
             TextH70(
                 text = data.topText(),
+                disableScale = true,
                 color = shareColors.cardText.copy(alpha = 0.5f),
                 maxLines = 1,
             )
@@ -141,6 +142,7 @@ private fun HorizontalCard(
             )
             TextH40(
                 text = data.middleText(),
+                disableScale = true,
                 color = shareColors.cardText,
                 maxLines = 3,
             )
@@ -149,6 +151,7 @@ private fun HorizontalCard(
             )
             TextH70(
                 text = data.bottomText(),
+                disableScale = true,
                 maxLines = 2,
                 color = shareColors.cardText.copy(alpha = 0.5f),
             )
