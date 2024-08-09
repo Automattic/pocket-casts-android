@@ -208,27 +208,19 @@ internal fun HorizontalSharePage(
     onClose: () -> Unit,
     onShareToPlatform: (SocialPlatform, VisualCardType) -> Unit,
     middleContent: @Composable BoxScope.() -> Unit,
-) = Box {
-    Column(
+) {
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(shareColors.background),
+            .background(shareColors.background)
+            .fillMaxSize(),
     ) {
-        Box(
-            contentAlignment = Alignment.TopEnd,
-            modifier = Modifier
-                .weight(0.25f)
-                .fillMaxSize(),
+        Column(
+            modifier = Modifier.fillMaxSize(),
         ) {
-            CloseButton(
-                shareColors = shareColors,
-                onClick = onClose,
-                modifier = Modifier.padding(top = 12.dp, end = 12.dp),
-            )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
             ) {
                 TextH30(
                     text = shareTitle,
@@ -246,47 +238,53 @@ internal fun HorizontalSharePage(
                     modifier = Modifier.padding(horizontal = 24.dp),
                 )
             }
-        }
-        Row(
-            modifier = Modifier
-                .weight(0.75f)
-                .fillMaxSize(),
-        ) {
-            Spacer(
-                modifier = Modifier.weight(0.1f),
-            )
-            Box(
-                contentAlignment = Alignment.Center,
-                content = middleContent,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-            )
-            Spacer(
-                modifier = Modifier.weight(0.1f),
-            )
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxSize(),
             ) {
-                PlatformBar(
-                    platforms = socialPlatforms,
-                    shareColors = shareColors,
-                    onClick = { platform ->
-                        onShareToPlatform(platform, CardType.Horizontal)
-                    },
+                Spacer(
+                    modifier = Modifier.weight(0.1f),
+                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    content = middleContent,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize(),
+                )
+                Spacer(
+                    modifier = Modifier.weight(0.05f),
+                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                ) {
+                    PlatformBar(
+                        platforms = socialPlatforms,
+                        shareColors = shareColors,
+                        onClick = { platform ->
+                            onShareToPlatform(platform, CardType.Horizontal)
+                        },
+                    )
+                }
+                Spacer(
+                    modifier = Modifier.weight(0.1f),
                 )
             }
-            Spacer(
-                modifier = Modifier.weight(0.1f),
-            )
         }
+        CloseButton(
+            shareColors = shareColors,
+            onClick = onClose,
+            modifier = Modifier
+                .padding(top = 12.dp, end = 12.dp)
+                .align(Alignment.TopEnd),
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
+        )
     }
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = Modifier.align(Alignment.BottomCenter),
-        snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
-    )
 }
