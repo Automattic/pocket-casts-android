@@ -50,22 +50,6 @@
         android:id="@+id/createDoneFragment"
         android:name="au.com.shiftyjelly.pocketcasts.account.CreateDoneFragment" />
     <fragment
-        android:id="@+id/createTOSFragment"
-        android:name="au.com.shiftyjelly.pocketcasts.account.CreateTOSFragment"
-        android:label="@string/profile_create_terms_of_use" >
-        <action
-            android:id="@+id/action_createTOSFragment_to_createEmailFragment"
-            app:destination="@id/createEmailFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
-        <action
-            android:id="@+id/action_createTOSFragment_to_accountFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popUpTo="@id/accountFragment" />
-    </fragment>
-
-    <fragment
         android:id="@+id/resetPasswordFragment"
         android:name="au.com.shiftyjelly.pocketcasts.account.ResetPasswordFragment"
         android:label="Reset Password" />
