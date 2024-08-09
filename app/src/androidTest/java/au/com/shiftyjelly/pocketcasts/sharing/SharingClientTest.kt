@@ -94,7 +94,7 @@ class SharingClientTest {
 
         assertNull(shareStarter.intent)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
@@ -192,7 +192,7 @@ class SharingClientTest {
 
         assertNull(shareStarter.intent)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
@@ -299,7 +299,7 @@ class SharingClientTest {
 
         assertNull(shareStarter.intent)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
@@ -451,7 +451,7 @@ class SharingClientTest {
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
     }
@@ -564,7 +564,7 @@ class SharingClientTest {
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
     }
@@ -658,7 +658,7 @@ class SharingClientTest {
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
     }

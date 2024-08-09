@@ -33,7 +33,6 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.flow.collect
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -116,7 +115,7 @@ class ShareClipFragment : BaseDialogFragment() {
                     val text = when (message) {
                         is SnackbarMessage.SharingResponse -> message.message
                         is SnackbarMessage.PlayerIssue -> getString(LR.string.podcast_episode_playback_error)
-                        is SnackbarMessage.GenericIssue -> getString(LR.string.error)
+                        is SnackbarMessage.GenericIssue -> getString(LR.string.share_error_message)
                     }
                     snackbarHostState.showSnackbar(text)
                 }

@@ -70,7 +70,7 @@ class SharingClient(
         } catch (error: Throwable) {
             SharingResponse(
                 isSuccsessful = false,
-                feedbackMessage = context.getString(LR.string.error),
+                feedbackMessage = context.getString(LR.string.share_error_message),
                 error = error,
             )
         }
@@ -137,7 +137,7 @@ class SharingClient(
             } else {
                 SharingResponse(
                     isSuccsessful = false,
-                    feedbackMessage = context.getString(LR.string.error),
+                    feedbackMessage = context.getString(LR.string.share_error_message),
                     error = null,
                 )
             }
@@ -412,7 +412,7 @@ data class SharingRequest internal constructor(
     }
 }
 
-data class SharingResponse(
+data class SharingResponse constructor(
     val isSuccsessful: Boolean,
     val feedbackMessage: String?,
     val error: Throwable?,
