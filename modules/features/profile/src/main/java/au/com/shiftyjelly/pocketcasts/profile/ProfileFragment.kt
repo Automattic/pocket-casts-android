@@ -291,7 +291,7 @@ class ProfileFragment : BaseFragment() {
                     KidsProfileCard(
                         onDismiss = { viewModel.dismissKidsBanner() },
                         onRequestEarlyAccess = {
-                            KidsBottomSheetDialog().show(childFragmentManager, "KidsBottomSheetDialog")
+                            KidsBottomSheetDialog().show(parentFragmentManager, "KidsBottomSheetDialog")
                         },
                     )
                 }
