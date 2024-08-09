@@ -35,7 +35,7 @@ internal class ShareEpisodeListener @AssistedInject constructor(
             .getOrElse { error ->
                 SharingResponse(
                     isSuccsessful = false,
-                    feedbackMessage = fragment.getString(LR.string.error),
+                    feedbackMessage = fragment.getString(LR.string.share_error_message),
                     error = error,
                 )
             }

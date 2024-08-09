@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.sharing.clip
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -32,15 +33,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -69,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.EpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.sharing.ui.SharingThemedSnackbar
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.estimateCardCoordinates
 import au.com.shiftyjelly.pocketcasts.sharing.ui.scrollBottomFade
@@ -76,14 +79,11 @@ import java.sql.Date
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface ShareClipPageListener {
-    suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range)
-    suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range)
-    suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range)
+    fun onShareClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: CardType)
     fun onClickPlay()
     fun onClickPause()
     fun onUpdateClipStart(duration: Duration)
@@ -94,9 +94,7 @@ internal interface ShareClipPageListener {
 
     companion object {
         val Preview = object : ShareClipPageListener {
-            override suspend fun onShareClipLink(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = Unit
-            override suspend fun onShareClipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = Unit
-            override suspend fun onShareClipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range) = Unit
+            override fun onShareClip(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, platform: SocialPlatform, cardType: CardType) = Unit
             override fun onClickPlay() = Unit
             override fun onClickPause() = Unit
             override fun onUpdateClipStart(duration: Duration) = Unit
@@ -115,6 +113,7 @@ internal fun ShareClipPage(
     clipRange: Clip.Range,
     playbackProgress: Duration,
     isPlaying: Boolean,
+    isSharing: Boolean,
     useEpisodeArtwork: Boolean,
     platforms: Set<SocialPlatform>,
     shareColors: ShareColors,
@@ -123,18 +122,21 @@ internal fun ShareClipPage(
     state: ClipPageState = rememberClipPageState(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
     ),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) = VerticalClipPage(
     episode = episode,
     podcast = podcast,
     clipRange = clipRange,
     playbackProgress = playbackProgress,
     isPlaying = isPlaying,
+    isSharing = isSharing,
     useEpisodeArtwork = useEpisodeArtwork,
     platforms = platforms,
     shareColors = shareColors,
     assetController = assetController,
     listener = listener,
     state = state,
+    snackbarHostState = snackbarHostState,
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -145,12 +147,14 @@ private fun VerticalClipPage(
     clipRange: Clip.Range,
     playbackProgress: Duration,
     isPlaying: Boolean,
+    isSharing: Boolean,
     useEpisodeArtwork: Boolean,
     platforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
     listener: ShareClipPageListener,
     state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
 ) {
     Box(
         modifier = Modifier
@@ -172,14 +176,16 @@ private fun VerticalClipPage(
                         .verticalScroll(scrollState),
                 ) {
                     TopContent(
+                        isSharing = isSharing,
                         shareColors = shareColors,
-                        state = state,
                         selectedCard = selectedCard,
+                        state = state,
                     )
                     MiddleContent(
                         episode = episode,
                         podcast = podcast,
                         useEpisodeArtwork = useEpisodeArtwork,
+                        isSharing = isSharing,
                         shareColors = shareColors,
                         assetController = assetController,
                         state = state,
@@ -193,6 +199,7 @@ private fun VerticalClipPage(
                     clipRange = clipRange,
                     playbackProgress = playbackProgress,
                     isPlaying = isPlaying,
+                    isSharing = isSharing,
                     platforms = platforms,
                     shareColors = shareColors,
                     selectedCard = selectedCard,
@@ -208,14 +215,20 @@ private fun VerticalClipPage(
                 .padding(top = 12.dp, end = 12.dp)
                 .align(Alignment.TopEnd),
         )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
+        )
     }
 }
 
 @Composable
 private fun TopContent(
+    isSharing: Boolean,
     shareColors: ShareColors,
-    state: ClipPageState,
     selectedCard: CardType,
+    state: ClipPageState,
 ) {
     val titleId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_label else LR.string.share_clip_create_label
     val descriptionId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_description else LR.string.single_space
@@ -254,6 +267,7 @@ private fun TopContent(
             Spacer(
                 modifier = Modifier.height(8.dp),
             )
+            val alpha by animateFloatAsState(targetValue = if (isSharing) 0.3f else 1f)
             when (step) {
                 SharingStep.Creating -> TextH40(
                     text = stringResource(descriptionId),
@@ -269,6 +283,7 @@ private fun TopContent(
                     color = shareColors.backgroundPrimaryText,
                     fontWeight = FontWeight.W400,
                     modifier = Modifier
+                        .alpha(alpha)
                         .background(shareColors.closeButton, CircleShape)
                         .defaultMinSize(minHeight = 24.dp)
                         .clickable(
@@ -276,7 +291,11 @@ private fun TopContent(
                             indication = rememberRipple(color = shareColors.base),
                             onClickLabel = stringResource(LR.string.share_clip_edit_label),
                             role = Role.Button,
-                            onClick = { state.step = SharingStep.Creating },
+                            onClick = {
+                                if (!isSharing) {
+                                    state.step = SharingStep.Creating
+                                }
+                            },
                         )
                         .padding(vertical = 4.dp, horizontal = 16.dp),
                 )
@@ -298,6 +317,7 @@ private fun TopContent(
 private fun MiddleContent(
     episode: PodcastEpisode,
     podcast: Podcast,
+    isSharing: Boolean,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
     assetController: BackgroundAssetController,
@@ -328,7 +348,7 @@ private fun MiddleContent(
     )
     HorizontalPager(
         state = pagerState,
-        userScrollEnabled = state.step == SharingStep.Creating,
+        userScrollEnabled = state.step == SharingStep.Creating && !isSharing,
         modifier = Modifier.height(coordiantes.size.height),
     ) { pageIndex ->
         val cardType = CardType.entires[pageIndex]
@@ -372,6 +392,7 @@ private fun BottomContent(
     clipRange: Clip.Range,
     playbackProgress: Duration,
     isPlaying: Boolean,
+    isSharing: Boolean,
     platforms: Set<SocialPlatform>,
     shareColors: ShareColors,
     selectedCard: CardType,
@@ -389,20 +410,22 @@ private fun BottomContent(
                 clipRange = clipRange,
                 playbackProgress = playbackProgress,
                 isPlaying = isPlaying,
+                isSharing = isSharing,
                 shareColors = shareColors,
                 selectedCard = selectedCard,
                 listener = listener,
                 state = state,
             )
-            SharingStep.Sharing -> Box(
-                modifier = Modifier.padding(vertical = 24.dp),
-            ) {
-                PlatformBar(
-                    platforms = platforms,
-                    shareColors = shareColors,
-                    onClick = {},
-                )
-            }
+            SharingStep.Sharing -> SharingControls(
+                podcast = podcast,
+                episode = episode,
+                clipRange = clipRange,
+                isSharing = isSharing,
+                platforms = platforms,
+                shareColors = shareColors,
+                selectedCard = selectedCard,
+                listener = listener,
+            )
         }
     }
 }
@@ -414,13 +437,12 @@ private fun ClipControls(
     clipRange: Clip.Range,
     playbackProgress: Duration,
     isPlaying: Boolean,
+    isSharing: Boolean,
     shareColors: ShareColors,
     selectedCard: CardType,
     listener: ShareClipPageListener,
     state: ClipPageState,
 ) {
-    val scope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.padding(horizontal = 16.dp),
     ) {
@@ -441,17 +463,19 @@ private fun ClipControls(
         )
         BaseRowButton(
             onClick = {
-                if (!isLoading) {
+                if (!isSharing) {
                     when (selectedCard) {
                         CardType.Vertical, CardType.Horizontal, CardType.Square -> {
                             state.step = SharingStep.Sharing
                         }
                         CardType.Audio -> {
-                            isLoading = true
-                            scope.launch {
-                                listener.onShareClipAudio(podcast, episode, clipRange)
-                                isLoading = false
-                            }
+                            listener.onShareClip(
+                                podcast = podcast,
+                                episode = episode,
+                                clipRange = clipRange,
+                                cardType = CardType.Audio,
+                                platform = SocialPlatform.More,
+                            )
                         }
                     }
                 }
@@ -464,20 +488,20 @@ private fun ClipControls(
             val buttonText = stringResource(if (selectedCard is CardType.Audio) LR.string.share else LR.string.next)
             AnimatedContent(
                 label = "ButtonText",
-                targetState = buttonText to isLoading,
-            ) { (buttonText, isLoading) ->
+                targetState = buttonText to isSharing,
+            ) { (buttonText, isSharing) ->
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     TextP40(
                         // Keep in the UI for to keep correct button size
-                        text = if (isLoading) " " else buttonText,
+                        text = if (isSharing) " " else buttonText,
                         textAlign = TextAlign.Center,
                         color = shareColors.clipButtonText,
                         modifier = Modifier.padding(6.dp),
                     )
-                    if (isLoading) {
+                    if (isSharing) {
                         CircularProgressIndicator(
                             color = shareColors.clipButtonText,
                             strokeWidth = 2.dp,
@@ -490,6 +514,67 @@ private fun ClipControls(
         Spacer(
             modifier = Modifier.height(12.dp),
         )
+    }
+}
+
+@Composable
+private fun SharingControls(
+    podcast: Podcast,
+    episode: PodcastEpisode,
+    clipRange: Clip.Range,
+    isSharing: Boolean,
+    platforms: Set<SocialPlatform>,
+    shareColors: ShareColors,
+    selectedCard: CardType,
+    listener: ShareClipPageListener,
+) {
+    AnimatedContent(
+        label = "SharingControls",
+        targetState = isSharing,
+    ) { isSharingState ->
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(vertical = 24.dp)
+                .heightIn(min = 80.dp),
+        ) {
+            if (!isSharingState) {
+                PlatformBar(
+                    platforms = platforms,
+                    shareColors = shareColors,
+                    onClick = { platform ->
+                        if (!isSharingState) {
+                            listener.onShareClip(
+                                podcast = podcast,
+                                episode = episode,
+                                clipRange = clipRange,
+                                cardType = selectedCard,
+                                platform = platform,
+                            )
+                        }
+                    },
+                )
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextH40(
+                        text = stringResource(LR.string.share_clip_sharing_clip),
+                        color = shareColors.backgroundPrimaryText,
+                    )
+                    Spacer(
+                        modifier = Modifier.height(24.dp),
+                    )
+                    LinearProgressIndicator(
+                        color = shareColors.base,
+                    )
+                    Spacer(
+                        modifier = Modifier.height(20.dp),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -515,8 +600,15 @@ private fun ShareClipVerticalRegularPreview() = ShareClipPagePreview()
 
 @Preview(name = "Regular device sharing", device = Devices.PortraitRegular)
 @Composable
-private fun ShareClipVerticalRegularEditingPreview() = ShareClipPagePreview(
+private fun ShareClipVerticalRegularSharingPreview() = ShareClipPagePreview(
     step = SharingStep.Sharing,
+)
+
+@Preview(name = "Regular device clipping", device = Devices.PortraitRegular)
+@Composable
+private fun ShareClipVerticalRegularClippingPreview() = ShareClipPagePreview(
+    step = SharingStep.Sharing,
+    isSharing = true,
 )
 
 @Preview(name = "Small device", device = Devices.PortraitSmall)
@@ -535,6 +627,7 @@ private fun ShareClipVerticalTabletPreview() = ShareClipPagePreview()
 internal fun ShareClipPagePreview(
     color: Long = 0xFFEC0404,
     step: SharingStep = SharingStep.Creating,
+    isSharing: Boolean = false,
 ) {
     val clipRange = Clip.Range(0.seconds, 15.seconds)
     ShareClipPage(
@@ -553,6 +646,7 @@ internal fun ShareClipPagePreview(
         clipRange = clipRange,
         playbackProgress = 8.seconds,
         isPlaying = false,
+        isSharing = isSharing,
         useEpisodeArtwork = true,
         platforms = SocialPlatform.entries.toSet(),
         shareColors = ShareColors(Color(color)),

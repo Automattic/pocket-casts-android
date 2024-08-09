@@ -12,7 +12,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.clip.FakeClipPlayer.PlaybackState
+import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import java.io.IOException
 import java.util.Date
 import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
@@ -23,9 +27,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -34,7 +40,11 @@ class ShareClipViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    @get:Rule
+    val tempDir = TemporaryFolder()
+
     private val clipPlayer = FakeClipPlayer()
+    private val sharingClient = FakeClipSharingClient()
     private val tracker = FakeTracker()
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
@@ -58,6 +68,7 @@ class ShareClipViewModelTest {
             episode.uuid,
             clipRange,
             clipPlayer,
+            sharingClient,
             ClipAnalytics(
                 episodeId = episode.uuid,
                 podcastId = podcast.uuid,
@@ -323,5 +334,88 @@ class ShareClipViewModelTest {
             ),
             event,
         )
+    }
+
+    @Test
+    fun `sharing clip changes sharing status`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(false, awaitItem().isSharing)
+
+            viewModel.shareClip(
+                podcast,
+                episode,
+                clipRange,
+                SocialPlatform.PocketCasts,
+                CardType.Vertical,
+                SourceView.PLAYER,
+                createBackgroundAsset = { error("Unexpected operation") },
+            )
+
+            assertEquals(true, awaitItem().isSharing)
+            assertEquals(false, awaitItem().isSharing)
+        }
+    }
+
+    @Test
+    fun `share clip link`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
+        val request = sharingClient.request!!
+
+        assertTrue(request.data is SharingRequest.Data.ClipLink)
+    }
+
+    @Test
+    fun `share audio clip`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.PocketCasts,
+            CardType.Audio,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
+        val request = sharingClient.request!!
+
+        assertTrue(request.data is SharingRequest.Data.ClipAudio)
+    }
+
+    @Test
+    fun `share video clip`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.Instagram,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { Result.success(tempDir.newFile()) },
+        )
+        val request = sharingClient.request!!
+
+        assertTrue(request.data is SharingRequest.Data.ClipVideo)
+    }
+
+    @Test
+    fun `fail to share video clip when there is no background asset`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.Instagram,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { Result.failure(IOException("Whoops!")) },
+        )
+
+        assertNull(sharingClient.request)
     }
 }

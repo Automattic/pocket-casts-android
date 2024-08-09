@@ -94,7 +94,7 @@ class SharingClientTest {
 
         assertNull(shareStarter.intent)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
@@ -192,7 +192,7 @@ class SharingClientTest {
 
         assertNull(shareStarter.intent)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
@@ -299,7 +299,7 @@ class SharingClientTest {
 
         assertNull(shareStarter.intent)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
 
@@ -451,7 +451,7 @@ class SharingClientTest {
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
     }
@@ -564,7 +564,7 @@ class SharingClientTest {
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
     }
@@ -594,6 +594,30 @@ class SharingClientTest {
             assertEquals(platform.packageId, intent.`package`)
             assertEquals(FileUtil.getUriForFile(context, file), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
         }
+    }
+
+    @Test
+    fun shareVideoClipToInstagram() = runTest {
+        val file = File(context.cacheDir, "file.mp4").also { it.writeBytes(Random.nextBytes(8)) }
+        testMediaService.videoClip = file
+
+        val request = SharingRequest.videoClip(
+            podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
+            episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+            range = Clip.Range(15.seconds, 28.seconds),
+            backgroundImage = File(context.cacheDir, "image.png"),
+        ).setPlatform(SocialPlatform.Instagram)
+            .build()
+
+        client.share(request)
+        val intent = shareStarter.requireIntent
+
+        assertEquals("com.instagram.share.ADD_TO_STORY", intent.action)
+        assertEquals("Meta ID", intent.getStringExtra("source_application"))
+        assertEquals("video/mp4", intent.type)
+        assertEquals(FileUtil.getUriForFile(context, file), intent.data)
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FLAG_ACTIVITY_NEW_TASK, intent.flags and FLAG_ACTIVITY_NEW_TASK)
     }
 
     @Test
@@ -634,7 +658,7 @@ class SharingClientTest {
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
-        assertEquals(context.getString(LR.string.error), response.feedbackMessage)
+        assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
     }

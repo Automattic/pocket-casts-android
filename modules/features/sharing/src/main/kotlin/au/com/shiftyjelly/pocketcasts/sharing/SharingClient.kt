@@ -70,7 +70,7 @@ class SharingClient(
         } catch (error: Throwable) {
             SharingResponse(
                 isSuccsessful = false,
-                feedbackMessage = context.getString(LR.string.error),
+                feedbackMessage = context.getString(LR.string.share_error_message),
                 error = error,
             )
         }
@@ -137,7 +137,7 @@ class SharingClient(
             } else {
                 SharingResponse(
                     isSuccsessful = false,
-                    feedbackMessage = context.getString(LR.string.error),
+                    feedbackMessage = context.getString(LR.string.share_error_message),
                     error = null,
                 )
             }
@@ -167,7 +167,19 @@ class SharingClient(
         }
         is SharingRequest.Data.ClipVideo -> when (platform) {
             Instagram -> {
-                error("Not implemented yet")
+                val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
+                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, backgroundImage).getOrThrow()
+                Intent()
+                    .setAction("com.instagram.share.ADD_TO_STORY")
+                    .putExtra("source_application", metaAppId)
+                    .setDataAndType(FileUtil.getUriForFile(context, file), "video/mp4")
+                    .addFlags(FLAG_GRANT_READ_URI_PERMISSION or FLAG_ACTIVITY_NEW_TASK)
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                    error = null,
+                )
             }
             WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
@@ -260,7 +272,7 @@ data class SharingRequest internal constructor(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipLink(podcast, episode, range))
+        ) = Builder(Data.ClipLink(podcast, episode, range)).setPlatform(SocialPlatform.PocketCasts)
 
         fun audioClip(
             podcast: Podcast,
@@ -400,7 +412,7 @@ data class SharingRequest internal constructor(
     }
 }
 
-data class SharingResponse(
+data class SharingResponse constructor(
     val isSuccsessful: Boolean,
     val feedbackMessage: String?,
     val error: Throwable?,
