@@ -30,8 +30,6 @@ class GiveRatingFragment : BaseDialogFragment() {
 
     private val viewModel: GiveRatingViewModel by viewModels()
 
-    private var snackBarCoordinatorLayout: View? = null
-
     companion object {
         fun newInstance(podcastUuid: String) = GiveRatingFragment().apply {
             arguments = bundleOf(
@@ -91,11 +89,6 @@ class GiveRatingFragment : BaseDialogFragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        snackBarCoordinatorLayout = (activity as? FragmentHostListener)?.snackBarView()
-    }
-
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         val state = viewModel.state.value
@@ -108,12 +101,8 @@ class GiveRatingFragment : BaseDialogFragment() {
     }
 
     private fun displayMessage(message: String) {
-        snackBarCoordinatorLayout?.let {
-            Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
-        } ?: run {
-            context?.let { context ->
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            }
+        (activity as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
+            Snackbar.make(snackBarView, message, Snackbar.LENGTH_LONG).show()
         }
     }
 
