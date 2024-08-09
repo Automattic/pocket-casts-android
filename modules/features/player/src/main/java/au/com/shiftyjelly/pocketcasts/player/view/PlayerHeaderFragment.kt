@@ -352,7 +352,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun setupTranscriptPage() {
         binding?.transcriptPage?.setContent {
             TranscriptPageWrapper(
-                viewModel = viewModel,
+                playerViewModel = viewModel,
                 transcriptViewModel = transcriptViewModel,
                 theme = theme,
             )

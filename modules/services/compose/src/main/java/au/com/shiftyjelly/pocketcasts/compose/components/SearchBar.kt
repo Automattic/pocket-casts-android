@@ -40,6 +40,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -53,11 +54,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun SearchBar(
     text: String,
     onTextChanged: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     onSearch: () -> Unit = {},
-    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
+    cornerRadius: Dp = 10.dp,
 ) {
     val focusManager = LocalFocusManager.current
     val colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -80,7 +84,7 @@ fun SearchBar(
     }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
-    val shape = RoundedCornerShape(10.dp)
+    val shape = RoundedCornerShape(cornerRadius)
     BasicTextField(
         value = text,
         onValueChange = {
@@ -123,13 +127,13 @@ fun SearchBar(
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
-                leadingIcon = {
+                leadingIcon = leadingIcon ?: {
                     Icon(
                         painter = painterResource(IR.drawable.ic_search),
                         contentDescription = null,
                     )
                 },
-                trailingIcon = {
+                trailingIcon = trailingIcon ?: {
                     if (text.isNotEmpty()) {
                         IconButton(
                             onClick = {
