@@ -51,16 +51,16 @@ class ShareClipViewModel @AssistedInject constructor(
         clipRange,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         clipPlayer.playbackProgress,
-        clipPlayer.playbackState,
+        clipPlayer.isPlayingState,
         isSharingState,
-        transform = { episode, podcast, clipRange, useEpisodeArtwork, playbackProgress, playbackState, isSharing ->
+        transform = { episode, podcast, clipRange, useEpisodeArtwork, playbackProgress, isPlaying, isSharing ->
             UiState(
                 episode = episode,
                 podcast = podcast,
                 clipRange = clipRange,
                 useEpisodeArtwork = useEpisodeArtwork,
                 playbackProgress = playbackProgress,
-                isPlaying = playbackState.allowPausing,
+                isPlaying = isPlaying,
                 isSharing = isSharing,
             )
         },
