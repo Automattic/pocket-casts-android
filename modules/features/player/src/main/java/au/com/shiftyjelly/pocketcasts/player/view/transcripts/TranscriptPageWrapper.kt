@@ -17,13 +17,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.ripple.LocalRippleTheme
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +47,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarDefaults
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
@@ -55,6 +63,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val SearchBarMaxWidth = 500.dp
 private val SearchViewCornerRadius = 38.dp
+private val SearchBarIconColor = Color.Gray.copy(alpha = 0.8f)
+private val SearchBarPlaceholderColor = SearchBarIconColor
 
 @Composable
 fun TranscriptPageWrapper(
@@ -62,7 +72,7 @@ fun TranscriptPageWrapper(
     transcriptViewModel: TranscriptViewModel,
     theme: Theme,
 ) {
-    AppTheme(Theme.ThemeType.LIGHT) {
+    AppTheme(Theme.ThemeType.DARK) {
         val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
 
         val configuration = LocalConfiguration.current
@@ -129,64 +139,76 @@ fun TranscriptToolbar(
         searchFieldValue = TextFieldValue(text)
     }
 
-    Box(
-        contentAlignment = Alignment.TopEnd,
-        modifier = Modifier
-            .fillMaxSize(),
-    ) {
-        CloseButton(
-            modifier = Modifier.align(Alignment.TopStart),
-            onClick = onCloseClick,
-        )
-        val transition = updateTransition(expandSearch, label = "search transition")
-        transition.AnimatedVisibility(
-            visible = { !it },
-            enter = fadeIn(),
-            exit = fadeOut(),
+    AppTheme(Theme.ThemeType.LIGHT) { // Makes search bar always white for any theme
+        Box(
+            contentAlignment = Alignment.TopEnd,
+            modifier = Modifier
+                .fillMaxSize(),
         ) {
-            IconButton(
-                onClick = onSearchClicked,
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(SearchViewCornerRadius))
+            val transition = updateTransition(expandSearch, label = "Searchbar transition")
+            CompositionLocalProvider(LocalRippleTheme provides ToolbarButtonRippleTheme) {
+                CloseButton(
+                    modifier = Modifier.align(Alignment.TopStart),
+                    onClick = onCloseClick,
+                )
+
+                transition.AnimatedVisibility(
+                    visible = { !it },
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    IconButton(
+                        onClick = onSearchClicked,
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(SearchViewCornerRadius)),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(LR.string.search),
+                            tint = Color.White,
+                        )
+                    }
+                }
+            }
+
+            transition.AnimatedVisibility(
+                visible = { it },
+                enter = expandHorizontally(),
+                exit = shrinkHorizontally(targetWidth = { 50 }) + fadeOut(),
             ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(LR.string.search),
-                    tint = Color.White,
+                SearchBar(
+                    text = searchFieldValue.text,
+                    leadingIcon = {
+                        SearchBarLeadingIcons(onTextChanged, onSearchDoneClicked)
+                    },
+                    trailingIcon = {
+                        SearchBarTrailingIcons(searchFieldValue.text, onTextChanged)
+                    },
+                    placeholder = stringResource(LR.string.search),
+                    onTextChanged = onTextChanged,
+                    onSearch = {},
+                    cornerRadius = SearchViewCornerRadius,
+                    modifier = Modifier
+                        .width(SearchBarMaxWidth)
+                        .focusRequester(focusRequester)
+                        .padding(start = 56.dp, end = 16.dp),
+                    colors = SearchBarDefaults.colors(
+                        leadingIconColor = SearchBarIconColor,
+                        trailingIconColor = SearchBarIconColor,
+                        disabledTrailingIconColor = SearchBarIconColor.copy(alpha = 0.7f),
+                        placeholderColor = SearchBarPlaceholderColor,
+                    ),
                 )
             }
         }
-        transition.AnimatedVisibility(
-            visible = { it },
-            enter = expandHorizontally(),
-            exit = shrinkHorizontally(targetWidth = { 50 }) + fadeOut(),
-        ) {
-            SearchBar(
-                text = searchFieldValue.text,
-                leadingIcon = {
-                    SearchBarLeadingIcons(onTextChanged, onSearchDoneClicked)
-                },
-                trailingIcon = {
-                    SearchBarTrailingIcons(searchFieldValue.text, onTextChanged)
-                },
-                placeholder = stringResource(LR.string.search),
-                onTextChanged = onTextChanged,
-                onSearch = {},
-                cornerRadius = SearchViewCornerRadius,
-                modifier = Modifier
-                    .width(SearchBarMaxWidth)
-                    .focusRequester(focusRequester)
-                    .padding(start = 56.dp, end = 16.dp),
-            )
-        }
-    }
 
-    LaunchedEffect(expandSearch) {
-        if (expandSearch) {
-            focusRequester.requestFocus()
-        } else {
-            focusManager.clearFocus()
+        LaunchedEffect(expandSearch) {
+            if (expandSearch) {
+                focusRequester.requestFocus()
+            } else {
+                focusManager.clearFocus()
+            }
         }
     }
 }
@@ -222,10 +244,11 @@ private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = "0/0",
-        )
         if (text.isNotEmpty()) {
+            Text(
+                text = "0/0",
+                color = SearchBarIconColor,
+            )
             IconButton(
                 onClick = {
                     onTextChanged("")
@@ -258,24 +281,42 @@ private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit
     }
 }
 
+private object ToolbarButtonRippleTheme : RippleTheme {
+    @Composable
+    override fun defaultColor() =
+        RippleTheme.defaultRippleColor(Color.White, lightTheme = MaterialTheme.colors.isLight)
+
+    @Composable
+    override fun rippleAlpha(): RippleAlpha =
+        RippleTheme.defaultRippleAlpha(Color.Black, lightTheme = MaterialTheme.colors.isLight)
+}
+
 @Preview("Collapsed search bar", heightDp = 100)
 @Composable
-private fun TranscriptToolbarPreview() {
-    TranscriptToolbar(
-        onCloseClick = {},
-        onSearchDoneClicked = {},
-        onSearchClicked = {},
-        expandSearch = false,
-    )
+private fun TranscriptToolbarPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        TranscriptToolbar(
+            onCloseClick = {},
+            onSearchDoneClicked = {},
+            onSearchClicked = {},
+            expandSearch = false,
+        )
+    }
 }
 
 @Preview("Expanded search bar", heightDp = 100)
 @Composable
-private fun TranscriptToolbarExpandedSearchPreview() {
-    TranscriptToolbar(
-        onCloseClick = {},
-        onSearchDoneClicked = {},
-        onSearchClicked = {},
-        expandSearch = true,
-    )
+private fun TranscriptToolbarExpandedSearchPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        TranscriptToolbar(
+            onCloseClick = {},
+            onSearchDoneClicked = {},
+            onSearchClicked = {},
+            expandSearch = true,
+        )
+    }
 }
