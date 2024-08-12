@@ -39,8 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -76,15 +74,8 @@ fun TranscriptPageWrapper(
         val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
 
         val configuration = LocalConfiguration.current
-        val connection = remember { object : NestedScrollConnection {} }
 
         var expandSearch by remember { mutableStateOf(false) }
-        val onSearchClicked = {
-            expandSearch = true
-        }
-        val onSearchDoneClicked = {
-            expandSearch = false
-        }
         when (transitionState.value) {
             is TransitionState.CloseTranscript -> {
                 if (expandSearch) expandSearch = false
@@ -95,8 +86,7 @@ fun TranscriptPageWrapper(
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(connection),
+                .fillMaxSize(),
         ) {
             TranscriptPage(
                 playerViewModel = playerViewModel,
@@ -114,8 +104,8 @@ fun TranscriptPageWrapper(
                         playerViewModel.closeTranscript(withTransition = true)
                     }
                 },
-                onSearchDoneClicked = onSearchDoneClicked,
-                onSearchClicked = onSearchClicked,
+                onSearchDoneClicked = { expandSearch = false },
+                onSearchClicked = { expandSearch = true },
                 expandSearch = expandSearch,
             )
         }
