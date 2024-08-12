@@ -478,7 +478,6 @@ platform :android do
 
   # This function is Buildkite-specific
   def generate_prototype_build_number
-    return ""
     if ENV['BUILDKITE']
       commit = ENV.fetch('BUILDKITE_COMMIT', nil)[0, 7]
       branch = ENV['BUILDKITE_BRANCH'].parameterize
