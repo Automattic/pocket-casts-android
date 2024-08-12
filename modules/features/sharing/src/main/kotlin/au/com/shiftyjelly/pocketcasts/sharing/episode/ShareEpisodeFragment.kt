@@ -36,12 +36,23 @@ class ShareEpisodeFragment : BaseDialogFragment() {
     private val viewModel by viewModels<ShareEpisodeViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShareEpisodeViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid)
+                factory.create(
+                    podcastUuid = args.podcastUuid,
+                    episodeUuid = args.episodeUuid,
+                    sourceView = args.source,
+                )
             }
         },
     )
 
     @Inject internal lateinit var shareListenerFactory: ShareEpisodeListener.Factory
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.onScreenShown()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,6 +86,7 @@ class ShareEpisodeFragment : BaseDialogFragment() {
 
     @Parcelize
     private class Args(
+        val podcastUuid: String,
         val episodeUuid: String,
         @TypeParceler<Color, ColorParceler>() val baseColor: Color,
         val source: SourceView,
@@ -90,6 +102,7 @@ class ShareEpisodeFragment : BaseDialogFragment() {
         ) = ShareEpisodeFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
+                    podcastUuid = episode.podcastUuid,
                     episodeUuid = episode.uuid,
                     baseColor = Color(baseColor),
                     source = source,

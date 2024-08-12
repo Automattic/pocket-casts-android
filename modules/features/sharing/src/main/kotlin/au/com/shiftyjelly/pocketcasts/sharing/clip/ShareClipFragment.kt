@@ -78,7 +78,7 @@ class ShareClipFragment : BaseDialogFragment() {
             initialClipRange = args.clipRange,
         )
         if (savedInstanceState == null) {
-            viewModel.onClipScreenShown()
+            viewModel.onScreenShown()
         }
     }
 

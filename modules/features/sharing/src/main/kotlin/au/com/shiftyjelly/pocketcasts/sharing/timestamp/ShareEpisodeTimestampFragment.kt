@@ -39,12 +39,23 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
     private val viewModel by viewModels<ShareEpisodeTimestampViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShareEpisodeTimestampViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid)
+                factory.create(
+                    podcastUuid = args.podcastUuid,
+                    episodeUuid = args.episodeUuid,
+                    sourceView = args.source,
+                )
             }
         },
     )
 
     @Inject internal lateinit var shareListenerFactory: ShareEpisodeTimestampListener.Factory
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.onScreenShown()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,6 +90,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
 
     @Parcelize
     private class Args(
+        val podcastUuid: String,
         val episodeUuid: String,
         @TypeParceler<Duration, DurationParceler>() val timestamp: Duration,
         @TypeParceler<Color, ColorParceler>() val baseColor: Color,
@@ -96,6 +108,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         ) = ShareEpisodeTimestampFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
+                    podcastUuid = episode.podcastUuid,
                     episodeUuid = episode.uuid,
                     timestamp = episode.playedUpTo.seconds,
                     baseColor = Color(baseColor),
@@ -113,6 +126,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         ) = ShareEpisodeTimestampFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
+                    podcastUuid = episode.podcastUuid,
                     episodeUuid = episode.uuid,
                     timestamp = timestamp,
                     baseColor = Color(baseColor),
