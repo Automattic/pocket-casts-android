@@ -464,6 +464,7 @@ platform :android do
             reuse_identifier: "app-prototype-build-link",
             body: prototype_build_comments.join('\n')
         )
+    end
   end
 
   def get_app_display_name(apk_path:)
