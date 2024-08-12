@@ -266,7 +266,7 @@ private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowUp,
-                contentDescription = stringResource(LR.string.go_to_top),
+                contentDescription = stringResource(LR.string.go_to_previous),
             )
         }
         IconButton(
@@ -275,7 +275,7 @@ private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = stringResource(LR.string.go_to_bottom),
+                contentDescription = stringResource(LR.string.go_to_next),
             )
         }
     }

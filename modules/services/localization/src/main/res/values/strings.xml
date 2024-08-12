@@ -160,6 +160,8 @@
     <string name="support">Support</string>
     <string name="go_to_top">Go to top</string>
     <string name="go_to_bottom">Go to bottom</string>
+    <string name="go_to_previous">Go to previous</string>
+    <string name="go_to_next">Go to next</string>
     <string name="submit">Submit</string>
     <string name="report">Report</string>
     <string name="report_subtitle">Report inappropriate content</string>
