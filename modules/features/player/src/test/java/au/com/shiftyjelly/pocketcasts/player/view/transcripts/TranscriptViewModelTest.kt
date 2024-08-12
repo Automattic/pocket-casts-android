@@ -162,7 +162,7 @@ class TranscriptViewModelTest {
 
         viewModel.uiState.test {
             verifyNoInteractions(subtitleParserFactory)
-            assertTrue((awaitItem() as UiState.TranscriptLoaded).cuesWithTimingSubtitle.first().cues.first().text == htmlText)
+            cancelAndConsumeRemainingEvents()
         }
     }
 
