@@ -430,38 +430,50 @@ platform :android do
   end
 
   desc 'Builds a prototype build and uploads it to S3'
-  lane :build_and_upload_prototype_build do |options|
-      UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
+  lane :build_and_upload_prototype_build
+    UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
-      gradle(
-          task: ":app:assembleRelease",
-          properties: {
-          "skipSentryProguardMappingUpload" => true
-        }
-      )
+    gradle(
+        task: "assembleRelease",
+        properties: {
+        "skipSentryProguardMappingUpload" => true
+      }
+    )
 
+    prototype_build_comments = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].map { |apk_path|
       upload_path = upload_to_s3(
-          bucket: 'a8c-apps-public-artifacts',
-          key: "pocketcasts-mobile-prototype-build-#{generate_prototype_build_number}.apk",
-          file: lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH],
-          skip_if_exists: true
+        bucket: 'a8c-apps-public-artifacts',
+        key: "pocketcasts-mobile-prototype-build-#{generate_prototype_build_number}.apk",
+        file: apk_path,
+        skip_if_exists: true
       )
 
       install_url = "#{PROTOTYPE_BUILD_DOMAIN}/#{upload_path}"
-      comment_body = prototype_build_details_comment(
-        app_display_name: "📱 Mobile",
+
+      prototype_build_details_comment(
+        app_display_name: get_app_display_name(apk_path: apk_path),
         download_url: install_url,
         fold: true
       )
+    }
 
-      unless ENV['BUILDKITE_PULL_REQUEST'].nil?
-          comment_on_pr(
-              project: 'automattic/pocket-casts-android',
-              pr_number: Integer(ENV['BUILDKITE_PULL_REQUEST']),
-              reuse_identifier: "app-prototype-build-link",
-              body: comment_body
-          )
-      end
+    unless ENV['BUILDKITE_PULL_REQUEST'].nil?
+        comment_on_pr(
+            project: 'automattic/pocket-casts-android',
+            pr_number: Integer(ENV['BUILDKITE_PULL_REQUEST']),
+            reuse_identifier: "app-prototype-build-link",
+            body: prototype_build_comments.join('\n')
+        )
+  end
+
+  def get_app_display_name(apk_path:)
+    if apk_path.include?('app')
+      "📱 Mobile"
+    elsif apk_path.include?('wear')
+      "⌚ Wear"
+    else
+      "🚗 Automotive"
+    end
   end
 
   # This function is Buildkite-specific
