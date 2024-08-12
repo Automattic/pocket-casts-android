@@ -9,6 +9,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.coerceAtMost
+import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
@@ -147,6 +150,7 @@ private fun HorizontalSharePodcastPage(
                     podcast = podcast,
                     episodeCount = episodeCount,
                     shareColors = shareColors,
+                    constrainedSize = { maxWidth, maxHeight -> DpSize(maxWidth.coerceAtMost(400.dp), maxHeight) },
                     captureController = assetController.captureController(CardType.Horizontal),
                 )
             }
