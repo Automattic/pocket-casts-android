@@ -296,7 +296,7 @@ class ProfileFragment : BaseFragment() {
                         },
                         onRequestEarlyAccess = {
                             analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_EARLY_ACCESS_REQUESTED)
-                            KidsBottomSheetDialog().show(childFragmentManager, "KidsBottomSheetDialog")
+                            KidsBottomSheetDialog().show(parentFragmentManager, "KidsBottomSheetDialog")
                         },
                     )
                 }

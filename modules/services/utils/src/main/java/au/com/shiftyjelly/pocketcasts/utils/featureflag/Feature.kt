@@ -152,7 +152,7 @@ enum class Feature(
         title = "Kids Profile",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     ;
