@@ -430,7 +430,7 @@ platform :android do
   end
 
   desc 'Builds a prototype build and uploads it to S3'
-  lane :build_and_upload_prototype_build
+  lane :build_and_upload_prototype_build do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
     gradle(
