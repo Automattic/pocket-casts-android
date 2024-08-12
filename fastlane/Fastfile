@@ -474,23 +474,12 @@ platform :android do
   end
 
   def get_app_key(apk_path:)
-    if apk_path.include?('app')
-      'mobile'
-    elsif apk_path.include?('wear')
-      'wear'
-    else
-      'automotive'
-    end
+    File.basename(apk_path).split('-').first
   end
 
   def get_app_display_name(apk_path:)
-    if apk_path.include?('app')
-      '📱 Mobile'
-    elsif apk_path.include?('wear')
-      '⌚ Wear'
-    else
-      '🚗 Automotive'
-    end
+    key = get_app_key(apk_path: apk_path).to_sym
+    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive' }.fetch(key, '❔ Unknown')
   end
 
   # This function is Buildkite-specific
