@@ -98,7 +98,7 @@ private fun VerticalSharePodcastPage(
                 }
             }
         },
-        middleContent = { cardType, modifier ->
+        middleContent = { cardType, cardSize, modifier ->
             if (podcast != null) {
                 val captureController = assetController.captureController(cardType)
                 PodcastCard(
@@ -107,6 +107,7 @@ private fun VerticalSharePodcastPage(
                     episodeCount = episodeCount,
                     shareColors = shareColors,
                     captureController = captureController,
+                    constrainedSize = { _, _ -> cardSize },
                     modifier = modifier,
                 )
             }

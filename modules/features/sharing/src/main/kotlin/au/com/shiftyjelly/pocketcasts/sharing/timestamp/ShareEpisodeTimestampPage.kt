@@ -113,7 +113,7 @@ private fun VerticalShareEpisodeTimestampPage(
                 }
             }
         },
-        middleContent = { cardType, modifier ->
+        middleContent = { cardType, cardSize, modifier ->
             if (podcast != null && episode != null) {
                 val captureController = assetController.captureController(cardType)
                 EpisodeCard(
@@ -123,6 +123,7 @@ private fun VerticalShareEpisodeTimestampPage(
                     useEpisodeArtwork = useEpisodeArtwork,
                     shareColors = shareColors,
                     captureController = captureController,
+                    constrainedSize = { _, _ -> cardSize },
                     modifier = modifier,
                 )
             }
