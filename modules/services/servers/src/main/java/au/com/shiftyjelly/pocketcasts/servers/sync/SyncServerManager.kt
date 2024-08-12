@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
+import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
@@ -285,6 +286,24 @@ open class SyncServerManager @Inject constructor(
             .setPodcastUuid(podcastUuid)
             .build()
         return server.getPodcastRating(addBearer(token), request)
+    }
+
+    suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
+        val request = SupportFeedbackRequest.newBuilder()
+            .setSubject(subject)
+            .setInbox(inbox)
+            .setMessage(message)
+            .build()
+        return server.sendAnonymousFeedback(request)
+    }
+
+    suspend fun sendFeedback(subject: String, inbox: String, message: String, token: AccessToken): Response<Void> {
+        val request = SupportFeedbackRequest.newBuilder()
+            .setSubject(subject)
+            .setInbox(inbox)
+            .setMessage(message)
+            .build()
+        return server.sendFeedback(addBearer(token), request)
     }
 
     fun signOut() {

@@ -10,33 +10,42 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 
 @Composable
-internal fun SquarePodcastCast(
+internal fun SquarePodcastCard(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = SquareCard(
     data = PodcastCardData(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
+    customSize = customSize,
+    captureController = captureController,
     modifier = modifier,
 )
 
@@ -46,7 +55,9 @@ internal fun SquareEpisodeCard(
     podcast: Podcast,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = SquareCard(
     data = EpisodeCardData(
         episode = episode,
@@ -54,37 +65,44 @@ internal fun SquareEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
+    customSize = customSize,
+    captureController = captureController,
     modifier = modifier,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SquareCard(
     data: CardData,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
     modifier = modifier,
 ) {
-    val size = minOf(maxWidth, maxHeight)
     val backgroundGradient = Brush.verticalGradient(
         listOf(
             shareColors.cardTop,
             shareColors.cardBottom,
         ),
     )
+    val size = customSize ?: DpSize(maxWidth, maxHeight)
+    val minDimension = minOf(size.width, size.height)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .capturable(captureController)
             .background(backgroundGradient, RoundedCornerShape(12.dp))
-            .size(size),
+            .size(minDimension),
     ) {
         Spacer(
             modifier = Modifier.height(42.dp),
         )
         data.Image(
             modifier = Modifier
-                .size(size * 0.4f)
+                .size(minDimension * 0.4f)
                 .clip(RoundedCornerShape(8.dp)),
         )
         Spacer(
@@ -92,6 +110,7 @@ private fun SquareCard(
         )
         TextH70(
             text = data.topText(),
+            disableScale = true,
             maxLines = 1,
             color = shareColors.cardText.copy(alpha = 0.5f),
             modifier = Modifier.padding(horizontal = 64.dp),
@@ -101,6 +120,7 @@ private fun SquareCard(
         )
         TextH40(
             text = data.middleText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText,
@@ -111,6 +131,7 @@ private fun SquareCard(
         )
         TextH70(
             text = data.bottomText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardText.copy(alpha = 0.5f),
@@ -187,4 +208,5 @@ private fun SquareCardPreview(
 ) = SquareCard(
     data = data,
     shareColors = ShareColors(baseColor),
+    captureController = rememberCaptureController(),
 )

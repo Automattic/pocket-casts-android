@@ -24,8 +24,6 @@ internal fun rememberClipSelectorState(
     firstVisibleItemIndex: Int,
     firstVisibleItemScrollOffset: Int = 0,
     scale: Float = 1f,
-    startOffset: Float = 0f,
-    endOffset: Float = 0f,
 ) = rememberSaveable(
     saver = ClipSelectorState.Saver,
     init = {
@@ -35,8 +33,8 @@ internal fun rememberClipSelectorState(
             scale = scale,
             secondsPerTick = 1,
             itemWidth = 0f,
-            startOffset = startOffset,
-            endOffset = endOffset,
+            startOffset = 0f,
+            endOffset = 0f,
         )
     },
 )
@@ -168,7 +166,7 @@ internal class ClipSelectorState(
 
         fun itemWidth(scale: Float) = TickWidth + SpaceWidth * scale
 
-        val Saver: Saver<ClipSelectorState, *> = listSaver(
+        val Saver: Saver<ClipSelectorState, Any> = listSaver(
             save = {
                 listOf(
                     it.listState.firstVisibleItemIndex,

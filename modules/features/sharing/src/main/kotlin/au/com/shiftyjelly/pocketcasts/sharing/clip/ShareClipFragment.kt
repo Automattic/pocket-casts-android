@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.compose.foundation.background
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
@@ -18,8 +20,10 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
+import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipViewModel.SnackbarMessage
+import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VideoBackgroundController
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -31,6 +35,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ShareClipFragment : BaseDialogFragment() {
@@ -45,6 +50,7 @@ class ShareClipFragment : BaseDialogFragment() {
                     args.episodeUuid,
                     args.clipRange,
                     clipPlayerFactory.create(requireActivity().applicationContext),
+                    sharingClient.asClipClient(),
                     clipAnalytics,
                 )
             }
@@ -72,7 +78,7 @@ class ShareClipFragment : BaseDialogFragment() {
             initialClipRange = args.clipRange,
         )
         if (savedInstanceState == null) {
-            viewModel.onClipScreenShown()
+            viewModel.onScreenShown()
         }
     }
 
@@ -81,28 +87,48 @@ class ShareClipFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
-        val shareColors = shareColors
-        val videoBackgroundController = VideoBackgroundController(requireContext(), shareColors)
-        val listener = ShareClipListener(this@ShareClipFragment, viewModel, sharingClient, videoBackgroundController)
+        val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
+        val assetController = BackgroundAssetController.create(requireContext().applicationContext, shareColors)
+        val listener = ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source)
+
         setContent {
             val uiState by viewModel.uiState.collectAsState()
+            val snackbarHostState = remember { SnackbarHostState() }
+
             ShareClipPage(
                 episode = uiState.episode,
                 podcast = uiState.podcast,
                 clipRange = uiState.clipRange,
                 playbackProgress = uiState.playbackProgress,
                 isPlaying = uiState.isPlaying,
+                isSharing = uiState.isSharing,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
+                platforms = platforms,
                 shareColors = shareColors,
+                assetController = assetController,
                 listener = listener,
-                captureController = videoBackgroundController.verticalCardController,
+                snackbarHostState = snackbarHostState,
             )
+
+            LaunchedEffect(Unit) {
+                viewModel.snackbarMessages.collect { message ->
+                    val text = when (message) {
+                        is SnackbarMessage.SharingResponse -> message.message
+                        is SnackbarMessage.PlayerIssue -> getString(LR.string.podcast_episode_playback_error)
+                        is SnackbarMessage.GenericIssue -> getString(LR.string.share_error_message)
+                    }
+                    snackbarHostState.showSnackbar(text)
+                }
+            }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        styleBackgroundColor(shareColors.background.toArgb())
+        styleBackgroundColor(
+            background = shareColors.background.toArgb(),
+            navigationBar = shareColors.navigationBar.toArgb(),
+        )
     }
 
     @Parcelize

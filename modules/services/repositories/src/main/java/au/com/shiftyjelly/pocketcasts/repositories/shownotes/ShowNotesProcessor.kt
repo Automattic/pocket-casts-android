@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.LoadTranscriptSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesChapter
@@ -26,12 +27,16 @@ class ShowNotesProcessor @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
     private val service: PodcastCacheServer,
 ) {
-    fun process(episodeUuid: String, showNotes: ShowNotesResponse) {
+    fun process(
+        episodeUuid: String,
+        showNotes: ShowNotesResponse,
+        loadTranscriptSource: LoadTranscriptSource = LoadTranscriptSource.DEFAULT,
+    ) {
         updateImageUrls(showNotes)
         updateChapters(episodeUuid, showNotes)
         updateChapterFromLink(episodeUuid, showNotes)
         if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            updateTranscripts(episodeUuid, showNotes)
+            updateTranscripts(episodeUuid, showNotes, loadTranscriptSource)
         }
     }
 
@@ -76,12 +81,16 @@ class ShowNotesProcessor @Inject constructor(
         newChapters?.let { chapterManager.updateChapters(episodeUuid, it) }
     }
 
-    private fun updateTranscripts(episodeUuid: String, showNotes: ShowNotesResponse) = scope.launch {
+    private fun updateTranscripts(
+        episodeUuid: String,
+        showNotes: ShowNotesResponse,
+        loadTranscriptSource: LoadTranscriptSource,
+    ) = scope.launch {
         val transcripts = showNotes.podcast?.episodes
             ?.firstOrNull { it.uuid == episodeUuid }
             ?.transcripts
             ?.mapNotNull { it.takeIf { it.url != null && it.type != null }?.toTranscript(episodeUuid) }
-        transcripts?.let { transcriptsManager.updateTranscripts(episodeUuid, it) }
+        transcripts?.let { transcriptsManager.updateTranscripts(episodeUuid, it, loadTranscriptSource) }
     }
 
     private fun ShowNotesChapter.toChapter(episodeUuid: String) = Chapter(

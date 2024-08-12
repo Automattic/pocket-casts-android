@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun PocketCastsPill(
     modifier: Modifier = Modifier,
+    disableScale: Boolean = false,
 ) = Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier
@@ -42,6 +43,7 @@ fun PocketCastsPill(
     TextH70(
         text = stringResource(id = LR.string.pocket_casts),
         color = Color.White,
+        disableScale = disableScale,
     )
 }
 

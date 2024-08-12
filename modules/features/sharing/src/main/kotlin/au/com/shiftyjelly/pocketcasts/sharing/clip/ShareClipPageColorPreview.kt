@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 
 private class PodcastColorProvider : PreviewParameterProvider<Long> {
     override val values = sequenceOf(

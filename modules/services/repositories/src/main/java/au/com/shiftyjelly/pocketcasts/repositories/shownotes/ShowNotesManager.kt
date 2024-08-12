@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.LoadTranscriptSource
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import javax.inject.Inject
@@ -27,7 +28,7 @@ class ShowNotesManager @Inject constructor(
     suspend fun downloadToCacheShowNotes(podcastUuid: String, episodeUuid: String) {
         serverShowNotesManager.downloadToCacheShowNotes(
             podcastUuid = podcastUuid,
-            processShowNotes = { showNotesProcessor.process(episodeUuid, it) },
+            processShowNotes = { showNotesProcessor.process(episodeUuid, it, LoadTranscriptSource.DOWNLOAD_EPISODE) },
         )
     }
 }

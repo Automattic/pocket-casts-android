@@ -16,12 +16,12 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
@@ -35,12 +35,22 @@ class SharePodcastFragment : BaseDialogFragment() {
     private val viewModel by viewModels<SharePodcastViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<SharePodcastViewModel.Factory> { factory ->
-                factory.create(args.podcastUuid)
+                factory.create(
+                    podcastUuid = args.podcastUuid,
+                    sourceView = args.source,
+                )
             }
         },
     )
 
     @Inject internal lateinit var shareListenerFactory: SharePodcastListener.Factory
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.onScreenShown()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +58,8 @@ class SharePodcastFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val listener = shareListenerFactory.create(this@SharePodcastFragment, args.source)
+        val assetController = BackgroundAssetController.create(requireContext(), shareColors)
+        val listener = shareListenerFactory.create(this@SharePodcastFragment, assetController, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             SharePodcastPage(
@@ -56,15 +67,18 @@ class SharePodcastFragment : BaseDialogFragment() {
                 episodeCount = uiState.episodeCount,
                 socialPlatforms = platforms,
                 shareColors = shareColors,
+                assetController = assetController,
                 listener = listener,
-                rememberCaptureController(),
             )
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        styleBackgroundColor(shareColors.background.toArgb())
+        styleBackgroundColor(
+            background = shareColors.background.toArgb(),
+            navigationBar = shareColors.navigationBar.toArgb(),
+        )
     }
 
     @Parcelize
