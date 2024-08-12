@@ -434,13 +434,13 @@ platform :android do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
     gradle(
-        task: "assembleRelease",
-        properties: {
-        "skipSentryProguardMappingUpload" => true
+      task: 'assembleRelease',
+      properties: {
+        'skipSentryProguardMappingUpload' => true
       }
     )
 
-    prototype_build_comments = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].map { |apk_path|
+    prototype_build_comments = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].map do |apk_path|
       upload_path = upload_to_s3(
         bucket: 'a8c-apps-public-artifacts',
         key: "pocketcasts-mobile-prototype-build-#{generate_prototype_build_number}.apk",
@@ -455,25 +455,25 @@ platform :android do
         download_url: install_url,
         fold: true
       )
-    }
+    end
 
     unless ENV['BUILDKITE_PULL_REQUEST'].nil?
-        comment_on_pr(
-            project: 'automattic/pocket-casts-android',
-            pr_number: Integer(ENV['BUILDKITE_PULL_REQUEST']),
-            reuse_identifier: "app-prototype-build-link",
-            body: prototype_build_comments.join('\n')
-        )
+      comment_on_pr(
+        project: 'automattic/pocket-casts-android',
+        pr_number: Integer(ENV['BUILDKITE_PULL_REQUEST']),
+        reuse_identifier: 'app-prototype-build-link',
+        body: prototype_build_comments.join('\n')
+      )
     end
   end
 
   def get_app_display_name(apk_path:)
     if apk_path.include?('app')
-      "📱 Mobile"
+      '📱 Mobile'
     elsif apk_path.include?('wear')
-      "⌚ Wear"
+      '⌚ Wear'
     else
-      "🚗 Automotive"
+      '🚗 Automotive'
     end
   end
 
