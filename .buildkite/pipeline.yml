@@ -57,6 +57,18 @@ steps:
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
 
+  - label: "Assemble release APK"
+    command: |
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
+      echo "--- :closed_lock_with_key: Installing Secrets"
+      bundle exec fastlane run configure_apply
+      echo "--- ⚙️ Building release variant"
+      ./gradlew assembleRelease -PskipSentryProguardMappingUpload=true
+    plugins: [ $CI_TOOLKIT ]
+    artifact_paths:
+      - "**/build/outputs/apk/**/*"
+
   - label: "Prototype Builds"
     command: |
       ".buildkite/commands/prototype-build.sh"
