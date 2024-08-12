@@ -30,10 +30,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// TODO: [Transcript] Modify regex for non english languages
-private val SpeakerRegex = """Speaker \d+: """.toRegex()
-private val NewLineRegex = """[.?!]$""".toRegex()
-
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
 @HiltViewModel
@@ -101,10 +97,11 @@ class TranscriptViewModel @Inject constructor(
                 if (content.trim().isEmpty()) {
                     emptyList<CuesWithTiming>()
                 } else {
+                    val newText = TranscriptRegexFilters.htmlFilters.filter(content)
                     // Html content is added as single large cue
                     ImmutableList.of(
                         CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(content).build()),
+                            ImmutableList.of(Cue.Builder().setText(newText).build()),
                             0,
                             0,
                         ),
@@ -153,16 +150,12 @@ class TranscriptViewModel @Inject constructor(
 
     /**
      * Modifies the cues in the given [CuesWithTiming] object.
-     * - Removes speaker names from the cue text using the [SpeakerRegex].
-     * - Replaces cue text ending with dot with newlines.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun modifiedCues(cuesWithTiming: CuesWithTiming) =
         cuesWithTiming.cues.map { cue ->
             val cueBuilder = cue.buildUpon()
-            val newText = cue.text.toString()
-                .replace(SpeakerRegex, "")
-                .replace(NewLineRegex, "${cue.text.toString().last()}\n\n")
+            val newText = TranscriptRegexFilters.transcriptFilters.filter(cue.text.toString())
             cueBuilder.setText(newText)
             cueBuilder.build()
         }
