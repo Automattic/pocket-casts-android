@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-open class AnalyticsTracker constructor(
+open class AnalyticsTracker(
     val trackers: List<Tracker>,
     val isTrackingEnabled: () -> Boolean,
 ) {
@@ -23,6 +23,6 @@ open class AnalyticsTracker constructor(
     }
 
     companion object {
-        fun test(vararg trackers: Tracker, isEnabled: Boolean = false) = AnalyticsTracker(trackers.toList(), { isEnabled })
+        fun test(vararg trackers: Tracker, isEnabled: Boolean = false) = AnalyticsTracker(trackers.toList()) { isEnabled }
     }
 }

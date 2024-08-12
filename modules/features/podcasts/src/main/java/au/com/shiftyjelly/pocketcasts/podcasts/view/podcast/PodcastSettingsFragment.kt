@@ -15,7 +15,6 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -234,7 +233,6 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                                 AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED
                             },
                         )
-                        FirebaseAnalyticsTracker.podcastFeedRefreshed()
                         showFeedUpdateQueued(success = success)
                     }
                 }

@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
@@ -83,7 +82,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val transformedList = viewModel.transformNetworkLoadableList(list, resources) // Replace any [regionCode] etc references
         val listId = list.listUuid
         if (listId != null) {
-            FirebaseAnalyticsTracker.listShowAllTapped(listId)
             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to listId))
         } else {
             analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId()))
@@ -273,13 +271,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.scrollToPosition(0)
     }
 
-    @Suppress("DEPRECATION")
-    override fun setUserVisibleHint(visible: Boolean) {
-        super.setUserVisibleHint(visible)
-        if (visible) {
-            FirebaseAnalyticsTracker.navigatedToDiscover()
-        }
-    }
     private fun updateDiscoverRowsAndRemoveCategoryAds(content: List<Any>, region: String): MutableList<Any> {
         val mutableContentList = content.toMutableList()
 
@@ -319,7 +310,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
     private fun trackCategoryShownImpression(category: DiscoverCategory) {
         viewModel.currentRegionCode?.let {
-            FirebaseAnalyticsTracker.openedCategory(category.id, it)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_CATEGORY_SHOWN,
                 mapOf(

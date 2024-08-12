@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORI
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_SHOWN
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent.DISCOVER_CATEGORY_CLOSE_BUTTON_TAPPED
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
@@ -324,7 +323,6 @@ internal class DiscoverAdapter(
             val discoverPodcast = adapter.currentList[position] as? DiscoverPodcast
             discoverPodcast?.listId?.let {
                 if (listIdImpressionTracked.contains(it)) return
-                FirebaseAnalyticsTracker.listImpression(it)
                 analyticsTracker.track(
                     AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
                     mapOf(LIST_ID to it),
@@ -503,7 +501,6 @@ internal class DiscoverAdapter(
         fun trackSponsoredListImpression(listId: String) {
             if (listIdImpressionTracked.contains(listId)) return
 
-            FirebaseAnalyticsTracker.listImpression(listId)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
                 mapOf(LIST_ID to listId),
@@ -747,7 +744,6 @@ internal class DiscoverAdapter(
                             binding.btnPlay.setIconResource(if (episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                             binding.btnPlay.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
-                                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
                                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid))
                                 }
                                 binding.btnPlay.setIconResource(if (!episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
@@ -773,7 +769,6 @@ internal class DiscoverAdapter(
                             }
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
-                                    FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
                                     analyticsTracker.track(
                                         AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
                                         mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid),
@@ -888,7 +883,6 @@ internal class DiscoverAdapter(
                         }
 
                         row.discoverRow.listUuid?.let { listUuid ->
-                            FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcast.uuid)
                             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcast.uuid))
                         }
                         listener.onPodcastClicked(podcast, row.discoverRow.listUuid)
@@ -946,17 +940,14 @@ internal class DiscoverAdapter(
         }
     }
     private fun trackListImpression(listUuid: String) {
-        FirebaseAnalyticsTracker.listImpression(listUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
     }
 
     private fun trackDiscoverListPodcastTapped(listUuid: String, podcastUuid: String) {
-        FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcastUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 
     private fun trackDiscoverListPodcastSubscribed(listUuid: String, podcastUuid: String) {
-        FirebaseAnalyticsTracker.podcastSubscribedFromList(listUuid, podcastUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 }

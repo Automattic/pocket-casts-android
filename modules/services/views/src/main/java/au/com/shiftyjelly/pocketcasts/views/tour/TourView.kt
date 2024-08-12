@@ -12,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.graphics.toRectF
 import androidx.core.view.children
 import androidx.transition.TransitionManager
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
@@ -51,8 +50,6 @@ class TourView @JvmOverloads constructor(
         visibility = View.VISIBLE
         this.currentStepView = null
         showStep(steps.first())
-
-        FirebaseAnalyticsTracker.tourStarted(tourName)
     }
 
     fun showStep(step: TourStep) {
@@ -79,14 +76,12 @@ class TourView @JvmOverloads constructor(
                 if (stepIndex < steps.size) {
                     showStep(steps[stepIndex])
                 } else {
-                    FirebaseAnalyticsTracker.tourCompleted(tourName)
                     (this.parent as? ViewGroup)?.removeView(this)
                 }
             }
         }
         val closeText = if (stepIndex == 0) "Close" else "End Tour"
         stepView.setupCloseButton(closeText) {
-            FirebaseAnalyticsTracker.tourCancelled(tourName, atStep = stepIndex)
             (this.parent as? ViewGroup)?.removeView(this)
         }
         val stepText = if (stepIndex == 0) "NEW" else "$stepIndex of ${(steps?.size ?: 0) - 1}"

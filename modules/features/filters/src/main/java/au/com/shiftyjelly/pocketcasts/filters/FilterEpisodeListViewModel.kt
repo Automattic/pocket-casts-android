@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -161,6 +160,5 @@ class FilterEpisodeListViewModel @Inject constructor(
 
     fun trackFilterShown() {
         analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
-        FirebaseAnalyticsTracker.openedFilter()
     }
 }
