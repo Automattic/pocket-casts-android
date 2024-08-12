@@ -443,7 +443,7 @@ platform :android do
     prototype_build_comments = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].map do |apk_path|
       upload_path = upload_to_s3(
         bucket: 'a8c-apps-public-artifacts',
-        key: "pocketcasts-mobile-prototype-build-#{generate_prototype_build_number}.apk",
+        key: "pocketcasts-#{get_app_key(apk_path: apk_path)}-prototype-build-#{generate_prototype_build_number}.apk",
         file: apk_path,
         skip_if_exists: true
       )
@@ -464,6 +464,16 @@ platform :android do
         reuse_identifier: 'app-prototype-build-link',
         body: prototype_build_comments.join('\n')
       )
+    end
+  end
+
+  def get_app_key(apk_path:)
+    if apk_path.include?('app')
+      'mobile'
+    elsif apk_path.include?('wear')
+      'wear'
+    else
+      'automotive'
     end
   end
 
