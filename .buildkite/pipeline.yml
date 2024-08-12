@@ -70,6 +70,7 @@ steps:
       - "**/build/outputs/apk/**/*"
 
   - label: "Prototype Builds"
+    if: "build.pull_request.id != null"
     command: |
       ".buildkite/commands/prototype-build.sh"
     plugins: [ $CI_TOOLKIT ]

@@ -463,14 +463,12 @@ platform :android do
       )
     end
 
-    unless ENV['BUILDKITE_PULL_REQUEST'].nil?
-      comment_on_pr(
-        project: 'automattic/pocket-casts-android',
-        pr_number: Integer(ENV['BUILDKITE_PULL_REQUEST']),
-        reuse_identifier: 'app-prototype-build-link',
-        body: prototype_build_comments.join
-      )
-    end
+    comment_on_pr(
+      project: 'automattic/pocket-casts-android',
+      pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
+      reuse_identifier: 'app-prototype-build-link',
+      body: prototype_build_comments.join
+    )
   end
 
   def get_app_key(apk_path:)
