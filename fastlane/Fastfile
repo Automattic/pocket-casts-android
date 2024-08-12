@@ -462,7 +462,7 @@ platform :android do
         project: 'automattic/pocket-casts-android',
         pr_number: Integer(ENV['BUILDKITE_PULL_REQUEST']),
         reuse_identifier: 'app-prototype-build-link',
-        body: prototype_build_comments.join('\n')
+        body: prototype_build_comments.join
       )
     end
   end
