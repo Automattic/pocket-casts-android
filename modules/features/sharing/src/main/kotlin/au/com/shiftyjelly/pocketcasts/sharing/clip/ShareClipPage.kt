@@ -480,7 +480,7 @@ private fun PagingContent(
                 useEpisodeArtwork = useEpisodeArtwork,
                 shareColors = shareColors,
                 captureController = assetController.captureController(cardType),
-                customSize = coordiantes.size,
+                constrainedSize = { _, _ -> coordiantes.size },
                 modifier = modifier,
             )
             is CardType.Audio -> Box(

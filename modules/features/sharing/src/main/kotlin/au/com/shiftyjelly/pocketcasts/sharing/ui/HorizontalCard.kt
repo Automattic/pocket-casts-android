@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -40,7 +41,7 @@ internal fun HorizontalPodcastCard(
     captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = false,
-    customSize: DpSize? = null,
+    constrainedSize: (maxWidth: Dp, maxHeight: Dp) -> DpSize = { width, height -> DpSize(width, height) },
 ) = HorizontalCard(
     data = PodcastCardData(
         podcast = podcast,
@@ -48,7 +49,7 @@ internal fun HorizontalPodcastCard(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
-    customSize = customSize,
+    constrainedSize = constrainedSize,
     captureController = captureController,
     modifier = modifier,
 )
@@ -62,7 +63,7 @@ internal fun HorizontalEpisodeCard(
     captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = false,
-    customSize: DpSize? = null,
+    constrainedSize: (maxWidth: Dp, maxHeight: Dp) -> DpSize = { width, height -> DpSize(width, height) },
 ) = HorizontalCard(
     data = EpisodeCardData(
         episode = episode,
@@ -71,7 +72,7 @@ internal fun HorizontalEpisodeCard(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
-    customSize = customSize,
+    constrainedSize = constrainedSize,
     captureController = captureController,
     modifier = modifier,
 )
@@ -91,7 +92,7 @@ private fun HorizontalCard(
     useHeightForAspectRatio: Boolean,
     captureController: CaptureController,
     modifier: Modifier = Modifier,
-    customSize: DpSize? = null,
+    constrainedSize: (maxWidth: Dp, maxHeight: Dp) -> DpSize = { width, height -> DpSize(width, height) },
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
     modifier = modifier,
@@ -102,7 +103,7 @@ private fun HorizontalCard(
             shareColors.cardBottom,
         ),
     )
-    val size = customSize ?: DpSize(maxWidth, maxHeight)
+    val size = constrainedSize(maxWidth, maxHeight)
     val (width, height) = if (useHeightForAspectRatio) {
         size.height / CardType.Horizontal.aspectRatio to size.height
     } else {
