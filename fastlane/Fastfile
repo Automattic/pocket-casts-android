@@ -431,10 +431,13 @@ platform :android do
 
   desc 'Builds a prototype build and uploads it to S3'
   lane :build_and_upload_prototype_build do
-    UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
+#     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
+
+    prototype_build_type = 'debugProd'
 
     gradle(
-      task: 'assembleRelease',
+      task: 'assemble',
+      build_type: prototype_build_type,
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
@@ -453,6 +456,9 @@ platform :android do
       prototype_build_details_comment(
         app_display_name: get_app_display_name(apk_path: apk_path),
         download_url: install_url,
+        metadata: {
+          'Build Type': prototype_build_type
+        },
         fold: true
       )
     end
