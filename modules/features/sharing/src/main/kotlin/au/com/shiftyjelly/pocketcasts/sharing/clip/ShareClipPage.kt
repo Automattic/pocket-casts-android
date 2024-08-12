@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.sharing.clip
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -70,6 +72,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ClipSelector
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CloseButton
 import au.com.shiftyjelly.pocketcasts.sharing.ui.EpisodeCard
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalEpisodeCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.sharing.ui.SharingThemedSnackbar
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
@@ -123,21 +126,40 @@ internal fun ShareClipPage(
         firstVisibleItemIndex = (clipRange.startInSeconds - 10).coerceAtLeast(0),
     ),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-) = VerticalClipPage(
-    episode = episode,
-    podcast = podcast,
-    clipRange = clipRange,
-    playbackProgress = playbackProgress,
-    isPlaying = isPlaying,
-    isSharing = isSharing,
-    useEpisodeArtwork = useEpisodeArtwork,
-    platforms = platforms,
-    shareColors = shareColors,
-    assetController = assetController,
-    listener = listener,
-    state = state,
-    snackbarHostState = snackbarHostState,
-)
+) {
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> HorizontalClipPage(
+            episode = episode,
+            podcast = podcast,
+            clipRange = clipRange,
+            playbackProgress = playbackProgress,
+            isPlaying = isPlaying,
+            isSharing = isSharing,
+            useEpisodeArtwork = useEpisodeArtwork,
+            platforms = platforms,
+            shareColors = shareColors,
+            assetController = assetController,
+            listener = listener,
+            state = state,
+            snackbarHostState = snackbarHostState,
+        )
+        else -> VerticalClipPage(
+            episode = episode,
+            podcast = podcast,
+            clipRange = clipRange,
+            playbackProgress = playbackProgress,
+            isPlaying = isPlaying,
+            isSharing = isSharing,
+            useEpisodeArtwork = useEpisodeArtwork,
+            platforms = platforms,
+            shareColors = shareColors,
+            assetController = assetController,
+            listener = listener,
+            state = state,
+            snackbarHostState = snackbarHostState,
+        )
+    }
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -175,13 +197,13 @@ private fun VerticalClipPage(
                         .nestedScroll(rememberNestedScrollInteropConnection())
                         .verticalScroll(scrollState),
                 ) {
-                    TopContent(
+                    DescriptionContent(
                         isSharing = isSharing,
                         shareColors = shareColors,
                         selectedCard = selectedCard,
                         state = state,
                     )
-                    MiddleContent(
+                    PagingContent(
                         episode = episode,
                         podcast = podcast,
                         useEpisodeArtwork = useEpisodeArtwork,
@@ -193,7 +215,7 @@ private fun VerticalClipPage(
                         pagerState = pagerState,
                     )
                 }
-                BottomContent(
+                PageControlsContent(
                     podcast = podcast,
                     episode = episode,
                     clipRange = clipRange,
@@ -224,7 +246,91 @@ private fun VerticalClipPage(
 }
 
 @Composable
-private fun TopContent(
+private fun HorizontalClipPage(
+    episode: PodcastEpisode?,
+    podcast: Podcast?,
+    clipRange: Clip.Range,
+    playbackProgress: Duration,
+    isPlaying: Boolean,
+    isSharing: Boolean,
+    useEpisodeArtwork: Boolean,
+    platforms: Set<SocialPlatform>,
+    shareColors: ShareColors,
+    assetController: BackgroundAssetController,
+    listener: ShareClipPageListener,
+    state: ClipPageState,
+    snackbarHostState: SnackbarHostState,
+) {
+    Box(
+        modifier = Modifier
+            .background(shareColors.background)
+            .fillMaxSize(),
+    ) {
+        AnimatedVisiblity(podcast, episode) { podcast, episode ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                DescriptionContent(
+                    isSharing = isSharing,
+                    shareColors = shareColors,
+                    selectedCard = CardType.Horizontal,
+                    state = state,
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    Spacer(
+                        modifier = Modifier.weight(0.1f),
+                    )
+                    HorizontalEpisodeCard(
+                        episode = episode,
+                        podcast = podcast,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        shareColors = shareColors,
+                        captureController = assetController.captureController(CardType.Horizontal),
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.05f),
+                    )
+                    PageControlsContent(
+                        podcast = podcast,
+                        episode = episode,
+                        clipRange = clipRange,
+                        playbackProgress = playbackProgress,
+                        isPlaying = isPlaying,
+                        isSharing = isSharing,
+                        platforms = platforms,
+                        shareColors = shareColors,
+                        selectedCard = CardType.Horizontal,
+                        listener = listener,
+                        state = state,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(
+                        modifier = Modifier.weight(0.1f),
+                    )
+                }
+            }
+        }
+        CloseButton(
+            shareColors = shareColors,
+            onClick = listener::onClose,
+            modifier = Modifier
+                .padding(top = 12.dp, end = 12.dp)
+                .align(Alignment.TopEnd),
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            snackbar = { data -> SharingThemedSnackbar(data, shareColors) },
+        )
+    }
+}
+
+@Composable
+private fun DescriptionContent(
     isSharing: Boolean,
     shareColors: ShareColors,
     selectedCard: CardType,
@@ -232,6 +338,7 @@ private fun TopContent(
 ) {
     val titleId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_label else LR.string.share_clip_create_label
     val descriptionId = if (selectedCard is CardType.Audio) LR.string.share_clip_create_audio_description else LR.string.single_space
+    val orientation = LocalConfiguration.current.orientation
     AnimatedContent(
         label = "TopContent",
         targetState = Triple(state.step, titleId, descriptionId),
@@ -269,13 +376,16 @@ private fun TopContent(
             )
             val alpha by animateFloatAsState(targetValue = if (isSharing) 0.3f else 1f)
             when (step) {
-                SharingStep.Creating -> TextH40(
-                    text = stringResource(descriptionId),
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    color = shareColors.backgroundSecondaryText,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
+                SharingStep.Creating -> when (orientation) {
+                    Configuration.ORIENTATION_LANDSCAPE -> Unit
+                    else -> TextH40(
+                        text = stringResource(descriptionId),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        color = shareColors.backgroundSecondaryText,
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                    )
+                }
                 SharingStep.Sharing -> TextH40(
                     text = stringResource(LR.string.share_clip_edit_label),
                     textAlign = TextAlign.Center,
@@ -300,13 +410,15 @@ private fun TopContent(
                         .padding(vertical = 4.dp, horizontal = 16.dp),
                 )
             }
+            val bottomSpace = when (orientation) {
+                Configuration.ORIENTATION_LANDSCAPE -> 0.dp
+                else -> when (step) {
+                    SharingStep.Creating -> 12.dp
+                    SharingStep.Sharing -> 48.dp
+                }
+            }
             Spacer(
-                modifier = Modifier.height(
-                    when (step) {
-                        SharingStep.Creating -> 12.dp
-                        SharingStep.Sharing -> 48.dp
-                    },
-                ),
+                modifier = Modifier.height(bottomSpace),
             )
         }
     }
@@ -314,7 +426,7 @@ private fun TopContent(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MiddleContent(
+private fun PagingContent(
     episode: PodcastEpisode,
     podcast: Podcast,
     isSharing: Boolean,
@@ -386,7 +498,7 @@ private fun MiddleContent(
 }
 
 @Composable
-private fun BottomContent(
+private fun PageControlsContent(
     podcast: Podcast,
     episode: PodcastEpisode,
     clipRange: Clip.Range,
@@ -398,10 +510,12 @@ private fun BottomContent(
     selectedCard: CardType,
     listener: ShareClipPageListener,
     state: ClipPageState,
+    modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
         label = "BottomContent",
         targetState = state.step,
+        modifier = modifier,
     ) { step ->
         when (step) {
             SharingStep.Creating -> ClipControls(
@@ -594,34 +708,55 @@ private fun AnimatedVisiblity(
     }
 }
 
-@Preview(name = "Regular device", device = Devices.PortraitRegular)
+@Preview(name = "Regular device", device = Devices.PortraitRegular, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularPreview() = ShareClipPagePreview()
 
-@Preview(name = "Regular device sharing", device = Devices.PortraitRegular)
+@Preview(name = "Regular device sharing", device = Devices.PortraitRegular, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularSharingPreview() = ShareClipPagePreview(
     step = SharingStep.Sharing,
 )
 
-@Preview(name = "Regular device clipping", device = Devices.PortraitRegular)
+@Preview(name = "Regular device clipping", device = Devices.PortraitRegular, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularClippingPreview() = ShareClipPagePreview(
     step = SharingStep.Sharing,
     isSharing = true,
 )
 
-@Preview(name = "Small device", device = Devices.PortraitSmall)
+@Preview(name = "Small device", device = Devices.PortraitSmall, group = "vertical")
 @Composable
 private fun ShareClipVerticalSmallPreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Foldable device", device = Devices.PortraitFoldable)
+@Preview(name = "Foldable device", device = Devices.PortraitFoldable, group = "irregular")
 @Composable
 private fun ShareClipVerticalFoldablePreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Tablet device", device = Devices.PortraitTablet)
+@Preview(name = "Tablet device", device = Devices.PortraitTablet, group = "irregular")
 @Composable
 private fun ShareClipVerticalTabletPreview() = ShareClipPagePreview()
+
+@Preview(name = "Regular device horizontal sharing", device = Devices.LandscapeRegular, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalRegularPreview() = ShareClipPagePreview()
+
+@Preview(name = "Regular device horizontal clipping", device = Devices.LandscapeRegular, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalRegularSharingPreview() = ShareClipPagePreview(
+    step = SharingStep.Sharing,
+)
+
+@Preview(name = "Regular device horizontal", device = Devices.LandscapeRegular, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalRegularClippingPreview() = ShareClipPagePreview(
+    step = SharingStep.Sharing,
+    isSharing = true,
+)
+
+@Preview(name = "Small device horizontal", device = Devices.LandscapeSmall, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalSmallPreviewPreview() = ShareClipPagePreview()
 
 @Composable
 internal fun ShareClipPagePreview(
