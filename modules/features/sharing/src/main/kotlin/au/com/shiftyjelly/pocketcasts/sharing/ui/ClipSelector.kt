@@ -54,9 +54,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipPageListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.ceilDiv
+import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -83,41 +86,61 @@ internal fun ClipSelector(
         state.refreshItemWidth(density)
         state.scaleBoxOffsets(clipRange)
     }
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(72.dp)
-            .background(shareColors.timeline, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
+    Column(
+        modifier = modifier,
     ) {
-        Image(
-            painter = painterResource(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
-            contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
-            colorFilter = ColorFilter.tint(shareColors.playPauseButton),
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .size(72.dp)
-                .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
-                .clickable(
-                    interactionSource = remember(::MutableInteractionSource),
-                    indication = rememberRipple(color = shareColors.base),
-                    onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
-                    role = Role.Button,
-                    onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
-                )
-                .padding(16.dp),
-        )
+                .fillMaxWidth()
+                .height(72.dp)
+                .background(shareColors.timeline, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
+        ) {
+            Image(
+                painter = painterResource(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
+                contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
+                colorFilter = ColorFilter.tint(shareColors.playPauseButton),
+                modifier = Modifier
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
+                    .clickable(
+                        interactionSource = remember(::MutableInteractionSource),
+                        indication = rememberRipple(color = shareColors.base),
+                        onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
+                        role = Role.Button,
+                        onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
+                    )
+                    .padding(16.dp),
+            )
+            Spacer(
+                modifier = Modifier.width(16.dp),
+            )
+            ClipSelector(
+                episodeDuration = episodeDuration,
+                clipRange = clipRange,
+                playbackProgress = playbackProgress,
+                shareColors = shareColors,
+                listener = listener,
+                state = state,
+            )
+        }
         Spacer(
-            modifier = Modifier.width(16.dp),
+            modifier = Modifier.height(12.dp),
         )
-        ClipSelector(
-            episodeDuration = episodeDuration,
-            clipRange = clipRange,
-            playbackProgress = playbackProgress,
-            shareColors = shareColors,
-            listener = listener,
-            state = state,
-        )
+        Row {
+            TextH70(
+                text = stringResource(LR.string.share_clip_start_position, clipRange.start.toHhMmSs()),
+                color = shareColors.backgroundSecondaryText,
+            )
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+            TextH70(
+                text = stringResource(LR.string.share_clip_duration, clipRange.duration.toHhMmSs()),
+                color = shareColors.backgroundSecondaryText,
+            )
+        }
     }
 }
 
@@ -467,10 +490,7 @@ private fun ClipSelectorPreview(
 ) {
     val shareColors = ShareColors(Color(0xFFEC0404))
     Box(
-        modifier = Modifier.background(
-            color = shareColors.background,
-            shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
-        ),
+        modifier = Modifier.background(shareColors.background),
     ) {
         ClipSelector(
             episodeDuration = 5.minutes,

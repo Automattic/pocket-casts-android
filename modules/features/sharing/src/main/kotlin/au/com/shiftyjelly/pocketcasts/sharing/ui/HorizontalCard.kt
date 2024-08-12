@@ -13,34 +13,43 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 
 @Composable
-internal fun HorizontalPodcastCast(
+internal fun HorizontalPodcastCard(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
-    useWidthForAspectRatio: Boolean = true,
+    useHeightForAspectRatio: Boolean = false,
+    customSize: DpSize? = null,
 ) = HorizontalCard(
     data = PodcastCardData(
         podcast = podcast,
         episodeCount = episodeCount,
     ),
     shareColors = shareColors,
-    useWidthForAspectRatio = useWidthForAspectRatio,
+    useHeightForAspectRatio = useHeightForAspectRatio,
+    customSize = customSize,
+    captureController = captureController,
     modifier = modifier,
 )
 
@@ -50,8 +59,10 @@ internal fun HorizontalEpisodeCard(
     podcast: Podcast,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
-    useWidthForAspectRatio: Boolean = true,
+    useHeightForAspectRatio: Boolean = false,
+    customSize: DpSize? = null,
 ) = HorizontalCard(
     data = EpisodeCardData(
         episode = episode,
@@ -59,16 +70,28 @@ internal fun HorizontalEpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
     ),
     shareColors = shareColors,
-    useWidthForAspectRatio = useWidthForAspectRatio,
+    useHeightForAspectRatio = useHeightForAspectRatio,
+    customSize = customSize,
+    captureController = captureController,
     modifier = modifier,
 )
 
+@ShowkaseComposable(name = "Horizontal podcast card", group = "Sharing")
+@Preview(name = "HorizontalPodcastCardDark")
+@Composable
+fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
+    baseColor = Color(0xFFEC0404),
+)
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun HorizontalCard(
     data: CardData,
     shareColors: ShareColors,
-    useWidthForAspectRatio: Boolean,
+    useHeightForAspectRatio: Boolean,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
+    customSize: DpSize? = null,
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
     modifier = modifier,
@@ -79,14 +102,16 @@ private fun HorizontalCard(
             shareColors.cardBottom,
         ),
     )
-    val (width, height) = if (useWidthForAspectRatio) {
-        maxWidth to maxWidth * 0.52f
+    val size = customSize ?: DpSize(maxWidth, maxHeight)
+    val (width, height) = if (useHeightForAspectRatio) {
+        size.height / CardType.Horizontal.aspectRatio to size.height
     } else {
-        maxHeight / 0.52f to maxHeight
+        size.width to size.width * CardType.Horizontal.aspectRatio
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .capturable(captureController)
             .background(backgroundGradient, RoundedCornerShape(12.dp))
             .width(width)
             .height(height),
@@ -108,6 +133,7 @@ private fun HorizontalCard(
         ) {
             TextH70(
                 text = data.topText(),
+                disableScale = true,
                 color = shareColors.cardText.copy(alpha = 0.5f),
                 maxLines = 1,
             )
@@ -116,6 +142,7 @@ private fun HorizontalCard(
             )
             TextH40(
                 text = data.middleText(),
+                disableScale = true,
                 color = shareColors.cardText,
                 maxLines = 3,
             )
@@ -124,19 +151,13 @@ private fun HorizontalCard(
             )
             TextH70(
                 text = data.bottomText(),
+                disableScale = true,
                 maxLines = 2,
                 color = shareColors.cardText.copy(alpha = 0.5f),
             )
         }
     }
 }
-
-@ShowkaseComposable(name = "Horizontal podcast card", group = "Sharing")
-@Preview(name = "HorizontalPodcastCardDark")
-@Composable
-fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
-    baseColor = Color(0xFFEC0404),
-)
 
 @Preview(name = "HorizontalPodcastCardLight")
 @Composable
@@ -199,5 +220,6 @@ private fun HorizontalCardPreview(
 ) = HorizontalCard(
     data = data,
     shareColors = ShareColors(baseColor),
-    useWidthForAspectRatio = true,
+    useHeightForAspectRatio = false,
+    captureController = rememberCaptureController(),
 )

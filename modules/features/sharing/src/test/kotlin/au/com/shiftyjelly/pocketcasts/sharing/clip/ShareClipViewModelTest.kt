@@ -12,7 +12,13 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharing.FakeTracker
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.sharing.TrackEvent
 import au.com.shiftyjelly.pocketcasts.sharing.clip.FakeClipPlayer.PlaybackState
+import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import java.io.IOException
 import java.util.Date
 import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
@@ -23,9 +29,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -34,7 +42,11 @@ class ShareClipViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    @get:Rule
+    val tempDir = TemporaryFolder()
+
     private val clipPlayer = FakeClipPlayer()
+    private val sharingClient = FakeClipSharingClient()
     private val tracker = FakeTracker()
     private val episodeManager = mock<EpisodeManager>()
     private val podcastManager = mock<PodcastManager>()
@@ -58,6 +70,7 @@ class ShareClipViewModelTest {
             episode.uuid,
             clipRange,
             clipPlayer,
+            sharingClient,
             ClipAnalytics(
                 episodeId = episode.uuid,
                 podcastId = podcast.uuid,
@@ -169,7 +182,7 @@ class ShareClipViewModelTest {
 
             assertEquals(
                 TrackEvent(
-                    AnalyticsEvent.CLIP_SCREEN_PLAY_TAPPED,
+                    AnalyticsEvent.SHARE_SCREEN_PLAY_TAPPED,
                     mapOf(
                         "episode_uuid" to "episode-id",
                         "podcast_uuid" to "podcast-id",
@@ -194,7 +207,7 @@ class ShareClipViewModelTest {
 
             assertEquals(
                 TrackEvent(
-                    AnalyticsEvent.CLIP_SCREEN_PAUSE_TAPPED,
+                    AnalyticsEvent.SHARE_SCREEN_PAUSE_TAPPED,
                     mapOf(
                         "episode_uuid" to "episode-id",
                         "podcast_uuid" to "podcast-id",
@@ -211,14 +224,15 @@ class ShareClipViewModelTest {
 
     @Test
     fun `track screen show event`() = runTest {
-        viewModel.onClipScreenShown()
+        viewModel.onScreenShown()
 
         val event = tracker.events.last()
 
         assertEquals(
             TrackEvent(
-                AnalyticsEvent.CLIP_SCREEN_SHOWN,
+                AnalyticsEvent.SHARE_SCREEN_SHOWN,
                 mapOf(
+                    "type" to "clip",
                     "episode_uuid" to "episode-id",
                     "podcast_uuid" to "podcast-id",
                     "clip_uuid" to "clip-id",
@@ -230,14 +244,22 @@ class ShareClipViewModelTest {
     }
 
     @Test
-    fun `sharing clip link tracks no changes to the clip`() = runTest {
-        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange))
+    fun `track sharing clip link`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
 
         val event = tracker.events.last()
 
         assertEquals(
             TrackEvent(
-                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
                     "podcast_uuid" to "podcast-id",
@@ -247,6 +269,8 @@ class ShareClipViewModelTest {
                     "end" to 30,
                     "start_modified" to false,
                     "end_modified" to false,
+                    "type" to "link",
+                    "card_type" to "vertical",
                 ),
             ),
             event,
@@ -254,14 +278,90 @@ class ShareClipViewModelTest {
     }
 
     @Test
-    fun `sharing clip link tracks changes to the clip start`() = runTest {
-        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange.copy(start = 7.seconds)))
+    fun `track sharing audio clip`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.PocketCasts,
+            CardType.Audio,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
 
         val event = tracker.events.last()
 
         assertEquals(
             TrackEvent(
-                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
+                mapOf(
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "clip_uuid" to "clip-id",
+                    "source" to "player",
+                    "start" to 15,
+                    "end" to 30,
+                    "start_modified" to false,
+                    "end_modified" to false,
+                    "type" to "audio",
+                    "card_type" to "audio",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track sharing video clip`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.Instagram,
+            CardType.Square,
+            SourceView.PLAYER,
+            createBackgroundAsset = { Result.success(tempDir.newFile()) },
+        )
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
+                mapOf(
+                    "episode_uuid" to "episode-id",
+                    "podcast_uuid" to "podcast-id",
+                    "clip_uuid" to "clip-id",
+                    "source" to "player",
+                    "start" to 15,
+                    "end" to 30,
+                    "start_modified" to false,
+                    "end_modified" to false,
+                    "type" to "video",
+                    "card_type" to "square",
+                ),
+            ),
+            event,
+        )
+    }
+
+    @Test
+    fun `track sharink clip with different start timestamp`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange.copy(start = 7.seconds),
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
+
+        val event = tracker.events.last()
+
+        assertEquals(
+            TrackEvent(
+                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
                     "podcast_uuid" to "podcast-id",
@@ -271,6 +371,8 @@ class ShareClipViewModelTest {
                     "end" to 30,
                     "start_modified" to true,
                     "end_modified" to false,
+                    "type" to "link",
+                    "card_type" to "vertical",
                 ),
             ),
             event,
@@ -278,14 +380,22 @@ class ShareClipViewModelTest {
     }
 
     @Test
-    fun `sharing clip link tracks changes to the clip end`() = runTest {
-        viewModel.onClipLinkShared(Clip.fromEpisode(episode, clipRange.copy(end = 20.seconds)))
+    fun `track sharing clip with different end timestamp`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange.copy(end = 20.seconds),
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
 
         val event = tracker.events.last()
 
         assertEquals(
             TrackEvent(
-                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
                     "podcast_uuid" to "podcast-id",
@@ -295,6 +405,8 @@ class ShareClipViewModelTest {
                     "end" to 20,
                     "start_modified" to false,
                     "end_modified" to true,
+                    "type" to "link",
+                    "card_type" to "vertical",
                 ),
             ),
             event,
@@ -302,14 +414,22 @@ class ShareClipViewModelTest {
     }
 
     @Test
-    fun `sharing clip link tracks changes to the whole clip`() = runTest {
-        viewModel.onClipLinkShared(Clip.fromEpisode(episode, Clip.Range(17.seconds, 34.seconds)))
+    fun `track sharing clip with different timestamps`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            Clip.Range(17.seconds, 34.seconds),
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
 
         val event = tracker.events.last()
 
         assertEquals(
             TrackEvent(
-                AnalyticsEvent.CLIP_SCREEN_LINK_SHARED,
+                AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
                     "podcast_uuid" to "podcast-id",
@@ -319,9 +439,94 @@ class ShareClipViewModelTest {
                     "end" to 34,
                     "start_modified" to true,
                     "end_modified" to true,
+                    "type" to "link",
+                    "card_type" to "vertical",
                 ),
             ),
             event,
         )
+    }
+
+    @Test
+    fun `sharing clip changes sharing status`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(false, awaitItem().isSharing)
+
+            viewModel.shareClip(
+                podcast,
+                episode,
+                clipRange,
+                SocialPlatform.PocketCasts,
+                CardType.Vertical,
+                SourceView.PLAYER,
+                createBackgroundAsset = { error("Unexpected operation") },
+            )
+
+            assertEquals(true, awaitItem().isSharing)
+            assertEquals(false, awaitItem().isSharing)
+        }
+    }
+
+    @Test
+    fun `share clip link`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
+        val request = sharingClient.request!!
+
+        assertTrue(request.data is SharingRequest.Data.ClipLink)
+    }
+
+    @Test
+    fun `share audio clip`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.PocketCasts,
+            CardType.Audio,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
+        val request = sharingClient.request!!
+
+        assertTrue(request.data is SharingRequest.Data.ClipAudio)
+    }
+
+    @Test
+    fun `share video clip`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.Instagram,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { Result.success(tempDir.newFile()) },
+        )
+        val request = sharingClient.request!!
+
+        assertTrue(request.data is SharingRequest.Data.ClipVideo)
+    }
+
+    @Test
+    fun `fail to share video clip when there is no background asset`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            clipRange,
+            SocialPlatform.Instagram,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { Result.failure(IOException("Whoops!")) },
+        )
+
+        assertNull(sharingClient.request)
     }
 }

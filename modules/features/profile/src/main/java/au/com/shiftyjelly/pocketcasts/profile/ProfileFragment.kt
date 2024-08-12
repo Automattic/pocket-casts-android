@@ -288,9 +288,14 @@ class ProfileFragment : BaseFragment() {
                 val isKidsBannerVisible = showKidsBanner && FeatureFlag.isEnabled(Feature.KIDS_PROFILE)
 
                 if (isKidsBannerVisible) {
+                    analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_SEEN)
                     KidsProfileCard(
-                        onDismiss = { viewModel.dismissKidsBanner() },
+                        onDismiss = {
+                            analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_DISMISSED)
+                            viewModel.dismissKidsBanner()
+                        },
                         onRequestEarlyAccess = {
+                            analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_EARLY_ACCESS_REQUESTED)
                             KidsBottomSheetDialog().show(parentFragmentManager, "KidsBottomSheetDialog")
                         },
                     )

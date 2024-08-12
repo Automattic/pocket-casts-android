@@ -19,6 +19,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -48,39 +50,62 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.removeNewLines
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+object SearchBarDefaults {
+    @Composable
+    fun colors(
+        cursorColor: Color = MaterialTheme.theme.colors.primaryText02,
+        textColor: Color = MaterialTheme.theme.colors.primaryText01,
+        disabledTextColor: Color = MaterialTheme.theme.colors.primaryText01,
+        placeholderColor: Color = MaterialTheme.theme.colors.primaryText02,
+        disabledPlaceholderColor: Color = MaterialTheme.theme.colors.primaryText02,
+        leadingIconColor: Color = MaterialTheme.theme.colors.primaryIcon02,
+        disabledLeadingIconColor: Color = MaterialTheme.theme.colors.primaryIcon02,
+        trailingIconColor: Color = MaterialTheme.theme.colors.primaryIcon02,
+        disabledTrailingIconColor: Color = MaterialTheme.theme.colors.primaryIcon02,
+        backgroundColor: Color = MaterialTheme.theme.colors.primaryField01,
+        focusedBorderColor: Color = Color.Transparent,
+        unfocusedBorderColor: Color = Color.Transparent,
+        disabledBorderColorColor: Color = Color.Transparent,
+
+    ) = TextFieldDefaults.outlinedTextFieldColors(
+        cursorColor = cursorColor,
+        textColor = textColor,
+        disabledTextColor = disabledTextColor,
+        placeholderColor = placeholderColor,
+        disabledPlaceholderColor = disabledPlaceholderColor,
+        leadingIconColor = leadingIconColor,
+        disabledLeadingIconColor = disabledLeadingIconColor,
+        trailingIconColor = trailingIconColor,
+        disabledTrailingIconColor = disabledTrailingIconColor,
+        backgroundColor = backgroundColor,
+        focusedBorderColor = focusedBorderColor,
+        unfocusedBorderColor = unfocusedBorderColor,
+        disabledBorderColor = disabledBorderColorColor,
+    )
+}
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchBar(
     text: String,
     onTextChanged: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     onSearch: () -> Unit = {},
-    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
+    cornerRadius: Dp = 10.dp,
+    colors: TextFieldColors = SearchBarDefaults.colors(),
 ) {
     val focusManager = LocalFocusManager.current
-    val colors = TextFieldDefaults.outlinedTextFieldColors(
-        cursorColor = MaterialTheme.theme.colors.primaryText02,
-        textColor = MaterialTheme.theme.colors.primaryText01,
-        disabledTextColor = MaterialTheme.theme.colors.primaryText01,
-        placeholderColor = MaterialTheme.theme.colors.primaryText02,
-        disabledPlaceholderColor = MaterialTheme.theme.colors.primaryText02,
-        leadingIconColor = MaterialTheme.theme.colors.primaryIcon02,
-        disabledLeadingIconColor = MaterialTheme.theme.colors.primaryIcon02,
-        trailingIconColor = MaterialTheme.theme.colors.primaryIcon02,
-        disabledTrailingIconColor = MaterialTheme.theme.colors.primaryIcon02,
-        backgroundColor = MaterialTheme.theme.colors.primaryField01,
-        focusedBorderColor = Color.Transparent,
-        unfocusedBorderColor = Color.Transparent,
-        disabledBorderColor = Color.Transparent,
-    )
     val textColor = textStyle.color.takeOrElse {
         colors.textColor(enabled).value
     }
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
-    val shape = RoundedCornerShape(10.dp)
+    val shape = RoundedCornerShape(cornerRadius)
     BasicTextField(
         value = text,
         onValueChange = {
@@ -123,13 +148,13 @@ fun SearchBar(
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
-                leadingIcon = {
+                leadingIcon = leadingIcon ?: {
                     Icon(
                         painter = painterResource(IR.drawable.ic_search),
                         contentDescription = null,
                     )
                 },
-                trailingIcon = {
+                trailingIcon = trailingIcon ?: {
                     if (text.isNotEmpty()) {
                         IconButton(
                             onClick = {

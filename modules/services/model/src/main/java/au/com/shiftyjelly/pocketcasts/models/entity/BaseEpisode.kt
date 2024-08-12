@@ -43,6 +43,7 @@ sealed interface BaseEpisode {
     var downloadErrorDetails: String?
     var deselectedChapters: ChapterIndices
     var deselectedChaptersModified: Date?
+    var isStarred: Boolean
 
     // temporary variables
     var playing: Boolean

@@ -30,13 +30,16 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -49,7 +52,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun KidsSendFeedbackDialog(
     modifier: Modifier = Modifier,
-    onSubmitFeedback: () -> Unit,
+    onSeen: () -> Unit,
+    onSubmitFeedback: (String) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -59,7 +63,11 @@ fun KidsSendFeedbackDialog(
     val onFeedbackTapped = {
         keyboardController?.hide()
         focusManager.clearFocus()
-        onSubmitFeedback()
+        onSubmitFeedback(feedbackText.text)
+    }
+
+    CallOnce {
+        onSeen()
     }
 
     LaunchedEffect(Unit) {
@@ -105,6 +113,7 @@ fun KidsSendFeedbackDialog(
                         feedbackText = it
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = MaterialTheme.theme.colors.primaryText01,
                         placeholderColor = MaterialTheme.theme.colors.primaryText02,
                         backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                         focusedBorderColor = MaterialTheme.theme.colors.primaryUi05,
@@ -118,6 +127,9 @@ fun KidsSendFeedbackDialog(
                             color = MaterialTheme.theme.colors.primaryText02,
                         )
                     },
+                    textStyle = TextStyle(
+                        fontSize = 13.sp,
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
@@ -130,6 +142,7 @@ fun KidsSendFeedbackDialog(
                     contentDescription = stringResource(LR.string.send_feedback),
                     onClick = { onFeedbackTapped() },
                     includePadding = false,
+                    enabled = feedbackText.text.isNotEmpty(),
                     textColor = MaterialTheme.theme.colors.primaryInteractive02,
                     modifier = Modifier.padding(bottom = 12.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -146,6 +159,7 @@ fun KidsSendFeedbackDialog(
 fun PreviewKidsSendFeedbackDialog(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         KidsSendFeedbackDialog(
+            onSeen = {},
             onSubmitFeedback = {},
         )
     }
