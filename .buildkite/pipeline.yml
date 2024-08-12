@@ -57,11 +57,9 @@ steps:
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
 
-  - group: "🛠 Prototype Builds"
-    steps:
-      - label: "🛠 Prototype Build: Mobile App"
-        command: |
-          ".buildkite/commands/prototype-build.sh"
-        if: build.pull_request.id != null
-        plugins: [$CI_TOOLKIT]
-
+  - label: "Prototype Builds"
+    command: |
+      ".buildkite/commands/prototype-build.sh"
+    plugins: [ $CI_TOOLKIT ]
+    artifact_paths:
+      - "**/build/outputs/apk/**/*"
