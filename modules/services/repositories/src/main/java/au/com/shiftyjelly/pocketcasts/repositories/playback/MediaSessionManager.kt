@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
@@ -168,7 +169,9 @@ class MediaSessionManager(
         val upNextQueueChanges = playbackManager.upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
             .distinctUntilChanged { stateOne, stateTwo ->
                 UpNextQueue.State.isEqualWithEpisodeCompare(stateOne, stateTwo) { episodeOne, episodeTwo ->
-                    episodeOne.uuid == episodeTwo.uuid && episodeOne.duration == episodeTwo.duration
+                    episodeOne.uuid == episodeTwo.uuid &&
+                    episodeOne.duration == episodeTwo.duration &&
+                    episodeOne.isStarred == episodeTwo.isStarred
                 }
             }
 
@@ -394,6 +397,10 @@ class MediaSessionManager(
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, episode.durationMs.toLong())
             .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Podcast")
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, episode.title)
+
+        if (episode is PodcastEpisode) {
+            nowPlayingBuilder.putRating(MediaMetadataCompat.METADATA_KEY_RATING, RatingCompat.newHeartRating(episode.isStarred))
+        }
 
         if (podcast != null && podcast.author.isNotEmpty()) {
             nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, podcast.author)

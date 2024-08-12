@@ -39,7 +39,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "podcast_id") var podcastUuid: String = "",
     @ColumnInfo(name = "added_date") override var addedDate: Date = Date(),
     @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = 0,
-    @ColumnInfo(name = "starred") var isStarred: Boolean = false,
+    @ColumnInfo(name = "starred") override var isStarred: Boolean = false,
     @ColumnInfo(name = "thumbnail_status") var thumbnailStatus: Int = THUMBNAIL_STATUS_UNKNOWN,
     @ColumnInfo(name = "last_download_attempt_date") override var lastDownloadAttemptDate: Date? = null,
     @ColumnInfo(name = "playing_status_modified") override var playingStatusModified: Long? = null,
