@@ -544,6 +544,9 @@ private fun KeyboardClipSelector(
                 value = clipRange.start,
                 episodeDuration = episodeDuration,
                 shareColors = shareColors,
+                hoursDescription = stringResource(LR.string.share_start_hours),
+                minutesDescription = stringResource(LR.string.share_start_minutes),
+                secondsDescription = stringResource(LR.string.share_start_seconds),
                 onValueChanged = listener::onUpdateClipStart,
             )
         }
@@ -566,6 +569,9 @@ private fun KeyboardClipSelector(
                 value = clipRange.end,
                 episodeDuration = episodeDuration,
                 shareColors = shareColors,
+                hoursDescription = stringResource(LR.string.share_end_hours),
+                minutesDescription = stringResource(LR.string.share_end_minutes),
+                secondsDescription = stringResource(LR.string.share_end_seconds),
                 onValueChanged = listener::onUpdateClipEnd,
             )
         }
@@ -577,6 +583,9 @@ private fun HhMmSsTextInput(
     value: Duration,
     episodeDuration: Duration,
     shareColors: ShareColors,
+    hoursDescription: String,
+    minutesDescription: String,
+    secondsDescription: String,
     onValueChanged: (Duration) -> Unit,
 ) {
     var hours by remember { mutableStateOf(value.inWholeHours.hours) }
@@ -598,6 +607,7 @@ private fun HhMmSsTextInput(
                 ),
                 showSeparator = true,
                 shareColors = shareColors,
+                contentDescription = hoursDescription,
                 onValueChanged = {
                     hours = it
                     onValueChanged(hours + minutes + seconds)
@@ -614,6 +624,7 @@ private fun HhMmSsTextInput(
                 ),
                 showSeparator = true,
                 shareColors = shareColors,
+                contentDescription = minutesDescription,
                 onValueChanged = {
                     minutes = it
                     onValueChanged(hours + minutes + seconds)
@@ -630,6 +641,7 @@ private fun HhMmSsTextInput(
                 ),
                 showSeparator = false,
                 shareColors = shareColors,
+                contentDescription = secondsDescription,
                 onValueChanged = {
                     seconds = it
                     onValueChanged(hours + minutes + seconds)
@@ -645,6 +657,7 @@ private fun TimeTextField(
     formatter: DurationFormatter,
     showSeparator: Boolean,
     shareColors: ShareColors,
+    contentDescription: String,
     onValueChanged: (Duration) -> Unit,
 ) {
     var displyedValue by remember { mutableStateOf(TextFieldValue(formatter.durationToComponenet(value).toString())) }
@@ -680,7 +693,8 @@ private fun TimeTextField(
                 if (event.isFocused) {
                     displyedValue = displyedValue.copy(selection = TextRange(Int.MAX_VALUE))
                 }
-            },
+            }
+            .semantics { this.contentDescription = contentDescription },
     )
 }
 
