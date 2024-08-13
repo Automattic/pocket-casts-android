@@ -133,6 +133,7 @@ fun TranscriptToolbar(
         Box(
             contentAlignment = Alignment.TopEnd,
             modifier = Modifier
+                .padding(top = 8.dp)
                 .fillMaxSize(),
         ) {
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
