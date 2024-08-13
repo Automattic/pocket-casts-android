@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -33,7 +36,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -63,8 +65,12 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private val ContentOffsetTop = 64.dp
+private val ContentOffsetBottom = 80.dp
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -184,30 +190,23 @@ private fun ScrollableTranscriptTextView(
     bottomPadding: Dp,
 ) {
     val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
-    /* Blank lines are appended to add content padding */
-    val blankLines = "\n\n"
-    val displayString = buildAnnotatedString {
-        withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
-            with(state.cuesWithTimingSubtitle) {
-                append(blankLines)
-                (0 until count()).forEach { index ->
-                    get(index).cues.forEach { cue ->
-                        withStyle(style = defaultTextStyle) { append(cue.text) }
-                    }
+    val displayString = buildString {
+        with(state.cuesWithTimingSubtitle) {
+            (0 until count()).forEach { index ->
+                get(index).cues.forEach { cue ->
+                    append(cue.text)
                 }
-                append(blankLines)
             }
         }
     }
-    val scrollState = rememberScrollState()
-    val textModifier = Modifier
+    val scrollState = rememberLazyListState()
+    val scrollableContentModifier = Modifier
         .padding(horizontal = 16.dp)
         .padding(bottom = bottomPadding)
-        .verticalScroll(scrollState)
         .verticalScrollBar(
             thumbColor = colors.textColor(),
             scrollState = scrollState,
-            contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
+            contentPadding = PaddingValues(top = ContentOffsetTop, bottom = ContentOffsetBottom),
         )
 
     val customMenu = buildList {
@@ -222,11 +221,29 @@ private fun ScrollableTranscriptTextView(
             LocalClipboardManager.current,
         ),
     ) {
-        SelectionContainer {
-            Text(
-                text = displayString,
-                modifier = textModifier,
-            )
+        LazyColumn(
+            state = scrollState,
+            modifier = scrollableContentModifier,
+            contentPadding = PaddingValues(top = ContentOffsetTop, bottom = ContentOffsetBottom),
+        ) {
+            itemsIndexed(displayString.splitIgnoreEmpty("\n\n")) { _, item ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                ) {
+                    SelectionContainer {
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(defaultTextStyle) {
+                                    append(item)
+                                }
+                            },
+                            lineHeight = 30.sp,
+                        )
+                    }
+                }
+            }
         }
     }
 }
