@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -30,10 +29,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
-import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -43,7 +41,6 @@ internal fun UpgradePlusLayoutExperiment(
     state: OnboardingUpgradeFeaturesState.Loaded,
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,
-    onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
@@ -77,25 +74,15 @@ internal fun UpgradePlusLayoutExperiment(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End,
                     ) {
-                        NavigationIconButton(
-                            onNavigationClick = onBackPressed,
-                            iconColor = Color.White,
+                        TextP30(
+                            text = stringResource(R.string.not_now),
+                            color = Color.White,
                             modifier = Modifier
-                                .height(48.dp)
-                                .width(48.dp),
+                                .padding(start = 24.dp, end = 24.dp, top = 8.dp)
+                                .clickable { onNotNowPressed() },
                         )
-                        if (state.showNotNow) {
-                            TextH30(
-                                text = stringResource(R.string.not_now),
-                                color = Color.White,
-                                modifier = Modifier
-                                    .padding(horizontal = 24.dp)
-                                    .clickable { onNotNowPressed() },
-                            )
-                        }
                     }
 
                     Spacer(Modifier.weight(1f))

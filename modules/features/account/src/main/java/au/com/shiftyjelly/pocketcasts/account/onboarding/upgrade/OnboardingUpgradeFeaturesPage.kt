@@ -127,7 +127,6 @@ internal fun OnboardingUpgradeFeaturesPage(
                     state = loadedState,
                     source = source,
                     scrollState = scrollState,
-                    onBackPressed = onBackPressed,
                     onNotNowPressed = onNotNowPressed,
                     onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
                     onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
