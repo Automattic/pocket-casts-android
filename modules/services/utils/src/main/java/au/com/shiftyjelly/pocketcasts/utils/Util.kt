@@ -63,7 +63,7 @@ object Util {
 
     fun isTalkbackOn(context: Context): Boolean {
         val am = context.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager?
-        return am?.isEnabled == true
+        return am?.isEnabled == true && am.isTouchExplorationEnabled == true
     }
 
     @Suppress("NAME_SHADOWING")
