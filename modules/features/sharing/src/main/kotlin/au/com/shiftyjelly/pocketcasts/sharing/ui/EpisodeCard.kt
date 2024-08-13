@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -17,7 +18,7 @@ internal fun EpisodeCard(
     captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = cardType == CardType.Vertical,
-    customSize: DpSize? = null,
+    constrainedSize: (maxWidth: Dp, maxHeight: Dp) -> DpSize = { width, height -> DpSize(width, height) },
 ) = when (cardType) {
     CardType.Vertical -> VerticalEpisodeCard(
         episode = episode,
@@ -26,7 +27,7 @@ internal fun EpisodeCard(
         shareColors = shareColors,
         captureController = captureController,
         useHeightForAspectRatio = useHeightForAspectRatio,
-        customSize = customSize,
+        constrainedSize = constrainedSize,
         modifier = modifier,
     )
     CardType.Horizontal -> HorizontalEpisodeCard(
@@ -36,7 +37,7 @@ internal fun EpisodeCard(
         shareColors = shareColors,
         captureController = captureController,
         useHeightForAspectRatio = useHeightForAspectRatio,
-        customSize = customSize,
+        constrainedSize = constrainedSize,
         modifier = modifier,
     )
     CardType.Square -> SquareEpisodeCard(
@@ -45,7 +46,7 @@ internal fun EpisodeCard(
         useEpisodeArtwork = useEpisodeArtwork,
         shareColors = shareColors,
         captureController = captureController,
-        customSize = customSize,
+        constrainedSize = constrainedSize,
         modifier = modifier,
     )
 }

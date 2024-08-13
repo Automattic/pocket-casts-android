@@ -9,6 +9,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.coerceAtMost
+import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -113,7 +116,7 @@ private fun VerticalShareEpisodeTimestampPage(
                 }
             }
         },
-        middleContent = { cardType, modifier ->
+        middleContent = { cardType, cardSize, modifier ->
             if (podcast != null && episode != null) {
                 val captureController = assetController.captureController(cardType)
                 EpisodeCard(
@@ -123,6 +126,7 @@ private fun VerticalShareEpisodeTimestampPage(
                     useEpisodeArtwork = useEpisodeArtwork,
                     shareColors = shareColors,
                     captureController = captureController,
+                    constrainedSize = { _, _ -> cardSize },
                     modifier = modifier,
                 )
             }
@@ -165,6 +169,7 @@ private fun HorizontalShareEpisodeTimestampPage(
                     episode = episode,
                     useEpisodeArtwork = useEpisodeArtwork,
                     shareColors = shareColors,
+                    constrainedSize = { maxWidth, maxHeight -> DpSize(maxWidth.coerceAtMost(400.dp), maxHeight) },
                     captureController = assetController.captureController(CardType.Horizontal),
                 )
             }

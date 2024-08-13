@@ -34,6 +34,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -51,7 +52,7 @@ internal fun VerticalSharePage(
     snackbarHostState: SnackbarHostState,
     onClose: () -> Unit,
     onShareToPlatform: (SocialPlatform, VisualCardType) -> Unit,
-    middleContent: @Composable (VisualCardType, Modifier) -> Unit,
+    middleContent: @Composable (VisualCardType, DpSize, Modifier) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -146,7 +147,7 @@ private fun MiddleContent(
     scrollState: ScrollState,
     pagerState: PagerState,
     topContentHeight: Int,
-    middleContent: @Composable (VisualCardType, Modifier) -> Unit,
+    middleContent: @Composable (VisualCardType, DpSize, Modifier) -> Unit,
 ) {
     var indicatorHeight by remember { mutableIntStateOf(0) }
     Row(
@@ -174,7 +175,7 @@ private fun MiddleContent(
             .offset { coordiantes.offset(cardType) }
             .fillMaxSize()
             .padding(coordiantes.padding)
-        middleContent(cardType, modifier)
+        middleContent(cardType, coordiantes.size, modifier)
     }
 }
 
