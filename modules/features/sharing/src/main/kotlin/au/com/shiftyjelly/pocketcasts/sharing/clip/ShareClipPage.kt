@@ -726,6 +726,12 @@ private fun AnimatedVisiblity(
 @Composable
 private fun ShareClipVerticalRegularPreview() = ShareClipPagePreview()
 
+@Preview(name = "Regular keyboard", device = Devices.PortraitRegular, group = "vertical")
+@Composable
+private fun ShareClipVerticalRegularKeyboardPreview() = ShareClipPagePreview(
+    useKeyboardInput = true,
+)
+
 @Preview(name = "Regular sharing", device = Devices.PortraitRegular, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularSharingPreview() = ShareClipPagePreview(
@@ -746,6 +752,12 @@ private fun ShareClipVerticalSmallPreviewPreview() = ShareClipPagePreview()
 @Preview(name = "Regular", device = Devices.LandscapeRegular, group = "horizontal")
 @Composable
 private fun ShareClipHorizontalRegularPreview() = ShareClipPagePreview()
+
+@Preview(name = "Regular keyboard", device = Devices.LandscapeRegular, group = "horizontal")
+@Composable
+private fun ShareClipHorizontalRegularKeyboardPreview() = ShareClipPagePreview(
+    useKeyboardInput = true,
+)
 
 @Preview(name = "Regular sharing", device = Devices.LandscapeRegular, group = "horizontal")
 @Composable

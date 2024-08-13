@@ -15,46 +15,69 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipPageListener
@@ -64,6 +87,7 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -473,8 +497,233 @@ private fun KeyboardClipSelector(
     listener: ShareClipPageListener,
     modifier: Modifier = Modifier,
 ) {
-    println(listOf(episodeDuration, clipRange, isPlaying, shareColors, listener, modifier))
-    println(clipRange)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.wrapContentSize(),
+    ) {
+        Box(
+            modifier = Modifier
+                .background(shareColors.timeline, RoundedCornerShape(8.dp))
+                .width(72.dp)
+                .height(72.dp),
+        ) {
+            Image(
+                painter = painterResource(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
+                contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
+                colorFilter = ColorFilter.tint(shareColors.playPauseButton),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(
+                        interactionSource = remember(::MutableInteractionSource),
+                        indication = rememberRipple(color = shareColors.base),
+                        onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
+                        role = Role.Button,
+                        onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
+                    )
+                    .padding(16.dp),
+            )
+        }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .background(shareColors.timeline, RoundedCornerShape(8.dp))
+                .weight(1f)
+                .heightIn(min = 72.dp)
+                .padding(12.dp),
+        ) {
+            TextH50(
+                text = stringResource(LR.string.share_start_position),
+                color = shareColors.backgroundSecondaryText,
+            )
+            Spacer(
+                modifier = Modifier.height(2.dp),
+            )
+            HhMmSsTextInput(
+                value = clipRange.start,
+                episodeDuration = episodeDuration,
+                shareColors = shareColors,
+                onValueChanged = listener::onUpdateClipStart,
+            )
+        }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .background(shareColors.timeline, RoundedCornerShape(8.dp))
+                .weight(1f)
+                .heightIn(min = 72.dp)
+                .padding(12.dp),
+        ) {
+            TextH50(
+                text = stringResource(LR.string.share_end_position),
+                color = shareColors.backgroundSecondaryText,
+            )
+            Spacer(
+                modifier = Modifier.height(2.dp),
+            )
+            HhMmSsTextInput(
+                value = clipRange.end,
+                episodeDuration = episodeDuration,
+                shareColors = shareColors,
+                onValueChanged = listener::onUpdateClipEnd,
+            )
+        }
+    }
+}
+
+@Composable
+private fun HhMmSsTextInput(
+    value: Duration,
+    episodeDuration: Duration,
+    shareColors: ShareColors,
+    onValueChanged: (Duration) -> Unit,
+) {
+    var hours by remember { mutableStateOf(value.inWholeHours.hours) }
+    var minutes by remember { mutableStateOf((value.inWholeMinutes % 60).minutes) }
+    var seconds by remember { mutableStateOf((value.inWholeSeconds % 60).seconds) }
+
+    val maxHours = episodeDuration.inWholeHours
+    val maxMinutes = if (maxHours == 0L) episodeDuration.inWholeMinutes else 59
+    val maxSeconds = if (maxMinutes == 0L) episodeDuration.inWholeSeconds else 59
+
+    Row {
+        if (maxHours > 0) {
+            TimeTextField(
+                value = value,
+                formatter = DurationFormatter(
+                    maxComponentValue = maxHours,
+                    durationToComponenet = { it.inWholeHours },
+                    componentToDuration = { it.hours },
+                ),
+                showSeparator = true,
+                shareColors = shareColors,
+                onValueChanged = {
+                    hours = it
+                    onValueChanged(hours + minutes + seconds)
+                },
+            )
+        }
+        if (maxMinutes > 0) {
+            TimeTextField(
+                value = value,
+                formatter = DurationFormatter(
+                    maxComponentValue = maxMinutes,
+                    durationToComponenet = { it.inWholeMinutes % 60 },
+                    componentToDuration = { it.minutes },
+                ),
+                showSeparator = true,
+                shareColors = shareColors,
+                onValueChanged = {
+                    minutes = it
+                    onValueChanged(hours + minutes + seconds)
+                },
+            )
+        }
+        if (maxSeconds > 0) {
+            TimeTextField(
+                value = value,
+                formatter = DurationFormatter(
+                    maxComponentValue = maxSeconds,
+                    durationToComponenet = { it.inWholeSeconds % 60 },
+                    componentToDuration = { it.seconds },
+                ),
+                showSeparator = false,
+                shareColors = shareColors,
+                onValueChanged = {
+                    seconds = it
+                    onValueChanged(hours + minutes + seconds)
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun TimeTextField(
+    value: Duration,
+    formatter: DurationFormatter,
+    showSeparator: Boolean,
+    shareColors: ShareColors,
+    onValueChanged: (Duration) -> Unit,
+) {
+    var displyedValue by remember { mutableStateOf(TextFieldValue(formatter.durationToComponenet(value).toString())) }
+    val focusManager = LocalFocusManager.current
+    BasicTextField(
+        value = displyedValue,
+        onValueChange = { textFieldValue ->
+            val newValue = textFieldValue.text.replace("""[^0-9]+""".toRegex(), "").trimStart('0')
+            val longValue = newValue.toLongOrNull()?.takeIf { it <= formatter.maxComponentValue }
+            if (newValue.isEmpty() || longValue != null) {
+                displyedValue = textFieldValue.copy(text = newValue)
+                onValueChanged(longValue?.let { formatter.componentToDuration(it) } ?: Duration.ZERO)
+            }
+        },
+        maxLines = 1,
+        textStyle = TextStyle(
+            color = shareColors.backgroundPrimaryText,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.W500,
+        ),
+        cursorBrush = SolidColor(shareColors.backgroundPrimaryText),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next,
+        ),
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(FocusDirection.Next) },
+        ),
+        visualTransformation = HHMmSsVisualTransformation(showSeparator),
+        modifier = Modifier
+            .width(IntrinsicSize.Min)
+            .onFocusEvent { event ->
+                if (event.isFocused) {
+                    displyedValue = displyedValue.copy(selection = TextRange(Int.MAX_VALUE))
+                }
+            },
+    )
+}
+
+private class DurationFormatter(
+    val maxComponentValue: Long,
+    val durationToComponenet: (Duration) -> Long,
+    val componentToDuration: (Long) -> Duration,
+)
+
+private class HHMmSsVisualTransformation(
+    private val showSeparator: Boolean,
+) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val originalText = text.text
+        val formattedText = buildString {
+            append(originalText.padStart(2, ':'))
+            if (showSeparator) {
+                append(':')
+            }
+        }
+        val displayedText = buildString {
+            append(originalText.padStart(2, '0'))
+            if (showSeparator) {
+                append(':')
+            }
+        }
+
+        return TransformedText(
+            AnnotatedString(displayedText),
+            object : OffsetMapping {
+                override fun originalToTransformed(offset: Int): Int {
+                    return originalText.length.coerceAtLeast(2) - originalText.length + offset
+                }
+
+                override fun transformedToOriginal(offset: Int): Int {
+                    val precedingSeparatorCount = formattedText
+                        .mapIndexedNotNull { index, c -> index.takeIf { c == ':' } }
+                        .count { separatorIndex -> separatorIndex < offset }
+                    return offset - precedingSeparatorCount
+                }
+            },
+        )
+    }
 }
 
 @ShowkaseComposable(name = "Clip selector", group = "Sharing")
@@ -526,6 +775,12 @@ private fun ClipSelectorPlayedPreview() = ClipSelectorPreview(
     progressPlayback = 15.seconds,
 )
 
+@Preview(name = "Keyboard", device = Devices.PortraitRegular)
+@Composable
+private fun ClipSelectorKeyboardPreview() = ClipSelectorPreview(
+    useKeyboardInput = true,
+)
+
 @Composable
 private fun ClipSelectorPreview(
     clipStart: Duration = 0.seconds,
@@ -534,18 +789,20 @@ private fun ClipSelectorPreview(
     isPlaying: Boolean = false,
     firstVisibleItemIndex: Int = 0,
     scale: Float = 1f,
+    useKeyboardInput: Boolean = false,
 ) {
     val shareColors = ShareColors(Color(0xFFEC0404))
     Box(
         modifier = Modifier.background(shareColors.background),
     ) {
-        TouchClipSelector(
+        ClipSelector(
             episodeDuration = 5.minutes,
             clipRange = Clip.Range(clipStart, clipEnd),
             playbackProgress = progressPlayback,
             isPlaying = isPlaying,
             shareColors = shareColors,
             listener = ShareClipPageListener.Preview,
+            useKeyboardInput = useKeyboardInput,
             state = rememberClipSelectorState(
                 firstVisibleItemIndex = firstVisibleItemIndex,
                 scale = scale,
