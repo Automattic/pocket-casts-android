@@ -1,14 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.compose.extensions
 
 import android.view.KeyEvent
+import androidx.compose.animation.core.Spring.StiffnessMediumLow
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -24,8 +23,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
@@ -103,12 +100,11 @@ enum class FadeDirection {
 }
 
 fun Modifier.verticalScrollBar(
-    scrollState: ScrollState,
+    scrollState: LazyListState,
     width: Dp = 4.dp,
     thumbColor: Color,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) = composed {
-    var viewPortHeight by remember { mutableFloatStateOf(0f) }
     val density = LocalDensity.current
     val miScrollBarHeight = density.run { 50.dp.toPx() }
     val topPaddingPx = density.run { contentPadding.calculateTopPadding().toPx() }
@@ -123,21 +119,32 @@ fun Modifier.verticalScrollBar(
         label = "",
     )
 
+    val firstIndex by animateFloatAsState(
+        targetValue = scrollState.layoutInfo.visibleItemsInfo.firstOrNull()?.index?.toFloat() ?: 0f,
+        animationSpec = spring(stiffness = StiffnessMediumLow),
+        label = "",
+    )
+
+    val lastIndex by animateFloatAsState(
+        targetValue = scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index?.toFloat() ?: 0f,
+        animationSpec = spring(stiffness = StiffnessMediumLow),
+        label = "",
+    )
+
     drawWithContent {
         drawContent()
-        if (scrollState.maxValue == 0) {
-            return@drawWithContent
+        val itemsCount = scrollState.layoutInfo.totalItemsCount
+        if (itemsCount > 0 && thumbAlphaAnimated > 0f) {
+            val contentHeight = size.height - (topPaddingPx + bottomPaddingPx)
+            val scrollbarTop = firstIndex / itemsCount * contentHeight + topPaddingPx
+            val scrollBottom = (lastIndex + 1f) / itemsCount * contentHeight + bottomPaddingPx
+            val scrollbarHeight = (scrollBottom - scrollbarTop).coerceAtLeast(miScrollBarHeight)
+            drawRect(
+                color = thumbColor,
+                topLeft = Offset(size.width - width.toPx(), scrollbarTop),
+                size = Size(width.toPx(), scrollbarHeight),
+                alpha = thumbAlphaAnimated,
+            )
         }
-        val contentHeight = size.height - (topPaddingPx + bottomPaddingPx)
-        val scrollBarHeight = (viewPortHeight * viewPortHeight / contentHeight).coerceAtLeast(miScrollBarHeight)
-        val scrollHeight = viewPortHeight - scrollBarHeight - bottomPaddingPx
-        val scrollOffset = scrollHeight * scrollState.value / scrollState.maxValue + topPaddingPx
-
-        drawRect(
-            thumbColor,
-            Offset(size.width - width.toPx(), scrollState.value.toFloat() + scrollOffset),
-            Size(width.toPx(), scrollBarHeight),
-            thumbAlphaAnimated,
-        )
-    }.onGloballyPositioned { viewPortHeight = it.boundsInParent().height }
+    }
 }
