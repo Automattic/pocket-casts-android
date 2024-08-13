@@ -36,6 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class ShareClipFragment : BaseDialogFragment() {
@@ -70,6 +71,7 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, UR.style.Theme_ClipSharing)
         clipAnalytics = clipAnalyticsFactory.create(
             episodeId = args.episodeUuid,
             podcastId = args.podcastUuid,
