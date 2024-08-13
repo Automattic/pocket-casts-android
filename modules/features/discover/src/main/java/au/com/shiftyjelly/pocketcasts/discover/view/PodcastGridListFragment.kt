@@ -13,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
@@ -118,7 +117,6 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
 
     val onPodcastClicked: (DiscoverPodcast) -> Unit = { podcast ->
         listUuid?.let {
-            FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
         }
         val sourceView = when (expandedStyle) {
@@ -132,7 +130,6 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
 
     val onPodcastSubscribe: (String) -> Unit = { podcastUuid ->
         listUuid?.let {
-            FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
         }
         var podcastSubscribedSource = SourceView.DISCOVER
@@ -147,7 +144,6 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
 
     val onEpisodeClick: (DiscoverEpisode) -> Unit = { episode ->
         listUuid?.let { listUuid ->
-            FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
                 mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid),
@@ -178,7 +174,6 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, shareUrl ?: "")
             }
-            listUuid?.let { FirebaseAnalyticsTracker.listShared(it) }
             startActivity(Intent.createChooser(intent, getString(LR.string.podcasts_share_via)))
             return true
         }

@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
@@ -438,13 +437,7 @@ class MainActivity :
                     if (settings.selectedTab() != currentTab) {
                         trackTabOpened(currentTab)
                         when (currentTab) {
-                            VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
-                            VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
-                            VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> {
-                                resetEoYBadgeIfNeeded()
-                                FirebaseAnalyticsTracker.navigatedToProfile()
-                            }
+                            VR.id.navigation_profile -> resetEoYBadgeIfNeeded()
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -508,10 +501,6 @@ class MainActivity :
 
     override fun onResume() {
         super.onResume()
-
-        if (settings.selectedTab() == VR.id.navigation_discover) {
-            FirebaseAnalyticsTracker.navigatedToDiscover()
-        }
 
         refreshApp()
         addLineView()
@@ -1003,8 +992,6 @@ class MainActivity :
 
         updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
         UiUtil.hideKeyboard(binding.root)
-
-        FirebaseAnalyticsTracker.nowPlayingOpen()
 
         viewModel.isPlayerOpen = true
 

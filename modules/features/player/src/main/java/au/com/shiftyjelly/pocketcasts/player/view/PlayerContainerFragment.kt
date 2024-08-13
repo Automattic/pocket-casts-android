@@ -22,7 +22,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -137,8 +136,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     }
 
                     upNextFragment.onExpanded()
-
-                    FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
 
@@ -163,12 +160,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     adapter.isPlayerTab(position) -> {
                         if (previousPosition == INVALID_TAB_POSITION) return
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "now_playing"))
-                        FirebaseAnalyticsTracker.nowPlayingOpen()
                     }
 
                     adapter.isNotesTab(position) -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "show_notes"))
-                        FirebaseAnalyticsTracker.openedPlayerNotes()
                     }
 
                     adapter.isBookmarksTab(position) -> {
@@ -177,7 +172,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
                     adapter.isChaptersTab(position) -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to "chapters"))
-                        FirebaseAnalyticsTracker.openedPlayerChapters()
                     }
 
                     else -> {
