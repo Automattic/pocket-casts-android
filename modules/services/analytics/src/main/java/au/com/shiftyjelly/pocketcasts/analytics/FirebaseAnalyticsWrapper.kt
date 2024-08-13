@@ -7,8 +7,8 @@ import com.google.firebase.analytics.ktx.logEvent
 /**
  * A wrapper around Firebase Analytics to allow for mocking as the class is final.
  */
-open class FirebaseAnalyticsWrapper(private val firebaseAnalytics: FirebaseAnalytics?) {
+open class FirebaseAnalyticsWrapper(private val firebaseAnalytics: FirebaseAnalytics) {
     open fun logEvent(name: String, params: Bundle?) {
-        firebaseAnalytics?.logEvent(name, params)
+        firebaseAnalytics.logEvent(name, params)
     }
 }
