@@ -126,11 +126,10 @@ internal fun OnboardingUpgradeFeaturesPage(
                 UpgradePlusLayoutExperiment(
                     state = loadedState,
                     source = source,
-                    scrollState = scrollState,
                     onNotNowPressed = onNotNowPressed,
-                    onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
                     onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
                     onClickSubscribe = onClickSubscribe,
+                    scrollState = scrollState,
                     canUpgrade = canUpgrade,
                 )
             } else {

@@ -17,12 +17,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,11 +35,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
-import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 internal fun UpgradePlusLayoutExperiment(
@@ -42,7 +50,6 @@ internal fun UpgradePlusLayoutExperiment(
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,
     onNotNowPressed: () -> Unit,
-    onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
     onClickSubscribe: () -> Unit,
     canUpgrade: Boolean,
@@ -52,28 +59,23 @@ internal fun UpgradePlusLayoutExperiment(
         modifier = modifier.fillMaxHeight(),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        // Need this BoxWithConstraints so we can force the inner column to fill the screen with vertical scroll enabled
         BoxWithConstraints(
             Modifier
                 .fillMaxHeight()
-                .background(OnboardingUpgradeHelper.backgroundColor),
+                .background(Color.Black),
         ) {
-            OnboardingUpgradeHelper.UpgradeBackground(
-                modifier = Modifier.verticalScroll(scrollState),
-                tier = state.currentFeatureCard.subscriptionTier,
-                backgroundGlowsRes = state.currentFeatureCard.backgroundGlowsRes,
-            ) {
+            Box(modifier = Modifier.verticalScroll(scrollState)) {
                 Column(
                     Modifier
                         .windowInsetsPadding(WindowInsets.statusBars)
                         .windowInsetsPadding(WindowInsets.navigationBars)
-                        .heightIn(min = this.calculateMinimumHeightWithInsets())
-                        .padding(bottom = 100.dp), // Added to allow scrolling feature cards beyond upgrade button in large font sizes
+                        .heightIn(min = this@BoxWithConstraints.calculateMinimumHeightWithInsets())
+                        .padding(bottom = 100.dp),
                 ) {
-                    Spacer(Modifier.height(8.dp))
-
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
                         horizontalArrangement = Arrangement.End,
                     ) {
                         TextP30(
@@ -85,11 +87,23 @@ internal fun UpgradePlusLayoutExperiment(
                         )
                     }
 
-                    Spacer(Modifier.weight(1f))
-
                     Column {
                         Box(
-                            modifier = Modifier.heightIn(min = 70.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp, top = 24.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            SubscriptionBadgeForTier(
+                                tier = SubscriptionTier.PLUS,
+                                displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+                                fontSize = 16.sp,
+                                padding = 8.dp,
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier.padding(bottom = 20.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             AutoResizeText(
@@ -106,27 +120,9 @@ internal fun UpgradePlusLayoutExperiment(
                             )
                         }
 
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(20.dp))
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 24.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            StyledToggle(
-                                items = state.subscriptionFrequencies
-                                    .map { stringResource(id = it.localisedLabelRes) },
-                                defaultSelectedItemIndex = state.subscriptionFrequencies.indexOf(
-                                    state.currentSubscriptionFrequency,
-                                ),
-                            ) {
-                                val selectedFrequency = state.subscriptionFrequencies[it]
-                                onSubscriptionFrequencyChanged(selectedFrequency)
-                            }
-                        }
-
-                        FeatureCards(
+                        FeatureCards( // TODO: it will be replaced for the new one
                             state = state,
                             upgradeButton = state.currentUpgradeButton,
                             onFeatureCardChanged = onFeatureCardChanged,
@@ -139,9 +135,50 @@ internal fun UpgradePlusLayoutExperiment(
         }
 
         if (canUpgrade) {
-            UpgradeButton(
-                button = state.currentUpgradeButton,
-                onClickSubscribe = onClickSubscribe,
+            SubscribeButton(onClickSubscribe)
+        }
+    }
+}
+
+@Composable
+private fun SubscribeButton(
+    onClickSubscribe: () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Column {
+            Button(
+                onClick = onClickSubscribe,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 24.dp)
+                    .heightIn(min = 56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = colorResource(UR.color.plus_gold),
+                ),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 34.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    AutoResizeText(
+                        text = stringResource(LR.string.get_pocket_casts_plus),
+                        color = Color.Black,
+                        maxFontSize = 18.sp,
+                        lineHeight = 22.sp,
+                        fontWeight = FontWeight.W600,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+            Spacer(
+                modifier = Modifier
+                    .windowInsetsBottomHeight(WindowInsets.navigationBars),
             )
         }
     }
