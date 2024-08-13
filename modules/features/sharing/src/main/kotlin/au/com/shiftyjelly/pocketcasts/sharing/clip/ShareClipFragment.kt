@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipViewModel.SnackbarMe
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -92,6 +93,7 @@ class ShareClipFragment : BaseDialogFragment() {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
         val assetController = BackgroundAssetController.create(requireContext().applicationContext, shareColors)
         val listener = ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source)
+        val isTalkbackOn = Util.isTalkbackOn(requireContext())
 
         setContent {
             val uiState by viewModel.uiState.collectAsState()
@@ -107,6 +109,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 platforms = platforms,
                 shareColors = shareColors,
+                useKeyboardInput = isTalkbackOn,
                 assetController = assetController,
                 listener = listener,
                 snackbarHostState = snackbarHostState,

@@ -77,9 +77,43 @@ internal fun ClipSelector(
     playbackProgress: Duration,
     isPlaying: Boolean,
     shareColors: ShareColors,
+    useKeyboardInput: Boolean,
     listener: ShareClipPageListener,
     modifier: Modifier = Modifier,
     state: ClipSelectorState = rememberClipSelectorState(firstVisibleItemIndex = 0),
+) {
+    if (useKeyboardInput) {
+        KeyboardClipSelector(
+            episodeDuration = episodeDuration,
+            clipRange = clipRange,
+            isPlaying = isPlaying,
+            shareColors = shareColors,
+            listener = listener,
+        )
+    } else {
+        TouchClipSelector(
+            episodeDuration = episodeDuration,
+            clipRange = clipRange,
+            playbackProgress = playbackProgress,
+            isPlaying = isPlaying,
+            shareColors = shareColors,
+            listener = listener,
+            modifier = modifier,
+            state = state,
+        )
+    }
+}
+
+@Composable
+private fun TouchClipSelector(
+    episodeDuration: Duration,
+    clipRange: Clip.Range,
+    playbackProgress: Duration,
+    isPlaying: Boolean,
+    shareColors: ShareColors,
+    listener: ShareClipPageListener,
+    modifier: Modifier = Modifier,
+    state: ClipSelectorState,
 ) {
     val density = LocalDensity.current
     LaunchedEffect(state.scale) {
@@ -116,7 +150,7 @@ internal fun ClipSelector(
             Spacer(
                 modifier = Modifier.width(16.dp),
             )
-            ClipSelector(
+            ClipBox(
                 episodeDuration = episodeDuration,
                 clipRange = clipRange,
                 playbackProgress = playbackProgress,
@@ -145,7 +179,7 @@ internal fun ClipSelector(
 }
 
 @Composable
-private fun ClipSelector(
+private fun ClipBox(
     episodeDuration: Duration,
     clipRange: Clip.Range,
     playbackProgress: Duration,
@@ -163,7 +197,7 @@ private fun ClipSelector(
             state = state,
             listener = listener,
         )
-        ClipBox(
+        ClipWindow(
             episodeDuration = episodeDuration,
             clipRange = clipRange,
             playbackProgress = playbackProgress,
@@ -250,7 +284,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
 }
 
 @Composable
-private fun BoxWithConstraintsScope.ClipBox(
+private fun BoxWithConstraintsScope.ClipWindow(
     episodeDuration: Duration,
     clipRange: Clip.Range,
     playbackProgress: Duration,
@@ -344,7 +378,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                 Box(
                     modifier = Modifier
                         .width(2.dp)
-                        .height(this@ClipBox.maxHeight / 2)
+                        .height(this@ClipWindow.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
                         .background(shareColors.selectorHandle),
                 )
@@ -387,7 +421,7 @@ private fun BoxWithConstraintsScope.ClipBox(
                 Box(
                     modifier = Modifier
                         .width(2.dp)
-                        .height(this@ClipBox.maxHeight / 2)
+                        .height(this@ClipWindow.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
                         .background(shareColors.selectorHandle),
                 )
@@ -401,7 +435,7 @@ private fun BoxWithConstraintsScope.ClipBox(
             // centers content inside parent layout if the width is larger than parent.
             // We need to account for that automatic offset.
             val frameWidthPx = state.endOffset - state.startOffset + handleWidthPx
-            val maxWidthPx = with(LocalDensity.current) { this@ClipBox.maxWidth.toPx() }
+            val maxWidthPx = with(LocalDensity.current) { this@ClipWindow.maxWidth.toPx() }
             frameOffsetPx = if (frameWidthPx <= maxWidthPx) {
                 (state.startOffset - handleWidthPx / 2).roundToInt()
             } else {
@@ -428,6 +462,19 @@ private fun BoxWithConstraintsScope.ClipBox(
             )
         }
     }
+}
+
+@Composable
+private fun KeyboardClipSelector(
+    episodeDuration: Duration,
+    clipRange: Clip.Range,
+    isPlaying: Boolean,
+    shareColors: ShareColors,
+    listener: ShareClipPageListener,
+    modifier: Modifier = Modifier,
+) {
+    println(listOf(episodeDuration, clipRange, isPlaying, shareColors, listener, modifier))
+    println(clipRange)
 }
 
 @ShowkaseComposable(name = "Clip selector", group = "Sharing")
@@ -492,7 +539,7 @@ private fun ClipSelectorPreview(
     Box(
         modifier = Modifier.background(shareColors.background),
     ) {
-        ClipSelector(
+        TouchClipSelector(
             episodeDuration = 5.minutes,
             clipRange = Clip.Range(clipStart, clipEnd),
             playbackProgress = progressPlayback,
