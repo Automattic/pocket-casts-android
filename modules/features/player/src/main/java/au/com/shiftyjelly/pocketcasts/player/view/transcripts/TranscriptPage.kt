@@ -53,7 +53,6 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
@@ -66,7 +65,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -187,11 +185,7 @@ private fun ScrollableTranscriptTextView(
 ) {
     val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
     /* Blank lines are appended to add content padding */
-    val blankLines = if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
-        "<br><br>"
-    } else {
-        "\n\n"
-    }
+    val blankLines = "\n\n"
     val displayString = buildAnnotatedString {
         withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
             with(state.cuesWithTimingSubtitle) {
@@ -199,7 +193,6 @@ private fun ScrollableTranscriptTextView(
                 (0 until count()).forEach { index ->
                     get(index).cues.forEach { cue ->
                         withStyle(style = defaultTextStyle) { append(cue.text) }
-                        append(" ")
                     }
                 }
                 append(blankLines)
@@ -217,35 +210,23 @@ private fun ScrollableTranscriptTextView(
             contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
         )
 
-    if (state.transcript.type == TranscriptFormat.HTML.mimeType) {
-        /* Display html content using Android text view.
-               Html rendering in Compose text view is available in Compose 1.7.0 beta which is not yet production ready: https://rb.gy/ev7182 */
-        HtmlText(
-            html = displayString.toString(),
-            color = colors.textColor(),
-            textStyleResId = UR.style.H40,
-            selectable = true,
-            modifier = textModifier,
-        )
-    } else {
-        val customMenu = buildList {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                add(CustomMenuItemOption.Share)
-            }
+    val customMenu = buildList {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            add(CustomMenuItemOption.Share)
         }
-        CompositionLocalProvider(
-            LocalTextToolbar provides CustomTextToolbar(
-                LocalView.current,
-                customMenu,
-                LocalClipboardManager.current,
-            ),
-        ) {
-            SelectionContainer {
-                Text(
-                    text = displayString,
-                    modifier = textModifier,
-                )
-            }
+    }
+    CompositionLocalProvider(
+        LocalTextToolbar provides CustomTextToolbar(
+            LocalView.current,
+            customMenu,
+            LocalClipboardManager.current,
+        ),
+    ) {
+        SelectionContainer {
+            Text(
+                text = displayString,
+                modifier = textModifier,
+            )
         }
     }
 }
