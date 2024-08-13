@@ -43,7 +43,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -68,17 +67,23 @@ private val SearchBarPlaceholderColor = SearchBarIconColor
 fun TranscriptPageWrapper(
     playerViewModel: PlayerViewModel,
     transcriptViewModel: TranscriptViewModel,
+    searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+        val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
+        val searchQueryFlow = searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
 
         val configuration = LocalConfiguration.current
 
         var expandSearch by remember { mutableStateOf(false) }
         when (transitionState.value) {
             is TransitionState.CloseTranscript -> {
-                if (expandSearch) expandSearch = false
+                if (expandSearch) {
+                    expandSearch = false
+                    searchViewModel.onSearchDone()
+                }
             }
 
             else -> Unit
@@ -100,12 +105,22 @@ fun TranscriptPageWrapper(
                 onCloseClick = {
                     if (expandSearch) {
                         expandSearch = false
+                        searchViewModel.onSearchDone()
                     } else {
                         playerViewModel.closeTranscript(withTransition = true)
                     }
                 },
-                onSearchDoneClicked = { expandSearch = false },
+                onSearchDoneClicked = {
+                    expandSearch = false
+                    searchViewModel.onSearchDone()
+                },
                 onSearchClicked = { expandSearch = true },
+                searchText = searchQueryFlow.value,
+                searchOccurencesText = searchState.value.searchOccurencesText,
+                onSearchCleared = { searchViewModel.onSearchCleared() },
+                onSearchPreviousClicked = { searchViewModel.onSearchPrevious() },
+                onSearchNextClicked = { searchViewModel.onSearchNext() },
+                onSearchQueryChanged = searchViewModel::onSearchQueryChanged,
                 expandSearch = expandSearch,
             )
         }
@@ -118,16 +133,16 @@ fun TranscriptToolbar(
     onCloseClick: () -> Unit,
     onSearchDoneClicked: () -> Unit,
     onSearchClicked: () -> Unit,
+    onSearchCleared: () -> Unit,
+    onSearchPreviousClicked: () -> Unit,
+    onSearchNextClicked: () -> Unit,
+    searchText: String,
+    searchOccurencesText: String,
+    onSearchQueryChanged: (String) -> Unit,
     expandSearch: Boolean,
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
-
-    var searchFieldValue by remember { mutableStateOf(TextFieldValue()) }
-
-    val onTextChanged = { text: String ->
-        searchFieldValue = TextFieldValue(text)
-    }
 
     AppTheme(Theme.ThemeType.LIGHT) { // Makes search bar always white for any theme
         Box(
@@ -169,15 +184,23 @@ fun TranscriptToolbar(
                 exit = shrinkHorizontally(targetWidth = { 50 }) + fadeOut(),
             ) {
                 SearchBar(
-                    text = searchFieldValue.text,
+                    text = searchText,
                     leadingIcon = {
-                        SearchBarLeadingIcons(onTextChanged, onSearchDoneClicked)
+                        SearchBarLeadingIcons(
+                            onDoneClicked = onSearchDoneClicked,
+                        )
                     },
                     trailingIcon = {
-                        SearchBarTrailingIcons(searchFieldValue.text, onTextChanged)
+                        SearchBarTrailingIcons(
+                            text = searchText,
+                            searchOccurrencesText = searchOccurencesText,
+                            onSearchCleared = onSearchCleared,
+                            onPrevious = onSearchPreviousClicked,
+                            onNext = onSearchNextClicked,
+                        )
                     },
                     placeholder = stringResource(LR.string.search),
-                    onTextChanged = onTextChanged,
+                    onTextChanged = onSearchQueryChanged,
                     onSearch = {},
                     cornerRadius = SearchViewCornerRadius,
                     modifier = Modifier
@@ -206,7 +229,6 @@ fun TranscriptToolbar(
 
 @Composable
 private fun SearchBarLeadingIcons(
-    onTextChanged: (String) -> Unit,
     onDoneClicked: () -> Unit,
 ) {
     Row(
@@ -214,7 +236,6 @@ private fun SearchBarLeadingIcons(
     ) {
         IconButton(
             onClick = {
-                onTextChanged("")
                 onDoneClicked()
             },
         ) {
@@ -231,18 +252,24 @@ private fun SearchBarLeadingIcons(
 }
 
 @Composable
-private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit) {
+private fun SearchBarTrailingIcons(
+    text: String,
+    searchOccurrencesText: String,
+    onSearchCleared: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (text.isNotEmpty()) {
             Text(
-                text = "0/0",
+                text = searchOccurrencesText,
                 color = SearchBarIconColor,
             )
             IconButton(
                 onClick = {
-                    onTextChanged("")
+                    onSearchCleared()
                 },
             ) {
                 Icon(
@@ -252,7 +279,7 @@ private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit
             }
         }
         IconButton(
-            onClick = {},
+            onClick = onPrevious,
             enabled = text.isNotEmpty(),
         ) {
             Icon(
@@ -261,7 +288,7 @@ private fun SearchBarTrailingIcons(text: String, onTextChanged: (String) -> Unit
             )
         }
         IconButton(
-            onClick = {},
+            onClick = onNext,
             enabled = text.isNotEmpty(),
         ) {
             Icon(
@@ -292,6 +319,12 @@ private fun TranscriptToolbarPreview(
             onCloseClick = {},
             onSearchDoneClicked = {},
             onSearchClicked = {},
+            onSearchCleared = {},
+            onSearchPreviousClicked = {},
+            onSearchNextClicked = {},
+            searchText = "",
+            searchOccurencesText = "",
+            onSearchQueryChanged = {},
             expandSearch = false,
         )
     }
@@ -307,6 +340,12 @@ private fun TranscriptToolbarExpandedSearchPreview(
             onCloseClick = {},
             onSearchDoneClicked = {},
             onSearchClicked = {},
+            onSearchCleared = {},
+            onSearchPreviousClicked = {},
+            onSearchNextClicked = {},
+            searchText = "",
+            searchOccurencesText = "",
+            onSearchQueryChanged = {},
             expandSearch = true,
         )
     }
