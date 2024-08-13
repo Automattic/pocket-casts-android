@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
+import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -105,7 +106,7 @@ class ShareClipFragment : BaseDialogFragment() {
                 clipRange = uiState.clipRange,
                 playbackProgress = uiState.playbackProgress,
                 isPlaying = uiState.isPlaying,
-                isSharing = uiState.isSharing,
+                sharingState = uiState.sharingState,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 platforms = platforms,
                 shareColors = shareColors,
@@ -121,6 +122,8 @@ class ShareClipFragment : BaseDialogFragment() {
                         is SnackbarMessage.SharingResponse -> message.message
                         is SnackbarMessage.PlayerIssue -> getString(LR.string.podcast_episode_playback_error)
                         is SnackbarMessage.GenericIssue -> getString(LR.string.share_error_message)
+                        is SnackbarMessage.ClipStartAfterEnd -> getString(LR.string.share_invalid_clip_message)
+                        is SnackbarMessage.ClipEndAfterEpisodeDuration -> getString(LR.string.share_clip_too_long_message, message.episodeDuration.toHhMmSs())
                     }
                     snackbarHostState.showSnackbar(text)
                 }

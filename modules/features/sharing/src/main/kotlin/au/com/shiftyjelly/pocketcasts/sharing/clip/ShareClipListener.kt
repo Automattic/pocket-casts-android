@@ -50,6 +50,14 @@ internal class ShareClipListener(
         viewModel.updateProgressPollingPeriod(scale, secondsPerTick)
     }
 
+    override fun onShowPlatformSelection() {
+        viewModel.showPlatformSelection()
+    }
+
+    override fun onShowClipSelection() {
+        viewModel.showClipSelection()
+    }
+
     override fun onClose() {
         fragment.dismiss()
     }
