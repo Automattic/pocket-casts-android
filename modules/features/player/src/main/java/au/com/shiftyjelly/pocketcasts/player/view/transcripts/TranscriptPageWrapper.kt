@@ -53,11 +53,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 
 private val SearchBarMaxWidth = 500.dp
 private val SearchViewCornerRadius = 38.dp
@@ -73,11 +73,13 @@ fun TranscriptPageWrapper(
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+        val transcriptUiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
         val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
         val searchQueryFlow = searchViewModel.searchQueryFlow.collectAsStateWithLifecycle()
 
         val configuration = LocalConfiguration.current
 
+        var showSearch by remember { mutableStateOf(false) }
         var expandSearch by remember { mutableStateOf(false) }
         when (transitionState.value) {
             is TransitionState.CloseTranscript -> {
@@ -112,6 +114,7 @@ fun TranscriptPageWrapper(
                         playerViewModel.closeTranscript(withTransition = true)
                     }
                 },
+                showSearch = showSearch,
                 onSearchDoneClicked = {
                     expandSearch = false
                     searchViewModel.onSearchDone()
@@ -126,6 +129,11 @@ fun TranscriptPageWrapper(
                 expandSearch = expandSearch,
             )
         }
+
+        LaunchedEffect(transcriptUiState.value) {
+            showSearch = transcriptUiState.value is TranscriptViewModel.UiState.TranscriptLoaded
+            if (!showSearch) expandSearch = false
+        }
     }
 }
 
@@ -133,6 +141,7 @@ fun TranscriptPageWrapper(
 @Composable
 fun TranscriptToolbar(
     onCloseClick: () -> Unit,
+    showSearch: Boolean,
     onSearchDoneClicked: () -> Unit,
     onSearchClicked: () -> Unit,
     onSearchCleared: () -> Unit,
@@ -160,70 +169,72 @@ fun TranscriptToolbar(
                     onClick = onCloseClick,
                 )
 
-                transition.AnimatedVisibility(
-                    visible = { !it },
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
-                    IconButton(
-                        onClick = onSearchClicked,
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(SearchViewCornerRadius)),
+                if (showSearch) {
+                    transition.AnimatedVisibility(
+                        visible = { !it },
+                        enter = fadeIn(),
+                        exit = fadeOut(),
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(LR.string.search),
-                            tint = Color.White,
+                        IconButton(
+                            onClick = onSearchClicked,
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .background(Color.White.copy(alpha = 0.2f), shape = RoundedCornerShape(SearchViewCornerRadius)),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = stringResource(LR.string.search),
+                                tint = Color.White,
+                            )
+                        }
+                    }
+
+                    transition.AnimatedVisibility(
+                        visible = { it },
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally(targetWidth = { 50 }) + fadeOut(),
+                    ) {
+                        SearchBar(
+                            text = searchText,
+                            leadingIcon = {
+                                SearchBarLeadingIcons(
+                                    onDoneClicked = onSearchDoneClicked,
+                                )
+                            },
+                            trailingIcon = {
+                                SearchBarTrailingIcons(
+                                    text = searchText,
+                                    searchState = searchState,
+                                    onSearchCleared = onSearchCleared,
+                                    onPrevious = onSearchPreviousClicked,
+                                    onNext = onSearchNextClicked,
+                                )
+                            },
+                            placeholder = stringResource(LR.string.search),
+                            onTextChanged = onSearchQueryChanged,
+                            onSearch = {},
+                            cornerRadius = SearchViewCornerRadius,
+                            modifier = Modifier
+                                .width(SearchBarMaxWidth)
+                                .focusRequester(focusRequester)
+                                .padding(start = 56.dp, end = 16.dp),
+                            colors = SearchBarDefaults.colors(
+                                leadingIconColor = SearchBarIconColor,
+                                trailingIconColor = SearchBarIconColor,
+                                disabledTrailingIconColor = SearchBarIconColor.copy(alpha = 0.7f),
+                                placeholderColor = SearchBarPlaceholderColor,
+                            ),
                         )
                     }
                 }
-            }
 
-            transition.AnimatedVisibility(
-                visible = { it },
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally(targetWidth = { 50 }) + fadeOut(),
-            ) {
-                SearchBar(
-                    text = searchText,
-                    leadingIcon = {
-                        SearchBarLeadingIcons(
-                            onDoneClicked = onSearchDoneClicked,
-                        )
-                    },
-                    trailingIcon = {
-                        SearchBarTrailingIcons(
-                            text = searchText,
-                            searchState = searchState,
-                            onSearchCleared = onSearchCleared,
-                            onPrevious = onSearchPreviousClicked,
-                            onNext = onSearchNextClicked,
-                        )
-                    },
-                    placeholder = stringResource(LR.string.search),
-                    onTextChanged = onSearchQueryChanged,
-                    onSearch = {},
-                    cornerRadius = SearchViewCornerRadius,
-                    modifier = Modifier
-                        .width(SearchBarMaxWidth)
-                        .focusRequester(focusRequester)
-                        .padding(start = 56.dp, end = 16.dp),
-                    colors = SearchBarDefaults.colors(
-                        leadingIconColor = SearchBarIconColor,
-                        trailingIconColor = SearchBarIconColor,
-                        disabledTrailingIconColor = SearchBarIconColor.copy(alpha = 0.7f),
-                        placeholderColor = SearchBarPlaceholderColor,
-                    ),
-                )
-            }
-        }
-
-        LaunchedEffect(expandSearch) {
-            if (expandSearch) {
-                focusRequester.requestFocus()
-            } else {
-                focusManager.clearFocus()
+                LaunchedEffect(expandSearch) {
+                    if (expandSearch) {
+                        focusRequester.requestFocus()
+                    } else {
+                        focusManager.clearFocus()
+                    }
+                }
             }
         }
     }
@@ -320,6 +331,7 @@ private fun TranscriptToolbarPreview(
     AppTheme(themeType) {
         TranscriptToolbar(
             onCloseClick = {},
+            showSearch = true,
             onSearchDoneClicked = {},
             onSearchClicked = {},
             onSearchCleared = {},
@@ -341,6 +353,7 @@ private fun TranscriptToolbarExpandedSearchPreview(
     AppTheme(themeType) {
         TranscriptToolbar(
             onCloseClick = {},
+            showSearch = true,
             onSearchDoneClicked = {},
             onSearchClicked = {},
             onSearchCleared = {},

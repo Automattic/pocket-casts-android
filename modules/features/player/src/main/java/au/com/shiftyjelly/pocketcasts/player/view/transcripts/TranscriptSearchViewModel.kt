@@ -39,6 +39,7 @@ class TranscriptSearchViewModel @Inject constructor(
     }
 
     fun setSearchSourceText(searchSourceText: String) {
+        resetSearch()
         this._searchSourceText = searchSourceText
     }
 
