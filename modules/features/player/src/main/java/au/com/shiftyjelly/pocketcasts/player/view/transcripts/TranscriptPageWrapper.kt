@@ -96,6 +96,7 @@ fun TranscriptPageWrapper(
             TranscriptPage(
                 playerViewModel = playerViewModel,
                 transcriptViewModel = transcriptViewModel,
+                searchViewModel = searchViewModel,
                 theme = theme,
                 modifier = Modifier
                     .height(configuration.screenHeightDp.dp),

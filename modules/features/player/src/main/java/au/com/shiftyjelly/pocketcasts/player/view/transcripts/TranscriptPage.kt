@@ -78,6 +78,7 @@ private val ContentOffsetBottom = 80.dp
 fun TranscriptPage(
     playerViewModel: PlayerViewModel,
     transcriptViewModel: TranscriptViewModel,
+    searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
     modifier: Modifier,
 ) {
@@ -127,6 +128,13 @@ fun TranscriptPage(
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
         transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
+    }
+
+    if (uiState.value is UiState.TranscriptLoaded) {
+        val state = uiState.value as UiState.TranscriptLoaded
+        LaunchedEffect(state.displayInfo.text) {
+            searchViewModel.setSearchSourceText(state.displayInfo.text)
+        }
     }
 }
 

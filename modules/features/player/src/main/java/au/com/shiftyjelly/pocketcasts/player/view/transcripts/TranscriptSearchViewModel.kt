@@ -16,6 +16,8 @@ private const val SEARCH_DEBOUNCE = 300L
 
 @HiltViewModel
 class TranscriptSearchViewModel @Inject constructor() : ViewModel() {
+    private var _searchSourceText: String = ""
+
     private val _searchQueryFlow = MutableStateFlow("")
     val searchQueryFlow = _searchQueryFlow.asStateFlow()
 
@@ -30,6 +32,10 @@ class TranscriptSearchViewModel @Inject constructor() : ViewModel() {
                 performSearch(searchQuery)
             }
             .launchIn(viewModelScope)
+    }
+
+    fun setSearchSourceText(searchSourceText: String) {
+        this._searchSourceText = searchSourceText
     }
 
     fun onSearchQueryChanged(searchQuery: String) {
