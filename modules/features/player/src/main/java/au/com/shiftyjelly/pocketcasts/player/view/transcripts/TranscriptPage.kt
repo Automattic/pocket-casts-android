@@ -382,10 +382,29 @@ private data class DefaultColors(
         MaterialTheme.theme.colors.playerContrast01
 }
 
-@OptIn(UnstableApi::class)
 @Preview(name = "Dark")
 @Composable
-private fun TranscriptContentPreview() {
+private fun TranscriptWithoutSearchContentPreview() {
+    TranscriptContentPreview(searchState = SearchUiState())
+}
+
+@Preview(name = "Dark")
+@Composable
+private fun TranscriptWithSearchContentPreview() {
+    TranscriptContentPreview(
+        searchState = SearchUiState(
+            searchTerm = "se",
+            searchResultIndices = listOf(26, 61, 134),
+            currentSearchIndex = 0,
+        ),
+    )
+}
+
+@OptIn(UnstableApi::class)
+@Composable
+private fun TranscriptContentPreview(
+    searchState: SearchUiState
+) {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptContent(
             state = UiState.TranscriptLoaded(
@@ -410,13 +429,13 @@ private fun TranscriptContentPreview() {
                 displayInfo = DisplayInfo(
                     text = "",
                     items = listOf(
-                        DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", 0, 0),
-                        DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", 0, 0),
-                        DisplayItem("Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed.", 0, 0),
+                        DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", 0, 52),
+                        DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", 53, 114),
+                        DisplayItem("Maecenas fermentum senectus penatibus tenectus integer per vulputate tellus ted.", 115, 195),
                     ),
                 ),
             ),
-            searchState = SearchUiState(),
+            searchState = searchState,
             colors = DefaultColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
