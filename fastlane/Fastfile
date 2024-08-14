@@ -11,6 +11,7 @@ UI.user_error!('Please run fastlane via `bundle exec`') unless FastlaneCore::Hel
 ENV_FILE_NAME = '.pocketcastsandroid-env.default'
 USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
+PROTOTYPE_BUILD_DOMAIN = 'https://d2twmm2nzpx3bg.cloudfront.net'
 APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
 GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
 ORIGINALS_METADATA_DIR_PATH = File.join(PROJECT_ROOT_FOLDER, 'metadata')
@@ -426,6 +427,74 @@ platform :android do
       apk_path: File.join(apk_dir, 'debug', 'app-debug.apk'),
       results_output_dir: File.join(PROJECT_ROOT_FOLDER, 'build', 'instrumented-tests')
     )
+  end
+
+  desc 'Builds a prototype build and uploads it to S3'
+  lane :build_and_upload_prototype_build do
+    UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
+
+    prototype_build_type = 'debugProd'
+
+    gradle(
+      task: 'assemble',
+      build_type: prototype_build_type,
+      properties: {
+        'skipSentryProguardMappingUpload' => true
+      }
+    )
+
+    prototype_build_comments = lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].map do |apk_path|
+      upload_path = upload_to_s3(
+        bucket: 'a8c-apps-public-artifacts',
+        key: "pocketcasts-#{get_app_key(apk_path: apk_path)}-prototype-build-#{generate_prototype_build_number}.apk",
+        file: apk_path,
+        skip_if_exists: true
+      )
+
+      install_url = "#{PROTOTYPE_BUILD_DOMAIN}/#{upload_path}"
+
+      prototype_build_details_comment(
+        app_display_name: get_app_display_name(apk_path: apk_path),
+        download_url: install_url,
+        metadata: {
+          'Build Type': prototype_build_type
+        },
+        fold: true
+      )
+    end
+
+    comment_on_pr(
+      project: 'automattic/pocket-casts-android',
+      pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
+      reuse_identifier: 'app-prototype-build-link',
+      body: prototype_build_comments.join
+    )
+  end
+
+  def get_app_key(apk_path:)
+    File.basename(apk_path).split('-').first
+  end
+
+  def get_app_display_name(apk_path:)
+    key = get_app_key(apk_path: apk_path).to_sym
+    { app: '📱 Mobile', wear: '⌚ Wear', automotive: '🚗 Automotive' }.fetch(key, '❔ Unknown')
+  end
+
+  # This function is Buildkite-specific
+  def generate_prototype_build_number
+    if ENV['BUILDKITE']
+      commit = ENV.fetch('BUILDKITE_COMMIT', nil)[0, 7]
+      branch = ENV['BUILDKITE_BRANCH'].parameterize
+      pr_num = ENV.fetch('BUILDKITE_PULL_REQUEST', nil)
+
+      pr_num == 'false' ? "#{branch}-#{commit}" : "pr#{pr_num}-#{commit}"
+    else
+      repo = Git.open(PROJECT_ROOT_FOLDER)
+      commit = repo.current_branch.parameterize
+      branch = repo.revparse('HEAD')[0, 7]
+
+      "#{branch}-#{commit}"
+    end
   end
 
   #####################################################################################
