@@ -2058,4 +2058,11 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="swipe_affordance_icon">Swipe Affordance Icon</string>
     <string name="thank_you_for_your_feedback">Thank you for your feedback!</string>
     <string name="something_went_wrong_when_sending_feedback">Something went wrong. Please try submitting your feedback again.</string>
+
+    <!-- Paywall -->
+    <string name="paywall_desktop_and_web_title">Desktop and web apps</string>
+    <string name="paywall_desktop_and_web_description">Listen in more places with our Windows, macOS and Web apps.</string>
+    <string name="paywall_desktop_and_web_content_description">Desktop and web apps image</string>
+
+
 </resources>
