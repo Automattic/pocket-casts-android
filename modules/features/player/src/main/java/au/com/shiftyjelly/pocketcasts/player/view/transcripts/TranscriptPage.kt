@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
@@ -72,6 +73,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ContentOffsetTop = 64.dp
 private val ContentOffsetBottom = 80.dp
+private val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.DarkGray, color = Color.White)
+private val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.White, color = Color.Black)
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -84,6 +87,7 @@ fun TranscriptPage(
 ) {
     val uiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+    val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
     val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(refreshing.value, {
         transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
@@ -109,6 +113,7 @@ fun TranscriptPage(
 
                 TranscriptContent(
                     state = loadedState,
+                    searchState = searchState.value,
                     colors = colors,
                     modifier = modifier,
                 )
@@ -148,6 +153,7 @@ private fun EmptyView(
 @Composable
 private fun TranscriptContent(
     state: UiState.TranscriptLoaded,
+    searchState: SearchUiState,
     colors: DefaultColors,
     modifier: Modifier,
 ) {
@@ -168,9 +174,10 @@ private fun TranscriptContent(
             )
         } else {
             ScrollableTranscriptView(
-                state,
-                colors,
-                bottomPadding,
+                state = state,
+                searchState = searchState,
+                colors = colors,
+                bottomPadding = bottomPadding,
             )
         }
 
@@ -195,6 +202,7 @@ private fun TranscriptContent(
 @Composable
 private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
+    searchState: SearchUiState,
     colors: DefaultColors,
     bottomPadding: Dp,
 ) {
@@ -230,6 +238,7 @@ private fun ScrollableTranscriptView(
                     TranscriptItem(
                         colors = colors,
                         item = item,
+                        searchState = searchState,
                     )
                 }
             }
@@ -241,6 +250,7 @@ private fun ScrollableTranscriptView(
 private fun TranscriptItem(
     colors: DefaultColors,
     item: DisplayItem,
+    searchState: SearchUiState,
 ) {
     val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
     Box(
@@ -251,6 +261,24 @@ private fun TranscriptItem(
         Text(
             text = buildAnnotatedString {
                 withStyle(defaultTextStyle) { append(item.text) }
+                if (searchState.searchTerm.isNotEmpty()) {
+                    // Highlight search occurrences
+                    searchState.searchResultIndices
+                        .filter { searchResultIndex -> searchResultIndex in item.startIndex until item.endIndex }
+                        .forEach { searchResultIndex ->
+                            val style = if (searchState.searchResultIndices.indexOf(searchResultIndex) == searchState.currentSearchIndex) {
+                                SearchOccurrenceSelectedSpanStyle
+                            } else {
+                                SearchOccurrenceDefaultSpanStyle
+                            }
+                            val start = searchResultIndex - item.startIndex
+                            addStyle(
+                                style = style,
+                                start = start,
+                                end = start + searchState.searchTerm.length,
+                            )
+                        }
+                }
             },
         )
     }
@@ -388,6 +416,7 @@ private fun TranscriptContentPreview() {
                     ),
                 ),
             ),
+            searchState = SearchUiState(),
             colors = DefaultColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
@@ -413,6 +442,7 @@ private fun TranscriptEmptyContentPreview() {
                     items = emptyList(),
                 ),
             ),
+            searchState = SearchUiState(),
             colors = DefaultColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
