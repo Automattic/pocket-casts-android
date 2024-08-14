@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.FlowPreview
@@ -11,11 +12,14 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 private const val SEARCH_DEBOUNCE = 300L
 
 @HiltViewModel
-class TranscriptSearchViewModel @Inject constructor() : ViewModel() {
+class TranscriptSearchViewModel @Inject constructor(
+    private val kmpSearch: KMPSearch,
+) : ViewModel() {
     private var _searchSourceText: String = ""
 
     private val _searchQueryFlow = MutableStateFlow("")
@@ -42,8 +46,22 @@ class TranscriptSearchViewModel @Inject constructor() : ViewModel() {
         _searchQueryFlow.value = searchQuery
     }
 
-    @Suppress("UNUSED_PARAMETER")
     private fun performSearch(searchTerm: String) {
+        viewModelScope.launch {
+            try {
+                kmpSearch.setPattern(searchTerm)
+                val searchResultIndices = kmpSearch.search(_searchSourceText)
+                _searchState.update {
+                    it.copy(
+                        searchTerm = searchTerm,
+                        searchResultIndices = searchResultIndices,
+                    )
+                }
+            } catch (e: Exception) {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Error searching transcript: ${e.message}")
+                e.printStackTrace()
+            }
+        }
     }
 
     fun onSearchPrevious() {
@@ -85,7 +103,7 @@ class TranscriptSearchViewModel @Inject constructor() : ViewModel() {
         val searchOccurencesText: String
             get() = searchResultIndices
                 .takeIf { it.isNotEmpty() }
-                ?.let { "${currentSearchIndex + 1}/${it.size}" }
-                ?: ""
+                ?.let { "${currentSearchIndex + 1}/${searchResultIndices.size}" }
+                ?: "0"
     }
 }
