@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.X
 import au.com.shiftyjelly.pocketcasts.sharing.timestamp.TimestampType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
 import coil.executeBlocking
 import coil.imageLoader
 import java.io.File
@@ -372,7 +373,7 @@ data class SharingRequest internal constructor(
                 TimestampType.Bookmark -> LR.string.share_link_bookmark
             }
 
-            override fun toString() = "EpisodePosition(title=${episode.title}, uuid=${episode.uuid}, position=$position, type=$type)"
+            override fun toString() = "EpisodePosition(title=${episode.title}, uuid=${episode.uuid}, position=${position.inWholeSeconds}, type=$type)"
         }
 
         class EpisodeFile internal constructor(
@@ -387,11 +388,11 @@ data class SharingRequest internal constructor(
             val episode: EpisodeModel,
             val range: Clip.Range,
         ) : Data {
-            fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${range.startInSeconds},${range.endInSeconds}"
+            fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${range.start.toSecondsWithSingleMilli()},${range.end.toSecondsWithSingleMilli()}"
 
             fun linkDescription() = LR.string.share_link_clip
 
-            override fun toString() = "ClipLink(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
+            override fun toString() = "ClipLink(title=${episode.title}, uuid=${episode.uuid}, start=${range.start.toSecondsWithSingleMilli()}, end=${range.end.toSecondsWithSingleMilli()})"
         }
 
         class ClipAudio internal constructor(
@@ -399,7 +400,7 @@ data class SharingRequest internal constructor(
             val episode: EpisodeModel,
             val range: Clip.Range,
         ) : Data {
-            override fun toString() = "ClipAudio(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
+            override fun toString() = "ClipAudio(title=${episode.title}, uuid=${episode.uuid}, start=${range.start.toSecondsWithSingleMilli()}, end=${range.end.toSecondsWithSingleMilli()})"
         }
 
         class ClipVideo internal constructor(
@@ -407,7 +408,7 @@ data class SharingRequest internal constructor(
             val episode: EpisodeModel,
             val range: Clip.Range,
         ) : Data {
-            override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.startInSeconds}, end=${range.endInSeconds})"
+            override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.start.toSecondsWithSingleMilli()}, end=${range.end.toSecondsWithSingleMilli()})"
         }
     }
 }

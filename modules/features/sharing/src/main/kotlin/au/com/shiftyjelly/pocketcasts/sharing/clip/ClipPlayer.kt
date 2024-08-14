@@ -216,8 +216,9 @@ private class ExoPlayerClipPlayer(
         .setUri(sourceUri)
         .setClippingConfiguration(
             ClippingConfiguration.Builder()
-                .setStartPositionMs(range.start.inWholeMilliseconds)
-                .setEndPositionMs(range.end.inWholeMilliseconds)
+                // Divide and multiple by 100 to drop insignificant for clip creation millseconds resolution
+                .setStartPositionMs((range.start.inWholeMilliseconds / 100) * 100)
+                .setEndPositionMs((range.end.inWholeMilliseconds / 100) * 100)
                 .build(),
         )
         .build()
