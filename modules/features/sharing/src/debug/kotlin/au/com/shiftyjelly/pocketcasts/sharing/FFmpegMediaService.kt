@@ -86,7 +86,7 @@ internal class FFmpegMediaService(
             append("-ss ${clipRange.startInSeconds} ") // Clip start, must be in seconds or HH:MM:SS.xxx
             append("-to ${clipRange.endInSeconds} ") // Clip end, must be in seconds or HH:MM:SS.xxx
             if (isWebSource) {
-                append("-user_agent 'Pocket Casts' ")
+                append("-user_agent 'Pocket Casts' ") // Set User-Agent header so we don't get blocked by hosts
             }
             append("-i $audioSource ") // Audio stream source
             val coverFile = if (addCover) {
@@ -95,7 +95,7 @@ internal class FFmpegMediaService(
                 null
             }
             if (coverFile != null) {
-                append("-i $coverFile ")
+                append("-i $coverFile ") // Include cover in the MP3 file
             }
             append("-q:a 0 ") // Max audio quality
             append("-map 0:a:0 ") // Include only the first audio stream, videos can have multiple audio streams
