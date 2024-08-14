@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
+import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -72,11 +73,13 @@ class TranscriptViewModel @Inject constructor(
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
-                    val result = buildSubtitleCues(transcript, forceRefresh)
+                    val cuesWithTimingSubtitle = buildSubtitleCues(transcript, forceRefresh)
+                    val displayInfo = buildDisplayInfo(cuesWithTimingSubtitle)
                     UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
-                        cuesWithTimingSubtitle = result,
+                        displayInfo = displayInfo,
+                        cuesWithTimingSubtitle = cuesWithTimingSubtitle,
                     )
                 } catch (e: UnsupportedOperationException) {
                     UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
@@ -139,6 +142,26 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
+    private suspend fun buildDisplayInfo(cuesWithTimingSubtitle: List<CuesWithTiming>) = withContext(ioDispatcher) {
+        val formattedText = buildString {
+            with(cuesWithTimingSubtitle) {
+                (0 until count()).forEach { index ->
+                    get(index).cues.forEach { cue ->
+                        append(cue.text)
+                    }
+                }
+            }
+        }
+        val items = formattedText.splitIgnoreEmpty("\n\n").map {
+            val startIndex = formattedText.indexOf(it)
+            DisplayItem(it, startIndex, startIndex + it.length)
+        }
+        DisplayInfo(
+            text = formattedText,
+            items = items,
+        )
+    }
+
     private fun clearErrorsIfFound(transcript: Transcript) {
         if (_uiState.value is UiState.Error) {
             _uiState.value = UiState.TranscriptFound(
@@ -181,6 +204,7 @@ class TranscriptViewModel @Inject constructor(
         data class TranscriptLoaded(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
+            val displayInfo: DisplayInfo,
             val cuesWithTimingSubtitle: List<CuesWithTiming>,
         ) : UiState() {
             val isTranscriptEmpty: Boolean = cuesWithTimingSubtitle.isEmpty()
@@ -192,6 +216,17 @@ class TranscriptViewModel @Inject constructor(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
         ) : UiState()
     }
+
+    data class DisplayInfo(
+        val text: String,
+        val items: List<DisplayItem> = emptyList(),
+    )
+
+    data class DisplayItem(
+        val text: String,
+        val startIndex: Int,
+        val endIndex: Int,
+    )
 
     sealed class TranscriptError {
         data class NotSupported(val format: String) : TranscriptError()

@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,13 +59,14 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -158,7 +159,7 @@ private fun TranscriptContent(
                     .padding(top = 60.dp),
             )
         } else {
-            ScrollableTranscriptTextView(
+            ScrollableTranscriptView(
                 state,
                 colors,
                 bottomPadding,
@@ -184,21 +185,11 @@ private fun TranscriptContent(
 
 @OptIn(UnstableApi::class)
 @Composable
-private fun ScrollableTranscriptTextView(
+private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
     colors: DefaultColors,
     bottomPadding: Dp,
 ) {
-    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
-    val displayString = buildString {
-        with(state.cuesWithTimingSubtitle) {
-            (0 until count()).forEach { index ->
-                get(index).cues.forEach { cue ->
-                    append(cue.text)
-                }
-            }
-        }
-    }
     val scrollState = rememberLazyListState()
     val scrollableContentModifier = Modifier
         .padding(horizontal = 16.dp)
@@ -221,30 +212,39 @@ private fun ScrollableTranscriptTextView(
             LocalClipboardManager.current,
         ),
     ) {
-        LazyColumn(
-            state = scrollState,
-            modifier = scrollableContentModifier,
-            contentPadding = PaddingValues(top = ContentOffsetTop, bottom = ContentOffsetBottom),
-        ) {
-            itemsIndexed(displayString.splitIgnoreEmpty("\n\n")) { _, item ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                ) {
-                    SelectionContainer {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(defaultTextStyle) {
-                                    append(item)
-                                }
-                            },
-                            lineHeight = 30.sp,
-                        )
-                    }
+        SelectionContainer {
+            LazyColumn(
+                state = scrollState,
+                modifier = scrollableContentModifier,
+                contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
+            ) {
+                items(state.displayInfo.items) { item ->
+                    TranscriptItem(
+                        colors = colors,
+                        item = item,
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TranscriptItem(
+    colors: DefaultColors,
+    item: DisplayItem,
+) {
+    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                withStyle(defaultTextStyle) { append(item.text) }
+            },
+        )
     }
 }
 
@@ -364,16 +364,19 @@ private fun TranscriptContentPreview() {
                     CuesWithTiming(
                         ImmutableList.of(
                             Cue.Builder().setText(
-                                "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed. Laoreet justo orci luctus venenatis taciti lobortis sapien. Torquent quis dignissim curabitur magna molestie lectus pretium litora. Urna sodales rutrum posuere fusce velit turpis sollicitudin iaculis. Imperdiet turpis natoque vehicula cursus quisque congue.<br>" +
-                                    "<br>" +
-                                    "Quis etiam torquent feugiat penatibus curabitur. Facilisi inceptos egestas dolor mauris eget; rutrum facilisis nam. Ipsum mollis auctor mollis libero facilisi, sed posuere tristique lectus. Morbi erat suscipit eu feugiat nisi mauris. Convallis nostra condimentum est turpis ornare egestas lorem euismod at. Est nec eleifend leo proin vel hendrerit. Sem ipsum duis nam bibendum faucibus vestibulum class. Leo iaculis magna dignissim sit tristique porttitor dapibus non.<br>" +
-                                    "<br>" +
-                                    "Dis etiam suspendisse rhoncus, a class nisi porttitor. Ornare velit imperdiet natoque elit lacinia suscipit. Feugiat phasellus vestibulum sapien posuere rhoncus. Massa hendrerit purus taciti elit, maecenas non lobortis. Potenti class condimentum consectetur convallis, lacus habitasse praesent. Potenti risus mi neque volutpat vivamus taciti.<br>",
-
+                                "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed.",
                             ).build(),
                         ),
                         0,
                         0,
+                    ),
+                ),
+                displayInfo = DisplayInfo(
+                    text = "",
+                    items = listOf(
+                        DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", 0, 0),
+                        DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", 0, 0),
+                        DisplayItem("Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed.", 0, 0),
                     ),
                 ),
             ),
@@ -397,6 +400,10 @@ private fun TranscriptEmptyContentPreview() {
                     url = "url",
                 ),
                 cuesWithTimingSubtitle = emptyList(),
+                displayInfo = DisplayInfo(
+                    text = "",
+                    items = emptyList(),
+                ),
             ),
             colors = DefaultColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
