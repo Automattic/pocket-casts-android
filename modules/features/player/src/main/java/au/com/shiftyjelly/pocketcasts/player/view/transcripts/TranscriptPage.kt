@@ -403,7 +403,7 @@ private fun TranscriptWithSearchContentPreview() {
 @OptIn(UnstableApi::class)
 @Composable
 private fun TranscriptContentPreview(
-    searchState: SearchUiState
+    searchState: SearchUiState,
 ) {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptContent(
