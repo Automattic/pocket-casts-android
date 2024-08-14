@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.FakeTracker
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.TrackEvent
 import au.com.shiftyjelly.pocketcasts.sharing.clip.FakeClipPlayer.PlaybackState
+import au.com.shiftyjelly.pocketcasts.sharing.clip.SharingState.Step
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import java.io.IOException
@@ -52,7 +53,7 @@ class ShareClipViewModelTest {
     private val podcastManager = mock<PodcastManager>()
     private val settings = mock<Settings>()
 
-    private val episode = PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date())
+    private val episode = PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date(), duration = 60.0)
     private val podcast = Podcast(uuid = "podcast-id", title = "Podcast Title")
     private val clipRange = Clip.Range(15.seconds, 30.seconds)
 
@@ -448,9 +449,39 @@ class ShareClipViewModelTest {
     }
 
     @Test
+    fun `too short clip is not shared`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode,
+            Clip.Range(start = 10.seconds, end = 10.seconds),
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
+
+        assertTrue(tracker.events.isEmpty())
+    }
+
+    @Test
+    fun `clip with end timestamp after episode end is not shared`() = runTest {
+        viewModel.shareClip(
+            podcast,
+            episode.copy(duration = 10.0),
+            Clip.Range(start = 0.seconds, end = 11.seconds),
+            SocialPlatform.PocketCasts,
+            CardType.Vertical,
+            SourceView.PLAYER,
+            createBackgroundAsset = { error("Unexpected operation") },
+        )
+
+        assertTrue(tracker.events.isEmpty())
+    }
+
+    @Test
     fun `sharing clip changes sharing status`() = runTest {
         viewModel.uiState.test {
-            assertEquals(false, awaitItem().isSharing)
+            assertEquals(false, awaitItem().sharingState.iSharing)
 
             viewModel.shareClip(
                 podcast,
@@ -462,8 +493,8 @@ class ShareClipViewModelTest {
                 createBackgroundAsset = { error("Unexpected operation") },
             )
 
-            assertEquals(true, awaitItem().isSharing)
-            assertEquals(false, awaitItem().isSharing)
+            assertEquals(true, awaitItem().sharingState.iSharing)
+            assertEquals(false, awaitItem().sharingState.iSharing)
         }
     }
 
@@ -528,5 +559,77 @@ class ShareClipViewModelTest {
         )
 
         assertNull(sharingClient.request)
+    }
+
+    @Test
+    fun `show platform selection`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(Step.ClipSelection, awaitItem().sharingState.step)
+
+            viewModel.showPlatformSelection()
+
+            assertEquals(Step.PlatformSelection, awaitItem().sharingState.step)
+        }
+    }
+
+    @Test
+    fun `do not show platform selection if is sharing`() = runTest {
+        sharingClient.isSuspended = true
+
+        viewModel.uiState.test {
+            viewModel.shareClip(
+                podcast,
+                episode,
+                clipRange,
+                SocialPlatform.PocketCasts,
+                CardType.Vertical,
+                SourceView.PLAYER,
+                createBackgroundAsset = { error("Unexpected operation") },
+            )
+            skipItems(2)
+
+            viewModel.showPlatformSelection()
+            expectNoEvents()
+
+            sharingClient.isSuspended = false
+            assertEquals(Step.ClipSelection, awaitItem().sharingState.step)
+        }
+    }
+
+    @Test
+    fun `show clip selection`() = runTest {
+        viewModel.uiState.test {
+            viewModel.showPlatformSelection()
+            skipItems(2)
+
+            viewModel.showClipSelection()
+
+            assertEquals(Step.ClipSelection, awaitItem().sharingState.step)
+        }
+    }
+
+    @Test
+    fun `do not show clip selection if is sharing`() = runTest {
+        sharingClient.isSuspended = true
+
+        viewModel.uiState.test {
+            viewModel.showPlatformSelection()
+            viewModel.shareClip(
+                podcast,
+                episode,
+                clipRange,
+                SocialPlatform.PocketCasts,
+                CardType.Vertical,
+                SourceView.PLAYER,
+                createBackgroundAsset = { error("Unexpected operation") },
+            )
+            skipItems(3)
+
+            viewModel.showClipSelection()
+            expectNoEvents()
+
+            sharingClient.isSuspended = false
+            assertEquals(Step.PlatformSelection, awaitItem().sharingState.step)
+        }
     }
 }

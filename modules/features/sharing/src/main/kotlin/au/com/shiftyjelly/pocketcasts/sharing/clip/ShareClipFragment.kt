@@ -24,8 +24,10 @@ import au.com.shiftyjelly.pocketcasts.sharing.clip.ShareClipViewModel.SnackbarMe
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
+import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -36,6 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class ShareClipFragment : BaseDialogFragment() {
@@ -70,6 +73,7 @@ class ShareClipFragment : BaseDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, UR.style.Theme_ClipSharing)
         clipAnalytics = clipAnalyticsFactory.create(
             episodeId = args.episodeUuid,
             podcastId = args.podcastUuid,
@@ -90,6 +94,7 @@ class ShareClipFragment : BaseDialogFragment() {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
         val assetController = BackgroundAssetController.create(requireContext().applicationContext, shareColors)
         val listener = ShareClipListener(this@ShareClipFragment, viewModel, assetController, args.source)
+        val isTalkbackOn = Util.isTalkbackOn(requireContext())
 
         setContent {
             val uiState by viewModel.uiState.collectAsState()
@@ -101,10 +106,11 @@ class ShareClipFragment : BaseDialogFragment() {
                 clipRange = uiState.clipRange,
                 playbackProgress = uiState.playbackProgress,
                 isPlaying = uiState.isPlaying,
-                isSharing = uiState.isSharing,
+                sharingState = uiState.sharingState,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 platforms = platforms,
                 shareColors = shareColors,
+                useKeyboardInput = isTalkbackOn,
                 assetController = assetController,
                 listener = listener,
                 snackbarHostState = snackbarHostState,
@@ -116,6 +122,8 @@ class ShareClipFragment : BaseDialogFragment() {
                         is SnackbarMessage.SharingResponse -> message.message
                         is SnackbarMessage.PlayerIssue -> getString(LR.string.podcast_episode_playback_error)
                         is SnackbarMessage.GenericIssue -> getString(LR.string.share_error_message)
+                        is SnackbarMessage.ClipStartAfterEnd -> getString(LR.string.share_invalid_clip_message)
+                        is SnackbarMessage.ClipEndAfterEpisodeDuration -> getString(LR.string.share_clip_too_long_message, message.episodeDuration.toHhMmSs())
                     }
                     snackbarHostState.showSnackbar(text)
                 }

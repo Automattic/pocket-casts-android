@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.sharing.clip.SharingState.Step
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
@@ -19,6 +20,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -28,6 +30,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -43,7 +46,7 @@ class ShareClipViewModel @AssistedInject constructor(
     private val settings: Settings,
 ) : ViewModel() {
     private val clipRange = MutableStateFlow(initialClipRange)
-    private val isSharingState = MutableStateFlow(false)
+    private val sharingState = MutableStateFlow(SharingState(Step.ClipSelection, iSharing = false))
 
     val uiState = combine(
         episodeManager.observeByUuid(episodeUuid),
@@ -52,8 +55,8 @@ class ShareClipViewModel @AssistedInject constructor(
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork },
         clipPlayer.playbackProgress,
         clipPlayer.isPlayingState,
-        isSharingState,
-        transform = { episode, podcast, clipRange, useEpisodeArtwork, playbackProgress, isPlaying, isSharing ->
+        sharingState,
+        transform = { episode, podcast, clipRange, useEpisodeArtwork, playbackProgress, isPlaying, sharingStep ->
             UiState(
                 episode = episode,
                 podcast = podcast,
@@ -61,7 +64,7 @@ class ShareClipViewModel @AssistedInject constructor(
                 useEpisodeArtwork = useEpisodeArtwork,
                 playbackProgress = playbackProgress,
                 isPlaying = isPlaying,
-                isSharing = isSharing,
+                sharingState = sharingStep,
             )
         },
     ).stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = UiState(clipRange = initialClipRange))
@@ -78,7 +81,16 @@ class ShareClipViewModel @AssistedInject constructor(
     }
 
     fun playClip() {
-        if (uiState.value.clip?.let(clipPlayer::play) == true) {
+        val uiState = uiState.value
+        val clip = uiState.clip ?: return
+        val episodeDurtion = uiState.episode?.durationMs?.milliseconds ?: Duration.ZERO
+
+        if (clip.range.durationInSeconds < 1) {
+            viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipStartAfterEnd) }
+        } else if (clip.range.end > episodeDurtion) {
+            viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipEndAfterEpisodeDuration(episodeDurtion)) }
+            return
+        } else if (clipPlayer.play(clip)) {
             Timber.tag(TAG).d("Clip playback started")
             clipAnalytics.playTapped()
         }
@@ -119,6 +131,33 @@ class ShareClipViewModel @AssistedInject constructor(
         clipPlayer.setPlaybackPollingPeriod(pollingPeriod)
     }
 
+    fun showPlatformSelection() {
+        val step = sharingState.value
+        if (step.iSharing) {
+            return
+        }
+        val clipRange = clipRange.value
+        val episodeDurtion = uiState.value.episode?.durationMs?.milliseconds ?: Duration.ZERO
+        when {
+            clipRange.durationInSeconds < 1 -> {
+                viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipStartAfterEnd) }
+            }
+            clipRange.end > episodeDurtion -> {
+                viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipEndAfterEpisodeDuration(episodeDurtion)) }
+            }
+            else -> {
+                sharingState.update { it.copy(step = Step.PlatformSelection) }
+            }
+        }
+    }
+
+    fun showClipSelection() {
+        val step = sharingState.value
+        if (!step.iSharing) {
+            sharingState.update { it.copy(step = Step.ClipSelection) }
+        }
+    }
+
     fun shareClip(
         podcast: Podcast,
         episode: PodcastEpisode,
@@ -128,10 +167,18 @@ class ShareClipViewModel @AssistedInject constructor(
         sourceView: SourceView,
         createBackgroundAsset: suspend (VisualCardType) -> Result<File>,
     ) {
-        if (isSharingState.value) {
+        if (sharingState.value.iSharing) {
             return
         }
-        isSharingState.value = true
+        if (clipRange.durationInSeconds < 1) {
+            viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipStartAfterEnd) }
+            return
+        }
+        if (clipRange.end > episode.durationMs.milliseconds) {
+            viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipEndAfterEpisodeDuration(episode.durationMs.milliseconds)) }
+            return
+        }
+        sharingState.update { it.copy(iSharing = true) }
         viewModelScope.launch {
             val animation = async {
                 // Make sure that animation lasts for at least 1 seconds when sharing
@@ -149,7 +196,7 @@ class ShareClipViewModel @AssistedInject constructor(
                     _snackbarMessages.emit(SnackbarMessage.GenericIssue)
                 }
             animation.await()
-            isSharingState.value = false
+            sharingState.update { it.copy(iSharing = false) }
         }
     }
 
@@ -236,13 +283,15 @@ class ShareClipViewModel @AssistedInject constructor(
         val useEpisodeArtwork: Boolean = false,
         val playbackProgress: Duration = Duration.ZERO,
         val isPlaying: Boolean = false,
-        val isSharing: Boolean = false,
+        val sharingState: SharingState = SharingState(Step.ClipSelection, iSharing = false),
     ) {
         val clip get() = episode?.let { Clip.fromEpisode(it, clipRange) }
     }
 
     sealed interface SnackbarMessage {
         data class SharingResponse(val message: String) : SnackbarMessage
+        data object ClipStartAfterEnd : SnackbarMessage
+        data class ClipEndAfterEpisodeDuration(val episodeDuration: Duration) : SnackbarMessage
         data object PlayerIssue : SnackbarMessage
         data object GenericIssue : SnackbarMessage
     }

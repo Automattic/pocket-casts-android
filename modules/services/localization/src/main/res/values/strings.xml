@@ -2027,6 +2027,22 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <!-- Description while the clip is being created and a progress bar is shown -->
     <string name="share_clip_sharing_clip">Creating clip…</string>
     <string name="share_error_message">Unable to share. Please try again later.</string>
+    <string name="share_invalid_clip_message">Clip start must be before clip end</string>
+    <string name="share_clip_too_long_message">Clip exceeds episode duration: %s</string>
+    <string name="share_start_position">Start</string>
+    <string name="share_end_position">End</string>
+    <!-- Content description of a text field that allows to control clip's start hours position in hh:mm:ss format -->
+    <string name="share_start_hours">Clip start hours</string>
+    <!-- Content description of a text field that allows to control clip's start minutes position in hh:mm:ss format -->
+    <string name="share_start_minutes">Clip start minutes</string>
+    <!-- Content description of a text field that allows to control clip's start seconds position in hh:mm:ss format -->
+    <string name="share_start_seconds">Clip start seconds</string>
+    <!-- Content description of a text field that allows to control clip's end hours position in hh:mm:ss format -->
+    <string name="share_end_hours">Clip end hours</string>
+    <!-- Content description of a text field that allows to control clip's end minutes position in hh:mm:ss format -->
+    <string name="share_end_minutes">Clip end minutes</string>
+    <!-- Content description of a text field that allows to control clip's end seconds position in hh:mm:ss format -->
+    <string name="share_end_seconds">Clip end seconds</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
