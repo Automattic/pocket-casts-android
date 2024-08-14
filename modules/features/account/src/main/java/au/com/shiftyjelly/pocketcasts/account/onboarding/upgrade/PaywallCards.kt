@@ -73,7 +73,7 @@ fun DesktopWebAppCard() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DesktopWebAppCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
