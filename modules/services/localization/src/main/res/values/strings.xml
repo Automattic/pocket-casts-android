@@ -2065,5 +2065,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <!-- Paywall -->
     <string name="paywall_save_50_off">Save 50% off your first year.</string>
     <string name="paywall_free_1_month_trial">Free 1-month trial.</string>
+    <string name="paywall_desktop_and_web_title">Desktop and web apps</string>
+    <string name="paywall_desktop_and_web_description">Listen in more places with our Windows, macOS and Web apps.</string>
+    <string name="paywall_desktop_and_web_content_description">Desktop and web apps image</string>
+
 
 </resources>
