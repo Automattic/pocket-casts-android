@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -79,13 +80,15 @@ private fun Content(
         Stars(
             stars = state.stars,
             color = MaterialTheme.theme.colors.primaryUi05Selected,
+            onClick = onClick,
         )
 
         if (!state.noRatings) {
             TextP40(
                 text = state.roundedAverage,
                 modifier = Modifier
-                    .padding(start = 4.dp),
+                    .padding(start = 4.dp)
+                    .clickable { onClick() },
                 fontWeight = FontWeight.W700,
             )
         }
@@ -93,7 +96,8 @@ private fun Content(
         TextP40(
             text = if (state.noRatings) stringResource(R.string.no_ratings) else "(${state.total?.abbreviated})",
             modifier = Modifier
-                .padding(start = 4.dp),
+                .padding(start = 4.dp)
+                .clickable { onClick() },
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -122,9 +126,11 @@ private fun Content(
 private fun Stars(
     stars: List<Star>,
     color: Color,
+    onClick: () -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.Start,
+        modifier = Modifier.clickable { onClick() },
     ) {
         stars.forEach { star ->
             Icon(
