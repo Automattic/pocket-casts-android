@@ -126,7 +126,8 @@ android {
     buildTypes {
         debug {
             pseudoLocalesEnabled true
-            testCoverageEnabled false
+            enableUnitTestCoverage = false
+            enableAndroidTestCoverage = false
             ext.alwaysUpdateBuildId = false
 
             buildConfigField "String", "SERVER_MAIN_URL", "\"https://refresh.pocketcasts.net\""
@@ -145,7 +146,8 @@ android {
         debugProd {
             debuggable true
 
-            testCoverageEnabled false
+            enableUnitTestCoverage = false
+            enableAndroidTestCoverage = false
             ext.alwaysUpdateBuildId = false
 
             buildConfigField "String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD
