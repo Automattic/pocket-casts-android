@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 
 private val SearchBarMaxWidth = 500.dp
 private val SearchViewCornerRadius = 38.dp
@@ -117,7 +118,7 @@ fun TranscriptPageWrapper(
                 },
                 onSearchClicked = { expandSearch = true },
                 searchText = searchQueryFlow.value,
-                searchOccurencesText = searchState.value.searchOccurencesText,
+                searchState = searchState.value,
                 onSearchCleared = { searchViewModel.onSearchCleared() },
                 onSearchPreviousClicked = { searchViewModel.onSearchPrevious() },
                 onSearchNextClicked = { searchViewModel.onSearchNext() },
@@ -138,7 +139,7 @@ fun TranscriptToolbar(
     onSearchPreviousClicked: () -> Unit,
     onSearchNextClicked: () -> Unit,
     searchText: String,
-    searchOccurencesText: String,
+    searchState: SearchUiState,
     onSearchQueryChanged: (String) -> Unit,
     expandSearch: Boolean,
 ) {
@@ -194,7 +195,7 @@ fun TranscriptToolbar(
                     trailingIcon = {
                         SearchBarTrailingIcons(
                             text = searchText,
-                            searchOccurrencesText = searchOccurencesText,
+                            searchState = searchState,
                             onSearchCleared = onSearchCleared,
                             onPrevious = onSearchPreviousClicked,
                             onNext = onSearchNextClicked,
@@ -255,7 +256,7 @@ private fun SearchBarLeadingIcons(
 @Composable
 private fun SearchBarTrailingIcons(
     text: String,
-    searchOccurrencesText: String,
+    searchState: SearchUiState,
     onSearchCleared: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
@@ -265,7 +266,7 @@ private fun SearchBarTrailingIcons(
     ) {
         if (text.isNotEmpty()) {
             Text(
-                text = searchOccurrencesText,
+                text = searchState.searchOccurrencesText,
                 color = SearchBarIconColor,
             )
             IconButton(
@@ -279,9 +280,10 @@ private fun SearchBarTrailingIcons(
                 )
             }
         }
+
         IconButton(
             onClick = onPrevious,
-            enabled = text.isNotEmpty(),
+            enabled = searchState.prevNextArrowButtonsEnabled,
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowUp,
@@ -290,7 +292,7 @@ private fun SearchBarTrailingIcons(
         }
         IconButton(
             onClick = onNext,
-            enabled = text.isNotEmpty(),
+            enabled = searchState.prevNextArrowButtonsEnabled,
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
@@ -324,7 +326,7 @@ private fun TranscriptToolbarPreview(
             onSearchPreviousClicked = {},
             onSearchNextClicked = {},
             searchText = "",
-            searchOccurencesText = "",
+            searchState = SearchUiState(),
             onSearchQueryChanged = {},
             expandSearch = false,
         )
@@ -345,7 +347,7 @@ private fun TranscriptToolbarExpandedSearchPreview(
             onSearchPreviousClicked = {},
             onSearchNextClicked = {},
             searchText = "",
-            searchOccurencesText = "",
+            searchState = SearchUiState(),
             onSearchQueryChanged = {},
             expandSearch = true,
         )
