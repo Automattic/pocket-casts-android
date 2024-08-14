@@ -21,8 +21,9 @@ class BetaFeaturesViewModel @Inject constructor() : ViewModel() {
     val state: StateFlow<State> = _state
 
     private val featureFlags: List<FeatureFlagWrapper>
-        get() = Feature.values()
+        get() = Feature.entries
             .filter { it.hasDevToggle }
+            .sortedBy { it.title }
             .map {
                 FeatureFlagWrapper(
                     featureFlag = it,
