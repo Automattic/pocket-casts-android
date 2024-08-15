@@ -7,16 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
@@ -110,7 +107,7 @@ internal fun UpgradeLayoutFeatures(
                             }
 
                             Box(
-                                modifier = Modifier.padding(bottom = 20.dp),
+                                modifier = Modifier.padding(bottom = 40.dp),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 AutoResizeText(
@@ -127,8 +124,6 @@ internal fun UpgradeLayoutFeatures(
                                 )
                             }
 
-                            Spacer(Modifier.height(20.dp))
-
                             FeatureCards(
                                 // TODO: it will be replaced for the new one
                                 state = state,
@@ -136,8 +131,6 @@ internal fun UpgradeLayoutFeatures(
                                 onFeatureCardChanged = onFeatureCardChanged,
                             )
                         }
-
-                        Spacer(Modifier.weight(1f))
                     }
                 }
             }
@@ -156,23 +149,17 @@ private fun SubscribeButton(
     Box(
         contentAlignment = Alignment.BottomCenter,
     ) {
-        Column {
-            RowButton(
-                text = stringResource(LR.string.get_pocket_casts_plus),
-                onClick = onClickSubscribe,
-                fontWeight = FontWeight.W600,
-                fontSize = 18.sp,
-                textColor = Color.Black,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = colorResource(UR.color.plus_gold),
-                ),
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars),
-            )
-        }
+        RowButton(
+            modifier = Modifier.padding(bottom = 80.dp),
+            text = stringResource(LR.string.get_pocket_casts_plus),
+            onClick = onClickSubscribe,
+            fontWeight = FontWeight.W600,
+            fontSize = 18.sp,
+            textColor = Color.Black,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = colorResource(UR.color.plus_gold),
+            ),
+        )
     }
 }
 
