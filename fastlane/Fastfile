@@ -437,7 +437,7 @@ platform :android do
       project: 'automattic/pocket-casts-android',
       pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
       reuse_identifier: 'app-prototype-build-link',
-      body: "🚧 Prototype builds will be available soon"
+      body: '🚧 Prototype builds will be available soon'
     )
 
     prototype_build_type = 'debugProd'
