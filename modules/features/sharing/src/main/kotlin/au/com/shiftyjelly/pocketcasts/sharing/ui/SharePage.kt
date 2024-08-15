@@ -80,6 +80,7 @@ internal fun VerticalSharePage(
                     modifier = Modifier.onGloballyPositioned { coordinates -> topContentHeight = coordinates.size.height },
                 )
                 MiddleContent(
+                    shareColors = shareColors,
                     middleContent = middleContent,
                     pagerState = pagerState,
                     scrollState = scrollState,
@@ -144,6 +145,7 @@ private fun TopContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MiddleContent(
+    shareColors: ShareColors,
     scrollState: ScrollState,
     pagerState: PagerState,
     topContentHeight: Int,
@@ -159,6 +161,8 @@ private fun MiddleContent(
     ) {
         PagerDotIndicator(
             state = pagerState,
+            activeDotColor = shareColors.onBackgroundPrimary,
+            inactiveDotColor = shareColors.onBackgroundSecondary,
         )
     }
 

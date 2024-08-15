@@ -464,6 +464,8 @@ private fun PagingContent(
         ) {
             PagerDotIndicator(
                 state = pagerState,
+                activeDotColor = shareColors.onBackgroundPrimary,
+                inactiveDotColor = shareColors.onBackgroundSecondary,
             )
         }
     }
