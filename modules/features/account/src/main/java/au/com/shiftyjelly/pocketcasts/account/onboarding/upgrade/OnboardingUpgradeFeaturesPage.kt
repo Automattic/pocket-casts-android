@@ -133,7 +133,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                     canUpgrade = canUpgrade,
                 )
             } else {
-                UpgradeLayout(
+                UpgradeLayoutOriginal(
                     state = loadedState,
                     source = source,
                     scrollState = scrollState,
@@ -157,7 +157,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 }
 
 @Composable
-private fun UpgradeLayout(
+private fun UpgradeLayoutOriginal(
     state: OnboardingUpgradeFeaturesState.Loaded,
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,
