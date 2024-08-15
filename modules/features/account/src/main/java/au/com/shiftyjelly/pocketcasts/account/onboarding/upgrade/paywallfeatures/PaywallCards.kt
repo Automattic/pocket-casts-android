@@ -30,6 +30,52 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
+fun FoldersCard() {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .height(394.dp)
+            .width(313.dp)
+            .background(Color.Transparent),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colorResource(UR.color.coolgrey_90)),
+        ) {
+            Image(
+                painter = painterResource(IR.drawable.folders),
+                contentDescription = stringResource(LR.string.paywall_folders_content_description),
+                modifier = Modifier
+                    .height(231.dp)
+                    .padding(top = 12.dp, start = 2.dp, end = 2.dp)
+                    .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Inside,
+            )
+
+            TextH30(
+                text = stringResource(LR.string.paywall_folders_title),
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.W600,
+                color = Color.White,
+                modifier = Modifier
+                    .padding(top = 20.dp, start = 24.dp, end = 24.dp)
+                    .align(Alignment.Start),
+            )
+            TextP50(
+                text = stringResource(LR.string.paywall_folders_description),
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.W400,
+                color = colorResource(UR.color.coolgrey_50),
+                modifier = Modifier
+                    .padding(top = 4.dp, start = 24.dp, end = 24.dp, bottom = 48.dp)
+                    .align(Alignment.Start),
+            )
+        }
+    }
+}
+
+@Composable
 fun DesktopWebAppCard() {
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -48,7 +94,7 @@ fun DesktopWebAppCard() {
                 contentDescription = stringResource(LR.string.paywall_desktop_and_web_content_description),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(vertical = 20.dp)
                     .height(186.dp)
                     .align(Alignment.CenterHorizontally),
                 contentScale = ContentScale.Fit,
@@ -81,5 +127,13 @@ fun DesktopWebAppCard() {
 private fun DesktopWebAppCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         DesktopWebAppCard()
+    }
+}
+
+@Preview
+@Composable
+private fun FoldersCardPreview() {
+    AppTheme(Theme.ThemeType.LIGHT) {
+        FoldersCard()
     }
 }
