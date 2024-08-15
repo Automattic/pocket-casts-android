@@ -26,7 +26,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 
@@ -39,6 +41,7 @@ fun BaseRowButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    fontSize: TextUnit = 16.sp,
     elevation: ButtonElevation? = ButtonDefaults.elevation(),
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
@@ -86,6 +89,7 @@ fun BaseRowButton(
                 TextP40(
                     text = text,
                     fontFamily = fontFamily,
+                    fontSize = fontSize,
                     fontWeight = fontWeight,
                     modifier = Modifier
                         .padding(vertical = textVerticalPadding, horizontal = 6.dp),

@@ -18,9 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -35,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
@@ -157,34 +156,17 @@ private fun SubscribeButton(
         contentAlignment = Alignment.BottomCenter,
     ) {
         Column {
-            Button(
+            RowButton(
+                text = stringResource(LR.string.get_pocket_casts_plus),
                 onClick = onClickSubscribe,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 24.dp)
-                    .heightIn(min = 56.dp),
+                fontWeight = FontWeight.W600,
+                fontSize = 18.sp,
+                textColor = Color.Black,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = colorResource(UR.color.plus_gold),
                 ),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 34.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    AutoResizeText(
-                        text = stringResource(LR.string.get_pocket_casts_plus),
-                        color = Color.Black,
-                        maxFontSize = 18.sp,
-                        lineHeight = 22.sp,
-                        fontWeight = FontWeight.W600,
-                        maxLines = 1,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
+            )
+
             Spacer(
                 modifier = Modifier
                     .windowInsetsBottomHeight(WindowInsets.navigationBars),
