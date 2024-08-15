@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -36,12 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -83,12 +81,16 @@ internal fun UpgradePlusLayoutExperiment(
                                 .padding(top = 8.dp),
                             horizontalArrangement = Arrangement.End,
                         ) {
-                            TextP30(
-                                text = stringResource(R.string.not_now),
-                                color = Color.White,
-                                modifier = Modifier
-                                    .padding(start = 24.dp, end = 24.dp, top = 8.dp)
-                                    .clickable { onNotNowPressed() },
+                            RowTextButton(
+                                text = stringResource(LR.string.not_now),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    backgroundColor = Color.Transparent,
+                                    contentColor = Color.White,
+                                ),
+                                fontSize = 18.sp,
+                                onClick = onNotNowPressed,
+                                fullWidth = false,
+                                includePadding = false,
                             )
                         }
 
