@@ -52,11 +52,6 @@ enum class AnalyticsEvent(val key: String) {
     SIGNIN_SHOWN("signin_shown"),
     SIGNIN_DISMISSED("signin_dismissed"),
 
-    /* Select Account Type */
-    SELECT_ACCOUNT_TYPE_SHOWN("select_account_type_shown"),
-    SELECT_ACCOUNT_TYPE_DISMISSED("select_account_type_dismissed"),
-    SELECT_ACCOUNT_TYPE_BUTTON_TAPPED("select_account_type_button_tapped"),
-
     /* Create Account */
     CREATE_ACCOUNT_SHOWN("create_account_shown"),
     CREATE_ACCOUNT_DISMISSED("create_account_dismissed"),

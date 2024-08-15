@@ -122,7 +122,6 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_SHOWN
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_SHOWN
-            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_SHOWN
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_SHOWN
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_SHOWN
@@ -147,7 +146,6 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_DISMISSED
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_DISMISSED
-            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_DISMISSED
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_DISMISSED
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED

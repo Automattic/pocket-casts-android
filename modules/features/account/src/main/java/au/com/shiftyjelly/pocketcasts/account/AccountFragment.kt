@@ -105,8 +105,6 @@ class AccountFragment : BaseFragment() {
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 if (Util.isCarUiMode(view.context)) { // We can't sign up to plus on cars so skip that step
                     view.findNavController().navigate(R.id.action_accountFragment_to_createEmailFragment)
-                } else {
-                    view.findNavController().navigate(R.id.action_accountFragment_to_createAccountFragment)
                 }
             }
         }
