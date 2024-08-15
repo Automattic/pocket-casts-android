@@ -144,6 +144,18 @@ fun SlumberStudiosCard() {
     CardItem(cardData = slumberCardData)
 }
 
+@Composable
+fun StorageCard() {
+    val slumberCardData = CardData(
+        imageResId = IR.drawable.storage,
+        contentDescription = stringResource(LR.string.paywall_storage_content_description),
+        title = stringResource(LR.string.paywall_storage_title),
+        description = stringResource(LR.string.paywall_storage_description),
+        imageHeight = 163.dp,
+    )
+    CardItem(cardData = slumberCardData)
+}
+
 @Preview
 @Composable
 private fun WatchCardPreview() {
@@ -181,5 +193,13 @@ private fun FoldersCardPreview() {
 private fun SlumberStudiosCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         SlumberStudiosCard()
+    }
+}
+
+@Preview
+@Composable
+private fun StorageCardPreview() {
+    AppTheme(Theme.ThemeType.LIGHT) {
+        StorageCard()
     }
 }
