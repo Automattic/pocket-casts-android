@@ -21,9 +21,9 @@ internal fun CloseButton(
 ) = Image(
     painter = painterResource(IR.drawable.ic_close_sheet),
     contentDescription = stringResource(LR.string.close),
-    colorFilter = ColorFilter.tint(shareColors.closeButtonIcon),
+    colorFilter = ColorFilter.tint(shareColors.onContainerPrimary),
     modifier = modifier
         .clickable(onClick = onClick)
         .clip(CircleShape)
-        .background(shareColors.closeButton),
+        .background(shareColors.container),
 )

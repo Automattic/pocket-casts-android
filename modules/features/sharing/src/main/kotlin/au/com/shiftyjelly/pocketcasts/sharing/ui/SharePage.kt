@@ -126,7 +126,7 @@ private fun TopContent(
         TextH30(
             text = shareTitle,
             textAlign = TextAlign.Center,
-            color = shareColors.backgroundPrimaryText,
+            color = shareColors.onBackgroundPrimary,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
         Spacer(
@@ -135,7 +135,7 @@ private fun TopContent(
         TextH40(
             text = shareDescription,
             textAlign = TextAlign.Center,
-            color = shareColors.backgroundSecondaryText,
+            color = shareColors.onBackgroundSecondary,
             modifier = Modifier.sizeIn(maxWidth = 220.dp),
         )
     }
@@ -226,7 +226,7 @@ internal fun HorizontalSharePage(
                 TextH30(
                     text = shareTitle,
                     textAlign = TextAlign.Center,
-                    color = shareColors.backgroundPrimaryText,
+                    color = shareColors.onBackgroundPrimary,
                     modifier = Modifier.padding(horizontal = 24.dp),
                 )
                 Spacer(
@@ -235,7 +235,7 @@ internal fun HorizontalSharePage(
                 TextH40(
                     text = shareDescription,
                     textAlign = TextAlign.Center,
-                    color = shareColors.backgroundSecondaryText,
+                    color = shareColors.onBackgroundSecondary,
                     modifier = Modifier.padding(horizontal = 24.dp),
                 )
             }

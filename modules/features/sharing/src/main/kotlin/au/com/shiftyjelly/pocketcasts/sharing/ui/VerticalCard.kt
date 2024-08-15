@@ -125,7 +125,7 @@ private fun VerticalCard(
             text = data.topText(),
             disableScale = true,
             maxLines = 1,
-            color = shareColors.cardText.copy(alpha = 0.5f),
+            color = shareColors.cardTextSecondary,
             modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
@@ -136,7 +136,7 @@ private fun VerticalCard(
             disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = shareColors.cardText,
+            color = shareColors.cardTextPrimary,
             modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
@@ -147,7 +147,7 @@ private fun VerticalCard(
             disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = shareColors.cardText.copy(alpha = 0.5f),
+            color = shareColors.cardTextSecondary,
             modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
