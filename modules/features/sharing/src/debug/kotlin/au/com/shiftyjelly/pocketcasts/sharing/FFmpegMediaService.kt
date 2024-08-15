@@ -50,7 +50,7 @@ internal class FFmpegMediaService(
                     append("-t ${clipRange.duration.toSecondsWithSingleMilli()} ") // Duration must be in S.xxx or HH:MM:SS.xxx format
                     append("-i $backgroundFile ") // Image stream source
                     append("-i $clipFile ") // Audio stream source
-                    append("-c:a aac ") // Use aac audio codec, it helps with Qucik Time which doesn't handle libmp3lame
+                    append("-c:a aac ") // Use aac audio codec, it helps with Quick Time which doesn't handle libmp3lame
                     append("-c:v mpeg4 ") // Use mpeg4 video codec
                     append("-q:v 1 ") // Use the highest video quality
                     append("-pix_fmt yuv420p ") // Use 4:2:0 pixel format
