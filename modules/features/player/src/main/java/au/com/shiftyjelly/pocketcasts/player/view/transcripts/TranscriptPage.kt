@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,29 +59,35 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ContentOffsetTop = 64.dp
 private val ContentOffsetBottom = 80.dp
+private val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.DarkGray, color = Color.White)
+private val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.White, color = Color.Black)
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TranscriptPage(
     playerViewModel: PlayerViewModel,
     transcriptViewModel: TranscriptViewModel,
+    searchViewModel: TranscriptSearchViewModel,
     theme: Theme,
     modifier: Modifier,
 ) {
     val uiState = transcriptViewModel.uiState.collectAsStateWithLifecycle()
     val transitionState = playerViewModel.transitionState.collectAsStateWithLifecycle(null)
+    val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
     val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(refreshing.value, {
         transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
@@ -107,6 +113,7 @@ fun TranscriptPage(
 
                 TranscriptContent(
                     state = loadedState,
+                    searchState = searchState.value,
                     colors = colors,
                     modifier = modifier,
                 )
@@ -127,6 +134,13 @@ fun TranscriptPage(
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
         transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
     }
+
+    if (uiState.value is UiState.TranscriptLoaded) {
+        val state = uiState.value as UiState.TranscriptLoaded
+        LaunchedEffect(state.displayInfo.text) {
+            searchViewModel.setSearchSourceText(state.displayInfo.text)
+        }
+    }
 }
 
 @Composable
@@ -139,6 +153,7 @@ private fun EmptyView(
 @Composable
 private fun TranscriptContent(
     state: UiState.TranscriptLoaded,
+    searchState: SearchUiState,
     colors: DefaultColors,
     modifier: Modifier,
 ) {
@@ -158,10 +173,11 @@ private fun TranscriptContent(
                     .padding(top = 60.dp),
             )
         } else {
-            ScrollableTranscriptTextView(
-                state,
-                colors,
-                bottomPadding,
+            ScrollableTranscriptView(
+                state = state,
+                searchState = searchState,
+                colors = colors,
+                bottomPadding = bottomPadding,
             )
         }
 
@@ -184,21 +200,12 @@ private fun TranscriptContent(
 
 @OptIn(UnstableApi::class)
 @Composable
-private fun ScrollableTranscriptTextView(
+private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
+    searchState: SearchUiState,
     colors: DefaultColors,
     bottomPadding: Dp,
 ) {
-    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
-    val displayString = buildString {
-        with(state.cuesWithTimingSubtitle) {
-            (0 until count()).forEach { index ->
-                get(index).cues.forEach { cue ->
-                    append(cue.text)
-                }
-            }
-        }
-    }
     val scrollState = rememberLazyListState()
     val scrollableContentModifier = Modifier
         .padding(horizontal = 16.dp)
@@ -221,30 +228,59 @@ private fun ScrollableTranscriptTextView(
             LocalClipboardManager.current,
         ),
     ) {
-        LazyColumn(
-            state = scrollState,
-            modifier = scrollableContentModifier,
-            contentPadding = PaddingValues(top = ContentOffsetTop, bottom = ContentOffsetBottom),
-        ) {
-            itemsIndexed(displayString.splitIgnoreEmpty("\n\n")) { _, item ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                ) {
-                    SelectionContainer {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(defaultTextStyle) {
-                                    append(item)
-                                }
-                            },
-                            lineHeight = 30.sp,
-                        )
-                    }
+        SelectionContainer {
+            LazyColumn(
+                state = scrollState,
+                modifier = scrollableContentModifier,
+                contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
+            ) {
+                items(state.displayInfo.items) { item ->
+                    TranscriptItem(
+                        colors = colors,
+                        item = item,
+                        searchState = searchState,
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TranscriptItem(
+    colors: DefaultColors,
+    item: DisplayItem,
+    searchState: SearchUiState,
+) {
+    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                withStyle(defaultTextStyle) { append(item.text) }
+                if (searchState.searchTerm.isNotEmpty()) {
+                    // Highlight search occurrences
+                    searchState.searchResultIndices
+                        .filter { searchResultIndex -> searchResultIndex in item.startIndex until item.endIndex }
+                        .forEach { searchResultIndex ->
+                            val style = if (searchState.searchResultIndices.indexOf(searchResultIndex) == searchState.currentSearchIndex) {
+                                SearchOccurrenceSelectedSpanStyle
+                            } else {
+                                SearchOccurrenceDefaultSpanStyle
+                            }
+                            val start = searchResultIndex - item.startIndex
+                            addStyle(
+                                style = style,
+                                start = start,
+                                end = start + searchState.searchTerm.length,
+                            )
+                        }
+                }
+            },
+        )
     }
 }
 
@@ -346,10 +382,29 @@ private data class DefaultColors(
         MaterialTheme.theme.colors.playerContrast01
 }
 
-@OptIn(UnstableApi::class)
 @Preview(name = "Dark")
 @Composable
-private fun TranscriptContentPreview() {
+private fun TranscriptWithoutSearchContentPreview() {
+    TranscriptContentPreview(searchState = SearchUiState())
+}
+
+@Preview(name = "Dark")
+@Composable
+private fun TranscriptWithSearchContentPreview() {
+    TranscriptContentPreview(
+        searchState = SearchUiState(
+            searchTerm = "se",
+            searchResultIndices = listOf(26, 61, 134),
+            currentSearchIndex = 0,
+        ),
+    )
+}
+
+@OptIn(UnstableApi::class)
+@Composable
+private fun TranscriptContentPreview(
+    searchState: SearchUiState,
+) {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptContent(
             state = UiState.TranscriptLoaded(
@@ -364,19 +419,23 @@ private fun TranscriptContentPreview() {
                     CuesWithTiming(
                         ImmutableList.of(
                             Cue.Builder().setText(
-                                "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed. Laoreet justo orci luctus venenatis taciti lobortis sapien. Torquent quis dignissim curabitur magna molestie lectus pretium litora. Urna sodales rutrum posuere fusce velit turpis sollicitudin iaculis. Imperdiet turpis natoque vehicula cursus quisque congue.<br>" +
-                                    "<br>" +
-                                    "Quis etiam torquent feugiat penatibus curabitur. Facilisi inceptos egestas dolor mauris eget; rutrum facilisis nam. Ipsum mollis auctor mollis libero facilisi, sed posuere tristique lectus. Morbi erat suscipit eu feugiat nisi mauris. Convallis nostra condimentum est turpis ornare egestas lorem euismod at. Est nec eleifend leo proin vel hendrerit. Sem ipsum duis nam bibendum faucibus vestibulum class. Leo iaculis magna dignissim sit tristique porttitor dapibus non.<br>" +
-                                    "<br>" +
-                                    "Dis etiam suspendisse rhoncus, a class nisi porttitor. Ornare velit imperdiet natoque elit lacinia suscipit. Feugiat phasellus vestibulum sapien posuere rhoncus. Massa hendrerit purus taciti elit, maecenas non lobortis. Potenti class condimentum consectetur convallis, lacus habitasse praesent. Potenti risus mi neque volutpat vivamus taciti.<br>",
-
+                                "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed.",
                             ).build(),
                         ),
                         0,
                         0,
                     ),
                 ),
+                displayInfo = DisplayInfo(
+                    text = "",
+                    items = listOf(
+                        DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", 0, 52),
+                        DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", 53, 114),
+                        DisplayItem("Maecenas fermentum senectus penatibus tenectus integer per vulputate tellus ted.", 115, 195),
+                    ),
+                ),
             ),
+            searchState = searchState,
             colors = DefaultColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
@@ -397,7 +456,12 @@ private fun TranscriptEmptyContentPreview() {
                     url = "url",
                 ),
                 cuesWithTimingSubtitle = emptyList(),
+                displayInfo = DisplayInfo(
+                    text = "",
+                    items = emptyList(),
+                ),
             ),
+            searchState = SearchUiState(),
             colors = DefaultColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
