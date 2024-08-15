@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.security.MessageDigest
+import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -64,6 +65,12 @@ fun CharSequence.splitIgnoreEmpty(delimiter: String): List<String> {
 fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
 }
+
+fun String.removeAccents() =
+    Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("\\p{Mn}+".toRegex(), "")
+        .replace("\u0141", "L") // Remove L with stroke
+        .replace("\u0142", "l") // Remove l with stroke
 
 fun String.sha1(): String? = hashString("SHA-1")
 fun String.sha256(): String? = hashString("SHA-256")

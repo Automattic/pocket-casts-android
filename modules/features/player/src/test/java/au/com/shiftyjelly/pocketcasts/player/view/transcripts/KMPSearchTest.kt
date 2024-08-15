@@ -44,4 +44,19 @@ class KMPSearchTest {
 
         assertEquals(emptyList<Int>(), result)
     }
+
+    @Test
+    fun `search handles diacritics`() {
+        val text = "testing diacritics żółć zolc."
+
+        val pattern1 = "żółć"
+        kmpSearch.setPattern(pattern1)
+        var result = kmpSearch.search(text)
+        assertEquals(listOf(19, 24), result)
+
+        val pattern2 = "zolc"
+        kmpSearch.setPattern(pattern2)
+        result = kmpSearch.search(text)
+        assertEquals(listOf(19, 24), result)
+    }
 }

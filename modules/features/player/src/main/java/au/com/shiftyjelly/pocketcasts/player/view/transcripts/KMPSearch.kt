@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
+import au.com.shiftyjelly.pocketcasts.utils.extensions.removeAccents
 import javax.inject.Inject
 
 // An implementation of the Knuth-Morris-Pratt algorithm
@@ -8,7 +9,7 @@ class KMPSearch @Inject constructor() {
     private var lps: IntArray = intArrayOf()
 
     fun setPattern(pattern: String) {
-        this.pattern = pattern.lowercase().toCharArray()
+        this.pattern = pattern.removeAccents().lowercase().toCharArray()
         lps = IntArray(pattern.length)
         computeLPSArray()
     }
@@ -46,7 +47,7 @@ class KMPSearch @Inject constructor() {
             return emptyList()
         }
 
-        val textArray = text.lowercase().toCharArray()
+        val textArray = text.removeAccents().lowercase().toCharArray()
         val result = mutableListOf<Int>()
         var i = 0 // index for textArray
         var j = 0 // index for pattern
