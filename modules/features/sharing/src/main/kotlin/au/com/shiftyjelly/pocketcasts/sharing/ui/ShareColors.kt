@@ -21,7 +21,10 @@ internal data class ShareColors(
 
     val cardBottom = ColorUtils.changeHsvValue(base, 0.6f)
     val cardTop = ColorUtils.changeHsvValue(base, 0.75f)
-    val cardTextPrimary = if (base.isDark) Color.White else Color.Black
+
+    // Text is on vertical card is about at 33% height of card
+    private val belowTextColor = ColorUtils.changeHsvValue(base, 0.65f)
+    val cardTextPrimary = if (belowTextColor.isDark) Color.White else Color.Black
     val cardTextSecondary = cardTextPrimary.copy(alpha = 0.5f)
 
     val snackbar = if (background.isDark) Color.White else Color.Black
