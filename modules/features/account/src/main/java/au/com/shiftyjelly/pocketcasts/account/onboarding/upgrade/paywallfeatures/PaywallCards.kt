@@ -214,6 +214,52 @@ fun WatchCard() {
     }
 }
 
+@Composable
+fun SlumberStudiosCard() {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .height(394.dp)
+            .width(313.dp)
+            .background(Color.Transparent),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colorResource(UR.color.coolgrey_90)),
+        ) {
+            Image(
+                painter = painterResource(IR.drawable.slumber),
+                contentDescription = stringResource(LR.string.paywall_slumber_studios_content_description),
+                modifier = Modifier
+                    .height(195.dp)
+                    .padding(top = 20.dp, start = 2.dp, end = 2.dp)
+                    .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Fit,
+            )
+
+            TextH30(
+                text = stringResource(LR.string.paywall_slumber_studios_title),
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.W600,
+                color = Color.White,
+                modifier = Modifier
+                    .padding(top = 20.dp, start = 24.dp, end = 24.dp)
+                    .align(Alignment.Start),
+            )
+            TextP50(
+                text = stringResource(LR.string.paywall_slumber_studios_description),
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.W400,
+                color = colorResource(UR.color.coolgrey_50),
+                modifier = Modifier
+                    .padding(top = 4.dp, start = 24.dp, end = 24.dp, bottom = 48.dp)
+                    .align(Alignment.Start),
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun WatchCardPreview() {
@@ -243,5 +289,13 @@ private fun DesktopWebAppCardPreview() {
 private fun FoldersCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         FoldersCard()
+    }
+}
+
+@Preview
+@Composable
+private fun SlumberStudiosCardPreview() {
+    AppTheme(Theme.ThemeType.LIGHT) {
+        SlumberStudiosCard()
     }
 }
