@@ -59,6 +59,7 @@ private const val SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET = -1
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
+    private val productDetailsInterceptor: ProductDetailsInterceptor,
     private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : SubscriptionManager,
@@ -186,13 +187,14 @@ class SubscriptionManagerImpl @Inject constructor(
             .build()
 
         billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+            val (result, products) = productDetailsInterceptor.intercept(billingResult, productDetailsList)
+            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
-                productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
+                productDetails.accept(ProductDetailsState.Loaded(products))
 
                 refreshPurchases()
             } else {
-                productDetails.accept(ProductDetailsState.Error(billingResult.debugMessage))
+                productDetails.accept(ProductDetailsState.Error(result.debugMessage))
             }
         }
     }
