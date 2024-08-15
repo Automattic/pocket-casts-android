@@ -2,9 +2,11 @@ package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,13 +14,14 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val SEARCH_DEBOUNCE = 300L
 
 @HiltViewModel
 class TranscriptSearchViewModel @Inject constructor(
     private val kmpSearch: KMPSearch,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var _searchSourceText: String = ""
 
@@ -47,20 +50,18 @@ class TranscriptSearchViewModel @Inject constructor(
         _searchQueryFlow.value = searchQuery
     }
 
-    private fun performSearch(searchTerm: String) {
-        viewModelScope.launch {
-            try {
-                kmpSearch.setPattern(searchTerm)
-                val searchResultIndices = kmpSearch.search(_searchSourceText)
-                _searchState.update {
-                    it.copy(
-                        searchTerm = searchTerm,
-                        searchResultIndices = searchResultIndices,
-                    )
-                }
-            } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, "Error searching transcript")
+    private suspend fun performSearch(searchTerm: String) = withContext(defaultDispatcher) {
+        try {
+            kmpSearch.setPattern(searchTerm)
+            val searchResultIndices = kmpSearch.search(_searchSourceText)
+            _searchState.update {
+                it.copy(
+                    searchTerm = searchTerm,
+                    searchResultIndices = searchResultIndices,
+                )
             }
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, "Error searching transcript")
         }
     }
 
