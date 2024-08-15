@@ -59,8 +59,7 @@ class TranscriptSearchViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Error searching transcript: ${e.message}")
-                e.printStackTrace()
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, "Error searching transcript")
             }
         }
     }
