@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,14 +44,16 @@ fun DesktopWebAppCard() {
                 .background(colorResource(UR.color.coolgrey_90)),
         ) {
             Image(
-                painter = painterResource(IR.drawable.about_logo_pocketcasts),
+                painter = painterResource(IR.drawable.desktop),
                 contentDescription = stringResource(LR.string.paywall_desktop_and_web_content_description),
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(20.dp)
                     .height(186.dp)
-                    .padding(top = 57.dp)
                     .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Fit,
             )
+
             TextH30(
                 text = stringResource(LR.string.paywall_desktop_and_web_title),
                 textAlign = TextAlign.Start,
