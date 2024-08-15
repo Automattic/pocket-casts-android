@@ -2083,5 +2083,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="paywall_storage_title">20 GB of storage</string>
     <string name="paywall_storage_description">Upload your audio files to cloud storage and have them available everywhere.</string>
     <string name="paywall_storage_content_description">20 GB of storage image</string>
+    <string name="paywall_themes_title">Extra themes and icons</string>
+    <string name="paywall_themes_description">Fly your true colors. Exclusive icons and themes for our subscribers.</string>
+    <string name="paywall_themes_content_description">Extra themes and icons image</string>
 
 </resources>
