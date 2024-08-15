@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
+package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallfeatures
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
