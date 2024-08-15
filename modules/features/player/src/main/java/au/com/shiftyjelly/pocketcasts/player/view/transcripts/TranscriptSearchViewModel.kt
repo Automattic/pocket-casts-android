@@ -58,6 +58,7 @@ class TranscriptSearchViewModel @Inject constructor(
                 it.copy(
                     searchTerm = searchTerm,
                     searchResultIndices = searchResultIndices,
+                    currentSearchIndex = 0,
                 )
             }
         } catch (e: Exception) {

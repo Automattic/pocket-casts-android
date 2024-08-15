@@ -82,6 +82,21 @@ class TranscriptSearchViewModelTest {
     }
 
     @Test
+    fun `current search index is reset to zero on new search`() = runTest {
+        viewModel.onSearchQueryChanged("test1")
+        advanceUntilIdle()
+        viewModel.onSearchNext()
+        viewModel.onSearchNext() // currentSearchIndex = 2
+
+        viewModel.onSearchQueryChanged("test2")
+
+        viewModel.searchState.test {
+            assertTrue((awaitItem().currentSearchIndex == 2))
+            assertTrue((awaitItem().currentSearchIndex == 0))
+        }
+    }
+
+    @Test
     fun `search state is reset when search is done`() = runTest {
         viewModel.onSearchQueryChanged(searchTerm)
         advanceUntilIdle()
