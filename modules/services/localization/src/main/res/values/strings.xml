@@ -2063,6 +2063,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="paywall_desktop_and_web_title">Desktop and web apps</string>
     <string name="paywall_desktop_and_web_description">Listen in more places with our Windows, macOS and Web apps.</string>
     <string name="paywall_desktop_and_web_content_description">Desktop and web apps image</string>
+    <string name="paywall_folders_title">Folders</string>
+    <string name="paywall_folders_description">Organize your podcasts in folders, and keep them in sync across all your devices.</string>
+    <string name="paywall_folders_content_description">Folders image</string>
 
 
 </resources>
