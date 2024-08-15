@@ -47,7 +47,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
-internal fun UpgradePlusLayoutExperiment(
+internal fun UpgradeLayoutFeatures(
     state: OnboardingUpgradeFeaturesState.Loaded,
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,

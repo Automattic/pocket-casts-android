@@ -123,7 +123,7 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loaded -> {
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
             if (FeatureFlag.isEnabled(Feature.PAYWALL_EXPERIMENT)) {
-                UpgradePlusLayoutExperiment(
+                UpgradeLayoutFeatures(
                     state = loadedState,
                     source = source,
                     onNotNowPressed = onNotNowPressed,
