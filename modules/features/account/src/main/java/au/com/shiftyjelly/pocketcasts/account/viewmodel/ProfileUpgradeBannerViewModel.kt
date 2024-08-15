@@ -32,7 +32,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
 ) : AndroidViewModel(app) {
 
     sealed class State {
-        data class Loaded constructor(
+        data class Loaded(
             val featureCardsState: FeatureCardsState,
             val upgradeButtons: List<UpgradeButton>,
         ) : State()

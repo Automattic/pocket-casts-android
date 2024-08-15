@@ -86,7 +86,7 @@ sealed interface SubscriptionPricingPhase {
             }
         }
 
-    class Years constructor(
+    class Years(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period,
     ) : RecurringSubscriptionPricingPhase, OfferSubscriptionPricingPhase {
