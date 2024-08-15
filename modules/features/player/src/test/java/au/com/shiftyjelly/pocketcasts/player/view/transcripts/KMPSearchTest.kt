@@ -47,101 +47,101 @@ class KMPSearchTest {
 
     @Test
     fun `search handles diacritics`() {
-        val text = "testing diacritics żółć zolc. frère hôtel niño über façade māter mătură čaj ząb mąż kő ångest cơm fødsel ȑat"
+        val text = "testing diacritics żółŁć zolLc.frère hôtel niño über façade māter mătură čaj ząb mąż kő ångest cơm fødsel ȑat"
 
-        val pattern1 = "żółć"
+        val pattern1 = "żółŁć"
         kmpSearch.setPattern(pattern1)
         var result = kmpSearch.search(text)
-        assertEquals(listOf(19, 24), result)
+        assertEquals(listOf(19, 25), result)
 
         // Testing pattern without diacritics
-        val pattern2 = "zolc"
+        val pattern2 = "zolLc"
         kmpSearch.setPattern(pattern2)
         result = kmpSearch.search(text)
-        assertEquals(listOf(19, 24), result)
+        assertEquals(listOf(19, 25), result)
 
         // Testing Grave Accent (`)
         val pattern3 = "frère"
         kmpSearch.setPattern(pattern3)
         result = kmpSearch.search(text)
-        assertEquals(listOf(30), result)
+        assertEquals(listOf(31), result)
 
         // Testing Circumflex (^)
         val pattern4 = "hôtel"
         kmpSearch.setPattern(pattern4)
         result = kmpSearch.search(text)
-        assertEquals(listOf(36), result)
+        assertEquals(listOf(37), result)
 
         // Testing Umlaut or Diaeresis (¨)
         val pattern5 = "über"
         kmpSearch.setPattern(pattern5)
         result = kmpSearch.search(text)
-        assertEquals(listOf(47), result)
+        assertEquals(listOf(48), result)
 
         // Testing Cedilla (¸)
         val pattern6 = "façade"
         kmpSearch.setPattern(pattern6)
         result = kmpSearch.search(text)
-        assertEquals(listOf(52), result)
+        assertEquals(listOf(53), result)
 
         // Testing Macron (¯)
         val pattern8 = "MĀTER"
         kmpSearch.setPattern(pattern8)
         result = kmpSearch.search(text)
-        assertEquals(listOf(59), result)
+        assertEquals(listOf(60), result)
 
         // Testing Breve (˘)
         val pattern9 = "mătură"
         kmpSearch.setPattern(pattern9)
         result = kmpSearch.search(text)
-        assertEquals(listOf(65), result)
+        assertEquals(listOf(66), result)
 
         // Testing Caron or Háček (ˇ)
         val pattern10 = "čaj"
         kmpSearch.setPattern(pattern10)
         result = kmpSearch.search(text)
-        assertEquals(listOf(72), result)
+        assertEquals(listOf(73), result)
 
         // Testing Ogonek (˛)
         val pattern11 = "ząb"
         kmpSearch.setPattern(pattern11)
         result = kmpSearch.search(text)
-        assertEquals(listOf(76), result)
+        assertEquals(listOf(77), result)
 
         // Testing Dot Above (˙)
         val pattern12 = "mąż"
         kmpSearch.setPattern(pattern12)
         result = kmpSearch.search(text)
-        assertEquals(listOf(80), result)
+        assertEquals(listOf(81), result)
 
         // Testing Double Acute (˝)
         val pattern13 = "kő"
         kmpSearch.setPattern(pattern13)
         result = kmpSearch.search(text)
-        assertEquals(listOf(84), result)
+        assertEquals(listOf(85), result)
 
         // Testing Ring Above (°)
         val pattern14 = "ångest"
         kmpSearch.setPattern(pattern14)
         result = kmpSearch.search(text)
-        assertEquals(listOf(87), result)
+        assertEquals(listOf(88), result)
 
         // Testing Horn (˛)
         val pattern15 = "cơm"
         kmpSearch.setPattern(pattern15)
         result = kmpSearch.search(text)
-        assertEquals(listOf(94), result)
+        assertEquals(listOf(95), result)
 
         // Testing Stroke (Ø)
         val pattern16 = "fødsel"
         kmpSearch.setPattern(pattern16)
         result = kmpSearch.search(text)
-        assertEquals(listOf(98), result)
+        assertEquals(listOf(99), result)
 
         // Testing Inverted Breve (̑)
         val pattern17 = "ȑat"
         kmpSearch.setPattern(pattern17)
         result = kmpSearch.search(text)
-        assertEquals(listOf(105), result)
+        assertEquals(listOf(106), result)
     }
 }
