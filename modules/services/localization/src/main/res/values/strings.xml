@@ -2077,9 +2077,11 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="paywall_watch_title">Apple Watch and Wear OS playback</string>
     <string name="paywall_watch_description">Ditch the phone and go for a run.</string>
     <string name="paywall_watch_content_description">Apple Watch and Wear OS playback image</string>
-
     <string name="paywall_slumber_studios_title">Dream with Slumber Studios</string>
     <string name="paywall_slumber_studios_description">Get 1 year of premium content from Slumber Studios.</string>
     <string name="paywall_slumber_studios_content_description">Dream with Slumber Studios image</string>
+    <string name="paywall_storage_title">20 GB of storage</string>
+    <string name="paywall_storage_description">Upload your audio files to cloud storage and have them available everywhere.</string>
+    <string name="paywall_storage_content_description">20 GB of storage image</string>
 
 </resources>
