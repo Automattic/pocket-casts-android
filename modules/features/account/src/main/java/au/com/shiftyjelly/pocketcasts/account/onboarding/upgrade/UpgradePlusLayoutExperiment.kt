@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,13 +35,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -55,87 +59,90 @@ internal fun UpgradePlusLayoutExperiment(
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier.fillMaxHeight(),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        BoxWithConstraints(
-            Modifier
-                .fillMaxHeight()
-                .background(Color.Black),
+    AppTheme(Theme.ThemeType.DARK) { // We need to set Dark since this screen will have dark colors for all themes
+        Box(
+            modifier = modifier.fillMaxHeight(),
+            contentAlignment = Alignment.BottomCenter,
         ) {
-            Box(modifier = Modifier.verticalScroll(scrollState)) {
-                Column(
-                    Modifier
-                        .windowInsetsPadding(WindowInsets.statusBars)
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .heightIn(min = this@BoxWithConstraints.calculateMinimumHeightWithInsets())
-                        .padding(bottom = 100.dp),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.End,
+            BoxWithConstraints(
+                Modifier
+                    .fillMaxHeight()
+                    .background(color = MaterialTheme.theme.colors.primaryUi02),
+            ) {
+                Box(modifier = Modifier.verticalScroll(scrollState)) {
+                    Column(
+                        Modifier
+                            .windowInsetsPadding(WindowInsets.statusBars)
+                            .windowInsetsPadding(WindowInsets.navigationBars)
+                            .heightIn(min = this@BoxWithConstraints.calculateMinimumHeightWithInsets())
+                            .padding(bottom = 100.dp),
                     ) {
-                        TextP30(
-                            text = stringResource(R.string.not_now),
-                            color = Color.White,
-                            modifier = Modifier
-                                .padding(start = 24.dp, end = 24.dp, top = 8.dp)
-                                .clickable { onNotNowPressed() },
-                        )
-                    }
-
-                    Column {
-                        Box(
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 12.dp, top = 24.dp),
-                            contentAlignment = Alignment.Center,
+                                .padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.End,
                         ) {
-                            SubscriptionBadgeForTier(
-                                tier = SubscriptionTier.PLUS,
-                                displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-                                fontSize = 16.sp,
-                                padding = 8.dp,
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier.padding(bottom = 20.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            AutoResizeText(
-                                text = stringResource(state.currentFeatureCard.titleRes(source)),
+                            TextP30(
+                                text = stringResource(R.string.not_now),
                                 color = Color.White,
-                                maxFontSize = 22.sp,
-                                lineHeight = 30.sp,
-                                fontWeight = FontWeight.W700,
-                                maxLines = 2,
-                                textAlign = TextAlign.Center,
                                 modifier = Modifier
-                                    .padding(horizontal = 24.dp)
-                                    .fillMaxWidth(),
+                                    .padding(start = 24.dp, end = 24.dp, top = 8.dp)
+                                    .clickable { onNotNowPressed() },
                             )
                         }
 
-                        Spacer(Modifier.height(20.dp))
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 12.dp, top = 24.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                SubscriptionBadgeForTier(
+                                    tier = SubscriptionTier.PLUS,
+                                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+                                    fontSize = 16.sp,
+                                    padding = 8.dp,
+                                )
+                            }
 
-                        FeatureCards( // TODO: it will be replaced for the new one
-                            state = state,
-                            upgradeButton = state.currentUpgradeButton,
-                            onFeatureCardChanged = onFeatureCardChanged,
-                        )
+                            Box(
+                                modifier = Modifier.padding(bottom = 20.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                AutoResizeText(
+                                    text = stringResource(state.currentFeatureCard.titleRes(source)),
+                                    color = Color.White,
+                                    maxFontSize = 22.sp,
+                                    lineHeight = 30.sp,
+                                    fontWeight = FontWeight.W700,
+                                    maxLines = 2,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .padding(horizontal = 24.dp)
+                                        .fillMaxWidth(),
+                                )
+                            }
+
+                            Spacer(Modifier.height(20.dp))
+
+                            FeatureCards(
+                                // TODO: it will be replaced for the new one
+                                state = state,
+                                upgradeButton = state.currentUpgradeButton,
+                                onFeatureCardChanged = onFeatureCardChanged,
+                            )
+                        }
+
+                        Spacer(Modifier.weight(1f))
                     }
-
-                    Spacer(Modifier.weight(1f))
                 }
             }
-        }
 
-        if (canUpgrade) {
-            SubscribeButton(onClickSubscribe)
+            if (canUpgrade) {
+                SubscribeButton(onClickSubscribe)
+            }
         }
     }
 }
