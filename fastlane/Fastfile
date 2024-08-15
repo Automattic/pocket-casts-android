@@ -433,6 +433,13 @@ platform :android do
   lane :build_and_upload_prototype_build do
     UI.user_error!("'BUILDKITE_ARTIFACTS_S3_BUCKET' must be defined as an environment variable.") unless ENV['BUILDKITE_ARTIFACTS_S3_BUCKET']
 
+    comment_on_pr(
+      project: 'automattic/pocket-casts-android',
+      pr_number: Integer(ENV.fetch('BUILDKITE_PULL_REQUEST', nil)),
+      reuse_identifier: 'app-prototype-build-link',
+      body: '🚧 Prototype builds will be available soon'
+    )
+
     prototype_build_type = 'debugProd'
 
     gradle(
