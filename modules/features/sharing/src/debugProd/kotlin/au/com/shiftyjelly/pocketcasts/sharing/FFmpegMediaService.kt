@@ -4,7 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
-import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
+import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.FFmpegSession
 import com.arthenica.ffmpegkit.FFmpegSessionCompleteCallback
@@ -46,14 +46,15 @@ internal class FFmpegMediaService(
         createMp3Clip(episode, clipRange, addCover = false)
             .mapCatching { clipFile ->
                 val command = buildString {
-                    append("-r 1 ") // Set frame rate
-                    append("-t ${clipRange.durationInSeconds} ") // Specifcy duration
-                    append("-i $backgroundFile ") // Video stream source
+                    append("-r 10 ") // Set frame rate to 10 to allow sub-second clips
+                    append("-t ${clipRange.duration.toSecondsWithSingleMilli()} ") // Duration must be in S.xxx or HH:MM:SS.xxx format
+                    append("-i $backgroundFile ") // Image stream source
                     append("-i $clipFile ") // Audio stream source
                     append("-c:a copy ") // Copy audio codec
                     append("-c:v mpeg4 ") // Use mpeg4 video codec
+                    append("-q:v 1 ") // Use the highest video quality
                     append("-pix_fmt yuv420p ") // Use 4:2:0 pixel format
-                    val loopCount = (clipRange.durationInSeconds - 1).coerceAtLeast(1)
+                    val loopCount = (clipRange.duration.inWholeMilliseconds / 100 - 1).coerceAtLeast(1)
                     append("-vf \"loop=$loopCount:1\" ") // Loop the first frame to match clip's length
                     append("-movflags faststart ") // Move metadata to the file's start for faster playback
                     append("-y ") // Overwrite output file if it already exists
@@ -83,10 +84,10 @@ internal class FFmpegMediaService(
             }
             val isWebSource = audioSource == episode.downloadUrl
 
-            append("-ss ${clipRange.startInSeconds} ") // Clip start, must be in seconds or HH:MM:SS.xxx
-            append("-to ${clipRange.endInSeconds} ") // Clip end, must be in seconds or HH:MM:SS.xxx
+            append("-ss ${clipRange.start.toSecondsWithSingleMilli()} ") // Clip start, must be in S.xxx or HH:MM:SS.xxx format
+            append("-to ${clipRange.end.toSecondsWithSingleMilli()} ") // Clip end, must be in S.xxx or HH:MM:SS.xxx format
             if (isWebSource) {
-                append("-user_agent 'Pocket Casts' ")
+                append("-user_agent 'Pocket Casts' ") // Set User-Agent header so we don't get blocked by hosts
             }
             append("-i $audioSource ") // Audio stream source
             val coverFile = if (addCover) {
@@ -95,7 +96,7 @@ internal class FFmpegMediaService(
                 null
             }
             if (coverFile != null) {
-                append("-i $coverFile ")
+                append("-i $coverFile ") // Include cover in the MP3 file
             }
             append("-q:a 0 ") // Max audio quality
             append("-map 0:a:0 ") // Include only the first audio stream, videos can have multiple audio streams
@@ -117,7 +118,7 @@ internal class FFmpegMediaService(
     }
 
     private fun sanitizedFileName(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): String {
-        return "${podcast.title} - ${episode.title} - ${clipRange.start.toHhMmSs()}–${clipRange.end.toHhMmSs()}".replace("""\W+""".toRegex(), "_")
+        return "${podcast.title} - ${episode.title} - ${clipRange.start.toSecondsWithSingleMilli()}–${clipRange.end.toSecondsWithSingleMilli()}".replace("""\W+""".toRegex(), "_")
     }
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->

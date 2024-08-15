@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.util.Date
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -248,7 +249,7 @@ class SharingClientTest {
             val request = SharingRequest.episodePosition(
                 podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
                 episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-                position = 10.seconds,
+                position = 10.seconds + 300.milliseconds,
             ).setPlatform(platform)
                 .build()
 
@@ -308,7 +309,7 @@ class SharingClientTest {
         val request = SharingRequest.episodePosition(
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
+            position = 10.seconds + 421.milliseconds,
         ).setPlatform(SocialPlatform.PocketCasts)
             .build()
 
@@ -358,7 +359,7 @@ class SharingClientTest {
             val request = SharingRequest.bookmark(
                 podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
                 episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-                position = 10.seconds,
+                position = 10.seconds + 112.milliseconds,
             ).setPlatform(platform)
                 .build()
 
@@ -379,7 +380,7 @@ class SharingClientTest {
         val request = SharingRequest.bookmark(
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            position = 10.seconds,
+            position = 10.seconds + 677.milliseconds,
         ).setPlatform(SocialPlatform.PocketCasts)
             .build()
 
@@ -461,13 +462,13 @@ class SharingClientTest {
         val request = SharingRequest.clipLink(
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
-            range = Clip.Range(15.seconds, 28.seconds),
+            range = Clip.Range(15.seconds + 200.milliseconds, 28.seconds + 105.milliseconds),
         ).build()
 
         client.share(request)
         val clipData = shareStarter.requireShareLink
 
-        assertEquals("https://pca.st/episode/episode-uuid?t=15,28", clipData.getItemAt(0).text)
+        assertEquals("https://pca.st/episode/episode-uuid?t=15.2,28.1", clipData.getItemAt(0).text)
         assertEquals(context.getString(LR.string.share_link_clip), clipData.description.label)
         assertNull(shareStarter.chooserIntent)
     }
