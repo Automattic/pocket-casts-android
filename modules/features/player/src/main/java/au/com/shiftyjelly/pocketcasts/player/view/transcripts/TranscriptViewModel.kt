@@ -144,13 +144,9 @@ class TranscriptViewModel @Inject constructor(
 
     private suspend fun buildDisplayInfo(cuesWithTimingSubtitle: List<CuesWithTiming>) = withContext(ioDispatcher) {
         val formattedText = buildString {
-            with(cuesWithTimingSubtitle) {
-                (0 until count()).forEach { index ->
-                    get(index).cues.forEach { cue ->
-                        append(cue.text)
-                    }
-                }
-            }
+            cuesWithTimingSubtitle
+                .flatMap { it.cues }
+                .forEach { cue -> append(cue.text) }
         }
         val items = formattedText.splitIgnoreEmpty("\n\n").map {
             val startIndex = formattedText.indexOf(it)
