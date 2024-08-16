@@ -76,7 +76,7 @@ private fun Content(
 
     Row(
         modifier = Modifier.padding(
-            start = 16.dp,
+            start = 8.dp,
             end = 4.dp,
             top = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 8.dp else 18.dp,
             bottom = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 0.dp else 18.dp,
@@ -84,8 +84,10 @@ private fun Content(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onClick() }
+                .padding(8.dp)
                 .semantics {
                     this.contentDescription = starsContentDescription
                 },
