@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
@@ -99,9 +100,20 @@ fun TranscriptError(
     }
 }
 
-@Preview(name = "Dark")
+@Preview(name = "Phone")
 @Composable
-private fun ErrorDarkPreview() {
+private fun ErrorDarkPreview() = ErrorPreview()
+
+@Preview(name = "Landscape", device = Devices.LandscapeRegular)
+@Composable
+private fun ErrorLandscapePreview() = ErrorPreview()
+
+@Preview(name = "Tablet", device = Devices.PortraitTablet)
+@Composable
+private fun ErrorTabletPreview() = ErrorPreview()
+
+@Composable
+private fun ErrorPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TranscriptError(
             state = UiState.Error(

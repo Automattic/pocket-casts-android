@@ -43,6 +43,7 @@ import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
@@ -330,13 +331,25 @@ private fun GradientView(
     )
 }
 
-@Preview(name = "Dark")
+@Preview(name = "Phone")
 @Composable
-private fun TranscriptWithoutSearchContentPreview() {
+private fun TranscriptPhonePreview() {
     TranscriptContentPreview(searchState = SearchUiState())
 }
 
-@Preview(name = "Dark")
+@Preview(name = "PortraitFoldable", device = Devices.PortraitFoldable)
+@Composable
+private fun TranscriptPortraitFoldableContentPreview() {
+    TranscriptContentPreview(searchState = SearchUiState())
+}
+
+@Preview(name = "Tablet", device = Devices.PortraitTablet)
+@Composable
+private fun TranscriptTabletContentPreview() {
+    TranscriptContentPreview(searchState = SearchUiState())
+}
+
+@Preview(name = "Phone")
 @Composable
 private fun TranscriptWithSearchContentPreview() {
     TranscriptContentPreview(
@@ -391,7 +404,7 @@ private fun TranscriptContentPreview(
 }
 
 @OptIn(UnstableApi::class)
-@Preview(name = "Dark")
+@Preview(name = "Phone")
 @Composable
 private fun TranscriptEmptyContentPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
