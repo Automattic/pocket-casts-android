@@ -1,12 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
-import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,12 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -33,16 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,33 +43,30 @@ import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.ScrollToHighlightedTextOffset
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private val ContentOffsetTop = 64.dp
-private val ContentOffsetBottom = 80.dp
-private val ScrollToHighlightedTextOffset = 100.dp
-private val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.DarkGray, color = Color.White)
-private val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.White, color = Color.Black)
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -95,7 +85,7 @@ fun TranscriptPage(
         transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
     })
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.value.podcastAndEpisode?.podcast))
-    val colors = DefaultColors(playerBackgroundColor)
+    val colors = TranscriptColors(playerBackgroundColor)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -107,7 +97,10 @@ fun TranscriptPage(
             }
 
             is UiState.TranscriptFound -> {
-                LoadingView(Modifier.background(colors.backgroundColor()))
+                LoadingView(
+                    modifier = Modifier.background(colors.backgroundColor()),
+                    color = TranscriptColors.textColor(),
+                )
             }
 
             is UiState.TranscriptLoaded -> {
@@ -119,18 +112,31 @@ fun TranscriptPage(
                     colors = colors,
                     modifier = modifier,
                 )
+
+                PullRefreshIndicator(
+                    refreshing = refreshing.value,
+                    state = pullRefreshState,
+                    backgroundColor = TranscriptColors.contentColor(),
+                    contentColor = TranscriptColors.iconColor(),
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
             }
 
             is UiState.Error -> {
                 val errorState = uiState.value as UiState.Error
                 TranscriptError(
                     state = errorState,
+                    onRetry = {
+                        transcriptViewModel.parseAndLoadTranscript(
+                            isTranscriptViewOpen = true,
+                            forceRefresh = true,
+                        )
+                    },
                     colors = colors,
                     modifier = modifier,
                 )
             }
         }
-        PullRefreshIndicator(refreshing.value, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
@@ -156,11 +162,9 @@ private fun EmptyView(
 private fun TranscriptContent(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
-    colors: DefaultColors,
+    colors: TranscriptColors,
     modifier: Modifier,
 ) {
-    val configuration = LocalConfiguration.current
-    val bottomPadding = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 125.dp
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -169,7 +173,7 @@ private fun TranscriptContent(
         if (state.isTranscriptEmpty) {
             TextP40(
                 text = stringResource(LR.string.transcript_empty),
-                color = colors.textColor(),
+                color = TranscriptColors.textColor(),
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 60.dp),
@@ -178,8 +182,6 @@ private fun TranscriptContent(
             ScrollableTranscriptView(
                 state = state,
                 searchState = searchState,
-                colors = colors,
-                bottomPadding = bottomPadding,
             )
         }
 
@@ -194,7 +196,7 @@ private fun TranscriptContent(
             baseColor = colors.backgroundColor(),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = bottomPadding),
+                .padding(bottom = bottomPadding()),
             fadeDirection = FadeDirection.BottomToTop,
         )
     }
@@ -205,17 +207,18 @@ private fun TranscriptContent(
 private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
-    colors: DefaultColors,
-    bottomPadding: Dp,
 ) {
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val displayWidthPercent = if (Util.isTablet(LocalContext.current)) 0.8f else 1f
+    val horizontalContentPadding = ((1 - displayWidthPercent) * screenWidthDp).dp / 2
+
     val scrollState = rememberLazyListState()
     val scrollableContentModifier = Modifier
-        .padding(horizontal = 16.dp)
-        .padding(bottom = bottomPadding)
+        .padding(bottom = bottomPadding())
         .verticalScrollBar(
-            thumbColor = colors.textColor(),
+            thumbColor = TranscriptColors.textColor(),
             scrollState = scrollState,
-            contentPadding = PaddingValues(top = ContentOffsetTop, bottom = ContentOffsetBottom),
+            contentPadding = PaddingValues(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
         )
 
     val customMenu = buildList {
@@ -234,11 +237,15 @@ private fun ScrollableTranscriptView(
             LazyColumn(
                 state = scrollState,
                 modifier = scrollableContentModifier,
-                contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
+                contentPadding = PaddingValues(
+                    start = horizontalContentPadding,
+                    end = horizontalContentPadding,
+                    top = 64.dp,
+                    bottom = 80.dp,
+                ),
             ) {
                 items(state.displayInfo.items) { item ->
                     TranscriptItem(
-                        colors = colors,
                         item = item,
                         searchState = searchState,
                     )
@@ -267,14 +274,14 @@ private fun ScrollableTranscriptView(
 
 @Composable
 private fun TranscriptItem(
-    colors: DefaultColors,
     item: DisplayItem,
     searchState: SearchUiState,
 ) {
-    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
+    val defaultTextStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, fontFamily = TranscriptFontFamily, color = TranscriptColors.textColor())
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 32.dp)
             .padding(bottom = 16.dp),
     ) {
         Text(
@@ -286,9 +293,9 @@ private fun TranscriptItem(
                         .filter { searchResultIndex -> searchResultIndex in item.startIndex until item.endIndex }
                         .forEach { searchResultIndex ->
                             val style = if (searchState.searchResultIndices.indexOf(searchResultIndex) == searchState.currentSearchIndex) {
-                                SearchOccurrenceSelectedSpanStyle
+                                TranscriptDefaults.SearchOccurrenceSelectedSpanStyle
                             } else {
-                                SearchOccurrenceDefaultSpanStyle
+                                TranscriptDefaults.SearchOccurrenceDefaultSpanStyle
                             }
                             val start = searchResultIndex - item.startIndex
                             addStyle(
@@ -325,89 +332,25 @@ private fun GradientView(
     )
 }
 
+@Preview(name = "Phone")
 @Composable
-private fun TranscriptError(
-    state: UiState.Error,
-    colors: DefaultColors,
-    modifier: Modifier,
-) {
-    val errorMessage = when (val error = state.error) {
-        is TranscriptError.NotSupported ->
-            stringResource(LR.string.error_transcript_format_not_supported, error.format)
-
-        is TranscriptError.NoNetwork ->
-            stringResource(LR.string.error_no_network)
-
-        is TranscriptError.FailedToLoad ->
-            stringResource(LR.string.error_transcript_failed_to_load)
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 32.dp)
-            .background(colors.backgroundColor())
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(
-                    color = colors.contentColor(),
-                    shape = RoundedCornerShape(size = 4.dp),
-                ),
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            ) {
-                TextH30(
-                    text = stringResource(LR.string.error),
-                    color = colors.titleColor(),
-                    textAlign = TextAlign.Center,
-                )
-                TextP40(
-                    text = errorMessage,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 12.dp),
-                    color = colors.textColor(),
-                )
-            }
-        }
-    }
-}
-
-private data class DefaultColors(
-    val playerBackgroundColor: Color,
-) {
-    @Composable
-    fun backgroundColor() =
-        playerBackgroundColor
-
-    @Composable
-    fun contentColor() =
-        MaterialTheme.theme.colors.playerContrast06
-
-    @Composable
-    fun textColor() =
-        MaterialTheme.theme.colors.playerContrast02
-
-    @Composable
-    fun titleColor() =
-        MaterialTheme.theme.colors.playerContrast01
-}
-
-@Preview(name = "Dark")
-@Composable
-private fun TranscriptWithoutSearchContentPreview() {
+private fun TranscriptPhonePreview() {
     TranscriptContentPreview(searchState = SearchUiState())
 }
 
-@Preview(name = "Dark")
+@Preview(name = "PortraitFoldable", device = Devices.PortraitFoldable)
+@Composable
+private fun TranscriptPortraitFoldableContentPreview() {
+    TranscriptContentPreview(searchState = SearchUiState())
+}
+
+@Preview(name = "Tablet", device = Devices.PortraitTablet)
+@Composable
+private fun TranscriptTabletContentPreview() {
+    TranscriptContentPreview(searchState = SearchUiState())
+}
+
+@Preview(name = "Phone")
 @Composable
 private fun TranscriptWithSearchContentPreview() {
     TranscriptContentPreview(
@@ -455,14 +398,14 @@ private fun TranscriptContentPreview(
                 ),
             ),
             searchState = searchState,
-            colors = DefaultColors(Color.Black),
+            colors = TranscriptColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
     }
 }
 
 @OptIn(UnstableApi::class)
-@Preview(name = "Dark")
+@Preview(name = "Phone")
 @Composable
 private fun TranscriptEmptyContentPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
@@ -481,26 +424,7 @@ private fun TranscriptEmptyContentPreview() {
                 ),
             ),
             searchState = SearchUiState(),
-            colors = DefaultColors(Color.Black),
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
-}
-
-@Preview(name = "Dark")
-@Composable
-private fun ErrorDarkPreview() {
-    AppThemeWithBackground(Theme.ThemeType.DARK) {
-        TranscriptError(
-            state = UiState.Error(
-                error = TranscriptError.NotSupported(TranscriptFormat.HTML.mimeType),
-                transcript = Transcript(
-                    episodeUuid = "uuid",
-                    type = TranscriptFormat.HTML.mimeType,
-                    url = "url",
-                ),
-            ),
-            colors = DefaultColors(Color.Black),
+            colors = TranscriptColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
     }

@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
@@ -165,8 +166,11 @@ fun TranscriptToolbar(
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
             CompositionLocalProvider(LocalRippleTheme provides ToolbarButtonRippleTheme) {
                 CloseButton(
-                    modifier = Modifier.align(Alignment.TopStart),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(start = 16.dp),
                     onClick = onCloseClick,
+                    tintColor = TranscriptColors.iconColor(),
                 )
 
                 if (showSearch) {
