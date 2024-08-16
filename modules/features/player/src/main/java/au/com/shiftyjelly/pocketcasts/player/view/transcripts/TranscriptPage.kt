@@ -24,7 +24,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -59,10 +58,10 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
@@ -75,11 +74,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private val ContentOffsetTop = 64.dp
-private val ContentOffsetBottom = 80.dp
-private val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.DarkGray, color = Color.White)
-private val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, background = Color.White, color = Color.Black)
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -98,7 +92,7 @@ fun TranscriptPage(
         transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
     })
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.value.podcastAndEpisode?.podcast))
-    val colors = DefaultColors(playerBackgroundColor)
+    val colors = TranscriptColors(playerBackgroundColor)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -112,7 +106,7 @@ fun TranscriptPage(
             is UiState.TranscriptFound -> {
                 LoadingView(
                     modifier = Modifier.background(colors.backgroundColor()),
-                    color = colors.textColor(),
+                    color = TranscriptColors.textColor(),
                 )
             }
 
@@ -129,8 +123,8 @@ fun TranscriptPage(
                 PullRefreshIndicator(
                     refreshing = refreshing.value,
                     state = pullRefreshState,
-                    backgroundColor = colors.contentColor(),
-                    contentColor = colors.iconColor(),
+                    backgroundColor = TranscriptColors.contentColor(),
+                    contentColor = TranscriptColors.iconColor(),
                     modifier = Modifier.align(Alignment.TopCenter),
                 )
             }
@@ -142,7 +136,8 @@ fun TranscriptPage(
                     onRetry = {
                         transcriptViewModel.parseAndLoadTranscript(
                             isTranscriptViewOpen = true,
-                            forceRefresh = true)
+                            forceRefresh = true,
+                        )
                     },
                     colors = colors,
                     modifier = modifier,
@@ -174,7 +169,7 @@ private fun EmptyView(
 private fun TranscriptContent(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
-    colors: DefaultColors,
+    colors: TranscriptColors,
     modifier: Modifier,
 ) {
     val configuration = LocalConfiguration.current
@@ -187,7 +182,7 @@ private fun TranscriptContent(
         if (state.isTranscriptEmpty) {
             TextP40(
                 text = stringResource(LR.string.transcript_empty),
-                color = colors.textColor(),
+                color = TranscriptColors.textColor(),
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 60.dp),
@@ -223,7 +218,7 @@ private fun TranscriptContent(
 private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
-    colors: DefaultColors,
+    colors: TranscriptColors,
     bottomPadding: Dp,
 ) {
     val scrollState = rememberLazyListState()
@@ -231,9 +226,9 @@ private fun ScrollableTranscriptView(
         .padding(horizontal = 16.dp)
         .padding(bottom = bottomPadding)
         .verticalScrollBar(
-            thumbColor = colors.textColor(),
+            thumbColor = TranscriptColors.textColor(),
             scrollState = scrollState,
-            contentPadding = PaddingValues(top = ContentOffsetTop, bottom = ContentOffsetBottom),
+            contentPadding = PaddingValues(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
         )
 
     val customMenu = buildList {
@@ -268,11 +263,11 @@ private fun ScrollableTranscriptView(
 
 @Composable
 private fun TranscriptItem(
-    colors: DefaultColors,
+    colors: TranscriptColors,
     item: DisplayItem,
     searchState: SearchUiState,
 ) {
-    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = colors.textColor())
+    val defaultTextStyle = SpanStyle(fontSize = 16.sp, color = TranscriptColors.textColor())
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -287,9 +282,9 @@ private fun TranscriptItem(
                         .filter { searchResultIndex -> searchResultIndex in item.startIndex until item.endIndex }
                         .forEach { searchResultIndex ->
                             val style = if (searchState.searchResultIndices.indexOf(searchResultIndex) == searchState.currentSearchIndex) {
-                                SearchOccurrenceSelectedSpanStyle
+                                TranscriptDefaults.SearchOccurrenceSelectedSpanStyle
                             } else {
-                                SearchOccurrenceDefaultSpanStyle
+                                TranscriptDefaults.SearchOccurrenceDefaultSpanStyle
                             }
                             val start = searchResultIndex - item.startIndex
                             addStyle(
@@ -329,7 +324,7 @@ private fun GradientView(
 @Composable
 private fun TranscriptError(
     state: UiState.Error,
-    colors: DefaultColors,
+    colors: TranscriptColors,
     onRetry: () -> Unit,
     modifier: Modifier,
 ) {
@@ -360,53 +355,33 @@ private fun TranscriptError(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .padding(top = ContentOffsetTop, bottom = ContentOffsetBottom),
+                .padding(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_warning),
                 contentDescription = null,
-                tint = colors.textColor(),
+                tint = TranscriptColors.textColor(),
                 modifier = Modifier.size(48.dp),
             )
             TextP40(
                 text = errorMessage,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 16.dp),
-                color = colors.textColor(),
+                color = TranscriptColors.textColor(),
             )
             Button(
                 onClick = onRetry,
                 modifier = Modifier.padding(top = 16.dp),
                 shape = RoundedCornerShape(40.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = colors.contentColor()),
+                colors = ButtonDefaults.buttonColors(backgroundColor = TranscriptColors.contentColor()),
             ) {
                 Text(
                     text = stringResource(LR.string.try_again),
-                    color = colors.textColor(),
+                    color = TranscriptColors.textColor(),
                 )
             }
         }
     }
-}
-
-private data class DefaultColors(
-    val playerBackgroundColor: Color,
-) {
-    @Composable
-    fun backgroundColor() =
-        playerBackgroundColor
-
-    @Composable
-    fun contentColor() =
-        MaterialTheme.theme.colors.playerContrast06
-
-    @Composable
-    fun textColor() =
-        MaterialTheme.theme.colors.playerContrast02
-
-    @Composable
-    fun iconColor() =
-        MaterialTheme.theme.colors.playerContrast02
 }
 
 @Preview(name = "Dark")
@@ -463,7 +438,7 @@ private fun TranscriptContentPreview(
                 ),
             ),
             searchState = searchState,
-            colors = DefaultColors(Color.Black),
+            colors = TranscriptColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -489,7 +464,7 @@ private fun TranscriptEmptyContentPreview() {
                 ),
             ),
             searchState = SearchUiState(),
-            colors = DefaultColors(Color.Black),
+            colors = TranscriptColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -509,7 +484,7 @@ private fun ErrorDarkPreview() {
                 ),
             ),
             onRetry = {},
-            colors = DefaultColors(Color.Black),
+            colors = TranscriptColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
     }
