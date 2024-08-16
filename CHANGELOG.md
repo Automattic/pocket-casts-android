@@ -4,6 +4,8 @@
     *   Adds the kids banner in profile
         ([#2591](https://github.com/Automattic/pocket-casts-android/pull/2591))
 *   Bug Fixes
+    *   Fix crash when clicking on chapter name within Player
+        ([#2650](https://github.com/Automattic/pocket-casts-android/pull/2650)) 
     *   Update the episode star value in the Media Session to fix places where it's shown outside the app
         ([#2613](https://github.com/Automattic/pocket-casts-android/pull/2613))
 
