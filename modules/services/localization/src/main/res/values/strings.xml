@@ -1895,9 +1895,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="bookmarks_search_results_not_found">We couldn\'t find any bookmark for that search.</string>
 
     <!-- Transcripts -->
-    <string name="error_transcript_failed_to_load">Sorry, but something went wrong while loading this transcript</string>
+    <string name="error_transcript_failed_to_load">Sorry, but something went wrong while loading this transcript.</string>
     <string name="error_transcript_format_not_supported">Sorry, but but this transcript format is not supported: %s</string>
-    <string name="error_transcript_failed_to_parse">Sorry, but something went wrong while parsing this transcript</string>
+    <string name="error_transcript_failed_to_parse">Sorry, but something went wrong while parsing this transcript.</string>
     <string name="transcript_empty">Transcript is empty.</string>
 
     <!--    Tasker Plugin-->
