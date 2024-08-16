@@ -19,7 +19,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,9 +32,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.asFlow
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -63,38 +62,39 @@ private const val MAX_ITEM_COUNT = 20
 
 @Composable
 fun SearchInlineResultsPage(
-    viewModel: SearchViewModel,
+    state: SearchState,
+    loading: Boolean,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onShowAllCLick: (ResultsType) -> Unit,
+    onSubscribeToPodcast: (Podcast) -> Unit,
     onScroll: () -> Unit,
     onlySearchRemote: Boolean,
+    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val state by viewModel.state.collectAsState()
-    val loading = viewModel.loading.asFlow().collectAsState(false)
     Column {
         when (state) {
             is SearchState.NoResults -> NoResultsView()
             is SearchState.Results -> {
-                val result = state as SearchState.Results
-                if (result.error == null || !onlySearchRemote || result.loading) {
+                if (state.error == null || !onlySearchRemote || state.loading) {
                     SearchResultsView(
-                        state = state as SearchState.Results,
+                        state = state,
                         onEpisodeClick = onEpisodeClick,
                         onPodcastClick = onPodcastClick,
                         onFolderClick = onFolderClick,
                         onShowAllCLick = onShowAllCLick,
-                        onSubscribeToPodcast = { viewModel.onSubscribeToPodcast(it) },
+                        onSubscribeToPodcast = onSubscribeToPodcast,
                         onScroll = onScroll,
+                        bottomInset = bottomInset,
                     )
                 } else {
                     SearchFailedView()
                 }
             }
         }
-        if (loading.value) {
+        if (loading) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = modifier
@@ -119,6 +119,7 @@ private fun SearchResultsView(
     onShowAllCLick: (ResultsType) -> Unit,
     onSubscribeToPodcast: (Podcast) -> Unit,
     onScroll: () -> Unit,
+    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -146,6 +147,7 @@ private fun SearchResultsView(
     }
     LazyColumn(
         state = episodesRowState,
+        contentPadding = PaddingValues(bottom = bottomInset),
         modifier = modifier
             .nestedScroll(nestedScrollConnection),
     ) {
@@ -347,6 +349,7 @@ private fun SearchResultsViewPreview(
             onShowAllCLick = {},
             onSubscribeToPodcast = {},
             onScroll = {},
+            bottomInset = 0.dp,
         )
     }
 }
