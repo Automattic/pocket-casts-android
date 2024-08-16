@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Update the episode star value in the Media Session to fix places where it's shown outside the app
         ([#2613](https://github.com/Automattic/pocket-casts-android/pull/2613))
+    *   Fix crash when clicking on chapter title within player
+        ([#2657](https://github.com/Automattic/pocket-casts-android/pull/2657))
 
 7.70
 -----
