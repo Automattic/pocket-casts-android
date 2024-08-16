@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
 import javax.inject.Inject
@@ -41,8 +42,13 @@ class PodcastCacheServerManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPodcastRatings(podcastUuid: String) =
-        server.getPodcastRatings(podcastUuid).toPodcastRatings(podcastUuid)
+    override suspend fun getPodcastRatings(podcastUuid: String, useCache: Boolean): PodcastRatings {
+        return if (useCache) {
+            server.getPodcastRatings(podcastUuid).toPodcastRatings(podcastUuid)
+        } else {
+            server.getPodcastRatingsNoCache(podcastUuid).toPodcastRatings(podcastUuid)
+        }
+    }
 
     override suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse {
         return server.getShowNotes(podcastUuid)

@@ -62,7 +62,7 @@ class PodcastRatingsViewModel
     fun refreshPodcastRatings(uuid: String) {
         launch(Dispatchers.IO) {
             try {
-                ratingsManager.refreshPodcastRatings(uuid)
+                ratingsManager.refreshPodcastRatings(podcastUuid = uuid, useCache = true)
             } catch (e: Exception) {
                 val message = "Failed to refresh podcast ratings"
                 // don't report missing rating or network errors to Sentry
