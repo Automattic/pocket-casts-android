@@ -6,23 +6,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -68,18 +68,17 @@ fun TranscriptError(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .padding(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
+                .padding(bottom = TranscriptDefaults.ContentOffsetBottom),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_warning),
                 contentDescription = null,
-                tint = TranscriptColors.textColor(),
-                modifier = Modifier.size(48.dp),
+                tint = TranscriptColors.iconColor().copy(alpha = 0.5f),
             )
             TextP40(
                 text = errorMessage,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(top = 12.dp),
                 color = TranscriptColors.textColor(),
             )
             Button(
@@ -88,9 +87,11 @@ fun TranscriptError(
                 shape = RoundedCornerShape(40.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = TranscriptColors.contentColor()),
             ) {
-                Text(
+                TextP40(
                     text = stringResource(LR.string.try_again),
-                    color = TranscriptColors.textColor(),
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.W400,
                 )
             }
         }
