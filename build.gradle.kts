@@ -223,26 +223,6 @@ subprojects {
                     signingConfig = signingConfigs.getByName("debug")
                 }
 
-                maybeCreate("debugProd").apply {
-                    isDebuggable = true
-                    isPseudoLocalesEnabled = true
-                    enableUnitTestCoverage = false
-                    enableAndroidTestCoverage = false
-                    ext.set("alwaysUpdateBuildId", false)
-
-                    buildConfigField("String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD)
-                    buildConfigField("String", "SERVER_API_URL", SERVER_API_URL_PROD)
-                    buildConfigField("String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD)
-                    buildConfigField("String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD)
-                    buildConfigField("String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD)
-                    buildConfigField("String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD)
-                    buildConfigField("String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD)
-                    buildConfigField("String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD)
-                    buildConfigField("String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD)
-
-                    signingConfig = signingConfigs.getByName("debug")
-                }
-
                 named("release") {
                     buildConfigField("String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD)
                     buildConfigField("String", "SERVER_API_URL", SERVER_API_URL_PROD)
@@ -281,8 +261,27 @@ subprojects {
                     applicationIdSuffix = ".debug"
                 }
 
-                maybeCreate("debugProd").apply {
+                create("debugProd") {
                     applicationIdSuffix = ".debug"
+                    isDebuggable = true
+                    isPseudoLocalesEnabled = true
+                    enableUnitTestCoverage = false
+                    enableAndroidTestCoverage = false
+                    ext.set("alwaysUpdateBuildId", false)
+
+                    buildConfigField("String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD)
+                    buildConfigField("String", "SERVER_API_URL", SERVER_API_URL_PROD)
+                    buildConfigField("String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD)
+                    buildConfigField("String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD)
+                    buildConfigField("String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD)
+                    buildConfigField("String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD)
+                    buildConfigField("String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD)
+                    buildConfigField("String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD)
+                    buildConfigField("String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD)
+
+                    signingConfig = signingConfigs.getByName("debug")
+
+                    matchingFallbacks += listOf("debug")
                 }
 
                 named("release") {

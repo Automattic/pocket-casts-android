@@ -5,7 +5,6 @@
 dependencies {
     // Uncomment if you want to run with leak canary
 //    debugImplementation libs.leakcanary
-//    debugProdImplementation libs.leakcanary
 
     implementation libs.bundles.billing
     implementation libs.bundles.coroutines
@@ -71,8 +70,10 @@ dependencies {
 
     debugImplementation libs.compose.ui.test.manifest
     debugImplementation libs.compose.ui.tooling
-    debugProdImplementation libs.compose.ui.test.manifest
-    debugProdImplementation libs.compose.ui.tooling
+    if (configurations.findByName("debugProdImplementation") != null) {
+        debugProdImplementation libs.compose.ui.test.manifest
+        debugProdImplementation libs.compose.ui.tooling
+    }
 
     androidTestImplementation libs.accessibility.test.framework
     androidTestImplementation libs.annotation

@@ -18,8 +18,6 @@ android {
 }
 
 dependencies {
-    val debugProdImplementation by configurations
-
     implementation(libs.capturable)
 
     implementation(project(":modules:services:analytics"))
@@ -37,7 +35,6 @@ dependencies {
     // to not increase the binary size.
     // We can add it once we release clip sharing.
     debugImplementation(libs.ffmpeg)
-    debugProdImplementation(libs.ffmpeg)
 
     testImplementation(project(":modules:services:sharedtest"))
 }
