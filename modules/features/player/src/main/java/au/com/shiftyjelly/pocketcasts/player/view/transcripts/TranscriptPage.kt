@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -246,6 +247,23 @@ private fun ScrollableTranscriptView(
                         searchState = searchState,
                     )
                 }
+            }
+        }
+    }
+
+    // Scroll to highlighted text
+    if (searchState.searchResultIndices.isNotEmpty()) {
+        val density = LocalDensity.current
+        LaunchedEffect(searchState.searchTerm, searchState.currentSearchIndex) {
+            val displayItems = state.displayInfo.items
+            val targetSearchResultIndexIndex = searchState.searchResultIndices[searchState.currentSearchIndex]
+            displayItems.find { item ->
+                targetSearchResultIndexIndex in item.startIndex until item.endIndex
+            }?.let { displayItemWithCurrentSearchText ->
+                scrollState.animateScrollToItem(
+                    displayItems.indexOf(displayItemWithCurrentSearchText),
+                    scrollOffset = -(density.run { ScrollToHighlightedTextOffset.roundToPx() }),
+                )
             }
         }
     }
