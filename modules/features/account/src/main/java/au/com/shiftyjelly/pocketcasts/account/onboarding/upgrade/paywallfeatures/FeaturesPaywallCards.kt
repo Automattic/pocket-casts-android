@@ -39,7 +39,7 @@ data class CardData(
 )
 
 @Composable
-fun CardItem(cardData: CardData) {
+fun FeaturePaywallCard(cardData: CardData) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -93,7 +93,7 @@ fun BookmarksCard() {
         description = stringResource(LR.string.paywall_bookmarks_description),
         imageHeight = 224.dp,
     )
-    CardItem(cardData = bookmarksCardData)
+    FeaturePaywallCard(cardData = bookmarksCardData)
 }
 
 @Composable
@@ -105,7 +105,7 @@ fun FoldersCard() {
         description = stringResource(LR.string.paywall_folders_description),
         imageHeight = 231.dp,
     )
-    CardItem(cardData = foldersCardData)
+    FeaturePaywallCard(cardData = foldersCardData)
 }
 
 @Composable
@@ -117,7 +117,7 @@ fun DesktopWebAppCard() {
         description = stringResource(LR.string.paywall_desktop_and_web_description),
         imageHeight = 186.dp,
     )
-    CardItem(cardData = desktopCardData)
+    FeaturePaywallCard(cardData = desktopCardData)
 }
 
 @Composable
@@ -129,7 +129,7 @@ fun WatchCard() {
         description = stringResource(LR.string.paywall_watch_description),
         imageHeight = 231.dp,
     )
-    CardItem(cardData = watchCardData)
+    FeaturePaywallCard(cardData = watchCardData)
 }
 
 @Composable
@@ -141,7 +141,7 @@ fun SlumberStudiosCard() {
         description = stringResource(LR.string.paywall_slumber_studios_description),
         imageHeight = 195.dp,
     )
-    CardItem(cardData = slumberCardData)
+    FeaturePaywallCard(cardData = slumberCardData)
 }
 
 @Composable
@@ -153,7 +153,7 @@ fun StorageCard() {
         description = stringResource(LR.string.paywall_storage_description),
         imageHeight = 163.dp,
     )
-    CardItem(cardData = slumberCardData)
+    FeaturePaywallCard(cardData = slumberCardData)
 }
 
 @Composable
@@ -165,7 +165,7 @@ fun ThemesCard() {
         description = stringResource(LR.string.paywall_themes_description),
         imageHeight = 87.dp,
     )
-    CardItem(cardData = slumberCardData)
+    FeaturePaywallCard(cardData = slumberCardData)
 }
 
 @Preview
