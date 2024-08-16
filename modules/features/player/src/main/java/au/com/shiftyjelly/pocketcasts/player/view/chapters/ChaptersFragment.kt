@@ -82,7 +82,7 @@ class ChaptersFragment : BaseFragment() {
                     LaunchedEffect(Unit) {
                         viewModel.scrollToChapter.collect {
                             delay(250)
-                            lazyListState.animateScrollToItem(it.index - 1)
+                            lazyListState.animateScrollToItem(it.index)
                         }
                     }
 
