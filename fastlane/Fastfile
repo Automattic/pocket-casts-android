@@ -125,7 +125,7 @@ platform :android do
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
     push_to_git_remote(tags: false)
-    copy_branch_protection(repository: GH_REPOSITORY, from_branch: DEFAULT_BRANCH, to_branch: "release/#{new_version}")
+    set_branch_protection(repository: GH_REPOSITORY, branch: "release/#{new_version}")
     set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: new_version)
   end
 
