@@ -125,6 +125,10 @@ platform :android do
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
     push_to_git_remote(tags: false)
+
+    # We cannot use the `copy_branch_protection` action here as it would create a branch protection rule with the same
+    # restrictions we have in `trunk`, and the release managers wouldn't be able to push due to permissions.
+    # This should be changed only when we have PC Android releases done on CI, when the CI bot is the one running `git push`.
     set_branch_protection(repository: GH_REPOSITORY, branch: "release/#{new_version}")
     set_milestone_frozen_marker(repository: GH_REPOSITORY, milestone: new_version)
   end
