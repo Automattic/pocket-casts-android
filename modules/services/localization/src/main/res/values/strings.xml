@@ -634,6 +634,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="whats_new_new_rating_title">Now Available: Podcast Ratings &#127881;</string>
     <string name="whats_new_new_rating_message">Rate your top podcasts and let creators know how much you appreciate their work. Plus, your ratings help others find new favorite shows!</string>
     <string name="star_rating_animation">Star Rating Animation</string>
+    <string name="podcast_star_rating_content_description">Podcast Star Rating</string>
 
     <!-- Episodes -->
 

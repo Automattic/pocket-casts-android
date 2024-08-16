@@ -1,12 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-31 15:54:03+0000
+Translation-Revision-Date: 2024-08-14 14:54:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="share_error_message">Delen is mislukt. Probeer het later opnieuw.</string>
+    <string name="share_clip_sharing_clip">Clip aanmaken …</string>
+    <string name="something_went_wrong_when_sending_feedback">Er is iets fout gegaan. Probeer je feedback opnieuw in te dienen.</string>
+    <string name="thank_you_for_your_feedback">Bedankt voor je feedback!</string>
+    <string name="share_clip_create_audio_description">Een .mp3-audiobestand genereren</string>
+    <string name="share_clip_create_audio_label">Audiobestand aanmaken</string>
+    <string name="share_clip_edit_label">Clip bewerken</string>
+    <string name="share_clip_share_label">Clip delen</string>
+    <string name="share_clip_duration">Duur %s</string>
+    <string name="share_clip_start_position">Start %s</string>
+    <string name="transcript_empty">Transcriptie is leeg.</string>
+    <string name="star_rating_animation">Animatie voor sterwaardering</string>
+    <string name="share_link_clip">Link clip</string>
+    <string name="swipe_affordance_icon">Affordance-pictogram vegen</string>
+    <string name="feedback_form_placeholder">Ik wil afleveringen filteren op</string>
+    <string name="send_feedback_title">Wat zijn je wensen voor een Kids-profiel voor Pocket Casts?</string>
+    <string name="no_thank_you">Nee, bedankt</string>
     <string name="send_feedback">Feedback verzenden</string>
+    <string name="kids_bottom_sheet_description">Je ontvangt een melding via de app wanneer het nieuwe Kids-profiel klaar is! Wil je ons je wensen vertellen?</string>
+    <string name="thank_you_for_your_interest">Bedankt voor je interesse</string>
+    <string name="share_link_bookmark">Link bladwijzer</string>
+    <string name="share_link_episode_position">Link positie in aflevering</string>
+    <string name="share_link_episode">Link aflevering</string>
+    <string name="share_link_podcast">Link podcast</string>
+    <string name="share_link_copied_feedback">Link naar klembord gekopieerd</string>
+    <string name="kids_profile_face_image">Gezichtsafbeelding Kids-profiel</string>
+    <string name="request_early_access">Vroegtijdige toegang aanvragen</string>
+    <string name="kids_profile_banner_description">Een nieuw profiel met alleen content voor kinderen, om je abonnementen overzichtelijk te houden.</string>
+    <string name="soon_label">Binnenkort</string>
+    <string name="kids_profile_banner">Banner Kids-profiel</string>
+    <string name="kids_profile">Kids-profiel</string>
+    <string name="pocket_casts_logo">Pocket Casts logo</string>
+    <string name="rate_pocket_casts">Pocket Casts beoordelen</string>
+    <string name="pocket_casts_champion_dialog_description">Bedankt dat je al sinds het begin op ons vertrouwt! Als je onze app graag gebruikt, horen wij graag je feedback.</string>
+    <string name="pocket_casts_champion_dialog_title">Je bent een echte Pocket Casts-kampioen!</string>
     <string name="share_episode_timestamp_title">Aflevering delen op %s</string>
     <string name="share_via">Delen via %s</string>
     <string name="share_podcast_description">Kies een indeling en een platform om naar te delen</string>
@@ -58,7 +92,6 @@ Language: nl
     <string name="settings_storage_fix_downloads">Downloads herstellen</string>
     <string name="nova_launcher_new_releases">Nieuwe releases</string>
     <string name="nova_launcher_subscribed_podcasts">Geen podcast-abonnementen</string>
-    <string name="whats_new_new_widgets_message">We hebben net drie nieuwe widgets toegevoegd zodat het beheren van je podcasts vanaf je homescreen eenvoudiger wordt. Probeer het eens uit!</string>
     <string name="medium_player_classic_widget_label">Medium Player (Classic)</string>
     <string name="widget_preview_time_left_4">nog 1u 36m</string>
     <string name="widget_preview_time_left_3">nog 55m</string>
@@ -83,7 +116,6 @@ Language: nl
     <string name="player_sleep_in_one_episode">Slaapstand inschakelen na 1 aflevering</string>
     <string name="player_sleep_timer_stopped_your_podcast">De slaaptimer heeft je podcast gepauzeerd.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">De slaaptimer is opnieuw gestart omdat er met het apparaat is geschud</string>
-    <string name="whats_new_new_widgets_title">Nieuwe widgets</string>
     <string name="widget_check_out_discover">Bekijk Ontdekken voor nog meer</string>
     <string name="widget_nothing_in_up_next">Niets in Hierna</string>
     <string name="widget_no_episode_playing">Er wordt geen aflevering afgespeeld</string>
@@ -256,7 +288,7 @@ Language: nl
     <string name="settings_open_on_phone">Openen op telefoon</string>
     <string name="settings_about_privacy_policy_available_at">Onze privacyverklaring is beschikbaar via %s</string>
     <string name="settings_about_terms_of_service_available_at">Onze gebruiksvoorwaarden zijn beschikbaar via %s</string>
-    <string name="log_in_no_network">Geen netwerkverbinding gedetecteerd. Probeer later opnieuw.</string>
+    <string name="error_no_network">Geen netwerkverbinding gedetecteerd. Probeer het later opnieuw.</string>
     <string name="error_server_failed">Er heeft zich een interne serverfout voorgedaan. Probeer later opnieuw.</string>
     <string name="error_invalid_password_length">Voer een wachtwoord in dat ten minste 6 tekens lang is.</string>
     <string name="error_invalid_email_address">Voer een geldig e-mailadres in.</string>
@@ -443,7 +475,6 @@ Language: nl
     <string name="onboarding_plus_feature_folders_text">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop- en web-apps</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
     <string name="onboarding_recommendations_import">Importeren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Pas Pocket Casts aan je voorkeuren aan door je favoriete podcasts te selecteren of ze te importeren vanuit een andere podcast-speler. Je kunt dit later altijd nog doen.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Vind je favoriete podcasts</string>
@@ -1064,8 +1095,6 @@ Language: nl
     <string name="plus_learn_more_button">Meer weten</string>
     <string name="plus_learn_more_about_plus">Bekijk meer informatie over Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Desktop-apps</string>
-    <string name="plus_create_marketing_features"> Alles</string>
-    <string name="plus_cloud_storage_limit">%dGB cloud-opslagruimte</string>
     <string name="plus_cloud_storage">Opslag in de cloud</string>
     <string name="profile_expiry_date_unknown">Onbekend</string>
     <string name="profile_yearly">Jaarlijks</string>
@@ -1132,7 +1161,6 @@ Language: nl
     <string name="profile_reset_password_failed">We kunnen je geen nieuw wachtwoord e-mailen. Probeer het later opnieuw.</string>
     <string name="profile_reset_password">Wachtwoord opnieuw instellen</string>
     <string name="profile_regular_price">Reguliere prijs</string>
-    <string name="profile_regular">Standaard</string>
     <string name="profile_refreshing">Bezig met vernieuwen…</string>
     <string name="profile_refreshed_never">Nooit vernieuwd</string>
     <string name="profile_refresh_status_unknown">Onbekend</string>
@@ -1178,9 +1206,7 @@ Language: nl
     <string name="profile_joined">Deelnemen:</string>
     <string name="profile_get_plus">Neem Pocket Casts Plus om deze functie en nog veel meer te ontgrendelen!</string>
     <string name="profile_free_account">Gratis account</string>
-    <string name="profile_free">Gratis</string>
     <string name="profile_forgot_your_password">Ik ben mijn wachtwoord vergeten</string>
-    <string name="profile_find_out_more">Meer informatie over Pocket Casts Plus</string>
     <string name="profile_files_remove_image">Afbeelding vervangen</string>
     <string name="profile_files_empty_title">Geen bestanden</string>
     <string name="profile_files_empty_summary">Wil je naar je eigen bestanden luisteren?\nTik op de knop + om ze te openen in Pocket Casts en ze verschijnen hier.</string>
@@ -1190,9 +1216,6 @@ Language: nl
     <string name="profile_file_locked">vergrendeld</string>
     <string name="profile_file">Bestand</string>
     <string name="profile_feature_requires">Deze functie vereist\nPocket Casts Plus</string>
-    <string name="profile_extra_themes">Extra thema\'s</string>
-    <string name="profile_extra_app_icons">Extra app-pictogrammen</string>
-    <string name="profile_everything_unlocked">Alles ontgrendeld</string>
     <string name="profile_ends">Eindigt %s</string>
     <string name="profile_ended">Beëindigd %s</string>
     <string name="profile_end_tour">EINDE RONDLEIDING</string>
@@ -1224,16 +1247,10 @@ Language: nl
     <string name="profile_select_account_type">Accounttype selecteren</string>
     <string name="profile_create_completed">Volledig account</string>
     <string name="profile_create_terms_of_use">Gebruiksvoorwaarden</string>
-    <string name="profile_create_tos_full_terms_of_use">Volledige gebruiksvoorwaarden</string>
-    <string name="profile_create_tos_disagree">Nee, liever niet</string>
-    <string name="profile_create_tos_agree">Ik ga akkoord</string>
-    <string name="profile_create_tos">Voor we je kunnen toelaten tot de Plus-club moet je akkoord gaan met onze Gebruiksvoorwaarden. Je kunt deze altijd doorlezen via de onderstaande link.</string>
     <string name="profile_create_subscription_failed">Kan geen abonnement aanmaken. Probeer het nog eens</string>
-    <string name="profile_create_privacy_policy_title">Privacybeleid</string>
     <string name="profile_create_privacy_policy">We hebben ook een koppeling toegevoegd naar ons Privacybeleid voor het geval je daarin geïnteresseerd bent. We hebben geprobeerd ze kort en bondig te houden en zo weinig mogelijk juridische taal gebruikt.</string>
     <string name="profile_create_password_requirements">Wachtwoord moet bestaan uit ten minste 6 tekens</string>
     <string name="profile_create_newsletter_summary">Ontvang nieuws, app-updates, thematische podcastlijsten, interviews en meer</string>
-    <string name="profile_create_license">Sorry dat we zo formeel zijn</string>
     <string name="profile_create_failed">Kon geen account aanmaken. Probeer het nog eens</string>
     <string name="profile_create_account_image">accountafbeelding aanmaken</string>
     <string name="profile_create_account">Account aanmaken</string>
@@ -1280,7 +1297,6 @@ Language: nl
     <string name="profile_alreadysignedindescription">Je kunt slechts op één account tegelijkertijd aangemeld zijn.</string>
     <string name="profile_alreadysignedin">Je bent al ingelogd</string>
     <string name="profile_already_have_account">Heb je al een Pocket Casts-account?</string>
-    <string name="profile_almost_everything">Bijna alles</string>
     <string name="profile_account_delete_yes">Ja, verwijderen</string>
     <string name="profile_account_created">Account aangemaakt.</string>
     <string name="profile_access_ends">Toegang eindigt: %s</string>

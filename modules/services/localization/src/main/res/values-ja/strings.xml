@@ -1,12 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-31 14:10:05+0000
+Translation-Revision-Date: 2024-08-15 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts Plus で限定機能を利用しましょう</string>
+    <string name="whats_new_new_rating_message">お気に入りのポッドキャストを評価して、作品をどの程度気に入っているかをクリエイターに伝えましょう。 さらに、あなたの評価は他のユーザーが新しいお気に入り番組を見つけるのに役立ちます !</string>
+    <string name="whats_new_new_rating_title">ポッドキャストの評価が利用可能になりました 🎉</string>
+    <string name="go_to_next">次に移動</string>
+    <string name="go_to_previous">前に移動</string>
+    <string name="share_error_message">共有できませんでした。 後でもう一度お試しください。</string>
+    <string name="share_clip_sharing_clip">クリップを作成中…</string>
+    <string name="something_went_wrong_when_sending_feedback">問題が発生しました。 フィードバックをもう一度送信してください。</string>
+    <string name="thank_you_for_your_feedback">フィードバックをありがとうございます。</string>
+    <string name="share_clip_create_audio_description">.mp3音声ファイルを生成</string>
+    <string name="share_clip_create_audio_label">音声ファイルを作成</string>
+    <string name="share_clip_edit_label">クリップを編集</string>
+    <string name="share_clip_share_label">クリップを共有</string>
+    <string name="share_clip_duration">%s 期間</string>
+    <string name="share_clip_start_position">%s 開始</string>
+    <string name="transcript_empty">トランスクリプトが空です。</string>
+    <string name="star_rating_animation">星評価のアニメーション</string>
+    <string name="share_link_clip">クリップへのリンク</string>
+    <string name="swipe_affordance_icon">アフォーダンスアイコンをスワイプ</string>
+    <string name="feedback_form_placeholder">次でエピソードをフィルター:</string>
+    <string name="send_feedback_title">Pocket Casts のキッズプロフィールに表示したいものは何ですか ?</string>
+    <string name="no_thank_you">結構です</string>
     <string name="send_feedback">意見を送る</string>
+    <string name="kids_bottom_sheet_description">新しいキッズプロフィールの準備ができたら、アプリから通知が届きます ! ご覧になりたいものは何ですか ?</string>
+    <string name="thank_you_for_your_interest">ご検討いただきありがとうございます</string>
+    <string name="share_link_bookmark">ブックマークへのリンク</string>
+    <string name="share_link_episode_position">エピソードポジションへのリンク</string>
+    <string name="share_link_episode">エピソードへのリンク</string>
+    <string name="share_link_podcast">ポッドキャストへのリンク</string>
+    <string name="share_link_copied_feedback">リンクがクリップボードにコピーされました</string>
+    <string name="kids_profile_face_image">キッズプロフィールのフェイス画像</string>
+    <string name="request_early_access">早期アクセスをリクエスト</string>
+    <string name="kids_profile_banner_description">子ども向けコンテンツのみのプロフィールを新規に作成して、サブスクリプションを整理しておくことができます。</string>
+    <string name="soon_label">すぐに</string>
+    <string name="kids_profile_banner">キッズプロフィールのバナー</string>
+    <string name="kids_profile">キッズプロフィール</string>
+    <string name="pocket_casts_logo">Pocket Casts ロゴ</string>
+    <string name="rate_pocket_casts">Pocket Casts を評価</string>
+    <string name="pocket_casts_champion_dialog_description">最初からご利用いただきありがとうございます ! アプリを気に入っていただけましたら、ぜひフィードバックをお寄せください。</string>
+    <string name="pocket_casts_champion_dialog_title">あなたは Pocket Casts の真のサポーターです !</string>
     <string name="share_episode_timestamp_title">%s でエピソードを共有</string>
     <string name="share_via">%s で共有</string>
     <string name="share_podcast_description">フォーマットおよび共有先のプラットフォームを選択</string>
@@ -58,7 +97,6 @@ Language: ja_JP
     <string name="settings_storage_fix_downloads">ダウンロードを修正</string>
     <string name="nova_launcher_new_releases">新規リリース</string>
     <string name="nova_launcher_subscribed_podcasts">購読されたポッドキャスト</string>
-    <string name="whats_new_new_widgets_message">新しいウィジェットが3つ追加され、ホーム画面からポッドキャストを非常に簡単に管理できるようになりました。 ぜひお試しください。</string>
     <string name="medium_player_classic_widget_label">中型プレーヤー (クラシック)</string>
     <string name="widget_preview_time_left_4">残り1時間36分</string>
     <string name="widget_preview_time_left_3">残り55分</string>
@@ -83,7 +121,6 @@ Language: ja_JP
     <string name="player_sleep_in_one_episode">1エピソードでスリープ</string>
     <string name="player_sleep_timer_stopped_your_podcast">スリープタイマーにより、ポッドキャストが停止しました。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">端末を振った後、スリープタイマーが再開しました</string>
-    <string name="whats_new_new_widgets_title">新しいウィジェット</string>
     <string name="widget_check_out_discover">Discover をチェックして他のエピソードを見つけましょう</string>
     <string name="widget_nothing_in_up_next">次のエピソードには何もありません</string>
     <string name="widget_no_episode_playing">再生中のエピソードはありません</string>
@@ -256,7 +293,7 @@ Language: ja_JP
     <string name="settings_open_on_phone">スマートフォンを開く</string>
     <string name="settings_about_privacy_policy_available_at">プライバシーポリシーは %s でご覧いただけます</string>
     <string name="settings_about_terms_of_service_available_at">利用規約は %s でご覧いただけます</string>
-    <string name="log_in_no_network">ネットワーク接続が検出されませんでした。 後でもう一度お試しください。</string>
+    <string name="error_no_network">ネットワーク接続が検出されませんでした。 後でもう一度お試しください。</string>
     <string name="error_server_failed">内部サーバーエラーが発生しました。 後でもう一度お試しください。</string>
     <string name="error_invalid_password_length">パスワードは少なくとも6文字以上にしてください。</string>
     <string name="error_invalid_email_address">有効なメールアドレスを入力してください。</string>
@@ -443,7 +480,6 @@ Language: ja_JP
     <string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">デスクトップアプリとウェブアプリ</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">お気に入りの Pocket Casts の機能に加え、さらなる機能を利用できます</string>
     <string name="onboarding_recommendations_import">インポート</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">お気に入りのポッドキャストを選択するか、別のポッドキャストプレイヤーからインポートして、Pocket Casts を自分のものにしましょう。 この操作は後でいつでも実行できます。</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">お気に入りのポッドキャストを見つける</string>
@@ -1064,8 +1100,6 @@ Language: ja_JP
     <string name="plus_learn_more_button">もっと詳しく知る</string>
     <string name="plus_learn_more_about_plus">Pocket Casts Plus の詳細</string>
     <string name="plus_desktop_apps">デスクトップアプリ</string>
-    <string name="plus_create_marketing_features"> すべて</string>
-    <string name="plus_cloud_storage_limit">%dGB のクラウドストレージ</string>
     <string name="plus_cloud_storage">クラウドストレージ</string>
     <string name="profile_expiry_date_unknown">不明</string>
     <string name="profile_yearly">年払い</string>
@@ -1132,7 +1166,6 @@ Language: ja_JP
     <string name="profile_reset_password_failed">新しいパスワードをメールで送信できません。 後ほど、もう一度お試しください。</string>
     <string name="profile_reset_password">パスワードをリセット</string>
     <string name="profile_regular_price">標準価格</string>
-    <string name="profile_regular">標準</string>
     <string name="profile_refreshing">再読み込みしています…</string>
     <string name="profile_refreshed_never">これまで一度も再読み込みされていません</string>
     <string name="profile_refresh_status_unknown">不明</string>
@@ -1178,9 +1211,7 @@ Language: ja_JP
     <string name="profile_joined">参加済み:</string>
     <string name="profile_get_plus">Pocket Casts Plus を取得してこれらの機能をフルに利用しましょう !</string>
     <string name="profile_free_account">無料アカウント</string>
-    <string name="profile_free">無料</string>
     <string name="profile_forgot_your_password">パスワードを忘れた場合</string>
-    <string name="profile_find_out_more">Pocket Casts Plus の詳細を確認</string>
     <string name="profile_files_remove_image">画像を置換</string>
     <string name="profile_files_empty_title">ファイルなし</string>
     <string name="profile_files_empty_summary">自身のファイルを聴きたい場合は、\n+ ボタンをタップして Pocket Casts で開くとここに表示されます。</string>
@@ -1190,9 +1221,6 @@ Language: ja_JP
     <string name="profile_file_locked">ロック中</string>
     <string name="profile_file">ファイル</string>
     <string name="profile_feature_requires">この機能には以下が必要です\nPocket Casts Plus</string>
-    <string name="profile_extra_themes">追加のテーマ</string>
-    <string name="profile_extra_app_icons">追加のアプリアイコン</string>
-    <string name="profile_everything_unlocked">すべてのロックを解除済み</string>
     <string name="profile_ends">終了 %s</string>
     <string name="profile_ended">%sに終了</string>
     <string name="profile_end_tour">ツアーを終了</string>
@@ -1224,16 +1252,10 @@ Language: ja_JP
     <string name="profile_select_account_type">アカウントタイプを選択</string>
     <string name="profile_create_completed">アカウントを完了</string>
     <string name="profile_create_terms_of_use">利用規約</string>
-    <string name="profile_create_tos_full_terms_of_use">利用規約全文</string>
-    <string name="profile_create_tos_disagree">いいえ</string>
-    <string name="profile_create_tos_agree">同意する</string>
-    <string name="profile_create_tos">Plus をご利用いただくには、利用規約に同意していただく必要があります。 以下のリンクからいつでも詳細を確認できます。</string>
     <string name="profile_create_subscription_failed">サブスクリプションを作成できませんでした。 もう一度お試しください</string>
-    <string name="profile_create_privacy_policy_title">プライバシーポリシー</string>
     <string name="profile_create_privacy_policy">ご興味がある方のためにプライバシーポリシーのリンクもご用意しました。 どちらもなるべくコンパクトかつわかりやすくなるようにし、法律用語も最小限に抑えてあります。</string>
     <string name="profile_create_password_requirements">6文字以上のパスワードを選んでください</string>
     <string name="profile_create_newsletter_summary">ニュースやアプリの更新、特定のテーマを取り上げたポッドキャストリスト、インタビューなどをお楽しみください</string>
-    <string name="profile_create_license">ご面倒をおかけしますがよろしくお願いいたします。</string>
     <string name="profile_create_failed">アカウントを作成できませんでした。 もう一度お試しください</string>
     <string name="profile_create_account_image">アカウント画像作成</string>
     <string name="profile_create_account">アカウントを作成</string>
@@ -1280,7 +1302,6 @@ Language: ja_JP
     <string name="profile_alreadysignedindescription">一度にログインできるアカウントは1つだけです。</string>
     <string name="profile_alreadysignedin">ログイン中です</string>
     <string name="profile_already_have_account">すでに Pocket Casts アカウントを保有されていますか ?</string>
-    <string name="profile_almost_everything">ほぼすべて</string>
     <string name="profile_account_delete_yes">はい、削除します</string>
     <string name="profile_account_created">アカウントを作成済み</string>
     <string name="profile_access_ends">アクセス権終了予定日: %s</string>
