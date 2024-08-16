@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -85,6 +86,8 @@ class TranscriptViewModel @Inject constructor(
                     UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
                 } catch (e: NoNetworkException) {
                     UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
+                } catch (e: TranscriptParsingException) {
+                    UiState.Error(TranscriptError.FailedToParse, transcript, podcastAndEpisode)
                 } catch (e: Exception) {
                     UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
                 }
@@ -111,6 +114,7 @@ class TranscriptViewModel @Inject constructor(
                     )
                 }
             }
+
             else -> {
                 val format = Format.Builder()
                     .setSampleMimeType(transcript.type)
@@ -120,20 +124,26 @@ class TranscriptViewModel @Inject constructor(
                 } else {
                     val result = ImmutableList.builder<CuesWithTiming>()
                     transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.bytes()?.let { data ->
-                        val parser = subtitleParserFactory.create(format)
-                        parser.parse(
-                            data,
-                            SubtitleParser.OutputOptions.allCues(),
-                        ) { element: CuesWithTiming? ->
-                            element?.let {
-                                result.add(
-                                    CuesWithTiming(
-                                        modifiedCues(it),
-                                        it.startTimeUs,
-                                        it.endTimeUs,
-                                    ),
-                                )
+                        try {
+                            val parser = subtitleParserFactory.create(format)
+                            parser.parse(
+                                data,
+                                SubtitleParser.OutputOptions.allCues(),
+                            ) { element: CuesWithTiming? ->
+                                element?.let {
+                                    result.add(
+                                        CuesWithTiming(
+                                            modifiedCues(it),
+                                            it.startTimeUs,
+                                            it.endTimeUs,
+                                        ),
+                                    )
+                                }
                             }
+                        } catch (e: Exception) {
+                            val message = "Failed to parse transcript: ${transcript.url}"
+                            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, message)
+                            throw TranscriptParsingException(message)
                         }
                     }
                     result.build()
@@ -228,5 +238,8 @@ class TranscriptViewModel @Inject constructor(
         data class NotSupported(val format: String) : TranscriptError()
         data object FailedToLoad : TranscriptError()
         data object NoNetwork : TranscriptError()
+        data object FailedToParse : TranscriptError()
     }
+
+    class TranscriptParsingException(message: String) : Exception(message)
 }

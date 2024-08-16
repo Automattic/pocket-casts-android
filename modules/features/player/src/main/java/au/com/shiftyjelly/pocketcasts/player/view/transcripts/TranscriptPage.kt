@@ -319,6 +319,9 @@ private fun TranscriptError(
         is TranscriptError.NoNetwork ->
             stringResource(LR.string.error_no_network)
 
+        is TranscriptError.FailedToParse ->
+            stringResource(LR.string.error_transcript_failed_to_parse)
+
         is TranscriptError.FailedToLoad ->
             stringResource(LR.string.error_transcript_failed_to_load)
     }
