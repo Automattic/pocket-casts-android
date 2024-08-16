@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemMostPopularPodcastsBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
@@ -77,7 +76,6 @@ internal class MostPopularPodcastsAdapter(
                 val podcast = getItem(position) as DiscoverPodcast
                 binding.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = R.attr.contrast_01, colorUnsubscribed = R.attr.contrast_01)
                 fromListId?.let {
-                    FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                 }
                 onPodcastSubscribe(podcast, fromListId)
@@ -105,7 +103,6 @@ internal class MostPopularPodcastsAdapter(
 
     private fun trackImpression(podcast: DiscoverPodcast) {
         fromListId?.let {
-            FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
                 mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid),

@@ -81,9 +81,13 @@ fun SubscriptionBadge(
 fun SubscriptionBadgeForTier(
     tier: SubscriptionTier,
     displayMode: SubscriptionBadgeDisplayMode,
+    fontSize: TextUnit = 14.sp,
+    padding: Dp = 4.dp,
 ) {
     when (tier) {
         SubscriptionTier.PLUS -> SubscriptionBadge(
+            fontSize = fontSize,
+            padding = padding,
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
             iconColor = when (displayMode) {
@@ -104,6 +108,8 @@ fun SubscriptionBadgeForTier(
             },
         )
         SubscriptionTier.PATRON -> SubscriptionBadge(
+            fontSize = fontSize,
+            padding = padding,
             iconRes = IR.drawable.ic_patron,
             shortNameRes = LR.string.pocket_casts_patron_short,
             iconColor = when (displayMode) {

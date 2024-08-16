@@ -17,7 +17,6 @@ import androidx.media3.datasource.HttpDataSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -526,11 +525,6 @@ open class PlaybackManager @Inject constructor(
                     }
                 },
             )
-
-            if (episode is PodcastEpisode) {
-                // We only want to track playing of episodes, not files
-                FirebaseAnalyticsTracker.playedEpisode()
-            }
         } else if (!switchEpisode && playbackStateRelay.blockingFirst().isPaused) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No player switch required. Playing queue.")
             playQueue(

@@ -8,7 +8,6 @@ import androidx.media3.common.Format
 import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
-import androidx.media3.extractor.text.CuesWithTimingSubtitle
 import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
@@ -16,7 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.utils.UrlUtil
+import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
+import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -31,22 +31,19 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// TODO: [Transcript] Modify regex for non english languages
-private val SpeakerRegex = """Speaker \d+: """.toRegex()
-private val NewLineRegex = """[.?!]$""".toRegex()
-
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
 @HiltViewModel
 class TranscriptViewModel @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
     private val playbackManager: PlaybackManager,
-    private val urlUtil: UrlUtil,
     private val subtitleParserFactory: SubtitleParser.Factory,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty())
     val uiState: StateFlow<UiState> = _uiState
+    private var _isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     init {
         viewModelScope.launch {
@@ -68,40 +65,51 @@ class TranscriptViewModel @Inject constructor(
                 } ?: UiState.Empty(podcastAndEpisode)
             }
 
-    fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean) {
+    fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean, forceRefresh: Boolean = false) {
         if (isTranscriptViewOpen.not()) return
+        if (forceRefresh) _isRefreshing.value = true
         _uiState.value.transcript?.let { transcript ->
+            clearErrorsIfFound(transcript)
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
-                    val result = buildSubtitleCues(transcript)
+                    val cuesWithTimingSubtitle = buildSubtitleCues(transcript, forceRefresh)
+                    val displayInfo = buildDisplayInfo(cuesWithTimingSubtitle)
                     UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
-                        cuesWithTimingSubtitle = result,
+                        displayInfo = displayInfo,
+                        cuesWithTimingSubtitle = cuesWithTimingSubtitle,
                     )
                 } catch (e: UnsupportedOperationException) {
-                    UiState.Error(TranscriptError.NotSupported(transcript.type), podcastAndEpisode)
+                    UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
+                } catch (e: NoNetworkException) {
+                    UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
                 } catch (e: Exception) {
-                    UiState.Error(TranscriptError.FailedToLoad, podcastAndEpisode)
+                    UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
                 }
+                if (forceRefresh) _isRefreshing.value = false
             }
         }
     }
 
-    private suspend fun buildSubtitleCues(transcript: Transcript) = withContext(ioDispatcher) {
+    private suspend fun buildSubtitleCues(transcript: Transcript, forceRefresh: Boolean) = withContext(ioDispatcher) {
         when (transcript.type) {
             TranscriptFormat.HTML.mimeType -> {
-                // Html content is added as single large cue
-                CuesWithTimingSubtitle(
+                val content = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
+                if (content.trim().isEmpty()) {
+                    emptyList<CuesWithTiming>()
+                } else {
+                    val newText = TranscriptRegexFilters.htmlFilters.filter(content)
+                    // Html content is added as single large cue
                     ImmutableList.of(
                         CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(urlUtil.contentString(transcript.url)).build()),
+                            ImmutableList.of(Cue.Builder().setText(newText).build()),
                             0,
                             0,
                         ),
-                    ),
-                )
+                    )
+                }
             }
             else -> {
                 val format = Format.Builder()
@@ -111,7 +119,7 @@ class TranscriptViewModel @Inject constructor(
                     throw UnsupportedOperationException("Unsupported MIME type: ${transcript.type}")
                 } else {
                     val result = ImmutableList.builder<CuesWithTiming>()
-                    urlUtil.contentBytes(transcript.url)?.let { data ->
+                    transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.bytes()?.let { data ->
                         val parser = subtitleParserFactory.create(format)
                         parser.parse(
                             data,
@@ -128,24 +136,45 @@ class TranscriptViewModel @Inject constructor(
                             }
                         }
                     }
-                    CuesWithTimingSubtitle(result.build())
+                    result.build()
                 }
             }
         }
     }
 
+    private suspend fun buildDisplayInfo(cuesWithTimingSubtitle: List<CuesWithTiming>) = withContext(ioDispatcher) {
+        val formattedText = buildString {
+            cuesWithTimingSubtitle
+                .flatMap { it.cues }
+                .forEach { cue -> append(cue.text) }
+        }
+        val items = formattedText.splitIgnoreEmpty("\n\n").map {
+            val startIndex = formattedText.indexOf(it)
+            DisplayItem(it, startIndex, startIndex + it.length)
+        }
+        DisplayInfo(
+            text = formattedText,
+            items = items,
+        )
+    }
+
+    private fun clearErrorsIfFound(transcript: Transcript) {
+        if (_uiState.value is UiState.Error) {
+            _uiState.value = UiState.TranscriptFound(
+                podcastAndEpisode = _uiState.value.podcastAndEpisode,
+                transcript = transcript,
+            )
+        }
+    }
+
     /**
      * Modifies the cues in the given [CuesWithTiming] object.
-     * - Removes speaker names from the cue text using the [SpeakerRegex].
-     * - Replaces cue text ending with dot with newlines.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun modifiedCues(cuesWithTiming: CuesWithTiming) =
         cuesWithTiming.cues.map { cue ->
             val cueBuilder = cue.buildUpon()
-            val newText = cue.text.toString()
-                .replace(SpeakerRegex, "")
-                .replace(NewLineRegex, "${cue.text.toString().last()}\n\n")
+            val newText = TranscriptRegexFilters.transcriptFilters.filter(cue.text.toString())
             cueBuilder.setText(newText)
             cueBuilder.build()
         }
@@ -171,17 +200,33 @@ class TranscriptViewModel @Inject constructor(
         data class TranscriptLoaded(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
-            val cuesWithTimingSubtitle: CuesWithTimingSubtitle,
-        ) : UiState()
+            val displayInfo: DisplayInfo,
+            val cuesWithTimingSubtitle: List<CuesWithTiming>,
+        ) : UiState() {
+            val isTranscriptEmpty: Boolean = cuesWithTimingSubtitle.isEmpty()
+        }
 
         data class Error(
             val error: TranscriptError,
+            override val transcript: Transcript,
             override val podcastAndEpisode: PodcastAndEpisode? = null,
         ) : UiState()
     }
 
+    data class DisplayInfo(
+        val text: String,
+        val items: List<DisplayItem> = emptyList(),
+    )
+
+    data class DisplayItem(
+        val text: String,
+        val startIndex: Int,
+        val endIndex: Int,
+    )
+
     sealed class TranscriptError {
         data class NotSupported(val format: String) : TranscriptError()
         data object FailedToLoad : TranscriptError()
+        data object NoNetwork : TranscriptError()
     }
 }

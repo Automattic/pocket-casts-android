@@ -48,7 +48,8 @@ internal class SharingAnalytics(
 
     private val CardType.analyticsValue get() = when (this) {
         CardType.Vertical -> "vertical"
-        CardType.Horiozntal -> "horizontal"
+        CardType.Horizontal -> "horizontal"
         CardType.Square -> "square"
+        CardType.Audio -> "audio"
     }
 }

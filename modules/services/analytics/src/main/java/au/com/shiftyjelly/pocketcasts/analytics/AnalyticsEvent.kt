@@ -52,21 +52,10 @@ enum class AnalyticsEvent(val key: String) {
     SIGNIN_SHOWN("signin_shown"),
     SIGNIN_DISMISSED("signin_dismissed"),
 
-    /* Select Account Type */
-    SELECT_ACCOUNT_TYPE_SHOWN("select_account_type_shown"),
-    SELECT_ACCOUNT_TYPE_DISMISSED("select_account_type_dismissed"),
-    SELECT_ACCOUNT_TYPE_BUTTON_TAPPED("select_account_type_button_tapped"),
-
     /* Create Account */
     CREATE_ACCOUNT_SHOWN("create_account_shown"),
     CREATE_ACCOUNT_DISMISSED("create_account_dismissed"),
     CREATE_ACCOUNT_NEXT_BUTTON_TAPPED("create_account_next_button_tapped"),
-
-    /* Terms of Use */
-    TERMS_OF_USE_SHOWN("terms_of_use_shown"),
-    TERMS_OF_USE_DISMISSED("terms_of_use_dismissed"),
-    TERMS_OF_USE_ACCEPTED("terms_of_use_accepted"),
-    TERMS_OF_USE_REJECTED("terms_of_use_rejected"),
 
     /* Select Payment Frequency */
     SELECT_PAYMENT_FREQUENCY_SHOWN("select_payment_frequency_shown"),
@@ -631,13 +620,23 @@ enum class AnalyticsEvent(val key: String) {
     WIDGET_INSTALLED("widget_installed"),
     WIDGET_UNINSTALLED("widget_uninstalled"),
 
-    /* Clips */
-    CLIP_SCREEN_SHOWN("clip_screen_shown"),
-    CLIP_SCREEN_PLAY_TAPPED("clip_screen_play_tapped"),
-    CLIP_SCREEN_PAUSE_TAPPED("clip_screen_pause_tapped"),
-    CLIP_SCREEN_LINK_SHARED("clip_screen_link_shared"),
+    /* Sharing */
+    SHARE_SCREEN_SHOWN("share_screen_shown"),
+    SHARE_SCREEN_PLAY_TAPPED("share_screen_play_tapped"),
+    SHARE_SCREEN_PAUSE_TAPPED("share_screen_pause_tapped"),
+    SHARE_SCREEN_CLIP_SHARED("share_screen_clip_shared"),
 
     /* Pocket Casts Champion */
     POCKET_CASTS_CHAMPION_DIALOG_SHOWN("pocket_casts_champion_dialog_shown"),
     POCKET_CASTS_CHAMPION_DIALOG_RATE_BUTTON_TAPPED("pocket_casts_champion_dialog_rate_button_tapped"),
+
+    /* Kids */
+    KIDS_PROFILE_BANNER_SEEN("kids_profile_banner_seen"),
+    KIDS_PROFILE_EARLY_ACCESS_REQUESTED("kids_profile_early_access_requested"),
+    KIDS_PROFILE_BANNER_DISMISSED("kids_profile_banner_dismissed"),
+    KIDS_PROFILE_FEEDBACK_SENT("kids_profile_feedback_sent"),
+    KIDS_PROFILE_SEND_FEEDBACK_TAPPED("kids_profile_send_feedback_tapped"),
+    KIDS_PROFILE_NO_THANK_YOU_TAPPED("kids_profile_no_thank_you_tapped"),
+    KIDS_PROFILE_THANK_YOU_FOR_YOUR_INTEREST_SEEN("kids_profile_thank_you_for_your_interest_seen"),
+    KIDS_PROFILE_FEEDBACK_FORM_SEEN("kids_profile_feedback_form_seen"),
 }

@@ -30,6 +30,7 @@ android {
         buildConfigField "String", "BUILD_PLATFORM", "\"${project.buildPlatform}\""
         buildConfigField "String", "ENCRYPTION_KEY", "\"${project.encryptionKey}\""
         buildConfigField "String", "APP_SECRET", "\"${project.appSecret}\""
+        buildConfigField "String", "META_APP_ID", "\"${project.metaAppId}\""
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
@@ -125,7 +126,8 @@ android {
     buildTypes {
         debug {
             pseudoLocalesEnabled true
-            testCoverageEnabled false
+            enableUnitTestCoverage = false
+            enableAndroidTestCoverage = false
             ext.alwaysUpdateBuildId = false
 
             buildConfigField "String", "SERVER_MAIN_URL", "\"https://refresh.pocketcasts.net\""
@@ -144,7 +146,8 @@ android {
         debugProd {
             debuggable true
 
-            testCoverageEnabled false
+            enableUnitTestCoverage = false
+            enableAndroidTestCoverage = false
             ext.alwaysUpdateBuildId = false
 
             buildConfigField "String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD

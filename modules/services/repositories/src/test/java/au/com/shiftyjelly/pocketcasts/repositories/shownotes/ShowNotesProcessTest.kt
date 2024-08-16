@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.LoadTranscriptSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.podcast.RawChaptersResponse
@@ -461,7 +462,7 @@ class ShowNotesProcessTest {
                 language = "Language 2",
             ),
         )
-        verify(transcriptsManager).updateTranscripts("episode-id", expected1)
+        verify(transcriptsManager).updateTranscripts("episode-id", expected1, LoadTranscriptSource.DEFAULT)
     }
 
     @Test
@@ -489,7 +490,7 @@ class ShowNotesProcessTest {
         processor.process("episode-id", showNotes)
 
         val expected2 = emptyList<Transcript>()
-        verify(transcriptsManager).updateTranscripts("episode-id", expected2)
+        verify(transcriptsManager).updateTranscripts("episode-id", expected2, LoadTranscriptSource.DEFAULT)
     }
 
     @Test
@@ -510,6 +511,6 @@ class ShowNotesProcessTest {
         processor.process("episode-id", showNotes)
 
         val expected2 = emptyList<Transcript>()
-        verify(transcriptsManager, never()).updateTranscripts("episode-id", expected2)
+        verify(transcriptsManager, never()).updateTranscripts("episode-id", expected2, LoadTranscriptSource.DEFAULT)
     }
 }

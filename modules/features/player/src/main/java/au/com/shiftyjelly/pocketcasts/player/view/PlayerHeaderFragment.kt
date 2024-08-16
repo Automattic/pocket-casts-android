@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBind
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -104,6 +105,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
     private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
+    private val transcriptSearchViewModel by viewModels<TranscriptSearchViewModel>({ requireParentFragment() })
     private var binding: AdapterPlayerHeaderBinding? = null
     private val sourceView = SourceView.PLAYER
 
@@ -352,8 +354,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun setupTranscriptPage() {
         binding?.transcriptPage?.setContent {
             TranscriptPageWrapper(
-                viewModel = viewModel,
+                playerViewModel = viewModel,
                 transcriptViewModel = transcriptViewModel,
+                searchViewModel = transcriptSearchViewModel,
                 theme = theme,
             )
         }

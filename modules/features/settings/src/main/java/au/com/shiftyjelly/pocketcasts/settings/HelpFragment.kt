@@ -25,7 +25,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -89,8 +88,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
                 }
             }
         }
-
-        FirebaseAnalyticsTracker.userGuideOpened()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -260,7 +257,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         }
 
         analyticsTracker.track(AnalyticsEvent.SETTINGS_LEAVE_FEEDBACK)
-        FirebaseAnalyticsTracker.userGuideEmailFeedback()
     }
 
     private fun contactSupport() {
@@ -270,7 +266,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         }
 
         analyticsTracker.track(AnalyticsEvent.SETTINGS_GET_SUPPORT)
-        FirebaseAnalyticsTracker.userGuideEmailSupport()
     }
 
     private fun useForumPopup() {
