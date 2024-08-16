@@ -54,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextT
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.ScrollToHighlightedTextOffset
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
@@ -276,7 +277,7 @@ private fun TranscriptItem(
     item: DisplayItem,
     searchState: SearchUiState,
 ) {
-    val defaultTextStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, color = TranscriptColors.textColor())
+    val defaultTextStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, fontFamily = TranscriptFontFamily, color = TranscriptColors.textColor())
     Box(
         modifier = Modifier
             .fillMaxWidth()

@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
@@ -82,6 +83,9 @@ fun TranscriptError(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 12.dp),
                 color = TranscriptColors.textColor(),
+                fontFamily = TranscriptFontFamily,
+                fontWeight = FontWeight.W500,
+                lineHeight = 24.sp,
             )
             Button(
                 onClick = onRetry,
