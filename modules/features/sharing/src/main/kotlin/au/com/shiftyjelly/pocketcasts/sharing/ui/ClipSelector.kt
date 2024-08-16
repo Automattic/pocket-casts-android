@@ -153,18 +153,18 @@ private fun TouchClipSelector(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(72.dp)
-                .background(shareColors.timeline, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
+                .background(shareColors.container, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)),
         ) {
             Image(
                 painter = painterResource(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
                 contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
-                colorFilter = ColorFilter.tint(shareColors.playPauseButton),
+                colorFilter = ColorFilter.tint(shareColors.onContainerPrimary),
                 modifier = Modifier
                     .size(72.dp)
                     .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                     .clickable(
                         interactionSource = remember(::MutableInteractionSource),
-                        indication = rememberRipple(color = shareColors.base),
+                        indication = rememberRipple(color = shareColors.accent),
                         onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
                         role = Role.Button,
                         onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
@@ -189,14 +189,14 @@ private fun TouchClipSelector(
         Row {
             TextH70(
                 text = stringResource(LR.string.share_clip_start_position, clipRange.start.toHhMmSs()),
-                color = shareColors.backgroundSecondaryText,
+                color = shareColors.onBackgroundSecondary,
             )
             Spacer(
                 modifier = Modifier.weight(1f),
             )
             TextH70(
                 text = stringResource(LR.string.share_clip_duration, clipRange.duration.toHhMmSs()),
-                color = shareColors.backgroundSecondaryText,
+                color = shareColors.onBackgroundSecondary,
             )
         }
     }
@@ -301,7 +301,7 @@ private fun BoxWithConstraintsScope.ClipTimeline(
                 modifier = Modifier
                     .width(state.tickWidthDp)
                     .height(heightIndex)
-                    .background(shareColors.timelineTick),
+                    .background(shareColors.onBackgroundSecondary),
             )
         }
     }
@@ -361,7 +361,7 @@ private fun BoxWithConstraintsScope.ClipWindow(
                 modifier = Modifier
                     .width(2.dp)
                     .fillMaxHeight()
-                    .background(shareColors.timelineProgress),
+                    .background(shareColors.onBackgroundPrimary),
             )
         }
 
@@ -397,14 +397,14 @@ private fun BoxWithConstraintsScope.ClipWindow(
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topStart = handleWidth / 2, bottomStart = handleWidth / 2))
-                    .background(shareColors.selector),
+                    .background(shareColors.accent),
             ) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
                         .height(this@ClipWindow.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
-                        .background(shareColors.selectorHandle),
+                        .background(shareColors.onAccent.copy(alpha = 0.6f)),
                 )
             }
         }
@@ -440,14 +440,14 @@ private fun BoxWithConstraintsScope.ClipWindow(
                     .width(handleWidth)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topEnd = handleWidth / 2, bottomEnd = handleWidth / 2))
-                    .background(shareColors.selector),
+                    .background(shareColors.accent),
             ) {
                 Box(
                     modifier = Modifier
                         .width(2.dp)
                         .height(this@ClipWindow.maxHeight / 2)
                         .clip(RoundedCornerShape(1.dp))
-                        .background(shareColors.selectorHandle),
+                        .background(shareColors.onAccent.copy(alpha = 0.6f)),
                 )
             }
         }
@@ -472,7 +472,7 @@ private fun BoxWithConstraintsScope.ClipWindow(
                     .offset { IntOffset(frameOffsetPx, 0) }
                     .requiredWidth(frameWidth)
                     .height(6.dp)
-                    .background(shareColors.selector),
+                    .background(shareColors.accent),
             )
             Spacer(
                 modifier = Modifier.weight(1f),
@@ -482,7 +482,7 @@ private fun BoxWithConstraintsScope.ClipWindow(
                     .offset { IntOffset(frameOffsetPx, 0) }
                     .requiredWidth(frameWidth)
                     .height(6.dp)
-                    .background(shareColors.selector),
+                    .background(shareColors.accent),
             )
         }
     }
@@ -504,20 +504,20 @@ private fun KeyboardClipSelector(
     ) {
         Box(
             modifier = Modifier
-                .background(shareColors.timeline, RoundedCornerShape(8.dp))
+                .background(shareColors.container, RoundedCornerShape(8.dp))
                 .width(72.dp)
                 .height(72.dp),
         ) {
             Image(
                 painter = painterResource(if (isPlaying) IR.drawable.ic_widget_pause else IR.drawable.ic_widget_play),
                 contentDescription = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
-                colorFilter = ColorFilter.tint(shareColors.playPauseButton),
+                colorFilter = ColorFilter.tint(shareColors.onContainerPrimary),
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp))
                     .clickable(
                         interactionSource = remember(::MutableInteractionSource),
-                        indication = rememberRipple(color = shareColors.base),
+                        indication = rememberRipple(color = shareColors.accent),
                         onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
                         role = Role.Button,
                         onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
@@ -528,14 +528,14 @@ private fun KeyboardClipSelector(
         Column(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .background(shareColors.timeline, RoundedCornerShape(8.dp))
+                .background(shareColors.container, RoundedCornerShape(8.dp))
                 .weight(1f)
                 .heightIn(min = 72.dp)
                 .padding(12.dp),
         ) {
             TextH50(
                 text = stringResource(LR.string.share_start_position),
-                color = shareColors.backgroundSecondaryText,
+                color = shareColors.onContainerSecondary,
             )
             Spacer(
                 modifier = Modifier.height(2.dp),
@@ -553,14 +553,14 @@ private fun KeyboardClipSelector(
         Column(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .background(shareColors.timeline, RoundedCornerShape(8.dp))
+                .background(shareColors.container, RoundedCornerShape(8.dp))
                 .weight(1f)
                 .heightIn(min = 72.dp)
                 .padding(12.dp),
         ) {
             TextH50(
                 text = stringResource(LR.string.share_end_position),
-                color = shareColors.backgroundSecondaryText,
+                color = shareColors.onContainerSecondary,
             )
             Spacer(
                 modifier = Modifier.height(2.dp),
@@ -674,11 +674,11 @@ private fun TimeTextField(
         },
         maxLines = 1,
         textStyle = TextStyle(
-            color = shareColors.backgroundPrimaryText,
+            color = shareColors.onContainerPrimary,
             fontSize = 18.sp,
             fontWeight = FontWeight.W500,
         ),
-        cursorBrush = SolidColor(shareColors.backgroundPrimaryText),
+        cursorBrush = SolidColor(shareColors.onContainerPrimary),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Next,

@@ -80,6 +80,7 @@ internal fun VerticalSharePage(
                     modifier = Modifier.onGloballyPositioned { coordinates -> topContentHeight = coordinates.size.height },
                 )
                 MiddleContent(
+                    shareColors = shareColors,
                     middleContent = middleContent,
                     pagerState = pagerState,
                     scrollState = scrollState,
@@ -126,7 +127,7 @@ private fun TopContent(
         TextH30(
             text = shareTitle,
             textAlign = TextAlign.Center,
-            color = shareColors.backgroundPrimaryText,
+            color = shareColors.onBackgroundPrimary,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
         Spacer(
@@ -135,7 +136,7 @@ private fun TopContent(
         TextH40(
             text = shareDescription,
             textAlign = TextAlign.Center,
-            color = shareColors.backgroundSecondaryText,
+            color = shareColors.onBackgroundSecondary,
             modifier = Modifier.sizeIn(maxWidth = 220.dp),
         )
     }
@@ -144,6 +145,7 @@ private fun TopContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MiddleContent(
+    shareColors: ShareColors,
     scrollState: ScrollState,
     pagerState: PagerState,
     topContentHeight: Int,
@@ -159,6 +161,8 @@ private fun MiddleContent(
     ) {
         PagerDotIndicator(
             state = pagerState,
+            activeDotColor = shareColors.onBackgroundPrimary,
+            inactiveDotColor = shareColors.onBackgroundSecondary,
         )
     }
 
@@ -226,7 +230,7 @@ internal fun HorizontalSharePage(
                 TextH30(
                     text = shareTitle,
                     textAlign = TextAlign.Center,
-                    color = shareColors.backgroundPrimaryText,
+                    color = shareColors.onBackgroundPrimary,
                     modifier = Modifier.padding(horizontal = 24.dp),
                 )
                 Spacer(
@@ -235,7 +239,7 @@ internal fun HorizontalSharePage(
                 TextH40(
                     text = shareDescription,
                     textAlign = TextAlign.Center,
-                    color = shareColors.backgroundSecondaryText,
+                    color = shareColors.onBackgroundSecondary,
                     modifier = Modifier.padding(horizontal = 24.dp),
                 )
             }

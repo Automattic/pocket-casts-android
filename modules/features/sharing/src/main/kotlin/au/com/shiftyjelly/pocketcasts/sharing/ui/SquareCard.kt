@@ -113,7 +113,7 @@ private fun SquareCard(
             text = data.topText(),
             disableScale = true,
             maxLines = 1,
-            color = shareColors.cardText.copy(alpha = 0.5f),
+            color = shareColors.cardTextSecondary,
             modifier = Modifier.padding(horizontal = 64.dp),
         )
         Spacer(
@@ -124,7 +124,7 @@ private fun SquareCard(
             disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = shareColors.cardText,
+            color = shareColors.cardTextPrimary,
             modifier = Modifier.padding(horizontal = 42.dp),
         )
         Spacer(
@@ -135,7 +135,7 @@ private fun SquareCard(
             disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = shareColors.cardText.copy(alpha = 0.5f),
+            color = shareColors.cardTextSecondary,
             modifier = Modifier.padding(horizontal = 64.dp),
         )
     }

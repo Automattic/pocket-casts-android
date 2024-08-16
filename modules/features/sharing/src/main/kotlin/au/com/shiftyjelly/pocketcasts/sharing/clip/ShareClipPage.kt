@@ -384,7 +384,7 @@ private fun DescriptionContent(
                 ),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                color = shareColors.backgroundPrimaryText,
+                color = shareColors.onBackgroundPrimary,
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .align(Alignment.CenterHorizontally),
@@ -400,7 +400,7 @@ private fun DescriptionContent(
                         text = stringResource(descriptionId),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
-                        color = shareColors.backgroundSecondaryText,
+                        color = shareColors.onBackgroundSecondary,
                         modifier = Modifier.padding(horizontal = 24.dp),
                     )
                 }
@@ -408,15 +408,15 @@ private fun DescriptionContent(
                     text = stringResource(LR.string.share_clip_edit_label),
                     textAlign = TextAlign.Center,
                     maxLines = 1,
-                    color = shareColors.backgroundPrimaryText,
+                    color = shareColors.onContainerPrimary,
                     fontWeight = FontWeight.W400,
                     modifier = Modifier
                         .alpha(alpha)
-                        .background(shareColors.closeButton, CircleShape)
+                        .background(shareColors.container, CircleShape)
                         .defaultMinSize(minHeight = 24.dp)
                         .clickable(
                             interactionSource = remember(::MutableInteractionSource),
-                            indication = rememberRipple(color = shareColors.base),
+                            indication = rememberRipple(color = shareColors.accent),
                             onClickLabel = stringResource(LR.string.share_clip_edit_label),
                             role = Role.Button,
                             onClick = listener::onShowClipSelection,
@@ -464,6 +464,8 @@ private fun PagingContent(
         ) {
             PagerDotIndicator(
                 state = pagerState,
+                activeDotColor = shareColors.onBackgroundPrimary,
+                inactiveDotColor = shareColors.onBackgroundSecondary,
             )
         }
     }
@@ -504,7 +506,7 @@ private fun PagingContent(
                 Image(
                     painter = painterResource(IR.drawable.ic_audio_card),
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(shareColors.backgroundPrimaryText),
+                    colorFilter = ColorFilter.tint(shareColors.onBackgroundPrimary),
                 )
             }
         }
@@ -612,7 +614,7 @@ private fun ClipControls(
                     }
                 }
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.clipButton),
+            colors = ButtonDefaults.buttonColors(backgroundColor = shareColors.accent),
             elevation = null,
             includePadding = false,
             modifier = Modifier.heightIn(min = 48.dp),
@@ -630,12 +632,12 @@ private fun ClipControls(
                         // Keep in the UI for to keep correct button size
                         text = if (isSharing) " " else buttonText,
                         textAlign = TextAlign.Center,
-                        color = shareColors.clipButtonText,
+                        color = shareColors.onAccent,
                         modifier = Modifier.padding(6.dp),
                     )
                     if (isSharing) {
                         CircularProgressIndicator(
-                            color = shareColors.clipButtonText,
+                            color = shareColors.onAccent,
                             strokeWidth = 2.dp,
                             modifier = Modifier.size(24.dp),
                         )
@@ -693,13 +695,13 @@ private fun SharingControls(
                 ) {
                     TextH40(
                         text = stringResource(LR.string.share_clip_sharing_clip),
-                        color = shareColors.backgroundPrimaryText,
+                        color = shareColors.onBackgroundPrimary,
                     )
                     Spacer(
                         modifier = Modifier.height(24.dp),
                     )
                     LinearProgressIndicator(
-                        color = shareColors.base,
+                        color = shareColors.accent,
                     )
                     Spacer(
                         modifier = Modifier.height(20.dp),

@@ -135,7 +135,7 @@ private fun HorizontalCard(
             TextH70(
                 text = data.topText(),
                 disableScale = true,
-                color = shareColors.cardText.copy(alpha = 0.5f),
+                color = shareColors.cardTextSecondary,
                 maxLines = 1,
             )
             Spacer(
@@ -144,7 +144,7 @@ private fun HorizontalCard(
             TextH40(
                 text = data.middleText(),
                 disableScale = true,
-                color = shareColors.cardText,
+                color = shareColors.cardTextPrimary,
                 maxLines = 3,
             )
             Spacer(
@@ -154,7 +154,7 @@ private fun HorizontalCard(
                 text = data.bottomText(),
                 disableScale = true,
                 maxLines = 2,
-                color = shareColors.cardText.copy(alpha = 0.5f),
+                color = shareColors.cardTextSecondary,
             )
         }
     }
