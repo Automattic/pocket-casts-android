@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
-import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
@@ -27,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -35,7 +35,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuI
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
@@ -60,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.google.common.collect.ImmutableList
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -160,8 +161,6 @@ private fun TranscriptContent(
     colors: TranscriptColors,
     modifier: Modifier,
 ) {
-    val configuration = LocalConfiguration.current
-    val bottomPadding = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 125.dp
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -179,7 +178,6 @@ private fun TranscriptContent(
             ScrollableTranscriptView(
                 state = state,
                 searchState = searchState,
-                bottomPadding = bottomPadding,
             )
         }
 
@@ -194,7 +192,7 @@ private fun TranscriptContent(
             baseColor = colors.backgroundColor(),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = bottomPadding),
+                .padding(bottom = bottomPadding()),
             fadeDirection = FadeDirection.BottomToTop,
         )
     }
@@ -205,12 +203,14 @@ private fun TranscriptContent(
 private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
-    bottomPadding: Dp,
 ) {
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val displayWidthPercent = if (Util.isTablet(LocalContext.current)) 0.8f else 1f
+    val horizontalContentPadding = ((1 - displayWidthPercent) * screenWidthDp).dp / 2
+
     val scrollState = rememberLazyListState()
     val scrollableContentModifier = Modifier
-        .padding(horizontal = 16.dp)
-        .padding(bottom = bottomPadding)
+        .padding(bottom = bottomPadding())
         .verticalScrollBar(
             thumbColor = TranscriptColors.textColor(),
             scrollState = scrollState,
@@ -233,7 +233,12 @@ private fun ScrollableTranscriptView(
             LazyColumn(
                 state = scrollState,
                 modifier = scrollableContentModifier,
-                contentPadding = PaddingValues(top = 64.dp, bottom = 80.dp),
+                contentPadding = PaddingValues(
+                    start = horizontalContentPadding,
+                    end = horizontalContentPadding,
+                    top = 64.dp,
+                    bottom = 80.dp,
+                ),
             ) {
                 items(state.displayInfo.items) { item ->
                     TranscriptItem(
@@ -255,6 +260,7 @@ private fun TranscriptItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .padding(bottom = 16.dp),
     ) {
         Text(
@@ -390,4 +396,3 @@ private fun TranscriptEmptyContentPreview() {
         )
     }
 }
-

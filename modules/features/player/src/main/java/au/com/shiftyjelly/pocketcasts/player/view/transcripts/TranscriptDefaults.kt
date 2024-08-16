@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
+import android.content.res.Configuration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -14,6 +16,10 @@ object TranscriptDefaults {
     val ContentOffsetBottom = 80.dp
     val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, background = Color.DarkGray, color = Color.White)
     val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, background = Color.White, color = Color.Black)
+
+    @Composable
+    fun bottomPadding() =
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 125.dp
 
     data class TranscriptColors(
         val playerBackgroundColor: Color,

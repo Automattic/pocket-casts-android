@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
@@ -68,7 +69,7 @@ fun TranscriptError(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .padding(bottom = TranscriptDefaults.ContentOffsetBottom),
+                .padding(bottom = bottomPadding()),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_warning),
