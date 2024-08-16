@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.util.Date
@@ -580,6 +582,7 @@ class SharingClientTest {
                 podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
                 episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
                 range = Clip.Range(15.seconds, 28.seconds),
+                cardType = CardType.Square,
                 backgroundImage = File(context.cacheDir, "image.png"),
             ).setPlatform(platform)
                 .build()
@@ -606,6 +609,7 @@ class SharingClientTest {
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
             range = Clip.Range(15.seconds, 28.seconds),
+            cardType = CardType.Square,
             backgroundImage = File(context.cacheDir, "image.png"),
         ).setPlatform(SocialPlatform.Instagram)
             .build()
@@ -630,6 +634,7 @@ class SharingClientTest {
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
             range = Clip.Range(15.seconds, 28.seconds),
+            cardType = CardType.Square,
             backgroundImage = File(context.cacheDir, "image.png"),
         ).setPlatform(SocialPlatform.PocketCasts)
             .build()
@@ -654,6 +659,7 @@ class SharingClientTest {
             podcast = Podcast(uuid = "podcast-uuid", title = "Podcast Title"),
             episode = PodcastEpisode(uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
             range = Clip.Range(15.seconds, 28.seconds),
+            cardType = CardType.Square,
             backgroundImage = File(context.cacheDir, "image.png"),
         ).build()
 
@@ -705,7 +711,7 @@ class SharingClientTest {
             requireNotNull(audioClip)
         }
 
-        override suspend fun clipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, backgroundFile: File) = runCatching {
+        override suspend fun clipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: VisualCardType, backgroundFile: File) = runCatching {
             requireNotNull(videoClip)
         }
     }

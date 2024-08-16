@@ -185,9 +185,8 @@ class SharingAnalyticsTest {
 
     @Test
     fun `log clip video sharing`() {
-        val request = SharingRequest.videoClip(podcast, episode, clipRange, tempFolder.newFile())
+        val request = SharingRequest.videoClip(podcast, episode, clipRange, CardType.Vertical, tempFolder.newFile())
             .setPlatform(SocialPlatform.PocketCasts)
-            .setCardType(CardType.Vertical)
             .setSourceView(SourceView.PLAYER)
             .build()
 
@@ -291,7 +290,7 @@ class SharingAnalyticsTest {
 
     @Test
     fun `log clip video type property`() {
-        val request = SharingRequest.videoClip(podcast, episode, clipRange, tempFolder.newFile()).build()
+        val request = SharingRequest.videoClip(podcast, episode, clipRange, CardType.Vertical, tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()

@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.WhatsApp
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform.X
 import au.com.shiftyjelly.pocketcasts.sharing.timestamp.TimestampType
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
 import coil.executeBlocking
@@ -169,7 +170,8 @@ class SharingClient(
         is SharingRequest.Data.ClipVideo -> when (platform) {
             Instagram -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
-                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, backgroundImage).getOrThrow()
+                val cardType = requireNotNull(cardType as VisualCardType) { "Video must be shared with a visual card" }
+                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, cardType, backgroundImage).getOrThrow()
                 Intent()
                     .setAction("com.instagram.share.ADD_TO_STORY")
                     .putExtra("source_application", metaAppId)
@@ -184,7 +186,8 @@ class SharingClient(
             }
             WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
-                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, backgroundImage).getOrThrow()
+                val cardType = requireNotNull(cardType as VisualCardType) { "Video must be shared with a visual card" }
+                val file = mediaService.clipVideo(data.podcast, data.episode, data.range, cardType, backgroundImage).getOrThrow()
                 Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("video/mp4")
@@ -285,8 +288,11 @@ data class SharingRequest internal constructor(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
+            cardType: VisualCardType,
             backgroundImage: File,
-        ) = Builder(Data.ClipVideo(podcast, episode, range)).setBackgroundImage(backgroundImage)
+        ) = Builder(Data.ClipVideo(podcast, episode, range))
+            .setCardType(cardType)
+            .setBackgroundImage(backgroundImage)
     }
 
     class Builder internal constructor(

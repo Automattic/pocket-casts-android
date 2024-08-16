@@ -4,6 +4,8 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
+import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.FFmpegSession
@@ -36,8 +38,8 @@ internal class FFmpegMediaService(
             .onSuccess { sessionFiles.add(it) }
     }
 
-    override suspend fun clipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, backgroundFile: File): Result<File> = withContext(Dispatchers.IO) {
-        val outputFile = File(context.cacheDir, "${sanitizedFileName(podcast, episode, clipRange)}.mp4")
+    override suspend fun clipVideo(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: VisualCardType, backgroundFile: File): Result<File> = withContext(Dispatchers.IO) {
+        val outputFile = File(context.cacheDir, "${sanitizedFileName(podcast, episode, clipRange, cardType)}.mp4")
         if (outputFile in sessionFiles && outputFile.exists()) {
             return@withContext Result.success(outputFile)
         }
@@ -119,6 +121,16 @@ internal class FFmpegMediaService(
 
     private fun sanitizedFileName(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): String {
         return "${podcast.title} - ${episode.title} - ${clipRange.start.toSecondsWithSingleMilli()}–${clipRange.end.toSecondsWithSingleMilli()}".replace("""\W+""".toRegex(), "_")
+    }
+
+    private fun sanitizedFileName(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: VisualCardType): String {
+        return "${podcast.title} - ${episode.title} - ${clipRange.start.toSecondsWithSingleMilli()}–${clipRange.end.toSecondsWithSingleMilli()}-${cardType.id}".replace("""\W+""".toRegex(), "_")
+    }
+
+    private val VisualCardType.id get() = when (this) {
+        CardType.Horizontal -> "h"
+        CardType.Square -> "s"
+        CardType.Vertical -> "v"
     }
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->

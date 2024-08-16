@@ -265,9 +265,8 @@ class ShareClipViewModel @AssistedInject constructor(
         backgroundAsset: File,
         sourceView: SourceView,
     ): SharingRequest {
-        return SharingRequest.videoClip(podcast, episode, clipRange, backgroundAsset)
+        return SharingRequest.videoClip(podcast, episode, clipRange, cardType, backgroundAsset)
             .setPlatform(platform)
-            .setCardType(cardType)
             .setSourceView(sourceView)
             .build()
     }
