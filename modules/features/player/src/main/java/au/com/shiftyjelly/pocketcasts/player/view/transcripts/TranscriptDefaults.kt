@@ -14,8 +14,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 object TranscriptDefaults {
     val ContentOffsetTop = 64.dp
     val ContentOffsetBottom = 80.dp
-    val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, background = Color.DarkGray, color = Color.White)
-    val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, background = Color.White, color = Color.Black)
+    val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, background = Color.White.copy(alpha = .2f), color = Color.White)
+    val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, background = Color.White.copy(alpha = .8f), color = Color.Black)
 
     @Composable
     fun bottomPadding() =
