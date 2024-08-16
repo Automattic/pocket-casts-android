@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,7 +20,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -35,6 +39,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -49,7 +54,6 @@ import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
@@ -69,6 +73,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.Transitio
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.common.collect.ImmutableList
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ContentOffsetTop = 64.dp
@@ -105,7 +110,10 @@ fun TranscriptPage(
             }
 
             is UiState.TranscriptFound -> {
-                LoadingView(Modifier.background(colors.backgroundColor()))
+                LoadingView(
+                    modifier = Modifier.background(colors.backgroundColor()),
+                    color = colors.textColor(),
+                )
             }
 
             is UiState.TranscriptLoaded -> {
@@ -117,18 +125,30 @@ fun TranscriptPage(
                     colors = colors,
                     modifier = modifier,
                 )
+
+                PullRefreshIndicator(
+                    refreshing = refreshing.value,
+                    state = pullRefreshState,
+                    backgroundColor = colors.contentColor(),
+                    contentColor = colors.iconColor(),
+                    modifier = Modifier.align(Alignment.TopCenter),
+                )
             }
 
             is UiState.Error -> {
                 val errorState = uiState.value as UiState.Error
                 TranscriptError(
                     state = errorState,
+                    onRetry = {
+                        transcriptViewModel.parseAndLoadTranscript(
+                            isTranscriptViewOpen = true,
+                            forceRefresh = true)
+                    },
                     colors = colors,
                     modifier = modifier,
                 )
             }
         }
-        PullRefreshIndicator(refreshing.value, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 
     LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
@@ -310,6 +330,7 @@ private fun GradientView(
 private fun TranscriptError(
     state: UiState.Error,
     colors: DefaultColors,
+    onRetry: () -> Unit,
     modifier: Modifier,
 ) {
     val errorMessage = when (val error = state.error) {
@@ -329,35 +350,38 @@ private fun TranscriptError(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 32.dp)
             .background(colors.backgroundColor())
             .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
     ) {
-        Box(
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .background(
-                    color = colors.contentColor(),
-                    shape = RoundedCornerShape(size = 4.dp),
-                ),
+                .padding(horizontal = 16.dp)
+                .padding(top = ContentOffsetTop, bottom = ContentOffsetBottom),
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            Icon(
+                painter = painterResource(IR.drawable.ic_warning),
+                contentDescription = null,
+                tint = colors.textColor(),
+                modifier = Modifier.size(48.dp),
+            )
+            TextP40(
+                text = errorMessage,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 16.dp),
+                color = colors.textColor(),
+            )
+            Button(
+                onClick = onRetry,
+                modifier = Modifier.padding(top = 16.dp),
+                shape = RoundedCornerShape(40.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = colors.contentColor()),
             ) {
-                TextH30(
-                    text = stringResource(LR.string.error),
-                    color = colors.titleColor(),
-                    textAlign = TextAlign.Center,
-                )
-                TextP40(
-                    text = errorMessage,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 12.dp),
+                Text(
+                    text = stringResource(LR.string.try_again),
                     color = colors.textColor(),
                 )
             }
@@ -381,8 +405,8 @@ private data class DefaultColors(
         MaterialTheme.theme.colors.playerContrast02
 
     @Composable
-    fun titleColor() =
-        MaterialTheme.theme.colors.playerContrast01
+    fun iconColor() =
+        MaterialTheme.theme.colors.playerContrast02
 }
 
 @Preview(name = "Dark")
@@ -484,6 +508,7 @@ private fun ErrorDarkPreview() {
                     url = "url",
                 ),
             ),
+            onRetry = {},
             colors = DefaultColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
