@@ -280,7 +280,7 @@ private fun TranscriptItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 32.dp)
             .padding(bottom = 16.dp),
     ) {
         Text(

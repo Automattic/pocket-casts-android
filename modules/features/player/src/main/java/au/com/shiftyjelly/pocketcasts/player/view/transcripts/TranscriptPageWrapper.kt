@@ -166,7 +166,9 @@ fun TranscriptToolbar(
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
             CompositionLocalProvider(LocalRippleTheme provides ToolbarButtonRippleTheme) {
                 CloseButton(
-                    modifier = Modifier.align(Alignment.TopStart),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(start = 16.dp),
                     onClick = onCloseClick,
                     tintColor = TranscriptColors.iconColor(),
                 )
