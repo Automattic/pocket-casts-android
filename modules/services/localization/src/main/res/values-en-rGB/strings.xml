@@ -94,7 +94,6 @@ Language: en_GB
     <string name="settings_about_terms_of_service_available_at">Our Terms of service are available at %s</string>
     <string name="settings_about_privacy_policy_available_at">Our Privacy policy is available at %s</string>
     <string name="settings_open_on_phone">Open on phone</string>
-    <string name="log_in_no_network">No network connection detected. Please try again later.</string>
     <string name="error_server_failed">Internal server error occurred. Please try again later.</string>
     <string name="error_invalid_email_address">Please enter a valid email address.</string>
     <string name="error_invalid_password_length">Please enter a password that is at least 6 characters long.</string>
@@ -278,7 +277,6 @@ Language: en_GB
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket Casts, plus more</string>
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favourite podcasts or import them from another podcast player. You can always do this later.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Find your favourite podcasts</string>
@@ -890,9 +888,7 @@ Language: en_GB
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Desktop Apps</string>
-    <string name="plus_create_marketing_features"> Everything</string>
     <string name="settings_logs">Logs</string>
-    <string name="plus_cloud_storage_limit">%dGB Cloud Storage</string>
     <string name="plus_cloud_storage">Cloud Storage</string>
     <string name="profile_expiry_date_unknown">Unknown</string>
     <string name="profile_yearly">Yearly</string>
@@ -959,7 +955,6 @@ Language: en_GB
     <string name="profile_reset_password_failed">Unable to email you a new password. Please try again later.</string>
     <string name="profile_reset_password">Reset Password</string>
     <string name="profile_regular_price">Regular Price</string>
-    <string name="profile_regular">Regular</string>
     <string name="profile_refreshing">Refreshing…</string>
     <string name="profile_refreshed_never">Never refreshed</string>
     <string name="profile_refresh_status_unknown">Unknown</string>
@@ -1005,9 +1000,7 @@ Language: en_GB
     <string name="profile_joined">Joined:</string>
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
     <string name="profile_free_account">Free Account</string>
-    <string name="profile_free">Free</string>
     <string name="profile_forgot_your_password">I forgot my password</string>
-    <string name="profile_find_out_more">Find out more about Pocket Casts Plus</string>
     <string name="profile_files_remove_image">Replace Image</string>
     <string name="profile_files_empty_title">No Files</string>
     <string name="profile_files_empty_summary">Want to listen to your own files?\nTap the + button to open them in Pocket Casts, and they’ll appear here.</string>
@@ -1017,9 +1010,6 @@ Language: en_GB
     <string name="profile_file_locked">locked</string>
     <string name="profile_file">File</string>
     <string name="profile_feature_requires">This feature requires\nPocket Casts Plus</string>
-    <string name="profile_extra_themes">Extra Themes</string>
-    <string name="profile_extra_app_icons">Extra App Icons</string>
-    <string name="profile_everything_unlocked">Everything Unlocked</string>
     <string name="profile_ends">Ends %s</string>
     <string name="profile_ended">Ended %s</string>
     <string name="profile_end_tour">END TOUR</string>
@@ -1051,16 +1041,10 @@ Language: en_GB
     <string name="profile_select_account_type">Select Account Type</string>
     <string name="profile_create_completed">Complete Account</string>
     <string name="profile_create_terms_of_use">Terms of Use</string>
-    <string name="profile_create_tos_full_terms_of_use">Full Terms of Use</string>
-    <string name="profile_create_tos_disagree">No Thanks</string>
-    <string name="profile_create_tos_agree">I Agree</string>
-    <string name="profile_create_tos">Before we can let you into the Plus club we need you to agree to our Terms of Use. You can peruse them at your leisure using the link below.</string>
     <string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
-    <string name="profile_create_privacy_policy_title">Privacy Policy</string>
     <string name="profile_create_privacy_policy">We\'ve linked our Privacy Policy too in case you\'re interested. We\'ve tried to keep both short and to the point and included as little Legalese as possible.</string>
     <string name="profile_create_password_requirements">Must be at least 6 characters</string>
     <string name="profile_create_newsletter_summary">Receive news, app updates, themed podcast lists, interviews and more</string>
-    <string name="profile_create_license">Please excuse our formality</string>
     <string name="profile_create_failed">Could not create account. Please try again</string>
     <string name="profile_create_account_image">create account image</string>
     <string name="profile_create_account">Create Account</string>
@@ -1107,7 +1091,6 @@ Language: en_GB
     <string name="profile_alreadysignedindescription">You can only be signed in to one account at a time.</string>
     <string name="profile_alreadysignedin">You are already signed in</string>
     <string name="profile_already_have_account">Already have a Pocket Casts account?</string>
-    <string name="profile_almost_everything">Almost Everything</string>
     <string name="profile_account_delete_yes">Yes, delete it</string>
     <string name="profile_account_created">Account Created</string>
     <string name="profile_access_ends">Access ends: %s</string>

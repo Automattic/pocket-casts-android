@@ -85,7 +85,6 @@ Language: ar
     <string name="error_invalid_email_address">يرجى إدخال عنوان بريد إلكتروني صالح.</string>
     <string name="error_invalid_password_length">يرجى إدخال كلمة مرور يصل طولها إلى 6 أحرف على الأقل.</string>
     <string name="error_server_failed">حدث خطأ داخلي في الخادم. ترجى المحاولة مرة أخرى لاحقًا.</string>
-    <string name="log_in_no_network">لم يتم الكشف عن اتصال الشبكة. ترجى المحاولة مرة أخرى لاحقًا.</string>
     <string name="settings_privacy_crash_link_short">ربط حسابك</string>
     <string name="log_in_watch_requires_plus">تسجيل الدخول باستخدام حساب Plus لاستخدام هذا التطبيق أو ترقية الزيارة</string>
     <string name="log_in_with_plus">يرجى تسجيل الدخول باستخدام حساب Plus</string>
@@ -265,7 +264,6 @@ Language: ar
     <string name="onboarding_recommendations_find_favorite_podcasts">العثور على حلقات البودكاست التي أفضّلها</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">اجعل Pocket Casts خاصًا بك من خلال تحديد حلقات البودكاست التي تفضلها أو قم باستيرادها من مشغل حلقة بودكاست أخرى. يمكنك دومًا القيام بذلك لاحقًا.</string>
     <string name="onboarding_recommendations_import">استيراد</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">كل شيء تحبه بشأن Pocket Casts، إلى جانب المزيد</string>
     <string name="onboarding_plus_feature_desktop_apps_text">يمكنك الاستماع في مزيد من الأماكن من خلال تطبيقاتنا التي تعمل بنظامَي التشغيل Windows وmacOS وتطبيقات الويب.</string>
     <string name="onboarding_plus_feature_folders_text">يمكنك تنظيم حلقات البودكاست الخاصة بك في المجلدات وحافظ عليها قيد المزامنة عبر كل أجهزتك.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ارفع ملفاتك إلى مساحة التخزين على السحابة واجعلها متوافرة في كل مكان.</string>
@@ -875,9 +873,7 @@ Language: ar
     <string name="plus_learn_more_button">أعرف أكثر</string>
     <string name="plus_learn_more_about_plus">معرفة المزيد حول Pocket Casts Plus</string>
     <string name="plus_desktop_apps">تطبيقات سطح المكتب</string>
-    <string name="plus_create_marketing_features"> كل شيء</string>
     <string name="settings_logs">السجلات</string>
-    <string name="plus_cloud_storage_limit">%d جيجابايت من مساحة التخزين السحابي</string>
     <string name="plus_cloud_storage">التخزين السحابي</string>
     <string name="profile_expiry_date_unknown">غير معروف</string>
     <string name="profile_yearly">سنوي</string>
@@ -944,7 +940,6 @@ Language: ar
     <string name="profile_reset_password_failed">يتعذر إرسال كلمة مرور جديدة إليك عبر البريد الإلكتروني. يرجى المحاولة لاحقًا.</string>
     <string name="profile_reset_password">استعادة كلمة المرور</string>
     <string name="profile_regular_price">السعر العادي</string>
-    <string name="profile_regular">قياسي</string>
     <string name="profile_refreshing">جارٍ التحديث…</string>
     <string name="profile_refreshed_never">لم يتم التحديث إطلاقًا</string>
     <string name="profile_refresh_status_unknown">غير معروف</string>
@@ -987,14 +982,12 @@ Language: ar
     <string name="profile_monthly">شهريًا</string>
     <string name="profile_last_refresh">آخر تحديث: منذ %s</string>
     <string name="profile_joined">تم الانضمام:</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_get_plus">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة، بالإضافة إلى المزيد!</string>
     <string name="profile_free_account">حساب مجاني</string>
-    <string name="profile_free">مجانية</string>
     <string name="profile_forgot_your_password">نسيتُ كلمة المرور الخاصة بي</string>
-    <string name="profile_find_out_more">اكتشاف المزيد حول Pocket Casts Plus</string>
     <string name="profile_files_remove_image">استبدال صورة</string>
     <string name="profile_files_empty_title">لا توجد ملفات</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_files_empty_summary">هل ترغب في الاستماع إلى ملفاتك الخاصة؟\nاضغط على زر + لفتحها في Pocket Casts، وستظهر هنا.</string>
     <string name="profile_files_addfile_save">حفظ</string>
     <string name="profile_files_add_filename">الاسم</string>
@@ -1002,9 +995,6 @@ Language: ar
     <string name="profile_file_locked">مقفل</string>
     <string name="profile_file">الملف</string>
     <string name="profile_feature_requires">تتطلب هذه الميزة \nPocket Casts Plus</string>
-    <string name="profile_extra_themes">قوالب إضافية</string>
-    <string name="profile_extra_app_icons">أيقونات تطبيق إضافية</string>
-    <string name="profile_everything_unlocked">تم فتح كل شيء</string>
     <string name="profile_ends">ينتهي في %s</string>
     <string name="profile_ended">انتهى في %s</string>
     <string name="profile_end_tour">إنهاء الجولة</string>
@@ -1036,15 +1026,9 @@ Language: ar
     <string name="profile_select_account_type">تحديد نوع الحساب</string>
     <string name="profile_create_completed">إكمال الحساب</string>
     <string name="profile_create_terms_of_use">شروط الاستخدام</string>
-    <string name="profile_create_tos_full_terms_of_use">شروط الاستخدام بالكامل</string>
-    <string name="profile_create_tos_disagree">لا، شكرًا</string>
-    <string name="profile_create_tos_agree">أوافق</string>
-    <string name="profile_create_tos">قبل أن نسمح لك بالانضمام إلى نادي Plus، نحتاج منك الموافقة على شروط الاستخدام الخاصة بنا. يمكنك دراستها في وقت فراغك باستخدام الرابط الوارد أدناه.</string>
     <string name="profile_create_subscription_failed">يتعذر إنشاء حساب. يرجى المحاولة مجددًا</string>
-    <string name="profile_create_privacy_policy_title">سياسة الخصوصية</string>
     <string name="profile_create_privacy_policy">لقد وضعنا سياسة الخصوصية الخاصة بنا كذلك في رابط إذا كنت مهتمًا. لقد حاولنا أن نجعل كلاهما قصيرًا وواضحًا وقمنا بتضمين أقل قدر ممكن من المصطلحات القانونية.</string>
     <string name="profile_create_newsletter_summary">يمكنك تلقي الأخبار، وتحديثات التطبيق وقوائم بث صوتي مُنسَّقة ومقابلات والمزيد</string>
-    <string name="profile_create_license">يرجى عذرنا على إجرائاتنا الرسمية</string>
     <string name="profile_create_failed">تعذر إنشاء حساب. يرجى المحاولة مجددًا</string>
     <string name="profile_create_account_image">إنشاء صورة حساب</string>
     <string name="profile_create_account">إنشاء حساب</string>
@@ -1091,7 +1075,6 @@ Language: ar
     <string name="profile_alreadysignedindescription">يمكنك فقط تسجيل الدخول إلى حساب واحد في المرة الواحدة.</string>
     <string name="profile_alreadysignedin">لقد قمت بتسجيل الدخول بالفعل</string>
     <string name="profile_already_have_account">هل لديك حساب على Pocket Casts بالفعل؟</string>
-    <string name="profile_almost_everything">كل شيء تقريبًا</string>
     <string name="profile_account_delete_yes">نعم، احذفه</string>
     <string name="profile_account_created">تم إنشاء حساب</string>
     <string name="profile_access_ends">ينتهي الوصول: %s</string>
