@@ -4,26 +4,17 @@ import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -38,11 +29,9 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -65,14 +54,12 @@ import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.common.collect.ImmutableList
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
@@ -191,7 +178,6 @@ private fun TranscriptContent(
             ScrollableTranscriptView(
                 state = state,
                 searchState = searchState,
-                colors = colors,
                 bottomPadding = bottomPadding,
             )
         }
@@ -218,7 +204,6 @@ private fun TranscriptContent(
 private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
-    colors: TranscriptColors,
     bottomPadding: Dp,
 ) {
     val scrollState = rememberLazyListState()
@@ -251,7 +236,6 @@ private fun ScrollableTranscriptView(
             ) {
                 items(state.displayInfo.items) { item ->
                     TranscriptItem(
-                        colors = colors,
                         item = item,
                         searchState = searchState,
                     )
@@ -263,7 +247,6 @@ private fun ScrollableTranscriptView(
 
 @Composable
 private fun TranscriptItem(
-    colors: TranscriptColors,
     item: DisplayItem,
     searchState: SearchUiState,
 ) {
@@ -319,69 +302,6 @@ private fun GradientView(
                 direction = fadeDirection,
             ),
     )
-}
-
-@Composable
-private fun TranscriptError(
-    state: UiState.Error,
-    colors: TranscriptColors,
-    onRetry: () -> Unit,
-    modifier: Modifier,
-) {
-    val errorMessage = when (val error = state.error) {
-        is TranscriptError.NotSupported ->
-            stringResource(LR.string.error_transcript_format_not_supported, error.format)
-
-        is TranscriptError.NoNetwork ->
-            stringResource(LR.string.error_no_network)
-
-        is TranscriptError.FailedToParse ->
-            stringResource(LR.string.error_transcript_failed_to_parse)
-
-        is TranscriptError.FailedToLoad ->
-            stringResource(LR.string.error_transcript_failed_to_load)
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(colors.backgroundColor())
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = TranscriptDefaults.ContentOffsetTop, bottom = TranscriptDefaults.ContentOffsetBottom),
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_warning),
-                contentDescription = null,
-                tint = TranscriptColors.textColor(),
-                modifier = Modifier.size(48.dp),
-            )
-            TextP40(
-                text = errorMessage,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp),
-                color = TranscriptColors.textColor(),
-            )
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.padding(top = 16.dp),
-                shape = RoundedCornerShape(40.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = TranscriptColors.contentColor()),
-            ) {
-                Text(
-                    text = stringResource(LR.string.try_again),
-                    color = TranscriptColors.textColor(),
-                )
-            }
-        }
-    }
 }
 
 @Preview(name = "Dark")
@@ -470,22 +390,3 @@ private fun TranscriptEmptyContentPreview() {
     }
 }
 
-@Preview(name = "Dark")
-@Composable
-private fun ErrorDarkPreview() {
-    AppThemeWithBackground(Theme.ThemeType.DARK) {
-        TranscriptError(
-            state = UiState.Error(
-                error = TranscriptError.NotSupported(TranscriptFormat.HTML.mimeType),
-                transcript = Transcript(
-                    episodeUuid = "uuid",
-                    type = TranscriptFormat.HTML.mimeType,
-                    url = "url",
-                ),
-            ),
-            onRetry = {},
-            colors = TranscriptColors(Color.Black),
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
-}
