@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.sharing
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import java.io.File
 
 interface MediaService {
@@ -16,6 +17,7 @@ interface MediaService {
         podcast: Podcast,
         episode: PodcastEpisode,
         clipRange: Clip.Range,
+        cardType: VisualCardType,
         backgroundFile: File,
     ): Result<File>
 }
