@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.annotation.OptIn
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Format
@@ -130,15 +129,7 @@ class TranscriptViewModel @Inject constructor(
                                 data,
                                 SubtitleParser.OutputOptions.allCues(),
                             ) { element: CuesWithTiming? ->
-                                element?.let {
-                                    result.add(
-                                        CuesWithTiming(
-                                            modifiedCues(it),
-                                            it.startTimeUs,
-                                            it.endTimeUs,
-                                        ),
-                                    )
-                                }
+                                element?.let { result.add(it) }
                             }
                         } catch (e: Exception) {
                             val message = "Failed to parse transcript: ${transcript.url}"
@@ -156,7 +147,10 @@ class TranscriptViewModel @Inject constructor(
         val formattedText = buildString {
             cuesWithTimingSubtitle
                 .flatMap { it.cues }
-                .forEach { cue -> append(cue.text) }
+                .forEach { cue ->
+                    val newText = TranscriptRegexFilters.transcriptFilters.filter(cue.text.toString())
+                    append(newText)
+                }
         }
         val items = formattedText.splitIgnoreEmpty("\n\n").map {
             val startIndex = formattedText.indexOf(it)
@@ -176,18 +170,6 @@ class TranscriptViewModel @Inject constructor(
             )
         }
     }
-
-    /**
-     * Modifies the cues in the given [CuesWithTiming] object.
-     */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun modifiedCues(cuesWithTiming: CuesWithTiming) =
-        cuesWithTiming.cues.map { cue ->
-            val cueBuilder = cue.buildUpon()
-            val newText = TranscriptRegexFilters.transcriptFilters.filter(cue.text.toString())
-            cueBuilder.setText(newText)
-            cueBuilder.build()
-        }
 
     data class PodcastAndEpisode(
         val podcast: Podcast?,
