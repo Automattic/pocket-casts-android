@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
+import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
 // TODO: [Transcript] Modify regex for non english languages
@@ -38,6 +40,30 @@ class TranscriptRegexFilters(private val filters: List<TranscriptFilter>) : Tran
                 RegexFilters.tripleOrMoreEmptyLinesFilter,
             ),
         )
+
+        fun extractSpeaker(cue: String, format: TranscriptFormat?) = when (format) {
+            TranscriptFormat.VTT -> regexMatch(input = cue, pattern = "<v (.+?)>", position = 1)
+            TranscriptFormat.SRT -> regexMatch(input = cue, pattern = "^(.+?):", position = 1)
+            else -> null
+        }
+
+        private fun regexMatch(input: String, pattern: String, position: Int = 0): String? {
+            return try {
+                val regex = Pattern.compile(pattern)
+                val matcher = regex.matcher(input)
+                if (matcher.find()) {
+                    if (position < matcher.groupCount() + 1) {
+                        matcher.group(position)
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 }
 
