@@ -363,7 +363,10 @@ public final class WebvttCueParser {
       }
       textBuilder.append(line.trim());
     }
-    builder.text = parseCueText(id, textBuilder.toString(), styles);
+    String markup = textBuilder.toString();
+    builder.text = parseCueText(id, markup, styles);
+    // parseCueText strips tags like TAG_VOICE "v" and set it on the cue text. This sets original markup wih tags in cue to allow extracting it in the application.
+    builder.markup = markup;
     return builder.build();
   }
 
@@ -777,6 +780,7 @@ public final class WebvttCueParser {
     public @Cue.AnchorType int positionAnchor;
     public float size;
     public @Cue.VerticalType int verticalType;
+    public @MonotonicNonNull CharSequence markup;
 
     public WebvttCueInfoBuilder() {
       startTimeUs = 0;
@@ -793,6 +797,7 @@ public final class WebvttCueParser {
       // Default: https://www.w3.org/TR/webvtt1/#webvtt-cue-size
       size = 1.0f;
       verticalType = Cue.TYPE_UNSET;
+      markup = "";
     }
 
     public WebvttCueInfo build() {
@@ -819,6 +824,10 @@ public final class WebvttCueParser {
 
       if (text != null) {
         cueBuilder.setText(text);
+      }
+
+      if (markup != null) {
+        cueBuilder.setMarkup(markup);
       }
 
       return cueBuilder;

@@ -310,6 +310,8 @@ public final class Cue {
    */
   public final float shearDegrees;
 
+  public final CharSequence markup;
+
   private Cue(
       @Nullable CharSequence text,
       @Nullable Alignment textAlignment,
@@ -327,7 +329,8 @@ public final class Cue {
       boolean windowColorSet,
       int windowColor,
       @VerticalType int verticalType,
-      float shearDegrees) {
+      float shearDegrees,
+      CharSequence markup) {
     // Exactly one of text or bitmap should be set.
     if (text == null) {
       Assertions.checkNotNull(bitmap);
@@ -357,6 +360,7 @@ public final class Cue {
     this.textSize = textSize;
     this.verticalType = verticalType;
     this.shearDegrees = shearDegrees;
+    this.markup = markup;
   }
 
   /** Returns a new {@link Cue.Builder} initialized with the same values as this Cue. */
@@ -392,7 +396,8 @@ public final class Cue {
         && textSizeType == that.textSizeType
         && textSize == that.textSize
         && verticalType == that.verticalType
-        && shearDegrees == that.shearDegrees;
+        && shearDegrees == that.shearDegrees
+        && markup.equals(that.markup);
   }
 
   @Override
@@ -414,7 +419,8 @@ public final class Cue {
         textSizeType,
         textSize,
         verticalType,
-        shearDegrees);
+        shearDegrees,
+        markup);
   }
 
   /** A builder for {@link Cue} objects. */
@@ -437,6 +443,7 @@ public final class Cue {
     @ColorInt private int windowColor;
     private @VerticalType int verticalType;
     private float shearDegrees;
+    private CharSequence markup;
 
     public Builder() {
       text = null;
@@ -455,6 +462,7 @@ public final class Cue {
       windowColorSet = false;
       windowColor = Color.BLACK;
       verticalType = TYPE_UNSET;
+      markup = "";
     }
 
     private Builder(Cue cue) {
@@ -475,6 +483,7 @@ public final class Cue {
       windowColor = cue.windowColor;
       verticalType = cue.verticalType;
       shearDegrees = cue.shearDegrees;
+      markup = cue.markup;
     }
 
     /**
@@ -797,6 +806,13 @@ public final class Cue {
       return this;
     }
 
+    /** Sets the markup for this Cue. */
+    @CanIgnoreReturnValue
+    public Builder setMarkup(CharSequence markup) {
+      this.markup = markup;
+      return this;
+    }
+
     /**
      * Gets the vertical formatting for this Cue.
      *
@@ -826,7 +842,8 @@ public final class Cue {
           windowColorSet,
           windowColor,
           verticalType,
-          shearDegrees);
+          shearDegrees,
+          markup);
     }
   }
 
@@ -849,6 +866,7 @@ public final class Cue {
   private static final String FIELD_WINDOW_COLOR_SET = Util.intToStringMaxRadix(14);
   private static final String FIELD_VERTICAL_TYPE = Util.intToStringMaxRadix(15);
   private static final String FIELD_SHEAR_DEGREES = Util.intToStringMaxRadix(16);
+  private static final String FIELD_MARKUP = Util.intToStringMaxRadix(18);
 
   /**
    * Returns a {@link Bundle} that can be serialized to bytes.
@@ -924,6 +942,7 @@ public final class Cue {
     bundle.putInt(FIELD_WINDOW_COLOR, windowColor);
     bundle.putInt(FIELD_VERTICAL_TYPE, verticalType);
     bundle.putFloat(FIELD_SHEAR_DEGREES, shearDegrees);
+    bundle.putCharSequence(FIELD_MARKUP, markup);
     return bundle;
   }
 
@@ -995,6 +1014,9 @@ public final class Cue {
     }
     if (bundle.containsKey(FIELD_SHEAR_DEGREES)) {
       builder.setShearDegrees(bundle.getFloat(FIELD_SHEAR_DEGREES));
+    }
+    if (bundle.containsKey(FIELD_MARKUP)) {
+      builder.setMarkup(bundle.getString(FIELD_MARKUP, ""));
     }
     return builder.build();
   }
