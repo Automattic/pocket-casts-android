@@ -39,4 +39,25 @@ class ExperimentProviderTest {
         val variation = experimentProvider.getVariation(experiment)
         assertEquals(Variation.Treatment, variation)
     }
+
+    @Test
+    fun getVariationUnknown() {
+        val experiment = Experiment.PaywallAATest
+        val variationName = "unknown"
+
+        whenever(firebaseRemoteConfig.getString(experiment.identifier)).thenReturn(variationName)
+
+        val variation = experimentProvider.getVariation(experiment)
+        assertEquals(Variation.Control, variation)
+    }
+
+    @Test
+    fun getVariationEmpty() {
+        val experiment = Experiment.PaywallAATest
+
+        whenever(firebaseRemoteConfig.getString(experiment.identifier)).thenReturn("")
+
+        val variation = experimentProvider.getVariation(experiment)
+        assertEquals(Variation.Control, variation)
+    }
 }

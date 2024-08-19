@@ -6,10 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,11 +34,5 @@ object TrackerModule {
     @Singleton
     internal fun provideFirebaseAnalytics(@ApplicationContext context: Context): FirebaseAnalyticsWrapper {
         return FirebaseAnalyticsWrapper(FirebaseAnalytics.getInstance(context))
-    }
-
-    @Provides
-    @Singleton
-    fun provideExperimentProvider(firebaseRemoteConfig: FirebaseRemoteConfig): ExperimentProvider {
-        return ExperimentProvider(firebaseRemoteConfig)
     }
 }

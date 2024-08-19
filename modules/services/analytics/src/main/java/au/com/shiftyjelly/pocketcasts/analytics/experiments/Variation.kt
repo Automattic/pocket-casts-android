@@ -5,10 +5,10 @@ sealed class Variation {
     data object Treatment : Variation()
 
     companion object {
-        private const val CONTROL = "control"
-        fun fromName(name: String?) = when (name) {
-            CONTROL, null -> Control
-            else -> Treatment
+        private const val TREATMENT = "treatment"
+        fun fromName(name: String) = when (name) {
+            TREATMENT -> Treatment
+            else -> Control
         }
     }
 }
