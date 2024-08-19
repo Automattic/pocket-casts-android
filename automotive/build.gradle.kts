@@ -26,15 +26,27 @@ android {
 
     buildTypes {
         named("debug") {
+            applicationIdSuffix = ".debug"
+
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
         }
 
         named("debugProd") {
-            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
+            initWith(getByName("debug"))
+            isDebuggable = true
         }
 
         named("release") {
+            isMinifyEnabled = true
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
+
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    file("proguard-rules.pro"),
+                ),
+            )
+            isShrinkResources = true
         }
     }
 }
