@@ -4,12 +4,14 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
+import timber.log.Timber
 
 class RatingsManagerImpl @Inject constructor(
     private val cacheServerManager: PodcastCacheServerManager,
@@ -26,15 +28,25 @@ class RatingsManagerImpl @Inject constructor(
             .map { it.firstOrNull() ?: noRatings(podcastUuid) }
 
     override suspend fun refreshPodcastRatings(podcastUuid: String, useCache: Boolean) {
-        // The server asks for the ratings to be cached for a period of time. After a user rates ignore the cache to get the new rating.
-        val ratings = cacheServerManager.getPodcastRatings(podcastUuid, useCache)
-        podcastRatingsDao.insert(
-            PodcastRatings(
-                podcastUuid = podcastUuid,
-                total = ratings.total,
-                average = ratings.average,
-            ),
-        )
+        try {
+            // The server asks for the ratings to be cached for a period of time. After a user rates ignore the cache to get the new rating.
+            val ratings = cacheServerManager.getPodcastRatings(podcastUuid, useCache)
+            podcastRatingsDao.insert(
+                PodcastRatings(
+                    podcastUuid = podcastUuid,
+                    total = ratings.total,
+                    average = ratings.average,
+                ),
+            )
+        } catch (e: Exception) {
+            val message = "Failed to refresh podcast ratings"
+            // don't report missing rating or network errors to Sentry
+            if (e is HttpException || e is IOException) {
+                Timber.i(e, message)
+            } else {
+                Timber.e(e, message)
+            }
+        }
     }
 
     override suspend fun submitPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResult = try {
