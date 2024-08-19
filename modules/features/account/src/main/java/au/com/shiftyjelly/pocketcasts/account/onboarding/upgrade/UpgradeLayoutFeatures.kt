@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,11 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -34,9 +37,11 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -54,6 +59,17 @@ internal fun UpgradeLayoutFeatures(
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val offerText = when (state.currentSubscription) {
+        is Subscription.Trial -> stringResource(LR.string.paywall_free_1_month_trial)
+        is Subscription.Intro -> stringResource(LR.string.paywall_save_50_off)
+        else -> null
+    }
+
+    val shouldShowOffer = offerText != null && !isLandscape
+
     AppTheme(Theme.ThemeType.DARK) { // We need to set Dark since this screen will have dark colors for all themes
         Box(
             modifier = modifier.fillMaxHeight(),
@@ -136,7 +152,25 @@ internal fun UpgradeLayoutFeatures(
             }
 
             if (canUpgrade) {
-                SubscribeButton(onClickSubscribe)
+                Column(
+                    modifier = Modifier,
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    val bottomPadding = if (shouldShowOffer) 0.dp else 50.dp
+
+                    SubscribeButton(onClickSubscribe, bottomPadding)
+
+                    if (shouldShowOffer) {
+                        offerText?.let {
+                            TextP50(
+                                text = it,
+                                fontWeight = FontWeight.W400,
+                                modifier = Modifier.padding(bottom = 50.dp),
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -145,12 +179,13 @@ internal fun UpgradeLayoutFeatures(
 @Composable
 private fun SubscribeButton(
     onClickSubscribe: () -> Unit,
+    bottomPadding: Dp,
 ) {
     Box(
         contentAlignment = Alignment.BottomCenter,
     ) {
         RowButton(
-            modifier = Modifier.padding(bottom = 80.dp),
+            modifier = Modifier.padding(bottom = bottomPadding).padding(horizontal = 16.dp),
             text = stringResource(LR.string.get_pocket_casts_plus),
             onClick = onClickSubscribe,
             fontWeight = FontWeight.W600,
@@ -166,5 +201,5 @@ private fun SubscribeButton(
 @Preview(showBackground = true)
 @Composable
 fun SubscribeButtonPreview() {
-    SubscribeButton(onClickSubscribe = { })
+    SubscribeButton(onClickSubscribe = { }, bottomPadding = 50.dp)
 }
