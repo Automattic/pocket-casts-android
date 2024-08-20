@@ -74,10 +74,13 @@ class TranscriptViewModel @Inject constructor(
         retryOnFail: Boolean = false,
     ) {
         if (isTranscriptViewOpen.not()) return
-        if (pulledToRefresh) _isRefreshing.value = true
+        val podcastAndEpisode = _uiState.value.podcastAndEpisode
+        if (pulledToRefresh) {
+            _isRefreshing.value = true
+            podcastAndEpisode?.let { track(AnalyticsEvent.TRANSCRIPT_PULLED_TO_REFRESH, it) }
+        }
         _uiState.value.transcript?.let { transcript ->
             clearErrorsIfFound(transcript)
-            val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
                     val forceRefresh = pulledToRefresh || retryOnFail
@@ -88,11 +91,8 @@ class TranscriptViewModel @Inject constructor(
                         transcriptFormat = TranscriptFormat.fromType(transcript.type),
                     )
 
-                    podcastAndEpisode?.let {
-                        track(
-                            if (pulledToRefresh) AnalyticsEvent.TRANSCRIPT_PULLED_TO_REFRESH else AnalyticsEvent.TRANSCRIPT_SHOWN,
-                            it,
-                        )
+                    if (!pulledToRefresh) {
+                        podcastAndEpisode?.let { track(AnalyticsEvent.TRANSCRIPT_SHOWN, it) }
                     }
 
                     UiState.TranscriptLoaded(
