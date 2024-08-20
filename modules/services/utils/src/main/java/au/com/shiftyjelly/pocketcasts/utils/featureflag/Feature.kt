@@ -171,6 +171,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    ENGAGE_SDK(
+        key = "engage_sdk",
+        title = "Integrate Pocket Casts with Engage SDK",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
     ;
 
     companion object {
