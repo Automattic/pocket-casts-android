@@ -82,7 +82,7 @@ fun TranscriptPage(
     val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
     val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(refreshing.value, {
-        transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
+        transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = true)
     })
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.value.podcastAndEpisode?.podcast))
     val colors = TranscriptColors(playerBackgroundColor)
@@ -129,7 +129,7 @@ fun TranscriptPage(
                     onRetry = {
                         transcriptViewModel.parseAndLoadTranscript(
                             isTranscriptViewOpen = true,
-                            forceRefresh = true,
+                            retryOnFail = true,
                         )
                     },
                     colors = colors,

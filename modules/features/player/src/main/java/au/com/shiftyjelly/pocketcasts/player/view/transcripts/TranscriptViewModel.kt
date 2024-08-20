@@ -8,6 +8,8 @@ import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
 import androidx.media3.extractor.text.SubtitleParser
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
@@ -38,6 +40,7 @@ class TranscriptViewModel @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
     private val playbackManager: PlaybackManager,
     private val subtitleParserFactory: SubtitleParser.Factory,
+    private val analyticsTracker: AnalyticsTracker,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty())
@@ -65,20 +68,32 @@ class TranscriptViewModel @Inject constructor(
                 } ?: UiState.Empty(podcastAndEpisode)
             }
 
-    fun parseAndLoadTranscript(isTranscriptViewOpen: Boolean, forceRefresh: Boolean = false) {
+    fun parseAndLoadTranscript(
+        isTranscriptViewOpen: Boolean,
+        pulledToRefresh: Boolean = false,
+        retryOnFail: Boolean = false,
+    ) {
         if (isTranscriptViewOpen.not()) return
-        if (forceRefresh) _isRefreshing.value = true
+        if (pulledToRefresh) _isRefreshing.value = true
         _uiState.value.transcript?.let { transcript ->
             clearErrorsIfFound(transcript)
             val podcastAndEpisode = _uiState.value.podcastAndEpisode
             viewModelScope.launch {
                 _uiState.value = try {
+                    val forceRefresh = pulledToRefresh || retryOnFail
                     val cuesWithTimingSubtitle = buildSubtitleCues(transcript, forceRefresh)
 
                     val displayInfo = buildDisplayInfo(
                         cuesWithTimingSubtitle = cuesWithTimingSubtitle,
                         transcriptFormat = TranscriptFormat.fromType(transcript.type),
                     )
+
+                    podcastAndEpisode?.let {
+                        track(
+                            if (pulledToRefresh) AnalyticsEvent.TRANSCRIPT_PULLED_TO_REFRESH else AnalyticsEvent.TRANSCRIPT_SHOWN,
+                            it,
+                        )
+                    }
 
                     UiState.TranscriptLoaded(
                         transcript = transcript,
@@ -95,7 +110,7 @@ class TranscriptViewModel @Inject constructor(
                 } catch (e: Exception) {
                     UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
                 }
-                if (forceRefresh) _isRefreshing.value = false
+                if (pulledToRefresh) _isRefreshing.value = false
             }
         }
     }
@@ -199,6 +214,19 @@ class TranscriptViewModel @Inject constructor(
                 transcript = transcript,
             )
         }
+    }
+
+    fun track(
+        event: AnalyticsEvent,
+        podcastAndEpisode: PodcastAndEpisode?,
+        analyticsProp: Map<String, String> = emptyMap(),
+    ) {
+        analyticsTracker.track(
+            event,
+            analyticsProp
+                .plus("episode_uuid" to podcastAndEpisode?.episodeUuid.orEmpty())
+                .plus("podcast_uuid" to podcastAndEpisode?.podcast?.uuid.orEmpty()),
+        )
     }
 
     data class PodcastAndEpisode(

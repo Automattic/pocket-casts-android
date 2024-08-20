@@ -265,10 +265,6 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun onPlayerClose() {
-        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
-            viewModel.closeTranscript()
-        }
-
         try {
             if (isAdded) {
                 ((childFragmentManager.fragments.firstOrNull { it is BookmarksFragment }) as? BookmarksFragment)

@@ -172,7 +172,7 @@ class TranscriptViewModelTest {
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         initViewModel()
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = true)
 
         verify(transcriptsManager).loadTranscript(transcript.url, forceRefresh = true)
     }
@@ -183,7 +183,7 @@ class TranscriptViewModelTest {
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         initViewModel()
 
-        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = false)
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = false)
 
         verify(transcriptsManager).loadTranscript(transcript.url, forceRefresh = false)
     }
@@ -211,6 +211,7 @@ class TranscriptViewModelTest {
             playbackManager = playbackManager,
             subtitleParserFactory = subtitleParserFactory,
             ioDispatcher = UnconfinedTestDispatcher(),
+            analyticsTracker = mock(),
         )
     }
 }
