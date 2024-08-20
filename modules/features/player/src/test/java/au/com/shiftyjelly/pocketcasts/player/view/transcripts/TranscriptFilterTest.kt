@@ -19,7 +19,7 @@ class TranscriptFilterTest {
     fun `filter removes speaker tags from input`() {
         val input = "Speaker 1: Hello, world!"
         val expected = "Hello, world!"
-        val filter = RegexFilters.speakerFilter
+        val filter = RegexFilters.srtTagsFilter
         val result = filter.filter(input)
         assertEquals(expected, result)
     }
