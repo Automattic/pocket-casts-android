@@ -84,6 +84,7 @@ class TranscriptSearchViewModel @Inject constructor(
         if (currentState.searchResultIndices.isEmpty()) return
         val previousIndex = (currentState.currentSearchIndex - 1 + currentState.searchResultIndices.size) % currentState.searchResultIndices.size
         _searchState.update { it.copy(currentSearchIndex = previousIndex) }
+        track(AnalyticsEvent.TRANSCRIPT_SEARCH_PREVIOUS_RESULT)
     }
 
     fun onSearchNext() {
@@ -91,6 +92,7 @@ class TranscriptSearchViewModel @Inject constructor(
         if (currentState.searchResultIndices.isEmpty()) return
         val nextIndex = (currentState.currentSearchIndex + 1) % currentState.searchResultIndices.size
         _searchState.update { it.copy(currentSearchIndex = nextIndex) }
+        track(AnalyticsEvent.TRANSCRIPT_SEARCH_NEXT_RESULT)
     }
 
     fun onSearchDone() {
