@@ -162,7 +162,9 @@ class TranscriptViewModel @Inject constructor(
                     markupText?.let {
                         TranscriptRegexFilters.extractSpeaker(it.toString(), transcriptFormat)?.let { speaker ->
                             if (previousSpeaker != speaker) {
-                                append("\n\n$speaker\n\n")
+                                append("\n\n")
+                                append(speaker)
+                                append("\n\n")
                                 speakerIndices.add(length - speaker.length - 2)
                                 previousSpeaker = speaker
                             }
