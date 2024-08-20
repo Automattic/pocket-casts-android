@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -44,7 +45,7 @@ class RatingsManagerImpl @Inject constructor(
             if (e is HttpException || e is IOException) {
                 Timber.i(e, message)
             } else {
-                Timber.e(e, message)
+                LogBuffer.e(LogBuffer.TAG_CRASH, e, message)
             }
         }
     }
