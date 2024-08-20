@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
-import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
+
+private val vttSpeakerRegex = "<v (.+?)>".toRegex()
+private val srtSpeakerRegex = "^(.+?):".toRegex()
 
 // TODO: [Transcript] Modify regex for non english languages
 interface TranscriptFilter {
@@ -42,24 +44,14 @@ class TranscriptRegexFilters(private val filters: List<TranscriptFilter>) : Tran
         )
 
         fun extractSpeaker(cue: String, format: TranscriptFormat?) = when (format) {
-            TranscriptFormat.VTT -> regexMatch(input = cue, pattern = "<v (.+?)>", position = 1)
-            TranscriptFormat.SRT -> regexMatch(input = cue, pattern = "^(.+?):", position = 1)
+            TranscriptFormat.VTT -> regexMatch(input = cue, regex = vttSpeakerRegex, position = 1)
+            TranscriptFormat.SRT -> regexMatch(input = cue, regex = srtSpeakerRegex, position = 1)
             else -> null
         }
 
-        private fun regexMatch(input: String, pattern: String, position: Int = 0): String? {
+        private fun regexMatch(input: String, regex: Regex, position: Int = 0): String? {
             return try {
-                val regex = Pattern.compile(pattern)
-                val matcher = regex.matcher(input)
-                if (matcher.find()) {
-                    if (position < matcher.groupCount() + 1) {
-                        matcher.group(position)
-                    } else {
-                        null
-                    }
-                } else {
-                    null
-                }
+                regex.find(input)?.groupValues?.get(position)
             } catch (e: Exception) {
                 null
             }
