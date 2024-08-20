@@ -101,14 +101,23 @@ class TranscriptViewModel @Inject constructor(
                         displayInfo = displayInfo,
                         cuesWithTimingSubtitle = cuesWithTimingSubtitle,
                     )
-                } catch (e: UnsupportedOperationException) {
-                    UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
-                } catch (e: NoNetworkException) {
-                    UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
-                } catch (e: TranscriptParsingException) {
-                    UiState.Error(TranscriptError.FailedToParse, transcript, podcastAndEpisode)
                 } catch (e: Exception) {
-                    UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
+                    track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
+                    when (e) {
+                        is UnsupportedOperationException ->
+                            UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
+
+                        is NoNetworkException ->
+                            UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
+
+                        is TranscriptParsingException ->
+                            UiState.Error(TranscriptError.FailedToParse, transcript, podcastAndEpisode)
+
+                        else -> {
+                            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, "Failed to load transcript: ${transcript.url}")
+                            UiState.Error(TranscriptError.FailedToLoad, transcript, podcastAndEpisode)
+                        }
+                    }
                 }
                 if (pulledToRefresh) _isRefreshing.value = false
             }
