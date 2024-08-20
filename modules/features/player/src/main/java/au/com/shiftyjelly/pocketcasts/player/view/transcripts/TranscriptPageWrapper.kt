@@ -120,7 +120,10 @@ fun TranscriptPageWrapper(
                     expandSearch = false
                     searchViewModel.onSearchDone()
                 },
-                onSearchClicked = { expandSearch = true },
+                onSearchClicked = {
+                    expandSearch = true
+                    searchViewModel.onSearchButtonClicked()
+                },
                 searchText = searchQueryFlow.value,
                 searchState = searchState.value,
                 onSearchCleared = { searchViewModel.onSearchCleared() },

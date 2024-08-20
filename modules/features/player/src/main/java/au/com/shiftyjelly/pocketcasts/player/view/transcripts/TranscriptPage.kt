@@ -146,7 +146,7 @@ fun TranscriptPage(
     if (uiState.value is UiState.TranscriptLoaded) {
         val state = uiState.value as UiState.TranscriptLoaded
         LaunchedEffect(state.displayInfo.text) {
-            searchViewModel.setSearchSourceText(state.displayInfo.text)
+            searchViewModel.setSearchInput(state.displayInfo.text, state.podcastAndEpisode)
         }
     }
 }

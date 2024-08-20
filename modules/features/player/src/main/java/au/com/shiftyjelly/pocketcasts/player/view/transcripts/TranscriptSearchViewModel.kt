@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.PodcastAndEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,9 +24,11 @@ private const val SEARCH_DEBOUNCE = 300L
 @HiltViewModel
 class TranscriptSearchViewModel @Inject constructor(
     private val kmpSearch: KMPSearch,
+    private val analyticsTracker: AnalyticsTracker,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var _searchSourceText: String = ""
+    private var _podcastAndEpisode: PodcastAndEpisode? = null
 
     private val _searchQueryFlow = MutableStateFlow("")
     val searchQueryFlow = _searchQueryFlow.asStateFlow()
@@ -41,9 +46,13 @@ class TranscriptSearchViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun setSearchSourceText(searchSourceText: String) {
+    fun setSearchInput(
+        searchSourceText: String,
+        podcastAndEpisode: PodcastAndEpisode?,
+    ) {
         resetSearch()
         this._searchSourceText = searchSourceText
+        this._podcastAndEpisode = podcastAndEpisode
     }
 
     fun onSearchQueryChanged(searchQuery: String) {
@@ -64,6 +73,10 @@ class TranscriptSearchViewModel @Inject constructor(
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, "Error searching transcript")
         }
+    }
+
+    fun onSearchButtonClicked() {
+        track(AnalyticsEvent.TRANSCRIPT_SEARCH)
     }
 
     fun onSearchPrevious() {
@@ -97,6 +110,18 @@ class TranscriptSearchViewModel @Inject constructor(
                 searchResultIndices = emptyList(),
             )
         }
+    }
+
+    fun track(
+        event: AnalyticsEvent,
+    ) {
+        analyticsTracker.track(
+            event,
+            mapOf(
+                "episode_uuid" to _podcastAndEpisode?.episodeUuid.orEmpty(),
+                "podcast_uuid" to _podcastAndEpisode?.podcast?.uuid.orEmpty(),
+            ),
+        )
     }
 
     data class SearchUiState(

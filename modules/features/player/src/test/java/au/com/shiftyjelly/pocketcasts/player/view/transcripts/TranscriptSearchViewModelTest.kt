@@ -34,7 +34,11 @@ class TranscriptSearchViewModelTest {
     fun setUp() {
         doNothing().whenever(kmpSearch).setPattern(anyOrNull())
         whenever(kmpSearch.search(any())).thenReturn(searchResultIndices)
-        viewModel = TranscriptSearchViewModel(kmpSearch, testDispatcher)
+        viewModel = TranscriptSearchViewModel(
+            kmpSearch = kmpSearch,
+            analyticsTracker = mock(),
+            defaultDispatcher = testDispatcher,
+        )
     }
 
     @Test

@@ -645,4 +645,5 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_DISMISSED("transcript_dismissed"),
     TRANSCRIPT_PULLED_TO_REFRESH("transcript_pulled_to_refresh"),
     TRANSCRIPT_ERROR("transcript_error"),
+    TRANSCRIPT_SEARCH("transcript_search"),
 }
