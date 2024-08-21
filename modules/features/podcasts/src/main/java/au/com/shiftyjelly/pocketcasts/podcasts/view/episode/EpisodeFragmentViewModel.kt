@@ -74,14 +74,17 @@ class EpisodeFragmentViewModel @Inject constructor(
     var isFragmentChangingConfigurations: Boolean = false
 
     private var startPlaybackTimestamp: Duration? = null
+    private var autoDispatchPlay = false
 
     fun setup(
         episodeUuid: String,
         podcastUuid: String?,
-        forceDark: Boolean,
         timestamp: Duration?,
+        autoPlay: Boolean,
+        forceDark: Boolean,
     ) {
         startPlaybackTimestamp = timestamp
+        autoDispatchPlay = autoPlay
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
             .filter { it.episodeUuid == episodeUuid }
@@ -129,7 +132,17 @@ class EpisodeFragmentViewModel @Inject constructor(
                     zipper,
                 )
             }
-            .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
+            .doOnNext {
+                if (it is EpisodeFragmentState.Loaded) {
+                    if (autoDispatchPlay) {
+                        val playTimestamp = startPlaybackTimestamp
+                        autoDispatchPlay = false
+                        startPlaybackTimestamp = null
+                        play(it.episode, playTimestamp)
+                    }
+                    episode = it.episode
+                }
+            }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -277,9 +290,12 @@ class EpisodeFragmentViewModel @Inject constructor(
                 }
                 timestamp != null -> {
                     startPlaybackTimestamp = null
-                    playAtTimestamp(episode, timestamp)
+                    autoDispatchPlay = false
+                    play(episode, timestamp)
                     return true
                 } else -> {
+                    startPlaybackTimestamp = null
+                    autoDispatchPlay = false
                     fromListUuid?.let {
                         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
                     }
@@ -298,13 +314,15 @@ class EpisodeFragmentViewModel @Inject constructor(
         return false
     }
 
-    private fun playAtTimestamp(
+    private fun play(
         episode: BaseEpisode,
-        timestamp: Duration,
+        timestamp: Duration?,
     ) {
         viewModelScope.launch(Dispatchers.IO + NonCancellable) {
             playbackManager.playNowSync(episode, sourceView = source)
-            playbackManager.seekToTimeMsSuspend(timestamp.toInt(DurationUnit.MILLISECONDS))
+            if (timestamp != null) {
+                playbackManager.seekToTimeMsSuspend(timestamp.toInt(DurationUnit.MILLISECONDS))
+            }
         }
     }
 

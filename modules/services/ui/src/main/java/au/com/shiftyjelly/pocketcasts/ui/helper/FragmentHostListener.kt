@@ -31,6 +31,7 @@ interface FragmentHostListener {
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
+        autoPlay: Boolean,
         startTimestamp: Duration? = null,
         endTimestamp: Duration? = null,
     )

@@ -89,6 +89,7 @@ class EpisodeFragment : BaseFragment() {
             fromListUuid: String? = null,
             forceDark: Boolean = false,
             timestamp: Duration? = null,
+            autoPlay: Boolean = false,
         ): EpisodeFragment {
             return EpisodeFragment().apply {
                 arguments = Bundle().apply {
@@ -102,6 +103,7 @@ class EpisodeFragment : BaseFragment() {
                             fromListUuid = fromListUuid,
                             forceDark = forceDark,
                             timestamp = timestamp,
+                            autoPlay = autoPlay,
                         ),
                     )
                 }
@@ -150,6 +152,9 @@ class EpisodeFragment : BaseFragment() {
 
     val fromListUuid: String?
         get() = args.fromListUuid
+
+    private val autoPlay: Boolean
+        get() = args.autoPlay
 
     private val forceDarkTheme: Boolean
         get() = args.forceDark
@@ -219,12 +224,15 @@ class EpisodeFragment : BaseFragment() {
 
         binding?.loadingGroup?.isInvisible = true
 
-        viewModel.setup(
-            episodeUuid = episodeUUID,
-            podcastUuid = podcastUuid,
-            forceDark = forceDarkTheme,
-            timestamp = timestamp,
-        )
+        if (savedInstanceState == null) {
+            viewModel.setup(
+                episodeUuid = episodeUUID,
+                podcastUuid = podcastUuid,
+                timestamp = timestamp,
+                autoPlay = autoPlay,
+                forceDark = forceDarkTheme,
+            )
+        }
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->
@@ -605,6 +613,7 @@ class EpisodeFragment : BaseFragment() {
         val podcastUuid: String? = null,
         val fromListUuid: String? = null,
         val forceDark: Boolean = false,
+        val autoPlay: Boolean = false,
         @TypeParceler<Duration?, DurationParceler>() val timestamp: Duration? = null,
     ) : Parcelable
 }
