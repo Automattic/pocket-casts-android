@@ -158,7 +158,7 @@ internal fun UpgradeLayoutFeatures(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    val bottomPadding = if (shouldShowOffer) 0.dp else 50.dp
+                    val bottomPadding = if (shouldShowOffer) 0.dp else 34.dp
 
                     SubscribeButton(onClickSubscribe, Modifier.padding(bottom = bottomPadding))
 
