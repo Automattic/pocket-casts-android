@@ -395,7 +395,7 @@ private fun TranscriptContentPreview(
                             ),
                             0,
                             0,
-                        )
+                        ),
                     ),
                 ),
                 displayInfo = DisplayInfo(

@@ -197,7 +197,8 @@ class TranscriptViewModelTest {
         initViewModel(jsonString)
 
         viewModel.parseAndLoadTranscript(
-            isTranscriptViewOpen = true, pulledToRefresh = false
+            isTranscriptViewOpen = true,
+            pulledToRefresh = false,
         )
 
         viewModel.uiState.test {
@@ -207,7 +208,7 @@ class TranscriptViewModelTest {
                     TranscriptViewModel.DisplayItem("Speaker 1", true, 2, 11),
                     TranscriptViewModel.DisplayItem("Hello.", false, 13, 19),
                     TranscriptViewModel.DisplayItem("World!", false, 21, 27),
-                )
+                ),
             )
         }
     }
