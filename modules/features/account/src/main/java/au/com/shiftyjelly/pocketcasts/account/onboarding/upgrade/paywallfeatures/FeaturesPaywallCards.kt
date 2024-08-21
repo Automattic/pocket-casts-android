@@ -114,7 +114,7 @@ fun FoldersCard() {
         contentDescription = stringResource(LR.string.paywall_folders_content_description),
         title = stringResource(LR.string.paywall_folders_title),
         description = stringResource(LR.string.paywall_folders_description),
-        imageHeight = 231.dp,
+        imageHeight = 227.dp,
         imageTopPadding = 34.dp,
     )
     FeaturePaywallCard(cardData = foldersCardData)
