@@ -10,7 +10,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.repositories.nova.NovaLauncherManager
+import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -27,7 +27,7 @@ import kotlinx.coroutines.coroutineScope
 internal class NovaLauncherSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val manager: NovaLauncherManager,
+    private val manager: ExternalDataManager,
 ) : CoroutineWorker(context, params) {
     private val catalogFactory = CatalogFactory(context)
     private val name get() = requireNotNull(inputData.getString(WORKER_NAME_KEY)) { "Missing worker name" }
@@ -47,7 +47,7 @@ internal class NovaLauncherSyncWorker @AssistedInject constructor(
             try {
                 val subscribedPodcasts = async { catalogFactory.subscribedPodcasts(manager.getSubscribedPodcasts(limit = 200)) }
                 val recentlyPlayedPodcasts = async { catalogFactory.recentlyPlayedPodcasts(manager.getRecentlyPlayedPodcasts(limit = 200)) }
-                val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getTrendingPodcasts(limit = 25)) }
+                val trendingPodcasts = async { catalogFactory.trendingPodcasts(manager.getCuratedPodcastGroups(limitPerGroup = 25).trendingGroup()?.podcasts.orEmpty()) }
                 val newEpisodes = async { catalogFactory.newEpisodes(manager.getNewEpisodes(limit = 25)) }
                 val inProgressEpisodes = async { catalogFactory.inProgressEpisodes(manager.getInProgressEpisodes(limit = 25)) }
 
