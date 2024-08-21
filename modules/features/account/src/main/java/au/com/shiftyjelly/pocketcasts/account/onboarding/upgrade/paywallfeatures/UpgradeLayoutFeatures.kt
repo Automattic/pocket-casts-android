@@ -165,6 +165,7 @@ private fun Content(
                 displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
                 fontSize = 16.sp,
                 padding = 8.dp,
+                hasGradientEffect = true,
             )
         }
 
@@ -230,6 +231,7 @@ private fun SmallDeviceContent(
             SubscriptionBadgeForTier(
                 tier = SubscriptionTier.PLUS,
                 displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+                hasGradientEffect = true,
                 fontSize = 16.sp,
                 padding = 4.dp,
             )
