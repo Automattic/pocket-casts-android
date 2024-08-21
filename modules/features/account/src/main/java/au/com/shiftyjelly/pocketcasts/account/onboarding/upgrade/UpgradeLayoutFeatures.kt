@@ -31,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -161,7 +160,7 @@ internal fun UpgradeLayoutFeatures(
                 ) {
                     val bottomPadding = if (shouldShowOffer) 0.dp else 50.dp
 
-                    SubscribeButton(onClickSubscribe, bottomPadding)
+                    SubscribeButton(onClickSubscribe, Modifier.padding(bottom = bottomPadding))
 
                     if (shouldShowOffer) {
                         offerText?.let {
@@ -181,13 +180,14 @@ internal fun UpgradeLayoutFeatures(
 @Composable
 private fun SubscribeButton(
     onClickSubscribe: () -> Unit,
-    bottomPadding: Dp,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.BottomCenter,
+        modifier = modifier,
     ) {
         RowButton(
-            modifier = Modifier.padding(bottom = bottomPadding).padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             text = stringResource(LR.string.get_pocket_casts_plus),
             onClick = onClickSubscribe,
             fontWeight = FontWeight.W600,
@@ -203,5 +203,5 @@ private fun SubscribeButton(
 @Preview(showBackground = true)
 @Composable
 fun SubscribeButtonPreview() {
-    SubscribeButton(onClickSubscribe = { }, bottomPadding = 50.dp)
+    SubscribeButton(onClickSubscribe = { }, Modifier)
 }
