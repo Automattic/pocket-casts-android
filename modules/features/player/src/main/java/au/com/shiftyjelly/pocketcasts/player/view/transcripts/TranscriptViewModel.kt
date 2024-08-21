@@ -22,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +34,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.toImmutableList
 
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
@@ -142,6 +145,25 @@ class TranscriptViewModel @Inject constructor(
                 }
             }
 
+            TranscriptFormat.JSON_PODCAST_INDEX.mimeType -> {
+                val jsonString = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
+                if (jsonString.trim().isEmpty()) {
+                    emptyList()
+                } else {
+                    // Parse json following PodcastIndex.org transcript json spec: https://github.com/Podcastindex-org/podcast-namespace/blob/main/transcripts/transcripts.md#json
+                    val transcriptCues = TranscriptJsonParser.parse(jsonString)
+                    transcriptCues.map { cue ->
+                        val startTimeUs = cue.startTime?.toMicroSeconds ?: 0
+                        val endTimeUs = cue.endTime?.toMicroSeconds ?: 0
+                        CuesWithTiming(
+                            ImmutableList.of(Cue.Builder().setText(cue.body ?: "").build()),
+                            startTimeUs,
+                            endTimeUs - startTimeUs,
+                        )
+                    }.toImmutableList()
+                }
+            }
+
             else -> {
                 val format = Format.Builder()
                     .setSampleMimeType(transcript.type)
@@ -236,6 +258,9 @@ class TranscriptViewModel @Inject constructor(
                 .plus("podcast_uuid" to podcastAndEpisode?.podcast?.uuid.orEmpty()),
         )
     }
+
+    private val Double.toMicroSeconds: Long
+        get() = toDuration(DurationUnit.SECONDS).inWholeMicroseconds
 
     data class PodcastAndEpisode(
         val podcast: Podcast?,
