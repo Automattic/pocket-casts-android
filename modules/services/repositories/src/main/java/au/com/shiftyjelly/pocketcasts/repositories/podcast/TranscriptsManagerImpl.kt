@@ -89,4 +89,10 @@ enum class TranscriptFormat(val mimeType: String) {
     SRT("application/srt"),
     VTT("text/vtt"),
     HTML("text/html"),
+    ;
+
+    companion object {
+        fun fromType(type: String) =
+            entries.firstOrNull { it.mimeType == type }
+    }
 }
