@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -52,7 +51,6 @@ class EpisodeFragmentViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val theme: Theme,
     val downloadManager: DownloadManager,
-    val serverManager: ServerManager,
     val playbackManager: PlaybackManager,
     val settings: Settings,
     private val showNotesManager: ShowNotesManager,
