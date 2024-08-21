@@ -477,6 +477,7 @@ class RefreshPodcastsThread(
                 episodeUuid = episode.uuid,
                 podcastUuid = podcast.uuid,
                 sourceView = EpisodeViewSource.NOTIFICATION.value,
+                autoPlay = false,
             ).toIntent(context).apply {
                 action = action + System.currentTimeMillis() + intentId
             }
