@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
+package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallfeatures
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ScrollState
@@ -33,6 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCards
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.calculateMinimumHeightWithInsets
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
