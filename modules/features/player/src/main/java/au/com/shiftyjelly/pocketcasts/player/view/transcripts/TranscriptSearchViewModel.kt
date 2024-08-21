@@ -76,7 +76,7 @@ class TranscriptSearchViewModel @Inject constructor(
     }
 
     fun onSearchButtonClicked() {
-        track(AnalyticsEvent.TRANSCRIPT_SEARCH)
+        track(AnalyticsEvent.TRANSCRIPT_SEARCH_SHOWN)
     }
 
     fun onSearchPrevious() {
