@@ -4,6 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
 @JsonClass(generateAdapter = true)
 data class TranscriptSegments(
@@ -18,10 +19,9 @@ data class TranscriptCue(
     @field:Json(name = "speaker") var speaker: String?,
 )
 
-object TranscriptJsonParser {
-    private val moshi = Moshi.Builder()
-        .build()
-
+class TranscriptJsonParser @Inject constructor(
+    private val moshi: Moshi,
+) {
     fun parse(jsonString: String): List<TranscriptCue> {
         val jsonAdapter: JsonAdapter<TranscriptSegments> =
             moshi.adapter(TranscriptSegments::class.java)
