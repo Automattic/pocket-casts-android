@@ -54,7 +54,7 @@ class CreateFilterViewModel @Inject constructor(
     private val _lockedToFirstPage = MutableStateFlow(true)
     val lockedToFirstPage get() = _lockedToFirstPage.asStateFlow()
 
-    private var playlist: LiveData<Playlist>? = null
+    var playlist: LiveData<Playlist>? = null
 
     suspend fun createFilter(name: String, iconId: Int, colorId: Int) =
         withContext(Dispatchers.IO) { playlistManager.createPlaylist(name, Playlist.calculateCombinedIconId(colorId, iconId), draft = true) }
@@ -122,7 +122,7 @@ class CreateFilterViewModel @Inject constructor(
 
     fun updateAutoDownload(autoDownload: Boolean) {
         launch {
-            playlist.value?.let { playlist ->
+            playlist?.value?.let { playlist ->
                 playlist.autoDownload = autoDownload
 
                 val userPlaylistUpdate = if (isAutoDownloadSwitchInitialized) {
