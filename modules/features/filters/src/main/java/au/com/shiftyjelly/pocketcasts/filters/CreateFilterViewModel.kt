@@ -54,7 +54,7 @@ class CreateFilterViewModel @Inject constructor(
     private val _lockedToFirstPage = MutableStateFlow(true)
     val lockedToFirstPage get() = _lockedToFirstPage.asStateFlow()
 
-    lateinit var playlist: LiveData<Playlist>
+    private var playlist: LiveData<Playlist>? = null
 
     suspend fun createFilter(name: String, iconId: Int, colorId: Int) =
         withContext(Dispatchers.IO) { playlistManager.createPlaylist(name, Playlist.calculateCombinedIconId(colorId, iconId), draft = true) }
@@ -88,7 +88,7 @@ class CreateFilterViewModel @Inject constructor(
         colorIndex: Int,
         isCreatingNewFilter: Boolean,
     ) = withContext(Dispatchers.Default) {
-        val playlist = playlist.value ?: return@withContext
+        val playlist = playlist?.value ?: return@withContext
         playlist.title = filterName.value
         playlist.iconId = Playlist.calculateCombinedIconId(colorIndex, iconIndex)
         playlist.draft = false
@@ -165,7 +165,7 @@ class CreateFilterViewModel @Inject constructor(
     fun updateDownloadLimit(limit: Int) {
         userChangedAutoDownloadEpisodeCount.recordUserChange()
         launch {
-            val playlist = playlist.value ?: return@launch
+            val playlist = playlist?.value ?: return@launch
             playlist.autodownloadLimit = limit
 
             val userPlaylistUpdate = UserPlaylistUpdate(
@@ -187,7 +187,7 @@ class CreateFilterViewModel @Inject constructor(
     fun clearNewFilter() {
         reset()
         launch(Dispatchers.Default) {
-            val playlist = playlist.value ?: return@launch
+            val playlist = playlist?.value ?: return@launch
             playlistManager.delete(playlist)
         }
     }
@@ -195,7 +195,7 @@ class CreateFilterViewModel @Inject constructor(
     fun starredChipTapped(isCreatingFilter: Boolean) {
         _lockedToFirstPage.value = false
         launch {
-            playlist.value?.let { playlist ->
+            playlist?.value?.let { playlist ->
                 playlist.starred = !playlist.starred
 
                 // Only indicate user is updating the starred property if this is not
