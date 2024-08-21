@@ -50,6 +50,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+private val SCREEN_HEIGHT_FOR_SMALL_DEVICES = 600.dp
+
 @Composable
 internal fun UpgradeLayoutFeatures(
     state: OnboardingUpgradeFeaturesState.Loaded,
@@ -62,6 +64,8 @@ internal fun UpgradeLayoutFeatures(
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val screenHeight = configuration.screenHeightDp.dp
+    val isSmallDevice = screenHeight < SCREEN_HEIGHT_FOR_SMALL_DEVICES
 
     val offerText = when (state.currentSubscription) {
         is Subscription.Trial -> stringResource(LR.string.paywall_free_1_month_trial)
@@ -71,7 +75,7 @@ internal fun UpgradeLayoutFeatures(
 
     val shouldShowOffer = offerText != null && !isLandscape
 
-    AppTheme(Theme.ThemeType.DARK) { // We need to set Dark since this screen will have dark colors for all themes
+    AppTheme(Theme.ThemeType.DARK) {
         Box(
             modifier = modifier.fillMaxHeight(),
             contentAlignment = Alignment.BottomCenter,
@@ -89,63 +93,10 @@ internal fun UpgradeLayoutFeatures(
                             .heightIn(min = this@BoxWithConstraints.calculateMinimumHeightWithInsets())
                             .padding(bottom = 100.dp),
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            horizontalArrangement = Arrangement.End,
-                        ) {
-                            RowTextButton(
-                                text = stringResource(LR.string.not_now),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    backgroundColor = Color.Transparent,
-                                    contentColor = Color.White,
-                                ),
-                                fontSize = 18.sp,
-                                onClick = onNotNowPressed,
-                                fullWidth = false,
-                                includePadding = false,
-                            )
-                        }
-
-                        Column {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 12.dp, top = 24.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                SubscriptionBadgeForTier(
-                                    tier = SubscriptionTier.PLUS,
-                                    displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-                                    fontSize = 16.sp,
-                                    padding = 8.dp,
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier.padding(bottom = 40.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                AutoResizeText(
-                                    text = stringResource(state.currentFeatureCard.titleRes(source)),
-                                    color = Color.White,
-                                    maxFontSize = 22.sp,
-                                    lineHeight = 30.sp,
-                                    fontWeight = FontWeight.W700,
-                                    maxLines = 2,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .padding(horizontal = 24.dp)
-                                        .fillMaxWidth(),
-                                )
-                            }
-
-                            FeaturedPaywallCards(
-                                modifier = modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 40.dp),
-                            )
+                        if (isSmallDevice) {
+                            SmallDeviceContent(onNotNowPressed, state, source, modifier)
+                        } else {
+                            Content(onNotNowPressed, state, source, modifier)
                         }
                     }
                 }
@@ -157,7 +108,7 @@ internal fun UpgradeLayoutFeatures(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    val bottomPadding = if (shouldShowOffer) 0.dp else 34.dp
+                    val bottomPadding = if (shouldShowOffer) 0.dp else if (isSmallDevice) 8.dp else 34.dp
 
                     SubscribeButton(onClickSubscribe, Modifier.padding(bottom = bottomPadding))
 
@@ -167,12 +118,146 @@ internal fun UpgradeLayoutFeatures(
                                 text = it,
                                 fontWeight = FontWeight.W400,
                             )
-                            Spacer(Modifier.height(50.dp))
+                            Spacer(Modifier.height(if (isSmallDevice) 12.dp else 50.dp))
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun Content(
+    onNotNowPressed: () -> Unit,
+    state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
+    modifier: Modifier,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        RowTextButton(
+            text = stringResource(LR.string.not_now),
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = Color.Transparent,
+                contentColor = Color.White,
+            ),
+            fontSize = 18.sp,
+            onClick = onNotNowPressed,
+            fullWidth = false,
+            includePadding = false,
+        )
+    }
+
+    Column {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp, top = 24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            SubscriptionBadgeForTier(
+                tier = SubscriptionTier.PLUS,
+                displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+                fontSize = 16.sp,
+                padding = 8.dp,
+            )
+        }
+
+        Box(
+            modifier = Modifier.padding(bottom = 40.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            AutoResizeText(
+                text = stringResource(state.currentFeatureCard.titleRes(source)),
+                color = Color.White,
+                maxFontSize = 22.sp,
+                lineHeight = 30.sp,
+                fontWeight = FontWeight.W700,
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(),
+            )
+        }
+
+        FeaturedPaywallCards(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 40.dp),
+        )
+    }
+}
+
+@Composable
+private fun SmallDeviceContent(
+    onNotNowPressed: () -> Unit,
+    state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
+    modifier: Modifier,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        RowTextButton(
+            text = stringResource(LR.string.not_now),
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = Color.Transparent,
+                contentColor = Color.White,
+            ),
+            fontSize = 18.sp,
+            onClick = onNotNowPressed,
+            fullWidth = false,
+            includePadding = false,
+        )
+    }
+
+    Column {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            SubscriptionBadgeForTier(
+                tier = SubscriptionTier.PLUS,
+                displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+                fontSize = 16.sp,
+                padding = 4.dp,
+            )
+        }
+
+        Box(
+            modifier = Modifier.padding(bottom = 4.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            AutoResizeText(
+                text = stringResource(state.currentFeatureCard.titleRes(source)),
+                color = Color.White,
+                maxFontSize = 22.sp,
+                lineHeight = 24.sp,
+                fontWeight = FontWeight.W700,
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .fillMaxWidth(),
+            )
+        }
+
+        FeaturedPaywallCards(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 8.dp),
+        )
     }
 }
 
