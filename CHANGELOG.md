@@ -1,3 +1,7 @@
+7.72
+-----
+
+
 7.71
 -----
 *   New Features
@@ -10,6 +14,8 @@
         ([#2649](https://github.com/Automattic/pocket-casts-android/pull/2649))
     *   Fix crash when clicking on chapter title within player
         ([#2657](https://github.com/Automattic/pocket-casts-android/pull/2657))
+    *   Handle more podcast share links
+        ([#2666](https://github.com/Automattic/pocket-casts-android/pull/2666))
 
 7.70
 -----

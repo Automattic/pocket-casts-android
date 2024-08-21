@@ -707,14 +707,14 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun shareUnknownItem() {
+    fun shareItunesId() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
-            .setData(Uri.parse("https://pca.st/unidentified-sharing-object/object-id"))
+            .setData(Uri.parse("https://pca.st/itunes/1671087656"))
 
         val deepLink = factory.create(intent)
 
-        assertNull(deepLink)
+        assertEquals(ShowPodcastFromUrlDeepLink("https://pca.st/itunes/1671087656"), deepLink)
     }
 
     @Test

@@ -182,8 +182,7 @@ class TranscriptViewModel @Inject constructor(
                 .flatMap { it.cues }
                 .forEach { cue ->
                     // Extract speaker
-                    val markupText = if (transcriptFormat == TranscriptFormat.VTT) cue.markup else cue.text
-                    markupText?.let {
+                    cue.text?.let {
                         TranscriptRegexFilters.extractSpeaker(it.toString(), transcriptFormat)?.let { speaker ->
                             if (previousSpeaker != speaker) {
                                 append("\n\n")

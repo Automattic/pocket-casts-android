@@ -375,7 +375,6 @@ private class ShareLinkAdapter(
                     startTimestamp = timestamps?.first,
                     endTimestamp = timestamps?.second,
                 )
-                uriData.pathSegments[0] == "podcast" -> ShowPodcastFromUrlDeepLink(uriData.toString())
                 uriData.pathSegments[0] == "episode" -> ShowEpisodeDeepLink(
                     episodeUuid = uriData.pathSegments[1],
                     podcastUuid = null,
@@ -383,7 +382,8 @@ private class ShareLinkAdapter(
                     endTimestamp = timestamps?.second,
                     sourceView = null,
                 )
-                else -> null
+                // handle the different podcast share links such as /podcast/uuid, /itunes/itunes_id, /feed/feed_url
+                else -> ShowPodcastFromUrlDeepLink(uriData.toString())
             }
         } else {
             null

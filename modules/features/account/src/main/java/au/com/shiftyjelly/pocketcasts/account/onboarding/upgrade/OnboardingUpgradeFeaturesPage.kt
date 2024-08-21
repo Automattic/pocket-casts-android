@@ -79,8 +79,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val MAX_OFFER_BADGE_TEXT_LENGTH = 23
@@ -122,28 +120,31 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
         is OnboardingUpgradeFeaturesState.Loaded -> {
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
-            if (FeatureFlag.isEnabled(Feature.PAYWALL_EXPERIMENT)) {
-                UpgradeLayoutFeatures(
-                    state = loadedState,
-                    source = source,
-                    onNotNowPressed = onNotNowPressed,
-                    onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                    onClickSubscribe = onClickSubscribe,
-                    scrollState = scrollState,
-                    canUpgrade = canUpgrade,
-                )
-            } else {
-                UpgradeLayoutOriginal(
-                    state = loadedState,
-                    source = source,
-                    scrollState = scrollState,
-                    onBackPressed = onBackPressed,
-                    onNotNowPressed = onNotNowPressed,
-                    onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                    onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                    onClickSubscribe = onClickSubscribe,
-                    canUpgrade = canUpgrade,
-                )
+            when (loadedState.upgradeLayout) {
+                UpgradeLayout.Features, UpgradeLayout.Reviews -> {
+                    UpgradeLayoutFeatures(
+                        state = loadedState,
+                        source = source,
+                        onNotNowPressed = onNotNowPressed,
+                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
+                        onClickSubscribe = onClickSubscribe,
+                        scrollState = scrollState,
+                        canUpgrade = canUpgrade,
+                    )
+                }
+                UpgradeLayout.Original -> {
+                    UpgradeLayoutOriginal(
+                        state = loadedState,
+                        source = source,
+                        scrollState = scrollState,
+                        onBackPressed = onBackPressed,
+                        onNotNowPressed = onNotNowPressed,
+                        onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
+                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
+                        onClickSubscribe = onClickSubscribe,
+                        canUpgrade = canUpgrade,
+                    )
+                }
             }
         }
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
