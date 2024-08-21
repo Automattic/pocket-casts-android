@@ -848,7 +848,7 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     database.execSQL("CREATE INDEX curated_podcasts_list_id_index ON curated_podcasts(list_id)")
                     database.execSQL("CREATE INDEX curated_podcasts_podcast_id_index ON curated_podcasts(podcast_id)")
-                    database.execSQL("DROP TABLE IF EXISTS trending_podcasts")
+                    database.execSQL("DROP TABLE trending_podcasts")
                     setTransactionSuccessful()
                 } finally {
                     endTransaction()
