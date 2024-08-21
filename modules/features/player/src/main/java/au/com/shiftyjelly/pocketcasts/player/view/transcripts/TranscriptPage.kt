@@ -385,16 +385,17 @@ private fun TranscriptContentPreview(
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
                 ),
-                cuesWithTimingSubtitle =
-                ImmutableList.of(
-                    CuesWithTiming(
-                        ImmutableList.of(
-                            Cue.Builder().setText(
-                                "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed.",
-                            ).build(),
-                        ),
-                        0,
-                        0,
+                cuesInfo = ImmutableList.of(
+                    TranscriptViewModel.TranscriptCuesInfo(
+                        CuesWithTiming(
+                            ImmutableList.of(
+                                Cue.Builder().setText(
+                                    "Speaker 1",
+                                ).build(),
+                            ),
+                            0,
+                            0,
+                        )
                     ),
                 ),
                 displayInfo = DisplayInfo(
@@ -427,7 +428,7 @@ private fun TranscriptEmptyContentPreview() {
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
                 ),
-                cuesWithTimingSubtitle = emptyList(),
+                cuesInfo = emptyList(),
                 displayInfo = DisplayInfo(
                     text = "",
                     items = emptyList(),

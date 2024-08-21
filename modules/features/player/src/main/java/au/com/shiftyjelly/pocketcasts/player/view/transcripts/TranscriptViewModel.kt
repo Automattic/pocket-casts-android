@@ -87,10 +87,10 @@ class TranscriptViewModel @Inject constructor(
             viewModelScope.launch {
                 _uiState.value = try {
                     val forceRefresh = pulledToRefresh || retryOnFail
-                    val cuesWithTimingSubtitle = buildSubtitleCues(transcript, forceRefresh)
+                    val cuesInfo = buildSubtitleCues(transcript, forceRefresh)
 
                     val displayInfo = buildDisplayInfo(
-                        cuesWithTimingSubtitle = cuesWithTimingSubtitle,
+                        cuesInfo = cuesInfo,
                         transcriptFormat = TranscriptFormat.fromType(transcript.type),
                     )
 
@@ -102,7 +102,7 @@ class TranscriptViewModel @Inject constructor(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
                         displayInfo = displayInfo,
-                        cuesWithTimingSubtitle = cuesWithTimingSubtitle,
+                        cuesInfo = cuesInfo,
                     )
                 } catch (e: Exception) {
                     track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
@@ -132,7 +132,7 @@ class TranscriptViewModel @Inject constructor(
             TranscriptFormat.HTML.mimeType -> {
                 val content = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
                 if (content.trim().isEmpty()) {
-                    emptyList<CuesWithTiming>()
+                    emptyList()
                 } else {
                     // Html content is added as single large cue
                     ImmutableList.of(
@@ -140,7 +140,7 @@ class TranscriptViewModel @Inject constructor(
                             ImmutableList.of(Cue.Builder().setText(content).build()),
                             0,
                             0,
-                        ),
+                        ).toTranscriptCuesInfo(),
                     )
                 }
             }
@@ -159,6 +159,8 @@ class TranscriptViewModel @Inject constructor(
                             ImmutableList.of(Cue.Builder().setText(cue.body ?: "").build()),
                             startTimeUs,
                             endTimeUs - startTimeUs,
+                        ).toTranscriptCuesInfo(
+                            cuesAdditionalInfo = CuesAdditionalInfo(speaker = cue.speaker),
                         )
                     }.toImmutableList()
                 }
@@ -187,25 +189,25 @@ class TranscriptViewModel @Inject constructor(
                             throw TranscriptParsingException(message)
                         }
                     }
-                    result.build()
+                    result.build().map { it.toTranscriptCuesInfo() }
                 }
             }
         }
     }
 
     private suspend fun buildDisplayInfo(
-        cuesWithTimingSubtitle: List<CuesWithTiming>,
+        cuesInfo: List<TranscriptCuesInfo>,
         transcriptFormat: TranscriptFormat?,
     ) = withContext(ioDispatcher) {
         var previousSpeaker = ""
         val speakerIndices = mutableListOf<Int>()
         val formattedText = buildString {
-            cuesWithTimingSubtitle
-                .flatMap { it.cues }
-                .forEach { cue ->
+            cuesInfo.forEach {
+                it.cuesWithTiming.cues.forEach { cue ->
                     // Extract speaker
-                    cue.text?.let {
-                        TranscriptRegexFilters.extractSpeaker(it.toString(), transcriptFormat)?.let { speaker ->
+                    cue.text?.let { cueText ->
+                        val speaker = it.cuesAdditionalInfo?.speaker ?: TranscriptRegexFilters.extractSpeaker(cueText.toString(), transcriptFormat)
+                        speaker?.let {
                             if (previousSpeaker != speaker) {
                                 append("\n\n")
                                 append(speaker)
@@ -214,15 +216,16 @@ class TranscriptViewModel @Inject constructor(
                                 previousSpeaker = speaker
                             }
                         }
+                        val filters = if (transcriptFormat == TranscriptFormat.HTML) {
+                            TranscriptRegexFilters.htmlFilters
+                        } else {
+                            TranscriptRegexFilters.transcriptFilters
+                        }
+                        val newText = filters.filter(cueText.toString())
+                        append(newText)
                     }
-                    val filters = if (transcriptFormat == TranscriptFormat.HTML) {
-                        TranscriptRegexFilters.htmlFilters
-                    } else {
-                        TranscriptRegexFilters.transcriptFilters
-                    }
-                    val newText = filters.filter(cue.text.toString())
-                    append(newText)
                 }
+            }
         }
         val items = mutableListOf<DisplayItem>()
         formattedText.splitIgnoreEmpty("\n\n").filter { it.isNotEmpty() }.mapIndexed { index, currentItem ->
@@ -284,9 +287,9 @@ class TranscriptViewModel @Inject constructor(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
             override val transcript: Transcript,
             val displayInfo: DisplayInfo,
-            val cuesWithTimingSubtitle: List<CuesWithTiming>,
+            val cuesInfo: List<TranscriptCuesInfo>,
         ) : UiState() {
-            val isTranscriptEmpty: Boolean = cuesWithTimingSubtitle.isEmpty()
+            val isTranscriptEmpty: Boolean = cuesInfo.isEmpty()
         }
 
         data class Error(
@@ -295,6 +298,19 @@ class TranscriptViewModel @Inject constructor(
             override val podcastAndEpisode: PodcastAndEpisode? = null,
         ) : UiState()
     }
+
+    data class TranscriptCuesInfo(
+        val cuesWithTiming: CuesWithTiming,
+        val cuesAdditionalInfo: CuesAdditionalInfo? = null,
+    )
+
+    private fun CuesWithTiming.toTranscriptCuesInfo(
+        cuesAdditionalInfo: CuesAdditionalInfo? = null,
+    ) = TranscriptCuesInfo(this, cuesAdditionalInfo)
+
+    data class CuesAdditionalInfo(
+        val speaker: String?,
+    )
 
     data class DisplayInfo(
         val text: String,
