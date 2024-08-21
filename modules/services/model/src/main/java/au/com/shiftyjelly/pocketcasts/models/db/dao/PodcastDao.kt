@@ -8,11 +8,11 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherRecentlyPlayedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
@@ -396,16 +396,16 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET auto_archive_episode_limit = :value, auto_archive_episode_limit_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract suspend fun updateArchiveEpisodeLimit(uuid: String, value: AutoArchiveLimit, modified: Date = Date())
 
-    @Query("DELETE FROM trending_podcasts")
-    protected abstract suspend fun deleteAllTrendingPodcasts()
+    @Query("DELETE FROM curated_podcasts")
+    protected abstract suspend fun deleteAllCuratedPodcasts()
 
     @Insert(onConflict = REPLACE)
-    protected abstract suspend fun insertAllTrendingPodcasts(podcasts: List<TrendingPodcast>)
+    protected abstract suspend fun insertAllCuratedPodcasts(podcasts: List<CuratedPodcast>)
 
     @Transaction
-    open suspend fun replaceAllTrendingPodcasts(podcasts: List<TrendingPodcast>) {
-        deleteAllTrendingPodcasts()
-        insertAllTrendingPodcasts(podcasts)
+    open suspend fun replaceAllCuratedPodcasts(podcasts: List<CuratedPodcast>) {
+        deleteAllCuratedPodcasts()
+        insertAllCuratedPodcasts(podcasts)
     }
 
     @Query(
@@ -447,13 +447,14 @@ abstract class PodcastDao {
     @Query(
         """
         SELECT 
-          trending_podcast.uuid AS id, 
-          trending_podcast.title AS title 
+          curated_podcast.podcast_id AS id, 
+          curated_podcast.podcast_title AS title 
         FROM 
-          trending_podcasts as trending_podcast 
-          LEFT JOIN podcasts AS podcast ON podcast.uuid = trending_podcast.uuid 
+          curated_podcasts as curated_podcast 
+          LEFT JOIN podcasts AS podcast ON podcast.uuid = curated_podcast.podcast_id 
         WHERE 
           IFNULL(podcast.subscribed, 0) IS 0
+          AND curated_podcast.list_id IS '${CuratedPodcast.TRENDING_LIST_ID}'
         LIMIT
           :limit
         """,

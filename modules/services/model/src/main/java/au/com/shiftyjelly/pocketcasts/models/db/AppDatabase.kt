@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
+import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
@@ -56,7 +57,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
-import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -82,10 +82,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class,
         DbChapter::class,
-        TrendingPodcast::class,
+        CuratedPodcast::class,
         Transcript::class,
     ],
-    version = 99,
+    version = 100,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -830,6 +830,32 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
         }
 
+        val MIGRATION_99_100 = addMigration(99, 100) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    database.execSQL(
+                        """
+                        CREATE TABLE curated_podcasts(
+                            list_id TEXT NOT NULL,
+                            list_title TEXT NOT NULL,
+                            podcast_id TEXT NOT NULL,
+                            podcast_title TEXT NOT NULL,
+                            podcast_description TEXT,
+                            PRIMARY KEY (list_id, podcast_id)
+                        )
+                        """.trimIndent(),
+                    )
+                    database.execSQL("CREATE INDEX curated_podcasts_list_id_index ON curated_podcasts(list_id)")
+                    database.execSQL("CREATE INDEX curated_podcasts_podcast_id_index ON curated_podcasts(podcast_id)")
+                    database.execSQL("DROP TABLE IF EXISTS trending_podcasts")
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1219,6 +1245,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_96_97,
                 MIGRATION_97_98,
                 MIGRATION_98_99,
+                MIGRATION_99_100,
             )
         }
 
