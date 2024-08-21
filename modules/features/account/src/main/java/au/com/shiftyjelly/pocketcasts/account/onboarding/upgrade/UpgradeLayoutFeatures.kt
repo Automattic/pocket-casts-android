@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -166,8 +168,8 @@ internal fun UpgradeLayoutFeatures(
                             TextP50(
                                 text = it,
                                 fontWeight = FontWeight.W400,
-                                modifier = Modifier.padding(bottom = 50.dp),
                             )
+                            Spacer(Modifier.height(50.dp))
                         }
                     }
                 }
