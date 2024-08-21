@@ -208,7 +208,7 @@ abstract class UpNextDao {
           LEFT JOIN (
             SELECT
               -- common properties
-              TRUE AS is_podcast_episode, 
+              1 AS is_podcast_episode, 
               episode.uuid AS id, 
               episode.title AS title, 
               episode.duration AS duration, 
@@ -227,7 +227,7 @@ abstract class UpNextDao {
             UNION ALL 
             SELECT
               -- common properties
-              FALSE AS is_podcast_episode, 
+              0 AS is_podcast_episode, 
               episode.uuid AS id, 
               episode.title AS title, 
               episode.duration AS duration, 

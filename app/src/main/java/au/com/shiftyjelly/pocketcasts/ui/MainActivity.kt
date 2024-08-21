@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
@@ -438,13 +437,7 @@ class MainActivity :
                     if (settings.selectedTab() != currentTab) {
                         trackTabOpened(currentTab)
                         when (currentTab) {
-                            VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
-                            VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
-                            VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> {
-                                resetEoYBadgeIfNeeded()
-                                FirebaseAnalyticsTracker.navigatedToProfile()
-                            }
+                            VR.id.navigation_profile -> resetEoYBadgeIfNeeded()
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -508,10 +501,6 @@ class MainActivity :
 
     override fun onResume() {
         super.onResume()
-
-        if (settings.selectedTab() == VR.id.navigation_discover) {
-            FirebaseAnalyticsTracker.navigatedToDiscover()
-        }
 
         refreshApp()
         addLineView()
@@ -1004,8 +993,6 @@ class MainActivity :
         updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
         UiUtil.hideKeyboard(binding.root)
 
-        FirebaseAnalyticsTracker.nowPlayingOpen()
-
         viewModel.isPlayerOpen = true
 
         val playerContainerFragment = supportFragmentManager.fragments
@@ -1387,7 +1374,7 @@ class MainActivity :
         }
 
         launch(Dispatchers.Main.immediate) {
-            when (val localEpisode = withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }) {
+            val fragment = when (val localEpisode = withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }) {
                 is UserEpisode -> {
                     CloudFileBottomSheetFragment.newInstance(localEpisode.uuid, forceDark = true, source)
                 }
@@ -1398,24 +1385,24 @@ class MainActivity :
                         podcastUuid = localEpisode.podcastUuid,
                         forceDark = forceDark,
                         timestamp = startTimestamp,
-                    ).showAllowingStateLoss(supportFragmentManager, "episode_card")
+                    )
                 }
                 null -> {
                     val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
                     val searchResult = serverManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
                     dialog.hide()
-                    val episode = searchResult?.episode
-                    if (episode != null) {
+                    searchResult?.episode?.let {
                         EpisodeContainerFragment.newInstance(
-                            episodeUuid = episode.uuid,
+                            episodeUuid = it.uuid,
                             source = source,
-                            podcastUuid = episode.podcastUuid,
+                            podcastUuid = it.podcastUuid,
                             forceDark = forceDark,
                             timestamp = startTimestamp,
-                        ).showAllowingStateLoss(supportFragmentManager, "episode_card")
+                        )
                     }
                 }
             }
+            fragment?.showAllowingStateLoss(supportFragmentManager, "episode_card")
         }
     }
 

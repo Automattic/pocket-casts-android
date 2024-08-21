@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
@@ -50,7 +49,6 @@ class PodcastListFragment : PodcastGridListFragment() {
     }
 
     private val onPromotionClick: (DiscoverPromotion) -> Unit = { promotion ->
-        FirebaseAnalyticsTracker.podcastTappedFromList(promotion.promotionUuid, promotion.podcastUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to promotion.promotionUuid, PODCAST_UUID_KEY to promotion.podcastUuid))
 
         val sourceView = when (expandedStyle) {
@@ -120,7 +118,6 @@ class PodcastListFragment : PodcastGridListFragment() {
         if (analyticsImpressionSent || impressionId == null) {
             return
         }
-        FirebaseAnalyticsTracker.listImpression(impressionId)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to impressionId))
         analyticsImpressionSent = true
     }

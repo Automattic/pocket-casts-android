@@ -71,7 +71,7 @@
                 android:textColor="?attr/primary_interactive_01"
                 android:importantForAccessibility="no"
                 app:layout_constraintBottom_toBottomOf="@+id/btnChangeAvatar"
-                app:layout_constraintStart_toEndOf="@+id/imgMail"
+                app:layout_constraintStart_toEndOf="@+id/imgAvatar"
                 app:layout_constraintTop_toTopOf="@id/btnChangeAvatar" />
 
             <View

@@ -24,6 +24,8 @@ data class Clip(
     ) {
         val startInSeconds = start.inWholeSeconds.toInt()
         val endInSeconds = end.inWholeSeconds.toInt()
+        val duration = end - start
+        val durationInSeconds = duration.inWholeSeconds.toInt()
 
         operator fun contains(duration: Duration) = duration in start..end
 

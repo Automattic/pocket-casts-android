@@ -1885,4 +1885,15 @@
         <item name="android:elevation">0dp</item>
     </style>
 
+    <!-- Clip sharing theme to enable content resisign -->
+    <style name="Theme.ClipSharing" parent="Theme.Design.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="bottomSheetStyle">@style/Widget.BottomSheet.ClipSharing</item>
+    </style>
+
+    <style name="Widget.BottomSheet.ClipSharing" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment_dark</item>
+    </style>
+
 </resources>

@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
 import android.app.Activity
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
@@ -60,6 +59,7 @@ private const val SUBSCRIPTION_REPLACEMENT_MODE_NOT_SET = -1
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
+    private val productDetailsInterceptor: ProductDetailsInterceptor,
     private val settings: Settings,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : SubscriptionManager,
@@ -187,13 +187,14 @@ class SubscriptionManagerImpl @Inject constructor(
             .build()
 
         billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+            val (result, products) = productDetailsInterceptor.intercept(billingResult, productDetailsList)
+            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
-                productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
+                productDetails.accept(ProductDetailsState.Loaded(products))
 
                 refreshPurchases()
             } else {
-                productDetails.accept(ProductDetailsState.Error(billingResult.debugMessage))
+                productDetails.accept(ProductDetailsState.Error(result.debugMessage))
             }
         }
     }
@@ -272,8 +273,6 @@ class SubscriptionManagerImpl @Inject constructor(
                     }.distinct().forEach {
                         updateOfferEligible(it, false)
                     }
-
-                    FirebaseAnalyticsTracker.plusPurchased()
                 } catch (e: Exception) {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
                     purchaseEvents.accept(PurchaseEvent.Failure(e.message ?: "Unknown error", null))

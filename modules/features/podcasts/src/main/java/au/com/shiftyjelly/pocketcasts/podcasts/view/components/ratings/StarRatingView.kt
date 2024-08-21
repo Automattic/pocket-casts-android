@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -35,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.UUID
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun StarRatingView(
@@ -56,6 +60,7 @@ fun StarRatingView(
                 },
             )
         }
+
         is RatingState.Loading,
         is RatingState.Error,
         -> Unit // Do Nothing
@@ -67,31 +72,44 @@ private fun Content(
     state: RatingState.Loaded,
     onClick: () -> Unit,
 ) {
-    val verticalPadding = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 8.dp else 18.dp
+    val starsContentDescription = stringResource(LR.string.podcast_star_rating_content_description)
 
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = verticalPadding),
+        modifier = Modifier.padding(
+            start = 8.dp,
+            end = 4.dp,
+            top = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 8.dp else 18.dp,
+            bottom = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 0.dp else 18.dp,
+        ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Stars(
-            stars = state.stars,
-            color = MaterialTheme.theme.colors.primaryUi05Selected,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clickable { onClick() }
+                .padding(8.dp)
+                .semantics {
+                    this.contentDescription = starsContentDescription
+                },
+        ) {
+            Stars(
+                stars = state.stars,
+                color = MaterialTheme.theme.colors.primaryUi05Selected,
+            )
 
-        if (!state.noRatings) {
+            if (!state.noRatings) {
+                TextP40(
+                    text = state.roundedAverage,
+                    modifier = Modifier.padding(start = 4.dp),
+                    fontWeight = FontWeight.W700,
+                )
+            }
+
             TextP40(
-                text = state.roundedAverage,
-                modifier = Modifier
-                    .padding(start = 4.dp),
-                fontWeight = FontWeight.W700,
+                text = if (state.noRatings) stringResource(R.string.no_ratings) else "(${state.total?.abbreviated})",
+                modifier = Modifier.padding(start = 4.dp),
             )
         }
-
-        TextP40(
-            text = if (state.noRatings) stringResource(R.string.no_ratings) else "(${state.total?.abbreviated})",
-            modifier = Modifier
-                .padding(start = 4.dp),
-        )
 
         Spacer(modifier = Modifier.weight(1f))
 

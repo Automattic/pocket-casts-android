@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -191,11 +191,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
-            FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
         }
         if (featuredPodcast) {
-            FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
             viewModel.podcast.value?.uuid?.let { podcastUuid ->
                 analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
             }
@@ -264,7 +262,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private val onRowClicked: (PodcastEpisode) -> Unit = { episode ->
         fromListUuid?.let { listUuid ->
-            FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
                 mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid),
@@ -557,7 +554,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         if (savedInstanceState == null) {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN, mapOf(SOURCE_KEY to sourceView.analyticsValue))
-            FirebaseAnalyticsTracker.openedPodcast(podcastUuid)
         }
     }
 
@@ -974,6 +970,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun share() {
         val podcast = viewModel.podcast.value ?: return
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
         if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
             SharePodcastFragment
                 .newInstance(podcast, SourceView.PODCAST_SCREEN)

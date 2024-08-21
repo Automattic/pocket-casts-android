@@ -5,7 +5,6 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -24,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
-import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
@@ -89,11 +87,6 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     private fun setupApp() {
         runBlocking {
-            FirebaseAnalyticsTracker.setup(
-                analytics = FirebaseAnalytics.getInstance(this@PocketCastsWearApplication),
-                settings = settings,
-            )
-
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
 

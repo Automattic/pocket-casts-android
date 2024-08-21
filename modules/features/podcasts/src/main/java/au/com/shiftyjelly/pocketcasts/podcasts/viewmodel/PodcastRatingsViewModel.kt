@@ -1,15 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.images.PocketCastsIcons
+import au.com.shiftyjelly.pocketcasts.images.icons.StarEmpty
+import au.com.shiftyjelly.pocketcasts.images.icons.StarFull
+import au.com.shiftyjelly.pocketcasts.images.icons.StarHalf
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
@@ -61,7 +62,7 @@ class PodcastRatingsViewModel
     fun refreshPodcastRatings(uuid: String) {
         launch(Dispatchers.IO) {
             try {
-                ratingsManager.refreshPodcastRatings(uuid)
+                ratingsManager.refreshPodcastRatings(podcastUuid = uuid, useCache = true)
             } catch (e: Exception) {
                 val message = "Failed to refresh podcast ratings"
                 // don't report missing rating or network errors to Sentry
@@ -134,9 +135,9 @@ class PodcastRatingsViewModel
     }
 
     enum class Star(val icon: ImageVector) {
-        FilledStar(Icons.Filled.Star),
-        HalfStar(Icons.AutoMirrored.Filled.StarHalf),
-        BorderedStar(Icons.Filled.StarBorder),
+        FilledStar(PocketCastsIcons.StarFull),
+        HalfStar(PocketCastsIcons.StarHalf),
+        BorderedStar(PocketCastsIcons.StarEmpty),
     }
 
     companion object {

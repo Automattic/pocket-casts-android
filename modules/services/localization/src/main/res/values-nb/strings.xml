@@ -84,7 +84,6 @@ Language: nb_NO
     <string name="error_invalid_email_address">Oppgi en gyldig e-postadresse.</string>
     <string name="error_invalid_password_length">Oppgi et passord som er minst seks tegn langt</string>
     <string name="error_server_failed">Det har oppstått en intern serverfeil. Prøv på nytt senere.</string>
-    <string name="log_in_no_network">Fant ingen nettverkstilkobling. Prøv på nytt senere.</string>
     <string name="settings_privacy_crash_link_short">Koble kontoen din</string>
     <string name="log_in_watch_requires_plus">Logg på med en Plus-konto for å bruke denne appen eller oppgradere besøket</string>
     <string name="log_in_with_plus">Logg på med en Plus-konto</string>
@@ -264,7 +263,6 @@ Language: nb_NO
     <string name="onboarding_recommendations_find_favorite_podcasts">Finn favorittpodcasten din</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gjør Pocket Casts til din egen ved å velge favorittpodcaster eller importere dem fra en annen podcastspiller. Du kan alltids gjøre dette senere.</string>
     <string name="onboarding_recommendations_import">Importer</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alt du liker med Pocket Casts, pluss mye mer</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lytt på flere steder med appene våre for Windows, macOS og nett.</string>
     <string name="onboarding_plus_feature_folders_text">Ordne podcastene i mapper og synkroniser dem mellom alle enhetene dine.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Last opp filene til skylageret, slik at du har dem tilgjengelig overalt.</string>
@@ -871,13 +869,10 @@ Language: nb_NO
     <string name="plus_themes_icons_body">Vis ditt sanne jeg. Eksklusive ikoner og temaer kun for Plus-klubben.</string>
     <string name="plus_themes_icons">Temaer og ikoner</string>
     <string name="plus_thanks_for_your_support_bang">Takk for støtten!</string>
-    <string name="plus_lifetime_member">Livstidsmedlem</string>
     <string name="plus_learn_more_button">Finn ut mer</string>
     <string name="plus_learn_more_about_plus">Finn ut mer om Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Skrivebordsapper</string>
-    <string name="plus_create_marketing_features"> Alt</string>
     <string name="settings_logs">Logger</string>
-    <string name="plus_cloud_storage_limit">%d GB lagringsplass i skyen</string>
     <string name="plus_cloud_storage">Lagring i skyen</string>
     <string name="profile_expiry_date_unknown">Ukjent</string>
     <string name="profile_yearly">Årlig</string>
@@ -943,7 +938,6 @@ Language: nb_NO
     <string name="profile_reset_password_failed">Kan ikke sende et nytt passord til deg via e-post. Prøv på nytt senere.</string>
     <string name="profile_reset_password">Tilbakestill passord</string>
     <string name="profile_regular_price">Regulær pris</string>
-    <string name="profile_regular">Regulær</string>
     <string name="profile_refreshing">Oppdaterer …</string>
     <string name="profile_refreshed_never">Aldri oppdatert</string>
     <string name="profile_refresh_status_unknown">Ukjent</string>
@@ -989,9 +983,7 @@ Language: nb_NO
     <string name="profile_joined">Ble med:</string>
     <string name="profile_get_plus">Skaff deg Pocket Casts Plus for å frigjøre denne funksjonen og mye mer!</string>
     <string name="profile_free_account">Gratis konto</string>
-    <string name="profile_free">Gratis</string>
     <string name="profile_forgot_your_password">Jeg har glemt passordet mitt</string>
-    <string name="profile_find_out_more">Finn ut mer om Pocket Casts Plus</string>
     <string name="profile_files_remove_image">Erstatt bilde</string>
     <string name="profile_files_empty_title">Ingen filer</string>
     <string name="profile_files_empty_summary">Vil du lytte til dine egne filer?\nTrykk på +-knappen for å åpne dem i Pocket Casts, så vises de her.</string>
@@ -1001,9 +993,6 @@ Language: nb_NO
     <string name="profile_file_locked">låst</string>
     <string name="profile_file">Fil</string>
     <string name="profile_feature_requires">Denne funksjonen krever\nPocket Casts Plus</string>
-    <string name="profile_extra_themes">Ekstra temaer</string>
-    <string name="profile_extra_app_icons">Ekstra appikoner</string>
-    <string name="profile_everything_unlocked">Alt låst opp</string>
     <string name="profile_ends">Avsluttes %s</string>
     <string name="profile_ended">Avsluttet %s</string>
     <string name="profile_end_tour">AVSLUTT OMVISNING</string>
@@ -1035,15 +1024,9 @@ Language: nb_NO
     <string name="profile_select_account_type">Velg kontotype</string>
     <string name="profile_create_completed">Komplett konto</string>
     <string name="profile_create_terms_of_use">Bruksvilkår</string>
-    <string name="profile_create_tos_full_terms_of_use">Fullstendige bruksvilkår</string>
-    <string name="profile_create_tos_disagree">Nei takk</string>
-    <string name="profile_create_tos_agree">Jeg godtar</string>
-    <string name="profile_create_tos">Før du kan bli med i Plus-klubben, må du godta bruksvilkårene våre. Du kan lese gjennom dem når det passer ved å bruke koblingen nedenfor.</string>
     <string name="profile_create_subscription_failed">Kunne ikke opprette abonnement. Prøv på nytt</string>
-    <string name="profile_create_privacy_policy_title">Retningslinjer for personvern</string>
     <string name="profile_create_privacy_policy">Vi har oppgitt en kobling til retningslinjene for personvern, hvis du er interessert. Vi har prøvd å fatte oss i korthet og gå rett på sak med så lite juridisk tekst som mulig.</string>
     <string name="profile_create_newsletter_summary">Få nyheter, appoppdateringer, tematiserte podcast-lister , intervjuer og mer.</string>
-    <string name="profile_create_license">Vi beklager at vi fremstår som formelle</string>
     <string name="profile_create_failed">Kunne ikke opprette konto. Prøv på nytt</string>
     <string name="profile_create_account_image">bilde av oppretting av konto</string>
     <string name="profile_create_account">Opprett konto</string>
@@ -1090,7 +1073,6 @@ Language: nb_NO
     <string name="profile_alreadysignedindescription">Du kan bare være logget inn på én konto om gangen.</string>
     <string name="profile_alreadysignedin">Du er allerede logget inn</string>
     <string name="profile_already_have_account">Har du allerede en Pocket Casts-konto?</string>
-    <string name="profile_almost_everything">Nesten alt</string>
     <string name="profile_account_delete_yes">Ja, slett den</string>
     <string name="profile_account_created">Konto opprettet</string>
     <string name="profile_access_ends">Tilgang avsluttes: %s</string>

@@ -1,3 +1,22 @@
+7.72
+-----
+
+
+7.71
+-----
+*   New Features
+    *   Adds the kids banner in profile
+        ([#2591](https://github.com/Automattic/pocket-casts-android/pull/2591))
+*   Bug Fixes
+    *   Update the episode star value in the Media Session to fix places where it's shown outside the app
+        ([#2613](https://github.com/Automattic/pocket-casts-android/pull/2613))
+    *   Fix content under the mini player on search screens
+        ([#2649](https://github.com/Automattic/pocket-casts-android/pull/2649))
+    *   Fix crash when clicking on chapter title within player
+        ([#2657](https://github.com/Automattic/pocket-casts-android/pull/2657))
+    *   Handle more podcast share links
+        ([#2666](https://github.com/Automattic/pocket-casts-android/pull/2666))
+
 7.70
 -----
 *   Updates
@@ -28,6 +47,8 @@
         ([#2496](https://github.com/Automattic/pocket-casts-android/pull/2496))
     *   Fixed Wear app episode download issue.
         ([#2495](https://github.com/Automattic/pocket-casts-android/pull/2495))
+    *   Fix redirects to the app through https://pocketcasts.com/get links.
+        ([#2559](https://github.com/Automattic/pocket-casts-android/pull/2559))
 
 7.68
 -----

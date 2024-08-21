@@ -1,11 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 11:54:03+0000
+Translation-Revision-Date: 2024-08-16 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">使用 Pocket Casts Plus 解鎖獨家功能</string>
+    <string name="whats_new_new_rating_message">為你最愛的 Podcast 評分，讓創作者知道你有多喜歡他們的作品。 此外，你的評分也可以幫助其他人找到新的最愛節目！</string>
+    <string name="whats_new_new_rating_title">全新推出：Podcast 評分 🎉</string>
+    <string name="go_to_next">下一個</string>
+    <string name="go_to_previous">上一個</string>
+    <string name="share_error_message">無法分享。 請稍後再試。</string>
+    <string name="share_clip_sharing_clip">正在建立片段…</string>
+    <string name="something_went_wrong_when_sending_feedback">發生錯誤。 請重新提交你的意見回饋。</string>
+    <string name="thank_you_for_your_feedback">感謝你的意見回饋！</string>
+    <string name="share_clip_create_audio_description">產生 .mp3 音訊檔</string>
+    <string name="share_clip_create_audio_label">建立音訊檔</string>
+    <string name="share_clip_edit_label">編輯片段</string>
+    <string name="share_clip_share_label">分享片段</string>
+    <string name="share_clip_duration">「%s」時間長度</string>
+    <string name="share_clip_start_position">「%s」開始</string>
+    <string name="transcript_empty">逐字稿沒有內容。</string>
+    <string name="star_rating_animation">星級評分動畫</string>
+    <string name="share_link_clip">片段連結</string>
+    <string name="swipe_affordance_icon">滑動操作暗示圖示</string>
+    <string name="feedback_form_placeholder">我想要用於篩選單集的條件</string>
+    <string name="send_feedback_title">你想要在 Pocket Casts 的兒童個人檔案中看到哪些內容？</string>
+    <string name="no_thank_you">沒有，謝謝</string>
+    <string name="send_feedback">傳送意見回饋</string>
+    <string name="kids_bottom_sheet_description">待新的兒童個人檔案準備就緒後，你就會從應用程式收到通知！ 想讓我們了解你想看的內容嗎？</string>
+    <string name="thank_you_for_your_interest">感謝你對本產品的青睞。</string>
+    <string name="share_link_bookmark">書籤連結</string>
+    <string name="share_link_episode_position">單集位置連結</string>
+    <string name="share_link_episode">單集連結</string>
+    <string name="share_link_podcast">Podcast 連結</string>
+    <string name="share_link_copied_feedback">連結已複製到剪貼簿</string>
+    <string name="kids_profile_face_image">兒童個人檔案臉部圖片</string>
+    <string name="request_early_access">申請搶先使用</string>
+    <string name="kids_profile_banner_description">新版個人資料僅包含適合兒童的內容，可為訂閱項目保持條理。</string>
+    <string name="soon_label">即將推出</string>
+    <string name="kids_profile_banner">兒童個人檔案橫幅</string>
+    <string name="kids_profile">兒童個人檔案</string>
+    <string name="pocket_casts_logo">Pocket Casts 標誌</string>
+    <string name="rate_pocket_casts">為 Pocket Casts 評分</string>
+    <string name="pocket_casts_champion_dialog_description">感謝你從一開始就選擇我們！ 若你滿意我們的應用程式，我們很樂意聽聽你的意見回饋。</string>
+    <string name="pocket_casts_champion_dialog_title">你是 Pocket Casts 真正的冠軍！</string>
+    <string name="share_episode_timestamp_title">分享從「%s」開始的單集</string>
+    <string name="share_via">分享管道：%s</string>
+    <string name="share_podcast_description">選擇要分享的格式和平台</string>
+    <string name="podcast_cover_description">「%s」Podcast 的封面</string>
+    <string name="share_label_copy_link">複製連結</string>
+    <string name="share_label_instagram_stories">限時動態</string>
+    <string name="profile_change_avatar">變更個人頭像</string>
     <string name="something_went_wrong_to_rate_this_podcast">發生錯誤。 請稍後再試一次</string>
     <string name="thank_you_for_rating">謝謝你的評分！</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">系統會暫時快取播放中的完整單集，以便將串流最小化。</string>
@@ -22,10 +69,6 @@ Language: zh_TW
     <string name="settings_advanced_cache_entire_playing_episode">快取播放單集</string>
     <string name="playback">播放</string>
     <string name="podcast_share_clip">片段</string>
-    <string name="download_completed_for_episode">「%1$s」已下載完成</string>
-    <string name="episode_queued_for_download">單集已排入下載佇列</string>
-    <string name="episode_was_removed">單集已移除</string>
-    <string name="remove_downloaded_file">移除已下載的檔案</string>
     <string name="settings_export_database_failed">資料庫匯出失敗</string>
     <string name="settings_export_database">匯出資料庫</string>
     <string name="settings_sleep_timer_auto_restart_summary">在睡眠計時器開啟的狀態下，若你在最後暫停的 5 分鐘內播放一集單集，計時器就會自動重新啟動。</string>
@@ -54,7 +97,6 @@ Language: zh_TW
     <string name="settings_storage_fix_downloads">修正下載問題</string>
     <string name="nova_launcher_new_releases">新發佈內容</string>
     <string name="nova_launcher_subscribed_podcasts">已訂閱的 Podcast</string>
-    <string name="whats_new_new_widgets_message">我們新增了三個全新小工具，讓你從主畫面管理 Podcast 時更加輕鬆。 不妨探索一下！</string>
     <string name="medium_player_classic_widget_label">中型播放器 (傳統)</string>
     <string name="widget_preview_time_left_4">剩餘 1 小時 36 分鐘</string>
     <string name="widget_preview_time_left_3">剩餘 55 分鐘</string>
@@ -79,7 +121,6 @@ Language: zh_TW
     <string name="player_sleep_in_one_episode">在 1 集後休眠</string>
     <string name="player_sleep_timer_stopped_your_podcast">睡眠計時器停止播放 Podcast。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">裝置晃動後重新啟動睡眠計時器</string>
-    <string name="whats_new_new_widgets_title">全新小工具</string>
     <string name="widget_check_out_discover">查看「探索」深入更多內容</string>
     <string name="widget_nothing_in_up_next">「接下來播放」沒有內容</string>
     <string name="widget_no_episode_playing">沒有正在播放的單集</string>
@@ -252,7 +293,7 @@ Language: zh_TW
     <string name="settings_open_on_phone">在手機上開啟</string>
     <string name="settings_about_privacy_policy_available_at">可在 %s 查看我們的隱私權政策</string>
     <string name="settings_about_terms_of_service_available_at">可在 %s 查看我們的使用條款</string>
-    <string name="log_in_no_network">未偵測到網路連線。 請稍後再試一次。</string>
+    <string name="error_no_network">未偵測到網路連線。 請稍後再試。</string>
     <string name="error_server_failed">發生內部伺服器錯誤。 請稍後再試一次。</string>
     <string name="error_invalid_password_length">請輸入長度至少為 6 個字元的密碼。</string>
     <string name="error_invalid_email_address">請輸入有效的電子郵件地址。</string>
@@ -439,7 +480,6 @@ Language: zh_TW
     <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並同步到所有裝置。</string>
     <string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，享受更多元的收聽方式。</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">桌面和網頁應用程式</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">包含所有你喜愛的 Pocket Casts 功能，以及更多好康</string>
     <string name="onboarding_recommendations_import">匯入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">選取你最愛的 Podcast，或從其他 Podcast 播放器匯入，打造你專屬的 Pocket Casts。 你可以稍後進行。</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">尋找你最愛的 Podcast</string>
@@ -1057,12 +1097,9 @@ Language: zh_TW
     <string name="plus_themes_icons">佈景主題與圖示</string>
     <string name="plus_thanks_for_your_support_bang">感謝你的支持！</string>
     <string name="plus_slash_month">%s /月</string>
-    <string name="plus_lifetime_member">終身會員</string>
     <string name="plus_learn_more_button">進一步了解</string>
     <string name="plus_learn_more_about_plus">深入了解 Pocket Casts Plus</string>
     <string name="plus_desktop_apps">桌上型電腦應用程式</string>
-    <string name="plus_create_marketing_features"> 所有內容</string>
-    <string name="plus_cloud_storage_limit">%d GB 雲端儲存空間</string>
     <string name="plus_cloud_storage">雲端儲存空間</string>
     <string name="profile_expiry_date_unknown">未知</string>
     <string name="profile_yearly">每年</string>
@@ -1129,7 +1166,6 @@ Language: zh_TW
     <string name="profile_reset_password_failed">無法將新密碼以電子郵件傳送給你。 請稍後再試一次。</string>
     <string name="profile_reset_password">重設密碼</string>
     <string name="profile_regular_price">原價</string>
-    <string name="profile_regular">一般</string>
     <string name="profile_refreshing">正在重新整理…</string>
     <string name="profile_refreshed_never">從未重新整理</string>
     <string name="profile_refresh_status_unknown">未知</string>
@@ -1175,9 +1211,7 @@ Language: zh_TW
     <string name="profile_joined">已加入：</string>
     <string name="profile_get_plus">取得 Pocket Casts Plus 即可解鎖此功能和其他功能！</string>
     <string name="profile_free_account">免費帳號</string>
-    <string name="profile_free">免費</string>
     <string name="profile_forgot_your_password">我忘記密碼</string>
-    <string name="profile_find_out_more">深入瞭解 Pocket Casts Plus</string>
     <string name="profile_files_remove_image">取代圖片</string>
     <string name="profile_files_empty_title">沒有檔案</string>
     <string name="profile_files_empty_summary">想收聽自己的檔案嗎？\n點選 + 按鈕即可在 Pocket Casts 中開啟這些檔案，檔案會顯示於此處。</string>
@@ -1187,9 +1221,6 @@ Language: zh_TW
     <string name="profile_file_locked">已鎖定</string>
     <string name="profile_file">檔案</string>
     <string name="profile_feature_requires">此功能需要 \nPocket Casts Plus</string>
-    <string name="profile_extra_themes">額外的佈景主題</string>
-    <string name="profile_extra_app_icons">額外的應用程式圖示</string>
-    <string name="profile_everything_unlocked">解鎖所有功能</string>
     <string name="profile_ends">預計結束時間：%s</string>
     <string name="profile_ended">結束時間：%s</string>
     <string name="profile_end_tour">結束導覽</string>
@@ -1221,16 +1252,10 @@ Language: zh_TW
     <string name="profile_select_account_type">選取帳號類型</string>
     <string name="profile_create_completed">完成帳號</string>
     <string name="profile_create_terms_of_use">使用條款</string>
-    <string name="profile_create_tos_full_terms_of_use">使用條款全文</string>
-    <string name="profile_create_tos_disagree">不用了，謝謝</string>
-    <string name="profile_create_tos_agree">我同意</string>
-    <string name="profile_create_tos">你需要同意我們的使用條款，才能開始使用 Plus。 請撥空閱讀以下連結的條款內容。</string>
     <string name="profile_create_subscription_failed">無法建立訂閱。 請再試一次</string>
-    <string name="profile_create_privacy_policy_title">隱私權政策</string>
     <string name="profile_create_privacy_policy">隨附隱私權政策連結供你參閱。 條款與政策內容已盡可能簡明扼要，並減少法律用語。</string>
     <string name="profile_create_password_requirements">密碼至少要有 6 個字元</string>
     <string name="profile_create_newsletter_summary">接收最新消息、應用程式更新、佈景主題 Podcast 清單、訪談等內容。</string>
-    <string name="profile_create_license">這是我們的例行程序，請見諒</string>
     <string name="profile_create_failed">無法建立帳號。 請再試一次</string>
     <string name="profile_create_account_image">建立帳號圖片</string>
     <string name="profile_create_account">建立帳號</string>
@@ -1277,7 +1302,6 @@ Language: zh_TW
     <string name="profile_alreadysignedindescription">一次只能登入一個帳號。</string>
     <string name="profile_alreadysignedin">你已經登入</string>
     <string name="profile_already_have_account">已經有 Pocket Casts 帳號了嗎？</string>
-    <string name="profile_almost_everything">幾乎所有內容</string>
     <string name="profile_account_delete_yes">是的，請刪除</string>
     <string name="profile_account_created">已建立帳號</string>
     <string name="profile_access_ends">使用權預計結束時間：%s</string>
@@ -1718,7 +1742,7 @@ Language: zh_TW
         <item quantity="other">%d 集</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="other">%1$d 集單集 - 剩餘 %2$s</item>
+        <item quantity="other" formatted="true">%1$d 集單集 - 剩餘 %2$s</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="other">結尾片段控點：%d 秒</item>

@@ -97,4 +97,8 @@ interface PodcastCacheServer {
 
     @GET("/podcast/rating/{podcastUuid}")
     suspend fun getPodcastRatings(@Path("podcastUuid") podcastUuid: String): PodcastRatingsResponse
+
+    @GET("/podcast/rating/{podcastUuid}")
+    @Headers("Cache-Control: no-cache")
+    suspend fun getPodcastRatingsNoCache(@Path("podcastUuid") podcastUuid: String): PodcastRatingsResponse
 }

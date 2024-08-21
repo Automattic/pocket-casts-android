@@ -39,7 +39,7 @@ internal fun PlatformItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable(
             interactionSource = remember(::MutableInteractionSource),
-            indication = rememberRipple(color = shareColors.base),
+            indication = rememberRipple(color = shareColors.accent),
             onClickLabel = stringResource(LR.string.share_via, stringResource(platform.nameId)),
             role = Role.Button,
             onClick = { onClick(platform) },
@@ -48,12 +48,12 @@ internal fun PlatformItem(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .background(shareColors.socialButton, CircleShape)
+                .background(shareColors.container, CircleShape)
                 .size(48.dp),
         ) {
             Image(
                 painter = painterResource(platform.logoId),
-                colorFilter = ColorFilter.tint(shareColors.socialButtonIcon),
+                colorFilter = ColorFilter.tint(shareColors.onContainerPrimary),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
             )
@@ -64,7 +64,7 @@ internal fun PlatformItem(
         TextH70(
             text = stringResource(platform.nameId),
             textAlign = TextAlign.Center,
-            color = shareColors.backgroundPrimaryText.copy(alpha = 0.5f),
+            color = shareColors.onBackgroundSecondary,
             modifier = Modifier.sizeIn(maxWidth = 80.dp),
         )
     }

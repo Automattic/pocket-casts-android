@@ -686,11 +686,24 @@ class PlayerViewModel @Inject constructor(
     fun closeTranscript(withTransition: Boolean = false) {
         viewModelScope.launch {
             _transitionState.emit(TransitionState.CloseTranscript(withTransition))
+            analyticsTracker.track(
+                AnalyticsEvent.TRANSCRIPT_DISMISSED,
+                AnalyticsProp.transcriptDismissed(
+                    episodeId = episode?.uuid.orEmpty(),
+                    podcastId = podcast?.uuid.orEmpty(),
+                ),
+            )
         }
     }
 
     sealed class TransitionState {
         data object OpenTranscript : TransitionState()
         data class CloseTranscript(val withTransition: Boolean) : TransitionState()
+    }
+
+    private object AnalyticsProp {
+        private const val episodeUuid = "episode_uuid"
+        private const val podcastUuid = "podcast_uuid"
+        fun transcriptDismissed(episodeId: String, podcastId: String) = mapOf(episodeId to episodeUuid, podcastId to podcastUuid)
     }
 }

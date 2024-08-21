@@ -25,8 +25,9 @@ class RatingsManagerImpl @Inject constructor(
         podcastRatingsDao.podcastRatings(podcastUuid)
             .map { it.firstOrNull() ?: noRatings(podcastUuid) }
 
-    override suspend fun refreshPodcastRatings(podcastUuid: String) {
-        val ratings = cacheServerManager.getPodcastRatings(podcastUuid)
+    override suspend fun refreshPodcastRatings(podcastUuid: String, useCache: Boolean) {
+        // The server asks for the ratings to be cached for a period of time. After a user rates ignore the cache to get the new rating.
+        val ratings = cacheServerManager.getPodcastRatings(podcastUuid, useCache)
         podcastRatingsDao.insert(
             PodcastRatings(
                 podcastUuid = podcastUuid,

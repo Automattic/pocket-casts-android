@@ -1,11 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 11:54:03+0000
+Translation-Revision-Date: 2024-08-14 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="share_error_message">No se ha podido compartir. Inténtalo de nuevo más tarde.</string>
+    <string name="share_clip_sharing_clip">Creando clip…</string>
+    <string name="something_went_wrong_when_sending_feedback">Se ha producido un error. Prueba a enviar tus comentarios de nuevo.</string>
+    <string name="thank_you_for_your_feedback">¡Gracias por tus comentarios!</string>
+    <string name="share_clip_create_audio_description">Genera un archivo de audio .mp3</string>
+    <string name="share_clip_create_audio_label">Crear archivo de audio</string>
+    <string name="share_clip_edit_label">Editar clip</string>
+    <string name="share_clip_share_label">Compartir clip</string>
+    <string name="share_clip_duration">Duración: %s</string>
+    <string name="share_clip_start_position">Inicio: %s</string>
+    <string name="transcript_empty">La transcripción está vacía.</string>
+    <string name="star_rating_animation">Animación de la valoración de estrellas</string>
+    <string name="share_link_clip">Enlace del clip</string>
+    <string name="swipe_affordance_icon">Icono de potenciación del deslizamiento</string>
+    <string name="feedback_form_placeholder">Quiero filtrar los episodios por</string>
+    <string name="send_feedback_title">¿Qué quieres ver en un perfil para niños de Pocket Casts?</string>
+    <string name="no_thank_you">No, gracias</string>
+    <string name="send_feedback">Enviar comentarios</string>
+    <string name="kids_bottom_sheet_description">Recibirás una notificación a través de la aplicación cuando esté listo el nuevo perfil para niños. ¿Quieres decirnos lo que te gustaría ver?</string>
+    <string name="thank_you_for_your_interest">Gracias por tu interés</string>
+    <string name="share_link_bookmark">Enlace del marcador</string>
+    <string name="share_link_episode_position">Enlace de posición del episodio</string>
+    <string name="share_link_episode">Enlace del episodio</string>
+    <string name="share_link_podcast">Enlace del podcast</string>
+    <string name="share_link_copied_feedback">Enlace copiado al portapapeles</string>
+    <string name="kids_profile_face_image">Imagen del rostro del perfil para niños</string>
+    <string name="request_early_access">Solicitar acceso anticipado</string>
+    <string name="kids_profile_banner_description">Un perfil nuevo solo con contenido para niños para mantener organizadas tus suscripciones.</string>
+    <string name="soon_label">Pronto</string>
+    <string name="kids_profile_banner">Banner del perfil para niños</string>
+    <string name="kids_profile">Perfil para niños</string>
+    <string name="pocket_casts_logo">Logotipo de Pocket Casts</string>
+    <string name="rate_pocket_casts">Calificar Pocket Casts</string>
+    <string name="pocket_casts_champion_dialog_description">Gracias por acompañarnos desde el principio. Si disfrutas con nuestra aplicación, nos encantará escuchar tu opinión.</string>
+    <string name="pocket_casts_champion_dialog_title">Eres un verdadero campeón de Pocket Casts.</string>
+    <string name="share_episode_timestamp_title">Compartir episodio en %s</string>
+    <string name="share_via">Compartir en %s</string>
+    <string name="share_podcast_description">Elegir un formato y una plataforma con la que compartir</string>
+    <string name="podcast_cover_description">Portada del podcast %s</string>
+    <string name="share_label_copy_link">Copiar enlace</string>
+    <string name="share_label_instagram_stories">Historias</string>
+    <string name="profile_change_avatar">Cambiar avatar</string>
     <string name="something_went_wrong_to_rate_this_podcast">Se ha producido un error. Inténtalo de nuevo más tarde.</string>
     <string name="thank_you_for_rating">¡Gracias por la valoración!</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">El episodio completo se almacena temporalmente en caché para minimizar la reproducción en streaming.</string>
@@ -22,10 +64,6 @@ Language: es
     <string name="settings_advanced_cache_entire_playing_episode">Episodio reproduciéndose en la caché</string>
     <string name="playback">Reproducción</string>
     <string name="podcast_share_clip">Clip</string>
-    <string name="download_completed_for_episode">Descarga de %1$s completada</string>
-    <string name="episode_queued_for_download">Episodio en cola para descargar</string>
-    <string name="episode_was_removed">Se ha eliminado el episodio</string>
-    <string name="remove_downloaded_file">Eliminar el archivo descargado</string>
     <string name="settings_export_database_failed">Se ha producido un error al exportar la base de datos</string>
     <string name="settings_export_database">Exportar base de datos</string>
     <string name="settings_sleep_timer_auto_restart_summary">Si está activado, el temporizador se reiniciará automáticamente si reproduces un episodio en los 5 minutos siguientes a la última pausa.</string>
@@ -54,7 +92,6 @@ Language: es
     <string name="settings_storage_fix_downloads">Solucionar descargas</string>
     <string name="nova_launcher_new_releases">Versiones nuevas</string>
     <string name="nova_launcher_subscribed_podcasts">Podcasts suscritos</string>
-    <string name="whats_new_new_widgets_message">Hemos añadido tres widgets nuevos, para que gestionar tus podcasts desde la pantalla de inicio sea mucho más fácil. ¡Comprueba cómo!</string>
     <string name="medium_player_classic_widget_label">Reproductor de medios (clásico)</string>
     <string name="widget_preview_time_left_4">Quedan 1 h 36 min</string>
     <string name="widget_preview_time_left_3">Quedan 55 min</string>
@@ -79,7 +116,6 @@ Language: es
     <string name="player_sleep_in_one_episode">Suspensión en 1 episodio</string>
     <string name="player_sleep_timer_stopped_your_podcast">El temporizador ha detenido tu podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">El temporizador se reinició tras agitar el dispositivo</string>
-    <string name="whats_new_new_widgets_title">Nuevos widgets</string>
     <string name="widget_check_out_discover">Comprueba y descubre más</string>
     <string name="widget_nothing_in_up_next">Nada pendiente en cola</string>
     <string name="widget_no_episode_playing">Ningún episodio en reproducción</string>
@@ -252,7 +288,7 @@ Language: es
     <string name="settings_open_on_phone">Abrir en el teléfono</string>
     <string name="settings_about_privacy_policy_available_at">Puedes consultar nuestra Política de privacidad en %s</string>
     <string name="settings_about_terms_of_service_available_at">Puedes consultar las condiciones del servicio en %s</string>
-    <string name="log_in_no_network">No se ha detectado ninguna conexión de red. Inténtalo de nuevo más tarde.</string>
+    <string name="error_no_network">No se ha detectado ninguna conexión de red. Inténtalo de nuevo más tarde.</string>
     <string name="error_server_failed">Se ha producido un error interno del servidor. Inténtalo de nuevo más tarde.</string>
     <string name="error_invalid_password_length">Introduce una contraseña que tenga al menos 6 caracteres.</string>
     <string name="error_invalid_email_address">Introduce una dirección de correo electrónico válida.</string>
@@ -439,7 +475,6 @@ Language: es
     <string name="onboarding_plus_feature_folders_text">Organiza tus pódcast en carpetas y mantenlos sincronizados en todos tus dispositivos.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Escucha pódcast en más lugares con nuestras aplicaciones para Windows, macOs y web.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicaciones web y para ordenador</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Todo lo que te encanta de Pocket Casts y mucho más</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Haz tuya la aplicación Pocket Casts seleccionando tus pódcast favoritos o impórtalos desde otro reproductor de pódcast. Siempre puedes hacerlo más adelante.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Encuentra tus pódcast favoritos</string>
@@ -1057,12 +1092,9 @@ Language: es
     <string name="plus_themes_icons">Temas e iconos</string>
     <string name="plus_thanks_for_your_support_bang">¡Gracias por tu apoyo!</string>
     <string name="plus_slash_month">%s/mes</string>
-    <string name="plus_lifetime_member">Miembro vitalicio</string>
     <string name="plus_learn_more_button">Aprender más</string>
     <string name="plus_learn_more_about_plus">Obtén más información sobre Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Aplicaciones para ordenadores</string>
-    <string name="plus_create_marketing_features"> Todo</string>
-    <string name="plus_cloud_storage_limit">%d GB de almacenamiento en la nube</string>
     <string name="plus_cloud_storage">Almacenamiento en la nube</string>
     <string name="profile_expiry_date_unknown">Desconocido</string>
     <string name="profile_yearly">Anual</string>
@@ -1129,7 +1161,6 @@ Language: es
     <string name="profile_reset_password_failed">No se te ha podido enviar una contraseña nueva. Inténtalo de nuevo más tarde.</string>
     <string name="profile_reset_password">Restablecer contraseña</string>
     <string name="profile_regular_price">Precio normal</string>
-    <string name="profile_regular">Normal</string>
     <string name="profile_refreshing">Actualizando…</string>
     <string name="profile_refreshed_never">Nunca se ha actualizado</string>
     <string name="profile_refresh_status_unknown">Desconocido</string>
@@ -1175,9 +1206,7 @@ Language: es
     <string name="profile_joined">Se ha unido:</string>
     <string name="profile_get_plus">Consigue Pocket Casts Plus para desbloquear esta función y muchas otras más.</string>
     <string name="profile_free_account">Cuenta gratuita</string>
-    <string name="profile_free">Gratis</string>
     <string name="profile_forgot_your_password">He olvidado mi contraseña</string>
-    <string name="profile_find_out_more">Obtén más información sobre Pocket Casts Plus</string>
     <string name="profile_files_remove_image">Reemplazar imagen</string>
     <string name="profile_files_empty_title">Sin archivos</string>
     <string name="profile_files_empty_summary">¿Quieres escuchar tus propios archivos?\nToca el botón con el signo + para abrirlos en Pocket Casts y aparecerán ahí.</string>
@@ -1187,9 +1216,6 @@ Language: es
     <string name="profile_file_locked">bloqueado</string>
     <string name="profile_file">Archivo</string>
     <string name="profile_feature_requires">Esta función necesita \nPocket Casts Plus</string>
-    <string name="profile_extra_themes">Temas adicionales</string>
-    <string name="profile_extra_app_icons">Iconos de la aplicación adicionales</string>
-    <string name="profile_everything_unlocked">Todo desbloqueado</string>
     <string name="profile_ends">Finaliza %s</string>
     <string name="profile_ended">Finalizó el %s</string>
     <string name="profile_end_tour">FINALIZAR RECORRIDO</string>
@@ -1221,16 +1247,10 @@ Language: es
     <string name="profile_select_account_type">Seleccionar tipo de cuenta</string>
     <string name="profile_create_completed">Completar cuenta</string>
     <string name="profile_create_terms_of_use">Condiciones de uso</string>
-    <string name="profile_create_tos_full_terms_of_use">Condiciones de uso completas</string>
-    <string name="profile_create_tos_disagree">No, gracias</string>
-    <string name="profile_create_tos_agree">Acepto</string>
-    <string name="profile_create_tos">Para entrar en el club Plus, necesitamos que aceptes nuestras Condiciones de uso. Cuando tengas tiempo, puedes revisarlas haciendo clic en el enlace que aparece más abajo.</string>
     <string name="profile_create_subscription_failed">No se ha podido crear la suscripción. Inténtalo de nuevo.</string>
-    <string name="profile_create_privacy_policy_title">Política de Privacidad</string>
     <string name="profile_create_privacy_policy">También hemos enlazado nuestra Política de privacidad, por si te interesa. Hemos intentado que fuese breve, directa y que incluyese la menor cantidad de jerga jurídica posible.</string>
     <string name="profile_create_password_requirements">La contraseña debe tener al menos 6 caracteres.</string>
     <string name="profile_create_newsletter_summary">Recibe noticias, actualizaciones de la aplicación, listas de podcasts por tema, entrevistas y más.</string>
-    <string name="profile_create_license">Disculpa las formalidades</string>
     <string name="profile_create_failed">No se ha podido crear la cuenta. Inténtalo de nuevo.</string>
     <string name="profile_create_account_image">imagen de crear cuenta</string>
     <string name="profile_create_account">Crear cuenta</string>
@@ -1277,7 +1297,6 @@ Language: es
     <string name="profile_alreadysignedindescription">Solo puedes tener la sesión iniciada en una cuenta.</string>
     <string name="profile_alreadysignedin">Ya has iniciado sesión</string>
     <string name="profile_already_have_account">¿Ya tienes una cuenta de Pocket Casts?</string>
-    <string name="profile_almost_everything">Casi todo</string>
     <string name="profile_account_delete_yes">Sí, bórrala</string>
     <string name="profile_account_created">Cuenta creada</string>
     <string name="profile_access_ends">El acceso termina: %s</string>
@@ -1719,8 +1738,8 @@ Language: es
         <item quantity="other">%d episodios</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="one">%1$d episodio - quedan %2$s</item>
-        <item quantity="other">%1$d episodios - quedan %2$s</item>
+        <item quantity="one" formatted="true">%1$d episodio - quedan %2$s</item>
+        <item quantity="other" formatted="true">%1$d episodios - quedan %2$s</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Control de clip final: %d segundo</item>

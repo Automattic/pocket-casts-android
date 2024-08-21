@@ -6,8 +6,8 @@ import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
+import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.nova.NovaLauncherBridge
@@ -41,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
 import coil.Coil
 import coil.ImageLoader
 import com.google.firebase.FirebaseApp
-import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
@@ -118,6 +117,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
 
+    @Inject lateinit var engageSdkBridge: EngageSdkBridge
+
     @Inject lateinit var databaseExportHelper: DatabaseExportHelper
 
     override fun onCreate() {
@@ -179,10 +180,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
-            FirebaseAnalyticsTracker.setup(
-                analytics = FirebaseAnalytics.getInstance(this@PocketCastsApplication),
-                settings = settings,
-            )
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
 
@@ -265,6 +262,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
         novaLauncherBridge.monitorNovaLauncherIntegration()
+        engageSdkBridge.registerIntegration()
 
         settings.useDynamicColorsForWidget.flow
             .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }

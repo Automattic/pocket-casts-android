@@ -10,9 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -31,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAll
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -244,15 +251,21 @@ class SearchFragment : BaseFragment() {
         binding.searchInlineResults.apply {
             ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             setContent {
+                val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+                val state by viewModel.state.collectAsState()
+                val loading by viewModel.loading.asFlow().collectAsState(false)
                 AppThemeWithBackground(theme.activeTheme) {
                     SearchInlineResultsPage(
-                        viewModel = viewModel,
+                        state = state,
+                        loading = loading,
                         onEpisodeClick = ::onEpisodeClick,
                         onPodcastClick = ::onPodcastClick,
                         onFolderClick = ::onFolderClick,
                         onShowAllCLick = ::onShowAllClick,
+                        onSubscribeToPodcast = ::onSubscribeToPodcast,
                         onScroll = { UiUtil.hideKeyboard(searchView) },
                         onlySearchRemote = onlySearchRemote,
+                        bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                     )
                 }
             }
@@ -288,6 +301,10 @@ class SearchFragment : BaseFragment() {
         searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
         listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+    }
+
+    private fun onSubscribeToPodcast(podcast: Podcast) {
+        viewModel.onSubscribeToPodcast(podcast)
     }
 
     private fun onFolderClick(folder: Folder, podcasts: List<Podcast>) {

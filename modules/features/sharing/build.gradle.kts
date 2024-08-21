@@ -18,6 +18,10 @@ android {
 }
 
 dependencies {
+    val debugProdImplementation by configurations
+
+    implementation(libs.capturable)
+
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))
     implementation(project(":modules:services:images"))
@@ -28,6 +32,12 @@ dependencies {
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
     implementation(project(":modules:services:views"))
+
+    // We do not include FFmpeg in the release variant for now
+    // to not increase the binary size.
+    // We can add it once we release clip sharing.
+    debugImplementation(libs.ffmpeg)
+    debugProdImplementation(libs.ffmpeg)
 
     testImplementation(project(":modules:services:sharedtest"))
 }

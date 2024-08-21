@@ -1,11 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-07-16 13:54:03+0000
+Translation-Revision-Date: 2024-08-16 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Lås upp exklusiva funktioner med Pocket Casts Plus</string>
+    <string name="whats_new_new_rating_message">Betygsätt dina favoritpodcasts och låt kreatörerna få veta hur mycket du uppskattar deras arbete. Dina betyg hjälper dessutom andra att hitta nya favoritshower.</string>
+    <string name="whats_new_new_rating_title">Nu tillgängligt: Podcastbetyg 🎉</string>
+    <string name="go_to_next">Gå till nästa</string>
+    <string name="go_to_previous">Gå till föregående</string>
+    <string name="share_error_message">Kan inte dela. Försök igen senare.</string>
+    <string name="share_clip_sharing_clip">Skapar klipp …</string>
+    <string name="something_went_wrong_when_sending_feedback">Något gick fel. Försök skicka din feedback igen.</string>
+    <string name="thank_you_for_your_feedback">Tack för din feedback!</string>
+    <string name="share_clip_create_audio_description">Generera en .mp3-ljudfil</string>
+    <string name="share_clip_create_audio_label">Skapa ljudfil</string>
+    <string name="share_clip_edit_label">Redigera klipp</string>
+    <string name="share_clip_share_label">Dela klipp</string>
+    <string name="share_clip_duration">%s Varaktighet</string>
+    <string name="share_clip_start_position">%s Starta</string>
+    <string name="transcript_empty">Transkriptionen är tom.</string>
+    <string name="star_rating_animation">Sjärnbetygsanimation</string>
+    <string name="share_link_clip">Klipplänk</string>
+    <string name="swipe_affordance_icon">Swipe Affordance-ikon</string>
+    <string name="feedback_form_placeholder">Jag vill filtrera avsnitt efter</string>
+    <string name="send_feedback_title">Vad skulle du vilja se i en barnprofil för Pocket Casts?</string>
+    <string name="no_thank_you">Nej tack</string>
+    <string name="send_feedback">Skicka feedback</string>
+    <string name="kids_bottom_sheet_description">Du kommer att få en notis via appen när barnprofilen är redo. Vill du berätta för oss vad du skulle vilja se?</string>
+    <string name="thank_you_for_your_interest">Tack för visat intresse</string>
+    <string name="share_link_bookmark">Bokmärk länk</string>
+    <string name="share_link_episode_position">Positionslänk för avsnitt</string>
+    <string name="share_link_episode">Avsnittslänk</string>
+    <string name="share_link_podcast">Podcastlänk</string>
+    <string name="share_link_copied_feedback">Länk kopierad till urklipp</string>
+    <string name="kids_profile_face_image">Ansiktsbild för barnprofil</string>
+    <string name="request_early_access">Begär tidig åtkomst</string>
+    <string name="kids_profile_banner_description">En ny profil med endast innehåll för barn för att hålla ordning på dina prenumerationer.</string>
+    <string name="soon_label">Snart</string>
+    <string name="kids_profile_banner">Banner för barnprofil</string>
+    <string name="kids_profile">Barnprofil</string>
+    <string name="pocket_casts_logo">Pocket Casts-logotyp</string>
+    <string name="rate_pocket_casts">Betygsätt Pocket Casts</string>
+    <string name="pocket_casts_champion_dialog_description">Tack för att du varit med oss sedan starten. Om du tycker om att använda vår app vill vi gärna höra din feedback.</string>
+    <string name="pocket_casts_champion_dialog_title">Du är en sann förespråkare för Pocket Casts.</string>
+    <string name="share_episode_timestamp_title">Dela avsnitt vid %s</string>
+    <string name="share_via">Dela via %s</string>
+    <string name="share_podcast_description">Välj ett format och en plattform att dela till</string>
+    <string name="podcast_cover_description">Omslag till %s-podcasten</string>
+    <string name="share_label_copy_link">Kopiera länk</string>
+    <string name="share_label_instagram_stories">Berättelser</string>
+    <string name="profile_change_avatar">Ändra profilbild</string>
     <string name="something_went_wrong_to_rate_this_podcast">Något gick fel. Försök igen senare.</string>
     <string name="thank_you_for_rating">Tack för ditt betyg!</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">Hela avsnittet som spelas upp cachelagras tillfälligt för att minimera streaming.</string>
@@ -22,10 +69,6 @@ Language: sv_SE
     <string name="settings_advanced_cache_entire_playing_episode">Cacheminne för uppspelning av avsnitt</string>
     <string name="playback">Uppspelning</string>
     <string name="podcast_share_clip">Klipp</string>
-    <string name="download_completed_for_episode">Ladda ner helt för %1$s</string>
-    <string name="episode_queued_for_download">Avsnitt placerat i kö för nedladdning</string>
-    <string name="episode_was_removed">Avsnittet togs bort</string>
-    <string name="remove_downloaded_file">Ta bort nedladdad fil</string>
     <string name="settings_export_database_failed">Export av databas misslyckades</string>
     <string name="settings_export_database">Exportera databas</string>
     <string name="settings_sleep_timer_auto_restart_summary">Om det här alternativet är aktiverat kommer sömntimern att starta om automatiskt om du spelar upp ett avsnitt inom 5 minuter efter den senaste pausen.</string>
@@ -54,7 +97,6 @@ Language: sv_SE
     <string name="settings_storage_fix_downloads">Åtgärda nedladdningar</string>
     <string name="nova_launcher_new_releases">Nya släpp</string>
     <string name="nova_launcher_subscribed_podcasts">Podcastprenumerationer</string>
-    <string name="whats_new_new_widgets_message">Vi har lagt till tre nya widgetar så det blir mycket lättare att hantera dina podcasts från hemskärmen. Kolla in dem!</string>
     <string name="medium_player_classic_widget_label">Medelstor spelare (klassisk)</string>
     <string name="widget_preview_time_left_4">1 tim 36 min kvar</string>
     <string name="widget_preview_time_left_3">55 min kvar</string>
@@ -79,7 +121,6 @@ Language: sv_SE
     <string name="player_sleep_in_one_episode">Somna efter 1 avsnitt</string>
     <string name="player_sleep_timer_stopped_your_podcast">Vilolägestimern stoppade din podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Vilolägestimern återstartad efter att enheten skakats</string>
-    <string name="whats_new_new_widgets_title">Nya widgetar</string>
     <string name="widget_check_out_discover">Kolla in Discover om du vill veta mer</string>
     <string name="widget_nothing_in_up_next">Inget i Nästa</string>
     <string name="widget_no_episode_playing">Inget avsnitt spelas</string>
@@ -252,7 +293,7 @@ Language: sv_SE
     <string name="settings_open_on_phone">Öppna på telefon</string>
     <string name="settings_about_privacy_policy_available_at">Vår integritetspolicy är tillgänglig på %s</string>
     <string name="settings_about_terms_of_service_available_at">Våra användarvillkor är tillgängliga på %s</string>
-    <string name="log_in_no_network">Ingen nätverksanslutning upptäckt. Försök igen senare.</string>
+    <string name="error_no_network">Ingen nätverksanslutning upptäckt. Försök igen senare.</string>
     <string name="error_server_failed">Ett internt serverfel inträffade. Försök igen senare.</string>
     <string name="error_invalid_password_length">Ange ett lösenord som är minst 6 tecken långt.</string>
     <string name="error_invalid_email_address">Ange en giltig e-postadress.</string>
@@ -439,7 +480,6 @@ Language: sv_SE
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Dator- och webbappar</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
     <string name="onboarding_recommendations_import">Importera</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Hitta dina favoritpodcasts</string>
@@ -1057,12 +1097,9 @@ Language: sv_SE
     <string name="plus_themes_icons">Teman och ikoner</string>
     <string name="plus_thanks_for_your_support_bang">Tack för ditt stöd!</string>
     <string name="plus_slash_month">%s/månad</string>
-    <string name="plus_lifetime_member">Livstidsmedlem</string>
     <string name="plus_learn_more_button">Lär dig mer</string>
     <string name="plus_learn_more_about_plus">Läs mer om Pocket Casts Plus</string>
     <string name="plus_desktop_apps">Dator-appar</string>
-    <string name="plus_create_marketing_features"> Allt</string>
-    <string name="plus_cloud_storage_limit">%d GB molnlagring</string>
     <string name="plus_cloud_storage">Molnlagring</string>
     <string name="profile_expiry_date_unknown">Okänd</string>
     <string name="profile_yearly">Årligen</string>
@@ -1129,7 +1166,6 @@ Language: sv_SE
     <string name="profile_reset_password_failed">Det gick inte att skicka ett nytt lösenord till dig via e-post. Försök igen senare.</string>
     <string name="profile_reset_password">Återställ lösenord</string>
     <string name="profile_regular_price">Ordinarie pris</string>
-    <string name="profile_regular">Vanlig</string>
     <string name="profile_refreshing">Uppdaterar …</string>
     <string name="profile_refreshed_never">Aldrig uppdaterad</string>
     <string name="profile_refresh_status_unknown">Okänd</string>
@@ -1175,9 +1211,7 @@ Language: sv_SE
     <string name="profile_joined">Gick med:</string>
     <string name="profile_get_plus">Skaffa Pocket Casts Plus för att låsa upp den här funktionen, samt mycket mer!</string>
     <string name="profile_free_account">Gratis konto</string>
-    <string name="profile_free">Gratis</string>
     <string name="profile_forgot_your_password">Jag har glömt lösenordet</string>
-    <string name="profile_find_out_more">Läs mer om Pocket Casts Plus</string>
     <string name="profile_files_remove_image">Byt bild</string>
     <string name="profile_files_empty_title">Inga filer</string>
     <string name="profile_files_empty_summary">Vill du lyssna på dina egna filer?\nTryck på knappen + för att öppna dem i Pocket Casts så visas de här.</string>
@@ -1187,9 +1221,6 @@ Language: sv_SE
     <string name="profile_file_locked">låst</string>
     <string name="profile_file">Fil</string>
     <string name="profile_feature_requires">Den här funktionen kräver\nPocket Casts Plus</string>
-    <string name="profile_extra_themes">Extra teman</string>
-    <string name="profile_extra_app_icons">Extra appikoner</string>
-    <string name="profile_everything_unlocked">Allt upplåst</string>
     <string name="profile_ends">Slutar %s</string>
     <string name="profile_ended">Slutade %s</string>
     <string name="profile_end_tour">AVSLUTA RUNDTUR</string>
@@ -1221,16 +1252,10 @@ Language: sv_SE
     <string name="profile_select_account_type">Välj kontotyp</string>
     <string name="profile_create_completed">Slutför kontoskapandet</string>
     <string name="profile_create_terms_of_use">Användningsvillkor</string>
-    <string name="profile_create_tos_full_terms_of_use">Fullständiga användingsvillkor</string>
-    <string name="profile_create_tos_disagree">Nej, tack</string>
-    <string name="profile_create_tos_agree">Jag samtycker</string>
-    <string name="profile_create_tos">Innan vi kan låta dig gå med i Plus-klubben måste du samtycka till våra användningsvillkor. Du kan granska dem på egen hand genom att använda länken nedan.</string>
     <string name="profile_create_subscription_failed">Det gick inte att skapa en prenumeration. Vänligen försök igen</string>
-    <string name="profile_create_privacy_policy_title">Integritetspolicy</string>
     <string name="profile_create_privacy_policy">Vi har inkluderat en länk till vår sekretesspolicy också, om du skulle vara intresserad. Vi har försökt att hålla båda dokumenten korta, rakt på sak och med så lite juridikspråk som möjligt.</string>
     <string name="profile_create_password_requirements">Lösenord måste innehålla minst 6 tecken</string>
     <string name="profile_create_newsletter_summary">Få nyheter, app-uppdateringar, temabaserade podcastlistor, intervjuer med mera.</string>
-    <string name="profile_create_license">Ursäkta vår formalitet</string>
     <string name="profile_create_failed">Det gick inte att skapa ett konto. Vänligen försök igen</string>
     <string name="profile_create_account_image">skapa kontobild</string>
     <string name="profile_create_account">Skapa konto</string>
@@ -1277,7 +1302,6 @@ Language: sv_SE
     <string name="profile_alreadysignedindescription">Du kan endast vara inloggad på ett konto åt gången.</string>
     <string name="profile_alreadysignedin">Du är redan inloggad</string>
     <string name="profile_already_have_account">Har du redan ett Pocket Casts-konto?</string>
-    <string name="profile_almost_everything">Nästan allt</string>
     <string name="profile_account_delete_yes">Ja, ta bort det</string>
     <string name="profile_account_created">Konto skapat.</string>
     <string name="profile_access_ends">Åtkomst upphör: %s</string>
@@ -1719,8 +1743,8 @@ Language: sv_SE
         <item quantity="other">%d avsnitt</item>
     </plurals>
     <plurals name="player_up_next_header_title">
-        <item quantity="one">%1$d avsnitt - %2$s kvar</item>
-        <item quantity="other">%1$d avsnitt - %2$s kvar</item>
+        <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>
+        <item quantity="other" formatted="true">%1$d avsnitt - %2$s kvar</item>
     </plurals>
     <plurals name="podcast_share_end_handle_description">
         <item quantity="one">Handtag för slutklipp: %d sekund</item>

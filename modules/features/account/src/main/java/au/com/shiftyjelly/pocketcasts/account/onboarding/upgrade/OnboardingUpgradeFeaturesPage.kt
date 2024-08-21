@@ -120,17 +120,32 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
         is OnboardingUpgradeFeaturesState.Loaded -> {
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
-            UpgradeLayout(
-                state = loadedState,
-                source = source,
-                scrollState = scrollState,
-                onBackPressed = onBackPressed,
-                onNotNowPressed = onNotNowPressed,
-                onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                onClickSubscribe = onClickSubscribe,
-                canUpgrade = canUpgrade,
-            )
+            when (loadedState.upgradeLayout) {
+                UpgradeLayout.Features, UpgradeLayout.Reviews -> {
+                    UpgradeLayoutFeatures(
+                        state = loadedState,
+                        source = source,
+                        onNotNowPressed = onNotNowPressed,
+                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
+                        onClickSubscribe = onClickSubscribe,
+                        scrollState = scrollState,
+                        canUpgrade = canUpgrade,
+                    )
+                }
+                UpgradeLayout.Original -> {
+                    UpgradeLayoutOriginal(
+                        state = loadedState,
+                        source = source,
+                        scrollState = scrollState,
+                        onBackPressed = onBackPressed,
+                        onNotNowPressed = onNotNowPressed,
+                        onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
+                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
+                        onClickSubscribe = onClickSubscribe,
+                        canUpgrade = canUpgrade,
+                    )
+                }
+            }
         }
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
@@ -143,7 +158,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 }
 
 @Composable
-private fun UpgradeLayout(
+private fun UpgradeLayoutOriginal(
     state: OnboardingUpgradeFeaturesState.Loaded,
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,
@@ -395,7 +410,7 @@ private fun FeatureCard(
 }
 
 @Composable
-private fun UpgradeButton(
+internal fun UpgradeButton(
     button: UpgradeButton,
     onClickSubscribe: () -> Unit,
 ) {
@@ -454,7 +469,7 @@ private fun SetStatusBarBackground(
 }
 
 @Composable
-private fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
+internal fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
     val statusBarPadding = WindowInsets.statusBars
         .asPaddingValues()
         .calculateTopPadding()

@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PocketCastsPill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -24,16 +27,21 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.sql.Date
 import java.time.Instant
 
 @Composable
-internal fun VerticalPodcastCast(
+internal fun VerticalPodcastCard(
     podcast: Podcast,
     episodeCount: Int,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
+    constrainedSize: (maxWidth: Dp, maxHeight: Dp) -> DpSize = { width, height -> DpSize(width, height) },
 ) = VerticalCard(
     data = PodcastCardData(
         podcast = podcast,
@@ -41,6 +49,8 @@ internal fun VerticalPodcastCast(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
+    constrainedSize = constrainedSize,
+    captureController = captureController,
     modifier = modifier,
 )
 
@@ -50,8 +60,10 @@ internal fun VerticalEpisodeCard(
     podcast: Podcast,
     useEpisodeArtwork: Boolean,
     shareColors: ShareColors,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
     useHeightForAspectRatio: Boolean = true,
+    constrainedSize: (maxWidth: Dp, maxHeight: Dp) -> DpSize = { width, height -> DpSize(width, height) },
 ) = VerticalCard(
     data = EpisodeCardData(
         episode = episode,
@@ -60,15 +72,20 @@ internal fun VerticalEpisodeCard(
     ),
     shareColors = shareColors,
     useHeightForAspectRatio = useHeightForAspectRatio,
+    constrainedSize = constrainedSize,
+    captureController = captureController,
     modifier = modifier,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun VerticalCard(
     data: CardData,
     shareColors: ShareColors,
     useHeightForAspectRatio: Boolean,
+    captureController: CaptureController,
     modifier: Modifier = Modifier,
+    constrainedSize: (maxWidth: Dp, maxHeight: Dp) -> DpSize = { width, height -> DpSize(width, height) },
 ) = BoxWithConstraints(
     contentAlignment = Alignment.Center,
     modifier = modifier,
@@ -79,15 +96,17 @@ private fun VerticalCard(
             shareColors.cardBottom,
         ),
     )
+    val size = constrainedSize(maxWidth, maxHeight)
     val (height, width) = if (useHeightForAspectRatio) {
-        maxHeight to maxHeight / 1.5f
+        size.height to size.height / CardType.Vertical.aspectRatio
     } else {
-        maxWidth * 1.5f to maxWidth
+        size.width * CardType.Vertical.aspectRatio to size.width
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(backgroundGradient, RoundedCornerShape(12.dp))
+            .capturable(captureController)
             .width(width)
             .height(height),
     ) {
@@ -104,8 +123,9 @@ private fun VerticalCard(
         )
         TextH70(
             text = data.topText(),
+            disableScale = true,
             maxLines = 1,
-            color = shareColors.cardText.copy(alpha = 0.5f),
+            color = shareColors.cardTextSecondary,
             modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
@@ -113,9 +133,10 @@ private fun VerticalCard(
         )
         TextH40(
             text = data.middleText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = shareColors.cardText,
+            color = shareColors.cardTextPrimary,
             modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
@@ -123,47 +144,48 @@ private fun VerticalCard(
         )
         TextH70(
             text = data.bottomText(),
+            disableScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = shareColors.cardText.copy(alpha = 0.5f),
+            color = shareColors.cardTextSecondary,
             modifier = Modifier.padding(horizontal = width * 0.1f),
         )
         Spacer(
             modifier = Modifier.weight(1f),
         )
-        PocketCastsPill()
+        PocketCastsPill(
+            disableScale = true,
+        )
         Spacer(
             modifier = Modifier.weight(1f),
         )
     }
 }
 
-@ShowkaseComposable(name = "VerticalPodcastCard", group = "Sharing", styleName = "Light")
-@Preview(name = "VerticalPodcastCardLight")
-@Composable
-fun VerticalPodcastCardLightPreview() = VerticalPodcastCardPreview(
-    baseColor = Color(0xFFFBCB04),
-)
-
-@ShowkaseComposable(name = "VerticalPodcastCard", group = "Sharing", styleName = "Dark")
+@ShowkaseComposable(name = "Vertical podcast card", group = "Sharing")
 @Preview(name = "VerticalPodcastCardDark")
 @Composable
 fun VerticalPodcastCardDarkPreview() = VerticalPodcastCardPreview(
     baseColor = Color(0xFFEC0404),
 )
 
-@ShowkaseComposable(name = "VerticalEpisodeCard", group = "Sharing", styleName = "Light")
-@Preview(name = "VerticalEpisodeCardLight")
+@Preview(name = "VerticalPodcastCardLight")
 @Composable
-fun VerticalEpisodeCardLightPreview() = VerticalEpisodeCardPreview(
+private fun VerticalPodcastCardLightPreview() = VerticalPodcastCardPreview(
     baseColor = Color(0xFFFBCB04),
 )
 
-@ShowkaseComposable(name = "VerticalEpisodeCard", group = "Sharing", styleName = "Dark")
+@ShowkaseComposable(name = "Vertical episode card", group = "Sharing")
 @Preview(name = "VerticalEpisodeCardDark")
 @Composable
 fun VerticalEpisodeCardDarkPreview() = VerticalEpisodeCardPreview(
     baseColor = Color(0xFFEC0404),
+)
+
+@Preview(name = "VerticalEpisodeCardLight")
+@Composable
+private fun VerticalEpisodeCardLightPreview() = VerticalEpisodeCardPreview(
+    baseColor = Color(0xFFFBCB04),
 )
 
 @Composable
@@ -209,4 +231,5 @@ private fun VerticalCardPreview(
     data = data,
     shareColors = ShareColors(baseColor),
     useHeightForAspectRatio = false,
+    captureController = rememberCaptureController(),
 )

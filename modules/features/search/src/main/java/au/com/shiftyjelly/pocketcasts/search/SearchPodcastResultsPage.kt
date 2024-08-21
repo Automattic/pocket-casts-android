@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
@@ -10,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -25,6 +27,7 @@ fun SearchPodcastResultsPage(
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onBackClick: () -> Unit,
+    bottomInset: Dp,
 ) {
     val state by viewModel.state.collectAsState()
     Column {
@@ -38,6 +41,7 @@ fun SearchPodcastResultsPage(
             onFolderClick = onFolderClick,
             onPodcastClick = onPodcastClick,
             onSubscribeClick = { viewModel.onSubscribeToPodcast(it) },
+            bottomInset = bottomInset,
         )
     }
 }
@@ -48,8 +52,11 @@ private fun SearchPodcastResultsView(
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onSubscribeClick: (Podcast) -> Unit,
+    bottomInset: Dp,
 ) {
-    LazyColumn {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = bottomInset),
+    ) {
         items(
             items = state.podcasts,
             key = { it.adapterId },

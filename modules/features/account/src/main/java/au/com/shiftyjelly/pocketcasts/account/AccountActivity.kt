@@ -20,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -113,9 +112,6 @@ class AccountActivity : AppCompatActivity() {
             finish()
             return
         }
-        if (currentFragment?.id == R.id.accountFragment) {
-            FirebaseAnalyticsTracker.closeAccountMissingClicked()
-        }
 
         UiUtil.hideKeyboard(binding.root)
         @Suppress("DEPRECATION")
@@ -126,9 +122,7 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_SHOWN
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_SHOWN
-            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_SHOWN
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
-            R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_SHOWN
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_SHOWN
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_SHOWN
             else -> null
@@ -152,9 +146,7 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_DISMISSED
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_DISMISSED
-            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_DISMISSED
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
-            R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_DISMISSED
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_DISMISSED
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED
             else -> null

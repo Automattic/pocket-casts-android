@@ -5,9 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -15,10 +19,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
 private const val ARG_SOURCE = "arg_source"
@@ -26,6 +33,9 @@ private const val ARG_TYPE = "arg_type"
 
 @AndroidEntryPoint
 class SearchResultsFragment : BaseFragment() {
+
+    @Inject lateinit var settings: Settings
+
     private val viewModel by viewModels<SearchViewModel>({ requireParentFragment() })
     private val searchHistoryViewModel by viewModels<SearchHistoryViewModel>()
     private var listener: SearchFragment.Listener? = null
@@ -53,6 +63,8 @@ class SearchResultsFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
+            val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+            val bottomInsetDp = bottomInset.pxToDp(LocalContext.current).dp
             AppThemeWithBackground(theme.activeTheme) {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 when (type) {
@@ -62,6 +74,7 @@ class SearchResultsFragment : BaseFragment() {
                             onFolderClick = ::onFolderClick,
                             onPodcastClick = ::onPodcastClick,
                             onBackClick = ::onBackClick,
+                            bottomInset = bottomInsetDp,
                         )
                     }
 
@@ -70,6 +83,7 @@ class SearchResultsFragment : BaseFragment() {
                             viewModel = viewModel,
                             onBackClick = ::onBackClick,
                             onEpisodeClick = ::onEpisodeClick,
+                            bottomInset = bottomInsetDp,
                         )
                     }
 

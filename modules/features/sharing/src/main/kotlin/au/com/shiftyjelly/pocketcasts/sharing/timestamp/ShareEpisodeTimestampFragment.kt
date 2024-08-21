@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.compose.foundation.background
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -18,6 +17,7 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
 import au.com.shiftyjelly.pocketcasts.utils.parceler.ColorParceler
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
@@ -39,12 +39,23 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
     private val viewModel by viewModels<ShareEpisodeTimestampViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<ShareEpisodeTimestampViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid)
+                factory.create(
+                    podcastUuid = args.podcastUuid,
+                    episodeUuid = args.episodeUuid,
+                    sourceView = args.source,
+                )
             }
         },
     )
 
     @Inject internal lateinit var shareListenerFactory: ShareEpisodeTimestampListener.Factory
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.onScreenShown()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,7 +63,8 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireActivity()).apply {
         val platforms = SocialPlatform.getAvailablePlatforms(requireContext())
-        val listener = shareListenerFactory.create(this@ShareEpisodeTimestampFragment, args.timestampType, args.source)
+        val assetController = BackgroundAssetController.create(requireContext(), shareColors)
+        val listener = shareListenerFactory.create(this@ShareEpisodeTimestampFragment, assetController, args.timestampType, args.source)
         setContent {
             val uiState by viewModel.uiState.collectAsState()
             ShareEpisodeTimestampPage(
@@ -62,6 +74,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 socialPlatforms = platforms,
                 shareColors = shareColors,
+                assetController = assetController,
                 listener = listener,
             )
         }
@@ -69,11 +82,15 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        styleBackgroundColor(shareColors.background.toArgb())
+        styleBackgroundColor(
+            background = shareColors.background.toArgb(),
+            navigationBar = shareColors.navigationBar.toArgb(),
+        )
     }
 
     @Parcelize
     private class Args(
+        val podcastUuid: String,
         val episodeUuid: String,
         @TypeParceler<Duration, DurationParceler>() val timestamp: Duration,
         @TypeParceler<Color, ColorParceler>() val baseColor: Color,
@@ -91,6 +108,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         ) = ShareEpisodeTimestampFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
+                    podcastUuid = episode.podcastUuid,
                     episodeUuid = episode.uuid,
                     timestamp = episode.playedUpTo.seconds,
                     baseColor = Color(baseColor),
@@ -108,6 +126,7 @@ class ShareEpisodeTimestampFragment : BaseDialogFragment() {
         ) = ShareEpisodeTimestampFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
+                    podcastUuid = episode.podcastUuid,
                     episodeUuid = episode.uuid,
                     timestamp = timestamp,
                     baseColor = Color(baseColor),

@@ -9,7 +9,6 @@ import android.widget.PopupMenu
 import androidx.annotation.ColorInt
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -87,7 +86,6 @@ class PlayButton @JvmOverloads constructor(
                 val currentFromListUuid = fromListUuid
                 val currentPodcastUuid = podcastUuid
                 if (currentFromListUuid != null && currentPodcastUuid != null) {
-                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(currentFromListUuid, currentPodcastUuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to currentFromListUuid, PODCAST_UUID_KEY to currentPodcastUuid))
                 }
                 listener?. onPlayClicked(episodeUuid)
@@ -102,7 +100,6 @@ class PlayButton @JvmOverloads constructor(
     }
 
     private fun onLongClick() {
-        FirebaseAnalyticsTracker.longPressedEpisodeButton()
         val popup = PopupMenu(context, this)
         this.setOnTouchListener(popup.dragToOpenListener)
         popup.inflate(R.menu.play_button)

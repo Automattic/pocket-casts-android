@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ButtonElevation
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ fun RowLoadingButton(
     isLoading: Boolean = false,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
     onClick: () -> Unit,
 ) {
     BaseRowButton(
@@ -36,6 +38,7 @@ fun RowLoadingButton(
         border = border,
         colors = colors,
         textColor = textColor,
+        elevation = elevation,
         leadingIcon = if (isLoading) {
             {
                 CircularProgressIndicator(

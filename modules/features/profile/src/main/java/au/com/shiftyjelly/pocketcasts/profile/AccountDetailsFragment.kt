@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -287,7 +286,6 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
         when (state) {
             is DeleteAccountState.Success -> {
                 viewModel.clearDeleteAccountState()
-                FirebaseAnalyticsTracker.accountDeleted()
                 performSignOut()
             }
             is DeleteAccountState.Failure -> {

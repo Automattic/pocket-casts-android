@@ -9,30 +9,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.coerceAtMost
+import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.sharing.social.SocialPlatform
+import au.com.shiftyjelly.pocketcasts.sharing.ui.BackgroundAssetController
 import au.com.shiftyjelly.pocketcasts.sharing.ui.CardType
-import au.com.shiftyjelly.pocketcasts.sharing.ui.Devices
-import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCast
+import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalPodcastCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.HorizontalSharePage
+import au.com.shiftyjelly.pocketcasts.sharing.ui.PodcastCard
 import au.com.shiftyjelly.pocketcasts.sharing.ui.ShareColors
-import au.com.shiftyjelly.pocketcasts.sharing.ui.SquarePodcastCast
-import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalPodcastCast
 import au.com.shiftyjelly.pocketcasts.sharing.ui.VerticalSharePage
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import au.com.shiftyjelly.pocketcasts.sharing.ui.VisualCardType
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal interface SharePodcastPageListener {
-    suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType): SharingResponse
+    suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: VisualCardType): SharingResponse
     fun onClose()
 
     companion object {
         val Preview = object : SharePodcastPageListener {
-            override suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: CardType) = SharingResponse(
+            override suspend fun onShare(podcast: Podcast, platform: SocialPlatform, cardType: VisualCardType) = SharingResponse(
                 isSuccsessful = true,
                 feedbackMessage = null,
+                error = null,
             )
             override fun onClose() = Unit
         }
@@ -45,6 +49,7 @@ internal fun SharePodcastPage(
     episodeCount: Int,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: SharePodcastPageListener,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -54,6 +59,7 @@ internal fun SharePodcastPage(
             episodeCount = episodeCount,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
@@ -62,6 +68,7 @@ internal fun SharePodcastPage(
             episodeCount = episodeCount,
             socialPlatforms = socialPlatforms,
             shareColors = shareColors,
+            assetController = assetController,
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
@@ -74,6 +81,7 @@ private fun VerticalSharePodcastPage(
     episodeCount: Int,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: SharePodcastPageListener,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -93,28 +101,18 @@ private fun VerticalSharePodcastPage(
                 }
             }
         },
-        middleContent = { cardType, modifier ->
+        middleContent = { cardType, cardSize, modifier ->
             if (podcast != null) {
-                when (cardType) {
-                    CardType.Vertical -> VerticalPodcastCast(
-                        podcast = podcast,
-                        episodeCount = episodeCount,
-                        shareColors = shareColors,
-                        modifier = modifier,
-                    )
-                    CardType.Horiozntal -> HorizontalPodcastCast(
-                        podcast = podcast,
-                        episodeCount = episodeCount,
-                        shareColors = shareColors,
-                        modifier = modifier,
-                    )
-                    CardType.Square -> SquarePodcastCast(
-                        podcast = podcast,
-                        episodeCount = episodeCount,
-                        shareColors = shareColors,
-                        modifier = modifier,
-                    )
-                }
+                val captureController = assetController.captureController(cardType)
+                PodcastCard(
+                    cardType = cardType,
+                    podcast = podcast,
+                    episodeCount = episodeCount,
+                    shareColors = shareColors,
+                    captureController = captureController,
+                    constrainedSize = { _, _ -> cardSize },
+                    modifier = modifier,
+                )
             }
         },
     )
@@ -126,6 +124,7 @@ private fun HorizontalSharePodcastPage(
     episodeCount: Int,
     socialPlatforms: Set<SocialPlatform>,
     shareColors: ShareColors,
+    assetController: BackgroundAssetController,
     listener: SharePodcastPageListener,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -147,45 +146,41 @@ private fun HorizontalSharePodcastPage(
         },
         middleContent = {
             if (podcast != null) {
-                HorizontalPodcastCast(
+                HorizontalPodcastCard(
                     podcast = podcast,
                     episodeCount = episodeCount,
                     shareColors = shareColors,
+                    constrainedSize = { maxWidth, maxHeight -> DpSize(maxWidth.coerceAtMost(400.dp), maxHeight) },
+                    captureController = assetController.captureController(CardType.Horizontal),
                 )
             }
         },
     )
 }
 
-@ShowkaseComposable(name = "SharePodcastVerticalRegularPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalRegularPreview", device = Devices.PortraitRegular)
 @Composable
-fun SharePodcastVerticalRegularPreview() = SharePodcastPagePreview()
+private fun SharePodcastVerticalRegularPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastVerticalSmallPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalSmallPreview", device = Devices.PortraitSmall)
 @Composable
-fun SharePodcastVerticalSmallPreviewPreview() = SharePodcastPagePreview()
+private fun SharePodcastVerticalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastVerticalTabletPreview", group = "Sharing")
 @Preview(name = "SharePodcastVerticalTabletPreview", device = Devices.PortraitTablet)
 @Composable
-fun SharePodcastVerticalTabletPreview() = SharePodcastPagePreview()
+private fun SharePodcastVerticalTabletPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalRegularPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalRegularPreview", device = Devices.LandscapeRegular)
 @Composable
-fun SharePodcastHorizontalRegularPreview() = SharePodcastPagePreview()
+private fun SharePodcastHorizontalRegularPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalSmallPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalSmallPreview", device = Devices.LandscapeSmall)
 @Composable
-fun SharePodcastHorizontalSmallPreviewPreview() = SharePodcastPagePreview()
+private fun SharePodcastHorizontalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@ShowkaseComposable(name = "SharePodcastHorizontalTabletPreview", group = "Sharing")
 @Preview(name = "SharePodcastHorizontalTabletPreview", device = Devices.LandscapeTablet)
 @Composable
-fun SharePodcastHorizontalTabletPreview() = SharePodcastPagePreview()
+private fun SharePodcastHorizontalTabletPreview() = SharePodcastPagePreview()
 
 @Composable
 private fun SharePodcastPagePreview(
@@ -199,5 +194,6 @@ private fun SharePodcastPagePreview(
     episodeCount = 120,
     socialPlatforms = SocialPlatform.entries.toSet(),
     shareColors = ShareColors(Color(color)),
+    assetController = BackgroundAssetController.preview(),
     listener = SharePodcastPageListener.Preview,
 )

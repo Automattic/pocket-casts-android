@@ -155,6 +155,7 @@ class GiveRatingViewModel @Inject constructor(
 
         if (result is PodcastRatingResult.Success) {
             LogBuffer.i(TAG, "Submitted a rating of ${result.rating} for $podcastUuid")
+            ratingManager.refreshPodcastRatings(podcastUuid = podcastUuid, useCache = false)
             onSuccess()
         } else {
             LogBuffer.e(TAG, "Error when submitting rating for: $podcastUuid")
