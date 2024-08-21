@@ -21,5 +21,8 @@ data class CuratedPodcast(
 ) {
     companion object {
         const val TRENDING_LIST_ID = "trending"
+        const val FEATURED_LIST_ID = "featured"
+
+        val specialListIds = listOf(TRENDING_LIST_ID, FEATURED_LIST_ID)
     }
 }
