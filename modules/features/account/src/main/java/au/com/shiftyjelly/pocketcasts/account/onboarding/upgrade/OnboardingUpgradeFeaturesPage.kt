@@ -89,7 +89,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
     onBackPressed: () -> Unit,
-    onClickSubscribe: () -> Unit,
+    onClickSubscribe: (showUpgradeBottomSheet: Boolean) -> Unit,
     onNotNowPressed: () -> Unit,
     canUpgrade: Boolean,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
@@ -127,7 +127,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                         source = source,
                         onNotNowPressed = onNotNowPressed,
                         onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                        onClickSubscribe = onClickSubscribe,
+                        onClickSubscribe = { onClickSubscribe(true) },
                         scrollState = scrollState,
                         canUpgrade = canUpgrade,
                     )
@@ -141,7 +141,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                         onNotNowPressed = onNotNowPressed,
                         onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
                         onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                        onClickSubscribe = onClickSubscribe,
+                        onClickSubscribe = { onClickSubscribe(false) },
                         canUpgrade = canUpgrade,
                     )
                 }

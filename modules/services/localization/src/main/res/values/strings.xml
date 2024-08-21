@@ -2061,4 +2061,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="swipe_affordance_icon">Swipe Affordance Icon</string>
     <string name="thank_you_for_your_feedback">Thank you for your feedback!</string>
     <string name="something_went_wrong_when_sending_feedback">Something went wrong. Please try submitting your feedback again.</string>
+
+    <!-- Paywall -->
+    <string name="paywall_save_50_off">Save 50% off your first year.</string>
+    <string name="paywall_free_1_month_trial">Free 1-month trial.</string>
+
 </resources>
