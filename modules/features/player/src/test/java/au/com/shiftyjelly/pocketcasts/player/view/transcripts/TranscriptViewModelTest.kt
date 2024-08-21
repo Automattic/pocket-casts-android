@@ -188,9 +188,33 @@ class TranscriptViewModelTest {
         verify(transcriptsManager).loadTranscript(transcript.url, forceRefresh = false)
     }
 
+    @Test
+    fun `given json format transcript, when transcript parse and load invoked, then transcript is parsed correctly`() = runTest {
+        val jsonString = """
+            {"version":"1.0.0","segments":[{"speaker":"Speaker 1","startTime":0,"endTime":10,"body":"Hello."},{"speaker":null,"startTime":11,"endTime":20,"body":"World!"}]}
+        """.trimIndent()
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "application/json")))
+        initViewModel(jsonString)
+
+        viewModel.parseAndLoadTranscript(
+            isTranscriptViewOpen = true, pulledToRefresh = false
+        )
+
+        viewModel.uiState.test {
+            val state = awaitItem() as UiState.TranscriptLoaded
+            assertTrue(
+                state.displayInfo.items == listOf(
+                    TranscriptViewModel.DisplayItem("Speaker 1", true, 2, 11),
+                    TranscriptViewModel.DisplayItem("Hello.", false, 13, 19),
+                    TranscriptViewModel.DisplayItem("World!", false, 21, 27),
+                )
+            )
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun initViewModel(
-        htmlContent: String? = null,
+        content: String? = null,
         transcriptLoadException: Exception? = null,
     ) = runTest {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
@@ -198,8 +222,8 @@ class TranscriptViewModelTest {
             given(transcriptsManager.loadTranscript(anyOrNull(), anyOrNull(), anyOrNull())).willAnswer { throw transcriptLoadException }
         } else {
             val response = mock<ResponseBody>()
-            if (htmlContent != null) {
-                whenever(response.string()).thenReturn(htmlContent)
+            if (content != null) {
+                whenever(response.string()).thenReturn(content)
             } else {
                 whenever(response.bytes()).thenReturn(byteArrayOf())
             }
