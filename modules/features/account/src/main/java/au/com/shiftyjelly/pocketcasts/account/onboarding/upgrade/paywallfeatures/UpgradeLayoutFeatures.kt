@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCards
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.calculateMinimumHeightWithInsets
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -57,7 +56,6 @@ internal fun UpgradeLayoutFeatures(
     source: OnboardingUpgradeSource,
     scrollState: ScrollState,
     onNotNowPressed: () -> Unit,
-    onFeatureCardChanged: (Int) -> Unit,
     onClickSubscribe: () -> Unit,
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
@@ -143,11 +141,10 @@ internal fun UpgradeLayoutFeatures(
                                 )
                             }
 
-                            FeatureCards(
-                                // TODO: it will be replaced for the new one
-                                state = state,
-                                upgradeButton = state.currentUpgradeButton,
-                                onFeatureCardChanged = onFeatureCardChanged,
+                            FeaturedPaywallCards(
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 40.dp),
                             )
                         }
                     }

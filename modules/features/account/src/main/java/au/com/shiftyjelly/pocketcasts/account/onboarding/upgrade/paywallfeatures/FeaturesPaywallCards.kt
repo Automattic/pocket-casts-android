@@ -1,7 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallfeatures
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -32,17 +36,34 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-data class CardData(
-    val imageResId: Int,
-    val contentDescription: String,
-    val title: String,
-    val description: String,
-    val imageHeight: Dp,
-    val imageTopPadding: Dp,
-)
+@Composable
+fun FeaturedPaywallCards(modifier: Modifier = Modifier) {
+    val featuredCards: List<CardData> = listOf(
+        bookmarks,
+        folders,
+        desktop,
+        watch,
+        slumber,
+        storage,
+        themes,
+    )
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier,
+    ) {
+        items(
+            count = featuredCards.size,
+            key = { index -> index },
+
+        ) { index ->
+            FeaturedPaywallCard(cardData = featuredCards[index])
+        }
+    }
+}
 
 @Composable
-fun FeaturePaywallCard(cardData: CardData) {
+fun FeaturedPaywallCard(cardData: CardData) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -57,7 +78,7 @@ fun FeaturePaywallCard(cardData: CardData) {
         ) {
             Image(
                 painter = painterResource(cardData.imageResId),
-                contentDescription = cardData.contentDescription,
+                contentDescription = stringResource(cardData.contentDescriptionResourceId),
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .padding(top = cardData.imageTopPadding)
@@ -73,7 +94,7 @@ fun FeaturePaywallCard(cardData: CardData) {
                     .fillMaxWidth(),
             ) {
                 TextH30(
-                    text = cardData.title,
+                    text = stringResource(cardData.titleResourceId),
                     textAlign = TextAlign.Start,
                     fontWeight = FontWeight.W600,
                     color = Color.White,
@@ -83,7 +104,7 @@ fun FeaturePaywallCard(cardData: CardData) {
                 )
 
                 TextP50(
-                    text = cardData.description,
+                    text = stringResource(cardData.descriptionResourceId),
                     textAlign = TextAlign.Start,
                     fontWeight = FontWeight.W400,
                     color = colorResource(UR.color.coolgrey_50),
@@ -94,102 +115,83 @@ fun FeaturePaywallCard(cardData: CardData) {
     }
 }
 
-@Composable
-fun BookmarksCard() {
-    val bookmarksCardData = CardData(
-        imageResId = IR.drawable.bookmarks,
-        contentDescription = stringResource(LR.string.paywall_bookmarks_content_description),
-        title = stringResource(LR.string.paywall_bookmarks_title),
-        description = stringResource(LR.string.paywall_bookmarks_description),
-        imageHeight = 224.dp,
-        imageTopPadding = 37.dp,
-    )
-    FeaturePaywallCard(cardData = bookmarksCardData)
-}
+data class CardData(
+    @DrawableRes val imageResId: Int,
+    @StringRes val contentDescriptionResourceId: Int,
+    @StringRes val titleResourceId: Int,
+    @StringRes val descriptionResourceId: Int,
+    val imageHeight: Dp,
+    val imageTopPadding: Dp,
+)
 
-@Composable
-fun FoldersCard() {
-    val foldersCardData = CardData(
-        imageResId = IR.drawable.folders,
-        contentDescription = stringResource(LR.string.paywall_folders_content_description),
-        title = stringResource(LR.string.paywall_folders_title),
-        description = stringResource(LR.string.paywall_folders_description),
-        imageHeight = 227.dp,
-        imageTopPadding = 34.dp,
-    )
-    FeaturePaywallCard(cardData = foldersCardData)
-}
+private val bookmarks = CardData(
+    imageResId = IR.drawable.bookmarks,
+    contentDescriptionResourceId = LR.string.paywall_bookmarks_content_description,
+    titleResourceId = LR.string.paywall_bookmarks_title,
+    descriptionResourceId = LR.string.paywall_bookmarks_description,
+    imageHeight = 224.dp,
+    imageTopPadding = 37.dp,
+)
 
-@Composable
-fun DesktopWebAppCard() {
-    val desktopCardData = CardData(
-        imageResId = IR.drawable.desktop,
-        contentDescription = stringResource(LR.string.paywall_desktop_and_web_content_description),
-        title = stringResource(LR.string.paywall_desktop_and_web_title),
-        description = stringResource(LR.string.paywall_desktop_and_web_description),
-        imageHeight = 186.dp,
-        imageTopPadding = 57.dp,
-    )
-    FeaturePaywallCard(cardData = desktopCardData)
-}
+private val folders = CardData(
+    imageResId = IR.drawable.folders,
+    contentDescriptionResourceId = LR.string.paywall_folders_content_description,
+    titleResourceId = LR.string.paywall_folders_title,
+    descriptionResourceId = LR.string.paywall_folders_description,
+    imageHeight = 227.dp,
+    imageTopPadding = 34.dp,
+)
 
-@Composable
-fun WatchCard() {
-    val watchCardData = CardData(
-        imageResId = IR.drawable.watch,
-        contentDescription = stringResource(LR.string.paywall_watch_content_description),
-        title = stringResource(LR.string.paywall_watch_title),
-        description = stringResource(LR.string.paywall_watch_description),
-        imageHeight = 231.dp,
-        imageTopPadding = 26.dp,
-    )
-    FeaturePaywallCard(cardData = watchCardData)
-}
+private val desktop = CardData(
+    imageResId = IR.drawable.desktop,
+    contentDescriptionResourceId = LR.string.paywall_desktop_and_web_content_description,
+    titleResourceId = LR.string.paywall_desktop_and_web_title,
+    descriptionResourceId = LR.string.paywall_desktop_and_web_description,
+    imageHeight = 186.dp,
+    imageTopPadding = 57.dp,
+)
 
-@Composable
-fun SlumberStudiosCard() {
-    val slumberCardData = CardData(
-        imageResId = IR.drawable.slumber,
-        contentDescription = stringResource(LR.string.paywall_slumber_studios_content_description),
-        title = stringResource(LR.string.paywall_slumber_studios_title),
-        description = stringResource(LR.string.paywall_slumber_studios_description),
-        imageHeight = 195.dp,
-        imageTopPadding = 49.dp,
-    )
-    FeaturePaywallCard(cardData = slumberCardData)
-}
+private val watch = CardData(
+    imageResId = IR.drawable.watch,
+    contentDescriptionResourceId = LR.string.paywall_watch_content_description,
+    titleResourceId = LR.string.paywall_watch_title,
+    descriptionResourceId = LR.string.paywall_watch_description,
+    imageHeight = 231.dp,
+    imageTopPadding = 26.dp,
+)
 
-@Composable
-fun StorageCard() {
-    val slumberCardData = CardData(
-        imageResId = IR.drawable.storage,
-        contentDescription = stringResource(LR.string.paywall_storage_content_description),
-        title = stringResource(LR.string.paywall_storage_title),
-        description = stringResource(LR.string.paywall_storage_description),
-        imageHeight = 163.dp,
-        imageTopPadding = 64.dp,
-    )
-    FeaturePaywallCard(cardData = slumberCardData)
-}
+private val slumber = CardData(
+    imageResId = IR.drawable.slumber,
+    contentDescriptionResourceId = LR.string.paywall_slumber_studios_content_description,
+    titleResourceId = LR.string.paywall_slumber_studios_title,
+    descriptionResourceId = LR.string.paywall_slumber_studios_description,
+    imageHeight = 195.dp,
+    imageTopPadding = 49.dp,
+)
 
-@Composable
-fun ThemesCard() {
-    val slumberCardData = CardData(
-        imageResId = IR.drawable.themes,
-        contentDescription = stringResource(LR.string.paywall_themes_content_description),
-        title = stringResource(LR.string.paywall_themes_title),
-        description = stringResource(LR.string.paywall_themes_description),
-        imageHeight = 84.dp,
-        imageTopPadding = 105.dp,
-    )
-    FeaturePaywallCard(cardData = slumberCardData)
-}
+private val storage = CardData(
+    imageResId = IR.drawable.storage,
+    contentDescriptionResourceId = LR.string.paywall_storage_content_description,
+    titleResourceId = LR.string.paywall_storage_title,
+    descriptionResourceId = LR.string.paywall_storage_description,
+    imageHeight = 163.dp,
+    imageTopPadding = 64.dp,
+)
+
+private val themes = CardData(
+    imageResId = IR.drawable.themes,
+    contentDescriptionResourceId = LR.string.paywall_themes_content_description,
+    titleResourceId = LR.string.paywall_themes_title,
+    descriptionResourceId = LR.string.paywall_themes_description,
+    imageHeight = 84.dp,
+    imageTopPadding = 105.dp,
+)
 
 @Preview
 @Composable
 private fun WatchCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        WatchCard()
+        FeaturedPaywallCard(watch)
     }
 }
 
@@ -197,7 +199,7 @@ private fun WatchCardPreview() {
 @Composable
 private fun BookmarksCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        BookmarksCard()
+        FeaturedPaywallCard(bookmarks)
     }
 }
 
@@ -205,7 +207,7 @@ private fun BookmarksCardPreview() {
 @Composable
 private fun DesktopWebAppCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        DesktopWebAppCard()
+        FeaturedPaywallCard(desktop)
     }
 }
 
@@ -213,7 +215,7 @@ private fun DesktopWebAppCardPreview() {
 @Composable
 private fun FoldersCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        FoldersCard()
+        FeaturedPaywallCard(folders)
     }
 }
 
@@ -221,7 +223,7 @@ private fun FoldersCardPreview() {
 @Composable
 private fun SlumberStudiosCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        SlumberStudiosCard()
+        FeaturedPaywallCard(slumber)
     }
 }
 
@@ -229,7 +231,7 @@ private fun SlumberStudiosCardPreview() {
 @Composable
 private fun StorageCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        StorageCard()
+        FeaturedPaywallCard(storage)
     }
 }
 
@@ -237,6 +239,6 @@ private fun StorageCardPreview() {
 @Composable
 private fun ThemesCardPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        ThemesCard()
+        FeaturedPaywallCard(themes)
     }
 }
