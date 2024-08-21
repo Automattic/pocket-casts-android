@@ -39,9 +39,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @Composable
 fun FeaturedPaywallCards(modifier: Modifier = Modifier) {
     val featuredCards: List<CardData> = listOf(
-        bookmarks,
-        folders,
         desktop,
+        folders,
+        bookmarks,
         watch,
         slumber,
         storage,
