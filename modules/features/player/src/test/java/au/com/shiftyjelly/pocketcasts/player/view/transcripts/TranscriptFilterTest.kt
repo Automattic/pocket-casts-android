@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -18,7 +19,7 @@ class TranscriptFilterTest {
     fun `filter removes speaker tags from input`() {
         val input = "Speaker 1: Hello, world!"
         val expected = "Hello, world!"
-        val filter = RegexFilters.speakerFilter
+        val filter = RegexFilters.srtTagsFilter
         val result = filter.filter(input)
         assertEquals(expected, result)
     }
@@ -133,6 +134,22 @@ class TranscriptFilterTest {
         val expected = "Hello, world!\n\nHow are you?"
         val filter = RegexFilters.tripleOrMoreEmptyLinesFilter
         val result = filter.filter(input)
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `extractFilter extracts speaker from input for vtt format`() {
+        val input = "<v Speaker 1> Hello, world!"
+        val expected = "Speaker 1"
+        val result = TranscriptRegexFilters.extractSpeaker(input, TranscriptFormat.VTT)
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `extractFilter extracts speaker from input for srt format`() {
+        val input = "Speaker 1: Hello, world!"
+        val expected = "Speaker 1"
+        val result = TranscriptRegexFilters.extractSpeaker(input, TranscriptFormat.SRT)
         assertEquals(expected, result)
     }
 }

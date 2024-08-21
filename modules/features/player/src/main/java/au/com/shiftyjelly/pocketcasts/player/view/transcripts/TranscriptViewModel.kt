@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.annotation.OptIn
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Format
@@ -75,7 +74,12 @@ class TranscriptViewModel @Inject constructor(
             viewModelScope.launch {
                 _uiState.value = try {
                     val cuesWithTimingSubtitle = buildSubtitleCues(transcript, forceRefresh)
-                    val displayInfo = buildDisplayInfo(cuesWithTimingSubtitle)
+
+                    val displayInfo = buildDisplayInfo(
+                        cuesWithTimingSubtitle = cuesWithTimingSubtitle,
+                        transcriptFormat = TranscriptFormat.fromType(transcript.type),
+                    )
+
                     UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
@@ -103,11 +107,10 @@ class TranscriptViewModel @Inject constructor(
                 if (content.trim().isEmpty()) {
                     emptyList<CuesWithTiming>()
                 } else {
-                    val newText = TranscriptRegexFilters.htmlFilters.filter(content)
                     // Html content is added as single large cue
                     ImmutableList.of(
                         CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(newText).build()),
+                            ImmutableList.of(Cue.Builder().setText(content).build()),
                             0,
                             0,
                         ),
@@ -130,15 +133,7 @@ class TranscriptViewModel @Inject constructor(
                                 data,
                                 SubtitleParser.OutputOptions.allCues(),
                             ) { element: CuesWithTiming? ->
-                                element?.let {
-                                    result.add(
-                                        CuesWithTiming(
-                                            modifiedCues(it),
-                                            it.startTimeUs,
-                                            it.endTimeUs,
-                                        ),
-                                    )
-                                }
+                                element?.let { result.add(it) }
                             }
                         } catch (e: Exception) {
                             val message = "Failed to parse transcript: ${transcript.url}"
@@ -152,15 +147,43 @@ class TranscriptViewModel @Inject constructor(
         }
     }
 
-    private suspend fun buildDisplayInfo(cuesWithTimingSubtitle: List<CuesWithTiming>) = withContext(ioDispatcher) {
+    private suspend fun buildDisplayInfo(
+        cuesWithTimingSubtitle: List<CuesWithTiming>,
+        transcriptFormat: TranscriptFormat?,
+    ) = withContext(ioDispatcher) {
+        var previousSpeaker = ""
+        val speakerIndices = mutableListOf<Int>()
         val formattedText = buildString {
             cuesWithTimingSubtitle
                 .flatMap { it.cues }
-                .forEach { cue -> append(cue.text) }
+                .forEach { cue ->
+                    // Extract speaker
+                    cue.text?.let {
+                        TranscriptRegexFilters.extractSpeaker(it.toString(), transcriptFormat)?.let { speaker ->
+                            if (previousSpeaker != speaker) {
+                                append("\n\n")
+                                append(speaker)
+                                append("\n\n")
+                                speakerIndices.add(length - speaker.length - 2)
+                                previousSpeaker = speaker
+                            }
+                        }
+                    }
+                    val filters = if (transcriptFormat == TranscriptFormat.HTML) {
+                        TranscriptRegexFilters.htmlFilters
+                    } else {
+                        TranscriptRegexFilters.transcriptFilters
+                    }
+                    val newText = filters.filter(cue.text.toString())
+                    append(newText)
+                }
         }
-        val items = formattedText.splitIgnoreEmpty("\n\n").map {
-            val startIndex = formattedText.indexOf(it)
-            DisplayItem(it, startIndex, startIndex + it.length)
+        val items = mutableListOf<DisplayItem>()
+        formattedText.splitIgnoreEmpty("\n\n").filter { it.isNotEmpty() }.mapIndexed { index, currentItem ->
+            val previousItemEndIndex = if (index == 0) 0 else items[index - 1].endIndex
+            val currentItemStartIndex = formattedText.indexOf(currentItem, previousItemEndIndex)
+            val isSpeaker = currentItemStartIndex in speakerIndices
+            items.add(DisplayItem(currentItem, isSpeaker, currentItemStartIndex, currentItemStartIndex + currentItem.length))
         }
         DisplayInfo(
             text = formattedText,
@@ -176,18 +199,6 @@ class TranscriptViewModel @Inject constructor(
             )
         }
     }
-
-    /**
-     * Modifies the cues in the given [CuesWithTiming] object.
-     */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun modifiedCues(cuesWithTiming: CuesWithTiming) =
-        cuesWithTiming.cues.map { cue ->
-            val cueBuilder = cue.buildUpon()
-            val newText = TranscriptRegexFilters.transcriptFilters.filter(cue.text.toString())
-            cueBuilder.setText(newText)
-            cueBuilder.build()
-        }
 
     data class PodcastAndEpisode(
         val podcast: Podcast?,
@@ -230,6 +241,7 @@ class TranscriptViewModel @Inject constructor(
 
     data class DisplayItem(
         val text: String,
+        val isSpeaker: Boolean = false,
         val startIndex: Int,
         val endIndex: Int,
     )
