@@ -639,4 +639,13 @@ enum class AnalyticsEvent(val key: String) {
     KIDS_PROFILE_NO_THANK_YOU_TAPPED("kids_profile_no_thank_you_tapped"),
     KIDS_PROFILE_THANK_YOU_FOR_YOUR_INTEREST_SEEN("kids_profile_thank_you_for_your_interest_seen"),
     KIDS_PROFILE_FEEDBACK_FORM_SEEN("kids_profile_feedback_form_seen"),
+
+    /* Transcripts */
+    TRANSCRIPT_SHOWN("transcript_shown"),
+    TRANSCRIPT_DISMISSED("transcript_dismissed"),
+    TRANSCRIPT_PULLED_TO_REFRESH("transcript_pulled_to_refresh"),
+    TRANSCRIPT_ERROR("transcript_error"),
+    TRANSCRIPT_SEARCH_SHOWN("transcript_search_shown"),
+    TRANSCRIPT_SEARCH_NEXT_RESULT("transcript_search_next_result"),
+    TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
 }
