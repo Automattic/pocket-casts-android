@@ -162,7 +162,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                 frequency = lastSelectedFrequency,
             )
         } else {
-            subscriptionManager.getDefaultSubscription(subscriptions = subscriptions)
+            subscriptionManager.getDefaultSubscription(subscriptions = subscriptions, tier = lastSelectedTier)
         }
 
         return if (defaultSelected == null) {
