@@ -205,7 +205,7 @@ fun OnboardingUpgradeBottomSheet(
 
             UpgradeRowButton(
                 primaryText = selectedTier.toSubscribeButton(resources),
-                backgroundColor = colorResource(state.upgradeButton.backgroundColorRes),
+                gradientBackgroundColor = state.upgradeButton.gradientBackgroundColor,
                 textColor = colorResource(state.upgradeButton.textColorRes),
                 onClick = onClickSubscribe,
             )

@@ -23,11 +23,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -36,12 +38,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
@@ -68,40 +73,50 @@ object OnboardingUpgradeHelper {
     @Composable
     fun UpgradeRowButton(
         primaryText: String,
-        backgroundColor: Color,
         textColor: Color,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
+        backgroundColor: Color = Color.Transparent,
         fontWeight: FontWeight = FontWeight.W600,
         secondaryText: String? = null,
+        gradientBackgroundColor: Brush? = null,
     ) {
-        Button(
-            onClick = onClick,
-            shape = RoundedCornerShape(12.dp),
-            modifier = modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = backgroundColor,
-            ),
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(gradientBackgroundColor ?: SolidColor(backgroundColor)),
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Button(
+                onClick = onClick,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Transparent,
+                    contentColor = Color.Transparent,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                elevation = ButtonDefaults.elevation(0.dp),
             ) {
-                AutoResizeText(
-                    text = primaryText,
-                    color = textColor,
-                    maxFontSize = 18.sp,
-                    lineHeight = 21.sp,
-                    fontWeight = fontWeight,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center,
-                )
-                secondaryText?.let {
-                    TextP60(
-                        text = it,
-                        textAlign = TextAlign.Center,
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    AutoResizeText(
+                        text = primaryText,
                         color = textColor,
-                        modifier = Modifier.padding(top = 4.dp),
+                        maxFontSize = 18.sp,
+                        lineHeight = 21.sp,
+                        fontWeight = fontWeight,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
                     )
+                    secondaryText?.let {
+                        TextP60(
+                            text = it,
+                            textAlign = TextAlign.Center,
+                            color = textColor,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
                 }
             }
         }
@@ -392,4 +407,15 @@ object OnboardingUpgradeHelper {
             modifier = modifier,
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UpgradeRowButtonPreview() {
+    UpgradeRowButton(
+        primaryText = "Upgrade Now",
+        textColor = Color.Black,
+        onClick = {},
+        gradientBackgroundColor = plusGradientBrush,
+    )
 }
