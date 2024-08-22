@@ -45,7 +45,7 @@ class TranscriptViewModel @Inject constructor(
     private val subtitleParserFactory: SubtitleParser.Factory,
     private val analyticsTracker: AnalyticsTracker,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val transcriptJsonParser: TranscriptJsonParser,
+    private val transcriptJsonConverter: TranscriptJsonConverter,
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty())
     val uiState: StateFlow<UiState> = _uiState
@@ -159,7 +159,7 @@ class TranscriptViewModel @Inject constructor(
                     emptyList()
                 } else {
                     // Parse json following PodcastIndex.org transcript json spec: https://github.com/Podcastindex-org/podcast-namespace/blob/main/transcripts/transcripts.md#json
-                    val transcriptCues = transcriptJsonParser.parse(jsonString)
+                    val transcriptCues = transcriptJsonConverter.fromString(jsonString)
                     transcriptCues.map { cue ->
                         val startTimeUs = cue.startTime?.toMicroSeconds ?: 0
                         val endTimeUs = cue.endTime?.toMicroSeconds ?: 0

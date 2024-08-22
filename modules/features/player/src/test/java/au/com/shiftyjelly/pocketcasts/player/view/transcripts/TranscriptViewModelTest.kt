@@ -39,7 +39,7 @@ class TranscriptViewModelTest {
     private val transcriptsManager: TranscriptsManager = mock()
     private val playbackManager: PlaybackManager = mock()
     private val subtitleParserFactory: SubtitleParser.Factory = mock()
-    private val transcriptJsonParser: TranscriptJsonParser = mock()
+    private val transcriptJsonConverter: TranscriptJsonConverter = mock()
     private val transcript: Transcript = Transcript("episode_id", "url", "type")
     private val playbackStateFlow = MutableStateFlow(PlaybackState(podcast = Podcast("podcast_id"), episodeUuid = "episode_id"))
     private lateinit var viewModel: TranscriptViewModel
@@ -195,7 +195,7 @@ class TranscriptViewModelTest {
             {"version":"1.0.0","segments":[{"speaker":"Speaker 1","startTime":0,"endTime":10,"body":"Hello."},{"speaker":null,"startTime":11,"endTime":20,"body":"World!"}]}
         """.trimIndent()
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "application/json")))
-        whenever(transcriptJsonParser.parse(jsonString)).thenReturn(
+        whenever(transcriptJsonConverter.fromString(jsonString)).thenReturn(
             listOf(
                 TranscriptCue(speaker = "Speaker 1", startTime = 0.0, endTime = 10.0, body = "Hello."),
                 TranscriptCue(speaker = null, startTime = 11.0, endTime = 20.0, body = "World!"),
@@ -244,7 +244,7 @@ class TranscriptViewModelTest {
             subtitleParserFactory = subtitleParserFactory,
             ioDispatcher = UnconfinedTestDispatcher(),
             analyticsTracker = mock(),
-            transcriptJsonParser = transcriptJsonParser,
+            transcriptJsonConverter = transcriptJsonConverter,
         )
     }
 }

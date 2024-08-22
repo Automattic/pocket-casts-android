@@ -19,10 +19,10 @@ data class TranscriptCue(
     @field:Json(name = "speaker") var speaker: String?,
 )
 
-class TranscriptJsonParser @Inject constructor(
+class TranscriptJsonConverter @Inject constructor(
     private val moshi: Moshi,
 ) {
-    fun parse(jsonString: String): List<TranscriptCue> {
+    fun fromString(jsonString: String): List<TranscriptCue> {
         val jsonAdapter: JsonAdapter<TranscriptSegments> =
             moshi.adapter(TranscriptSegments::class.java)
         val transcriptJson =
