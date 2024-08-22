@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.media3.extractor.text.SubtitleParser
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptCue
+import au.com.shiftyjelly.pocketcasts.models.converter.TranscriptJsonConverter
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError

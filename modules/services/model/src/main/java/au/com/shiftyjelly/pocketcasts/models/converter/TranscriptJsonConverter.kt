@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.player.view.transcripts
+package au.com.shiftyjelly.pocketcasts.models.converter
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
