@@ -2,8 +2,10 @@ package au.com.shiftyjelly.pocketcasts.engage
 
 import android.net.Uri
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.engage.BuildConfig.SERVER_SHORT_HOST
+import au.com.shiftyjelly.pocketcasts.models.entity.ExternalEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastView
 import com.google.android.engage.audio.datamodel.ListenNextType
@@ -18,6 +20,7 @@ import com.google.android.engage.service.PublishFeaturedClusterRequest
 import com.google.android.engage.service.PublishRecommendationClustersRequest
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
@@ -86,27 +89,27 @@ internal class ClusterRequestFactory {
             .build()
     }
 
-    fun createContinuation(): PublishContinuationClusterRequest {
-        val unfinishedEpisodes = List(Random.nextInt(1, 5)) { index ->
+    fun createContinuation(
+        episodes: List<ExternalEpisode.Podcast>,
+    ): PublishContinuationClusterRequest {
+        val unfinishedEpisodes = episodes.map { episode ->
             PodcastEpisodeEntity.Builder()
-                .setName("Continue listening: $index")
-                .addPosterImage(Image.Builder().setImageUri(Uri.parse("https://dummyimage.com/400x400&text=${index + 1}")).build())
-                .setPlayBackUri(Uri.parse("https://pca.st/episode/episode-id-$index?source=engage&autoplay=true"))
-                .setPodcastSeriesTitle("Podcast title: $index")
-                .setDurationMillis(Random.nextLong(25.minutes.inWholeMilliseconds, 40.minutes.inWholeMilliseconds))
-                .setPublishDateEpochMillis(Instant.now().minus(Random.nextLong(1, 14), ChronoUnit.DAYS).toEpochMilli())
-                .setInfoPageUri(Uri.parse("https://pca.st/episode/episode-id-$index?source=engage"))
-                .setEpisodeIndex(Random.nextInt(1, 20))
-                .setDownloadedOnDevice(Random.nextInt(0, 100) > 50)
-                .setDescription("Description: $index")
-                .setVideoPodcast(Random.nextInt(0, 100) > 50)
+                .setName(episode.title)
+                .addPosterImage(Image.Builder().setImageUri(Uri.parse(episode.coverUrl)).build())
+                .setPlayBackUri(episode.continuationUri(autoPlay = true))
+                .setPodcastSeriesTitle(episode.podcastTitle)
+                .setDurationMillis(episode.durationMs)
+                .setPublishDateEpochMillis(episode.releaseTimestampMs)
+                .setInfoPageUri(episode.continuationUri(autoPlay = false))
+                .addEpisodeIndex(episode.episodeNumber)
+                .setDownloadedOnDevice(episode.isDownloaded)
+                .setVideoPodcast(episode.isVideo)
                 .setListenNextType(ListenNextType.TYPE_CONTINUE)
-                .setLastEngagementTimeMillis(Instant.now().minus(Random.nextLong(1, 14), ChronoUnit.DAYS).toEpochMilli())
-                .setProgressPercentComplete(Random.nextInt(15, 76))
+                .addLastEngagementTimeMillis(episode.lastUsedTimestampMs)
+                .setProgressPercentComplete(episode.percentComplete.roundToInt())
                 .build()
         }
         val unfinishedCluster = ContinuationCluster.Builder()
-            .setSyncAcrossDevices(false)
             .apply { unfinishedEpisodes.forEach { addEntity(it) } }
             .build()
         return PublishContinuationClusterRequest.Builder()
@@ -133,15 +136,38 @@ internal class ClusterRequestFactory {
             .build()
     }
 
+    private fun ExternalEpisode.Podcast.continuationUri(autoPlay: Boolean) = ShowEpisodeDeepLink(
+        episodeUuid = id,
+        podcastUuid = podcastId,
+        sourceView = SourceView.ENGAGE_SDK_CONTINUATION.analyticsValue,
+        autoPlay = autoPlay,
+    ).toUri(SERVER_SHORT_HOST)
+
     private val ExternalPodcastView.featuredUri get() = ShowPodcastDeepLink(
         podcastUuid = id,
-        sourceView = SourceView.ENGAGE_SDK_FEATURED.analyticsValue
+        sourceView = SourceView.ENGAGE_SDK_FEATURED.analyticsValue,
     ).toUri(SERVER_SHORT_HOST)
 
     private fun PodcastSeriesEntity.Builder.addDescription(description: String?): PodcastSeriesEntity.Builder {
         return if (description != null) {
             val fittingDescription = if (description.length > 200) description.take(199) + "…" else description
             setDescription(fittingDescription)
+        } else {
+            this
+        }
+    }
+
+    private fun PodcastEpisodeEntity.Builder.addEpisodeIndex(index: Int?): PodcastEpisodeEntity.Builder {
+        return if (index != null) {
+            setEpisodeIndex(index)
+        } else {
+            this
+        }
+    }
+
+    private fun PodcastEpisodeEntity.Builder.addLastEngagementTimeMillis(time: Long?): PodcastEpisodeEntity.Builder {
+        return if (time != null) {
+            setLastEngagementTimeMillis(time)
         } else {
             this
         }

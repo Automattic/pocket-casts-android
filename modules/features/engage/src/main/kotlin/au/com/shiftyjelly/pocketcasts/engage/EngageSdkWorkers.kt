@@ -85,11 +85,13 @@ internal class RecommendationsSyncWorker @AssistedInject constructor(
 internal class ContinuationSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
+    private val externalDataManager: ExternalDataManager,
 ) : ClusterSyncWorker(context, params, "Continuation") {
     private val clusterRequestFactory = ClusterRequestFactory()
 
     override suspend fun submitCluster(client: AppEngagePublishClient): Task<Void> {
-        return client.publishContinuationCluster(clusterRequestFactory.createContinuation())
+        val inProgressEpisodes = externalDataManager.getInProgressEpisodes(limit = 10)
+        return client.publishContinuationCluster(clusterRequestFactory.createContinuation(inProgressEpisodes))
     }
 }
 
