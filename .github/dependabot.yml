@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    open-pull-requests-limit: 6
+    directory: "/"
+    schedule:
+      interval: "daily"
+    ignore:
+      # The Android Gradle Plugin is a dependency we'd like to upgrade manually.
+      - dependency-name: "com.android.tools.build:gradle"
+      - dependency-name: "com.android.application"
+      - dependency-name: "com.android.library"
