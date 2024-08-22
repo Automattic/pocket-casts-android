@@ -23,7 +23,6 @@ import com.google.android.engage.service.PublishContinuationClusterRequest
 import com.google.android.engage.service.PublishFeaturedClusterRequest
 import com.google.android.engage.service.PublishRecommendationClustersRequest
 import kotlin.math.roundToInt
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal class ClusterRequestFactory(
@@ -37,7 +36,7 @@ internal class ClusterRequestFactory(
                 PodcastSeriesEntity.Builder()
                     .setName(podcast.title)
                     .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
-                    .setInfoPageUri(podcast.recommendationsUri.also { Timber.tag("Engage").i(it.toString()) })
+                    .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .setEpisodeCount(podcast.episodeCount)
                     .addGenres(podcast.categories)
                     .addDescription(podcast.description)
@@ -54,11 +53,11 @@ internal class ClusterRequestFactory(
                 PodcastEpisodeEntity.Builder()
                     .setName(episode.title)
                     .addPosterImage(Image.Builder().setImageUri(Uri.parse(episode.coverUrl)).build())
-                    .setPlayBackUri(episode.recommendationsUri(autoPlay = true))
+                    .setPlayBackUri(episode.uri(autoPlay = true, SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .setPodcastSeriesTitle(episode.podcastTitle)
                     .setDurationMillis(episode.durationMs)
                     .setPublishDateEpochMillis(episode.releaseTimestampMs)
-                    .setInfoPageUri(episode.recommendationsUri(autoPlay = false))
+                    .setInfoPageUri(episode.uri(autoPlay = false, SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .addEpisodeIndex(episode.episodeNumber)
                     .setDownloadedOnDevice(episode.isDownloaded)
                     .setVideoPodcast(episode.isVideo)
@@ -77,13 +76,13 @@ internal class ClusterRequestFactory(
                 PodcastSeriesEntity.Builder()
                     .setName(podcast.title)
                     .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
-                    .setInfoPageUri(podcast.recommendationsUri)
+                    .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .addDescription(podcast.description)
                     .build()
             }
             RecommendationCluster.Builder()
                 .setTitle(context.getString(LR.string.engage_sdk_trending))
-                .setActionUri(list.recommendationsDeepLinkUri)
+                .setActionUri(list.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                 .apply { entities.forEach { addEntity(it) } }
                 .build()
         }
@@ -93,13 +92,13 @@ internal class ClusterRequestFactory(
                     PodcastSeriesEntity.Builder()
                         .setName(podcast.title)
                         .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
-                        .setInfoPageUri(podcast.recommendationsUri)
+                        .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                         .addDescription(podcast.description)
                         .build()
                 }
                 RecommendationCluster.Builder()
                     .setTitle(list.title)
-                    .setActionUri(list.recommendationsDeepLinkUri)
+                    .setActionUri(list.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .apply { entities.forEach { addEntity(it) } }
                     .build()
             }
@@ -126,11 +125,11 @@ internal class ClusterRequestFactory(
             PodcastEpisodeEntity.Builder()
                 .setName(episode.title)
                 .addPosterImage(Image.Builder().setImageUri(Uri.parse(episode.coverUrl)).build())
-                .setPlayBackUri(episode.continuationUri(autoPlay = true))
+                .setPlayBackUri(episode.uri(autoPlay = true, SourceView.ENGAGE_SDK_CONTINUATION))
                 .setPodcastSeriesTitle(episode.podcastTitle)
                 .setDurationMillis(episode.durationMs)
                 .setPublishDateEpochMillis(episode.releaseTimestampMs)
-                .setInfoPageUri(episode.continuationUri(autoPlay = false))
+                .setInfoPageUri(episode.uri(autoPlay = false, SourceView.ENGAGE_SDK_CONTINUATION))
                 .addEpisodeIndex(episode.episodeNumber)
                 .setDownloadedOnDevice(episode.isDownloaded)
                 .setVideoPodcast(episode.isVideo)
@@ -154,7 +153,7 @@ internal class ClusterRequestFactory(
             PodcastSeriesEntity.Builder()
                 .setName(podcast.title)
                 .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
-                .setInfoPageUri(podcast.featuredUri)
+                .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_FEATURED))
                 .addDescription(podcast.description)
                 .build()
         }
@@ -166,44 +165,40 @@ internal class ClusterRequestFactory(
             .build()
     }
 
-    private fun ExternalEpisode.Podcast.continuationUri(autoPlay: Boolean) = ShowEpisodeDeepLink(
+    private fun ExternalPodcast.uri(source: SourceView) = ShowPodcastDeepLink(
+        podcastUuid = id,
+        sourceView = source.analyticsValue,
+    ).toUri(SERVER_SHORT_HOST)
+
+    private fun ExternalEpisode.Podcast.uri(autoPlay: Boolean, source: SourceView) = ShowEpisodeDeepLink(
         episodeUuid = id,
         podcastUuid = podcastId,
-        sourceView = SourceView.ENGAGE_SDK_CONTINUATION.analyticsValue,
+        sourceView = source.analyticsValue,
         autoPlay = autoPlay,
     ).toUri(SERVER_SHORT_HOST)
 
-    private val ExternalPodcastView.featuredUri get() = ShowPodcastDeepLink(
-        podcastUuid = id,
-        sourceView = SourceView.ENGAGE_SDK_FEATURED.analyticsValue,
-    ).toUri(SERVER_SHORT_HOST)
-
-    private val ExternalPodcast.recommendationsUri get() = ShowPodcastDeepLink(
-        podcastUuid = id,
-        sourceView = SourceView.ENGAGE_SDK_RECOMMENDATIONS.analyticsValue,
-    ).toUri(SERVER_SHORT_HOST)
-
-    private fun ExternalEpisode.Podcast.recommendationsUri(autoPlay: Boolean) = ShowEpisodeDeepLink(
-        episodeUuid = id,
-        podcastUuid = podcastId,
-        sourceView = SourceView.ENGAGE_SDK_RECOMMENDATIONS.analyticsValue,
-        autoPlay = autoPlay,
-    ).toUri(SERVER_SHORT_HOST)
-
-    private val ExternalPodcastView.recommendationsUri get() = ShowPodcastDeepLink(
-        podcastUuid = id,
-        sourceView = SourceView.ENGAGE_SDK_RECOMMENDATIONS.analyticsValue,
-    ).toUri(SERVER_SHORT_HOST)
-
-    private val ExternalPodcastList.recommendationsDeepLinkUri get() = ShareListDeepLink(
+    private fun ExternalPodcastList.uri(source: SourceView) = ShareListDeepLink(
         path = id,
-        sourceView = SourceView.ENGAGE_SDK_RECOMMENDATIONS.analyticsValue,
+        sourceView = source.analyticsValue,
     ).toUri(SERVER_LIST_HOST)
+
+    private fun ExternalPodcastView.uri(source: SourceView) = ShowPodcastDeepLink(
+        podcastUuid = id,
+        sourceView = source.analyticsValue,
+    ).toUri(SERVER_SHORT_HOST)
 
     private fun PodcastSeriesEntity.Builder.addDescription(description: String?): PodcastSeriesEntity.Builder {
         return if (description != null) {
             val fittingDescription = if (description.length > 200) description.take(199) + "…" else description
             setDescription(fittingDescription)
+        } else {
+            this
+        }
+    }
+
+    private fun PodcastSeriesEntity.Builder.addLastEngagementTimeMillis(time: Long?): PodcastSeriesEntity.Builder {
+        return if (time != null) {
+            setLastEngagementTimeMillis(time)
         } else {
             this
         }
@@ -218,14 +213,6 @@ internal class ClusterRequestFactory(
     }
 
     private fun PodcastEpisodeEntity.Builder.addLastEngagementTimeMillis(time: Long?): PodcastEpisodeEntity.Builder {
-        return if (time != null) {
-            setLastEngagementTimeMillis(time)
-        } else {
-            this
-        }
-    }
-
-    private fun PodcastSeriesEntity.Builder.addLastEngagementTimeMillis(time: Long?): PodcastSeriesEntity.Builder {
         return if (time != null) {
             setLastEngagementTimeMillis(time)
         } else {
