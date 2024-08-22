@@ -88,10 +88,10 @@ abstract class ExternalDataDao {
           OR curated_podcast.list_id IS '${CuratedPodcast.FEATURED_LIST_ID}'
         """,
     )
-    abstract suspend fun _getCuratedPodcasts(): List<CuratedPodcast>
+    protected abstract suspend fun getCuratedPodcasts(): List<CuratedPodcast>
 
     final suspend fun getCuratedPodcastGroups(limitPerGroup: Int): ExternalPodcastMap {
-        val listsMap = _getCuratedPodcasts()
+        val listsMap = getCuratedPodcasts()
             .groupBy { it.listId }
             .mapValues { (_, value) ->
                 val listTitle = value[0].listTitle
