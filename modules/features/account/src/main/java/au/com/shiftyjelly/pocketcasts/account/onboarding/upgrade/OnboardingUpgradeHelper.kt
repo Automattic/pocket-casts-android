@@ -243,12 +243,12 @@ object OnboardingUpgradeHelper {
             modifier = if (selected) {
                 modifier.background(
                     brush = brush,
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(12.dp),
                 )
             } else {
                 modifier.background(
                     color = unselectedColor,
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(12.dp),
                 )
             },
         ) {
