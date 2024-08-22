@@ -260,7 +260,7 @@ private fun recurringAfterIntroString(
     "${recurringSubscriptionPricingPhase.formattedPrice} ${res.getString(LR.string.onboarding_plus_recurring_after_intro_offer_sufix)} (${offerSubscriptionPricingPhase.offerEnd()})"
 
 fun SubscriptionTier.toSubscribeTitle() = when (this) {
-    SubscriptionTier.PLUS -> R.string.onboarding_subscribe_to_subscribe
+    SubscriptionTier.PLUS -> R.string.onboarding_subscribe_to_plus
     SubscriptionTier.PATRON -> R.string.onboarding_patron_subscribe
     SubscriptionTier.UNKNOWN -> throw IllegalStateException(UNKNOWN_TIER)
 }
