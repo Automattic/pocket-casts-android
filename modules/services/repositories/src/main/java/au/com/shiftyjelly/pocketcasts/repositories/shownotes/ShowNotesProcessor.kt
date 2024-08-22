@@ -102,11 +102,11 @@ class ShowNotesProcessor @Inject constructor(
         url = url,
         isEmbedded = false,
     )
-
-    private fun ShowNotesTranscript.toTranscript(episodeUuid: String) = Transcript(
-        episodeUuid = episodeUuid,
-        url = requireNotNull(url),
-        type = requireNotNull(type),
-        language = language,
-    )
 }
+
+fun ShowNotesTranscript.toTranscript(episodeUuid: String) = Transcript(
+    episodeUuid = episodeUuid,
+    url = requireNotNull(url),
+    type = requireNotNull(type),
+    language = language,
+)

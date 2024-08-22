@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.LoadTranscriptSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -52,11 +53,12 @@ class TranscriptViewModel @Inject constructor(
     private var _isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
+    private val _failedFormats = MutableStateFlow(emptyList<TranscriptFormat>())
+
     init {
         viewModelScope.launch {
             playbackManager.playbackStateFlow
                 .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
-                .distinctUntilChanged { t1, t2 -> t1.episodeUuid == t2.episodeUuid }
                 .stateIn(viewModelScope)
                 .flatMapLatest(::transcriptFlow)
                 .collect { _uiState.value = it }
@@ -65,7 +67,10 @@ class TranscriptViewModel @Inject constructor(
 
     private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
         transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
-            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid }
+            .distinctUntilChanged { t1, t2 ->
+                if (t1?.episodeUuid != t2?.episodeUuid) _failedFormats.value = emptyList()
+                t1?.episodeUuid == t2?.episodeUuid && t1?.type == t2?.type
+            }
             .map { transcript ->
                 transcript?.let {
                     UiState.TranscriptFound(podcastAndEpisode, transcript)
@@ -90,10 +95,6 @@ class TranscriptViewModel @Inject constructor(
                     val forceRefresh = pulledToRefresh || retryOnFail
                     val cuesInfo = buildSubtitleCues(transcript, forceRefresh)
 
-                    if (cuesInfo.isEmpty()) {
-                        throw TranscriptEmptyException("Transcript is empty: ${transcript.url}")
-                    }
-
                     val displayInfo = buildDisplayInfo(
                         cuesInfo = cuesInfo,
                         transcriptFormat = TranscriptFormat.fromType(transcript.type),
@@ -110,6 +111,20 @@ class TranscriptViewModel @Inject constructor(
                         cuesInfo = cuesInfo,
                     )
                 } catch (e: Exception) {
+                    if (e is TranscriptEmptyException || e is TranscriptParsingException) {
+                        TranscriptFormat.fromType(transcript.type)?.let {
+                            _failedFormats.value += it
+                            podcastAndEpisode?.let {
+                                transcriptsManager.updateAlternativeTranscript(
+                                    podcastAndEpisode.podcast?.uuid.orEmpty(),
+                                    podcastAndEpisode.episodeUuid,
+                                    _failedFormats.value,
+                                    LoadTranscriptSource.DEFAULT,
+                                )
+                            }
+                        }
+                    }
+
                     track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
                     when (e) {
                         is TranscriptEmptyException ->
@@ -140,7 +155,7 @@ class TranscriptViewModel @Inject constructor(
             TranscriptFormat.HTML.mimeType -> {
                 val content = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
                 if (content.trim().isEmpty()) {
-                    emptyList()
+                    throw TranscriptEmptyException()
                 } else {
                     // Html content is added as single large cue
                     ImmutableList.of(
@@ -156,7 +171,7 @@ class TranscriptViewModel @Inject constructor(
             TranscriptFormat.JSON_PODCAST_INDEX.mimeType -> {
                 val jsonString = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
                 if (jsonString.trim().isEmpty()) {
-                    emptyList()
+                    throw TranscriptEmptyException()
                 } else {
                     // Parse json following PodcastIndex.org transcript json spec: https://github.com/Podcastindex-org/podcast-namespace/blob/main/transcripts/transcripts.md#json
                     val transcriptCues = transcriptJsonParser.parse(jsonString)
@@ -197,7 +212,8 @@ class TranscriptViewModel @Inject constructor(
                             throw TranscriptParsingException(message)
                         }
                     }
-                    result.build().map { it.toTranscriptCuesInfo() }
+                    val cuesInfo = result.build().map { it.toTranscriptCuesInfo() }
+                    cuesInfo.ifEmpty { throw TranscriptEmptyException() }
                 }
             }
         }
@@ -341,5 +357,5 @@ class TranscriptViewModel @Inject constructor(
     }
 
     class TranscriptParsingException(message: String) : Exception(message)
-    class TranscriptEmptyException(message: String) : Exception(message)
+    class TranscriptEmptyException : Exception("Transcript is empty")
 }

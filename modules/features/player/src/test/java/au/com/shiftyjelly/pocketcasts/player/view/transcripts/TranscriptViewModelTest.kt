@@ -98,7 +98,7 @@ class TranscriptViewModelTest {
     }
 
     @Test
-    fun `given transcript is supported, when transcript load invoked, then loaded state is returned`() = runTest {
+    fun `given transcript is supported but blank, when transcript load invoked, then error state is returned`() = runTest {
         whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript))
         whenever(subtitleParserFactory.supportsFormat(any())).thenReturn(true)
         val parser = mock<SubtitleParser>()
@@ -109,7 +109,7 @@ class TranscriptViewModelTest {
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
         viewModel.uiState.test {
-            assertEquals(transcript, (awaitItem() as UiState.TranscriptLoaded).transcript)
+            assertEquals((awaitItem() as UiState.Error).error, TranscriptError.Empty)
         }
     }
 

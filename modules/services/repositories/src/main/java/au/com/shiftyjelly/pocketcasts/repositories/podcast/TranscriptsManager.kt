@@ -18,6 +18,13 @@ interface TranscriptsManager {
         source: LoadTranscriptSource = LoadTranscriptSource.DEFAULT,
         forceRefresh: Boolean = false,
     ): ResponseBody?
+
+    suspend fun updateAlternativeTranscript(
+        podcastUuid: String,
+        episodeUuid: String,
+        failedFormats: List<TranscriptFormat>,
+        source: LoadTranscriptSource,
+    )
 }
 
 enum class LoadTranscriptSource {
