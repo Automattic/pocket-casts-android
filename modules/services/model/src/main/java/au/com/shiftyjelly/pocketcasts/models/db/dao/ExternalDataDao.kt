@@ -20,7 +20,9 @@ abstract class ExternalDataDao {
         SELECT 
           podcasts.uuid AS id, 
           podcasts.title AS title, 
+          podcasts.podcast_description AS description,
           podcasts.podcast_category AS podcast_category,
+          (SELECT COUNT(*) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS episode_count,
           (SELECT MIN(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
           (SELECT MAX(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
           (SELECT MAX(podcast_episodes.last_playback_interaction_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
@@ -56,7 +58,9 @@ abstract class ExternalDataDao {
         SELECT 
           podcasts.uuid AS id, 
           podcasts.title AS title,
+          podcasts.podcast_description AS description,
           podcasts.podcast_category AS podcast_category,
+          (SELECT COUNT(*) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS episode_count,
           (SELECT MIN(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
           (SELECT MAX(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
           (SELECT MAX(podcast_episodes.last_playback_interaction_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
@@ -118,7 +122,10 @@ abstract class ExternalDataDao {
           episode.season AS season_number,
           episode.number AS episode_number,
           episode.published_date AS release_timestamp,
-          episode.last_playback_interaction_date AS last_used_timestamp
+          episode.last_playback_interaction_date AS last_used_timestamp,
+          (episode.episode_status IS 4) AS is_downloaded,
+          (episode.file_type LIKE 'video/%') AS is_video,
+          podcast.title AS podcast_title
         FROM
           podcast_episodes AS episode
           JOIN podcasts AS podcast ON podcast.uuid IS episode.podcast_id
@@ -151,9 +158,13 @@ abstract class ExternalDataDao {
           episode.season AS season_number,
           episode.number AS episode_number,
           episode.published_date AS release_timestamp,
-          episode.last_playback_interaction_date AS last_used_timestamp
+          episode.last_playback_interaction_date AS last_used_timestamp,
+          (episode.episode_status IS 4) AS is_downloaded,
+          (episode.file_type LIKE 'video/%') AS is_video,
+          podcast.title AS podcast_title
         FROM
           podcast_episodes AS episode
+          JOIN podcasts AS podcast ON podcast.uuid IS episode.podcast_id
         WHERE
           episode.archived IS 0
           -- Check that the episode is in progress
@@ -185,9 +196,12 @@ abstract class ExternalDataDao {
               episode.title AS title, 
               episode.duration AS duration, 
               episode.played_up_to AS current_position, 
-              episode.published_date AS release_timestamp, 
+              episode.published_date AS release_timestamp,
+              (episode.episode_status IS 4) AS is_downloaded,
+              (episode.file_type LIKE 'video/%') AS is_video,
               -- podcast episode properties
-              episode.podcast_id AS podcast_id, 
+              episode.podcast_id AS podcast_id,
+              podcast.title AS podcast_title,
               episode.season AS season_number, 
               episode.number AS episode_number, 
               episode.last_playback_interaction_date AS last_used_timestamp,
@@ -196,6 +210,7 @@ abstract class ExternalDataDao {
               NULL AS tint_color_index
             FROM 
               podcast_episodes AS episode 
+              JOIN podcasts AS podcast ON podcast.uuid IS episode.podcast_id
             UNION ALL 
             SELECT
               -- common properties
@@ -205,8 +220,11 @@ abstract class ExternalDataDao {
               episode.duration AS duration, 
               episode.played_up_to AS current_position, 
               episode.published_date AS release_timestamp,
+              (episode.episode_status IS 4) AS is_downloaded,
+              (episode.file_type LIKE 'video/%') AS is_video,
               -- podcast episode properties
               NULL AS podcast_id, 
+              NULL AS podcast_title,
               NULL AS season_number, 
               NULL AS episode_number, 
               NULL AS last_used_timestamp,
