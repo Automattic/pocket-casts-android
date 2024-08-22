@@ -81,9 +81,12 @@ class ServersModule {
             val originalResponse = chain.proceed(request)
             var responseBuilder = originalResponse.newBuilder()
             if (request.cacheControl.noCache) {
-                responseBuilder = responseBuilder.header(HEADER_CACHE_CONTROL, "public, max-age=$CACHE_FIVE_MINUTES")
+                responseBuilder = responseBuilder
+                    .header(HEADER_CACHE_CONTROL, "public, max-age=$CACHE_FIVE_MINUTES")
+                    .removeHeader("Pragma")
             } else if (request.cacheControl.onlyIfCached) {
                 responseBuilder.header(HEADER_CACHE_CONTROL, "public, only-if-cached, max-stale=${request.cacheControl.maxStaleSeconds}")
+                    .removeHeader("Pragma")
             }
             responseBuilder.build()
         }
