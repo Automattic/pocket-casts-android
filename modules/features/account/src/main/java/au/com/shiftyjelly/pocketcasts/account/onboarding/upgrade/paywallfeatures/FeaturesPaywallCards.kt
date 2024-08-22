@@ -36,6 +36,8 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+private const val PodcastCoverScaleFactor = 1.5f
+
 @Composable
 fun FeaturedPaywallCards(modifier: Modifier = Modifier) {
     val featuredCards: List<CardData> = listOf(
@@ -48,8 +50,10 @@ fun FeaturedPaywallCards(modifier: Modifier = Modifier) {
         themes,
     )
 
+    val spacedBy = (16 / PodcastCoverScaleFactor).dp
+
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacedBy),
         modifier = modifier,
     ) {
         items(
