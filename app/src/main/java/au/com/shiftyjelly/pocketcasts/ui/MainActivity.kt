@@ -1303,7 +1303,7 @@ class MainActivity :
                     )
                 }
                 is ShareListDeepLink -> {
-                    addFragment(ShareListIncomingFragment.newInstance(deepLink.path))
+                    addFragment(ShareListIncomingFragment.newInstance(deepLink.path, SourceView.fromString(deepLink.sourceView)))
                 }
                 is CloudFilesDeepLink -> {
                     openCloudFiles()
