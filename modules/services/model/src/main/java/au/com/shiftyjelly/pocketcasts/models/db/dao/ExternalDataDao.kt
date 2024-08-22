@@ -46,7 +46,7 @@ abstract class ExternalDataDao {
           :limit
         """,
     )
-    abstract suspend fun getSubscirbedPodcasts(
+    abstract suspend fun getSubscribedPodcasts(
         sortOrder: PodcastsSortType,
         limit: Int,
     ): List<ExternalPodcast>

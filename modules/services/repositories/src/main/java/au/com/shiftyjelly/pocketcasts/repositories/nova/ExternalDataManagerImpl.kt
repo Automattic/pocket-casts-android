@@ -13,7 +13,7 @@ class ExternalDataManagerImpl @Inject constructor(
     private val settings: Settings,
 ) : ExternalDataManager {
     override suspend fun getSubscribedPodcasts(limit: Int): List<ExternalPodcast> {
-        return externalDataDao.getSubscirbedPodcasts(settings.podcastsSortType.value, limit)
+        return externalDataDao.getSubscribedPodcasts(settings.podcastsSortType.value, limit)
     }
 
     override suspend fun getRecentlyPlayedPodcasts(limit: Int): List<ExternalPodcast> {

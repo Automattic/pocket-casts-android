@@ -70,7 +70,7 @@ class ExternalDataDaoTest {
 
         podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
 
-        val podcasts = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
+        val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
         val expected = listOf(
             ExternalPodcast(
@@ -121,7 +121,7 @@ class ExternalDataDaoTest {
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-5", publishedDate = Date(0), podcastUuid = "id-2"))
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-6", publishedDate = Date(0), podcastUuid = "id-2"))
 
-        val podcasts = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
+        val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
         val expected = listOf(
             ExternalPodcast(
@@ -140,7 +140,7 @@ class ExternalDataDaoTest {
     fun includeCategoriesForSubscribedPodcasts() = runTest {
         podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, podcastCategory = "category-1"))
 
-        val podcasts = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
+        val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100)
 
         val expected = listOf(
             ExternalPodcast(
@@ -163,7 +163,7 @@ class ExternalDataDaoTest {
         podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, addedDate = Date(1)))
         podcastDao.insert(Podcast(uuid = "id-5", title = "title-5", isSubscribed = true, addedDate = null))
 
-        val podcastIds = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST, limit = 100).map { it.id }
+        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST, limit = 100).map { it.id }
 
         assertEquals(listOf("id-4", "id-3", "id-1", "id-2", "id-5"), podcastIds)
     }
@@ -175,7 +175,7 @@ class ExternalDataDaoTest {
         podcastDao.insert(Podcast(uuid = "id-3", title = "title-1", isSubscribed = true))
         podcastDao.insert(Podcast(uuid = "id-4", title = "title-2", isSubscribed = true))
 
-        val podcastIds = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
+        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
 
         assertEquals(listOf("id-3", "id-4", "id-2", "id-1"), podcastIds)
     }
@@ -191,7 +191,7 @@ class ExternalDataDaoTest {
         podcastDao.insert(Podcast(uuid = "id-7", title = "a 7", isSubscribed = true))
         podcastDao.insert(Podcast(uuid = "id-8", title = "8", isSubscribed = true))
 
-        val podcastIds = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
+        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 100).map { it.id }
 
         assertEquals(listOf("id-1", "id-2", "id-3", "id-4", "id-5", "id-6", "id-7", "id-8"), podcastIds)
     }
@@ -209,7 +209,7 @@ class ExternalDataDaoTest {
         podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true))
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(200), podcastUuid = "id-4"))
 
-        val podcastIds = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST, limit = 100).map { it.id }
+        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST, limit = 100).map { it.id }
 
         assertEquals(listOf("id-4", "id-2", "id-1", "id-3"), podcastIds)
     }
@@ -221,7 +221,7 @@ class ExternalDataDaoTest {
         podcastDao.insert(Podcast(uuid = "id-3", title = "title-3", isSubscribed = true, sortPosition = 2))
         podcastDao.insert(Podcast(uuid = "id-4", title = "title-4", isSubscribed = true, sortPosition = 4))
 
-        val podcastIds = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.DRAG_DROP, limit = 100).map { it.id }
+        val podcastIds = externalDataDao.getSubscribedPodcasts(PodcastsSortType.DRAG_DROP, limit = 100).map { it.id }
 
         assertEquals(listOf("id-2", "id-3", "id-1", "id-4"), podcastIds)
     }
@@ -232,7 +232,7 @@ class ExternalDataDaoTest {
             podcastDao.insert(Podcast(uuid = "id-$it", isSubscribed = true))
         }
 
-        val podcasts = externalDataDao.getSubscirbedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 60)
+        val podcasts = externalDataDao.getSubscribedPodcasts(PodcastsSortType.NAME_A_TO_Z, limit = 60)
 
         assertEquals(60, podcasts.size)
     }
