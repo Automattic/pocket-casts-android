@@ -51,12 +51,14 @@ class PodcastCacheServerManagerImpl @Inject constructor(
     }
 
     override suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse {
-        return server.getShowNotes(podcastUuid)
+        val url = server.getShowNotesLocation(podcastUuid).url
+        return server.getShowNotes(url)
     }
 
     override suspend fun getShowNotesCache(podcastUuid: String): ShowNotesResponse? {
         return try {
-            server.getShowNotesCache(podcastUuid)
+            val url = server.getShowNotesLocationCache(podcastUuid).url
+            server.getShowNotesCache(url)
         } catch (e: Exception) {
             // if the cache can't be found a HTTP 504 Unsatisfiable Request will be thrown
             if (e !is HttpException) {
