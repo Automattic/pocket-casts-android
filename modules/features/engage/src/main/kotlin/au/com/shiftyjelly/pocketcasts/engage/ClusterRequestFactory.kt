@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.engage
 
 import android.net.Uri
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
+import au.com.shiftyjelly.pocketcasts.engage.BuildConfig.SERVER_SHORT_HOST
+import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
+import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastView
 import com.google.android.engage.audio.datamodel.ListenNextType
 import com.google.android.engage.audio.datamodel.PodcastEpisodeEntity
 import com.google.android.engage.audio.datamodel.PodcastSeriesEntity
@@ -109,15 +114,15 @@ internal class ClusterRequestFactory {
             .build()
     }
 
-    fun createFeatured(): PublishFeaturedClusterRequest {
-        val featuredPodcasts = List(Random.nextInt(1, 5)) { index ->
+    fun createFeatured(
+        featuredList: ExternalPodcastList?,
+    ): PublishFeaturedClusterRequest {
+        val featuredPodcasts = featuredList?.podcasts.orEmpty().map { podcast ->
             PodcastSeriesEntity.Builder()
-                .setName("Featured: $index")
-                .addPosterImage(Image.Builder().setImageUri(Uri.parse("https://dummyimage.com/400x400&text=${index + 1}")).build())
-                .setInfoPageUri(Uri.parse("https://pca.st/podcast/podcast-id-$index?source=engage"))
-                .setEpisodeCount(Random.nextInt(20, 200))
-                .addGenres(List(Random.nextInt(0, 4)) { "Genre: $it" })
-                .setDescription("Description: $index")
+                .setName(podcast.title)
+                .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
+                .setInfoPageUri(podcast.featuredUri)
+                .addDescription(podcast.description)
                 .build()
         }
         val featuredCluster = FeaturedCluster.Builder()
@@ -126,5 +131,19 @@ internal class ClusterRequestFactory {
         return PublishFeaturedClusterRequest.Builder()
             .setFeaturedCluster(featuredCluster)
             .build()
+    }
+
+    private val ExternalPodcastView.featuredUri get() = ShowPodcastDeepLink(
+        podcastUuid = id,
+        sourceView = SourceView.ENGAGE_SDK_FEATURED.analyticsValue
+    ).toUri(SERVER_SHORT_HOST)
+
+    private fun PodcastSeriesEntity.Builder.addDescription(description: String?): PodcastSeriesEntity.Builder {
+        return if (description != null) {
+            val fittingDescription = if (description.length > 200) description.take(199) + "…" else description
+            setDescription(fittingDescription)
+        } else {
+            this
+        }
     }
 }
