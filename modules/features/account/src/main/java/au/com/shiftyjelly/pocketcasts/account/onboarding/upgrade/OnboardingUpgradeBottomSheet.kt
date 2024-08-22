@@ -217,6 +217,8 @@ fun OnboardingUpgradeBottomSheet(
             color = Color.White,
             textAlign = TextAlign.Center,
         )
+
+        Spacer(Modifier.height(16.dp))
     }
 }
 
