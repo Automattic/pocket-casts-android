@@ -29,7 +29,7 @@ abstract class ExternalDataDao {
         WHERE 
           podcasts.subscribed IS NOT 0
         ORDER BY
-          -- Order by oldest to newest date added
+          -- Order by oldest to newest date added, '9223372036854775807' is the max possible value putting things at the bottom
           CASE WHEN :sortOrder IS 0 THEN IFNULL(podcasts.added_date, 9223372036854775807) END ASC,
           -- Order by A-Z podcast title
           CASE WHEN :sortOrder IS 1 THEN (CASE
@@ -40,7 +40,7 @@ abstract class ExternalDataDao {
           END) END ASC,
           -- Order by newest to oldest episode
           CASE WHEN :sortOrder IS 2 THEN (SELECT IFNULL(MAX(podcast_episodes.published_date), 0) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) END DESC,
-          -- Order by drag and drop position
+          -- Order by drag and drop position, '9223372036854775807' is the max possible value putting things at the bottom
           CASE WHEN :sortOrder IS 3 THEN IFNULL(podcasts.sort_order, 9223372036854775807) END ASC
         LIMIT
           :limit
