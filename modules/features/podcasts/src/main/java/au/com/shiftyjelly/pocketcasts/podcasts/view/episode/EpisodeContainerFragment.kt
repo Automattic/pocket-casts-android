@@ -62,6 +62,7 @@ class EpisodeContainerFragment :
             overridePodcastLink: Boolean = false,
             fromListUuid: String? = null,
             forceDark: Boolean = false,
+            autoPlay: Boolean = false,
         ) = newInstance(
             episodeUuid = episode.uuid,
             source = source,
@@ -69,6 +70,7 @@ class EpisodeContainerFragment :
             podcastUuid = episode.podcastUuid,
             fromListUuid = fromListUuid,
             forceDark = forceDark,
+            autoPlay = autoPlay,
         )
 
         fun newInstance(
@@ -79,6 +81,7 @@ class EpisodeContainerFragment :
             fromListUuid: String? = null,
             forceDark: Boolean = false,
             timestamp: Duration? = null,
+            autoPlay: Boolean = false,
         ) = EpisodeContainerFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(
@@ -91,6 +94,7 @@ class EpisodeContainerFragment :
                         fromListUuid = fromListUuid,
                         forceDark = forceDark,
                         timestamp = timestamp,
+                        autoPlay = autoPlay,
                     ),
                 )
             }
@@ -131,6 +135,9 @@ class EpisodeContainerFragment :
 
     private val forceDarkTheme: Boolean
         get() = args.forceDark
+
+    private val autoPlay: Boolean
+        get() = args.autoPlay
 
     val activeTheme: Theme.ThemeType
         get() = if (forceDarkTheme && theme.isLightTheme) Theme.ThemeType.DARK else theme.activeTheme
@@ -217,6 +224,7 @@ class EpisodeContainerFragment :
             podcastUuid = podcastUuid,
             fromListUuid = fromListUuid,
             forceDarkTheme = forceDarkTheme,
+            autoPlay = autoPlay,
         )
 
         viewPager.adapter = adapter
@@ -292,6 +300,7 @@ class EpisodeContainerFragment :
         private val podcastUuid: String?,
         private val fromListUuid: String?,
         private val forceDarkTheme: Boolean,
+        private val autoPlay: Boolean,
     ) : FragmentStateAdapter(fragmentManager, lifecycle) {
         val indexOfBookmarks: Int
             get() = sections.indexOf(Section.Bookmarks)
@@ -341,15 +350,18 @@ class EpisodeContainerFragment :
         override fun createFragment(position: Int): Fragment {
             Timber.d("Creating fragment for position $position ${sections[position]}")
             return when (sections[position]) {
-                Section.Details -> EpisodeFragment.newInstance(
-                    episodeUuid = requireNotNull(episodeUUID),
-                    timestamp = timestamp,
-                    source = episodeViewSource,
-                    overridePodcastLink = overridePodcastLink,
-                    podcastUuid = podcastUuid,
-                    fromListUuid = fromListUuid,
-                    forceDark = forceDarkTheme,
-                )
+                Section.Details ->
+                    EpisodeFragment
+                        .newInstance(
+                            episodeUuid = requireNotNull(episodeUUID),
+                            timestamp = timestamp,
+                            source = episodeViewSource,
+                            overridePodcastLink = overridePodcastLink,
+                            podcastUuid = podcastUuid,
+                            fromListUuid = fromListUuid,
+                            forceDark = forceDarkTheme,
+                            autoPlay = autoPlay,
+                        )
                 Section.Bookmarks -> BookmarksFragment.newInstance(
                     sourceView = SourceView.EPISODE_DETAILS,
                     episodeUuid = requireNotNull(episodeUUID),

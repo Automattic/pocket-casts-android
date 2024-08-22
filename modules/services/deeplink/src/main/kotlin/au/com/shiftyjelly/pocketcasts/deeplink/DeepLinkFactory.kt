@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EPISODE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_ID
@@ -146,6 +147,7 @@ private class ShowEpisodeAdapter : DeepLinkAdapter {
             ShowEpisodeDeepLink(
                 episodeUuid = episodeUuid,
                 podcastUuid = intent.getStringExtra(EXTRA_PODCAST_UUID),
+                autoPlay = intent.getBooleanExtra(EXTRA_AUTO_PLAY, false),
                 sourceView = intent.getStringExtra(EXTRA_SOURCE_VIEW),
             )
         }
@@ -375,14 +377,19 @@ private class ShareLinkAdapter(
                     startTimestamp = timestamps?.first,
                     endTimestamp = timestamps?.second,
                 )
+                uriData.pathSegments[0] == "podcast" -> ShowPodcastDeepLink(
+                    podcastUuid = uriData.pathSegments[1],
+                    sourceView = uriData.getQueryParameter(EXTRA_SOURCE_VIEW),
+                )
                 uriData.pathSegments[0] == "episode" -> ShowEpisodeDeepLink(
                     episodeUuid = uriData.pathSegments[1],
                     podcastUuid = null,
                     startTimestamp = timestamps?.first,
                     endTimestamp = timestamps?.second,
-                    sourceView = null,
+                    autoPlay = uriData.getQueryParameter(EXTRA_AUTO_PLAY).toBoolean(),
+                    sourceView = uriData.getQueryParameter(EXTRA_SOURCE_VIEW),
                 )
-                // handle the different podcast share links such as /podcast/uuid, /itunes/itunes_id, /feed/feed_url
+                // handle the different podcast share links such as /itunes/itunes_id, /feed/feed_url
                 else -> ShowPodcastFromUrlDeepLink(uriData.toString())
             }
         } else {

@@ -146,7 +146,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", "Source View"), deepLink)
+        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", "Source View", autoPlay = false), deepLink)
     }
 
     // Notifications add numbers to the action to display multiple of them
@@ -160,7 +160,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", "Source View"), deepLink)
+        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", "Source View", autoPlay = false), deepLink)
     }
 
     @Test
@@ -184,7 +184,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowEpisodeDeepLink("Episode ID", podcastUuid = null, "Source View"), deepLink)
+        assertEquals(ShowEpisodeDeepLink("Episode ID", podcastUuid = null, "Source View", autoPlay = false), deepLink)
     }
 
     @Test
@@ -196,7 +196,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", sourceView = null), deepLink)
+        assertEquals(ShowEpisodeDeepLink("Episode ID", "Podcast ID", sourceView = null, autoPlay = false), deepLink)
     }
 
     @Test
@@ -642,18 +642,18 @@ class DeepLinkFactoryTest {
     fun sharePodcast() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
-            .setData(Uri.parse("https://pca.st/podcast/podcast-id"))
+            .setData(Uri.parse("https://pca.st/podcast/podcast-id?source_view=source"))
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowPodcastFromUrlDeepLink("https://pca.st/podcast/podcast-id"), deepLink)
+        assertEquals(ShowPodcastDeepLink("podcast-id", sourceView = "source"), deepLink)
     }
 
     @Test
     fun shareEpisode() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
-            .setData(Uri.parse("https://pca.st/episode/episode-id"))
+            .setData(Uri.parse("https://pca.st/episode/episode-id?source_view=source"))
 
         val deepLink = factory.create(intent)
 
@@ -661,7 +661,8 @@ class DeepLinkFactoryTest {
             ShowEpisodeDeepLink(
                 episodeUuid = "episode-id",
                 podcastUuid = null,
-                sourceView = null,
+                sourceView = "source",
+                autoPlay = false,
             ),
             deepLink,
         )
@@ -681,6 +682,7 @@ class DeepLinkFactoryTest {
                 podcastUuid = null,
                 startTimestamp = 15.seconds,
                 sourceView = null,
+                autoPlay = false,
             ),
             deepLink,
         )
@@ -701,6 +703,45 @@ class DeepLinkFactoryTest {
                 startTimestamp = 15.seconds,
                 endTimestamp = 55.seconds,
                 sourceView = null,
+                autoPlay = false,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareEpisodeAutoPlayTrue() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/episode/episode-id?auto_play=true"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            ShowEpisodeDeepLink(
+                episodeUuid = "episode-id",
+                podcastUuid = null,
+                sourceView = null,
+                autoPlay = true,
+            ),
+            deepLink,
+        )
+    }
+
+    @Test
+    fun shareEpisodeWithAutoPlayFalse() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/episode/episode-id?auto_play-false"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(
+            ShowEpisodeDeepLink(
+                episodeUuid = "episode-id",
+                podcastUuid = null,
+                sourceView = null,
+                autoPlay = false,
             ),
             deepLink,
         )
@@ -725,7 +766,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowPodcastFromUrlDeepLink("http://pca.st/podcast/podcast-id"), deepLink)
+        assertEquals(ShowPodcastDeepLink("podcast-id", sourceView = null), deepLink)
     }
 
     @Test
