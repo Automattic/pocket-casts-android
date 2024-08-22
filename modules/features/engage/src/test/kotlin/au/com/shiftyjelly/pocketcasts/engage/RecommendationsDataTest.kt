@@ -212,7 +212,7 @@ class RecommendationsDataTest {
 
     private fun createCuratedList(title: String, size: Int) = ExternalPodcastList(
         title = title,
-        url = "url-$title",
+        id = "id-$title",
         podcasts = List(size) { index ->
             ExternalPodcastView(
                 id = "id-$index",
