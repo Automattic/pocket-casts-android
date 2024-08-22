@@ -125,6 +125,7 @@ data class ExternalPodcastMap(
 }
 
 data class ExternalPodcastList(
+    val id: String,
     val title: String,
     val podcasts: List<ExternalPodcastView>,
 )

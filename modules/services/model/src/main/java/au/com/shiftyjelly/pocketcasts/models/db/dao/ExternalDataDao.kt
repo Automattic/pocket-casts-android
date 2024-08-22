@@ -97,7 +97,7 @@ abstract class ExternalDataDao {
     final suspend fun getCuratedPodcastGroups(limitPerGroup: Int): ExternalPodcastMap {
         val listsMap = getCuratedPodcasts()
             .groupBy { it.listId }
-            .mapValues { (_, value) ->
+            .mapValues { (listId, value) ->
                 val listTitle = value[0].listTitle
                 val podcasts = value.take(limitPerGroup).map { curatedPodcast ->
                     ExternalPodcastView(
@@ -106,7 +106,7 @@ abstract class ExternalDataDao {
                         description = curatedPodcast.podcastDescription,
                     )
                 }
-                ExternalPodcastList(listTitle, podcasts)
+                ExternalPodcastList(listId, listTitle, podcasts)
             }
         return ExternalPodcastMap(listsMap)
     }

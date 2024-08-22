@@ -266,6 +266,7 @@ class ExternalDataDaoTest {
         val podcasts = externalDataDao.getCuratedPodcastGroups(limitPerGroup = 100).trendingGroup()
 
         val expected = ExternalPodcastList(
+            id = "trending",
             title = "Trending",
             podcasts = List(65) { ExternalPodcastView("id-$it", "title-$it", description = null) },
         )
@@ -330,6 +331,7 @@ class ExternalDataDaoTest {
         val podcasts = externalDataDao.getCuratedPodcastGroups(limitPerGroup = 100).featuruedGroup()
 
         val expected = ExternalPodcastList(
+            id = "featured",
             title = "Featured",
             podcasts = List(65) { ExternalPodcastView("id-$it", "title-$it", description = null) },
         )
@@ -396,10 +398,12 @@ class ExternalDataDaoTest {
 
         val expected = mapOf(
             "bork-0" to ExternalPodcastList(
+                id = "bork-0",
                 title = "Bork",
                 podcasts = List(5) { ExternalPodcastView("id-${it * 2}", "title-${it * 2}", description = null) },
             ),
             "bork-1" to ExternalPodcastList(
+                id = "bork-1",
                 title = "Bork",
                 podcasts = List(5) { ExternalPodcastView("id-${it * 2 + 1}", "title-${it * 2 + 1}", description = null) },
             ),
@@ -550,6 +554,7 @@ class ExternalDataDaoTest {
 
         val expected = mapOf(
             "bork" to ExternalPodcastList(
+                id = "bork",
                 title = "Bork",
                 podcasts = listOf(ExternalPodcastView("id-2", "title-2", description = null)),
             ),
