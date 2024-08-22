@@ -3,13 +3,18 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.toTranscript
+import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.net.UnknownHostException
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.Headers
@@ -18,6 +23,8 @@ class TranscriptsManagerImpl @Inject constructor(
     private val transcriptDao: TranscriptDao,
     private val service: TranscriptCacheServer,
     private val networkWrapper: NetworkWrapper,
+    private val serverShowNotesManager: ServerShowNotesManager,
+    @ApplicationScope private val scope: CoroutineScope,
 ) : TranscriptsManager {
     private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT, TranscriptFormat.JSON_PODCAST_INDEX, TranscriptFormat.HTML)
 
@@ -81,6 +88,27 @@ class TranscriptsManagerImpl @Inject constructor(
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to load transcript from $url", e)
             if (source == LoadTranscriptSource.DOWNLOAD_EPISODE) null else throw e // fail silently if loaded as part of episode download
+        }
+    }
+
+    override suspend fun updateAlternativeTranscript(
+        podcastUuid: String,
+        episodeUuid: String,
+        failedFormats: List<TranscriptFormat>,
+        source: LoadTranscriptSource,
+    ) {
+        serverShowNotesManager.loadShowNotes(
+            podcastUuid = podcastUuid,
+            episodeUuid = episodeUuid,
+        ) { showNotes ->
+            val transcripts = showNotes.podcast?.episodes
+                ?.firstOrNull { it.uuid == episodeUuid }
+                ?.transcripts
+                ?.mapNotNull { it.takeIf { it.url != null && it.type != null }?.toTranscript(episodeUuid) } ?: emptyList()
+            val transcriptsAvailable = transcripts.filter { it.type !in failedFormats.map { it.mimeType } }
+            scope.launch {
+                updateTranscripts(episodeUuid, transcriptsAvailable, source)
+            }
         }
     }
 }

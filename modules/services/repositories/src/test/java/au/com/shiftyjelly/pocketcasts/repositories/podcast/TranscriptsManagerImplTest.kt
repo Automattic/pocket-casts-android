@@ -25,7 +25,13 @@ class TranscriptsManagerImplTest {
     private val transcriptDao: TranscriptDao = mock()
     private val transcriptCacheServer: TranscriptCacheServer = mock()
     private val networkWrapper: NetworkWrapper = mock()
-    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao, transcriptCacheServer, networkWrapper)
+    private val transcriptsManager = TranscriptsManagerImpl(
+        transcriptDao = transcriptDao,
+        service = transcriptCacheServer,
+        networkWrapper = networkWrapper,
+        serverShowNotesManager = mock(),
+        scope = mock(),
+    )
 
     @Test
     fun `findBestTranscript returns first supported transcript`() = runTest {
