@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallfeatures.UpgradeLayoutFeatures
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -89,7 +90,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
     onBackPressed: () -> Unit,
-    onClickSubscribe: () -> Unit,
+    onClickSubscribe: (showUpgradeBottomSheet: Boolean) -> Unit,
     onNotNowPressed: () -> Unit,
     canUpgrade: Boolean,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
@@ -127,7 +128,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                         source = source,
                         onNotNowPressed = onNotNowPressed,
                         onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                        onClickSubscribe = onClickSubscribe,
+                        onClickSubscribe = { onClickSubscribe(true) },
                         scrollState = scrollState,
                         canUpgrade = canUpgrade,
                     )
@@ -141,7 +142,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                         onNotNowPressed = onNotNowPressed,
                         onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
                         onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
-                        onClickSubscribe = onClickSubscribe,
+                        onClickSubscribe = { onClickSubscribe(false) },
                         canUpgrade = canUpgrade,
                     )
                 }

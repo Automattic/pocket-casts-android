@@ -19,7 +19,7 @@ class TranscriptsManagerImpl @Inject constructor(
     private val service: TranscriptCacheServer,
     private val networkWrapper: NetworkWrapper,
 ) : TranscriptsManager {
-    private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT, TranscriptFormat.HTML)
+    private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT, TranscriptFormat.JSON_PODCAST_INDEX, TranscriptFormat.HTML)
 
     override suspend fun updateTranscripts(
         episodeUuid: String,
@@ -88,6 +88,7 @@ class TranscriptsManagerImpl @Inject constructor(
 enum class TranscriptFormat(val mimeType: String) {
     SRT("application/srt"),
     VTT("text/vtt"),
+    JSON_PODCAST_INDEX("application/json"),
     HTML("text/html"),
     ;
 

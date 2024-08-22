@@ -1,6 +1,8 @@
 7.72
 -----
-
+*   Bug Fixes
+    *   Fix create filter crash
+        ([#2677](https://github.com/Automattic/pocket-casts-android/pull/2677))
 
 7.71
 -----

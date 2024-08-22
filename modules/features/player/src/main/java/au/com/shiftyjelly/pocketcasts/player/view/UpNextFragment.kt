@@ -426,6 +426,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 source = EpisodeViewSource.UP_NEXT,
                 podcastUuid = podcastUuid,
                 forceDark = true,
+                autoPlay = false,
             )
         }
     }
@@ -437,6 +438,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 source = EpisodeViewSource.UP_NEXT,
                 podcastUuid = podcastUuid,
                 forceDark = true,
+                autoPlay = false,
             )
         } else {
             playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)

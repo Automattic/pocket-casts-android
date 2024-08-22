@@ -170,12 +170,14 @@ internal class CatalogFactory(
         episodeUuid = episodeId,
         podcastUuid = podcastId,
         sourceView = source.value,
+        autoPlay = false,
     ).toIntent(context)
 
     private fun openUserEpisodeIntent(episodeId: String, source: EpisodeViewSource) = ShowEpisodeDeepLink(
         episodeUuid = episodeId,
         podcastUuid = null,
         sourceView = source.value,
+        autoPlay = false,
     ).toIntent(context)
 
     private fun ApplePodcastCategory.Companion.fromCategories(categories: String) = categories.split('\n').mapNotNull(ApplePodcastCategory::valueOfSafe)

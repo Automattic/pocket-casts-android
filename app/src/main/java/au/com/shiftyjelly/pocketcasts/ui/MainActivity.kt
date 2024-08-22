@@ -875,6 +875,7 @@ class MainActivity :
                                 source = EpisodeViewSource.NOTIFICATION_BOOKMARK,
                                 podcastUuid = navigationState.episode.podcastUuid,
                                 forceDark = false,
+                                autoPlay = false,
                             )
                         }
                         is NavigationState.BookmarksForUserEpisode -> {
@@ -1176,6 +1177,7 @@ class MainActivity :
             source = source,
             podcastUuid = podcastUuid,
             forceDark = false,
+            autoPlay = false,
         )
     }
 
@@ -1261,6 +1263,7 @@ class MainActivity :
                         podcastUuid = deepLink.podcastUuid,
                         source = EpisodeViewSource.fromString(deepLink.sourceView),
                         forceDark = false,
+                        autoPlay = deepLink.autoPlay,
                         startTimestamp = deepLink.startTimestamp,
                         endTimestamp = deepLink.endTimestamp,
                     )
@@ -1360,6 +1363,7 @@ class MainActivity :
         source: EpisodeViewSource,
         podcastUuid: String?,
         forceDark: Boolean,
+        autoPlay: Boolean,
         startTimestamp: Duration?,
         endTimestamp: Duration?,
     ) {
@@ -1385,6 +1389,7 @@ class MainActivity :
                         podcastUuid = localEpisode.podcastUuid,
                         forceDark = forceDark,
                         timestamp = startTimestamp,
+                        autoPlay = autoPlay,
                     )
                 }
                 null -> {
@@ -1398,6 +1403,7 @@ class MainActivity :
                             podcastUuid = it.podcastUuid,
                             forceDark = forceDark,
                             timestamp = startTimestamp,
+                            autoPlay = autoPlay,
                         )
                     }
                 }
@@ -1477,6 +1483,7 @@ class MainActivity :
                             source = EpisodeViewSource.SHARE,
                             podcastUuid = podcastUuid,
                             forceDark = false,
+                            autoPlay = false,
                             startTimestamp = deepLink.startTimestamp,
                         )
                     } else {
