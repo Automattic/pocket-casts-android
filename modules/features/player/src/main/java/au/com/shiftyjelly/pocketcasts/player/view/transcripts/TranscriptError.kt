@@ -45,6 +45,9 @@ fun TranscriptError(
     modifier: Modifier,
 ) {
     val errorMessage = when (val error = state.error) {
+        is TranscriptError.Empty ->
+            stringResource(LR.string.transcript_empty)
+
         is TranscriptError.NotSupported ->
             stringResource(LR.string.error_transcript_format_not_supported, error.format)
 
