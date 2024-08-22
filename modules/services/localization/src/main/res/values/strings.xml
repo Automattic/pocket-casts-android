@@ -1827,6 +1827,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
     <string name="onboarding_plus_subscribe">Subscribe to Pocket&#160;Casts Plus</string>
+    <string name="onboarding_subscribe_to_subscribe">Subscribe to Plus</string>
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Recurring payment at %s</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">after your first year</string>
