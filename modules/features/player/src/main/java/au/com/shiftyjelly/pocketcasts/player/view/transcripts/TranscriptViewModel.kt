@@ -90,6 +90,10 @@ class TranscriptViewModel @Inject constructor(
                     val forceRefresh = pulledToRefresh || retryOnFail
                     val cuesInfo = buildSubtitleCues(transcript, forceRefresh)
 
+                    if (cuesInfo.isEmpty()) {
+                        throw TranscriptEmptyException("Transcript is empty: ${transcript.url}")
+                    }
+
                     val displayInfo = buildDisplayInfo(
                         cuesInfo = cuesInfo,
                         transcriptFormat = TranscriptFormat.fromType(transcript.type),
@@ -108,6 +112,9 @@ class TranscriptViewModel @Inject constructor(
                 } catch (e: Exception) {
                     track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
                     when (e) {
+                        is TranscriptEmptyException ->
+                            UiState.Error(TranscriptError.Empty, transcript, podcastAndEpisode)
+
                         is UnsupportedOperationException ->
                             UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
 
@@ -330,7 +337,9 @@ class TranscriptViewModel @Inject constructor(
         data object FailedToLoad : TranscriptError()
         data object NoNetwork : TranscriptError()
         data object FailedToParse : TranscriptError()
+        data object Empty : TranscriptError()
     }
 
     class TranscriptParsingException(message: String) : Exception(message)
+    class TranscriptEmptyException(message: String) : Exception(message)
 }
