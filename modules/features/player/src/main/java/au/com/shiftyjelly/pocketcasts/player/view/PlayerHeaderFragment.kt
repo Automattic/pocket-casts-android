@@ -405,6 +405,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
         (root as? LockableNestedScrollView)?.setScrollingEnabled(true)
+        playerGroup.layoutTransition = null // Reset to null to avoid animation when changing children visibility anytime later
     }
 
     private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
