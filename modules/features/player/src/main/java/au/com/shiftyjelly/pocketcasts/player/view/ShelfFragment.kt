@@ -236,6 +236,11 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
             field = value
             notifyDataSetChanged()
         }
+    var isTranscriptAvailable: Boolean = false
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     var normalBackground = Color.TRANSPARENT
     var selectedBackground = Color.BLACK
@@ -296,6 +301,11 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
 
             binding.lblTitle.setText(item.titleId(episode))
             binding.imgIcon.setImageResource(item.iconId(episode))
+
+            val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
+            binding.root.isEnabled = isEnabled
+            binding.root.alpha = if (isEnabled) 1f else 0.5f
+
             binding.dragHandle.isVisible = editable
 
             if (listener != null) {
