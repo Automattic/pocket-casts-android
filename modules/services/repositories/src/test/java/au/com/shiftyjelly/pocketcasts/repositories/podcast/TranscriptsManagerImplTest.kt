@@ -25,7 +25,15 @@ class TranscriptsManagerImplTest {
     private val transcriptDao: TranscriptDao = mock()
     private val transcriptCacheServer: TranscriptCacheServer = mock()
     private val networkWrapper: NetworkWrapper = mock()
-    private val transcriptsManager = TranscriptsManagerImpl(transcriptDao, transcriptCacheServer, networkWrapper)
+    private val transcript = Transcript("1", "url_1", "application/srt")
+    private val transcriptsManager = TranscriptsManagerImpl(
+        transcriptDao = transcriptDao,
+        service = transcriptCacheServer,
+        networkWrapper = networkWrapper,
+        serverShowNotesManager = mock(),
+        scope = mock(),
+        transcriptCuesInfoBuilder = mock(),
+    )
 
     @Test
     fun `findBestTranscript returns first supported transcript`() = runTest {
@@ -79,7 +87,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(true)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscript("url_1", forceRefresh = true)
+        transcriptsManager.loadTranscriptCuesInfo(transcript, forceRefresh = true)
 
         verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
@@ -91,7 +99,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(true)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscript("url_1", forceRefresh = true)
+        transcriptsManager.loadTranscriptCuesInfo(transcript, forceRefresh = true)
 
         verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
@@ -102,7 +110,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(true)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscript("url_1")
+        transcriptsManager.loadTranscriptCuesInfo(transcript)
 
         verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
@@ -114,7 +122,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(false)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscript("url_1")
+        transcriptsManager.loadTranscriptCuesInfo(transcript)
 
         verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
@@ -127,7 +135,7 @@ class TranscriptsManagerImplTest {
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
         try {
-            transcriptsManager.loadTranscript("url_1")
+            transcriptsManager.loadTranscriptCuesInfo(transcript)
         } catch (e: Exception) {
             assertTrue(e is NoNetworkException)
         }

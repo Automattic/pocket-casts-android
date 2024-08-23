@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import kotlinx.coroutines.flow.Flow
-import okhttp3.ResponseBody
 
 interface TranscriptsManager {
     suspend fun updateTranscripts(
@@ -13,11 +15,12 @@ interface TranscriptsManager {
 
     fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
 
-    suspend fun loadTranscript(
-        url: String,
+    @OptIn(UnstableApi::class)
+    suspend fun loadTranscriptCuesInfo(
+        transcript: Transcript,
         source: LoadTranscriptSource = LoadTranscriptSource.DEFAULT,
         forceRefresh: Boolean = false,
-    ): ResponseBody?
+    ): List<TranscriptCuesInfo>
 }
 
 enum class LoadTranscriptSource {

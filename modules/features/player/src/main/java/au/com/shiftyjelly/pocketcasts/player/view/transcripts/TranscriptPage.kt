@@ -52,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.ScrollToHighlightedTextOffset
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
@@ -386,7 +387,7 @@ private fun TranscriptContentPreview(
                     url = "url",
                 ),
                 cuesInfo = ImmutableList.of(
-                    TranscriptViewModel.TranscriptCuesInfo(
+                    TranscriptCuesInfo(
                         CuesWithTiming(
                             ImmutableList.of(
                                 Cue.Builder().setText(
