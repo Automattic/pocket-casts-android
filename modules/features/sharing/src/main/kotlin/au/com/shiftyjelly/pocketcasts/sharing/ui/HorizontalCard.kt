@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.sharing.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.PocketCastsLogo
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -109,52 +111,66 @@ private fun HorizontalCard(
     } else {
         size.width to size.width * CardType.Horizontal.aspectRatio
     }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .capturable(captureController)
             .background(backgroundGradient, RoundedCornerShape(12.dp))
             .width(width)
             .height(height),
     ) {
-        Spacer(
-            modifier = Modifier.width(height * 0.15f),
-        )
-        data.Image(
-            modifier = Modifier
-                .size(height * 0.7f)
-                .clip(RoundedCornerShape(8.dp)),
-        )
-        Spacer(
-            modifier = Modifier.width(height * 0.15f),
-        )
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(end = height * 0.15f),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextH70(
-                text = data.topText(),
-                disableScale = true,
-                color = shareColors.cardTextSecondary,
-                maxLines = 1,
+            Spacer(
+                modifier = Modifier.width(height * 0.15f),
+            )
+            data.Image(
+                modifier = Modifier
+                    .size(height * 0.7f)
+                    .clip(RoundedCornerShape(8.dp)),
             )
             Spacer(
-                modifier = Modifier.height(6.dp),
+                modifier = Modifier.width(height * 0.10f),
             )
-            TextH40(
-                text = data.middleText(),
-                disableScale = true,
-                color = shareColors.cardTextPrimary,
-                maxLines = 3,
-            )
-            Spacer(
-                modifier = Modifier.height(6.dp),
-            )
-            TextH70(
-                text = data.bottomText(),
-                disableScale = true,
-                maxLines = 2,
-                color = shareColors.cardTextSecondary,
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(end = height * 0.15f),
+            ) {
+                TextH70(
+                    text = data.topText(),
+                    disableScale = true,
+                    color = shareColors.cardTextSecondary,
+                    maxLines = 1,
+                    modifier = Modifier.padding(end = height * 0.08f),
+                )
+                Spacer(
+                    modifier = Modifier.height(6.dp),
+                )
+                TextH40(
+                    text = data.middleText(),
+                    disableScale = true,
+                    color = shareColors.cardTextPrimary,
+                    maxLines = 3,
+                )
+                Spacer(
+                    modifier = Modifier.height(6.dp),
+                )
+                TextH70(
+                    text = data.bottomText(),
+                    disableScale = true,
+                    maxLines = 2,
+                    color = shareColors.cardTextSecondary,
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = height * 0.08f, end = height * 0.08f),
+        ) {
+            PocketCastsLogo(
+                modifier = Modifier.size(height * 0.15f),
             )
         }
     }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,6 +48,18 @@ fun PocketCastsPill(
     )
 }
 
+@Composable
+fun PocketCastsLogo(
+    modifier: Modifier = Modifier,
+) = Image(
+    painter = painterResource(id = IR.drawable.ic_logo_foreground),
+    contentDescription = null,
+    modifier = Modifier
+        .background(Color(0xFFF43E37), CircleShape)
+        .size(24.dp)
+        .then(modifier),
+)
+
 @Preview
 @Composable
 private fun PocketCastsPillPreview() = Box(
@@ -56,4 +69,15 @@ private fun PocketCastsPillPreview() = Box(
         .size(180.dp, 90.dp),
 ) {
     PocketCastsPill()
+}
+
+@Preview
+@Composable
+private fun PocketCastsLogoPreview() = Box(
+    contentAlignment = Alignment.Center,
+    modifier = Modifier
+        .background(Color.White)
+        .size(32.dp, 32.dp),
+) {
+    PocketCastsLogo()
 }

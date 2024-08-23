@@ -32,16 +32,20 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
@@ -52,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 object OnboardingUpgradeHelper {
     val plusGradientBrush = Brush.horizontalGradient(
@@ -68,20 +73,58 @@ object OnboardingUpgradeHelper {
     @Composable
     fun UpgradeRowButton(
         primaryText: String,
-        backgroundColor: Color,
         textColor: Color,
         onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        backgroundColor: Color,
+        fontWeight: FontWeight = FontWeight.W600,
+        secondaryText: String? = null,
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(backgroundColor, RoundedCornerShape(12.dp)),
+        ) {
+            UpgradeButtonContent(onClick, primaryText, textColor, fontWeight, secondaryText)
+        }
+    }
+
+    @Composable
+    fun UpgradeRowButton(
+        primaryText: String,
+        textColor: Color,
+        onClick: () -> Unit,
+        gradientBackgroundColor: Brush,
         modifier: Modifier = Modifier,
         fontWeight: FontWeight = FontWeight.W600,
         secondaryText: String? = null,
     ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(gradientBackgroundColor, RoundedCornerShape(12.dp)),
+        ) {
+            UpgradeButtonContent(onClick, primaryText, textColor, fontWeight, secondaryText)
+        }
+    }
+
+    @Composable
+    private fun UpgradeButtonContent(
+        onClick: () -> Unit,
+        primaryText: String,
+        textColor: Color,
+        fontWeight: FontWeight,
+        secondaryText: String?,
+    ) {
         Button(
             onClick = onClick,
             shape = RoundedCornerShape(12.dp),
-            modifier = modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = backgroundColor,
+                backgroundColor = Color.Transparent,
+                contentColor = Color.Transparent,
             ),
+            modifier = Modifier.fillMaxWidth(),
+            elevation = ButtonDefaults.elevation(0.dp),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -228,12 +271,12 @@ object OnboardingUpgradeHelper {
             modifier = if (selected) {
                 modifier.background(
                     brush = brush,
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(12.dp),
                 )
             } else {
                 modifier.background(
                     color = unselectedColor,
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(12.dp),
                 )
             },
         ) {
@@ -392,4 +435,26 @@ object OnboardingUpgradeHelper {
             modifier = modifier,
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UpgradeRowButtonWithGradientBackgroundPreview() {
+    UpgradeRowButton(
+        primaryText = "Upgrade Now",
+        textColor = Color.Black,
+        onClick = {},
+        gradientBackgroundColor = plusGradientBrush,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UpgradeRowButtonPreview() {
+    UpgradeRowButton(
+        primaryText = "Upgrade Now",
+        textColor = Color.Black,
+        onClick = {},
+        backgroundColor = colorResource(UR.color.plus_gold),
+    )
 }
