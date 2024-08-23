@@ -1808,7 +1808,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
     <string name="onboarding_patron_subscribe">Subscribe to Pocket&#160;Casts Patron</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop &amp; web apps</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop &amp; Web apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Folders &amp; Bookmarks</string>
     <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
@@ -1821,6 +1821,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
     <!-- Do not translate Slumber Studios -->
     <string name="onboarding_plus_feature_slumber_studios_title"><![CDATA[1 year of exclusive content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
+    <string name="onboarding_plus_feature_slumber_studios_title_static">Dream with Slumber Studios content</string>
     <string name="onboarding_plus_become_a_plus_member">Become a Plus member and unlock all Pocket&#160;Casts features</string>
     <string name="onboarding_plus_continuing_agrees_to">By continuing, you agree to our %1$s and %2$s.</string>
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
@@ -2090,6 +2091,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="paywall_themes_title">Extra themes and icons</string>
     <string name="paywall_themes_description">Fly your true colors. Exclusive icons and themes for our subscribers.</string>
     <string name="paywall_themes_content_description">Extra themes and icons image</string>
+    <string name="paywall_layout_reviews_title">\"Quite simply the best way to listen to podcasts\"</string>
+    <string name="paywall_layout_reviews_subtitle">See why people have upgraded to Plus</string>
 
     <!-- Engage SDK -->
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>

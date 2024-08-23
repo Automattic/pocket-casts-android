@@ -268,7 +268,7 @@ private fun SmallDeviceContent(
 }
 
 @Composable
-private fun SubscribeButton(
+fun SubscribeButton(
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

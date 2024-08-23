@@ -9,11 +9,14 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 interface UpgradeFeatureItem {
-    @get:DrawableRes val image: Int
+    @get:DrawableRes
+    val image: Int
 
-    @get:StringRes val title: Int
+    @get:StringRes
+    val title: Int
 
-    @get:StringRes val text: Int?
+    @get:StringRes
+    val text: Int?
 
     val isYearlyFeature: Boolean
     val isMonthlyFeature: Boolean
@@ -97,5 +100,42 @@ enum class PatronUpgradeFeatureItem(
     UndyingGratitude(
         image = IR.drawable.ic_heart,
         title = LR.string.onboarding_patron_feature_gratitude_title,
+    ),
+}
+
+enum class PlusUpgradeLayoutReviewsItem(
+    override val image: Int,
+    override val title: Int,
+    override val text: Int? = null,
+    override val isYearlyFeature: Boolean = true,
+    override val isMonthlyFeature: Boolean = true,
+) : UpgradeFeatureItem {
+    DesktopApps(
+        image = IR.drawable.ic_desktop_apps,
+        title = LR.string.onboarding_plus_feature_desktop_and_web_apps_title,
+    ),
+    Folders(
+        image = IR.drawable.ic_folders,
+        title = LR.string.onboarding_plus_feature_folders_and_bookmarks_title,
+    ),
+    SkipChapters(
+        image = IR.drawable.ic_tick_circle_filled,
+        title = LR.string.skip_chapters,
+    ),
+    CloudStorage(
+        image = IR.drawable.ic_cloud_storage,
+        title = LR.string.onboarding_plus_feature_cloud_storage_title,
+    ),
+    WatchPlayback(
+        image = IR.drawable.ic_watch_play,
+        title = LR.string.onboarding_plus_feature_watch_playback,
+    ),
+    SlumberStudiosPromo(
+        image = IR.drawable.ic_slumber_studios,
+        title = LR.string.onboarding_plus_feature_slumber_studios_title_static,
+    ),
+    ThemesIcons(
+        image = IR.drawable.ic_themes,
+        title = LR.string.onboarding_plus_feature_extra_themes_icons_title,
     ),
 }
