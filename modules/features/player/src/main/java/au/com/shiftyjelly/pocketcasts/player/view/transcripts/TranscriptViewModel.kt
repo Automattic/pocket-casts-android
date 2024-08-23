@@ -49,7 +49,6 @@ class TranscriptViewModel @Inject constructor(
         viewModelScope.launch {
             playbackManager.playbackStateFlow
                 .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
-                .distinctUntilChanged { t1, t2 -> t1.episodeUuid == t2.episodeUuid }
                 .stateIn(viewModelScope)
                 .flatMapLatest(::transcriptFlow)
                 .collect { _uiState.value = it }
@@ -58,7 +57,7 @@ class TranscriptViewModel @Inject constructor(
 
     private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
         transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
-            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid }
+            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid && t1?.type == t2?.type }
             .map { transcript ->
                 transcript?.let {
                     UiState.TranscriptFound(podcastAndEpisode, transcript)
@@ -81,7 +80,11 @@ class TranscriptViewModel @Inject constructor(
             viewModelScope.launch {
                 _uiState.value = try {
                     val forceRefresh = pulledToRefresh || retryOnFail
-                    val cuesInfo = transcriptsManager.loadTranscriptCuesInfo(transcript, forceRefresh = forceRefresh)
+                    val cuesInfo = transcriptsManager.loadTranscriptCuesInfo(
+                        podcastUuid = podcastAndEpisode?.podcast?.uuid.orEmpty(),
+                        transcript = transcript,
+                        forceRefresh = forceRefresh,
+                    )
 
                     val displayInfo = buildDisplayInfo(
                         cuesInfo = cuesInfo,

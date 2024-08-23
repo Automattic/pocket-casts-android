@@ -140,7 +140,7 @@ fun TranscriptPage(
         }
     }
 
-    LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
+    LaunchedEffect(uiState.value.transcript?.episodeUuid, uiState.value.transcript?.type, transitionState.value) {
         transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
     }
 
