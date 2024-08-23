@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.PocketCastsPill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -91,6 +92,7 @@ private fun SquareCard(
     )
     val size = constrainedSize(maxWidth, maxHeight)
     val minDimension = minOf(size.width, size.height)
+    val isCardSmall = minDimension < 280.dp
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -99,7 +101,7 @@ private fun SquareCard(
             .size(minDimension),
     ) {
         Spacer(
-            modifier = Modifier.height(42.dp),
+            modifier = Modifier.height(if (isCardSmall) 26.dp else 32.dp),
         )
         data.Image(
             modifier = Modifier
@@ -107,14 +109,14 @@ private fun SquareCard(
                 .clip(RoundedCornerShape(8.dp)),
         )
         Spacer(
-            modifier = Modifier.height(24.dp),
+            modifier = Modifier.height(if (isCardSmall) 12.dp else 16.dp),
         )
         TextH70(
             text = data.topText(),
             disableScale = true,
             maxLines = 1,
             color = shareColors.cardTextSecondary,
-            modifier = Modifier.padding(horizontal = 64.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -125,7 +127,7 @@ private fun SquareCard(
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardTextPrimary,
-            modifier = Modifier.padding(horizontal = 42.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
         )
         Spacer(
             modifier = Modifier.height(6.dp),
@@ -133,10 +135,19 @@ private fun SquareCard(
         TextH70(
             text = data.bottomText(),
             disableScale = true,
-            maxLines = 2,
+            maxLines = 1,
             textAlign = TextAlign.Center,
             color = shareColors.cardTextSecondary,
-            modifier = Modifier.padding(horizontal = 64.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
+        )
+        Spacer(
+            modifier = Modifier.weight(1f),
+        )
+        PocketCastsPill(
+            disableScale = true,
+        )
+        Spacer(
+            modifier = Modifier.weight(2f),
         )
     }
 }
