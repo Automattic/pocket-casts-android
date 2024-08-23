@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -55,7 +56,7 @@ class ExternalDataDaoTest {
 
     @Test
     fun useCorrectReleaseTimestampsForSubscribedPodcasts() = runTest {
-        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "id-1", title = "title-1", isSubscribed = true, podcastDescription = "description"))
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date(0), podcastUuid = "id-1", lastPlaybackInteraction = 10))
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-2", publishedDate = Date(2), podcastUuid = "id-1", lastPlaybackInteraction = null))
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date(1), podcastUuid = "id-1", lastPlaybackInteraction = 13))
@@ -76,6 +77,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-1",
                 title = "title-1",
+                description = "description",
+                episodeCount = 3,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 2,
@@ -84,6 +87,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-2",
                 title = "title-2",
+                description = "",
+                episodeCount = 3,
                 _categories = "",
                 initialReleaseTimestampMs = 3,
                 latestReleaseTimestampMs = 5,
@@ -92,6 +97,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-3",
                 title = "title-3",
+                episodeCount = 1,
+                description = "",
                 _categories = "",
                 initialReleaseTimestampMs = 12,
                 latestReleaseTimestampMs = 12,
@@ -100,6 +107,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-4",
                 title = "title-4",
+                description = "",
+                episodeCount = 0,
                 _categories = "",
                 initialReleaseTimestampMs = null,
                 latestReleaseTimestampMs = null,
@@ -127,6 +136,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-1",
                 title = "title-1",
+                description = "",
+                episodeCount = 3,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 0,
@@ -146,6 +157,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-1",
                 title = "title-1",
+                description = "",
+                episodeCount = 0,
                 _categories = "category-1",
                 initialReleaseTimestampMs = null,
                 latestReleaseTimestampMs = null,
@@ -253,6 +266,7 @@ class ExternalDataDaoTest {
         val podcasts = externalDataDao.getCuratedPodcastGroups(limitPerGroup = 100).trendingGroup()
 
         val expected = ExternalPodcastList(
+            id = "trending",
             title = "Trending",
             podcasts = List(65) { ExternalPodcastView("id-$it", "title-$it", description = null) },
         )
@@ -317,6 +331,7 @@ class ExternalDataDaoTest {
         val podcasts = externalDataDao.getCuratedPodcastGroups(limitPerGroup = 100).featuruedGroup()
 
         val expected = ExternalPodcastList(
+            id = "featured",
             title = "Featured",
             podcasts = List(65) { ExternalPodcastView("id-$it", "title-$it", description = null) },
         )
@@ -383,10 +398,12 @@ class ExternalDataDaoTest {
 
         val expected = mapOf(
             "bork-0" to ExternalPodcastList(
+                id = "bork-0",
                 title = "Bork",
                 podcasts = List(5) { ExternalPodcastView("id-${it * 2}", "title-${it * 2}", description = null) },
             ),
             "bork-1" to ExternalPodcastList(
+                id = "bork-1",
                 title = "Bork",
                 podcasts = List(5) { ExternalPodcastView("id-${it * 2 + 1}", "title-${it * 2 + 1}", description = null) },
             ),
@@ -537,6 +554,7 @@ class ExternalDataDaoTest {
 
         val expected = mapOf(
             "bork" to ExternalPodcastList(
+                id = "bork",
                 title = "Bork",
                 podcasts = listOf(ExternalPodcastView("id-2", "title-2", description = null)),
             ),
@@ -568,6 +586,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-1",
                 title = "title-1",
+                description = "",
+                episodeCount = 3,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 2,
@@ -576,6 +596,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-2",
                 title = "title-2",
+                episodeCount = 3,
+                description = "",
                 _categories = "",
                 initialReleaseTimestampMs = 3,
                 latestReleaseTimestampMs = 5,
@@ -584,6 +606,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-3",
                 title = "title-3",
+                episodeCount = 1,
+                description = "",
                 _categories = "",
                 initialReleaseTimestampMs = 12,
                 latestReleaseTimestampMs = 12,
@@ -610,6 +634,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-1",
                 title = "title-1",
+                description = "",
+                episodeCount = 1,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 0,
@@ -639,6 +665,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-2",
                 title = "title-2",
+                description = "",
+                episodeCount = 1,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 0,
@@ -647,6 +675,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-3",
                 title = "title-3",
+                description = "",
+                episodeCount = 1,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 0,
@@ -655,6 +685,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-1",
                 title = "title-1",
+                description = "",
+                episodeCount = 1,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 0,
@@ -692,6 +724,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-2",
                 title = "title-2",
+                description = "",
+                episodeCount = 1,
                 _categories = "",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 0,
@@ -713,6 +747,8 @@ class ExternalDataDaoTest {
             ExternalPodcast(
                 id = "id-1",
                 title = "title-1",
+                description = "",
+                episodeCount = 1,
                 _categories = "category1",
                 initialReleaseTimestampMs = 0,
                 latestReleaseTimestampMs = 0,
@@ -750,6 +786,7 @@ class ExternalDataDaoTest {
                 number = null,
                 publishedDate = publishedDate2,
                 lastPlaybackInteraction = null,
+                fileType = "video/mp4",
             ),
             PodcastEpisode(
                 uuid = "id-3",
@@ -761,11 +798,12 @@ class ExternalDataDaoTest {
                 number = 399,
                 publishedDate = publishedDate3,
                 lastPlaybackInteraction = 0,
+                episodeStatus = EpisodeStatusEnum.DOWNLOADED,
             ),
         )
         podcastEpisodeDao.insertAll(episodes)
-        podcastDao.insert(Podcast(uuid = "p-id-1", isSubscribed = true))
-        podcastDao.insert(Podcast(uuid = "p-id-2", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "p-id-1", title = "p-title-1", isSubscribed = true))
+        podcastDao.insert(Podcast(uuid = "p-id-2", title = "p-title-2", isSubscribed = true))
 
         val newEpisodes = externalDataDao.getNewEpisodes(limit = 100)
 
@@ -774,34 +812,43 @@ class ExternalDataDaoTest {
                 id = "id-1",
                 podcastId = "p-id-1",
                 title = "title-1",
-                durationMs = 100,
-                playbackPositionMs = 50,
+                podcastTitle = "p-title-1",
+                durationMs = 100_120,
+                playbackPositionMs = 50_000,
                 seasonNumber = 0,
                 episodeNumber = 11,
                 releaseTimestampMs = publishedDate1.time,
                 lastUsedTimestampMs = 20,
+                isVideo = false,
+                isDownloaded = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-2",
                 podcastId = "p-id-1",
+                podcastTitle = "p-title-1",
                 title = "title-2",
-                durationMs = 4120,
-                playbackPositionMs = 2021,
+                durationMs = 4_120_000,
+                playbackPositionMs = 2_021_240,
                 seasonNumber = 7,
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate2.time,
                 lastUsedTimestampMs = null,
+                isVideo = true,
+                isDownloaded = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-3",
                 podcastId = "p-id-2",
+                podcastTitle = "p-title-2",
                 title = "title-3",
-                durationMs = 2330,
+                durationMs = 2_330_000,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = 399,
                 releaseTimestampMs = publishedDate3.time,
                 lastUsedTimestampMs = 0,
+                isVideo = false,
+                isDownloaded = true,
             ),
         )
         assertEquals(expected, newEpisodes)
@@ -837,34 +884,43 @@ class ExternalDataDaoTest {
                 id = "id-3",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate3.time,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-1",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate1.time,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-2",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate2.time,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, newEpisodes)
@@ -911,12 +967,15 @@ class ExternalDataDaoTest {
                 id = "id-1",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate.time,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, newEpisodes)
@@ -952,12 +1011,15 @@ class ExternalDataDaoTest {
                 id = "id-1",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate.time,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, newEpisodes)
@@ -987,12 +1049,15 @@ class ExternalDataDaoTest {
                 id = "id-2",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate2.time,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, newEpisodes)
@@ -1023,6 +1088,7 @@ class ExternalDataDaoTest {
             ExternalEpisode.Podcast(
                 id = "id-1",
                 podcastId = "p-id-1",
+                podcastTitle = "",
                 title = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
@@ -1030,6 +1096,8 @@ class ExternalDataDaoTest {
                 episodeNumber = null,
                 releaseTimestampMs = publishedDate.time,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, newEpisodes)
@@ -1061,6 +1129,7 @@ class ExternalDataDaoTest {
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
                 publishedDate = Date(2),
                 lastPlaybackInteraction = 0,
+                episodeStatus = EpisodeStatusEnum.DOWNLOADED,
             ),
             PodcastEpisode(
                 uuid = "id-3",
@@ -1073,9 +1142,12 @@ class ExternalDataDaoTest {
                 playingStatus = EpisodePlayingStatus.IN_PROGRESS,
                 publishedDate = Date(3),
                 lastPlaybackInteraction = null,
+                fileType = "video/",
             ),
         )
         podcastEpisodeDao.insertAll(episodes)
+        podcastDao.insert(Podcast(uuid = "p-id-1", title = "p-title-1"))
+        podcastDao.insert(Podcast(uuid = "p-id-2", title = "p-title-2"))
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1084,34 +1156,43 @@ class ExternalDataDaoTest {
                 id = "id-1",
                 podcastId = "p-id-1",
                 title = "title-1",
-                durationMs = 100,
-                playbackPositionMs = 50,
+                podcastTitle = "p-title-1",
+                durationMs = 100_120,
+                playbackPositionMs = 50_000,
                 seasonNumber = 0,
                 episodeNumber = 11,
                 releaseTimestampMs = 0,
                 lastUsedTimestampMs = 74,
+                isDownloaded = false,
+                isVideo = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-2",
                 podcastId = "p-id-1",
                 title = "title-2",
-                durationMs = 4120,
-                playbackPositionMs = 2021,
+                podcastTitle = "p-title-1",
+                durationMs = 4_120_000,
+                playbackPositionMs = 2_021_240,
                 seasonNumber = 7,
                 episodeNumber = null,
                 releaseTimestampMs = 2,
                 lastUsedTimestampMs = 0,
+                isDownloaded = true,
+                isVideo = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-3",
                 podcastId = "p-id-2",
                 title = "title-3",
-                durationMs = 2330,
+                podcastTitle = "p-title-2",
+                durationMs = 2_330_000,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = 399,
                 releaseTimestampMs = 3,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = true,
             ),
         )
         assertEquals(expected, inProgressEpisodes)
@@ -1140,6 +1221,7 @@ class ExternalDataDaoTest {
             ),
         )
         podcastEpisodeDao.insertAll(episodes)
+        podcastDao.insert(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1148,34 +1230,43 @@ class ExternalDataDaoTest {
                 id = "id-3",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = 1,
                 lastUsedTimestampMs = 3,
+                isDownloaded = false,
+                isVideo = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-1",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = 2,
                 lastUsedTimestampMs = 1,
+                isDownloaded = false,
+                isVideo = false,
             ),
             ExternalEpisode.Podcast(
                 id = "id-2",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = 3,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, inProgressEpisodes)
@@ -1191,6 +1282,7 @@ class ExternalDataDaoTest {
             )
         }
         podcastEpisodeDao.insertAll(episodes)
+        podcastDao.insert(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 20, currentTime = 0)
 
@@ -1214,6 +1306,7 @@ class ExternalDataDaoTest {
             ),
         )
         podcastEpisodeDao.insertAll(episodes)
+        podcastDao.insert(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1222,12 +1315,15 @@ class ExternalDataDaoTest {
                 id = "id-1",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = 0,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, inProgressEpisodes)
@@ -1253,6 +1349,7 @@ class ExternalDataDaoTest {
             ),
         )
         podcastEpisodeDao.insertAll(episodes)
+        podcastDao.insert(Podcast())
 
         val inProgressEpisodes = externalDataDao.getInProgressEpisodes(limit = 100, currentTime = 0)
 
@@ -1261,12 +1358,15 @@ class ExternalDataDaoTest {
                 id = "id-1",
                 podcastId = "",
                 title = "",
+                podcastTitle = "",
                 durationMs = 0,
                 playbackPositionMs = 0,
                 seasonNumber = null,
                 episodeNumber = null,
                 releaseTimestampMs = 0,
                 lastUsedTimestampMs = null,
+                isDownloaded = false,
+                isVideo = false,
             ),
         )
         assertEquals(expected, inProgressEpisodes)
@@ -1284,9 +1384,12 @@ class ExternalDataDaoTest {
             number = 4,
             publishedDate = Date(800),
             lastPlaybackInteraction = 400,
+            fileType = "video/*",
+            episodeStatus = EpisodeStatusEnum.DOWNLOADED,
         )
         podcastEpisodeDao.insert(podcastEpisode)
         upNextDao.insert(UpNextEpisode(episodeUuid = "id-1"))
+        podcastDao.insert(Podcast(uuid = "p-id-1", title = "p-title-1", isSubscribed = true))
 
         val episodes = externalDataDao.observeUpNextQueue(limit = 100).first()
 
@@ -1294,13 +1397,16 @@ class ExternalDataDaoTest {
             ExternalEpisode.Podcast(
                 id = "id-1",
                 title = "title-1",
-                durationMs = 1000,
-                playbackPositionMs = 500,
+                durationMs = 1_000_000,
+                playbackPositionMs = 500_000,
                 releaseTimestampMs = 800,
                 podcastId = "p-id-1",
+                podcastTitle = "p-title-1",
                 seasonNumber = 10,
                 episodeNumber = 4,
                 lastUsedTimestampMs = 400,
+                isDownloaded = true,
+                isVideo = true,
             ),
         )
         assertEquals(expected, episodes)
@@ -1316,6 +1422,8 @@ class ExternalDataDaoTest {
             publishedDate = Date(100),
             artworkUrl = "artwork-url-1",
             tintColorIndex = 20,
+            fileType = "video/*",
+            episodeStatus = EpisodeStatusEnum.DOWNLOADED,
         )
         userEpisodeDao.insert(userEpisode)
         upNextDao.insert(UpNextEpisode(episodeUuid = "id-1"))
@@ -1326,11 +1434,13 @@ class ExternalDataDaoTest {
             ExternalEpisode.User(
                 id = "id-1",
                 title = "title-1",
-                durationMs = 555,
-                playbackPositionMs = 200,
+                durationMs = 555_000,
+                playbackPositionMs = 200_000,
                 releaseTimestampMs = 100,
                 artworkUrl = "artwork-url-1",
                 tintColorIndex = 20,
+                isDownloaded = true,
+                isVideo = true,
             ),
         )
         assertEquals(expected, episodes)
@@ -1343,6 +1453,7 @@ class ExternalDataDaoTest {
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date()))
         userEpisodeDao.insert(UserEpisode(uuid = "id-4", publishedDate = Date()))
         userEpisodeDao.insert(UserEpisode(uuid = "id-5", publishedDate = Date()))
+        podcastDao.insert(Podcast())
         upNextDao.insertAll(
             listOf(
                 UpNextEpisode(episodeUuid = "id-1", position = 0),
@@ -1363,6 +1474,7 @@ class ExternalDataDaoTest {
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-1", publishedDate = Date()))
         podcastEpisodeDao.insert(PodcastEpisode(uuid = "id-3", publishedDate = Date()))
         userEpisodeDao.insert(UserEpisode(uuid = "id-5", publishedDate = Date()))
+        podcastDao.insert(Podcast())
         upNextDao.insertAll(
             listOf(
                 UpNextEpisode(episodeUuid = "id-1", position = 0),
@@ -1382,6 +1494,7 @@ class ExternalDataDaoTest {
     fun limitUpNextEpisodes() = runTest {
         val podcastEpisodes = List(30) { PodcastEpisode(uuid = "id-$it", publishedDate = Date()) }
         podcastEpisodeDao.insertAll(podcastEpisodes)
+        podcastDao.insert(Podcast())
         upNextDao.insertAll(podcastEpisodes.mapIndexed { index, episode -> UpNextEpisode(episodeUuid = episode.uuid, position = index) })
 
         val episodes = externalDataDao.observeUpNextQueue(limit = 8).first()
