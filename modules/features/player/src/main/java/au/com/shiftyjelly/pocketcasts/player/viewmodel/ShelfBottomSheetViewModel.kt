@@ -11,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class ShelfBottomSheetViewModel @AssistedInject constructor(
         viewModelScope.launch {
             episodeId?.let {
                 transcriptsManager.observerTranscriptForEpisode(episodeId)
-                    .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid }
+                    .distinctUntilChangedBy { it?.episodeUuid }
                     .stateIn(viewModelScope)
                     .collectLatest { transcript ->
                         _uiState.update { it.copy(transcript = transcript) }
