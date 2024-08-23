@@ -226,9 +226,10 @@ private class ShareListAdapter(
         val scheme = uriData?.scheme
         val host = uriData?.host
         val path = uriData?.path?.takeIf { it != "/" }
+        val source = uriData?.getQueryParameter(EXTRA_SOURCE_VIEW)
 
         return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == listHost && path != null) {
-            ShareListDeepLink(path)
+            ShareListDeepLink(path, source)
         } else {
             null
         }
@@ -241,9 +242,10 @@ private class ShareListNativeAdapter : DeepLinkAdapter {
         val scheme = uriData?.scheme
         val host = uriData?.host
         val path = uriData?.path?.takeIf { it != "/" }
+        val source = uriData?.getQueryParameter(EXTRA_SOURCE_VIEW)
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "sharelist" && path != null) {
-            ShareListDeepLink(path)
+            ShareListDeepLink(path, source)
         } else {
             null
         }
