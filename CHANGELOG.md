@@ -1,9 +1,9 @@
 7.72
 -----
 *   New Features
-    *   Content is now shared through a new UI interface with support for different platforms including Instagram Stories.
+    *   Content is now shared through a new UI interface with support for different platforms including Instagram Stories
         ([#2707](https://github.com/Automattic/pocket-casts-android/pull/2707))
-    *   Share clips through links, audio clips, and video clips.
+    *   Share clips using links, audio clips, and video clips
         ([#2707](https://github.com/Automattic/pocket-casts-android/pull/2707))
 *   Bug Fixes
     *   Fix create filter crash
