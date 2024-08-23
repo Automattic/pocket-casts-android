@@ -71,7 +71,7 @@ class TranscriptsManagerImpl @Inject constructor(
     private suspend fun fetchTranscript(
         forceRefresh: Boolean,
         transcript: Transcript,
-        source: LoadTranscriptSource
+        source: LoadTranscriptSource,
     ) = try {
         var response = if (forceRefresh && networkWrapper.isConnected()) {
             service.getTranscript(transcript.url, CacheControl.FORCE_NETWORK)
