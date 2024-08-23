@@ -6,12 +6,12 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherRecentlyPlayedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherSubscribedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.NovaLauncherTrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -304,10 +304,16 @@ class PodcastDaoTest {
 
     @Test
     fun getAllTrendingPodcastsForNovaLauncher() = runTest {
-        val trendingPodcasts = List(65) {
-            TrendingPodcast("id-$it", "title-$it")
+        val curatedPodcasts = List(65) {
+            CuratedPodcast(
+                listId = "trending",
+                listTitle = "Trending",
+                podcastId = "id-$it",
+                podcastTitle = "title-$it",
+                podcastDescription = null,
+            )
         }
-        podcastDao.replaceAllTrendingPodcasts(trendingPodcasts)
+        podcastDao.replaceAllCuratedPodcasts(curatedPodcasts)
 
         val podcasts = podcastDao.getNovaLauncherTrendingPodcasts(limit = 100)
 
@@ -320,9 +326,15 @@ class PodcastDaoTest {
     @Test
     fun limitTrendingPodcastsForNovaLauncher() = runTest {
         val trendingPodcasts = List(65) {
-            TrendingPodcast("id-$it", "title-$it")
+            CuratedPodcast(
+                listId = "trending",
+                listTitle = "Trending",
+                podcastId = "id-$it",
+                podcastTitle = "title-$it",
+                podcastDescription = null,
+            )
         }
-        podcastDao.replaceAllTrendingPodcasts(trendingPodcasts)
+        podcastDao.replaceAllCuratedPodcasts(trendingPodcasts)
 
         val podcasts = podcastDao.getNovaLauncherTrendingPodcasts(limit = 5)
 
@@ -331,20 +343,59 @@ class PodcastDaoTest {
 
     @Test
     fun doNotIncludeTrendingPodcastsThatAreSubscribedForNovaLauncher() = runTest {
-        val trendingPodcasts = listOf(
-            TrendingPodcast("id-1", "title-1"),
-            TrendingPodcast("id-2", "title-2"),
-            TrendingPodcast("id-3", "title-3"),
-        )
-        podcastDao.replaceAllTrendingPodcasts(trendingPodcasts)
-        podcastDao.insert(Podcast("id-1", isSubscribed = true))
-        podcastDao.insert(Podcast("id-2", isSubscribed = false))
+        val trendingPodcasts = List(3) {
+            CuratedPodcast(
+                listId = "trending",
+                listTitle = "Trending",
+                podcastId = "id-$it",
+                podcastTitle = "title-$it",
+                podcastDescription = null,
+            )
+        }
+        podcastDao.replaceAllCuratedPodcasts(trendingPodcasts)
+        podcastDao.insert(Podcast("id-0", isSubscribed = true))
+        podcastDao.insert(Podcast("id-1", isSubscribed = false))
 
         val podcasts = podcastDao.getNovaLauncherTrendingPodcasts(limit = 100)
 
         val expected = listOf(
+            NovaLauncherTrendingPodcast("id-1", "title-1"),
             NovaLauncherTrendingPodcast("id-2", "title-2"),
-            NovaLauncherTrendingPodcast("id-3", "title-3"),
+        )
+        assertEquals(expected, podcasts)
+    }
+
+    @Test
+    fun getOnlyTrendingPodcastsForNovaLauncher() = runTest {
+        val curatedPodcasts = listOf(
+            CuratedPodcast(
+                listId = "trending",
+                listTitle = "Trending",
+                podcastId = "id-0",
+                podcastTitle = "title-0",
+                podcastDescription = null,
+            ),
+            CuratedPodcast(
+                listId = "featured",
+                listTitle = "Featured",
+                podcastId = "id-1",
+                podcastTitle = "title-1",
+                podcastDescription = null,
+            ),
+            CuratedPodcast(
+                listId = "some-other-list",
+                listTitle = "Some other list",
+                podcastId = "id-2",
+                podcastTitle = "title-2",
+                podcastDescription = null,
+            ),
+        )
+        podcastDao.replaceAllCuratedPodcasts(curatedPodcasts)
+
+        val podcasts = podcastDao.getNovaLauncherTrendingPodcasts(limit = 100)
+
+        val expected = listOf(
+            NovaLauncherTrendingPodcast("id-0", "title-0"),
         )
         assertEquals(expected, podcasts)
     }

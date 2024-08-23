@@ -84,7 +84,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     }
 
     val listType: ListType
-        get() = arguments?.getString(ARG_LIST_TYPE)?.let { ListType.fromString(it) } ?: ListType.PodcastList()
+        get() = arguments?.getString(ARG_LIST_TYPE)?.let { ListType.fromString(it) } ?: ListType.PodcastList
 
     val displayStyle: DisplayStyle
         get() = DisplayStyle.fromString(arguments?.getString(ARG_DISPLAY_STYLE)!!) ?: DisplayStyle.SmallList()
