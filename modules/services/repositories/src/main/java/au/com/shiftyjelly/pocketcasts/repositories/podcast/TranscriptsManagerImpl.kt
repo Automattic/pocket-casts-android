@@ -147,7 +147,7 @@ class TranscriptsManagerImpl @Inject constructor(
         try {
             _failedTranscriptFormats.update { currentMap ->
                 val format = TranscriptFormat.fromType(transcript.type) ?: return@update currentMap
-                currentMap + (transcript.episodeUuid to (currentMap[transcript.episodeUuid]?.plus(format) ?: listOf(format)))
+                currentMap + (transcript.episodeUuid to (currentMap[transcript.episodeUuid]?.plus(format)?.distinct() ?: listOf(format)))
             }
             val episodeFailedFormats = _failedTranscriptFormats.value[transcript.episodeUuid]
             if (!episodeFailedFormats.isNullOrEmpty()) {
