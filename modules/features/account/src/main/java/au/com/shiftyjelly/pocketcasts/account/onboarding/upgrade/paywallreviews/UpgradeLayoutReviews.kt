@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallreviews
 
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
@@ -33,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,9 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeLayoutReviewsItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.SubscribeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.calculateMinimumHeightWithInsets
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallfeatures.SubscribeButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
@@ -59,7 +56,6 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMod
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -75,17 +71,6 @@ fun UpgradeLayoutReviews(
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    val offerText = when (state.currentSubscription) {
-        is Subscription.Trial -> stringResource(R.string.paywall_free_1_month_trial)
-        is Subscription.Intro -> stringResource(R.string.paywall_save_50_off)
-        else -> null
-    }
-
-    val shouldShowOffer = offerText != null && !isLandscape
-
     AppTheme(Theme.ThemeType.DARK) { // We need to set Dark since this screen will have dark colors for all themes
         Box(
             modifier = modifier.fillMaxHeight(),
@@ -163,25 +148,7 @@ fun UpgradeLayoutReviews(
             }
 
             if (canUpgrade) {
-                Column(
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    val bottomPadding = if (shouldShowOffer) 0.dp else 34.dp
-
-                    SubscribeButton(onClickSubscribe, Modifier.padding(bottom = bottomPadding))
-
-                    if (shouldShowOffer) {
-                        offerText?.let {
-                            TextP50(
-                                text = it,
-                                fontWeight = FontWeight.W400,
-                            )
-                            Spacer(Modifier.height(50.dp))
-                        }
-                    }
-                }
+                SubscribeButton(state.currentSubscription, onClickSubscribe)
             }
         }
     }
