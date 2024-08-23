@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -46,9 +47,8 @@ fun SubscriptionBadge(
     padding: Dp = 4.dp,
     backgroundColor: Color? = null,
     textColor: Color? = null,
-    hasGradientEffect: Boolean = false,
 ) {
-    val background = getBackground(backgroundColor ?: Color.Black, hasGradientEffect)
+    val background = backgroundColor ?: Color.Black
 
     Card(
         shape = RoundedCornerShape(pillCornerRadiusInDp),
@@ -60,28 +60,68 @@ fun SubscriptionBadge(
                 .background(background)
                 .padding(horizontal = padding * 2, vertical = padding),
         ) {
-            Row(
-                modifier = Modifier
-                    .semantics(mergeDescendants = true) {},
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(iconSize),
-                    tint = iconColor,
-                )
-                TextH50(
-                    text = stringResource(shortNameRes),
-                    color = textColor ?: Color.White,
-                    fontSize = fontSize,
-                    lineHeight = fontSize,
-                    modifier = Modifier
-                        .padding(start = padding),
-                )
-            }
+            SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
         }
+    }
+}
+
+@Composable
+fun SubscriptionBadge(
+    @DrawableRes iconRes: Int,
+    @StringRes shortNameRes: Int,
+    backgroundBrush: Brush,
+    modifier: Modifier = Modifier,
+    iconColor: Color = Color.Unspecified,
+    iconSize: Dp = 14.dp,
+    fontSize: TextUnit = 14.sp,
+    padding: Dp = 4.dp,
+    textColor: Color? = null,
+) {
+    Card(
+        shape = RoundedCornerShape(pillCornerRadiusInDp),
+        modifier = modifier
+            .background(Color.Transparent),
+    ) {
+        Box(
+            modifier = Modifier
+                .background(backgroundBrush)
+                .padding(horizontal = padding * 2, vertical = padding),
+        ) {
+            SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
+        }
+    }
+}
+
+@Composable
+private fun SubscriptionBadgeContent(
+    iconRes: Int,
+    iconSize: Dp,
+    iconColor: Color,
+    shortNameRes: Int,
+    textColor: Color?,
+    fontSize: TextUnit,
+    padding: Dp,
+) {
+    Row(
+        modifier = Modifier
+            .semantics(mergeDescendants = true) {},
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier
+                .size(iconSize),
+            tint = iconColor,
+        )
+        TextH50(
+            text = stringResource(shortNameRes),
+            color = textColor ?: Color.White,
+            fontSize = fontSize,
+            lineHeight = fontSize,
+            modifier = Modifier
+                .padding(start = padding),
+        )
     }
 }
 
@@ -91,7 +131,6 @@ fun SubscriptionBadgeForTier(
     displayMode: SubscriptionBadgeDisplayMode,
     fontSize: TextUnit = 14.sp,
     padding: Dp = 4.dp,
-    hasGradientEffect: Boolean = false,
 ) {
     when (tier) {
         SubscriptionTier.PLUS -> SubscriptionBadge(
@@ -99,7 +138,6 @@ fun SubscriptionBadgeForTier(
             padding = padding,
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
-            hasGradientEffect = hasGradientEffect,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
@@ -117,6 +155,7 @@ fun SubscriptionBadgeForTier(
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
+
         SubscriptionTier.PATRON -> SubscriptionBadge(
             fontSize = fontSize,
             padding = padding,
@@ -139,6 +178,7 @@ fun SubscriptionBadgeForTier(
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
+
         SubscriptionTier.UNKNOWN -> Unit
     }
 }
@@ -206,24 +246,6 @@ fun OfferBadge(
     }
 }
 
-private fun getBackground(backgroundColor: Color, hasGradientEffect: Boolean): Brush = if (hasGradientEffect) {
-    when (backgroundColor) {
-        SubscriptionTierColor.patronPurple -> Brush.horizontalGradient(
-            colors = listOf(Color(0xFFAFA2fA), Color(0xFFAFA2fA)),
-        )
-        SubscriptionTierColor.plusGold -> Brush.horizontalGradient(
-            colors = listOf(Color(0xFFFED745), Color(0xFFFEB525)),
-        )
-        else -> Brush.horizontalGradient(
-            colors = listOf(backgroundColor),
-        )
-    }
-} else {
-    Brush.horizontalGradient(
-        colors = listOf(backgroundColor),
-    )
-}
-
 enum class SubscriptionBadgeDisplayMode {
     Black,
     ColoredWithWhiteForeground,
@@ -286,17 +308,6 @@ fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with black foreground and gradient")
-@Preview(name = "ColoredWithBlackForeground")
-@Composable
-fun SubscriptionBadgePlusColoredWithBlackForegroundAndGradientPreview() {
-    SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PLUS,
-        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-        hasGradientEffect = true,
-    )
-}
-
 @ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored with black foreground")
 @Preview(name = "ColoredWithBlackForeground")
 @Composable
@@ -307,13 +318,20 @@ fun SubscriptionBadgePatronColoredWithBlackForegroundPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored with black foreground and gradient")
-@Preview(name = "ColoredWithBlackForeground")
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with gradient background")
+@Preview(name = "ColoredWithBlackForegroundAndGradientBackground")
 @Composable
-fun SubscriptionBadgePatronColoredWithBlackForegroundAndGradientPreview() {
-    SubscriptionBadgeForTier(
-        tier = SubscriptionTier.PATRON,
-        displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-        hasGradientEffect = true,
+fun SubscriptionBadgeWithGradientBackgroundPreview() {
+    SubscriptionBadge(
+        fontSize = 16.sp,
+        padding = 4.dp,
+        iconRes = R.drawable.ic_plus,
+        shortNameRes = LR.string.pocket_casts_plus_short,
+        iconColor = Color.Black,
+        backgroundBrush = Brush.horizontalGradient(
+            0f to Color(0xFFFED745),
+            1f to Color(0xFFFEB525),
+        ),
+        textColor = Color.Black,
     )
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.calculateMinimumHeightWithInsets
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -40,11 +41,10 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -160,12 +160,14 @@ private fun Content(
                 .padding(bottom = 12.dp, top = 24.dp),
             contentAlignment = Alignment.Center,
         ) {
-            SubscriptionBadgeForTier(
-                tier = SubscriptionTier.PLUS,
-                displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+            SubscriptionBadge(
                 fontSize = 16.sp,
                 padding = 8.dp,
-                hasGradientEffect = true,
+                iconRes = R.drawable.ic_plus,
+                shortNameRes = LR.string.pocket_casts_plus_short,
+                iconColor = Color.Black,
+                backgroundBrush = plusGradientBrush,
+                textColor = Color.Black,
             )
         }
 
@@ -228,12 +230,14 @@ private fun SmallDeviceContent(
                 .padding(bottom = 8.dp, top = 12.dp),
             contentAlignment = Alignment.Center,
         ) {
-            SubscriptionBadgeForTier(
-                tier = SubscriptionTier.PLUS,
-                displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
-                hasGradientEffect = true,
+            SubscriptionBadge(
                 fontSize = 16.sp,
                 padding = 4.dp,
+                iconRes = R.drawable.ic_plus,
+                shortNameRes = LR.string.pocket_casts_plus_short,
+                iconColor = Color.Black,
+                backgroundBrush = plusGradientBrush,
+                textColor = Color.Black,
             )
         }
 
