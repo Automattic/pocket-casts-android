@@ -63,6 +63,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallfeatures.UpgradeLayoutFeatures
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallreviews.UpgradeLayoutReviews
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -122,13 +123,24 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loaded -> {
             val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
             when (loadedState.upgradeLayout) {
-                UpgradeLayout.Features, UpgradeLayout.Reviews -> {
+                UpgradeLayout.Features -> {
                     UpgradeLayoutFeatures(
                         state = loadedState,
                         source = source,
                         scrollState = scrollState,
                         onNotNowPressed = onNotNowPressed,
                         onClickSubscribe = { onClickSubscribe(true) },
+                        canUpgrade = canUpgrade,
+                    )
+                }
+                UpgradeLayout.Reviews -> {
+                    UpgradeLayoutReviews(
+                        state = loadedState,
+                        source = source,
+                        onNotNowPressed = onNotNowPressed,
+                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
+                        onClickSubscribe = { onClickSubscribe(true) },
+                        scrollState = scrollState,
                         canUpgrade = canUpgrade,
                     )
                 }
