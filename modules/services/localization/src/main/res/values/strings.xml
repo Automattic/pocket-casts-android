@@ -2093,6 +2093,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="paywall_themes_content_description">Extra themes and icons image</string>
     <string name="paywall_layout_reviews_title">\"Quite simply the best way to listen to podcasts\"</string>
     <string name="paywall_layout_reviews_subtitle">See why people have upgraded to Plus</string>
+    <string name="paywall_layout_reviews_stars_content_description">Stars</string>
+    <string name="paywall_layout_reviews_rating">4.1 Rating (5.7K Reviews)</string>
 
     <!-- Engage SDK -->
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>

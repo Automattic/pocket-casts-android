@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallreviews
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeature
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
@@ -60,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -144,7 +147,15 @@ fun UpgradeLayoutReviews(
                             )
 
                             PlusBenefits(
-                                modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 24.dp),
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp)
+                                    .padding(bottom = 24.dp),
+                            )
+
+                            Stars(
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp)
+                                    .padding(bottom = 24.dp),
                             )
                         }
                     }
@@ -252,8 +263,34 @@ fun PlusBenefitsItem(
     }
 }
 
+@Composable
+fun Stars(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Image(
+            painter = painterResource(IR.drawable.stars),
+            contentDescription = stringResource(LR.string.paywall_layout_reviews_stars_content_description),
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+
+        TextH40(
+            text = stringResource(LR.string.paywall_layout_reviews_rating),
+            color = Color.White,
+        )
+    }
+}
+
 @Preview
 @Composable
-fun PreviewPlusBenefits() {
+fun PlusBenefitsPreview() {
     PlusBenefits()
+}
+
+@Preview
+@Composable
+fun StarsPreview() {
+    Stars()
 }
