@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.sharing.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -43,6 +45,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,6 +94,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -128,6 +132,7 @@ internal fun ClipSelector(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TouchClipSelector(
     episodeDuration: Duration,
@@ -139,6 +144,7 @@ private fun TouchClipSelector(
     modifier: Modifier = Modifier,
     state: ClipSelectorState,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
     LaunchedEffect(state.scale) {
         state.refreshItemWidth(density)
@@ -190,6 +196,10 @@ private fun TouchClipSelector(
             TextH70(
                 text = stringResource(LR.string.share_clip_start_position, clipRange.start.toHhMmSs()),
                 color = shareColors.onBackgroundSecondary,
+                modifier = Modifier.combinedClickable(
+                    onClick = {},
+                    onLongClick = { coroutineScope.launch { state.scrollTo(clipRange.start) } },
+                ),
             )
             Spacer(
                 modifier = Modifier.weight(1f),
@@ -197,6 +207,10 @@ private fun TouchClipSelector(
             TextH70(
                 text = stringResource(LR.string.share_clip_duration, clipRange.duration.toHhMmSs()),
                 color = shareColors.onBackgroundSecondary,
+                modifier = Modifier.combinedClickable(
+                    onClick = {},
+                    onLongClick = { coroutineScope.launch { state.scrollTo(clipRange.end) } },
+                ),
             )
         }
     }
