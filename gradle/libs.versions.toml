@@ -19,7 +19,7 @@
 aboutlibraries = "11.2.1"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
 android-application = "8.5.2"
-billing = "6.0.1"
+billing = "7.0.0"
 coil = "2.5.0"
 compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
 # @keep
