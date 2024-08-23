@@ -233,7 +233,7 @@ class ShareDialogFragment : BottomSheetDialogFragment() {
                     },
                 ),
             )
-            if (FeatureFlag.isEnabled(Feature.SHARE_CLIPS) && FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
+            if (FeatureFlag.isEnabled(Feature.REIMAGINE_SHARING)) {
                 add(
                     shareOption(
                         textId = LR.string.podcast_share_clip,
