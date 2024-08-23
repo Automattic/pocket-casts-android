@@ -302,8 +302,9 @@ private fun BoxWithConstraintsScope.ClipTimeline(
                 )
             },
     ) {
+        val tickCount = episodeDuration.inWholeSeconds.toInt().ceilDiv(state.secondsPerTick)
         items(
-            count = episodeDuration.inWholeSeconds.toInt().ceilDiv(state.secondsPerTick) + 1,
+            count = tickCount,
             key = { index -> index },
         ) { index ->
             val heightIndex = when (index % 10) {
@@ -317,6 +318,9 @@ private fun BoxWithConstraintsScope.ClipTimeline(
                     .height(heightIndex)
                     .background(shareColors.onBackgroundSecondary),
             )
+            if (index == tickCount - 1) {
+                Spacer(modifier = Modifier.width(32.dp))
+            }
         }
     }
 }

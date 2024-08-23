@@ -132,7 +132,7 @@ internal class ClipSelectorState(
 
     suspend fun scrollTo(duration: Duration) {
         val index = duration.inWholeSeconds / secondsPerTick
-        val offset = durationToPixels(15.seconds)
+        val offset = durationToPixels(15.seconds * secondsPerTick)
         listState.animateScrollToItem(index.toInt(), scrollOffset = -offset.roundToInt())
     }
 
