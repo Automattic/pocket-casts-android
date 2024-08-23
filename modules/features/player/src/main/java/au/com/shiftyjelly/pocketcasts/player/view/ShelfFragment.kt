@@ -304,7 +304,7 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
 
             val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
             binding.root.isEnabled = isEnabled
-            binding.root.alpha = if (isEnabled) 1f else 0.5f
+            binding.root.alpha = if (isEnabled || editable) 1f else 0.5f
 
             binding.dragHandle.isVisible = editable
 
