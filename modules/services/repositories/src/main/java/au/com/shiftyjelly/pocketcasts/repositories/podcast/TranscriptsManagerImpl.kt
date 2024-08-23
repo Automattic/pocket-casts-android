@@ -19,6 +19,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,7 +37,8 @@ class TranscriptsManagerImpl @Inject constructor(
     private val transcriptCuesInfoBuilder: TranscriptCuesInfoBuilder,
 ) : TranscriptsManager {
     private val supportedFormats = listOf(TranscriptFormat.SRT, TranscriptFormat.VTT, TranscriptFormat.JSON_PODCAST_INDEX, TranscriptFormat.HTML)
-    private val failedTranscriptFormats = MutableStateFlow(emptyMap<String, List<TranscriptFormat>>())
+    private val _failedTranscriptFormats = MutableStateFlow(emptyMap<String, List<TranscriptFormat>>())
+    val failedTranscriptFormats = _failedTranscriptFormats.asStateFlow()
 
     override suspend fun updateTranscripts(
         podcastUuid: String,
@@ -47,7 +49,7 @@ class TranscriptsManagerImpl @Inject constructor(
     ) {
         if (transcripts.isEmpty()) return
         if (!fromUpdateAlternativeTranscript) {
-            failedTranscriptFormats.update { it.minus(episodeUuid) }
+            _failedTranscriptFormats.update { it.minus(episodeUuid) }
         }
 
         findBestTranscript(transcripts)?.let { bestTranscript ->
@@ -143,11 +145,11 @@ class TranscriptsManagerImpl @Inject constructor(
         source: LoadTranscriptSource,
     ) {
         try {
-            failedTranscriptFormats.update { currentMap ->
+            _failedTranscriptFormats.update { currentMap ->
                 val format = TranscriptFormat.fromType(transcript.type) ?: return@update currentMap
                 currentMap + (transcript.episodeUuid to (currentMap[transcript.episodeUuid]?.plus(format) ?: listOf(format)))
             }
-            val episodeFailedFormats = failedTranscriptFormats.value[transcript.episodeUuid]
+            val episodeFailedFormats = _failedTranscriptFormats.value[transcript.episodeUuid]
             if (!episodeFailedFormats.isNullOrEmpty()) {
                 // Get available transcripts from show notes
                 serverShowNotesManager.loadShowNotes(
