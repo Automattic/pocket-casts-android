@@ -25,6 +25,7 @@ class TranscriptsManagerImplTest {
     private val transcriptDao: TranscriptDao = mock()
     private val transcriptCacheServer: TranscriptCacheServer = mock()
     private val networkWrapper: NetworkWrapper = mock()
+    private val podcastId = "podcast_id"
     private val transcript = Transcript("1", "url_1", "application/srt")
     private val transcriptsManager = TranscriptsManagerImpl(
         transcriptDao = transcriptDao,
@@ -75,7 +76,7 @@ class TranscriptsManagerImplTest {
             Transcript("1", "url_2", "text/vtt"),
         )
 
-        transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DEFAULT)
+        transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DEFAULT)
 
         verify(transcriptDao).insert(transcripts[0])
     }
@@ -87,7 +88,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(true)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscriptCuesInfo(transcript, forceRefresh = true)
+        transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = true)
 
         verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
@@ -99,7 +100,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(true)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscriptCuesInfo(transcript, forceRefresh = true)
+        transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = true)
 
         verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
@@ -110,7 +111,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(true)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscriptCuesInfo(transcript)
+        transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript)
 
         verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
@@ -122,7 +123,7 @@ class TranscriptsManagerImplTest {
         whenever(response.isSuccessful).thenReturn(false)
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
-        transcriptsManager.loadTranscriptCuesInfo(transcript)
+        transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript)
 
         verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
@@ -135,7 +136,7 @@ class TranscriptsManagerImplTest {
         whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
 
         try {
-            transcriptsManager.loadTranscriptCuesInfo(transcript)
+            transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript)
         } catch (e: Exception) {
             assertTrue(e is NoNetworkException)
         }
@@ -148,7 +149,7 @@ class TranscriptsManagerImplTest {
             Transcript("1", "url_1", "application/srt"),
         )
 
-        transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DOWNLOAD_EPISODE)
+        transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DOWNLOAD_EPISODE)
 
         verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
@@ -160,7 +161,7 @@ class TranscriptsManagerImplTest {
             Transcript("1", "url_1", "application/srt"),
         )
 
-        transcriptsManager.updateTranscripts("1", transcripts, LoadTranscriptSource.DEFAULT)
+        transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DEFAULT)
 
         verifyNoInteractions(transcriptCacheServer)
     }
