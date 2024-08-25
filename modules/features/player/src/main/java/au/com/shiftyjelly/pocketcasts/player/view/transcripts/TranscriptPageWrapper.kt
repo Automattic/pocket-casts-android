@@ -174,6 +174,7 @@ fun TranscriptToolbar(
                         .padding(start = 16.dp),
                     onClick = onCloseClick,
                     tintColor = TranscriptColors.iconColor(),
+                    contentDescription = stringResource(LR.string.transcript_close),
                 )
 
                 if (showSearch) {
@@ -190,7 +191,7 @@ fun TranscriptToolbar(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = stringResource(LR.string.search),
+                                contentDescription = stringResource(LR.string.transcript_search),
                                 tint = Color.White,
                             )
                         }
