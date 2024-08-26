@@ -8,15 +8,18 @@ import kotlinx.coroutines.flow.Flow
 
 interface TranscriptsManager {
     suspend fun updateTranscripts(
+        podcastUuid: String,
         episodeUuid: String,
         transcripts: List<Transcript>,
         loadTranscriptSource: LoadTranscriptSource,
+        fromUpdateAlternativeTranscript: Boolean = false,
     )
 
     fun observerTranscriptForEpisode(episodeUuid: String): Flow<Transcript?>
 
     @OptIn(UnstableApi::class)
     suspend fun loadTranscriptCuesInfo(
+        podcastUuid: String,
         transcript: Transcript,
         source: LoadTranscriptSource = LoadTranscriptSource.DEFAULT,
         forceRefresh: Boolean = false,

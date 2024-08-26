@@ -35,6 +35,7 @@ class TranscriptViewModelTest {
 
     private val transcriptsManager: TranscriptsManager = mock()
     private val playbackManager: PlaybackManager = mock()
+    private val podcastId = "podcast_id"
     private val transcript: Transcript = Transcript("episode_id", "url", "type")
     private val playbackStateFlow = MutableStateFlow(PlaybackState(podcast = Podcast("podcast_id"), episodeUuid = "episode_id"))
     private lateinit var viewModel: TranscriptViewModel
@@ -129,7 +130,7 @@ class TranscriptViewModelTest {
 
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = true)
 
-        verify(transcriptsManager).loadTranscriptCuesInfo(transcript, forceRefresh = true)
+        verify(transcriptsManager).loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = true)
     }
 
     @Test
@@ -139,7 +140,7 @@ class TranscriptViewModelTest {
 
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = false)
 
-        verify(transcriptsManager).loadTranscriptCuesInfo(transcript, forceRefresh = false)
+        verify(transcriptsManager).loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = false)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -149,7 +150,7 @@ class TranscriptViewModelTest {
     ) = runTest {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
         if (transcriptLoadException != null) {
-            given(transcriptsManager.loadTranscriptCuesInfo(anyOrNull(), anyOrNull(), anyOrNull())).willAnswer { throw transcriptLoadException }
+            given(transcriptsManager.loadTranscriptCuesInfo(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).willAnswer { throw transcriptLoadException }
         } else {
             val response = mock<ResponseBody>()
             if (content != null) {
@@ -157,7 +158,7 @@ class TranscriptViewModelTest {
             } else {
                 whenever(response.bytes()).thenReturn(byteArrayOf())
             }
-            whenever(transcriptsManager.loadTranscriptCuesInfo(anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(emptyList())
+            whenever(transcriptsManager.loadTranscriptCuesInfo(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(emptyList())
         }
 
         viewModel = TranscriptViewModel(
