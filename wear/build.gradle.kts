@@ -81,6 +81,7 @@ dependencies {
     implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
+    implementation(project(":modules:services:media-noop"))
     implementation(project(":modules:services:model"))
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:repositories"))

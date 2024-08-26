@@ -9,7 +9,7 @@ plugins {
 apply(from = "${project.rootDir}/base.gradle")
 
 android {
-    namespace = "au.com.shiftyjelly.pocketcasts.sharing"
+    namespace = "au.com.shiftyjelly.pocketcasts.reimagine"
     buildFeatures {
         buildConfig = true
         viewBinding = false
@@ -18,9 +18,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.capturable)
-    implementation(libs.ffmpeg)
-
+    api(project(":modules:services:sharing"))
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))
     implementation(project(":modules:services:images"))
@@ -31,6 +29,8 @@ dependencies {
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
     implementation(project(":modules:services:views"))
+
+    implementation(libs.capturable)
 
     testImplementation(project(":modules:services:sharedtest"))
 }
