@@ -43,15 +43,22 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
 
     companion object {
         const val EXTRA_URL = "EXTRA_URL"
+        const val EXTRA_SOURCE = "EXTRA_SOURCE"
 
-        fun newInstance(listPath: String): ShareListIncomingFragment {
+        fun newInstance(
+            listPath: String,
+            sourceView: SourceView = SourceView.UNKNOWN,
+        ): ShareListIncomingFragment {
             return ShareListIncomingFragment().apply {
                 arguments = bundleOf(
                     EXTRA_URL to listPath,
+                    EXTRA_SOURCE to sourceView.analyticsValue,
                 )
             }
         }
     }
+
+    val source get() = SourceView.fromString(arguments?.getString(EXTRA_SOURCE))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,7 +120,7 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
         }
 
         if (!viewModel.isFragmentChangingConfigurations) {
-            viewModel.trackShareEvent(AnalyticsEvent.INCOMING_SHARE_LIST_SHOWN)
+            viewModel.trackShareEvent(AnalyticsEvent.INCOMING_SHARE_LIST_SHOWN, mapOf("source" to source.analyticsValue))
         }
     }
 

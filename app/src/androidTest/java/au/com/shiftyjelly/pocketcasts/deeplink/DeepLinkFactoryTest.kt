@@ -351,7 +351,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+        assertEquals(ShareListDeepLink("/path/to/list", sourceView = null), deepLink)
     }
 
     @Test
@@ -362,7 +362,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+        assertEquals(ShareListDeepLink("/path/to/list", sourceView = null), deepLink)
     }
 
     @Test
@@ -373,7 +373,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+        assertEquals(ShareListDeepLink("/path/to/list", sourceView = null), deepLink)
     }
 
     @Test
@@ -406,7 +406,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+        assertEquals(ShareListDeepLink("/path/to/list", sourceView = null), deepLink)
     }
 
     @Test
@@ -417,7 +417,29 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShareListDeepLink("/path/to/list"), deepLink)
+        assertEquals(ShareListDeepLink("/path/to/list", sourceView = null), deepLink)
+    }
+
+    @Test
+    fun shareListWithSource() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://lists.pocketcasts.com/path/to/list?source_view=someValue"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShareListDeepLink("/path/to/list", sourceView = "someValue"), deepLink)
+    }
+
+    @Test
+    fun shareListNativeWithSource() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://sharelist/path/to/list?source_view=someValue"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShareListDeepLink("/path/to/list", sourceView = "someValue"), deepLink)
     }
 
     @Test

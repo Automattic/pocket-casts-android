@@ -2088,4 +2088,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="paywall_themes_description">Fly your true colors. Exclusive icons and themes for our subscribers.</string>
     <string name="paywall_themes_content_description">Extra themes and icons image</string>
 
+    <!-- Engage SDK -->
+    <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
+    <string name="engage_sdk_new_releases" translatable="false">@string/nova_launcher_new_releases</string>
+    <string name="engage_sdk_trending" translatable="false">@string/discover_trending</string>
+
 </resources>

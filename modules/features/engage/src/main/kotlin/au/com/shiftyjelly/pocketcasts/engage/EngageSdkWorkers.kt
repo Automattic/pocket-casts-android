@@ -10,6 +10,8 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge.Companion.TAG
+import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
+import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
 import com.google.android.engage.service.AppEngageErrorCode
 import com.google.android.engage.service.AppEngageException
 import com.google.android.engage.service.AppEngagePublishClient
@@ -72,11 +74,17 @@ internal object EngageSdkWorkers {
 internal class RecommendationsSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
+    private val externalDataManager: ExternalDataManager,
 ) : ClusterSyncWorker(context, params, "Recommendations") {
-    private val clusterRequestFactory = ClusterRequestFactory()
+    private val clusterRequestFactory = ClusterRequestFactory(context)
 
     override suspend fun submitCluster(client: AppEngagePublishClient): Task<Void> {
-        return client.publishRecommendationClusters(clusterRequestFactory.createRecommendations())
+        val recentlyPlayedPodcasts = externalDataManager.getRecentlyPlayedPodcasts(limit = 50)
+        val newReleases = externalDataManager.getNewEpisodes(limit = 50)
+        val discoverRecommendations = externalDataManager.getCuratedPodcastGroups(limitPerGroup = 50)
+        val trending = discoverRecommendations.trendingGroup() ?: ExternalPodcastList("", "", emptyList())
+        val data = RecommendationsData.create(recentlyPlayedPodcasts, newReleases, trending, discoverRecommendations.genericGroups())
+        return client.publishRecommendationClusters(clusterRequestFactory.createRecommendations(data))
     }
 }
 
@@ -84,11 +92,13 @@ internal class RecommendationsSyncWorker @AssistedInject constructor(
 internal class ContinuationSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
+    private val externalDataManager: ExternalDataManager,
 ) : ClusterSyncWorker(context, params, "Continuation") {
-    private val clusterRequestFactory = ClusterRequestFactory()
+    private val clusterRequestFactory = ClusterRequestFactory(context)
 
     override suspend fun submitCluster(client: AppEngagePublishClient): Task<Void> {
-        return client.publishContinuationCluster(clusterRequestFactory.createContinuation())
+        val inProgressEpisodes = externalDataManager.getInProgressEpisodes(limit = 10)
+        return client.publishContinuationCluster(clusterRequestFactory.createContinuation(inProgressEpisodes))
     }
 }
 
@@ -96,11 +106,13 @@ internal class ContinuationSyncWorker @AssistedInject constructor(
 internal class FeaturedWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
+    private val externalDataManager: ExternalDataManager,
 ) : ClusterSyncWorker(context, params, "Featured") {
-    private val clusterRequestFactory = ClusterRequestFactory()
+    private val clusterRequestFactory = ClusterRequestFactory(context)
 
     override suspend fun submitCluster(client: AppEngagePublishClient): Task<Void> {
-        return client.publishFeaturedCluster(clusterRequestFactory.createFeatured())
+        val featuredList = externalDataManager.getCuratedPodcastGroups(limitPerGroup = 10).featuruedGroup()
+        return client.publishFeaturedCluster(clusterRequestFactory.createFeatured(featuredList))
     }
 }
 
