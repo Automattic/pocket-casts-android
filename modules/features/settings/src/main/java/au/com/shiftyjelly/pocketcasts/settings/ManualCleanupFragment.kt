@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -25,20 +24,15 @@ class ManualCleanupFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppThemeWithBackground(theme.activeTheme) {
-                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    ManualCleanupPage(
-                        viewModel = viewModel,
-                        onBackClick = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
-                        },
-                    )
-                }
-            }
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            ManualCleanupPage(
+                viewModel = viewModel,
+                onBackClick = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+            )
         }
     }
 
