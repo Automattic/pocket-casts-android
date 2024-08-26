@@ -52,11 +52,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -71,7 +69,7 @@ fun UpgradeLayoutReviews(
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    AppTheme(Theme.ThemeType.DARK) { // We need to set Dark since this screen will have dark colors for all themes
+    AppTheme(Theme.ThemeType.DARK) {
         Box(
             modifier = modifier.fillMaxHeight(),
             contentAlignment = Alignment.BottomCenter,
@@ -191,11 +189,14 @@ private fun PlusBenefits(
                 .offset(y = (-10).dp)
                 .padding(vertical = 8.dp),
         ) {
-            SubscriptionBadgeForTier(
-                tier = SubscriptionTier.PLUS,
-                displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+            SubscriptionBadge(
                 fontSize = 16.sp,
                 padding = 8.dp,
+                iconRes = IR.drawable.ic_plus,
+                shortNameRes = LR.string.pocket_casts_plus_short,
+                iconColor = Color.Black,
+                backgroundBrush = plusGradientBrush,
+                textColor = Color.Black,
             )
         }
     }

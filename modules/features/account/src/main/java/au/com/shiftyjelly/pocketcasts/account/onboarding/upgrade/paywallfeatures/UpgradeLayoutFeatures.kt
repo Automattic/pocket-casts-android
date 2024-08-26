@@ -37,9 +37,9 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val SCREEN_HEIGHT_FOR_SMALL_DEVICES = 600.dp
@@ -128,7 +128,7 @@ private fun Content(
             SubscriptionBadge(
                 fontSize = 16.sp,
                 padding = 8.dp,
-                iconRes = R.drawable.ic_plus,
+                iconRes = IR.drawable.ic_plus,
                 shortNameRes = LR.string.pocket_casts_plus_short,
                 iconColor = Color.Black,
                 backgroundBrush = plusGradientBrush,
@@ -198,7 +198,7 @@ private fun SmallDeviceContent(
             SubscriptionBadge(
                 fontSize = 16.sp,
                 padding = 4.dp,
-                iconRes = R.drawable.ic_plus,
+                iconRes = IR.drawable.ic_plus,
                 shortNameRes = LR.string.pocket_casts_plus_short,
                 iconColor = Color.Black,
                 backgroundBrush = plusGradientBrush,
