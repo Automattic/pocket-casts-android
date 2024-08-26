@@ -132,7 +132,8 @@ enum class PlusUpgradeLayoutReviewsItem(
     ),
     SlumberStudiosPromo(
         image = IR.drawable.ic_slumber_studios,
-        title = LR.string.onboarding_plus_feature_slumber_studios_title_static,
+        title = LR.string.onboarding_plus_feature_dream_with_slumber_studios,
+        isYearlyFeature = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO),
     ),
     ThemesIcons(
         image = IR.drawable.ic_themes,

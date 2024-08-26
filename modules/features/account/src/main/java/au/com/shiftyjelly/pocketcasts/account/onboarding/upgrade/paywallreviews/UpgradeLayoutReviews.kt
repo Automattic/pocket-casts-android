@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,15 +16,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,23 +30,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeLayoutReviewsItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.SubscribeButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.calculateMinimumHeightWithInsets
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -178,7 +172,7 @@ private fun PlusBenefits(
                 modifier = Modifier.padding(32.dp),
             ) {
                 PlusUpgradeLayoutReviewsItem.entries.forEach {
-                    PlusBenefitsItem(it)
+                    UpgradeFeatureItem(item = it, color = Color.White)
                 }
             }
         }
@@ -198,35 +192,6 @@ private fun PlusBenefits(
                 textColor = Color.Black,
             )
         }
-    }
-}
-
-@Composable
-fun PlusBenefitsItem(
-    item: UpgradeFeatureItem,
-    modifier: Modifier = Modifier,
-    color: Color = Color.White,
-) {
-    Row(
-        modifier = modifier
-            .semantics(mergeDescendants = true) {}
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Icon(
-            painter = painterResource(item.image),
-            contentDescription = null,
-            tint = color,
-            modifier = modifier
-                .size(20.dp)
-                .padding(2.dp),
-        )
-        Spacer(Modifier.width(16.dp))
-        TextH50(
-            text = stringResource(item.title),
-            color = color,
-        )
     }
 }
 

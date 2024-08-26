@@ -1821,7 +1821,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
     <!-- Do not translate Slumber Studios -->
     <string name="onboarding_plus_feature_slumber_studios_title"><![CDATA[1 year of exclusive content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
-    <string name="onboarding_plus_feature_slumber_studios_title_static">Dream with Slumber Studios content</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios"><![CDATA[<a href="https://slumberstudios.com/">Dream with Slumber Studios content</a>]]></string>
     <string name="onboarding_plus_become_a_plus_member">Become a Plus member and unlock all Pocket&#160;Casts features</string>
     <string name="onboarding_plus_continuing_agrees_to">By continuing, you agree to our %1$s and %2$s.</string>
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
