@@ -5,6 +5,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    labels:
+      - "[Type] Tech Debt"
+      - "[Area] Dependencies"
     ignore:
       # Automattic libraries have a custom versioning scheme which doesn't work with Dependabot.
       - dependency-name: "com.automattic:Automattic-Tracks-Android"
