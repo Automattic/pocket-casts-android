@@ -21,7 +21,7 @@ dependencies {
     // features
     implementation(project(":modules:features:account"))
     implementation(project(":modules:features:search"))
-    implementation(project(":modules:features:sharing"))
+    implementation(project(":modules:features:reimagine"))
     implementation(project(":modules:features:settings"))
     implementation(project(":modules:features:player"))
 

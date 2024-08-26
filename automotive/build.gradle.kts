@@ -69,6 +69,7 @@ dependencies {
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:preferences"))
     implementation(project(":modules:services:utils"))
+    implementation(project(":modules:services:media-noop"))
     implementation(project(":modules:services:model"))
     implementation(project(":modules:services:ui"))
     implementation(project(":modules:services:views"))
