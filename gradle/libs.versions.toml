@@ -28,6 +28,7 @@ compose-kotlin-compiler = "1.5.9"
 dependency-analysis = "1.28.0"
 espresso = "3.4.0"
 firebase = "30.5.0"
+fragment = "1.8.2"
 glance = "1.0.0"
 glide = "4.13.2"
 google-services = "4.3.14"
@@ -116,6 +117,10 @@ espresso-idling-resource = { module = "androidx.test.espresso:espresso-idling-re
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 firebase-config = { module = "com.google.firebase:firebase-config-ktx" }
+
+# Fragments
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragment" }
 
 # Glide
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
@@ -258,7 +263,6 @@ encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
 engage = "com.google.android.engage:engage-core:1.5.4"
 ffmpeg = "com.arthenica:ffmpeg-kit-full:6.0-2"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
-fragment-ktx = "androidx.fragment:fragment-ktx:1.5.2"
 guava = "com.google.guava:guava:33.1.0-android" # Required to fix conflict between versions in exoplayer and workmanager
 jsonassert = "org.skyscreamer:jsonassert:1.5.0"
 junit = "junit:junit:4.13.2"
@@ -327,6 +331,11 @@ firebase = [
     "firebase-bom",
     "firebase-analytics",
     "firebase-config"
+]
+
+fragment = [
+    "fragment-ktx",
+    "fragment-compose"
 ]
 
 hilt = [

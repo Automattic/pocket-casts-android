@@ -197,6 +197,7 @@ dependencies {
     implementation libs.bundles.billing
     implementation libs.bundles.coroutines
     implementation libs.bundles.firebase
+    implementation libs.bundles.fragment
     implementation libs.bundles.hilt
     implementation libs.bundles.lifecycle
     implementation libs.bundles.lottie
@@ -227,7 +228,6 @@ dependencies {
     implementation libs.core.ktx
     implementation libs.device.names
     implementation libs.flexbox
-    implementation libs.fragment.ktx
     implementation libs.glide
     implementation libs.glide.okhttp
     implementation libs.guava
