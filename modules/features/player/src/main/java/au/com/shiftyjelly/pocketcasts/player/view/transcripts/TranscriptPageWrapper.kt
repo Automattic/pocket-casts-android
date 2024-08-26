@@ -264,10 +264,6 @@ private fun SearchBarLeadingIcons(
                 contentDescription = stringResource(LR.string.done),
             )
         }
-        Icon(
-            painter = painterResource(R.drawable.ic_search),
-            contentDescription = null,
-        )
     }
 }
 
