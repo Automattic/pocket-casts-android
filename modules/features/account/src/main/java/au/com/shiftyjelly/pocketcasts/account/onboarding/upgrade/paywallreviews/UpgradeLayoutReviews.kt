@@ -110,7 +110,6 @@ fun UpgradeLayoutReviews(
                             TextH20(
                                 text = stringResource(LR.string.paywall_layout_reviews_title),
                                 color = Color.White,
-                                maxLines = 2,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp)
@@ -247,6 +246,7 @@ fun Stars(modifier: Modifier = Modifier) {
         TextH40(
             text = stringResource(LR.string.paywall_layout_reviews_rating),
             color = Color.White,
+            textAlign = TextAlign.Center,
         )
     }
 }
