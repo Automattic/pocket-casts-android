@@ -7,22 +7,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun SubscribeButton(
@@ -45,10 +44,16 @@ fun SubscribeButton(
     ) {
         val bottomPadding = if (offerText != null) 0.dp else 34.dp
 
-        SubscribeButtonContent(onClickSubscribe, Modifier.padding(bottom = bottomPadding))
+        SubscribeButtonContent(
+            onClickSubscribe,
+            Modifier
+                .padding(bottom = bottomPadding)
+                .padding(horizontal = 16.dp),
+        )
 
         offerText?.let {
             TextP50(
+                modifier = Modifier.padding(top = 12.dp),
                 text = it,
                 fontWeight = FontWeight.W400,
             )
@@ -66,16 +71,11 @@ private fun SubscribeButtonContent(
         contentAlignment = Alignment.BottomCenter,
         modifier = modifier,
     ) {
-        RowButton(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = stringResource(R.string.get_pocket_casts_plus),
+        UpgradeRowButton(
+            primaryText = stringResource(R.string.get_pocket_casts_plus),
+            gradientBackgroundColor = plusGradientBrush,
+            textColor = colorResource(UR.color.black),
             onClick = onClickSubscribe,
-            fontWeight = FontWeight.W600,
-            fontSize = 18.sp,
-            textColor = Color.Black,
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = colorResource(au.com.shiftyjelly.pocketcasts.ui.R.color.plus_gold),
-            ),
         )
     }
 }
