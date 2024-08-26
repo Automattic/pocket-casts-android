@@ -174,7 +174,11 @@ fun TranscriptToolbar(
                         .padding(start = 16.dp),
                     onClick = onCloseClick,
                     tintColor = TranscriptColors.iconColor(),
-                    contentDescription = stringResource(LR.string.transcript_close),
+                    contentDescription = if (expandSearch) {
+                        stringResource(LR.string.transcript_search_close)
+                    } else {
+                        stringResource(LR.string.transcript_close)
+                    },
                 )
 
                 if (showSearch) {
