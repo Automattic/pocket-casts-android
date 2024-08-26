@@ -27,7 +27,7 @@ object TranscriptDefaults {
 
     @Composable
     fun scrollToHighlightedTextOffset() =
-        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 50.dp else 100.dp
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 100.dp
 
     data class TranscriptColors(
         val playerBackgroundColor: Color,
