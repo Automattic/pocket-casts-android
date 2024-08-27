@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
@@ -71,7 +71,7 @@ interface PodcastManager {
 
     fun addFolderPodcast(podcast: Podcast)
 
-    suspend fun replaceTrendingPodcasts(podcasts: List<TrendingPodcast>)
+    suspend fun replaceCuratedPodcasts(podcasts: List<CuratedPodcast>)
 
     /** Update methods  */
     fun updatePodcast(podcast: Podcast)

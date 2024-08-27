@@ -9,7 +9,7 @@ import android.net.Uri
 import android.provider.MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
 import androidx.core.content.IntentCompat
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_LIST_HOST
-import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_SHORT_URL
+import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.SERVER_SHORT_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
@@ -30,7 +30,7 @@ import timber.log.Timber
 class DeepLinkFactory(
     private val webBaseHost: String = WEB_BASE_HOST,
     private val listHost: String = SERVER_LIST_HOST,
-    private val shareHost: String = SERVER_SHORT_URL.substringAfter("https://"),
+    private val shareHost: String = SERVER_SHORT_HOST,
 ) {
     private val adapters = listOf(
         DownloadsAdapter(),
@@ -226,9 +226,10 @@ private class ShareListAdapter(
         val scheme = uriData?.scheme
         val host = uriData?.host
         val path = uriData?.path?.takeIf { it != "/" }
+        val source = uriData?.getQueryParameter(EXTRA_SOURCE_VIEW)
 
         return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == listHost && path != null) {
-            ShareListDeepLink(path)
+            ShareListDeepLink(path, source)
         } else {
             null
         }
@@ -241,9 +242,10 @@ private class ShareListNativeAdapter : DeepLinkAdapter {
         val scheme = uriData?.scheme
         val host = uriData?.host
         val path = uriData?.path?.takeIf { it != "/" }
+        val source = uriData?.getQueryParameter(EXTRA_SOURCE_VIEW)
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "sharelist" && path != null) {
-            ShareListDeepLink(path)
+            ShareListDeepLink(path, source)
         } else {
             null
         }

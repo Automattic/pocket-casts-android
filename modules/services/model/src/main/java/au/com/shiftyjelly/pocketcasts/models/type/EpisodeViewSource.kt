@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 enum class EpisodeViewSource(val value: String) {
     DISCOVER("discover"),
+    ENGAGE_SDK_CONTINUATION("engage_sdk_continuation"),
+    ENGAGE_SDK_FEATURED("engage_sdk_featured"),
+    ENGAGE_SDK_RECOMMENDATIONS("engage_sdk_recommendations"),
     FILES("files"),
     FILTERS("filters"),
     PODCAST_SCREEN("podcast_screen"),

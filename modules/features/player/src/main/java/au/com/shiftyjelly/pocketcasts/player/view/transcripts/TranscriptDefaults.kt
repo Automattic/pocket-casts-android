@@ -20,11 +20,14 @@ object TranscriptDefaults {
     val TranscriptFontFamily = FontFamily(listOf(Font(R.font.roboto_serif)))
     val SearchOccurrenceDefaultSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, fontFamily = TranscriptFontFamily, background = Color.White.copy(alpha = .2f), color = Color.White)
     val SearchOccurrenceSelectedSpanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.W500, fontFamily = TranscriptFontFamily, background = Color.White, color = Color.Black)
-    val ScrollToHighlightedTextOffset = 100.dp
 
     @Composable
     fun bottomPadding() =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 125.dp
+
+    @Composable
+    fun scrollToHighlightedTextOffset() =
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.dp else 100.dp
 
     data class TranscriptColors(
         val playerBackgroundColor: Color,

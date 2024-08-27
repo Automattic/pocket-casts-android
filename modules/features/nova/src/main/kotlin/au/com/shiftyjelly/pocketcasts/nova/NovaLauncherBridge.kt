@@ -5,7 +5,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.nova.NovaLauncherManager
+import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -19,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 class NovaLauncherBridge @Inject constructor(
     @ApplicationContext private val context: Context,
     @ApplicationScope scope: CoroutineScope,
-    manager: NovaLauncherManager,
+    manager: ExternalDataManager,
 ) {
     private val isNovaLauncherIntegrationEnabled = AtomicBoolean(false)
     private val areSyncRulesActive = AtomicBoolean(false)

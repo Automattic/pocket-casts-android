@@ -17,9 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -27,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.fragment.compose.content
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -64,26 +63,23 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-            AppThemeWithBackground(theme.activeTheme) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                val previousAction = settings.headphoneControlsPreviousAction.flow.collectAsState().value
-                val nextAction = settings.headphoneControlsNextAction.flow.collectAsState().value
-                val confirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.flow.collectAsState().value
+    ) = content {
+        val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        AppThemeWithBackground(theme.activeTheme) {
+            val previousAction = settings.headphoneControlsPreviousAction.flow.collectAsState().value
+            val nextAction = settings.headphoneControlsNextAction.flow.collectAsState().value
+            val confirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.flow.collectAsState().value
 
-                HeadphoneControlsSettingsPage(
-                    previousAction = previousAction,
-                    nextAction = nextAction,
-                    confirmationSound = confirmationSound,
-                    onBackPressed = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
-                    },
-                    bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                )
-            }
+            HeadphoneControlsSettingsPage(
+                previousAction = previousAction,
+                nextAction = nextAction,
+                confirmationSound = confirmationSound,
+                onBackPressed = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 
