@@ -194,7 +194,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toStartOf="@id/btnSettings"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/primary_text_01"
+            app:tint="?attr/secondary_icon_01"
             tools:visibility="visible" />
 
         <ImageButton
@@ -207,7 +207,7 @@
             android:src="@drawable/ic_profile_settings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/primary_text_01" />
+            app:tint="?attr/secondary_icon_01" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
