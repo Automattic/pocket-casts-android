@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,9 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +18,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -50,24 +48,19 @@ class BetaFeaturesFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppThemeWithBackground(theme.activeTheme) {
-                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    val state by viewModel.state.collectAsState()
-                    val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
-                    BetaFeaturesPage(
-                        state = state,
-                        onFeatureEnabled = viewModel::setFeatureEnabled,
-                        onBackClick = {
-                            @Suppress("DEPRECATION")
-                            activity?.onBackPressed()
-                        },
-                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                    )
-                }
-            }
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            val state by viewModel.state.collectAsState()
+            val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
+            BetaFeaturesPage(
+                state = state,
+                onFeatureEnabled = viewModel::setFeatureEnabled,
+                onBackClick = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 }

@@ -3,27 +3,23 @@ package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.Format
-import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.extractor.text.CuesWithTiming
-import androidx.media3.extractor.text.SubtitleParser
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
+import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
+import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.common.collect.ImmutableList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.toImmutableList
 
 @kotlin.OptIn(ExperimentalCoroutinesApi::class)
 @OptIn(UnstableApi::class)
@@ -42,10 +37,8 @@ import okhttp3.internal.toImmutableList
 class TranscriptViewModel @Inject constructor(
     private val transcriptsManager: TranscriptsManager,
     private val playbackManager: PlaybackManager,
-    private val subtitleParserFactory: SubtitleParser.Factory,
     private val analyticsTracker: AnalyticsTracker,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val transcriptJsonParser: TranscriptJsonParser,
 ) : ViewModel() {
     private var _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty())
     val uiState: StateFlow<UiState> = _uiState
@@ -56,7 +49,6 @@ class TranscriptViewModel @Inject constructor(
         viewModelScope.launch {
             playbackManager.playbackStateFlow
                 .map { PodcastAndEpisode(it.podcast, it.episodeUuid) }
-                .distinctUntilChanged { t1, t2 -> t1.episodeUuid == t2.episodeUuid }
                 .stateIn(viewModelScope)
                 .flatMapLatest(::transcriptFlow)
                 .collect { _uiState.value = it }
@@ -65,7 +57,7 @@ class TranscriptViewModel @Inject constructor(
 
     private fun transcriptFlow(podcastAndEpisode: PodcastAndEpisode) =
         transcriptsManager.observerTranscriptForEpisode(podcastAndEpisode.episodeUuid)
-            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid }
+            .distinctUntilChanged { t1, t2 -> t1?.episodeUuid == t2?.episodeUuid && t1?.type == t2?.type }
             .map { transcript ->
                 transcript?.let {
                     UiState.TranscriptFound(podcastAndEpisode, transcript)
@@ -88,7 +80,11 @@ class TranscriptViewModel @Inject constructor(
             viewModelScope.launch {
                 _uiState.value = try {
                     val forceRefresh = pulledToRefresh || retryOnFail
-                    val cuesInfo = buildSubtitleCues(transcript, forceRefresh)
+                    val cuesInfo = transcriptsManager.loadTranscriptCuesInfo(
+                        podcastUuid = podcastAndEpisode?.podcast?.uuid.orEmpty(),
+                        transcript = transcript,
+                        forceRefresh = forceRefresh,
+                    )
 
                     val displayInfo = buildDisplayInfo(
                         cuesInfo = cuesInfo,
@@ -108,13 +104,16 @@ class TranscriptViewModel @Inject constructor(
                 } catch (e: Exception) {
                     track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
                     when (e) {
+                        is EmptyDataException ->
+                            UiState.Error(TranscriptError.Empty, transcript, podcastAndEpisode)
+
                         is UnsupportedOperationException ->
                             UiState.Error(TranscriptError.NotSupported(transcript.type), transcript, podcastAndEpisode)
 
                         is NoNetworkException ->
                             UiState.Error(TranscriptError.NoNetwork, transcript, podcastAndEpisode)
 
-                        is TranscriptParsingException ->
+                        is ParsingException ->
                             UiState.Error(TranscriptError.FailedToParse, transcript, podcastAndEpisode)
 
                         else -> {
@@ -124,74 +123,6 @@ class TranscriptViewModel @Inject constructor(
                     }
                 }
                 if (pulledToRefresh) _isRefreshing.value = false
-            }
-        }
-    }
-
-    private suspend fun buildSubtitleCues(transcript: Transcript, forceRefresh: Boolean) = withContext(ioDispatcher) {
-        when (transcript.type) {
-            TranscriptFormat.HTML.mimeType -> {
-                val content = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
-                if (content.trim().isEmpty()) {
-                    emptyList()
-                } else {
-                    // Html content is added as single large cue
-                    ImmutableList.of(
-                        CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(content).build()),
-                            0,
-                            0,
-                        ).toTranscriptCuesInfo(),
-                    )
-                }
-            }
-
-            TranscriptFormat.JSON_PODCAST_INDEX.mimeType -> {
-                val jsonString = transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.string() ?: ""
-                if (jsonString.trim().isEmpty()) {
-                    emptyList()
-                } else {
-                    // Parse json following PodcastIndex.org transcript json spec: https://github.com/Podcastindex-org/podcast-namespace/blob/main/transcripts/transcripts.md#json
-                    val transcriptCues = transcriptJsonParser.parse(jsonString)
-                    transcriptCues.map { cue ->
-                        val startTimeUs = cue.startTime?.toMicroSeconds ?: 0
-                        val endTimeUs = cue.endTime?.toMicroSeconds ?: 0
-                        CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(cue.body ?: "").build()),
-                            startTimeUs,
-                            endTimeUs - startTimeUs,
-                        ).toTranscriptCuesInfo(
-                            cuesAdditionalInfo = CuesAdditionalInfo(speaker = cue.speaker),
-                        )
-                    }.toImmutableList()
-                }
-            }
-
-            else -> {
-                val format = Format.Builder()
-                    .setSampleMimeType(transcript.type)
-                    .build()
-                if (subtitleParserFactory.supportsFormat(format).not()) {
-                    throw UnsupportedOperationException("Unsupported MIME type: ${transcript.type}")
-                } else {
-                    val result = ImmutableList.builder<CuesWithTiming>()
-                    transcriptsManager.loadTranscript(transcript.url, forceRefresh = forceRefresh)?.bytes()?.let { data ->
-                        try {
-                            val parser = subtitleParserFactory.create(format)
-                            parser.parse(
-                                data,
-                                SubtitleParser.OutputOptions.allCues(),
-                            ) { element: CuesWithTiming? ->
-                                element?.let { result.add(it) }
-                            }
-                        } catch (e: Exception) {
-                            val message = "Failed to parse transcript: ${transcript.url}"
-                            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, e, message)
-                            throw TranscriptParsingException(message)
-                        }
-                    }
-                    result.build().map { it.toTranscriptCuesInfo() }
-                }
             }
         }
     }
@@ -263,9 +194,6 @@ class TranscriptViewModel @Inject constructor(
         )
     }
 
-    private val Double.toMicroSeconds: Long
-        get() = toDuration(DurationUnit.SECONDS).inWholeMicroseconds
-
     data class PodcastAndEpisode(
         val podcast: Podcast?,
         val episodeUuid: String,
@@ -300,19 +228,6 @@ class TranscriptViewModel @Inject constructor(
         ) : UiState()
     }
 
-    data class TranscriptCuesInfo(
-        val cuesWithTiming: CuesWithTiming,
-        val cuesAdditionalInfo: CuesAdditionalInfo? = null,
-    )
-
-    private fun CuesWithTiming.toTranscriptCuesInfo(
-        cuesAdditionalInfo: CuesAdditionalInfo? = null,
-    ) = TranscriptCuesInfo(this, cuesAdditionalInfo)
-
-    data class CuesAdditionalInfo(
-        val speaker: String?,
-    )
-
     data class DisplayInfo(
         val text: String,
         val items: List<DisplayItem> = emptyList(),
@@ -330,7 +245,6 @@ class TranscriptViewModel @Inject constructor(
         data object FailedToLoad : TranscriptError()
         data object NoNetwork : TranscriptError()
         data object FailedToParse : TranscriptError()
+        data object Empty : TranscriptError()
     }
-
-    class TranscriptParsingException(message: String) : Exception(message)
 }

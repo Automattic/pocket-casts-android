@@ -52,10 +52,11 @@ import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.ScrollToHighlightedTextOffset
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.scrollToHighlightedTextOffset
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
@@ -139,7 +140,7 @@ fun TranscriptPage(
         }
     }
 
-    LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
+    LaunchedEffect(uiState.value.transcript?.episodeUuid, uiState.value.transcript?.type, transitionState.value) {
         transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
     }
 
@@ -257,6 +258,7 @@ private fun ScrollableTranscriptView(
     // Scroll to highlighted text
     if (searchState.searchResultIndices.isNotEmpty()) {
         val density = LocalDensity.current
+        val scrollToHighlightedTextOffset = density.run { scrollToHighlightedTextOffset().roundToPx() }
         LaunchedEffect(searchState.searchTerm, searchState.currentSearchIndex) {
             val displayItems = state.displayInfo.items
             val targetSearchResultIndexIndex = searchState.searchResultIndices[searchState.currentSearchIndex]
@@ -265,7 +267,7 @@ private fun ScrollableTranscriptView(
             }?.let { displayItemWithCurrentSearchText ->
                 scrollState.animateScrollToItem(
                     displayItems.indexOf(displayItemWithCurrentSearchText),
-                    scrollOffset = -(density.run { ScrollToHighlightedTextOffset.roundToPx() }),
+                    scrollOffset = -scrollToHighlightedTextOffset,
                 )
             }
         }
@@ -386,7 +388,7 @@ private fun TranscriptContentPreview(
                     url = "url",
                 ),
                 cuesInfo = ImmutableList.of(
-                    TranscriptViewModel.TranscriptCuesInfo(
+                    TranscriptCuesInfo(
                         CuesWithTiming(
                             ImmutableList.of(
                                 Cue.Builder().setText(

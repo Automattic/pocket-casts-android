@@ -90,7 +90,7 @@ class ShowNotesProcessor @Inject constructor(
             ?.firstOrNull { it.uuid == episodeUuid }
             ?.transcripts
             ?.mapNotNull { it.takeIf { it.url != null && it.type != null }?.toTranscript(episodeUuid) }
-        transcripts?.let { transcriptsManager.updateTranscripts(episodeUuid, it, loadTranscriptSource) }
+        transcripts?.let { transcriptsManager.updateTranscripts(showNotes.podcast?.uuid.orEmpty(), episodeUuid, it, loadTranscriptSource) }
     }
 
     private fun ShowNotesChapter.toChapter(episodeUuid: String) = Chapter(
@@ -102,11 +102,11 @@ class ShowNotesProcessor @Inject constructor(
         url = url,
         isEmbedded = false,
     )
-
-    private fun ShowNotesTranscript.toTranscript(episodeUuid: String) = Transcript(
-        episodeUuid = episodeUuid,
-        url = requireNotNull(url),
-        type = requireNotNull(type),
-        language = language,
-    )
 }
+
+fun ShowNotesTranscript.toTranscript(episodeUuid: String) = Transcript(
+    episodeUuid = episodeUuid,
+    url = requireNotNull(url),
+    type = requireNotNull(type),
+    language = language,
+)
