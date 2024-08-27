@@ -136,7 +136,6 @@ internal fun OnboardingUpgradeFeaturesPage(
                 UpgradeLayout.Reviews -> {
                     UpgradeLayoutReviews(
                         state = loadedState,
-                        scrollState = scrollState,
                         onNotNowPressed = onNotNowPressed,
                         onClickSubscribe = { onClickSubscribe(true) },
                         canUpgrade = canUpgrade,
