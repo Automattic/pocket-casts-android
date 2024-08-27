@@ -3,13 +3,11 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 import android.content.res.Resources
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryPill
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.TrendingPodcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -38,7 +36,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.InvalidObjectException
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @HiltViewModel
@@ -115,7 +112,7 @@ class DiscoverViewModel @Inject constructor(
         loadData(resources)
     }
 
-    fun loadPodcastList(source: String, categoryId: String): Flowable<PodcastList> {
+    fun loadPodcastList(source: String): Flowable<PodcastList> {
         return repository.getListFeed(source)
             .map {
                 PodcastList(
@@ -130,23 +127,15 @@ class DiscoverViewModel @Inject constructor(
                     listId = it.listId,
                 )
             }
-            .doOnSuccess { podcastList ->
-                if (categoryId == NetworkLoadableList.TRENDING) {
-                    viewModelScope.launch {
-                        val podcastIds = podcastList.podcasts.map { TrendingPodcast(it.uuid, it.title.orEmpty()) }
-                        podcastManager.replaceTrendingPodcasts(podcastIds)
-                    }
-                }
-            }
             .flatMapPublisher { addSubscriptionStateToPodcasts(it) }
             .flatMap {
                 addPlaybackStateToList(it)
             }
     }
-    fun filterPodcasts(source: String, categoryId: String, onPodcastsLoaded: (PodcastList) -> Unit) {
+    fun filterPodcasts(source: String, onPodcastsLoaded: (PodcastList) -> Unit) {
         state.postValue(DiscoverState.FilteringPodcastsByCategory)
 
-        loadPodcastList(source, categoryId).subscribeBy(
+        loadPodcastList(source).subscribeBy(
             onNext = {
                 state.postValue(DiscoverState.PodcastsFilteredByCategory)
                 onPodcastsLoaded(it)
@@ -160,7 +149,6 @@ class DiscoverViewModel @Inject constructor(
 
     fun loadCarouselSponsoredPodcasts(
         sponsoredPodcastList: List<SponsoredPodcast>,
-        categoryId: String,
     ): Flowable<List<CarouselSponsoredPodcast>> {
         val sponsoredPodcastsSources = sponsoredPodcastList
             .filter {
@@ -173,7 +161,7 @@ class DiscoverViewModel @Inject constructor(
                 !isInvalidSponsoredSource
             }
             .map { sponsoredPodcast ->
-                loadPodcastList(sponsoredPodcast.source as String, categoryId)
+                loadPodcastList(sponsoredPodcast.source as String)
                     .filter {
                         it.podcasts.isNotEmpty() && it.listId != null
                     }

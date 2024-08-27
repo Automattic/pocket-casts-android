@@ -13,6 +13,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.Url
 
 @JsonClass(generateAdapter = true)
@@ -71,11 +72,18 @@ interface PodcastCacheServer {
     fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String): Single<PodcastResponse>
 
     @GET("/mobile/show_notes/full/{podcastUuid}")
-    suspend fun getShowNotes(@Path("podcastUuid") podcastUuid: String): ShowNotesResponse
+    suspend fun getShowNotesLocation(@Path("podcastUuid") podcastUuid: String, @Query("disableredirect") disableRedirect: Boolean = true): ShowNotesLocationResponse
+
+    @GET
+    suspend fun getShowNotes(@Url url: String): ShowNotesResponse
 
     @GET("/mobile/show_notes/full/{podcastUuid}")
     @Headers("Cache-Control: only-if-cached, max-stale=7776000") // Use offline cache available for 90 days
-    suspend fun getShowNotesCache(@Path("podcastUuid") podcastUuid: String): ShowNotesResponse
+    suspend fun getShowNotesLocationCache(@Path("podcastUuid") podcastUuid: String, @Query("disableredirect") disableRedirect: Boolean = true): ShowNotesLocationResponse
+
+    @GET
+    @Headers("Cache-Control: only-if-cached, max-stale=7776000") // Use offline cache available for 90 days
+    suspend fun getShowNotesCache(@Url url: String): ShowNotesResponse
 
     @GET
     suspend fun getShowNotesChapters(@Url url: String): RawChaptersResponse

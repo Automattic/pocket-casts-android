@@ -80,6 +80,7 @@ class ServersModule {
             val request = chain.request()
             val originalResponse = chain.proceed(request)
             var responseBuilder = originalResponse.newBuilder()
+                .removeHeader("Pragma") // Remove Pragma header from transcript urls
             if (request.cacheControl.noCache) {
                 responseBuilder = responseBuilder.header(HEADER_CACHE_CONTROL, "public, max-age=$CACHE_FIVE_MINUTES")
             } else if (request.cacheControl.onlyIfCached) {

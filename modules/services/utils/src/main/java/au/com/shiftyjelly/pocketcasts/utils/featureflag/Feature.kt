@@ -155,13 +155,29 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    PAYWALL_EXPERIMENT(
-        key = "paywall_experiment",
-        title = "Paywall Experiment",
+    PAYWALL_AA_EXPERIMENT(
+        key = "paywall_aa_experiment",
+        title = "Paywall AA Experiment",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
+    ),
+    PAYWALL_AB_EXPERIMENT(
+        key = "paywall_ab_experiment",
+        title = "Paywall AB Experiment",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    ENGAGE_SDK(
+        key = "engage_sdk",
+        title = "Integrate Pocket Casts with Engage SDK",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
     ),
     ;
 

@@ -215,6 +215,7 @@ fun TextP50(
     textAlign: TextAlign? = null,
     fontWeight: FontWeight? = null,
     lineHeight: TextUnit? = null,
+    disableScale: Boolean = false,
 ) {
     TextP50(
         text = AnnotatedString(text),
@@ -224,6 +225,7 @@ fun TextP50(
         style = style,
         textAlign = textAlign,
         fontWeight = fontWeight,
+        disableScale = disableScale,
         lineHeight = lineHeight,
     )
 }
@@ -238,12 +240,16 @@ fun TextP50(
     textAlign: TextAlign? = null,
     fontWeight: FontWeight? = null,
     lineHeight: TextUnit? = null,
+    disableScale: Boolean = false,
 ) {
+    val fontSize = 14.sp
+    val lineHeightUpdated = lineHeight ?: 20.sp
+
     Text(
         text = text,
         color = color ?: MaterialTheme.theme.colors.primaryText01,
-        fontSize = 14.sp,
-        lineHeight = lineHeight ?: 20.sp,
+        fontSize = if (disableScale) fontSize.value.nonScaledSp else fontSize,
+        lineHeight = if (disableScale) lineHeightUpdated.value.nonScaledSp else lineHeightUpdated.value.sp,
         maxLines = maxLines ?: Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis,
         style = style ?: LocalTextStyle.current,

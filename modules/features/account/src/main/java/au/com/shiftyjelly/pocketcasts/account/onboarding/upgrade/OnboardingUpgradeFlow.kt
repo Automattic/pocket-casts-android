@@ -120,15 +120,21 @@ fun OnboardingUpgradeFlow(
                     flow = flow,
                     source = source,
                     onBackPressed = onBackPressed,
-                    onClickSubscribe = {
+                    onClickSubscribe = { showUpgradeBottomSheet ->
                         if (activity != null) {
                             if (isLoggedIn) {
-                                mainSheetViewModel.onClickSubscribe(
-                                    activity = activity,
-                                    flow = flow,
-                                    source = source,
-                                    onComplete = onProceed,
-                                )
+                                if (showUpgradeBottomSheet) {
+                                    coroutineScope.launch {
+                                        sheetState.show()
+                                    }
+                                } else {
+                                    mainSheetViewModel.onClickSubscribe(
+                                        activity = activity,
+                                        flow = flow,
+                                        source = source,
+                                        onComplete = onProceed,
+                                    )
+                                }
                             } else {
                                 onNeedLogin()
                             }

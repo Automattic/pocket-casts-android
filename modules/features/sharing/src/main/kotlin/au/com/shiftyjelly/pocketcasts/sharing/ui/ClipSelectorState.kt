@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.sharing.clip.Clip
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -127,6 +128,12 @@ internal class ClipSelectorState(
                 onTimelineScaleUpdate(scale, secondsPerTick)
             }
         }
+    }
+
+    suspend fun scrollTo(duration: Duration) {
+        val index = duration.inWholeSeconds / secondsPerTick
+        val offset = durationToPixels(15.seconds * secondsPerTick)
+        listState.animateScrollToItem(index.toInt(), scrollOffset = -offset.roundToInt())
     }
 
     fun refreshItemWidth(density: Density) {

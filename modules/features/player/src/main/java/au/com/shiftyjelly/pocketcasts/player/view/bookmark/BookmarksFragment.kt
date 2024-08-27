@@ -11,14 +11,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -100,59 +99,56 @@ class BookmarksFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            AppTheme(overrideTheme) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                // Hack to allow nested scrolling inside bottom sheet viewpager
-                // https://stackoverflow.com/a/70195667/193545
-                Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
-                    val listData = playerViewModel.listDataLive.asFlow()
-                        // ignore the episode progress
-                        .distinctUntilChanged { t1, t2 ->
-                            t1.podcastHeader.episodeUuid == t2.podcastHeader.episodeUuid &&
-                                t1.podcastHeader.isPlaying == t2.podcastHeader.isPlaying
-                        }
-                        .collectAsState(initial = null)
+    ) = content {
+        AppTheme(overrideTheme) {
+            // Hack to allow nested scrolling inside bottom sheet viewpager
+            // https://stackoverflow.com/a/70195667/193545
+            Surface(modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
+                val listData = playerViewModel.listDataLive.asFlow()
+                    // ignore the episode progress
+                    .distinctUntilChanged { t1, t2 ->
+                        t1.podcastHeader.episodeUuid == t2.podcastHeader.episodeUuid &&
+                            t1.podcastHeader.isPlaying == t2.podcastHeader.isPlaying
+                    }
+                    .collectAsState(initial = null)
 
-                    val episodeUuid = episodeUuid(listData)
-                    val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                    BookmarksPage(
-                        episodeUuid = episodeUuid,
-                        backgroundColor = backgroundColor(listData),
-                        textColor = textColor(listData),
-                        sourceView = sourceView,
-                        bookmarksViewModel = bookmarksViewModel,
-                        multiSelectHelper = bookmarksViewModel.multiSelectHelper,
-                        onRowLongPressed = { bookmark ->
-                            bookmarksViewModel.multiSelectHelper.defaultLongPress(
-                                multiSelectable = bookmark,
-                                fragmentManager = childFragmentManager,
-                                forceDarkTheme = sourceView == SourceView.PLAYER,
-                            )
-                        },
-                        onShareBookmarkClick = ::onShareBookmarkClick,
-                        onEditBookmarkClick = ::onEditBookmarkClick,
-                        onUpgradeClicked = ::onUpgradeClicked,
-                        showOptionsDialog = { showOptionsDialog(it) },
-                        openFragment = { fragment ->
-                            val bottomSheet = (parentFragment as? BottomSheetDialogFragment)
-                            if (sourceView != SourceView.PROFILE) bottomSheet?.dismiss() // Do not close bookmarks container dialog if opened from profile
-                            val fragmentHostListener = (activity as? FragmentHostListener)
-                            fragmentHostListener?.apply {
-                                closePlayer() // Closes player if open
-                                openTab(R.id.navigation_profile)
-                                addFragment(SettingsFragment())
-                                addFragment(fragment)
-                            }
-                        },
-                        bottomInset = if (sourceView == SourceView.PROFILE) {
-                            0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
-                        } else {
-                            28.dp
-                        },
-                    )
-                }
+                val episodeUuid = episodeUuid(listData)
+                val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+                BookmarksPage(
+                    episodeUuid = episodeUuid,
+                    backgroundColor = backgroundColor(listData),
+                    textColor = textColor(listData),
+                    sourceView = sourceView,
+                    bookmarksViewModel = bookmarksViewModel,
+                    multiSelectHelper = bookmarksViewModel.multiSelectHelper,
+                    onRowLongPressed = { bookmark ->
+                        bookmarksViewModel.multiSelectHelper.defaultLongPress(
+                            multiSelectable = bookmark,
+                            fragmentManager = childFragmentManager,
+                            forceDarkTheme = sourceView == SourceView.PLAYER,
+                        )
+                    },
+                    onShareBookmarkClick = ::onShareBookmarkClick,
+                    onEditBookmarkClick = ::onEditBookmarkClick,
+                    onUpgradeClicked = ::onUpgradeClicked,
+                    showOptionsDialog = { showOptionsDialog(it) },
+                    openFragment = { fragment ->
+                        val bottomSheet = (parentFragment as? BottomSheetDialogFragment)
+                        if (sourceView != SourceView.PROFILE) bottomSheet?.dismiss() // Do not close bookmarks container dialog if opened from profile
+                        val fragmentHostListener = (activity as? FragmentHostListener)
+                        fragmentHostListener?.apply {
+                            closePlayer() // Closes player if open
+                            openTab(R.id.navigation_profile)
+                            addFragment(SettingsFragment())
+                            addFragment(fragment)
+                        }
+                    },
+                    bottomInset = if (sourceView == SourceView.PROFILE) {
+                        0.dp + bottomInset.value.pxToDp(LocalContext.current).dp
+                    } else {
+                        28.dp
+                    },
+                )
             }
         }
     }

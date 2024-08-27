@@ -3,13 +3,11 @@ package au.com.shiftyjelly.pocketcasts.settings.developer
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -30,25 +28,20 @@ class DeveloperFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppThemeWithBackground(theme.activeTheme) {
-                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
-                    DeveloperPage(
-                        onBackClick = ::onBackClick,
-                        onShowkaseClick = ::onShowkaseClick,
-                        onForceRefreshClick = viewModel::forceRefresh,
-                        onTriggerNotificationClick = viewModel::triggerNotification,
-                        onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode,
-                        onTriggerUpdateEpisodeDetails = viewModel::triggerUpdateEpisodeDetails,
-                        onTriggerResetEoYModalProfileBadge = viewModel::resetEoYModalProfileBadge,
-                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                        onSendCrash = viewModel::onSendCrash,
-                    )
-                }
-            }
+    ) = content {
+        AppThemeWithBackground(theme.activeTheme) {
+            val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
+            DeveloperPage(
+                onBackClick = ::onBackClick,
+                onShowkaseClick = ::onShowkaseClick,
+                onForceRefreshClick = viewModel::forceRefresh,
+                onTriggerNotificationClick = viewModel::triggerNotification,
+                onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode,
+                onTriggerUpdateEpisodeDetails = viewModel::triggerUpdateEpisodeDetails,
+                onTriggerResetEoYModalProfileBadge = viewModel::resetEoYModalProfileBadge,
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                onSendCrash = viewModel::onSendCrash,
+            )
         }
     }
 

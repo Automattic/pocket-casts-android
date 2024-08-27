@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.compose.images
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -45,35 +48,80 @@ fun SubscriptionBadge(
     backgroundColor: Color? = null,
     textColor: Color? = null,
 ) {
-    val bgColor = backgroundColor ?: Color.Black
+    val background = backgroundColor ?: Color.Black
+
     Card(
         shape = RoundedCornerShape(pillCornerRadiusInDp),
-        backgroundColor = backgroundColor ?: bgColor,
-        modifier = modifier,
+        modifier = modifier
+            .background(Color.Transparent),
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .semantics(mergeDescendants = true) {}
+                .background(background)
                 .padding(horizontal = padding * 2, vertical = padding),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(iconSize)
-                    .background(bgColor),
-                tint = iconColor,
-            )
-            TextH50(
-                text = stringResource(shortNameRes),
-                color = textColor ?: Color.White,
-                fontSize = fontSize,
-                lineHeight = fontSize,
-                modifier = Modifier
-                    .padding(start = padding),
-            )
+            SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
         }
+    }
+}
+
+@Composable
+fun SubscriptionBadge(
+    @DrawableRes iconRes: Int,
+    @StringRes shortNameRes: Int,
+    backgroundBrush: Brush,
+    modifier: Modifier = Modifier,
+    iconColor: Color = Color.Unspecified,
+    iconSize: Dp = 14.dp,
+    fontSize: TextUnit = 14.sp,
+    padding: Dp = 4.dp,
+    textColor: Color? = null,
+) {
+    Card(
+        shape = RoundedCornerShape(pillCornerRadiusInDp),
+        modifier = modifier
+            .background(Color.Transparent),
+    ) {
+        Box(
+            modifier = Modifier
+                .background(backgroundBrush)
+                .padding(horizontal = padding * 2, vertical = padding),
+        ) {
+            SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
+        }
+    }
+}
+
+@Composable
+private fun SubscriptionBadgeContent(
+    iconRes: Int,
+    iconSize: Dp,
+    iconColor: Color,
+    shortNameRes: Int,
+    textColor: Color?,
+    fontSize: TextUnit,
+    padding: Dp,
+) {
+    Row(
+        modifier = Modifier
+            .semantics(mergeDescendants = true) {},
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier
+                .size(iconSize),
+            tint = iconColor,
+        )
+        TextH50(
+            text = stringResource(shortNameRes),
+            color = textColor ?: Color.White,
+            fontSize = fontSize,
+            lineHeight = fontSize,
+            modifier = Modifier
+                .padding(start = padding),
+        )
     }
 }
 
@@ -107,6 +155,7 @@ fun SubscriptionBadgeForTier(
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
+
         SubscriptionTier.PATRON -> SubscriptionBadge(
             fontSize = fontSize,
             padding = padding,
@@ -129,6 +178,7 @@ fun SubscriptionBadgeForTier(
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
+
         SubscriptionTier.UNKNOWN -> Unit
     }
 }
@@ -265,5 +315,23 @@ fun SubscriptionBadgePatronColoredWithBlackForegroundPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PATRON,
         displayMode = SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
+    )
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with gradient background")
+@Preview(name = "ColoredWithBlackForegroundAndGradientBackground")
+@Composable
+fun SubscriptionBadgeWithGradientBackgroundPreview() {
+    SubscriptionBadge(
+        fontSize = 16.sp,
+        padding = 4.dp,
+        iconRes = R.drawable.ic_plus,
+        shortNameRes = LR.string.pocket_casts_plus_short,
+        iconColor = Color.Black,
+        backgroundBrush = Brush.horizontalGradient(
+            0f to Color(0xFFFED745),
+            1f to Color(0xFFFEB525),
+        ),
+        textColor = Color.Black,
     )
 }

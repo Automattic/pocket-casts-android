@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_DOWNLOADS
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_EPISODE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PODCAST
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_ID
@@ -33,6 +34,7 @@ sealed interface DeepLink {
         const val EXTRA_BOOKMARK_UUID = "bookmark_uuid"
         const val EXTRA_PODCAST_UUID = "podcast_uuid"
         const val EXTRA_EPISODE_UUID = "episode_uuid"
+        const val EXTRA_AUTO_PLAY = "auto_play"
         const val EXTRA_SOURCE_VIEW = "source_view"
         const val EXTRA_NOTIFICATION_TAG = "NOTIFICATION_TAG"
         const val EXTRA_PAGE = "launch-page"
@@ -42,6 +44,10 @@ sealed interface DeepLink {
 
 sealed interface IntentableDeepLink : DeepLink {
     fun toIntent(context: Context): Intent
+}
+
+sealed interface UriDeepLink : DeepLink {
+    fun toUri(shareHost: String): Uri
 }
 
 data object DownloadsDeepLink : IntentableDeepLink {
@@ -85,26 +91,57 @@ data class DeleteBookmarkDeepLink(
 data class ShowPodcastDeepLink(
     val podcastUuid: String,
     val sourceView: String?,
-) : IntentableDeepLink {
+) : IntentableDeepLink, UriDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_PODCAST)
         .putExtra(EXTRA_PODCAST_UUID, podcastUuid)
         .putExtra(EXTRA_SOURCE_VIEW, sourceView)
+
+    override fun toUri(shareHost: String): Uri {
+        return Uri.Builder()
+            .scheme("https")
+            .authority(shareHost)
+            .appendPath("podcast")
+            .appendPath(podcastUuid)
+            .let { if (sourceView != null) it.appendQueryParameter(EXTRA_SOURCE_VIEW, sourceView) else it }
+            .build()
+    }
 }
 
 data class ShowEpisodeDeepLink(
     val episodeUuid: String,
     val podcastUuid: String?,
     val sourceView: String?,
+    val autoPlay: Boolean,
     val startTimestamp: Duration? = null,
     val endTimestamp: Duration? = null,
-) : IntentableDeepLink {
+) : IntentableDeepLink, UriDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_EPISODE)
         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         .putExtra(EXTRA_EPISODE_UUID, episodeUuid)
         .putExtra(EXTRA_PODCAST_UUID, podcastUuid)
+        .putExtra(EXTRA_AUTO_PLAY, autoPlay)
         .putExtra(EXTRA_SOURCE_VIEW, sourceView)
+
+    override fun toUri(shareHost: String): Uri {
+        return Uri.Builder()
+            .scheme("https")
+            .authority(shareHost)
+            .appendPath("episode")
+            .appendPath(episodeUuid)
+            .let { builder ->
+                val timestamps = listOfNotNull(startTimestamp?.inWholeSeconds, endTimestamp?.inWholeSeconds)
+                if (timestamps.isNotEmpty()) {
+                    builder.appendQueryParameter("t", timestamps.joinToString(separator = ","))
+                } else {
+                    builder
+                }
+            }
+            .appendQueryParameter(EXTRA_AUTO_PLAY, autoPlay.toString())
+            .let { if (sourceView != null) it.appendQueryParameter(EXTRA_SOURCE_VIEW, sourceView) else it }
+            .build()
+    }
 }
 
 sealed interface ShowPageDeepLink : IntentableDeepLink {
@@ -148,7 +185,17 @@ data class SonosDeepLink(
 
 data class ShareListDeepLink(
     val path: String,
-) : DeepLink
+    val sourceView: String?,
+) : UriDeepLink {
+    override fun toUri(shareHost: String): Uri {
+        return Uri.Builder()
+            .scheme("https")
+            .authority(shareHost)
+            .appendPath(path)
+            .let { if (sourceView != null) it.appendQueryParameter(EXTRA_SOURCE_VIEW, sourceView) else it }
+            .build()
+    }
+}
 
 data object CloudFilesDeepLink : IntentableDeepLink {
     override fun toIntent(context: Context) = Intent(ACTION_VIEW)

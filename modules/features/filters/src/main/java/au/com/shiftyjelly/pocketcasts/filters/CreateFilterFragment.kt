@@ -278,7 +278,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
     }
 
     private fun observePlaylist() {
-        viewModel.playlist.observe(viewLifecycleOwner) { filter ->
+        viewModel.playlist?.observe(viewLifecycleOwner) { filter ->
             if (binding == null) return@observe
 
             if (filter.title.isEmpty()) {

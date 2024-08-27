@@ -1,6 +1,6 @@
 name: Bug report
 description: Report a bug with the Pocket Casts Android app
-labels: ["bug", "triage"]
+labels: ["[Type] Bug"]
 body:
 
     - type: markdown
@@ -51,4 +51,3 @@ body:
           description: Pocket Casts app version can be found from the settings screen then scroll down to About
       validations:
           required: false
-

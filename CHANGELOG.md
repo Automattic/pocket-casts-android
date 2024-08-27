@@ -1,7 +1,10 @@
 7.72
 -----
-
-
+*   Bug Fixes
+    *   Fix create filter crash
+        ([#2677](https://github.com/Automattic/pocket-casts-android/pull/2677))
+    *   Fix playback and download failures due to an insecure connection
+        ([#2717](https://github.com/Automattic/pocket-casts-android/pull/2717))
 7.71
 -----
 *   New Features

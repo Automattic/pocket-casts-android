@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.nova
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.repositories.nova.NovaLauncherManager
+import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.branch.engage.conduit.source.BranchDynamicData
 import io.branch.engage.conduit.source.CatalogSubmission
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.onEach
 internal class NovaLauncherQueueSync(
     private val context: Context,
     private val coroutineScope: CoroutineScope,
-    private val manager: NovaLauncherManager,
+    private val manager: ExternalDataManager,
 ) {
     private val catalogFactory = CatalogFactory(context)
 
@@ -24,7 +24,7 @@ internal class NovaLauncherQueueSync(
         if (syncJob != null) {
             return
         }
-        syncJob = manager.getQueueEpisodes(limit = 25)
+        syncJob = manager.observeUpNextQueue(limit = 25)
             .distinctUntilChanged()
             .onEach { episodes ->
                 try {
