@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcast
@@ -19,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Date
@@ -41,7 +44,9 @@ class ExternalDataDaoTest {
     @Before
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+            .build()
         podcastDao = testDb.podcastDao()
         podcastEpisodeDao = testDb.episodeDao()
         userEpisodeDao = testDb.userEpisodeDao()

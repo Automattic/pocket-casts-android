@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
+import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
@@ -52,7 +53,6 @@ import retrofit2.create
 @Module
 @InstallIn(SingletonComponent::class)
 class ServersModule {
-
     companion object {
         private const val CACHE_SIX_MONTHS = 15552000
         private const val CACHE_FIVE_MINUTES = 300
@@ -135,29 +135,25 @@ class ServersModule {
                 .client(okHttpClient)
                 .build()
         }
-
-        fun provideMoshiBuilder(): Moshi.Builder {
-            return Moshi.Builder()
-                .add(InstantAdapter())
-                .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-                .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
-                .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
-                .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
-                .add(AccessToken::class.java, AccessToken.Adapter)
-                .add(RefreshToken::class.java, RefreshToken.Adapter)
-        }
     }
 
     @Provides
     @Singleton
-    internal fun provideMoshiBuilderInternal(): Moshi.Builder {
-        return provideMoshiBuilder()
-    }
-
-    @Provides
-    @Singleton
-    internal fun provideMoshi(moshiBuilder: Moshi.Builder): Moshi {
-        return moshiBuilder.build()
+    fun provideMoshi(): Moshi {
+        return Moshi.Builder()
+            .add(InstantAdapter())
+            .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+            .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
+            .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
+            .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
+            .add(AccessToken::class.java, AccessToken.Adapter)
+            .add(RefreshToken::class.java, RefreshToken.Adapter)
+            .add(AnonymousBumpStat.Adapter)
+            .add(LoginIdentity.Adapter)
+            .add(ListTypeMoshiAdapter())
+            .add(DisplayStyleMoshiAdapter())
+            .add(ExpandedStyleMoshiAdapter())
+            .build()
     }
 
     @Provides
@@ -340,11 +336,7 @@ class ServersModule {
     @Provides
     @WpComServerRetrofit
     @Singleton
-    internal fun provideWpComApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient): Retrofit {
-        val moshi = Moshi.Builder()
-            .add(AnonymousBumpStat.Adapter)
-            .build()
-
+    internal fun provideWpComApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .baseUrl(Settings.WP_COM_API_URL)
@@ -390,11 +382,8 @@ class ServersModule {
     @Provides
     @DiscoverServerRetrofit
     @Singleton
-    internal fun provideDiscoverRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshiBuilder: Moshi.Builder): Retrofit {
-        moshiBuilder.add(ListTypeMoshiAdapter())
-        moshiBuilder.add(DisplayStyleMoshiAdapter())
-        moshiBuilder.add(ExpandedStyleMoshiAdapter())
-        return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshiBuilder.build())
+    internal fun provideDiscoverRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+        return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides

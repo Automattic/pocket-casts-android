@@ -5,9 +5,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.runBlocking
@@ -26,7 +29,9 @@ class EpisodeDaoTest {
     @Before
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+            .build()
         episodeDao = testDb.episodeDao()
         podcastDao = testDb.podcastDao()
     }

@@ -6,9 +6,12 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import com.squareup.moshi.Moshi
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -111,7 +114,7 @@ class AppDatabaseTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             AppDatabase::class.java,
             TEST_DB,
-        )
+        ).addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
             .addMigrations(
                 AppDatabase.MIGRATION_45_46,
                 AppDatabase.MIGRATION_46_47,

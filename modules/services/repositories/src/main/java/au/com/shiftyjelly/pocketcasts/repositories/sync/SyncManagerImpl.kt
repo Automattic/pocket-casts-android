@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
@@ -47,6 +48,7 @@ import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -69,6 +71,7 @@ class SyncManagerImpl @Inject constructor(
     private val settings: Settings,
     private val syncAccountManager: SyncAccountManager,
     private val syncServerManager: SyncServerManager,
+    private val moshi: Moshi,
 ) : NamedSettingsCaller, SyncManager {
 
     override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply {
@@ -448,7 +451,7 @@ class SyncManagerImpl @Inject constructor(
         var message: String? = null
         var messageId: String? = null
         if (exception is HttpException) {
-            val errorResponse = exception.parseErrorResponse()
+            val errorResponse = exception.parseErrorResponse(moshi)
             message = errorResponse?.messageLocalized(resources)
             messageId = errorResponse?.messageId
         }

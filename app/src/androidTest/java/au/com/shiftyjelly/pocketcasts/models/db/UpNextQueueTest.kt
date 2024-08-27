@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.models.db
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -13,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.squareup.moshi.Moshi
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
@@ -32,7 +35,9 @@ class UpNextQueueTest {
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+            .build()
         downloadManager = mock {}
         val episodeManager = mock<EpisodeManager> {}
         val settings = mock<Settings> {

@@ -22,11 +22,12 @@ object AuthPhoneModule {
     fun providesTokenBundleRepository(
         wearDataLayerRegistry: WearDataLayerRegistry,
         @ApplicationScope coroutineScope: CoroutineScope,
+        serializer: WatchSyncAuthDataSerializer,
     ): TokenBundleRepository<WatchSyncAuthData?> {
         return TokenBundleRepositoryImpl(
             registry = wearDataLayerRegistry,
             coroutineScope = coroutineScope,
-            serializer = WatchSyncAuthDataSerializer,
+            serializer = serializer,
         )
     }
 }
