@@ -83,7 +83,7 @@ class PodcastSyncProcessTest {
 
         val okHttpClient = OkHttpClient.Builder().build()
         retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
-        okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
+        okhttpCache = ServersModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
     }
 
     /**

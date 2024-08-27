@@ -1,29 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.di
 
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AutomotiveAppModule {
+abstract class AutomotiveAppModule {
 
-    @Provides
-    @Singleton
-    @DownloadCallFactory
-    fun downloadCallFactory(
-        @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
-    ): Call.Factory = phoneCallFactory
+    companion object {
+        @Provides
+        @Downloads
+        fun downloadRequestBuilder(): Request.Builder = Request.Builder()
+    }
 
-    @Provides
-    @DownloadRequestBuilder
-    fun downloadRequestBuilder(): Request.Builder = Request.Builder()
+    @Binds
+    @Downloads
+    abstract fun downloadsCallFactory(@Downloads client: OkHttpClient): Call.Factory
 }

@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokenedOkHttpClient
+import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokened
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshPodcastBatcher
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -33,7 +33,7 @@ import timber.log.Timber
 
 @Singleton
 open class ServerManager @Inject constructor(
-    @NoCacheTokenedOkHttpClient private val httpClientNoCache: OkHttpClient,
+    @NoCacheTokened private val httpClientNoCache: OkHttpClient,
     private val settings: Settings,
 ) {
     companion object {

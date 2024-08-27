@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
+import au.com.shiftyjelly.pocketcasts.servers.di.Cached
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
@@ -56,7 +56,7 @@ import retrofit2.Retrofit
 open class SyncServerManager @Inject constructor(
     @SyncServerRetrofit retrofit: Retrofit,
     val settings: Settings,
-    @SyncServerCache val cache: Cache,
+    @Cached val cache: Cache,
 ) {
 
     companion object {

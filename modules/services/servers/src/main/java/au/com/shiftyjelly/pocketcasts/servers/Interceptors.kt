@@ -9,8 +9,6 @@ import okhttp3.Response
 sealed interface OkHttpInterceptor {
     @Throws(IOException::class)
     fun intercept(chain: Chain): Response
-
-    fun toInterceptor() = Interceptor { chain -> intercept(chain) }
 }
 
 fun interface ClientInterceptor : OkHttpInterceptor
@@ -23,7 +21,7 @@ fun Interceptor.toNetworkInterceptor() = NetworkInterceptor { chain -> intercept
 
 fun OkHttpClient.Builder.addInterceptors(interceptors: List<OkHttpInterceptor>) = interceptors.fold(this) { builder, okHttpInterceptor ->
     when (okHttpInterceptor) {
-        is ClientInterceptor -> builder.addInterceptor(okHttpInterceptor.toInterceptor())
-        is NetworkInterceptor -> builder.addNetworkInterceptor(okHttpInterceptor.toInterceptor())
+        is ClientInterceptor -> builder.addInterceptor(Interceptor { okHttpInterceptor.intercept(it) })
+        is NetworkInterceptor -> builder.addNetworkInterceptor(Interceptor { okHttpInterceptor.intercept(it) })
     }
 }
