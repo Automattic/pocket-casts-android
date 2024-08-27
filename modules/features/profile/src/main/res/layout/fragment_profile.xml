@@ -194,7 +194,7 @@
                 android:background="?android:attr/actionBarItemBackground"
                 android:contentDescription="@string/settings"
                 android:src="@drawable/ic_profile_settings"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="?attr/primary_text_01" />
 
