@@ -1901,6 +1901,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="error_transcript_format_not_supported">Sorry, but this transcript format is not supported: %s</string>
     <string name="error_transcript_failed_to_parse">Sorry, but something went wrong while parsing this transcript.</string>
     <string name="transcript_empty">Transcript is empty.</string>
+    <string name="transcript_close">Close transcript</string>
+    <string name="transcript_search">Search transcript</string>
+    <string name="transcript_search_close">Close search</string>
 
     <!--    Tasker Plugin-->
 
