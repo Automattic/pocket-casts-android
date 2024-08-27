@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- Large screens use default layout instead of the landscape one to match iOS design.
+This layout has full screen seekbar and player controls which makes them easier to transition to the Transcript screen.  -->
 <au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
