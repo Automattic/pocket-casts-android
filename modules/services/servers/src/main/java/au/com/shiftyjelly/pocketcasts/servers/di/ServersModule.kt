@@ -16,8 +16,8 @@ import au.com.shiftyjelly.pocketcasts.servers.addInterceptors
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
-import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
@@ -187,14 +187,14 @@ class ServersModule {
     }
 
     @Provides
-    @SyncServerRetrofit
+    @SyncServiceRetrofit
     @Singleton
     internal fun provideApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return provideRetrofit(baseUrl = Settings.SERVER_API_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
-    @WpComServerRetrofit
+    @WpComServiceRetrofit
     @Singleton
     internal fun provideWpComApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
@@ -205,42 +205,42 @@ class ServersModule {
     }
 
     @Provides
-    @RefreshServerRetrofit
+    @RefreshServiceRetrofit
     @Singleton
     internal fun provideRefreshRetrofit(@NoCacheTokened okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return provideRetrofit(baseUrl = Settings.SERVER_MAIN_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
-    @PodcastCacheServerRetrofit
+    @PodcastCacheServiceRetrofit
     @Singleton
     internal fun providePodcastRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return provideRetrofit(baseUrl = Settings.SERVER_CACHE_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
-    @StaticServerRetrofit
+    @StaticServiceRetrofit
     @Singleton
     internal fun provideStaticRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
-    @ListDownloadServerRetrofit
+    @ListDownloadServiceRetrofit
     @Singleton
     internal fun provideListDownloadRetrofit(@NoCache okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return provideRetrofit(baseUrl = Settings.SERVER_LIST_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
-    @ListUploadServerRetrofit
+    @ListUploadServiceRetrofit
     @Singleton
     internal fun provideListUploadRetrofit(@NoCache okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return provideRetrofit(baseUrl = Settings.SERVER_SHARING_URL, okHttpClient = okHttpClient, moshi = moshi)
     }
 
     @Provides
-    @DiscoverServerRetrofit
+    @DiscoverServiceRetrofit
     @Singleton
     internal fun provideDiscoverRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return provideRetrofit(baseUrl = Settings.SERVER_STATIC_URL, okHttpClient = okHttpClient, moshi = moshi)
@@ -248,7 +248,7 @@ class ServersModule {
 
     @Provides
     @Singleton
-    internal fun provideListWebService(@DiscoverServerRetrofit retrofit: Retrofit): ListWebService {
+    internal fun provideListWebService(@DiscoverServiceRetrofit retrofit: Retrofit): ListWebService {
         return retrofit.create(ListWebService::class.java)
     }
 
@@ -280,11 +280,11 @@ class ServersModule {
 
     @Provides
     @Singleton
-    fun provideCacheServer(@PodcastCacheServerRetrofit retrofit: Retrofit): PodcastCacheServer = retrofit.create()
+    fun provideCacheServer(@PodcastCacheServiceRetrofit retrofit: Retrofit): PodcastCacheService = retrofit.create()
 
     @Provides
     @Singleton
-    fun provideTranscriptCacheServer(@TranscriptRetrofit retrofit: Retrofit): TranscriptCacheServer = retrofit.create()
+    fun provideTranscriptCacheServer(@TranscriptRetrofit retrofit: Retrofit): TranscriptCacheService = retrofit.create()
 }
 
 @Qualifier
@@ -317,35 +317,35 @@ annotation class Transcripts
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class SyncServerRetrofit
+annotation class SyncServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class WpComServerRetrofit
+annotation class WpComServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class RefreshServerRetrofit
+annotation class RefreshServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class PodcastCacheServerRetrofit
+annotation class PodcastCacheServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class StaticServerRetrofit
+annotation class StaticServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class ListDownloadServerRetrofit
+annotation class ListDownloadServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class ListUploadServerRetrofit
+annotation class ListUploadServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class DiscoverServerRetrofit
+annotation class DiscoverServiceRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
-import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -56,7 +56,7 @@ class OpmlImportTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted parameters: WorkerParameters,
     var podcastManager: PodcastManager,
-    var refreshServerManager: RefreshServerManager,
+    var refreshServiceManager: RefreshServiceManager,
     var notificationHelper: NotificationHelper,
     private val analyticsTracker: AnalyticsTracker,
 ) : CoroutineWorker(context, parameters) {
@@ -321,12 +321,12 @@ class OpmlImportTask @AssistedInject constructor(
      * - failed: the number of podcast creates that have failed
      */
     suspend fun callServer(urls: List<String>): ImportOpmlResponse? {
-        val response = refreshServerManager.importOpml(urls)
+        val response = refreshServiceManager.importOpml(urls)
         return response.body()?.result
     }
 
     suspend fun pollServer(pollUuids: List<String>): ImportOpmlResponse? {
-        val response = refreshServerManager.pollImportOpml(pollUuids)
+        val response = refreshServiceManager.pollImportOpml(pollUuids)
         return response.body()?.result
     }
 }

@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
 import retrofit2.Response
 
-interface PodcastCacheServerManager {
+interface PodcastCacheServiceManager {
     fun getPodcast(podcastUuid: String): Single<Podcast>
     fun getPodcastAndEpisodeSingle(podcastUuid: String, episodeUuid: String): Single<Podcast>
     suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast

@@ -32,7 +32,7 @@ import okhttp3.Response
 import timber.log.Timber
 
 @Singleton
-open class ServerManager @Inject constructor(
+open class ServiceManager @Inject constructor(
     @NoCacheTokened private val httpClientNoCache: OkHttpClient,
     private val settings: Settings,
 ) {

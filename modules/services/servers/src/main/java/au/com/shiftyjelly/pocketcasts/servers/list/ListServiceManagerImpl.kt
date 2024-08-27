@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.servers.list
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.di.ListDownloadServerRetrofit
-import au.com.shiftyjelly.pocketcasts.servers.di.ListUploadServerRetrofit
+import au.com.shiftyjelly.pocketcasts.servers.di.ListDownloadServiceRetrofit
+import au.com.shiftyjelly.pocketcasts.servers.di.ListUploadServiceRetrofit
 import au.com.shiftyjelly.pocketcasts.utils.extensions.sha1
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -11,13 +11,13 @@ import java.util.Locale
 import javax.inject.Inject
 import retrofit2.Retrofit
 
-class ListServerManagerImpl @Inject constructor(
-    @ListUploadServerRetrofit uploadRetrofit: Retrofit,
-    @ListDownloadServerRetrofit downloadRetrofit: Retrofit,
-) : ListServerManager {
+class ListServiceManagerImpl @Inject constructor(
+    @ListUploadServiceRetrofit uploadRetrofit: Retrofit,
+    @ListDownloadServiceRetrofit downloadRetrofit: Retrofit,
+) : ListServiceManager {
 
-    private val uploadServer: ListUploadServer = uploadRetrofit.create(ListUploadServer::class.java)
-    private val downloadServer: ListDownloadServer = downloadRetrofit.create(ListDownloadServer::class.java)
+    private val uploadService: ListUploadService = uploadRetrofit.create(ListUploadService::class.java)
+    private val downloadService: ListDownloadService = downloadRetrofit.create(ListDownloadService::class.java)
 
     companion object {
         private val DATE_FORMAT = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
@@ -48,12 +48,12 @@ class ListServerManagerImpl @Inject constructor(
             date = dateString,
             podcasts = podcasts.map { podcast -> ListPodcast.fromPodcast(podcast) },
         )
-        val response = uploadServer.createPodcastList(request)
+        val response = uploadService.createPodcastList(request)
         return response.result?.shareUrl
     }
 
     override suspend fun openPodcastList(listId: String): PodcastList {
-        return downloadServer.getPodcastList(listId)
+        return downloadService.getPodcastList(listId)
     }
 
     override fun extractShareListIdFromWebUrl(webUrl: String): String {

@@ -4,7 +4,7 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.StatusResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface ListUploadServer {
+interface ListUploadService {
 
     @POST("/share/list")
     suspend fun createPodcastList(@Body request: PodcastList): StatusResponse<ListUploadResponse>

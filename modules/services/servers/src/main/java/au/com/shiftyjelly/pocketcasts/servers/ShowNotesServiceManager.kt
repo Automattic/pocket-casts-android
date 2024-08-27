@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import javax.inject.Inject
@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 
 @Singleton
-class ServerShowNotesManager @Inject constructor(
-    private val podcastCacheServerManager: PodcastCacheServerManager,
+class ShowNotesServiceManager @Inject constructor(
+    private val podcastCacheServiceManager: PodcastCacheServiceManager,
 ) {
 
     /**
@@ -92,7 +92,7 @@ class ServerShowNotesManager @Inject constructor(
     }
 
     private suspend fun findShowNotesInCache(podcastUuid: String, episodeUuid: String): String? {
-        val response = podcastCacheServerManager.getShowNotesCache(podcastUuid = podcastUuid) ?: return null
+        val response = podcastCacheServiceManager.getShowNotesCache(podcastUuid = podcastUuid) ?: return null
         return response.findEpisode(episodeUuid)?.showNotes
     }
 
@@ -104,7 +104,7 @@ class ServerShowNotesManager @Inject constructor(
         if (podcastUuid.isBlank() || episodeUuid.isBlank()) {
             return null
         }
-        val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
+        val response = podcastCacheServiceManager.getShowNotes(podcastUuid = podcastUuid)
         processShowNotes(response)
         return response.findEpisode(episodeUuid)?.showNotes
     }
@@ -116,7 +116,7 @@ class ServerShowNotesManager @Inject constructor(
         if (podcastUuid.isBlank()) {
             return
         }
-        val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
+        val response = podcastCacheServiceManager.getShowNotes(podcastUuid = podcastUuid)
         processShowNotes(response)
     }
 }

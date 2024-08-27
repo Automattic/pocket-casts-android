@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManagerImpl
 import java.net.HttpURLConnection
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -20,7 +20,7 @@ import org.skyscreamer.jsonassert.JSONAssert
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-class ShareServerManagerImplTest {
+class ShareServiceManagerImplTest {
 
     private lateinit var mockWebServer: MockWebServer
     private lateinit var retrofit: Retrofit
@@ -45,7 +45,7 @@ class ShareServerManagerImplTest {
 
     @Test
     fun buildSecurityHash() {
-        val hash = ListServerManagerImpl.buildSecurityHash(date = "20160913144421", serverSecret = "APP_SERVER_SECRET")
+        val hash = ListServiceManagerImpl.buildSecurityHash(date = "20160913144421", serverSecret = "APP_SERVER_SECRET")
         assertEquals("f91e649642ffb53813a79f816f2ef1ac36a52c4e", hash)
     }
 
@@ -69,7 +69,7 @@ class ShareServerManagerImplTest {
         val instant = LocalDateTime.parse("2021-11-25T15:20").atZone(ZoneId.systemDefault()).toInstant()
 
         runTest {
-            val url = ListServerManagerImpl(uploadRetrofit = retrofit, downloadRetrofit = retrofit)
+            val url = ListServiceManagerImpl(uploadRetrofit = retrofit, downloadRetrofit = retrofit)
                 .createPodcastList(
                     title = "A fun title",
                     description = "A even funnier description",
@@ -130,7 +130,7 @@ class ShareServerManagerImplTest {
         mockWebServer.enqueue(response)
 
         runTest {
-            val podcastList = ListServerManagerImpl(uploadRetrofit = retrofit, downloadRetrofit = retrofit)
+            val podcastList = ListServiceManagerImpl(uploadRetrofit = retrofit, downloadRetrofit = retrofit)
                 .openPodcastList(listId = "85c4bc9c-d905-40b1-96de-50c197803e4b")
 
             assertEquals("Android Development", podcastList.title)
@@ -146,15 +146,15 @@ class ShareServerManagerImplTest {
     @Test
     fun extractShareListIdFromWebUrl() {
         var websiteUrl = "${BuildConfig.SERVER_LIST_URL}/981d8691-5e1f-4009-adf4-ee5a204bd00c"
-        var id = ListServerManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
+        var id = ListServiceManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
         assertEquals("981d8691-5e1f-4009-adf4-ee5a204bd00c", id)
 
         websiteUrl = "/${BuildConfig.SERVER_LIST_HOST}/fddf52be-6058-48c4-a821-09edc8ad023d"
-        id = ListServerManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
+        id = ListServiceManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
         assertEquals("fddf52be-6058-48c4-a821-09edc8ad023d", id)
 
         websiteUrl = "/share-and-explore"
-        id = ListServerManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
+        id = ListServiceManagerImpl.extractShareListIdFromWebUrl(websiteUrl)
         assertEquals("share-and-explore", id)
     }
 }

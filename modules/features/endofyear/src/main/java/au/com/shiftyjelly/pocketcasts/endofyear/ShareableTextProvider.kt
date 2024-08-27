@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLonges
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryYearOverYear
-import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Singleton
 class ShareableTextProvider @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val listServerManager: ListServerManager,
+    private val listServiceManager: ListServiceManager,
 ) {
     var chosenActivity: String? = null
     private var shortURL: String = Settings.SERVER_SHORT_URL
@@ -35,7 +35,7 @@ class ShareableTextProvider @Inject constructor(
         val shareableLink: String = when (story) {
             is StoryTopFivePodcasts -> {
                 try {
-                    listServerManager.createPodcastList(
+                    listServiceManager.createPodcastList(
                         title = context.resources.getString(
                             LR.string.end_of_year_story_top_podcasts_share_text,
                             "",

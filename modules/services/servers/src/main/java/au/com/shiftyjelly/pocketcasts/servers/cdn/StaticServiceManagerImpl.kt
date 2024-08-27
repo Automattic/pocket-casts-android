@@ -1,16 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.servers.cdn
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.servers.di.StaticServerRetrofit
+import au.com.shiftyjelly.pocketcasts.servers.di.StaticServiceRetrofit
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 import retrofit2.Retrofit
 
-class StaticServerManagerImpl @Inject constructor(@StaticServerRetrofit retrofit: Retrofit) : StaticServerManager {
+class StaticServiceManagerImpl @Inject constructor(@StaticServiceRetrofit retrofit: Retrofit) : StaticServiceManager {
 
-    val server = retrofit.create(StaticServer::class.java)
+    val server = retrofit.create(StaticService::class.java)
 
     override fun getColorsSingle(podcastUuid: String): Single<Optional<ArtworkColors>> {
         return server.getColorsMaybe(podcastUuid)

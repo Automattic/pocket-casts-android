@@ -4,7 +4,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface RefreshServer {
+interface RefreshService {
 
     @POST("import/opml")
     suspend fun importOpml(@Body request: ImportOpmlRequest): Response<StatusResponse<ImportOpmlResponse>>

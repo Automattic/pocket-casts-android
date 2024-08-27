@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
@@ -70,7 +70,7 @@ class SyncManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settings: Settings,
     private val syncAccountManager: SyncAccountManager,
-    private val syncServerManager: SyncServerManager,
+    private val syncServiceManager: SyncServiceManager,
     private val moshi: Moshi,
 ) : NamedSettingsCaller, SyncManager {
 
@@ -88,7 +88,7 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun emailChange(newEmail: String, password: String): UserChangeResponse {
         val result = getCacheTokenOrLogin { token ->
-            syncServerManager.emailChange(newEmail, password, token)
+            syncServiceManager.emailChange(newEmail, password, token)
         }
         if (result.success == true) {
             syncAccountManager.setEmail(newEmail)
@@ -99,7 +99,7 @@ class SyncManagerImpl @Inject constructor(
 
     override fun deleteAccount(): Single<UserChangeResponse> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.deleteAccount(token)
+            syncServiceManager.deleteAccount(token)
         }.doOnSuccess {
             if (it.success == true) {
                 analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_DELETED)
@@ -108,7 +108,7 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun updatePassword(newPassword: String, oldPassword: String) {
         val response = getCacheTokenOrLogin { token ->
-            val response = syncServerManager.updatePassword(newPassword, oldPassword, token)
+            val response = syncServiceManager.updatePassword(newPassword, oldPassword, token)
             analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_UPDATED)
             response
         }
@@ -161,7 +161,7 @@ class SyncManagerImpl @Inject constructor(
     }
 
     override fun signOut(action: () -> Unit) {
-        syncServerManager.signOut()
+        syncServiceManager.signOut()
         action()
         syncAccountManager.signOut()
         isLoggedInObservable.accept(false)
@@ -171,7 +171,7 @@ class SyncManagerImpl @Inject constructor(
         idToken: String,
         signInSource: SignInSource,
     ): LoginResult = handleLogin(signInSource, LoginIdentity.Google) {
-        syncServerManager.loginGoogle(idToken)
+        syncServiceManager.loginGoogle(idToken)
     }
 
     override suspend fun loginWithToken(
@@ -179,7 +179,7 @@ class SyncManagerImpl @Inject constructor(
         loginIdentity: LoginIdentity,
         signInSource: SignInSource,
     ): LoginResult = handleLogin(signInSource, loginIdentity) {
-        syncServerManager.loginToken(token)
+        syncServiceManager.loginToken(token)
     }
 
     override suspend fun loginWithEmailAndPassword(
@@ -187,7 +187,7 @@ class SyncManagerImpl @Inject constructor(
         password: String,
         signInSource: SignInSource,
     ): LoginResult = handleLogin(signInSource, LoginIdentity.PocketCasts) {
-        syncServerManager.login(email = email, password = password)
+        syncServiceManager.login(email = email, password = password)
     }
 
     private suspend fun handleLogin(
@@ -211,7 +211,7 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun createUserWithEmailAndPassword(email: String, password: String): LoginResult {
         val loginResult = try {
-            val response = syncServerManager.register(email = email, password = password)
+            val response = syncServiceManager.register(email = email, password = password)
             val result = handleTokenResponse(loginIdentity = LoginIdentity.PocketCasts, response = response)
             LoginResult.Success(result)
         } catch (ex: Exception) {
@@ -224,7 +224,7 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         try {
-            val response = syncServerManager.forgotPassword(email = email)
+            val response = syncServiceManager.forgotPassword(email = email)
             if (response.success) {
                 analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
                 onSuccess()
@@ -241,30 +241,30 @@ class SyncManagerImpl @Inject constructor(
 
     override fun getFiles(): Single<Response<FilesResponse>> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getFiles(token)
+            syncServiceManager.getFiles(token)
         }
 
     override fun getFileUsage(): Single<FileAccount> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getFileUsage(token)
+            syncServiceManager.getFileUsage(token)
         }
 
     override fun postFiles(files: List<FilePost>): Single<Response<Void>> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.postFiles(files, token)
+            syncServiceManager.postFiles(files, token)
         }
 
     override fun getFileUploadStatus(episodeUuid: String): Single<Boolean> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getFileUploadStatus(episodeUuid, token)
+            syncServiceManager.getFileUploadStatus(episodeUuid, token)
         }
 
     override fun uploadFileToServer(episode: UserEpisode): Completable =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getFileUploadUrl(episode.toUploadData(), token)
+            syncServiceManager.getFileUploadUrl(episode.toUploadData(), token)
         }.flatMapCompletable { url ->
             Timber.d("Upload url $url")
-            syncServerManager.uploadToServer(episode, url)
+            syncServiceManager.uploadToServer(episode, url)
                 .doOnNext { progress ->
                     Timber.d("Progress $progress")
                     UploadProgressManager.uploadObservers[episode.uuid]?.forEach { consumer ->
@@ -280,30 +280,30 @@ class SyncManagerImpl @Inject constructor(
     ): Completable =
         getCacheTokenOrLoginRxSingle { token ->
             val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
-            syncServerManager.getFileImageUploadUrl(imageData, token)
+            syncServiceManager.getFileImageUploadUrl(imageData, token)
         }.flatMapCompletable { uploadUrl ->
-            syncServerManager.uploadImageToServer(imageFile, uploadUrl)
+            syncServiceManager.uploadImageToServer(imageFile, uploadUrl)
                 .ignoreElement()
         }
 
     override fun deleteImageFromServer(episode: UserEpisode): Single<Response<Void>> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.deleteImageFromServer(episode, token)
+            syncServiceManager.deleteImageFromServer(episode, token)
         }
 
     override fun deleteFromServer(episode: UserEpisode): Single<Response<Void>> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.deleteFromServer(episode, token)
+            syncServiceManager.deleteFromServer(episode, token)
         }
 
     override fun getPlaybackUrl(episode: UserEpisode): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getPlaybackUrl(episode, token)
+            syncServiceManager.getPlaybackUrl(episode, token)
         }
 
     override fun getUserEpisode(uuid: String): Maybe<ServerFile> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getUserEpisode(uuid, token)
+            syncServiceManager.getUserEpisode(uuid, token)
         }.flatMapMaybe {
             if (it.isSuccessful) {
                 Maybe.just(it.body())
@@ -318,33 +318,33 @@ class SyncManagerImpl @Inject constructor(
 
     override fun historySync(request: HistorySyncRequest): Single<HistorySyncResponse> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.historySync(request, token)
+            syncServiceManager.historySync(request, token)
         }
 
     override suspend fun historyYear(year: Int, count: Boolean): HistoryYearResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.historyYear(year, count, token)
+            syncServiceManager.historyYear(year, count, token)
         }
 
 // Subscription
 
     override fun subscriptionStatus(): Single<SubscriptionStatusResponse> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.subscriptionStatus(token)
+            syncServiceManager.subscriptionStatus(token)
         }
 
     override fun subscriptionPurchase(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.subscriptionPurchase(request, token)
+            syncServiceManager.subscriptionPurchase(request, token)
         }
 
     override fun redeemPromoCode(code: String): Single<PromoCodeResponse> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.redeemPromoCode(code, token)
+            syncServiceManager.redeemPromoCode(code, token)
         }
 
     override fun validatePromoCode(code: String): Single<PromoCodeResponse> =
-        syncServerManager.validatePromoCode(code)
+        syncServiceManager.validatePromoCode(code)
 
 // Sync
 
@@ -353,77 +353,77 @@ class SyncManagerImpl @Inject constructor(
         getEmail()?.let { email ->
             getCacheTokenOrLoginRxSingle { token ->
                 @Suppress("DEPRECATION")
-                syncServerManager.syncUpdate(email, data, lastSyncTime, token)
+                syncServiceManager.syncUpdate(email, data, lastSyncTime, token)
             }
         } ?: Single.error(Exception("Not logged in"))
 
     override suspend fun userSyncUpdate(request: SyncUpdateRequest): SyncUpdateResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.userSyncUpdate(token, request)
+            syncServiceManager.userSyncUpdate(token, request)
         }
 
     override fun getLastSyncAt(): Single<String> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getLastSyncAt(token)
+            syncServiceManager.getLastSyncAt(token)
         }
 
     override suspend fun getHomeFolder(): UserPodcastListResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.getHomeFolder(token)
+            syncServiceManager.getHomeFolder(token)
         }
 
     override fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getPodcastEpisodes(podcastUuid, token)
+            syncServiceManager.getPodcastEpisodes(podcastUuid, token)
         }
 
     override fun episodeSync(request: EpisodeSyncRequest): Completable =
         getCacheTokenOrLoginRxCompletable { token ->
-            syncServerManager.episodeSync(request, token)
+            syncServiceManager.episodeSync(request, token)
         }
 
     // Rating
 
     override suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.addPodcastRating(podcastUuid, rate, token)
+            syncServiceManager.addPodcastRating(podcastUuid, rate, token)
         }
 
     override suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.getPodcastRating(podcastUuid, token)
+            syncServiceManager.getPodcastRating(podcastUuid, token)
         }
 
     // Other
 
     override suspend fun exchangeSonos(): ExchangeSonosResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.exchangeSonos(token)
+            syncServiceManager.exchangeSonos(token)
         }
 
     override fun getFilters(): Single<List<Playlist>> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getFilters(token)
+            syncServiceManager.getFilters(token)
         }
 
     override suspend fun getBookmarks(): List<Bookmark> {
         return getCacheTokenOrLogin { token ->
-            syncServerManager.getBookmarks(token)
+            syncServiceManager.getBookmarks(token)
         }
     }
 
     override suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
-        return syncServerManager.sendAnonymousFeedback(subject, inbox, message)
+        return syncServiceManager.sendAnonymousFeedback(subject, inbox, message)
     }
 
     override suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void> =
         getCacheTokenOrLogin { token ->
-            syncServerManager.sendFeedback(subject, inbox, message, token)
+            syncServiceManager.sendFeedback(subject, inbox, message, token)
         }
 
     override suspend fun loadStats(): StatsBundle =
         getCacheTokenOrLogin { token ->
-            syncServerManager.loadStats(token)
+            syncServiceManager.loadStats(token)
         }
 
     @Suppress("DEPRECATION")
@@ -431,17 +431,17 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun namedSettings(
         request: au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest,
     ): NamedSettingsResponse = getCacheTokenOrLogin { token ->
-        syncServerManager.namedSettings(request, token)
+        syncServiceManager.namedSettings(request, token)
     }
 
     override suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest): ChangedNamedSettingsResponse =
         getCacheTokenOrLogin { token ->
-            syncServerManager.changedNamedSettings(request, token)
+            syncServiceManager.changedNamedSettings(request, token)
         }
 
     override fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse> =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.upNextSync(request, token)
+            syncServiceManager.upNextSync(request, token)
         }
 
 // private methods
@@ -539,8 +539,8 @@ class SyncManagerImpl @Inject constructor(
         signInType: AccountConstants.SignInType,
     ): LoginTokenResponse =
         when (signInType) {
-            AccountConstants.SignInType.Password -> syncServerManager.login(email = email, password = refreshToken.value)
-            AccountConstants.SignInType.Tokens -> syncServerManager.loginToken(refreshToken = refreshToken)
+            AccountConstants.SignInType.Password -> syncServiceManager.login(email = email, password = refreshToken.value)
+            AccountConstants.SignInType.Tokens -> syncServiceManager.loginToken(refreshToken = refreshToken)
         }
 
     private suspend fun <T : Any> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
