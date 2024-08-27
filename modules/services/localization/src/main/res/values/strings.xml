@@ -2095,7 +2095,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="paywall_layout_reviews_subtitle">See why people have upgraded to Plus</string>
     <string name="paywall_layout_reviews_stars_content_description">Stars</string>
     <string name="paywall_layout_reviews_rating">4.1 Rating (5.7K Reviews)</string>
-    <string name="paywall_layout_reviews_see_all_reviews_in_store">See all reviews in the App Store</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">See all reviews in the Play Store</string>
 
     <string name="paywall_layout_reviews_review_one_title">Best Podcast App By FAR</string>
     <string name="paywall_layout_reviews_review_one_message">I\'ve been a long time user and the amount of functionality and customization you get with the free version is astounding. I love that it syncs across devices so I can start listening on my phone and then pick up on an Alexa device. It\'s my recommendation for anyone who listens to podcasts. Also love the stats!</string>

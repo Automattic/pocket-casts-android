@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -42,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -73,85 +75,111 @@ fun UpgradeLayoutReviews(
                 .background(color = Color.Black),
             contentAlignment = Alignment.BottomCenter,
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxHeight(),
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 40.dp, top = 16.dp),
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        RowTextButton(
-                            text = stringResource(R.string.not_now),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.Transparent,
-                                contentColor = Color.White,
-                            ),
-                            fontSize = 18.sp,
-                            onClick = onNotNowPressed,
-                            fullWidth = false,
-                            includePadding = false,
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 40.dp, top = 16.dp),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            RowTextButton(
+                                text = stringResource(R.string.not_now),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    backgroundColor = Color.Transparent,
+                                    contentColor = Color.White,
+                                ),
+                                fontSize = 18.sp,
+                                onClick = onNotNowPressed,
+                                fullWidth = false,
+                                includePadding = false,
+                            )
+                        }
+                    }
+
+                    item {
+                        TextH20(
+                            text = stringResource(LR.string.paywall_layout_reviews_title),
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .padding(bottom = 8.dp)
+                                .fillMaxWidth(),
                         )
+
+                        TextP50(
+                            text = stringResource(LR.string.paywall_layout_reviews_subtitle),
+                            fontWeight = FontWeight.W400,
+                            color = colorResource(UR.color.coolgrey_50),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(horizontal = 40.dp)
+                                .padding(bottom = 16.dp)
+                                .fillMaxWidth(),
+                        )
+                    }
+
+                    item {
+                        PlusBenefits(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .padding(bottom = 24.dp),
+                        )
+                    }
+
+                    item {
+                        Stars(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .padding(bottom = 24.dp),
+                        )
+                    }
+
+                    items(
+                        count = reviews.size,
+                        key = { index -> index },
+                    ) { index ->
+                        ReviewItem(
+                            data = reviews[index],
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                                .padding(bottom = 12.dp),
+                        )
+                    }
+
+                    item {
+                        Button(
+                            onClick = {
+                                // Handle click event to navigate to the App Store
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Transparent,
+                            ),
+                            modifier = Modifier
+                                .padding(top = 20.dp, bottom = 32.dp),
+                        ) {
+                            TextP60(
+                                text = stringResource(LR.string.paywall_layout_reviews_see_all_reviews_in_store),
+                                fontWeight = FontWeight.W400,
+                                color = colorResource(UR.color.plus_gold_dark),
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
 
-                item {
-                    TextH20(
-                        text = stringResource(LR.string.paywall_layout_reviews_title),
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(bottom = 8.dp)
-                            .fillMaxWidth(),
-                    )
-
-                    TextP50(
-                        text = stringResource(LR.string.paywall_layout_reviews_subtitle),
-                        fontWeight = FontWeight.W400,
-                        color = colorResource(UR.color.coolgrey_50),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(horizontal = 40.dp)
-                            .padding(bottom = 16.dp)
-                            .fillMaxWidth(),
-                    )
+                if (canUpgrade) {
+                    SubscribeButton(state.currentSubscription, onClickSubscribe)
                 }
-
-                item {
-                    PlusBenefits(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(bottom = 24.dp),
-                    )
-                }
-
-                item {
-                    Stars(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(bottom = 24.dp),
-                    )
-                }
-
-                items(
-                    count = reviews.size,
-                    key = { index -> index },
-                ) { index ->
-                    ReviewItem(
-                        data = reviews[index],
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(bottom = 12.dp),
-                    )
-                }
-            }
-
-            if (canUpgrade) {
-                SubscribeButton(state.currentSubscription, onClickSubscribe)
             }
         }
     }
