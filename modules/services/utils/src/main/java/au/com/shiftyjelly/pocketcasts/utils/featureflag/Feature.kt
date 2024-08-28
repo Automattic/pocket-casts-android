@@ -134,9 +134,9 @@ enum class Feature(
     TRANSCRIPTS(
         key = "transcripts",
         title = "Transcripts",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     GRAVATAR_CHANGE_AVATAR(
