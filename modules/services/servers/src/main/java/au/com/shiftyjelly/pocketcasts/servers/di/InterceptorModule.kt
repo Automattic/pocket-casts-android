@@ -15,7 +15,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.net.HttpURLConnection
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -25,7 +24,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 @InstallIn(SingletonComponent::class)
 @Module
 object InterceptorModule {
-    private val sixMonths = 180.days.inWholeSeconds
     private val fiveMinutes = 5.minutes.inWholeSeconds
     private val cacheControlHeader = "Cache-Control"
 
@@ -50,12 +48,6 @@ object InterceptorModule {
             responseBuilder = responseBuilder.header(cacheControlHeader, "public, max-age=$fiveMinutes")
         }
         responseBuilder.build()
-    }
-
-    private val cacheControlNotesInterceptor = Interceptor { chain ->
-        val request = chain.request()
-        val originalResponse = chain.proceed(request)
-        originalResponse.newBuilder().header(cacheControlHeader, "public, max-age=$sixMonths").build()
     }
 
     private val cacheControlTranscriptsInterceptor = Interceptor { chain ->
