@@ -1253,8 +1253,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun addMigration(startVersion: Int, endVersion: Int, migration: (database: SupportSQLiteDatabase) -> Unit): Migration {
             return object : Migration(startVersion, endVersion) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    migration(database)
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    migration(db)
                 }
             }
         }
