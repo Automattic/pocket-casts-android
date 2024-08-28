@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetails
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.days
@@ -68,7 +68,7 @@ class EpisodeManagerImpl @Inject constructor(
     private val downloadManager: DownloadManager,
     @ApplicationContext private val context: Context,
     private val appDatabase: AppDatabase,
-    private val podcastCacheServerManager: PodcastCacheServerManager,
+    private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val userEpisodeManager: UserEpisodeManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val episodeAnalytics: EpisodeAnalytics,
@@ -1008,7 +1008,7 @@ class EpisodeManagerImpl @Inject constructor(
                 if (episodeExists || podcastUuid == Podcast.userPodcast.uuid) {
                     observeEpisodeByUuidRx(episodeUuid).firstElement()
                 } else {
-                    podcastCacheServerManager.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).flatMapMaybe { response ->
+                    podcastCacheServiceManager.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                         add(episode, downloadMetaData = downloadMetaData)
 
@@ -1089,7 +1089,7 @@ class EpisodeManagerImpl @Inject constructor(
      */
     override suspend fun updateDownloadUrl(episode: PodcastEpisode): String? =
         withContext(Dispatchers.IO) {
-            val newDownloadUrl = podcastCacheServerManager.getEpisodeUrl(episode)
+            val newDownloadUrl = podcastCacheServiceManager.getEpisodeUrl(episode)
             if (newDownloadUrl != null && episode.downloadUrl != newDownloadUrl) {
                 Timber.i("Updating PodcastEpisode url in database for ${episode.uuid} to $newDownloadUrl")
                 episodeDao.updateDownloadUrl(newDownloadUrl, episode.uuid)

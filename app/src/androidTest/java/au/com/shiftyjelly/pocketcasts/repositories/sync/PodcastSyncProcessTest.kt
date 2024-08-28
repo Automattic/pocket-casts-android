@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -142,7 +142,7 @@ class PodcastSyncProcessTest {
             whenever(syncAccountManager.isLoggedIn()) doReturn true
             whenever(syncAccountManager.getAccessToken()) doReturn AccessToken("access_token")
 
-            val syncServerManager = SyncServerManager(
+            val syncServiceManager = SyncServiceManager(
                 retrofit = retrofit,
                 settings = settings,
                 cache = okhttpCache,
@@ -153,7 +153,7 @@ class PodcastSyncProcessTest {
                 context = context,
                 settings = settings,
                 syncAccountManager = syncAccountManager,
-                syncServerManager = syncServerManager,
+                syncServiceManager = syncServiceManager,
                 moshi = moshi,
             )
 
@@ -168,7 +168,7 @@ class PodcastSyncProcessTest {
                 statsManager = statsManager,
                 fileStorage = mock(),
                 playbackManager = mock(),
-                podcastCacheServerManager = mock(),
+                podcastCacheServiceManager = mock(),
                 userEpisodeManager = mock(),
                 subscriptionManager = mock(),
                 folderManager = folderManager,

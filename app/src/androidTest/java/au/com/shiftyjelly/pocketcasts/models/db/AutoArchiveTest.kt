@@ -25,7 +25,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import com.squareup.moshi.Moshi
 import java.util.Calendar
 import java.util.Date
@@ -51,7 +51,7 @@ class AutoArchiveTest {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val fileStorage = mock<FileStorage> {}
     val downloadManager = mock<DownloadManager> {}
-    val podcastCacheServerManager = mock<PodcastCacheServerManager> {}
+    val podcastCacheServiceManager = mock<PodcastCacheServiceManager> {}
     val userEpisodeManager = mock<UserEpisodeManager> {}
     val episodeAnalytics = EpisodeAnalytics(mock())
 
@@ -90,7 +90,7 @@ class AutoArchiveTest {
             downloadManager = downloadManager,
             context = context,
             appDatabase = db,
-            podcastCacheServerManager = podcastCacheServerManager,
+            podcastCacheServiceManager = podcastCacheServiceManager,
             userEpisodeManager = userEpisodeManager,
             ioDispatcher = testDispatcher,
             episodeAnalytics = episodeAnalytics,

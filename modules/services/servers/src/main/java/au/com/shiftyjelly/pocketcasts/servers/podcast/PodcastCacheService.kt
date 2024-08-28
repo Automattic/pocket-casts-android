@@ -64,7 +64,7 @@ data class PodcastRatingsResponse(
     )
 }
 
-interface PodcastCacheServer {
+interface PodcastCacheService {
     @GET("/mobile/podcast/full/{podcastUuid}")
     fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String): Single<Response<PodcastResponse>>
 

@@ -122,7 +122,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -208,7 +208,7 @@ class MainActivity :
 
     @Inject lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var serviceManager: ServiceManager
 
     @Inject lateinit var theme: Theme
 
@@ -1394,7 +1394,7 @@ class MainActivity :
                 }
                 null -> {
                     val dialog = android.app.ProgressDialog.show(this@MainActivity, getString(LR.string.loading), getString(LR.string.please_wait), true)
-                    val searchResult = serverManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
+                    val searchResult = serviceManager.getSharedItemDetailsSuspend("/social/share/show/$episodeUuid")
                     dialog.hide()
                     searchResult?.episode?.let {
                         EpisodeContainerFragment.newInstance(
@@ -1417,7 +1417,7 @@ class MainActivity :
         url ?: return
 
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
-        serverManager.searchForPodcasts(
+        serviceManager.searchForPodcasts(
             url,
             object : ServerCallback<PodcastSearch> {
                 override fun dataReturned(result: PodcastSearch?) {
@@ -1458,7 +1458,7 @@ class MainActivity :
         }
 
         val dialog = android.app.ProgressDialog.show(this, getString(LR.string.loading), getString(LR.string.please_wait), true)
-        serverManager.getSharedItemDetails(
+        serviceManager.getSharedItemDetails(
             deepLink.sharePath,
             object : ServerCallback<au.com.shiftyjelly.pocketcasts.models.to.Share> {
                 override fun dataReturned(result: au.com.shiftyjelly.pocketcasts.models.to.Share?) {

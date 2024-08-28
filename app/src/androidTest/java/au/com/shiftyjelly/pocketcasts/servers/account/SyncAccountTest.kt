@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import java.net.HttpURLConnection
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
@@ -46,7 +46,7 @@ internal class SyncAccountTest {
         okhttpCache = ServersModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
 
         val accountManager = AccountManager.get(context)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
+        val syncServiceManager = SyncServiceManager(retrofit, mock(), okhttpCache)
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
@@ -54,7 +54,7 @@ internal class SyncAccountTest {
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,
-            syncServerManager = syncServerManager,
+            syncServiceManager = syncServiceManager,
             moshi = moshi,
         )
         syncManager.signOut()

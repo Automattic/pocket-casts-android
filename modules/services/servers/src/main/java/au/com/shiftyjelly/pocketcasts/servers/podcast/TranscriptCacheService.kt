@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Url
 
-interface TranscriptCacheServer {
+interface TranscriptCacheService {
     @GET
     suspend fun getTranscript(
         @Url url: String,

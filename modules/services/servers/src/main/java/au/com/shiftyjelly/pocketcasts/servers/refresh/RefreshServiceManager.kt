@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.refresh
 
 import retrofit2.Response
 
-interface RefreshServerManager {
+interface RefreshServiceManager {
 
     suspend fun importOpml(urls: List<String>): Response<StatusResponse<ImportOpmlResponse>>
 

@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.refresh
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager.Parameters
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager.Parameters
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

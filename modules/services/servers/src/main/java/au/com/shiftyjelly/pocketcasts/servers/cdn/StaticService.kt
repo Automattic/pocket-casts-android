@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-interface StaticServer {
+interface StaticService {
 
     @GET("/discover/images/metadata/{podcastUuid}.json")
     fun getColorsMaybe(@Path("podcastUuid") podcastUuid: String): Maybe<ColorsResponse>

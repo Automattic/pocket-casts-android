@@ -12,53 +12,53 @@ import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
 
-class PodcastCacheServerManagerImpl @Inject constructor(
-    private val server: PodcastCacheServer,
-) : PodcastCacheServerManager {
+class PodcastCacheServiceManagerImpl @Inject constructor(
+    private val service: PodcastCacheService,
+) : PodcastCacheServiceManager {
     override fun getPodcastResponse(podcastUuid: String): Single<Response<PodcastResponse>> {
-        return server.getPodcastAndEpisodesRaw(podcastUuid)
+        return service.getPodcastAndEpisodesRaw(podcastUuid)
     }
 
     override fun getPodcast(podcastUuid: String): Single<Podcast> {
-        return server.getPodcastAndEpisodes(podcastUuid)
+        return service.getPodcastAndEpisodes(podcastUuid)
             .map(PodcastResponse::toPodcast)
     }
 
     override fun getPodcastAndEpisodeSingle(podcastUuid: String, episodeUuid: String): Single<Podcast> {
-        return server.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).map(PodcastResponse::toPodcast)
+        return service.getPodcastAndEpisodeSingle(podcastUuid, episodeUuid).map(PodcastResponse::toPodcast)
     }
 
     override suspend fun getPodcastAndEpisode(podcastUuid: String, episodeUuid: String): Podcast {
-        return server.getPodcastAndEpisode(podcastUuid, episodeUuid).toPodcast()
+        return service.getPodcastAndEpisode(podcastUuid, episodeUuid).toPodcast()
     }
 
     override fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>> {
-        return server.searchPodcastForEpisodes(SearchBody(podcastUuid, searchTerm)).map { it.episodes.map { it.uuid } }
+        return service.searchPodcastForEpisodes(SearchBody(podcastUuid, searchTerm)).map { it.episodes.map { it.uuid } }
     }
 
     override fun searchEpisodes(searchTerm: String): Single<EpisodeSearch> {
-        return server.searchEpisodes(SearchEpisodesBody(searchTerm)).map {
+        return service.searchEpisodes(SearchEpisodesBody(searchTerm)).map {
             EpisodeSearch(it.episodes.map { result -> result.toEpisodeItem() })
         }
     }
 
     override suspend fun getPodcastRatings(podcastUuid: String, useCache: Boolean): PodcastRatings {
         return if (useCache) {
-            server.getPodcastRatings(podcastUuid).toPodcastRatings(podcastUuid)
+            service.getPodcastRatings(podcastUuid).toPodcastRatings(podcastUuid)
         } else {
-            server.getPodcastRatingsNoCache(podcastUuid).toPodcastRatings(podcastUuid)
+            service.getPodcastRatingsNoCache(podcastUuid).toPodcastRatings(podcastUuid)
         }
     }
 
     override suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse {
-        val url = server.getShowNotesLocation(podcastUuid).url
-        return server.getShowNotes(url)
+        val url = service.getShowNotesLocation(podcastUuid).url
+        return service.getShowNotes(url)
     }
 
     override suspend fun getShowNotesCache(podcastUuid: String): ShowNotesResponse? {
         return try {
-            val url = server.getShowNotesLocationCache(podcastUuid).url
-            server.getShowNotesCache(url)
+            val url = service.getShowNotesLocationCache(podcastUuid).url
+            service.getShowNotesCache(url)
         } catch (e: Exception) {
             // if the cache can't be found a HTTP 504 Unsatisfiable Request will be thrown
             if (e !is HttpException) {
@@ -72,7 +72,7 @@ class PodcastCacheServerManagerImpl @Inject constructor(
     override suspend fun getEpisodeUrl(episode: PodcastEpisode): String? =
         withContext(Dispatchers.IO) {
             try {
-                val response = server.getEpisodeUrl(episode.podcastUuid, episode.uuid)
+                val response = service.getEpisodeUrl(episode.podcastUuid, episode.uuid)
                 if (response.isSuccessful) {
                     response.body()?.string()
                 } else {

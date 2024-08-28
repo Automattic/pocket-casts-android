@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.ratings
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.io.IOException
 import javax.inject.Inject
@@ -15,7 +15,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class RatingsManagerImpl @Inject constructor(
-    private val cacheServerManager: PodcastCacheServerManager,
+    private val cacheServiceManager: PodcastCacheServiceManager,
     private val syncManager: SyncManager,
     appDatabase: AppDatabase,
 ) : RatingsManager, CoroutineScope {
@@ -31,7 +31,7 @@ class RatingsManagerImpl @Inject constructor(
     override suspend fun refreshPodcastRatings(podcastUuid: String, useCache: Boolean) {
         try {
             // The server asks for the ratings to be cached for a period of time. After a user rates ignore the cache to get the new rating.
-            val ratings = cacheServerManager.getPodcastRatings(podcastUuid, useCache)
+            val ratings = cacheServiceManager.getPodcastRatings(podcastUuid, useCache)
             podcastRatingsDao.insert(
                 PodcastRatings(
                     podcastUuid = podcastUuid,

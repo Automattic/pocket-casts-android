@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.io.FileInputStream
@@ -30,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class OpmlExporter(
     private val fragment: PreferenceFragmentCompat,
-    private val serverManager: ServerManager,
+    private val serviceManager: ServiceManager,
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
     private val context: Context,
@@ -42,7 +42,7 @@ class OpmlExporter(
         const val EXPORT_PICKER_REQUEST_CODE = 43
     }
 
-    private var serverTask: Call? = null
+    private var serviceTask: Call? = null
     private var progressDialog: ProgressDialog? = null
     private var sendAsEmail: Boolean = false
     private var opmlFile: File? = null
@@ -101,7 +101,7 @@ class OpmlExporter(
             val uuidToTitle = podcastManager.findSubscribed().associateBy({ it.uuid }, { it.title })
             val uuids = uuidToTitle.keys.toList()
 
-            serverTask = serverManager.exportFeedUrls(
+            serviceTask = serviceManager.exportFeedUrls(
                 uuids,
                 object : ServerCallback<Map<String, String>> {
                     override fun onFailed(
@@ -182,7 +182,7 @@ class OpmlExporter(
     fun showProgressDialog() {
         UiUtil.hideProgressDialog(progressDialog)
         progressDialog = ProgressDialog.show(context, "", context.getString(LR.string.settings_opml_exporting), true, true) {
-            serverTask?.cancel()
+            serviceTask?.cancel()
         }.apply {
             show()
         }

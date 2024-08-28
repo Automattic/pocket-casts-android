@@ -7,8 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.toTranscript
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -30,9 +30,9 @@ import timber.log.Timber
 @OptIn(UnstableApi::class)
 class TranscriptsManagerImpl @Inject constructor(
     private val transcriptDao: TranscriptDao,
-    private val service: TranscriptCacheServer,
+    private val service: TranscriptCacheService,
     private val networkWrapper: NetworkWrapper,
-    private val serverShowNotesManager: ServerShowNotesManager,
+    private val showNotesServiceManager: ShowNotesServiceManager,
     @ApplicationScope private val scope: CoroutineScope,
     private val transcriptCuesInfoBuilder: TranscriptCuesInfoBuilder,
 ) : TranscriptsManager {
@@ -152,7 +152,7 @@ class TranscriptsManagerImpl @Inject constructor(
             val episodeFailedFormats = _failedTranscriptFormats.value[transcript.episodeUuid]
             if (!episodeFailedFormats.isNullOrEmpty()) {
                 // Get available transcripts from show notes
-                serverShowNotesManager.loadShowNotes(
+                showNotesServiceManager.loadShowNotes(
                     podcastUuid = podcastUuid,
                     episodeUuid = transcript.episodeUuid,
                 ) { showNotes ->

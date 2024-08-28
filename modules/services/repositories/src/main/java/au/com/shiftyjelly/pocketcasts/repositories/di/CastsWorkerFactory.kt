@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncHistoryTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ class CastsWorkerFactory @Inject constructor(
     val syncManager: SyncManager,
     val downloadManager: DownloadManager,
     val playbackManager: PlaybackManager,
-    val refreshServerManager: RefreshServerManager,
+    val refreshServiceManager: RefreshServiceManager,
     val notificationHelper: NotificationHelper,
     val settings: Settings,
     val userEpisodeManager: UserEpisodeManager,
@@ -59,7 +59,7 @@ class CastsWorkerFactory @Inject constructor(
             }
             is OpmlImportTask -> {
                 instance.podcastManager = podcastManager
-                instance.refreshServerManager = refreshServerManager
+                instance.refreshServiceManager = refreshServiceManager
                 instance.notificationHelper = notificationHelper
             }
             is UpdateEpisodeDetailsTask -> {

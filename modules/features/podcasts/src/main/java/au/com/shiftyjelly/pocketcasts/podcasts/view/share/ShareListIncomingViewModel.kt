@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 class ShareListIncomingViewModel
 @Inject constructor(
     val podcastManager: PodcastManager,
-    val listServerManager: ListServerManager,
+    val listServiceManager: ListServiceManager,
     val playbackManager: PlaybackManager,
     val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
@@ -40,10 +40,10 @@ class ShareListIncomingViewModel
 
     fun loadShareUrl(url: String) {
         share.postValue(ShareState.Loading)
-        val id = listServerManager.extractShareListIdFromWebUrl(url)
+        val id = listServiceManager.extractShareListIdFromWebUrl(url)
         viewModelScope.launch {
             try {
-                val list = listServerManager.openPodcastList(id)
+                val list = listServiceManager.openPodcastList(id)
                 share.postValue(ShareState.Loaded(title = list.title, description = list.description, podcasts = list.fullPodcasts))
             } catch (ex: Exception) {
                 share.postValue(ShareState.Error)

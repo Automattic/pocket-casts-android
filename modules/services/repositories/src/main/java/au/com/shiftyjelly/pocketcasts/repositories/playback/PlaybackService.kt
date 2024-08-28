@@ -40,9 +40,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -117,15 +117,15 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var serviceManager: ServiceManager
 
     @Inject lateinit var notificationHelper: NotificationHelper
 
     @Inject lateinit var subscriptionManager: SubscriptionManager
 
-    @Inject lateinit var listServerManager: ListServerManager
+    @Inject lateinit var listServiceManager: ListServiceManager
 
-    @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManager
+    @Inject lateinit var podcastCacheServiceManager: PodcastCacheServiceManager
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
@@ -648,7 +648,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             if (termCleaned.length <= 1) {
                 emptyList()
             } else {
-                serverManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
+                serviceManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
             }
         } catch (ex: Exception) {
             Timber.e(ex)
