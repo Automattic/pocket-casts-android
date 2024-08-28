@@ -165,6 +165,7 @@
     <string name="go_to_bottom">Go to bottom</string>
     <string name="go_to_previous">Go to previous</string>
     <string name="go_to_next">Go to next</string>
+    <string name="got_it">Got it</string>
     <string name="submit">Submit</string>
     <string name="report">Report</string>
     <string name="report_subtitle">Report inappropriate content</string>
@@ -632,9 +633,6 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="not_allowed_to_rate_description">Only listeners of this podcast can give it a rating. Have a listen to a few episodes and then come back to give your rating. We look forward to hearing what you think!</string>
     <string name="thank_you_for_rating">Thank you for rating!</string>
     <string name="something_went_wrong_to_rate_this_podcast">Something went wrong. Please try again later</string>
-    <string name="whats_new_new_rating_title">Now Available: Podcast Ratings &#127881;</string>
-    <string name="whats_new_new_rating_message">Rate your top podcasts and let creators know how much you appreciate their work. Plus, your ratings help others find new favorite shows!</string>
-    <string name="star_rating_animation">Star Rating Animation</string>
     <string name="podcast_star_rating_content_description">Podcast Star Rating</string>
 
     <!-- Episodes -->
@@ -1515,8 +1513,6 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Prioritizing seek accuracy can significantly slow down seek responsiveness and cause Pocket Casts to consume more data.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Cache playing episode</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">Entire playing episode is temporarily cached to minimize streaming.</string>
-    <!-- Used in a button meaning that the user understood the message. -->
-    <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->
     <string name="upgrade_to_plus">Upgrade to Plus</string>
     <!-- Button title to upgrade to Patron. Don't translate "Patron" -->
@@ -2042,6 +2038,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_end_minutes">Clip end minutes</string>
     <!-- Content description of a text field that allows to control clip's end seconds position in hh:mm:ss format -->
     <string name="share_end_seconds">Clip end seconds</string>
+    <string name="share_whats_new_title">Clip&#160;sharing available&#160;now!</string>
+    <string name="share_whats_new_message">You can now share clips of your favorite bits from any episode. We’ve also made easier to share any content to all social media apps.</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
