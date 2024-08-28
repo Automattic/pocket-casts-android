@@ -19,14 +19,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.download.ResponseValidationResult
 import au.com.shiftyjelly.pocketcasts.repositories.download.toData
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
@@ -75,8 +74,8 @@ class DownloadEpisodeTask @AssistedInject constructor(
     var downloadManager: DownloadManager,
     var episodeManager: EpisodeManager,
     var userEpisodeManager: UserEpisodeManager,
-    @DownloadCallFactory private val callFactory: Call.Factory,
-    @DownloadRequestBuilder private val requestBuilderProvider: Provider<Request.Builder>,
+    @Downloads private val callFactory: Call.Factory,
+    @Downloads private val requestBuilderProvider: Provider<Request.Builder>,
 ) : Worker(context, params) {
 
     companion object {
@@ -251,7 +250,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                         emitter.onComplete()
                     }
                 } else {
-                    downloadFile(tempDownloadPath!!, callFactory, emitter)
+                    downloadFile(tempDownloadPath!!, emitter)
                     if (!emitter.isDisposed) {
                         emitter.onComplete()
                     }
@@ -266,7 +265,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         }
     }
 
-    private fun downloadFile(tempDownloadPath: String, httpClient: Call.Factory, emitter: ObservableEmitter<DownloadProgressUpdate>) {
+    private fun downloadFile(tempDownloadPath: String, emitter: ObservableEmitter<DownloadProgressUpdate>) {
         if (emitter.isDisposed || isStopped || pathToSaveTo == null) {
             return
         }
@@ -320,7 +319,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     .header("Range", "bytes=$localFileSize-")
                     .header("Accept-Encoding", "identity")
                     .build()
-                call = httpClient.newCall(request)
+                call = callFactory.newCall(request)
                 response = call.blockingEnqueue()
 
                 if (response.code != HTTP_RESUME_SUPPORTED) {
@@ -339,7 +338,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
             if (response == null) {
                 val request = requestBuilder.build()
-                call = httpClient.newCall(request)
+                call = callFactory.newCall(request)
                 response = call.blockingEnqueue()
             }
 

@@ -3,9 +3,7 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 import android.content.Context
 import android.net.ConnectivityManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.wear.networking.PocketCastsNetworkingRules
 import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator
@@ -78,12 +76,12 @@ object WearNetworkModule {
 
     @Provides
     @Singleton
-    @DownloadCallFactory
+    @Downloads
     fun provideDownloadWearCallFactory(
         highBandwidthNetworkMediator: HighBandwidthNetworkMediator,
         networkRepository: NetworkRepository,
         networkingRulesEngine: NetworkingRulesEngine,
-        @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
+        @Downloads client: OkHttpClient,
         @ApplicationScope coroutineScope: CoroutineScope,
         logger: NetworkStatusLogger,
     ): Call.Factory {
@@ -92,7 +90,7 @@ object WearNetworkModule {
             highBandwidthNetworkMediator = highBandwidthNetworkMediator,
             networkRepository = networkRepository,
             dataRequestRepository = null,
-            rootClient = phoneCallFactory,
+            rootClient = client,
             coroutineScope = coroutineScope,
             timeout = 5.seconds,
             logger = logger,
@@ -100,8 +98,8 @@ object WearNetworkModule {
     }
 
     @Provides
-    @DownloadRequestBuilder
-    fun downloadRequestBuilder(): Request.Builder =
-        Request.Builder()
-            .requestType(RequestType.MediaRequest.DownloadRequest)
+    @Downloads
+    fun downloadRequestBuilder(): Request.Builder {
+        return Request.Builder().requestType(RequestType.MediaRequest.DownloadRequest)
+    }
 }
