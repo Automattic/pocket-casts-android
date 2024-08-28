@@ -83,7 +83,6 @@ class ProfileFragment : BaseFragment() {
 
     private val viewModel: ProfileViewModel by viewModels()
     private val referralsViewModel: ReferralsViewModel by viewModels()
-    private var referralsCountBadge: BadgeDrawable? = null
 
     private var binding: FragmentProfileBinding? = null
     private val sections = arrayListOf(
@@ -105,7 +104,6 @@ class ProfileFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        referralsCountBadge = null
     }
 
     override fun onResume() {
@@ -223,6 +221,7 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
+        var referralsCountBadge: BadgeDrawable? = null
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 referralsViewModel.state.collect { state ->
