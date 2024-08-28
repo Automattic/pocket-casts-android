@@ -6,6 +6,10 @@
     *   Fix multi-select toolbar action order
         ([#2737](https://github.com/Automattic/pocket-casts-android/pull/2737))
 *   New Features
+    *   Content is now shared through a new UI interface with support for different platforms including Instagram Stories
+        ([#2707](https://github.com/Automattic/pocket-casts-android/pull/2707))
+    *   Share clips using links, audio clips, and video clips
+        ([#2707](https://github.com/Automattic/pocket-casts-android/pull/2707))
     *   Enables transcripts (Internal)
         ([#2747](https://github.com/Automattic/pocket-casts-android/pull/2747))
 
