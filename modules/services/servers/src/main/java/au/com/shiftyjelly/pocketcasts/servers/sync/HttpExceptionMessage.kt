@@ -8,11 +8,10 @@ import com.squareup.moshi.Moshi
 import retrofit2.HttpException
 import timber.log.Timber
 
-fun HttpException.parseErrorResponse(): ErrorResponse? {
+fun HttpException.parseErrorResponse(moshi: Moshi): ErrorResponse? {
     val errorBody = this.response()?.errorBody() ?: return null
     return try {
-        val errorMoshi = Moshi.Builder().build()
-        errorMoshi.adapter(ErrorResponse::class.java).fromJson(errorBody.source())
+        moshi.adapter(ErrorResponse::class.java).fromJson(errorBody.source())
     } catch (e: Exception) {
         Timber.e(e)
         null

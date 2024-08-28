@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManagerImpl
-import com.squareup.moshi.Moshi
 import java.net.HttpURLConnection
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -38,7 +38,7 @@ class ShareServerManagerImplTest {
 
         retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
+            .addConverterFactory(MoshiConverterFactory.create(ServersModule().provideMoshi()))
             .client(client)
             .build()
     }

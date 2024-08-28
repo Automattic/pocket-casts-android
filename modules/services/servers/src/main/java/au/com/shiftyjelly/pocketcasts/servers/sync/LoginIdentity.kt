@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.repositories.sync
+package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson

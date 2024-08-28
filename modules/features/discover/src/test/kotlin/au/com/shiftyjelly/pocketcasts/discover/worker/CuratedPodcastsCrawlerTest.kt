@@ -1,13 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.discover.worker
 
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
-import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
-import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
-import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
+import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
-import java.util.Date
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -29,12 +24,7 @@ class CuratedPodcastsCrawlerTest {
 
     @Before
     fun setup() {
-        val moshi = Moshi.Builder()
-            .add(ListTypeMoshiAdapter())
-            .add(DisplayStyleMoshiAdapter())
-            .add(ExpandedStyleMoshiAdapter())
-            .add(Date::class.java, Rfc3339DateJsonAdapter())
-            .build()
+        val moshi = ServersModule().provideMoshi()
         val service = Retrofit.Builder()
             .baseUrl(server.url("/"))
             .addConverterFactory(MoshiConverterFactory.create(moshi))

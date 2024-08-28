@@ -9,14 +9,12 @@ import androidx.core.os.BundleCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
-import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
+import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import com.squareup.moshi.Moshi
 import java.io.File
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
@@ -49,10 +47,7 @@ class PocketCastsAccountAuthenticatorTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val moshi = Moshi.Builder()
-            .add(AccessToken::class.java, AccessToken.Adapter)
-            .add(RefreshToken::class.java, RefreshToken.Adapter)
-            .build()
+        val moshi = ServersModule().provideMoshi()
 
         val retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -78,6 +73,7 @@ class PocketCastsAccountAuthenticatorTest {
             settings = mock(),
             syncAccountManager = syncAccountManager,
             syncServerManager = syncServerManager,
+            moshi = moshi,
         )
         // make sure the test device is signed out
         syncManager.signOut()
