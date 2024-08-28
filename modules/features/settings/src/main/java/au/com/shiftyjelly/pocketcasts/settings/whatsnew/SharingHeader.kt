@@ -97,7 +97,7 @@ private fun BoxWithConstraintsScope.SocialIcon(
     platform: SocialPlatform,
     animationState: AnimationState,
 ) {
-    val iconSize = maxWidth * 0.1f
+    val iconSize = maxWidth * 0.13f
     val transitionData = updateTransitionData(
         label = "${platform.name} animation",
         animationState = animationState,
@@ -114,7 +114,6 @@ private fun BoxWithConstraintsScope.SocialIcon(
         contentDescription = null,
         modifier = Modifier
             .offset { transitionData.offset }
-            .rotate(platform.targetRotation)
             .size(iconSize),
     )
 }
@@ -126,7 +125,6 @@ private enum class SocialPlatform(
 ) {
     WhatsApp(
         imageId = IR.drawable.whats_new_sharing_whatsapp,
-        targetRotation = 10f,
         targetOffset = { spaceSize, cardSize, iconSize ->
             val x = spaceSize.width * 0.06f + iconSize / 2 + cardSize.width / 2
             val y = -spaceSize.height * 0.07f - iconSize / 2 - cardSize.height / 2
@@ -135,7 +133,6 @@ private enum class SocialPlatform(
     ),
     Instagram(
         imageId = IR.drawable.whats_new_sharing_instagram,
-        targetRotation = 10f,
         targetOffset = { spaceSize, cardSize, iconSize ->
             val x = spaceSize.width * 0.08f + iconSize / 2 + cardSize.width / 2
             val y = -spaceSize.height * 0.13f + iconSize / 2 + cardSize.height / 2
@@ -144,7 +141,6 @@ private enum class SocialPlatform(
     ),
     Telegram(
         imageId = IR.drawable.whats_new_sharing_telegram,
-        targetRotation = -10f,
         targetOffset = { spaceSize, cardSize, iconSize ->
             val x = -spaceSize.width * 0.08f - iconSize / 2 - cardSize.width / 2
             val y = -spaceSize.height * 0.13f + iconSize / 2 + cardSize.height / 2
@@ -153,7 +149,6 @@ private enum class SocialPlatform(
     ),
     Tumblr(
         imageId = IR.drawable.whats_new_sharing_tumblr,
-        targetRotation = -10f,
         targetOffset = { spaceSize, cardSize, iconSize ->
             val x = -spaceSize.width * 0.06f - iconSize / 2 - cardSize.width / 2
             val y = -spaceSize.height * 0.07f - iconSize / 2 - cardSize.height / 2
