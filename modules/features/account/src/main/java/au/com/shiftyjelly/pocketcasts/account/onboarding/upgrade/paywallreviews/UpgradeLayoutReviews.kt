@@ -73,117 +73,111 @@ fun UpgradeLayoutReviews(
     )
 
     AppTheme(Theme.ThemeType.DARK) {
-        Box(
+        Column(
             modifier = modifier
                 .fillMaxHeight()
                 .background(color = Color.Black),
-            contentAlignment = Alignment.BottomCenter,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight(),
+            LazyColumn(
+                modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 40.dp, top = 16.dp),
-                            horizontalArrangement = Arrangement.End,
-                        ) {
-                            RowTextButton(
-                                text = stringResource(R.string.not_now),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    backgroundColor = Color.Transparent,
-                                    contentColor = Color.White,
-                                ),
-                                fontSize = 18.sp,
-                                onClick = onNotNowPressed,
-                                fullWidth = false,
-                                includePadding = false,
-                            )
-                        }
-                    }
-
-                    item {
-                        TextH20(
-                            text = stringResource(LR.string.paywall_layout_reviews_title),
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                                .padding(bottom = 8.dp)
-                                .fillMaxWidth(),
-                        )
-
-                        TextP50(
-                            text = stringResource(LR.string.paywall_layout_reviews_subtitle),
-                            fontWeight = FontWeight.W400,
-                            color = colorResource(UR.color.coolgrey_50),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(horizontal = 40.dp)
-                                .padding(bottom = 16.dp)
-                                .fillMaxWidth(),
-                        )
-                    }
-
-                    item {
-                        PlusBenefits(
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                                .padding(bottom = 24.dp),
-                        )
-                    }
-
-                    item {
-                        Stars(
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                                .padding(bottom = 24.dp),
-                        )
-                    }
-
-                    items(
-                        count = reviews.size,
-                        key = { index -> index },
-                    ) { index ->
-                        ReviewItem(
-                            data = reviews[index],
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                                .padding(bottom = 12.dp),
-                        )
-                    }
-
-                    item {
-                        Button(
-                            onClick = {
-                                rateUs(context)
-                            },
-                            colors = ButtonDefaults.buttonColors(
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 40.dp, top = 16.dp),
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        RowTextButton(
+                            text = stringResource(R.string.not_now),
+                            colors = ButtonDefaults.outlinedButtonColors(
                                 backgroundColor = Color.Transparent,
+                                contentColor = Color.White,
                             ),
-                            modifier = Modifier
-                                .padding(top = 20.dp, bottom = 32.dp),
-                        ) {
-                            TextP60(
-                                text = stringResource(LR.string.paywall_layout_reviews_see_all_reviews_in_store),
-                                fontWeight = FontWeight.W400,
-                                color = colorResource(UR.color.plus_gold_dark),
-                                textAlign = TextAlign.Center,
-                            )
-                        }
+                            fontSize = 18.sp,
+                            onClick = onNotNowPressed,
+                            fullWidth = false,
+                            includePadding = false,
+                        )
                     }
                 }
 
-                if (canUpgrade) {
-                    SubscribeButton(state.currentSubscription, onClickSubscribe)
+                item {
+                    TextH20(
+                        text = stringResource(LR.string.paywall_layout_reviews_title),
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 8.dp)
+                            .fillMaxWidth(),
+                    )
+
+                    TextP50(
+                        text = stringResource(LR.string.paywall_layout_reviews_subtitle),
+                        fontWeight = FontWeight.W400,
+                        color = colorResource(UR.color.coolgrey_50),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(horizontal = 40.dp)
+                            .padding(bottom = 16.dp)
+                            .fillMaxWidth(),
+                    )
                 }
+
+                item {
+                    PlusBenefits(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 24.dp),
+                    )
+                }
+
+                item {
+                    Stars(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 24.dp),
+                    )
+                }
+
+                items(
+                    count = reviews.size,
+                    key = { index -> index },
+                ) { index ->
+                    ReviewItem(
+                        data = reviews[index],
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 12.dp),
+                    )
+                }
+
+                item {
+                    Button(
+                        onClick = {
+                            rateUs(context)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.Transparent,
+                        ),
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 32.dp),
+                    ) {
+                        TextP60(
+                            text = stringResource(LR.string.paywall_layout_reviews_see_all_reviews_in_store),
+                            fontWeight = FontWeight.W400,
+                            color = colorResource(UR.color.plus_gold_dark),
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            }
+
+            if (canUpgrade) {
+                SubscribeButton(state.currentSubscription, onClickSubscribe)
             }
         }
     }
