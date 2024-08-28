@@ -7,6 +7,9 @@
         ([#2717](https://github.com/Automattic/pocket-casts-android/pull/2717))
     *   Fix multi-select toolbar action order
         ([#2737](https://github.com/Automattic/pocket-casts-android/pull/2737))
+*   New Features
+    *   Enables transcripts (Internal)
+        ([#2747](https://github.com/Automattic/pocket-casts-android/pull/2747))
 
 7.71
 -----
