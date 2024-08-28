@@ -25,7 +25,7 @@ import javax.inject.Singleton
 object ModelModule {
     @Provides
     @RoomConverters
-    fun provideRoomConveretrs(moshi: Moshi): List<Any> {
+    fun provideRoomConverters(moshi: Moshi): List<Any> {
         return listOf(
             AnonymousBumpStat.CustomEventPropsTypeConverter(moshi),
         )

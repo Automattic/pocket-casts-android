@@ -114,7 +114,7 @@ class AppDatabaseTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             AppDatabase::class.java,
             TEST_DB,
-        ).addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+        ).addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
             .addMigrations(
                 AppDatabase.MIGRATION_45_46,
                 AppDatabase.MIGRATION_46_47,

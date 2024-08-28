@@ -68,7 +68,7 @@ class PodcastSyncProcessTest {
         mockWebServer.start()
 
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
             .build()
 
         FeatureFlag.initialize(

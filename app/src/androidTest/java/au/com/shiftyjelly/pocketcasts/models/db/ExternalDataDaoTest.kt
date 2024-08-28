@@ -45,7 +45,7 @@ class ExternalDataDaoTest {
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
             .build()
         podcastDao = testDb.podcastDao()
         podcastEpisodeDao = testDb.episodeDao()

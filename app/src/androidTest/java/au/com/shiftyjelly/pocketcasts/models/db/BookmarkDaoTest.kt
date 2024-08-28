@@ -35,7 +35,7 @@ class BookmarkDaoTest {
     fun setupDatabase() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         testDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
             .build()
         bookmarkDao = testDatabase.bookmarkDao()
         episodeDao = testDatabase.episodeDao()

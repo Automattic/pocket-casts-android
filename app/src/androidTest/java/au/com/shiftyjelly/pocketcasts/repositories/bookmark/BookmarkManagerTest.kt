@@ -33,7 +33,7 @@ class BookmarkManagerTest {
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .addTypeConverters(ModelModule.provideRoomConveretrs(Moshi.Builder().build()))
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
             .build()
         bookmarkManager = BookmarkManagerImpl(
             appDatabase = appDatabase,
