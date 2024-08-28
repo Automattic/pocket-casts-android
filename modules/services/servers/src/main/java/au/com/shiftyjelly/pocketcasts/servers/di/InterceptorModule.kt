@@ -26,7 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 @Module
 object InterceptorModule {
     private val sixMonths = 180.days.inWholeSeconds
-    private val fiveMinutes = 180.minutes.inWholeSeconds
+    private val fiveMinutes = 5.minutes.inWholeSeconds
     private val cacheControlHeader = "Cache-Control"
 
     private val crashLoggingInterceptor = CrashLoggingOkHttpInterceptorProvider
