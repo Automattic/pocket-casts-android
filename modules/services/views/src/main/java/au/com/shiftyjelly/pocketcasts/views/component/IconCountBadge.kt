@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import com.google.android.material.badge.BadgeDrawable
 
-fun createIconCountBadge(context: Context) =
+fun createCountBadge(context: Context) =
     BadgeDrawable.create(context).apply {
         badgeGravity = BadgeDrawable.TOP_END
         badgeTextColor = context.getThemeColor(R.attr.primary_ui_01)

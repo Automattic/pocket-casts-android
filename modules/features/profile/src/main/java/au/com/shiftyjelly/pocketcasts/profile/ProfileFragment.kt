@@ -56,7 +56,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.views.component.createIconCountBadge
+import au.com.shiftyjelly.pocketcasts.views.component.createCountBadge
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
@@ -228,7 +228,7 @@ class ProfileFragment : BaseFragment() {
                 referralsViewModel.state.collect { state ->
                     binding.btnGift.isVisible = state.showIcon
                     if (referralsCountBadge == null) {
-                        referralsCountBadge = createIconCountBadge(requireContext())
+                        referralsCountBadge = createCountBadge(requireContext())
                         binding.btnGift.doOnLayout {
                             BadgeUtils.attachBadgeDrawable(requireNotNull(referralsCountBadge), binding.btnGift)
                         }
