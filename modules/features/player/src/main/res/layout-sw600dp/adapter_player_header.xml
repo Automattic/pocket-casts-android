@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- Large screens use default layout instead of the landscape one to match iOS design.
+Player controls and seekbar are centered horizontally on this layout, which makes them easier to transition to the Transcript screen.  -->
 <au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -233,13 +234,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintWidth_percent="@dimen/seekbar_width_percentage" />
 
-        <include layout="@layout/player_controls"
+        <include
+            layout="@layout/player_controls"
             android:id="@+id/playerControls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/shelf"/>
+            app:layout_constraintBottom_toTopOf="@+id/shelf" />
 
         <LinearLayout
             android:id="@+id/shelf"

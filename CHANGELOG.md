@@ -5,6 +5,8 @@
         ([#2677](https://github.com/Automattic/pocket-casts-android/pull/2677))
     *   Fix playback and download failures due to an insecure connection
         ([#2717](https://github.com/Automattic/pocket-casts-android/pull/2717))
+    *   Fix multi-select toolbar action order
+        ([#2737](https://github.com/Automattic/pocket-casts-android/pull/2737))
 
 7.71
 -----

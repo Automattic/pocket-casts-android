@@ -4,7 +4,6 @@ import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -376,13 +375,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun AdapterPlayerHeaderBinding.openTranscript() {
+        updatePlayerViewsAccessibility(enable = false)
         playerGroup.layoutTransition = LayoutTransition()
         transcriptPage.isVisible = true
         shelf.isVisible = false
-        seekBar.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
-        playerControls.root.isVisible = resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
+        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
+        seekBar.isVisible = transcriptShowSeekbarAndPlayerControls
+        playerControls.root.isVisible = transcriptShowSeekbarAndPlayerControls
         playerControls.scale(0.6f)
-        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (transcriptShowSeekbarAndPlayerControls) {
             (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
@@ -393,19 +394,31 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun AdapterPlayerHeaderBinding.closeTranscript(
         withTransition: Boolean,
     ) {
+        updatePlayerViewsAccessibility(enable = true)
         playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
         shelf.isVisible = true
         transcriptPage.isVisible = false
         seekBar.isVisible = true
         playerControls.root.isVisible = true
         playerControls.scale(1f)
-        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
+        if (transcriptShowSeekbarAndPlayerControls) {
             (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
         }
         val containerFragment = parentFragment as? PlayerContainerFragment
         containerFragment?.updateTabsVisibility(true)
         (root as? LockableNestedScrollView)?.setScrollingEnabled(true)
         playerGroup.layoutTransition = null // Reset to null to avoid animation when changing children visibility anytime later
+    }
+
+    private fun AdapterPlayerHeaderBinding.updatePlayerViewsAccessibility(enable: Boolean) {
+        val importantForAccessibility = if (enable) View.IMPORTANT_FOR_ACCESSIBILITY_YES else View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        episodeTitle.importantForAccessibility = importantForAccessibility
+        chapterTimeRemaining.importantForAccessibility = importantForAccessibility
+        chapterSummary.importantForAccessibility = importantForAccessibility
+        nextChapter.importantForAccessibility = importantForAccessibility
+        previousChapter.importantForAccessibility = importantForAccessibility
+        podcastTitle.importantForAccessibility = importantForAccessibility
     }
 
     private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
