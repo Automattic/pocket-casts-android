@@ -52,6 +52,17 @@ class ReferralsViewModelTest {
     }
 
     @Test
+    fun `referrals gift icon is not shown if feature flag is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS, false)
+
+        initViewModel()
+
+        viewModel.state.test {
+            assertEquals(false, awaitItem().showIcon)
+        }
+    }
+
+    @Test
     fun `referrals gift icon is not shown if signed out`() = runTest {
         initViewModel(SignInState.SignedOut)
 
