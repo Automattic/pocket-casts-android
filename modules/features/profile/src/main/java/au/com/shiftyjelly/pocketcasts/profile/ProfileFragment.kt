@@ -7,11 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.OptIn
 import androidx.annotation.StringRes
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -54,7 +56,11 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.views.component.createIconCountBadge
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
+import com.google.android.material.badge.ExperimentalBadgeUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
@@ -76,6 +82,8 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: ProfileViewModel by viewModels()
+    private val referralsViewModel: ReferralsViewModel by viewModels()
+    private var referralsCountBadge: BadgeDrawable? = null
 
     private var binding: FragmentProfileBinding? = null
     private val sections = arrayListOf(
@@ -97,6 +105,7 @@ class ProfileFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        referralsCountBadge = null
     }
 
     override fun onResume() {
@@ -109,11 +118,15 @@ class ProfileFragment : BaseFragment() {
         viewModel.isFragmentChangingConfigurations = activity?.isChangingConfigurations ?: false
     }
 
+    @OptIn(ExperimentalBadgeUtils::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
 
+        binding.btnGift.setOnClickListener {
+            referralsViewModel.updateBadgeCount()
+        }
         binding.btnSettings.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
             (activity as FragmentHostListener).addFragment(SettingsFragment())
@@ -203,12 +216,26 @@ class ProfileFragment : BaseFragment() {
 
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
             binding.userView.signedInState = state
-            binding.btnGift.isVisible = FeatureFlag.isEnabled(Feature.REFERRALS) && state.isSignedInAsPlusOrPatron
-
             binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
             if (binding.upgradeLayout.root.isInvisible) {
                 // We need this to get the correct padding below refresh
                 binding.upgradeLayout.root.updateLayoutParams<ConstraintLayout.LayoutParams> { height = 16.dpToPx(view.context) }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                referralsViewModel.state.collect { state ->
+                    binding.btnGift.isVisible = state.showIcon
+                    if (referralsCountBadge == null) {
+                        referralsCountBadge = createIconCountBadge(requireContext())
+                        binding.btnGift.doOnLayout {
+                            BadgeUtils.attachBadgeDrawable(requireNotNull(referralsCountBadge), binding.btnGift)
+                        }
+                    }
+                    referralsCountBadge?.number = state.badgeCount
+                    referralsCountBadge?.isVisible = state.showBadge
+                }
             }
         }
 
