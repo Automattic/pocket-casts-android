@@ -87,7 +87,7 @@ fun UpgradeLayoutReviews(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 40.dp, top = 16.dp),
+                            .padding(bottom = 40.dp, top = 32.dp),
                         horizontalArrangement = Arrangement.End,
                     ) {
                         RowTextButton(
