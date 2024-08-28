@@ -2094,4 +2094,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="engage_sdk_new_releases" translatable="false">@string/nova_launcher_new_releases</string>
     <string name="engage_sdk_trending" translatable="false">@string/discover_trending</string>
 
+    <!-- Referrals -->
+    <string name="gift">Gift</string>
+
 </resources>

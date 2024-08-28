@@ -174,17 +174,41 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <ImageButton
-        android:id="@+id/btnSettings"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_gravity="right"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
         android:layout_marginTop="7dp"
         android:layout_marginEnd="6dp"
-        android:layout_marginBottom="10dp"
-        android:background="?android:attr/actionBarItemBackground"
-        android:contentDescription="@string/settings"
-        android:src="@drawable/ic_profile_settings"
-        android:tint="?attr/primary_text_01" />
+        android:layout_marginBottom="10dp">
+
+        <ImageButton
+            android:id="@+id/btnGift"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:contentDescription="@string/gift"
+            android:src="@drawable/ic_gift"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/btnSettings"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/primary_icon_01"
+            tools:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginBottom="10dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:contentDescription="@string/settings"
+            android:src="@drawable/ic_profile_settings"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/primary_icon_01" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
