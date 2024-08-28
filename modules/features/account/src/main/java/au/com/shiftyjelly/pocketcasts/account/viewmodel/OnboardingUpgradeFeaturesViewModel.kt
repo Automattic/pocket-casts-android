@@ -103,7 +103,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         val upgradeLayout = when {
             showPatronOnly -> UpgradeLayout.Original
-            FeatureFlag.isEnabled(Feature.PAYWALL_AB_EXPERIMENT) -> UpgradeLayout.Features
+            FeatureFlag.isEnabled(Feature.PAYWALL_AB_EXPERIMENT) -> UpgradeLayout.Reviews
             FeatureFlag.isEnabled(Feature.PAYWALL_AA_EXPERIMENT) -> {
                 val variation = experimentProvider.getVariation(Experiment.PaywallAATest)
                 // For the A/A test show the same layout for both variations
