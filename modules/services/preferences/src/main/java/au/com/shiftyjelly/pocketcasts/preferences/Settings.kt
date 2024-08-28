@@ -253,7 +253,7 @@ interface Settings {
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
-    val multiSelectItemsObservable: Observable<List<Int>>
+    val multiSelectItemsObservable: Observable<List<String>>
 
     val shelfItems: UserSetting<List<ShelfItem>>
 
@@ -437,7 +437,8 @@ interface Settings {
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
     val shakeToResetSleepTimer: UserSetting<Boolean>
     val autoSleepTimerRestart: UserSetting<Boolean>
-    fun setMultiSelectItems(items: List<Int>)
+    fun getMultiSelectItems(): List<String>
+    fun setMultiSelectItems(items: List<String>)
     fun setLastPauseTime(date: Date)
     fun getLastPauseTime(): Date?
     fun setLastPausedUUID(uuid: String)
