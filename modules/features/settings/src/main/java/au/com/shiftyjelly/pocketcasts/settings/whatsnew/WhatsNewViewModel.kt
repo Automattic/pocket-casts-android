@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class WhatsNewViewModel @Inject constructor() : ViewModel() {
@@ -21,6 +22,14 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
+
+    init {
+        _state.value = UiState.Loaded(
+            feature = WhatsNewFeature.ReimagineSharing,
+            fullModel = true,
+            tier = UserTier.Free,
+        )
+    }
 
     fun onConfirm() {
         viewModelScope.launch {
@@ -48,6 +57,15 @@ class WhatsNewViewModel @Inject constructor() : ViewModel() {
         val hasOffer: Boolean
         val isUserEntitled: Boolean
         val subscriptionTier: SubscriptionTier? // To show subscription when user is not entitled to the feature
+
+        data object ReimagineSharing : WhatsNewFeature {
+            override val title = LR.string.share_whats_new_title
+            override val message = LR.string.share_whats_new_message
+            override val confirmButtonTitle = LR.string.got_it
+            override val hasOffer = false
+            override val isUserEntitled = true
+            override val subscriptionTier = null
+        }
     }
 
     sealed class NavigationState(

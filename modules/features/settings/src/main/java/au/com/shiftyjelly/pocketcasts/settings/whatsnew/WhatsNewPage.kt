@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -35,8 +36,9 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
 
 @Composable
 fun WhatsNewPage(
@@ -51,7 +53,11 @@ fun WhatsNewPage(
             val uiState = state as UiState.Loaded
             WhatsNewPageLoaded(
                 state = uiState,
-                header = {},
+                header = {
+                    when (uiState.feature) {
+                        is WhatsNewFeature.ReimagineSharing -> SharingHeader()
+                    }
+                },
                 onConfirm = { viewModel.onConfirm() },
                 onClose = onClose,
             )
@@ -96,90 +102,82 @@ private fun WhatsNewPageLoaded(
             .fillMaxSize(),
     ) {
         Column(
-            Modifier
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
                 .background(MaterialTheme.theme.colors.primaryUi01)
                 .then(if (state.fullModel) Modifier.fillMaxSize() else Modifier),
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier,
-            ) {
-                if (state.fullModel) {
-                    Spacer(Modifier.height(8.dp))
+            if (state.fullModel) {
+                Spacer(Modifier.height(8.dp))
 
-                    Pill()
+                Pill()
 
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Start),
-                    ) {
-                        RowTextButton(
-                            text = stringResource(LR.string.cancel),
-                            fontSize = 15.sp,
-                            onClick = performClose,
-                            fullWidth = false,
-                            includePadding = false,
-                        )
-                    }
-                }
-
-                // Hide the header graphic if the phone is in landscape mode so there is room for the text
-                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    if (state.fullModel) {
-                        Spacer(modifier = Modifier.weight(0.4f))
-                    }
-                    header()
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (state.fullModel) {
-                    Spacer(modifier = Modifier.weight(0.1f))
-                }
-
-                TextH10(
-                    text = stringResource(id = state.feature.title),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = Modifier.padding(horizontal = 32.dp),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                TextP40(
-                    text = stringResource(state.feature.message),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = Modifier.padding(horizontal = 32.dp),
-                )
-
-                if (state.fullModel) {
-                    Spacer(modifier = Modifier.weight(0.5f))
-                } else {
-                    Spacer(modifier = Modifier.height(32.dp))
-                }
-
-                RowButton(
-                    text = stringResource(state.feature.confirmButtonTitle),
-                    onClick = onConfirm,
-                    includePadding = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                state.feature.closeButtonTitle?.let {
+                Box(
+                    modifier = Modifier.align(Alignment.Start),
+                ) {
                     RowTextButton(
-                        text = stringResource(it),
+                        text = stringResource(R.string.cancel),
                         fontSize = 15.sp,
                         onClick = performClose,
+                        fullWidth = false,
+                        includePadding = false,
                     )
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
             }
+
+            // Hide the header graphic if the phone is in landscape mode so there is room for the text
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                if (state.fullModel) {
+                    Spacer(modifier = Modifier.weight(0.2f))
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    header()
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextH10(
+                text = stringResource(id = state.feature.title),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.theme.colors.primaryText01,
+                modifier = Modifier.padding(horizontal = 32.dp),
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextP40(
+                text = stringResource(state.feature.message),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.theme.colors.primaryText01,
+                modifier = Modifier.padding(horizontal = 32.dp),
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            RowButton(
+                text = stringResource(state.feature.confirmButtonTitle),
+                onClick = onConfirm,
+                includePadding = false,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            state.feature.closeButtonTitle?.let {
+                RowTextButton(
+                    text = stringResource(it),
+                    fontSize = 15.sp,
+                    onClick = performClose,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
