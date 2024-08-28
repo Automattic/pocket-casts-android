@@ -26,23 +26,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsNewFeature
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -58,11 +51,7 @@ fun WhatsNewPage(
             val uiState = state as UiState.Loaded
             WhatsNewPageLoaded(
                 state = uiState,
-                header = {
-                    when (uiState.feature) {
-                        is WhatsNewFeature.NewGiveRating -> NewGiveRatingHeader()
-                    }
-                },
+                header = {},
                 onConfirm = { viewModel.onConfirm() },
                 onClose = onClose,
             )
@@ -157,7 +146,12 @@ private fun WhatsNewPageLoaded(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Message(state)
+                TextP40(
+                    text = stringResource(state.feature.message),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                )
 
                 if (state.fullModel) {
                     Spacer(modifier = Modifier.weight(0.5f))
@@ -166,7 +160,7 @@ private fun WhatsNewPageLoaded(
                 }
 
                 RowButton(
-                    text = getButtonTitle(state),
+                    text = stringResource(state.feature.confirmButtonTitle),
                     onClick = onConfirm,
                     includePadding = false,
                     modifier = Modifier
@@ -187,43 +181,5 @@ private fun WhatsNewPageLoaded(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
-    }
-}
-
-@Composable
-private fun Message(
-    state: UiState.Loaded,
-) = when (state.feature) {
-    is WhatsNewFeature.NewGiveRating -> TextP40(
-        text = stringResource(state.feature.message),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.theme.colors.primaryText01,
-        modifier = Modifier.padding(horizontal = 32.dp),
-    )
-}
-
-@Composable
-private fun getButtonTitle(
-    state: UiState.Loaded,
-): String = when (state.feature) {
-    is WhatsNewFeature.NewGiveRating -> stringResource(state.feature.confirmButtonTitle)
-}
-
-@Composable
-@Preview
-private fun WhatsNewNewWidgetsPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
-    AppThemeWithBackground(themeType) {
-        WhatsNewPageLoaded(
-            state = UiState.Loaded(
-                feature = WhatsNewFeature.NewGiveRating,
-                tier = UserTier.Plus,
-                fullModel = true,
-            ),
-            header = { NewGiveRatingHeader() },
-            onConfirm = {},
-            onClose = {},
-        )
     }
 }

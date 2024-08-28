@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,33 +13,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
-class WhatsNewViewModel @Inject constructor(
-    private val settings: Settings,
-) : ViewModel() {
+class WhatsNewViewModel @Inject constructor() : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state = _state.asStateFlow()
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
 
-    init {
-        _state.value = UiState.Loaded(
-            feature = WhatsNewFeature.NewGiveRating,
-            fullModel = true,
-            tier = UserTier.Free,
-        )
-    }
-
     fun onConfirm() {
         viewModelScope.launch {
-            val currentState = state.value as? UiState.Loaded ?: return@launch
-            val target = when (currentState.feature) {
-                is WhatsNewFeature.NewGiveRating -> NavigationState.NewGiveRatingClose
-            }
-            _navigationState.emit(target)
+            _navigationState.emit(NavigationState.ForceClose)
         }
     }
 
@@ -64,15 +48,6 @@ class WhatsNewViewModel @Inject constructor(
         val hasOffer: Boolean
         val isUserEntitled: Boolean
         val subscriptionTier: SubscriptionTier? // To show subscription when user is not entitled to the feature
-
-        data object NewGiveRating : WhatsNewFeature {
-            override val title = LR.string.whats_new_new_rating_title
-            override val message = LR.string.whats_new_new_rating_message
-            override val confirmButtonTitle = LR.string.whats_new_got_it_button
-            override val hasOffer = false
-            override val isUserEntitled = true
-            override val subscriptionTier = null
-        }
     }
 
     sealed class NavigationState(
@@ -83,7 +58,6 @@ class WhatsNewViewModel @Inject constructor(
             override val shouldCloseOnConfirm: Boolean = true,
         ) : NavigationState()
 
-        data object NewGiveRatingClose : NavigationState()
         data object ForceClose : NavigationState()
     }
 }
