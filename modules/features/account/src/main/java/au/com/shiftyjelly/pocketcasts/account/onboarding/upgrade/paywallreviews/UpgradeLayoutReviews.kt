@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -59,6 +61,8 @@ fun UpgradeLayoutReviews(
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+
     val reviews: List<ReviewData> = listOf(
         review1,
         review2,
@@ -159,7 +163,7 @@ fun UpgradeLayoutReviews(
                     item {
                         Button(
                             onClick = {
-                                // Handle click event to navigate to the App Store
+                                rateUs(context)
                             },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.Transparent,
