@@ -2,13 +2,14 @@ package au.com.shiftyjelly.pocketcasts.account.watchsync
 
 import androidx.datastore.core.Serializer
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
-import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginIdentity
+import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -18,14 +19,10 @@ data class WatchSyncAuthData(
     @field:Json(name = "loginIdentity") val loginIdentity: LoginIdentity,
 )
 
-object WatchSyncAuthDataSerializer : Serializer<WatchSyncAuthData?> {
-
-    private val adapter = WatchSyncAuthDataJsonAdapter(
-        Moshi.Builder()
-            .add(RefreshToken::class.java, RefreshToken.Adapter)
-            .add(LoginIdentity.Adapter)
-            .build(),
-    )
+class WatchSyncAuthDataSerializer @Inject constructor(
+    moshi: Moshi,
+) : Serializer<WatchSyncAuthData?> {
+    private val adapter = moshi.adapter(WatchSyncAuthData::class.java)
 
     override val defaultValue: WatchSyncAuthData? = null
 

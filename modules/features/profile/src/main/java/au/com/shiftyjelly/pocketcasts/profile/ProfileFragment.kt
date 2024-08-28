@@ -203,6 +203,7 @@ class ProfileFragment : BaseFragment() {
 
         viewModel.signInState.observe(viewLifecycleOwner) { state ->
             binding.userView.signedInState = state
+            binding.btnGift.isVisible = FeatureFlag.isEnabled(Feature.REFERRALS) && state.isSignedInAsPlusOrPatron
 
             binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlusOrPatron
             if (binding.upgradeLayout.root.isInvisible) {

@@ -300,7 +300,7 @@ class PodcastSyncProcessTest {
         statsManager = statsManager,
         fileStorage = mock(),
         playbackManager = mock(),
-        podcastCacheServerManager = mock(),
+        podcastCacheServiceManager = mock(),
         userEpisodeManager = mock(),
         subscriptionManager = mock(),
         folderManager = mock(),

@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.refresh
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager.Parameters
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager.Parameters
 import java.lang.RuntimeException
 import java.util.Date
 import java.util.UUID

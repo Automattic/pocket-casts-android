@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateEpisodeTask
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.test.runTest
@@ -78,7 +78,7 @@ class UpdateEpisodeTaskTest {
             episodes.add(serverEpisode)
         }
 
-        val podcastCacheServerManager = mock<PodcastCacheServerManager> {
+        val podcastCacheServiceManager = mock<PodcastCacheServiceManager> {
             onBlocking { getPodcastAndEpisode(podcastUuid, episodeUuid) } doReturn serverPodcast
         }
         val episodeDao = mock<EpisodeDao> {
@@ -89,7 +89,7 @@ class UpdateEpisodeTaskTest {
         }
         val inputData = UpdateEpisodeTask.buildInputData(deviceEpisode)
         val worker = TestListenableWorkerBuilder<UpdateEpisodeTask>(context = context, inputData = inputData)
-            .setWorkerFactory(TestWorkerFactory(podcastCacheServerManager, appDatabase))
+            .setWorkerFactory(TestWorkerFactory(podcastCacheServiceManager, appDatabase))
             .build()
 
         runTest {
@@ -106,12 +106,12 @@ class UpdateEpisodeTaskTest {
         }
     }
 
-    class TestWorkerFactory(private val podcastCacheServerManager: PodcastCacheServerManager, private val appDatabase: AppDatabase) : WorkerFactory() {
+    class TestWorkerFactory(private val podcastCacheServiceManager: PodcastCacheServiceManager, private val appDatabase: AppDatabase) : WorkerFactory() {
         override fun createWorker(context: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
             return UpdateEpisodeTask(
                 context = context,
                 params = workerParameters,
-                podcastCacheServerManager = podcastCacheServerManager,
+                podcastCacheServiceManager = podcastCacheServiceManager,
                 appDatabase = appDatabase,
             )
         }

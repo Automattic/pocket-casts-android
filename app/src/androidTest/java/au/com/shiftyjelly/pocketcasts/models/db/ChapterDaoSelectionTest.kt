@@ -6,9 +6,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -27,7 +30,9 @@ class ChapterDaoSelectionTest {
     @Before
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
         chapterDao = testDb.chapterDao()
         episodeDao = testDb.episodeDao()
         userEpisodeDao = testDb.userEpisodeDao()

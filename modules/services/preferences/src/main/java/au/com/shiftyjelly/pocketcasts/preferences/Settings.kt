@@ -62,7 +62,7 @@ interface Settings {
 
         const val CHROME_CAST_APP_ID = "2FA4D21B"
 
-        const val WHATS_NEW_VERSION_CODE = 9256
+        const val WHATS_NEW_VERSION_CODE = 9257
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
         const val MAX_DOWNLOAD = 100
@@ -253,7 +253,7 @@ interface Settings {
 
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val refreshStateObservable: Observable<RefreshState>
-    val multiSelectItemsObservable: Observable<List<Int>>
+    val multiSelectItemsObservable: Observable<List<String>>
 
     val shelfItems: UserSetting<List<ShelfItem>>
 
@@ -437,7 +437,8 @@ interface Settings {
     val mediaControlItems: UserSetting<List<MediaNotificationControls>>
     val shakeToResetSleepTimer: UserSetting<Boolean>
     val autoSleepTimerRestart: UserSetting<Boolean>
-    fun setMultiSelectItems(items: List<Int>)
+    fun getMultiSelectItems(): List<String>
+    fun setMultiSelectItems(items: List<String>)
     fun setLastPauseTime(date: Date)
     fun getLastPauseTime(): Date?
     fun setLastPausedUUID(uuid: String)

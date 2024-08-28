@@ -115,28 +115,20 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    SHARE_CLIPS(
-        key = "share_clip",
-        title = "Share episode clips",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = true,
-    ),
     REIMAGINE_SHARING(
         key = "reimagine_sharing",
         title = "Use new sharing designs",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     TRANSCRIPTS(
         key = "transcripts",
         title = "Transcripts",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     GRAVATAR_CHANGE_AVATAR(
@@ -178,6 +170,14 @@ enum class Feature(
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
+    ),
+    REFERRALS(
+        key = "referrals",
+        title = "Referrals",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
     ),
     ;
 

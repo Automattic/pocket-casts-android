@@ -89,7 +89,7 @@ class SettingsImpl @Inject constructor(
     private var languageCode: String? = null
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
-    override val multiSelectItemsObservable = BehaviorRelay.create<List<Int>>().apply { accept(getMultiSelectItems()) }
+    override val multiSelectItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getMultiSelectItems()) }
 
     override val shelfItems = UserSetting.PrefFromString(
         sharedPrefKey = "shelfItems",
@@ -1160,12 +1160,12 @@ class SettingsImpl @Inject constructor(
         setInt("WhatsNewVersionCode", value)
     }
 
-    private fun getMultiSelectItems(): List<Int> {
-        return getStringList("multi_select_items").map { it.toInt() }
+    override fun getMultiSelectItems(): List<String> {
+        return getStringList("multi_select_items")
     }
 
-    override fun setMultiSelectItems(items: List<Int>) {
-        setStringList("multi_select_items", items.map { it.toString() })
+    override fun setMultiSelectItems(items: List<String>) {
+        setStringList("multi_select_items", items)
         multiSelectItemsObservable.accept(items)
     }
 

@@ -241,11 +241,11 @@ fun Stars(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
     ) {
         Image(
-            painter = painterResource(IR.drawable.stars),
+            painter = painterResource(IR.drawable.stars_gradient),
             contentDescription = stringResource(LR.string.paywall_layout_reviews_stars_content_description),
             modifier = Modifier
                 .padding(bottom = 8.dp)
-                .size(width = 150.dp, height = 26.dp),
+                .size(width = 157.dp, height = 29.dp),
         )
 
         TextH40(

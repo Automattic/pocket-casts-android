@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.squareup.moshi.Moshi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.Single
@@ -20,6 +21,7 @@ class UploadEpisodeTask @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     var userEpisodeManager: UserEpisodeManager,
     var playbackManager: PlaybackManager,
+    private val moshi: Moshi,
 ) : RxWorker(context, params) {
 
     companion object {
@@ -48,7 +50,7 @@ class UploadEpisodeTask @AssistedInject constructor(
                 val retry: Boolean
 
                 if (it is HttpException) {
-                    val errorResponse = it.parseErrorResponse()
+                    val errorResponse = it.parseErrorResponse(moshi)
                     errorMessage = errorResponse?.messageLocalized(context.resources)
 
                     if (errorMessage == null) {

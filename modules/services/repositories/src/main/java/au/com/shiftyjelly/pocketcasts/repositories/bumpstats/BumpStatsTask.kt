@@ -10,7 +10,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.servers.bumpstats.WpComServerManager
+import au.com.shiftyjelly.pocketcasts.servers.bumpstats.WpComServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -21,7 +21,7 @@ class BumpStatsTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val appDatabase: AppDatabase,
-    private val wpComServerManager: WpComServerManager,
+    private val wpComServiceManager: WpComServiceManager,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -29,7 +29,7 @@ class BumpStatsTask @AssistedInject constructor(
         val bumpStats = bumpStatsDao.get()
 
         return if (bumpStats.isNotEmpty()) {
-            val response = wpComServerManager.bumpStatAnonymously(bumpStats)
+            val response = wpComServiceManager.bumpStatAnonymously(bumpStats)
             if (response.isSuccessful && response.body() == "Accepted") {
                 Timber.i("$TAG, successfully sent bump stats")
 

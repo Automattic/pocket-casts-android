@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -63,7 +63,7 @@ class UpNextSyncJob : JobService() {
 
     @Inject lateinit var downloadManager: DownloadManager
 
-    @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManagerImpl
+    @Inject lateinit var podcastCacheServiceManager: PodcastCacheServiceManagerImpl
 
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 

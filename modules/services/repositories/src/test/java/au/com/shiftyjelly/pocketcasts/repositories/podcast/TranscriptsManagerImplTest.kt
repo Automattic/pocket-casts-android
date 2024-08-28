@@ -4,12 +4,12 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
+import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesEpisode
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesPodcast
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
-import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptCacheService
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
 import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
@@ -43,19 +43,19 @@ class TranscriptsManagerImplTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
     private val transcriptDao: TranscriptDao = mock()
-    private val transcriptCacheServer: TranscriptCacheServer = mock()
+    private val transcriptCacheService: TranscriptCacheService = mock()
     private val networkWrapper: NetworkWrapper = mock()
     private val transcriptCuesInfoBuilder: TranscriptCuesInfoBuilder = mock()
-    private val serverShowNotesManager: ServerShowNotesManager = mock()
+    private val showNotesServiceManager: ShowNotesServiceManager = mock()
     private val podcastId = "podcast_id"
     private val transcript = Transcript("1", "url_1", "application/srt")
     private val alternateTranscript = Transcript("1", "url_2", "application/json")
 
     private val transcriptsManager = TranscriptsManagerImpl(
         transcriptDao = transcriptDao,
-        service = transcriptCacheServer,
+        service = transcriptCacheService,
         networkWrapper = networkWrapper,
-        serverShowNotesManager = serverShowNotesManager,
+        showNotesServiceManager = showNotesServiceManager,
         scope = CoroutineScope(SupervisorJob() + coroutineRule.testDispatcher),
         transcriptCuesInfoBuilder = transcriptCuesInfoBuilder,
     )
@@ -67,7 +67,7 @@ class TranscriptsManagerImplTest {
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
         whenever(response.body()).thenReturn(mock())
-        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheService.getTranscript(any(), any())).thenReturn(response)
 
         val showNotesResponse = mock<ShowNotesResponse>()
         val showNotesTranscript1 = mock<ShowNotesTranscript>().apply {
@@ -86,7 +86,7 @@ class TranscriptsManagerImplTest {
             whenever(this.episodes).thenReturn(listOf(showNotesEpisode))
         }
         whenever(showNotesResponse.podcast).thenReturn(showNotesPodcast)
-        whenever(serverShowNotesManager.loadShowNotes(any(), any(), any())).thenAnswer { invocation ->
+        whenever(showNotesServiceManager.loadShowNotes(any(), any(), any())).thenAnswer { invocation ->
             val callback = invocation.getArgument<(ShowNotesResponse) -> Unit>(2)
             callback(showNotesResponse)
         }
@@ -142,11 +142,11 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(true)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
-        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheService.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = true)
 
-        verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+        verify(transcriptCacheService).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
 
     @Test
@@ -154,22 +154,22 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(false)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
-        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheService.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = true)
 
-        verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
+        verify(transcriptCacheService).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
 
     @Test
     fun `if force refresh is false, loadTranscript loads transcript from cache`() = runTest {
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(true)
-        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheService.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript)
 
-        verify(transcriptCacheServer).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
+        verify(transcriptCacheService).getTranscript(eq("url_1"), argWhere { it.onlyIfCached })
     }
 
     @Test
@@ -177,11 +177,11 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(true)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(false)
-        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheService.getTranscript(any(), any())).thenReturn(response)
 
         transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript)
 
-        verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+        verify(transcriptCacheService).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
 
     @Test
@@ -189,7 +189,7 @@ class TranscriptsManagerImplTest {
         whenever(networkWrapper.isConnected()).thenReturn(false)
         val response = mock<Response<ResponseBody>>()
         whenever(response.isSuccessful).thenReturn(false)
-        whenever(transcriptCacheServer.getTranscript(any(), any())).thenReturn(response)
+        whenever(transcriptCacheService.getTranscript(any(), any())).thenReturn(response)
 
         try {
             transcriptsManager.loadTranscriptCuesInfo(podcastId, transcript)
@@ -207,7 +207,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DOWNLOAD_EPISODE)
 
-        verify(transcriptCacheServer).getTranscript("url_1", CacheControl.FORCE_NETWORK)
+        verify(transcriptCacheService).getTranscript("url_1", CacheControl.FORCE_NETWORK)
     }
 
     @Test
@@ -219,7 +219,7 @@ class TranscriptsManagerImplTest {
 
         transcriptsManager.updateTranscripts(podcastId, "1", transcripts, LoadTranscriptSource.DEFAULT)
 
-        verifyNoInteractions(transcriptCacheServer)
+        verifyNoInteractions(transcriptCacheService)
     }
 
     @Test
