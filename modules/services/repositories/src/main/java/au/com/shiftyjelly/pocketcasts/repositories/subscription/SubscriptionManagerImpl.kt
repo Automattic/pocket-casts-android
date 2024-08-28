@@ -28,6 +28,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResult
@@ -35,6 +36,7 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.android.billingclient.api.queryPurchaseHistory
 import com.android.billingclient.api.queryPurchasesAsync
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
@@ -136,7 +138,14 @@ class SubscriptionManagerImpl @Inject constructor(
     }
 
     override fun connectToGooglePlay(context: Context) {
-        billingClient = BillingClient.newBuilder(context).enablePendingPurchases().setListener(this).build()
+        val params = PendingPurchasesParams.newBuilder()
+            .enablePrepaidPlans()
+            .enableOneTimeProducts()
+            .build()
+        billingClient = BillingClient.newBuilder(context)
+            .enablePendingPurchases(params)
+            .setListener(this)
+            .build()
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
@@ -296,7 +305,9 @@ class SubscriptionManagerImpl @Inject constructor(
     override fun refreshPurchases() {
         if (!billingClient.isReady) return
 
-        updateOfferEligibilityIfPurchaseHistoryExists()
+        applicationScope.launch {
+            updateOfferEligibilityIfPurchaseHistoryExists()
+        }
 
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
@@ -310,18 +321,16 @@ class SubscriptionManagerImpl @Inject constructor(
         }
     }
 
-    private fun updateOfferEligibilityIfPurchaseHistoryExists() {
+    private suspend fun updateOfferEligibilityIfPurchaseHistoryExists() {
         val queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
-
-        billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams) { _, purchases ->
-            purchases?.forEach {
-                it.products.map { productId ->
-                    mapProductIdToTier(productId)
-                }.distinct().forEach { tier ->
-                    updateOfferEligible(tier, false)
-                }
+        val result = billingClient.queryPurchaseHistory(queryPurchaseHistoryParams)
+        result.purchaseHistoryRecordList?.forEach {
+            it.products.map { productId ->
+                mapProductIdToTier(productId)
+            }.distinct().forEach { tier ->
+                updateOfferEligible(tier, false)
             }
         }
     }
