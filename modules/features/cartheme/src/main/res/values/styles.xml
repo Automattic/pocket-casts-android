@@ -641,7 +641,7 @@ limitations under the License.
 
     <style name="CarPreference.DialogPreference.EditTextPreference">
         <item name="android:layout">@layout/preference_material_car</item>
-        <item name="android:dialogLayout">@layout/preference_dialog_edittext</item>
+        <item name="android:dialogLayout">@layout/car_preference_dialog_edittext</item>
     </style>
 
     <style name="CarPreference.DropDown">
