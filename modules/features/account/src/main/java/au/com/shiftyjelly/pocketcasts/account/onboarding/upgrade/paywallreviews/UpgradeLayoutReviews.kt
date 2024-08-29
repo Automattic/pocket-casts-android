@@ -60,17 +60,9 @@ fun UpgradeLayoutReviews(
     onClickSubscribe: () -> Unit,
     canUpgrade: Boolean,
     modifier: Modifier = Modifier,
+    data: List<ReviewData> = reviews,
 ) {
     val context = LocalContext.current
-
-    val reviews: List<ReviewData> = listOf(
-        review1,
-        review2,
-        review3,
-        review4,
-        review5,
-        review6,
-    )
 
     AppTheme(Theme.ThemeType.DARK) {
         Column(
@@ -144,11 +136,11 @@ fun UpgradeLayoutReviews(
                 }
 
                 items(
-                    count = reviews.size,
+                    count = data.size,
                     key = { index -> index },
                 ) { index ->
                     ReviewItem(
-                        data = reviews[index],
+                        data = data[index],
                         modifier = Modifier
                             .padding(horizontal = 20.dp)
                             .padding(bottom = 12.dp),
@@ -338,38 +330,35 @@ data class ReviewData(
     @StringRes val dateResourceId: Int,
 )
 
-private val review1 = ReviewData(
-    titleResourceId = LR.string.paywall_layout_reviews_review_one_title,
-    messageResourceId = LR.string.paywall_layout_reviews_review_one_message,
-    dateResourceId = LR.string.paywall_layout_reviews_review_one_date,
-)
-
-private val review2 = ReviewData(
-    titleResourceId = LR.string.paywall_layout_reviews_review_two_title,
-    messageResourceId = LR.string.paywall_layout_reviews_review_two_message,
-    dateResourceId = LR.string.paywall_layout_reviews_review_two_date,
-)
-
-private val review3 = ReviewData(
-    titleResourceId = LR.string.paywall_layout_reviews_review_three_title,
-    messageResourceId = LR.string.paywall_layout_reviews_review_three_message,
-    dateResourceId = LR.string.paywall_layout_reviews_review_three_date,
-)
-
-private val review4 = ReviewData(
-    titleResourceId = LR.string.paywall_layout_reviews_review_four_title,
-    messageResourceId = LR.string.paywall_layout_reviews_review_four_message,
-    dateResourceId = LR.string.paywall_layout_reviews_review_four_date,
-)
-
-private val review5 = ReviewData(
-    titleResourceId = LR.string.paywall_layout_reviews_review_five_title,
-    messageResourceId = LR.string.paywall_layout_reviews_review_five_message,
-    dateResourceId = LR.string.paywall_layout_reviews_review_five_date,
-)
-
-private val review6 = ReviewData(
-    titleResourceId = LR.string.paywall_layout_reviews_review_six_title,
-    messageResourceId = LR.string.paywall_layout_reviews_review_six_message,
-    dateResourceId = LR.string.paywall_layout_reviews_review_six_date,
+private val reviews: List<ReviewData> = listOf(
+    ReviewData(
+        titleResourceId = LR.string.paywall_layout_reviews_review_one_title,
+        messageResourceId = LR.string.paywall_layout_reviews_review_one_message,
+        dateResourceId = LR.string.paywall_layout_reviews_review_one_date,
+    ),
+    ReviewData(
+        titleResourceId = LR.string.paywall_layout_reviews_review_two_title,
+        messageResourceId = LR.string.paywall_layout_reviews_review_two_message,
+        dateResourceId = LR.string.paywall_layout_reviews_review_two_date,
+    ),
+    ReviewData(
+        titleResourceId = LR.string.paywall_layout_reviews_review_three_title,
+        messageResourceId = LR.string.paywall_layout_reviews_review_three_message,
+        dateResourceId = LR.string.paywall_layout_reviews_review_three_date,
+    ),
+    ReviewData(
+        titleResourceId = LR.string.paywall_layout_reviews_review_four_title,
+        messageResourceId = LR.string.paywall_layout_reviews_review_four_message,
+        dateResourceId = LR.string.paywall_layout_reviews_review_four_date,
+    ),
+    ReviewData(
+        titleResourceId = LR.string.paywall_layout_reviews_review_five_title,
+        messageResourceId = LR.string.paywall_layout_reviews_review_five_message,
+        dateResourceId = LR.string.paywall_layout_reviews_review_five_date,
+    ),
+    ReviewData(
+        titleResourceId = LR.string.paywall_layout_reviews_review_six_title,
+        messageResourceId = LR.string.paywall_layout_reviews_review_six_message,
+        dateResourceId = LR.string.paywall_layout_reviews_review_six_date,
+    ),
 )
