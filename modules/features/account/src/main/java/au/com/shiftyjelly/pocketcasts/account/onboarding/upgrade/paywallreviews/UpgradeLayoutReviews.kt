@@ -71,31 +71,29 @@ fun UpgradeLayoutReviews(
                 .background(color = Color.Black),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp, top = 32.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                RowTextButton(
+                    text = stringResource(R.string.not_now),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = Color.Transparent,
+                        contentColor = Color.White,
+                    ),
+                    fontSize = 18.sp,
+                    onClick = onNotNowPressed,
+                    fullWidth = false,
+                    includePadding = false,
+                )
+            }
+
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 40.dp, top = 32.dp),
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        RowTextButton(
-                            text = stringResource(R.string.not_now),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.Transparent,
-                                contentColor = Color.White,
-                            ),
-                            fontSize = 18.sp,
-                            onClick = onNotNowPressed,
-                            fullWidth = false,
-                            includePadding = false,
-                        )
-                    }
-                }
-
                 item {
                     TextH20(
                         text = stringResource(LR.string.paywall_layout_reviews_title),
