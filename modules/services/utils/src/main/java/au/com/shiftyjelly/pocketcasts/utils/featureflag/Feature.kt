@@ -179,6 +179,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    EXO_OKHTTP(
+        key = "exo_okhttp",
+        title = "Whether OkHttp should be used as an ExoPlayer client",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

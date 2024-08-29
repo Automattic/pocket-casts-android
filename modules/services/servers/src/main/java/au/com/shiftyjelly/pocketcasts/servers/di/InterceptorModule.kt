@@ -178,4 +178,13 @@ object InterceptorModule {
             add(cacheControlTranscriptsInterceptor.toNetworkInterceptor())
         }
     }
+
+    @Provides
+    @Player
+    fun providePLayerInterceptors(): List<OkHttpInterceptor> {
+        return buildList {
+            add(userAgentInterceptor.toClientInterceptor())
+            add(crashLoggingInterceptor.toClientInterceptor())
+        }
+    }
 }

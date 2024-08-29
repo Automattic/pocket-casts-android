@@ -377,6 +377,7 @@ lottie = [
 media3 = [
     "media3-cast",
     "media3-datasource",
+    "media3-datasource-okhttp",
     "media3-exoplayer",
     "media3-exoplayer-hls",
     "media3-extractor",

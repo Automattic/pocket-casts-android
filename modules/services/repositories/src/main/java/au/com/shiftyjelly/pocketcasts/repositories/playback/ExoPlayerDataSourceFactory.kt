@@ -11,6 +11,7 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
@@ -19,6 +20,7 @@ import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.di.Player
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -28,11 +30,13 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
+import okhttp3.OkHttpClient
 
 @Singleton
 @OptIn(UnstableApi::class)
 class ExoPlayerDataSourceFactory @Inject constructor(
     @ApplicationContext private val context: Context,
+    @Player private val client: OkHttpClient,
     private val settings: Settings,
     private val crashLogging: CrashLogging,
 ) {
@@ -47,11 +51,16 @@ class ExoPlayerDataSourceFactory @Inject constructor(
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, errorMessage)
     }.getOrNull()
 
-    private val httpFactory = DefaultHttpDataSource.Factory()
-        .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
-        .setAllowCrossProtocolRedirects(true)
-        .setConnectTimeoutMs(sixtySeconds)
-        .setReadTimeoutMs(sixtySeconds)
+    private val httpFactory = if (FeatureFlag.isEnabled(Feature.EXO_OKHTTP)) {
+        OkHttpDataSource.Factory(client)
+            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
+    } else {
+        DefaultHttpDataSource.Factory()
+            .setUserAgent(Settings.USER_AGENT_POCKETCASTS_SERVER)
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(sixtySeconds)
+            .setReadTimeoutMs(sixtySeconds)
+    }
 
     private val defaultFactory = DefaultDataSource.Factory(context, httpFactory)
 

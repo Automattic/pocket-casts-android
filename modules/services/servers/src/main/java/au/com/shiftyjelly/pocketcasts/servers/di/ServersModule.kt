@@ -187,6 +187,21 @@ class ServersModule {
     }
 
     @Provides
+    @Singleton
+    @Player
+    fun providePlayerClinet(
+        @Raw client: OkHttpClient,
+        @Player interceptors: List<@JvmSuppressWildcards OkHttpInterceptor>,
+    ): OkHttpClient {
+        return client.newBuilder()
+            .addInterceptors(interceptors)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
     @SyncServiceRetrofit
     @Singleton
     internal fun provideApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
@@ -314,6 +329,10 @@ annotation class TokenInterceptor
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class Transcripts
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Player
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
