@@ -155,6 +155,7 @@ object InterceptorModule {
     @Downloads
     fun provideDownloadsInterceptors(): List<OkHttpInterceptor> {
         return buildList {
+            add(userAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
         }
     }
