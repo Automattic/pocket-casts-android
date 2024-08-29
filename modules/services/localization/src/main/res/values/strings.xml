@@ -2040,7 +2040,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <!-- Content description of a text field that allows to control clip's end seconds position in hh:mm:ss format -->
     <string name="share_end_seconds">Clip end seconds</string>
     <string name="share_whats_new_title">Clip&#160;sharing available&#160;now!</string>
-    <string name="share_whats_new_message">You can now share clips of your favorite bits from any episode. We’ve also made easier to share any content to all social media apps.</string>
+    <string name="share_whats_new_message">You can now share clips of your favorite bits from any episode. We’ve also made it easier to share any content to all social media apps.</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
