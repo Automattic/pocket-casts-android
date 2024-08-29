@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.paywallreviews
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +22,9 @@ import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -31,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
@@ -74,7 +77,7 @@ fun UpgradeLayoutReviews(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp, top = 32.dp),
+                    .padding(top = 32.dp),
                 horizontalArrangement = Arrangement.End,
             ) {
                 RowTextButton(
@@ -91,7 +94,9 @@ fun UpgradeLayoutReviews(
             }
 
             LazyColumn(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalFadingEdge(color = Color.Black, width = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 item {
@@ -101,7 +106,7 @@ fun UpgradeLayoutReviews(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .padding(horizontal = 20.dp)
-                            .padding(bottom = 8.dp)
+                            .padding(bottom = 8.dp, top = 8.dp)
                             .fillMaxWidth(),
                     )
 
@@ -322,41 +327,38 @@ fun ReviewItemPreview() {
     )
 }
 
-data class ReviewData(
-    @StringRes val titleResourceId: Int,
-    @StringRes val messageResourceId: Int,
-    @StringRes val dateResourceId: Int,
-)
+enum class FadeSide {
+    BOTTOM, TOP
+}
 
-private val reviews: List<ReviewData> = listOf(
-    ReviewData(
-        titleResourceId = LR.string.paywall_layout_reviews_review_one_title,
-        messageResourceId = LR.string.paywall_layout_reviews_review_one_message,
-        dateResourceId = LR.string.paywall_layout_reviews_review_one_date,
-    ),
-    ReviewData(
-        titleResourceId = LR.string.paywall_layout_reviews_review_two_title,
-        messageResourceId = LR.string.paywall_layout_reviews_review_two_message,
-        dateResourceId = LR.string.paywall_layout_reviews_review_two_date,
-    ),
-    ReviewData(
-        titleResourceId = LR.string.paywall_layout_reviews_review_three_title,
-        messageResourceId = LR.string.paywall_layout_reviews_review_three_message,
-        dateResourceId = LR.string.paywall_layout_reviews_review_three_date,
-    ),
-    ReviewData(
-        titleResourceId = LR.string.paywall_layout_reviews_review_four_title,
-        messageResourceId = LR.string.paywall_layout_reviews_review_four_message,
-        dateResourceId = LR.string.paywall_layout_reviews_review_four_date,
-    ),
-    ReviewData(
-        titleResourceId = LR.string.paywall_layout_reviews_review_five_title,
-        messageResourceId = LR.string.paywall_layout_reviews_review_five_message,
-        dateResourceId = LR.string.paywall_layout_reviews_review_five_date,
-    ),
-    ReviewData(
-        titleResourceId = LR.string.paywall_layout_reviews_review_six_title,
-        messageResourceId = LR.string.paywall_layout_reviews_review_six_message,
-        dateResourceId = LR.string.paywall_layout_reviews_review_six_date,
-    ),
-)
+fun Modifier.verticalFadingEdge(
+    color: Color,
+    width: Dp,
+) = fadingEdge(FadeSide.BOTTOM, FadeSide.TOP, color = color, width = width)
+
+fun Modifier.fadingEdge(
+    vararg sides: FadeSide,
+    color: Color,
+    width: Dp,
+) = drawWithContent {
+    this@drawWithContent.drawContent()
+
+    sides.forEach { side ->
+        val (start, end) = when (side) {
+            FadeSide.BOTTOM -> Offset(0f, this.size.height) to Offset.Zero
+            FadeSide.TOP -> Offset.Zero to Offset(0f, this.size.height)
+        }
+
+        val fraction = width.toPx() / this.size.height
+
+        drawRect(
+            brush = Brush.linearGradient(
+                0f to color,
+                fraction to Color.Transparent,
+                start = start,
+                end = end,
+            ),
+            size = this.size,
+        )
+    }
+}
