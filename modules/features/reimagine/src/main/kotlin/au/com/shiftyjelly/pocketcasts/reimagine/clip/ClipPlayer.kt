@@ -2,21 +2,13 @@ package au.com.shiftyjelly.pocketcasts.reimagine.clip
 
 import android.content.Context
 import androidx.annotation.OptIn
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaItem.ClippingConfiguration
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.extractor.DefaultExtractorsFactory
-import au.com.shiftyjelly.pocketcasts.reimagine.di.ClipSimpleCache
+import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.sharing.Clip
 import javax.inject.Inject
@@ -59,23 +51,13 @@ interface ClipPlayer {
     @OptIn(UnstableApi::class)
     class Factory @Inject constructor(
         private val playbackManager: PlaybackManager,
-        @ClipSimpleCache private val simpleCache: SimpleCache,
+        private val dataSourceFactory: ExoPlayerDataSourceFactory,
     ) {
         fun create(context: Context): ClipPlayer {
-            val httpSourceFactory = DefaultHttpDataSource.Factory()
-                .setUserAgent("Pocket Casts")
-                .setAllowCrossProtocolRedirects(true)
-            val dataSourceFactory = DefaultDataSource.Factory(context, httpSourceFactory)
-            val cacheSourceFactory = CacheDataSource.Factory()
-                .setCache(simpleCache)
-                .setUpstreamDataSourceFactory(dataSourceFactory)
-
-            val extractorsFactory = DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)
-            val mediaSourceFactory = DefaultMediaSourceFactory(cacheSourceFactory, extractorsFactory)
             val exoPlayer = ExoPlayer.Builder(context).build()
             return ExoPlayerClipPlayer(
                 exoPlayer,
-                mediaSourceFactory,
+                dataSourceFactory,
                 playbackManager,
             )
         }
@@ -85,7 +67,7 @@ interface ClipPlayer {
 @OptIn(UnstableApi::class)
 private class ExoPlayerClipPlayer(
     private val exoPlayer: ExoPlayer,
-    private val mediaSourceFactory: MediaSource.Factory,
+    private val dataSourceFactory: ExoPlayerDataSourceFactory,
     private val playbackManager: PlaybackManager,
 ) : ClipPlayer {
     private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
@@ -166,7 +148,12 @@ private class ExoPlayerClipPlayer(
     }
 
     private fun playNewClip(clip: Clip) {
-        exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(clip.toMediaItem()))
+        val source = dataSourceFactory.createMediaSource(clip)
+        if (source == null) {
+            errors.tryEmit(IllegalArgumentException("Couldn't create a media source from clip"))
+            return
+        }
+        exoPlayer.setMediaSource(source)
         exoPlayer.prepare()
         currentSeekToDuration?.let { exoPlayer.seekTo(it.inWholeMilliseconds) }
         currentSeekToDuration = null
@@ -213,14 +200,10 @@ private class ExoPlayerClipPlayer(
         exoPlayer.release()
     }
 
-    private fun Clip.toMediaItem() = MediaItem.Builder()
-        .setUri(sourceUri)
-        .setClippingConfiguration(
-            ClippingConfiguration.Builder()
-                // Divide and multiple by 100 to drop insignificant for clip creation millseconds resolution
-                .setStartPositionMs((range.start.inWholeMilliseconds / 100) * 100)
-                .setEndPositionMs((range.end.inWholeMilliseconds / 100) * 100)
-                .build(),
-        )
-        .build()
+    private fun ExoPlayerDataSourceFactory.createMediaSource(clip: Clip): MediaSource? {
+        // Divide and multiple by 100 to drop insignificant for clip creation millseconds resolution
+        val clipStart = (clip.range.start.inWholeMilliseconds / 100) * 100
+        val clipEnd = (clip.range.end.inWholeMilliseconds / 100) * 100
+        return createMediaSource(clip.episodeLocation, clipStart..clipEnd)
+    }
 }

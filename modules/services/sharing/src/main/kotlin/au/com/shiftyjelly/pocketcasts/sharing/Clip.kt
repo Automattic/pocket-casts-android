@@ -1,11 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.sharing
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeLocation
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 data class Clip(
-    val sourceUri: String,
+    val episodeLocation: EpisodeLocation,
     val range: Range,
 ) {
     companion object {
@@ -13,7 +14,7 @@ data class Clip(
             episode: PodcastEpisode,
             range: Range = Range.fromPosition(episode.playedUpTo.seconds, episode.duration.seconds),
         ) = Clip(
-            sourceUri = episode.let { if (it.isDownloaded) it.downloadedFilePath else it.downloadUrl }.orEmpty(),
+            episodeLocation = EpisodeLocation.create(episode),
             range = range,
         )
     }
