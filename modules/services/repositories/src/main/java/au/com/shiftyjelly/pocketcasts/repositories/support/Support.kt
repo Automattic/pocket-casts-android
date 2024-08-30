@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jaredrummler.android.device.DeviceName
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -268,6 +270,13 @@ class Support @Inject constructor(
                     }
                     output.append(eol)
                 }
+            }
+
+            runCatching {
+                val features = Feature.entries.map { "${it.key}: ${FeatureFlag.isEnabled(it)}" }
+                output.append("Feature flags").append(eol)
+                features.forEach { output.append(it).append(eol) }
+                output.append(eol)
             }
 
             val podcastsOutput = StringBuilder()
