@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-15 09:54:03+0000
+Translation-Revision-Date: 2024-08-29 11:22:50+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="got_it">知道了</string>
+    <string name="onboarding_subscribe_to_plus">订阅 Plus</string>
+    <string name="paywall_themes_content_description">其他主题和图标图片</string>
+    <string name="paywall_themes_description">表现出您的真实一面。 为我们的订阅者提供的独家图标和主题。</string>
+    <string name="paywall_themes_title">其他主题和图标</string>
+    <string name="paywall_storage_content_description">20GB 存储空间图片</string>
+    <string name="paywall_storage_description">将音频文件上传到云存储空间，以便随时随地访问。</string>
+    <string name="paywall_storage_title">20GB 存储空间</string>
+    <string name="paywall_slumber_studios_content_description">通过 Slumber Studios 圆梦图片</string>
+    <string name="paywall_slumber_studios_description">获得由 Slumber Studios 提供的 1 年高级版内容。</string>
+    <string name="paywall_slumber_studios_title">通过 Slumber Studios 圆梦</string>
+    <string name="paywall_watch_content_description">Apple Watch 和 Wear OS 播放功能图片</string>
+    <string name="paywall_watch_description">放下手机，出去跑步。</string>
+    <string name="paywall_watch_title">Apple Watch 和 Wear OS 播放功能</string>
+    <string name="paywall_bookmarks_content_description">书签图片</string>
+    <string name="paywall_bookmarks_description">保存任何剧集中的喜爱片段，然后回看。</string>
+    <string name="paywall_bookmarks_title">书签</string>
+    <string name="paywall_folders_content_description">文件夹图片</string>
+    <string name="paywall_folders_description">将播客整理到文件夹中，并让它们在所有设备中保持同步。</string>
+    <string name="paywall_folders_title">文件夹</string>
+    <string name="paywall_desktop_and_web_content_description">桌面和 Web 应用程序图片</string>
+    <string name="paywall_desktop_and_web_description">借助我们的 Windows、macOS 和 Web 应用程序，在更多地方收听播客。</string>
+    <string name="paywall_desktop_and_web_title">桌面和 Web 应用程序</string>
+    <string name="paywall_free_1_month_trial">免费试用 1 个月。</string>
+    <string name="paywall_save_50_off">首年享 5 折优惠。</string>
+    <string name="error_transcript_failed_to_parse">很抱歉，解析此文字转录稿时出现错误。</string>
+    <string name="error_transcript_format_not_supported">很抱歉，该文字转录稿格式不受支持：%s</string>
+    <string name="error_transcript_failed_to_load">很抱歉，加载此文字转录稿时出现错误。</string>
+    <string name="try_again">请重试</string>
+    <string name="podcast_star_rating_content_description">播客星级评分</string>
+    <string name="get_pocket_casts_plus">获取 Pocket Casts Plus</string>
+    <string name="share_end_seconds">片段结束秒数</string>
+    <string name="share_end_minutes">片段结束分钟数</string>
+    <string name="share_end_hours">片段结束小时数</string>
+    <string name="share_start_seconds">片段开始秒数</string>
+    <string name="share_start_minutes">片段开始分钟数</string>
+    <string name="share_start_hours">片段开始小时数</string>
+    <string name="share_end_position">结束时间</string>
+    <string name="share_start_position">开始时间</string>
+    <string name="share_clip_too_long_message">片段超过剧集时长：%s</string>
+    <string name="share_invalid_clip_message">片段开始时间必须在片段结束时间之前</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">通过 Pocket Casts Plus 解锁独家功能</string>
-    <string name="whats_new_new_rating_message">为您喜爱的播客评分，让创作者知道您有多欣赏他们的作品。 此外，您的评分还能帮助他人找到节目新宠！</string>
-    <string name="whats_new_new_rating_title">现已上线：播客评分功能 🎉</string>
     <string name="go_to_next">转至下一个</string>
     <string name="go_to_previous">转至上一个</string>
     <string name="share_error_message">无法共享。 请稍后重试。</string>
@@ -22,7 +61,6 @@ Language: zh_CN
     <string name="share_clip_duration">%s 时长</string>
     <string name="share_clip_start_position">%s 开始时间</string>
     <string name="transcript_empty">文字转录稿为空。</string>
-    <string name="star_rating_animation">星级评分动画</string>
     <string name="share_link_clip">片段链接</string>
     <string name="swipe_affordance_icon">轻扫功能图标</string>
     <string name="feedback_form_placeholder">我想根据以下条件筛选剧集</string>
@@ -60,8 +98,6 @@ Language: zh_CN
     <string name="not_allowed_to_rate_title">请先收听此播客</string>
     <string name="episode_cover_description">第 %s 集的封面</string>
     <string name="podcast_share_clip_description">为第 %1$s 集的 %2$d 至 %3$d 秒创建片段</string>
-    <string name="error_transcript_format_not_supported">文字转录稿格式不受支持：%s</string>
-    <string name="error_transcript_failed_to_load">加载文字转录稿失败</string>
     <string name="transcript">文字转录稿</string>
     <string name="no_ratings">无评分</string>
     <string name="rate_button">评分</string>
@@ -140,7 +176,6 @@ Language: zh_CN
     <string name="discover_all_categories">所有分类</string>
     <string name="upgrade_to_patron">升级至 Patron</string>
     <string name="upgrade_to_plus">升级至 Plus</string>
-    <string name="whats_new_got_it_button">知道了</string>
     <string name="skip_chapters_patron_prompt">使用 Pocket Casts Patron，享受预选章节等更多功能</string>
     <string name="skip_chapters_plus_prompt">使用 Pocket Casts Plus，享受预选章节等更多功能</string>
     <string name="number_of_chapters_summary_singular">1 个章节 • %d 已隐藏</string>
@@ -452,7 +487,7 @@ Language: zh_CN
     <string name="onboarding_import_from_castbox">从 Castbox 导入</string>
     <string name="onboarding_coming_from_another_app">来自其他应用？ 导入您的播客并开始收听。 您日后可以随时在设置中执行此操作。</string>
     <string name="onboarding_bring_your_podcasts">随时随地访问您的播客</string>
-    <string name="onboarding_import_podcasts_button">导入博客</string>
+    <string name="onboarding_import_podcasts_button">导入播客</string>
     <string name="onboarding_import_podcasts_text">来自其他应用？ 随时随地访问您的播客。</string>
     <string name="onboarding_import_podcasts_title">导入您的播客</string>
     <string name="onboarding_continue_with_google_error">无法启动 Google 登录。</string>

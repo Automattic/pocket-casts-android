@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-15 23:54:03+0000
+Translation-Revision-Date: 2024-08-28 15:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="got_it">Понятно</string>
+    <string name="onboarding_subscribe_to_plus">Подписаться на Plus</string>
+    <string name="paywall_themes_content_description">Изображение: дополнительные темы и значки</string>
+    <string name="paywall_themes_description">Покажите себя во всей красе. Эксклюзивные значки и темы для наших подписчиков.</string>
+    <string name="paywall_themes_title">Дополнительные темы и значки</string>
+    <string name="paywall_storage_content_description">Изображение: 20 ГБ дискового пространства</string>
+    <string name="paywall_storage_description">Загрузите аудиофайлы в облачное хранилище и пользуйтесь ими, где бы вы ни находились.</string>
+    <string name="paywall_storage_title">20 ГБ дискового пространства</string>
+    <string name="paywall_slumber_studios_content_description">Изображение: Slumber Studios — мы помогаем вам мечтать</string>
+    <string name="paywall_slumber_studios_description">Получите годовую подписку на премиум-контент от Slumber Studios.</string>
+    <string name="paywall_slumber_studios_title">Slumber Studios — мы помогаем вам мечтать</string>
+    <string name="paywall_watch_content_description">Изображение: воспроизведение на Apple Watch и Wear OS</string>
+    <string name="paywall_watch_description">Отправляйтесь на лёгкую пробежку без телефона.</string>
+    <string name="paywall_watch_title">Воспроизведение на Apple Watch и Wear OS</string>
+    <string name="paywall_bookmarks_content_description">Изображение: закладки</string>
+    <string name="paywall_bookmarks_description">Сохраняйте ваши любимые фрагменты любого выпуска и возвращайтесь к ним.</string>
+    <string name="paywall_bookmarks_title">Закладки</string>
+    <string name="paywall_folders_content_description">Изображение: папки</string>
+    <string name="paywall_folders_description">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
+    <string name="paywall_folders_title">Папки</string>
+    <string name="paywall_desktop_and_web_content_description">Изображение: веб-приложения и приложения для ПК</string>
+    <string name="paywall_desktop_and_web_description">Слушайте повсюду: в приложениях для Windows, для macOS и в веб-приложении.</string>
+    <string name="paywall_desktop_and_web_title">Приложения для ПК и веб-приложения</string>
+    <string name="paywall_free_1_month_trial">Бесплатный пробный период: 1 мес.</string>
+    <string name="paywall_save_50_off">Скидка 50 % на первый год.</string>
+    <string name="error_transcript_failed_to_parse">К сожалению, во время анализа этой расшифровки что-то пошло не так.</string>
+    <string name="error_transcript_format_not_supported">К сожалению, формат расшифровки не поддерживается: %s</string>
+    <string name="error_transcript_failed_to_load">К сожалению, во время загрузки этой расшифровки что-то пошло не так.</string>
+    <string name="try_again">Повторить попытку</string>
+    <string name="podcast_star_rating_content_description">Рейтинг подкастов</string>
+    <string name="get_pocket_casts_plus">Получите Pocket Casts Plus</string>
+    <string name="share_end_seconds">Конец клипа: секунды</string>
+    <string name="share_end_minutes">Конец клипа: минуты</string>
+    <string name="share_end_hours">Конец клипа: часы</string>
+    <string name="share_start_seconds">Начало клипа: секунды</string>
+    <string name="share_start_minutes">Начало клипа: минуты</string>
+    <string name="share_start_hours">Начало клипа: часы</string>
+    <string name="share_end_position">Конец</string>
+    <string name="share_start_position">Начало</string>
+    <string name="share_clip_too_long_message">Клип превышает продолжительность эпизода: %s</string>
+    <string name="share_invalid_clip_message">Время начала клипа должно предшествовать времени его окончания</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Получите эксклюзивные возможности в Pocket Casts Plus</string>
-    <string name="whats_new_new_rating_message">Оцените лучшие подкасты, чтобы авторы знали, как вам важна их работа. Кроме того, ваши оценки помогут остальным найти новые интересные материалы!</string>
-    <string name="whats_new_new_rating_title">Уже доступно: оценки подкастов 🎉</string>
     <string name="go_to_next">К следующему</string>
     <string name="go_to_previous">К предыдущему</string>
     <string name="share_error_message">Не получается поделиться. Повторите попытку позже.</string>
@@ -22,7 +61,6 @@ Language: ru
     <string name="share_clip_duration">Продолжительность %s</string>
     <string name="share_clip_start_position">Запустить %s</string>
     <string name="transcript_empty">Расшифровка пуста.</string>
-    <string name="star_rating_animation">Анимация рейтинга</string>
     <string name="share_link_clip">Ссылка на клип</string>
     <string name="swipe_affordance_icon">Смахнуть значок доступности</string>
     <string name="feedback_form_placeholder">Я хочу фильтровать выпуски по</string>
@@ -60,8 +98,6 @@ Language: ru
     <string name="not_allowed_to_rate_title">Сначала прослушайте подкаст</string>
     <string name="episode_cover_description">Обложка выпуска %s</string>
     <string name="podcast_share_clip_description">Создать клип с %2$d по %3$d сек выпуска %1$s</string>
-    <string name="error_transcript_format_not_supported">Формат расшифровки не поддерживается: %s</string>
-    <string name="error_transcript_failed_to_load">Не удалось загрузить расшифровку</string>
     <string name="transcript">Расшифровка</string>
     <string name="no_ratings">Нет оценок</string>
     <string name="rate_button">Оценить</string>
@@ -140,7 +176,6 @@ Language: ru
     <string name="discover_all_categories">Все рубрики</string>
     <string name="upgrade_to_patron">Перейти на Patron</string>
     <string name="upgrade_to_plus">Перейти на Plus</string>
-    <string name="whats_new_got_it_button">Понятно</string>
     <string name="skip_chapters_patron_prompt">Возможность предварительно выбирать главы и множество других функций с Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Возможность предварительно выбирать главы и множество других функций с Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 глава • Скрыто: %d</string>

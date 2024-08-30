@@ -1,11 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-14 16:54:03+0000
+Translation-Revision-Date: 2024-08-28 14:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="got_it">De acuerdo</string>
+    <string name="onboarding_subscribe_to_plus">Suscribirse a Plus</string>
+    <string name="paywall_themes_content_description">Imagen de temas e iconos adicionales</string>
+    <string name="paywall_themes_description">Muéstrate tal y como eres. Iconos y temas exclusivos para nuestros suscriptores.</string>
+    <string name="paywall_themes_title">Temas e iconos adicionales</string>
+    <string name="paywall_storage_content_description">Imagen de 20 GB de almacenamiento</string>
+    <string name="paywall_storage_description">Sube tus archivos de audio al almacenamiento en la nube para que estén disponibles desde cualquier lugar.</string>
+    <string name="paywall_storage_title">20 GB de almacenamiento</string>
+    <string name="paywall_slumber_studios_content_description">Imagen de Sueña con Slumber Studios</string>
+    <string name="paywall_slumber_studios_description">Consigue 1 año de contenido premium de Slumber Studios.</string>
+    <string name="paywall_slumber_studios_title">Sueña con Slumber Studios</string>
+    <string name="paywall_watch_content_description">Imagen de reproducción de Apple Watch y Wear OS</string>
+    <string name="paywall_watch_description">Deja el teléfono y sal a correr.</string>
+    <string name="paywall_watch_title">Reproducción de Apple Watch y Wear OS</string>
+    <string name="paywall_bookmarks_content_description">Imagen de marcadores</string>
+    <string name="paywall_bookmarks_description">Guarda tus fragmentos favoritos de cualquier episodio y vuelve a ellos.</string>
+    <string name="paywall_bookmarks_title">Marcadores</string>
+    <string name="paywall_folders_content_description">Imagen de carpetas</string>
+    <string name="paywall_folders_description">Organiza tus podcasts en carpetas y mantenlos sincronizados en todos tus dispositivos.</string>
+    <string name="paywall_folders_title">Carpetas</string>
+    <string name="paywall_desktop_and_web_content_description">Imagen de aplicaciones web y para ordenador</string>
+    <string name="paywall_desktop_and_web_description">Escucha podcasts en más lugares con nuestras aplicaciones para Windows, macOS y web.</string>
+    <string name="paywall_desktop_and_web_title">Aplicaciones web y para ordenador</string>
+    <string name="paywall_free_1_month_trial">Prueba gratuita de 1 mes.</string>
+    <string name="paywall_save_50_off">Ahorra un 50 % de descuento en tu primer año.</string>
+    <string name="error_transcript_failed_to_parse">Lo sentimos, pero algo ha ido mal al analizar esta transcripción.</string>
+    <string name="error_transcript_format_not_supported">Lo sentimos, pero este formato de transcripción no es compatible: %s</string>
+    <string name="error_transcript_failed_to_load">Lo sentimos, pero algo ha ido mal al cargar esta transcripción.</string>
+    <string name="try_again">Inténtalo de nuevo</string>
+    <string name="podcast_star_rating_content_description">Valoración de estrellas del podcast</string>
+    <string name="get_pocket_casts_plus">Obtener Pocket Casts Plus</string>
+    <string name="share_end_seconds">Segundos de fin de clip</string>
+    <string name="share_end_minutes">Minutos de fin de clip</string>
+    <string name="share_end_hours">Horas de fin de clip</string>
+    <string name="share_start_seconds">Segundos de inicio de clip</string>
+    <string name="share_start_minutes">Minutos de inicio de clip</string>
+    <string name="share_start_hours">Horas de inicio de clip</string>
+    <string name="share_end_position">Fin</string>
+    <string name="share_start_position">Inicio</string>
+    <string name="share_clip_too_long_message">El clip supera la duración del episodio: %s</string>
+    <string name="share_invalid_clip_message">El inicio del clip debe ser anterior al final del clip</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Desbloquea funciones exclusivas con Pocket Casts Plus</string>
+    <string name="go_to_next">Siguiente</string>
+    <string name="go_to_previous">Anterior</string>
     <string name="share_error_message">No se ha podido compartir. Inténtalo de nuevo más tarde.</string>
     <string name="share_clip_sharing_clip">Creando clip…</string>
     <string name="something_went_wrong_when_sending_feedback">Se ha producido un error. Prueba a enviar tus comentarios de nuevo.</string>
@@ -17,7 +61,6 @@ Language: es
     <string name="share_clip_duration">Duración: %s</string>
     <string name="share_clip_start_position">Inicio: %s</string>
     <string name="transcript_empty">La transcripción está vacía.</string>
-    <string name="star_rating_animation">Animación de la valoración de estrellas</string>
     <string name="share_link_clip">Enlace del clip</string>
     <string name="swipe_affordance_icon">Icono de potenciación del deslizamiento</string>
     <string name="feedback_form_placeholder">Quiero filtrar los episodios por</string>
@@ -55,8 +98,6 @@ Language: es
     <string name="not_allowed_to_rate_title">Primero escucha este podcast</string>
     <string name="episode_cover_description">Portada de %s episodio</string>
     <string name="podcast_share_clip_description">Crear clip de entre %2$d y %3$d segundos para %1$s episodio</string>
-    <string name="error_transcript_format_not_supported">El formato de la transcripción no es compatible: %s</string>
-    <string name="error_transcript_failed_to_load">No se ha podido cargar la transcripción</string>
     <string name="transcript">Transcripción</string>
     <string name="no_ratings">Sin valoraciones</string>
     <string name="rate_button">Valoración</string>
@@ -135,7 +176,6 @@ Language: es
     <string name="discover_all_categories">Todas las categorías</string>
     <string name="upgrade_to_patron">Actualiza a Patron</string>
     <string name="upgrade_to_plus">Actualiza a Plus</string>
-    <string name="whats_new_got_it_button">De acuerdo</string>
     <string name="skip_chapters_patron_prompt">Preselecciona capítulos y haz otros ajustes con Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Preselecciona capítulos y haz otros ajustes con Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 capítulo • %d oculto</string>
