@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 sealed class MultiSelectEpisodeAction(
-    override val groupId: Int,
+    override val groupId: String,
     override val actionId: Int,
     @StringRes override val title: Int,
     @DrawableRes override val iconRes: Int,
@@ -26,105 +26,105 @@ sealed class MultiSelectEpisodeAction(
     isVisible,
 ) {
     object DeleteDownload : MultiSelectEpisodeAction(
-        R.id.menu_download,
-        UR.id.menu_undownload,
-        LR.string.delete_download,
-        IR.drawable.ic_undownload,
-        "remove_download",
+        groupId = "download",
+        actionId = UR.id.menu_undownload,
+        title = LR.string.delete_download,
+        iconRes = IR.drawable.ic_undownload,
+        analyticsValue = "remove_download",
     )
     object Download : MultiSelectEpisodeAction(
-        R.id.menu_download,
-        R.id.menu_download,
-        LR.string.download,
-        IR.drawable.ic_download,
-        "download",
+        groupId = "download",
+        actionId = R.id.menu_download,
+        title = LR.string.download,
+        iconRes = IR.drawable.ic_download,
+        analyticsValue = "download",
     )
     object Archive : MultiSelectEpisodeAction(
-        R.id.menu_archive,
-        R.id.menu_archive,
-        LR.string.archive,
-        IR.drawable.ic_archive,
-        "archive",
+        groupId = "archive",
+        actionId = R.id.menu_archive,
+        title = LR.string.archive,
+        iconRes = IR.drawable.ic_archive,
+        analyticsValue = "archive",
     )
     object Unarchive : MultiSelectEpisodeAction(
-        R.id.menu_archive,
-        UR.id.menu_unarchive,
-        LR.string.unarchive,
-        IR.drawable.ic_unarchive,
-        "unarchive",
+        groupId = "archive",
+        actionId = UR.id.menu_unarchive,
+        title = LR.string.unarchive,
+        iconRes = IR.drawable.ic_unarchive,
+        analyticsValue = "unarchive",
     )
     object DeleteUserEpisode : MultiSelectEpisodeAction(
-        R.id.menu_archive,
-        R.id.menu_delete,
-        LR.string.delete,
-        R.drawable.ic_delete,
-        "delete",
+        groupId = "archive",
+        actionId = R.id.menu_delete,
+        title = LR.string.delete,
+        iconRes = R.drawable.ic_delete,
+        analyticsValue = "delete",
     )
     object Share : MultiSelectEpisodeAction(
-        groupId = R.id.menu_share,
+        groupId = "share",
         actionId = R.id.menu_share,
         title = LR.string.share,
         iconRes = IR.drawable.ic_share,
         analyticsValue = "share",
     )
     object MarkAsUnplayed : MultiSelectEpisodeAction(
-        R.id.menu_mark_played,
-        UR.id.menu_markasunplayed,
-        LR.string.mark_as_unplayed,
-        IR.drawable.ic_markasunplayed,
-        "mark_as_unplayed",
+        groupId = "mark_as_played",
+        actionId = UR.id.menu_markasunplayed,
+        title = LR.string.mark_as_unplayed,
+        iconRes = IR.drawable.ic_markasunplayed,
+        analyticsValue = "mark_as_unplayed",
     )
     object MarkAsPlayed : MultiSelectEpisodeAction(
-        R.id.menu_mark_played,
-        R.id.menu_mark_played,
-        LR.string.mark_as_played,
-        IR.drawable.ic_markasplayed,
-        "mark_as_played",
+        groupId = "mark_as_played",
+        actionId = R.id.menu_mark_played,
+        title = LR.string.mark_as_played,
+        iconRes = IR.drawable.ic_markasplayed,
+        analyticsValue = "mark_as_played",
     )
     object PlayNext : MultiSelectEpisodeAction(
-        R.id.menu_playnext,
-        R.id.menu_playnext,
-        LR.string.play_next,
-        IR.drawable.ic_upnext_playnext,
-        "play_next",
+        groupId = "play_next",
+        actionId = R.id.menu_playnext,
+        title = LR.string.play_next,
+        iconRes = IR.drawable.ic_upnext_playnext,
+        analyticsValue = "play_next",
     )
     object PlayLast : MultiSelectEpisodeAction(
-        R.id.menu_playlast,
-        R.id.menu_playlast,
-        LR.string.play_last,
-        IR.drawable.ic_upnext_playlast,
-        "play_last",
+        groupId = "play_last",
+        actionId = R.id.menu_playlast,
+        title = LR.string.play_last,
+        iconRes = IR.drawable.ic_upnext_playlast,
+        analyticsValue = "play_last",
     )
     object Unstar : MultiSelectEpisodeAction(
-        R.id.menu_star,
-        UR.id.menu_unstar,
-        LR.string.unstar,
-        IR.drawable.ic_unstar,
-        "unstar",
+        groupId = "star",
+        actionId = UR.id.menu_unstar,
+        title = LR.string.unstar,
+        iconRes = IR.drawable.ic_unstar,
+        analyticsValue = "unstar",
     )
     object Star : MultiSelectEpisodeAction(
-        R.id.menu_star,
-        R.id.menu_star,
-        LR.string.star,
-        IR.drawable.ic_star,
-        "star",
+        groupId = "star",
+        actionId = R.id.menu_star,
+        title = LR.string.star,
+        iconRes = IR.drawable.ic_star,
+        analyticsValue = "star",
     )
 
     companion object {
-        val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, PlayLast, Star, Share)
-        val ALL = STANDARD + listOf(DeleteDownload, DeleteUserEpisode, MarkAsUnplayed, Unstar, Unarchive)
-        val STANDARD_BY_ID = STANDARD.associateBy { it.actionId }
-        val ALL_BY_ID = ALL.associateBy { it.actionId }
+        private val STANDARD = listOf(Download, Archive, MarkAsPlayed, PlayNext, PlayLast, Star, Share)
+        private val ALL = STANDARD + listOf(DeleteDownload, DeleteUserEpisode, MarkAsUnplayed, Unstar, Unarchive)
+        private val STANDARD_BY_GROUP_ID = STANDARD.associateBy { it.groupId }
+        val ALL_BY_ACTION_ID = ALL.associateBy { it.actionId }
 
-        fun listFromIds(list: List<Int>): List<MultiSelectEpisodeAction> {
-            val loadedItems = list.mapNotNull { STANDARD_BY_ID[it] }
-            val missingItems = STANDARD.subtract(loadedItems) // We need to add on any missing items in case we add actions in the future
+        fun listFromIds(list: List<String>): List<MultiSelectEpisodeAction> {
+            val loadedItems = list.mapNotNull { STANDARD_BY_GROUP_ID[it] }
+            val missingItems = STANDARD.subtract(loadedItems.toHashSet()) // We need to add on any missing items in case we add actions in the future
             return loadedItems + missingItems
         }
 
-        fun actionForGroup(groupId: Int, selected: List<BaseEpisode>): MultiSelectEpisodeAction? {
+        fun actionForGroup(groupId: String, selected: List<BaseEpisode>): MultiSelectEpisodeAction? {
             when (groupId) {
-                R.id.menu_download -> {
+                Download.groupId -> {
                     for (episode in selected) {
                         if (!episode.isDownloaded) {
                             return Download
@@ -133,7 +133,7 @@ sealed class MultiSelectEpisodeAction(
 
                     return DeleteDownload
                 }
-                R.id.menu_archive -> {
+                Archive.groupId -> {
                     for (episode in selected) {
                         if (episode is PodcastEpisode && !episode.isArchived) {
                             return Archive
@@ -142,7 +142,7 @@ sealed class MultiSelectEpisodeAction(
 
                     return if (selected.filterIsInstance<UserEpisode>().size == selected.size) DeleteUserEpisode else Unarchive
                 }
-                R.id.menu_mark_played -> {
+                MarkAsPlayed.groupId -> {
                     for (episode in selected) {
                         if (!episode.isFinished) {
                             return MarkAsPlayed
@@ -151,7 +151,7 @@ sealed class MultiSelectEpisodeAction(
 
                     return MarkAsUnplayed
                 }
-                R.id.menu_star -> {
+                Star.groupId -> {
                     if (selected.filterIsInstance<UserEpisode>().isNotEmpty()) return null
                     for (episode in selected) {
                         if (episode is PodcastEpisode && !episode.isStarred) {
@@ -161,9 +161,9 @@ sealed class MultiSelectEpisodeAction(
 
                     return Unstar
                 }
-                R.id.menu_playnext -> return PlayNext
-                R.id.menu_playlast -> return PlayLast
-                R.id.menu_share -> {
+                PlayNext.groupId -> return PlayNext
+                PlayLast.groupId -> return PlayLast
+                Share.groupId -> {
                     if (selected.size == 1 &&
                         selected.firstOrNull() is PodcastEpisode
                     ) {

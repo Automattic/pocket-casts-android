@@ -3,8 +3,17 @@
 *   Bug Fixes
     *   Fix create filter crash
         ([#2677](https://github.com/Automattic/pocket-casts-android/pull/2677))
-    *   Fix playback and download failures due to an insecure connection
-        ([#2717](https://github.com/Automattic/pocket-casts-android/pull/2717))
+    *   Improved full screen player Talkback
+        ([#2742](https://github.com/Automattic/pocket-casts-android/pull/2742))
+    *   Fix multi-select toolbar action order
+        ([#2737](https://github.com/Automattic/pocket-casts-android/pull/2737))
+*   New Features
+    *   Content is now shared through a new UI interface with support for different platforms including Instagram Stories
+        ([#2707](https://github.com/Automattic/pocket-casts-android/pull/2707))
+    *   Share clips using links, audio clips, and video clips
+        ([#2707](https://github.com/Automattic/pocket-casts-android/pull/2707))
+    *   Enables transcripts (Internal)
+        ([#2747](https://github.com/Automattic/pocket-casts-android/pull/2747))
 
 7.71
 -----
@@ -12,6 +21,8 @@
     *   Adds the kids banner in profile
         ([#2591](https://github.com/Automattic/pocket-casts-android/pull/2591))
 *   Bug Fixes
+    *   Fix playback and download failures due to an insecure connection
+        ([#2717](https://github.com/Automattic/pocket-casts-android/pull/2717))
     *   Update the episode star value in the Media Session to fix places where it's shown outside the app
         ([#2613](https://github.com/Automattic/pocket-casts-android/pull/2613))
     *   Fix content under the mini player on search screens

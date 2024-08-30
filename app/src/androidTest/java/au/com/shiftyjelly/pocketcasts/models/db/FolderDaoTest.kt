@@ -5,8 +5,11 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.utils.FakeFileGenerator.fakeFolder
+import com.squareup.moshi.Moshi
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -25,7 +28,9 @@ class FolderDaoTest {
     @Before
     fun setupDatabase() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        testDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
         folderDao = testDatabase.folderDao()
     }
 

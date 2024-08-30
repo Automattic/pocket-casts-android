@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="large_play_button_margin_bottom">00dp</dimen>
+    <dimen name="large_play_button_margin_bottom">0dp</dimen>
+    <dimen name="transcript_text_bottom_padding">0dp</dimen>
 </resources>

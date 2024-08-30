@@ -67,10 +67,14 @@ class PodcastRatingsViewModel
     fun onRatingStarsTapped(
         podcastUuid: String,
         fragmentManager: FragmentManager,
+        source: RatingTappedSource,
     ) {
         analyticsTracker.track(
             AnalyticsEvent.RATING_STARS_TAPPED,
-            AnalyticsProp.ratingStarsTapped(podcastUuid),
+            mapOf(
+                "uuid" to podcastUuid,
+                "source" to source.analyticsValue,
+            ),
         )
         if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
             val fragment = GiveRatingFragment.newInstance(podcastUuid)
@@ -129,11 +133,8 @@ class PodcastRatingsViewModel
         BorderedStar(PocketCastsIcons.StarEmpty),
     }
 
-    companion object {
-        private object AnalyticsProp {
-            private const val UUID_KEY = "uuid"
-            fun ratingStarsTapped(podcastUuid: String) =
-                mapOf(UUID_KEY to podcastUuid)
-        }
+    enum class RatingTappedSource(val analyticsValue: String) {
+        BUTTON("button"),
+        STARS("stars"),
     }
 }

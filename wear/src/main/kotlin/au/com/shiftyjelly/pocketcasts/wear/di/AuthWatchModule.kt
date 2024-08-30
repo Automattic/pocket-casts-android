@@ -23,10 +23,11 @@ object AuthWatchModule {
     @Provides
     fun providesTokenBundleRepository(
         wearDataLayerRegistry: WearDataLayerRegistry,
+        serializer: WatchSyncAuthDataSerializer,
     ): TokenBundleRepository<WatchSyncAuthData?> {
         return TokenBundleRepositoryImpl.create(
             registry = wearDataLayerRegistry,
-            serializer = WatchSyncAuthDataSerializer,
+            serializer = serializer,
         )
     }
 

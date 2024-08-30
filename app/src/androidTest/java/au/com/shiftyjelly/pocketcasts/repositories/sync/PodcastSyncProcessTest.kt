@@ -6,6 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -17,12 +19,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureProvider
+import com.squareup.moshi.Moshi
 import java.net.HttpURLConnection
 import java.time.Instant
 import java.util.Date
@@ -55,6 +58,8 @@ class PodcastSyncProcessTest {
     private lateinit var okhttpCache: Cache
     private lateinit var appDatabase: AppDatabase
 
+    private val moshi = ServersModule().provideMoshi()
+
     @Before
     fun setUp() {
         context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -62,7 +67,9 @@ class PodcastSyncProcessTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
 
         FeatureFlag.initialize(
             listOf(object : FeatureProvider {
@@ -74,10 +81,9 @@ class PodcastSyncProcessTest {
             }),
         )
 
-        val moshi = ServersModule.provideMoshiBuilder().build()
         val okHttpClient = OkHttpClient.Builder().build()
         retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
-        okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
+        okhttpCache = ServersModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
     }
 
     /**
@@ -136,7 +142,7 @@ class PodcastSyncProcessTest {
             whenever(syncAccountManager.isLoggedIn()) doReturn true
             whenever(syncAccountManager.getAccessToken()) doReturn AccessToken("access_token")
 
-            val syncServerManager = SyncServerManager(
+            val syncServiceManager = SyncServiceManager(
                 retrofit = retrofit,
                 settings = settings,
                 cache = okhttpCache,
@@ -147,7 +153,8 @@ class PodcastSyncProcessTest {
                 context = context,
                 settings = settings,
                 syncAccountManager = syncAccountManager,
-                syncServerManager = syncServerManager,
+                syncServiceManager = syncServiceManager,
+                moshi = moshi,
             )
 
             val syncProcess = PodcastSyncProcess(
@@ -161,7 +168,7 @@ class PodcastSyncProcessTest {
                 statsManager = statsManager,
                 fileStorage = mock(),
                 playbackManager = mock(),
-                podcastCacheServerManager = mock(),
+                podcastCacheServiceManager = mock(),
                 userEpisodeManager = mock(),
                 subscriptionManager = mock(),
                 folderManager = folderManager,

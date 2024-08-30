@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncoming
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -33,7 +33,7 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
 
     @Inject lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var serviceManager: ServiceManager
 
     @Inject lateinit var settings: Settings
 

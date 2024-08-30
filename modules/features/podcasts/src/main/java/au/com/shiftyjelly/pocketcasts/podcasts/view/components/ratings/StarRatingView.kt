@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingTappedSource
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
@@ -52,10 +53,11 @@ fun StarRatingView(
             val loadedState = state as RatingState.Loaded
             Content(
                 state = loadedState,
-                onClick = {
+                onClick = { source ->
                     viewModel.onRatingStarsTapped(
                         podcastUuid = loadedState.podcastUuid,
                         fragmentManager = fragmentManager,
+                        source = source,
                     )
                 },
             )
@@ -70,7 +72,7 @@ fun StarRatingView(
 @Composable
 private fun Content(
     state: RatingState.Loaded,
-    onClick: () -> Unit,
+    onClick: (RatingTappedSource) -> Unit,
 ) {
     val starsContentDescription = stringResource(LR.string.podcast_star_rating_content_description)
 
@@ -86,7 +88,7 @@ private fun Content(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .clickable { onClick() }
+                .clickable { onClick(RatingTappedSource.STARS) }
                 .padding(8.dp)
                 .semantics {
                     this.contentDescription = starsContentDescription
@@ -116,7 +118,7 @@ private fun Content(
         if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
             RowOutlinedButton(
                 text = stringResource(R.string.rate_button),
-                onClick = { onClick() },
+                onClick = { onClick(RatingTappedSource.BUTTON) },
                 includePadding = false,
                 fontSize = 16.sp,
                 textPadding = 0.dp,

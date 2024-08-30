@@ -30,7 +30,6 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
     private var customData: JSONObject? = null
     private var podcast: Podcast? = null
-    private var episode: BaseEpisode? = null
     private var state: Int = 0
     private var remoteListenerAdded: Boolean = false
     private var localEpisodeUuid: String? = null
@@ -55,7 +54,9 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
             TextUtils.equals(localEpisodeUuid, remoteEpisodeUuid) &&
             state != PlaybackStateCompat.STATE_NONE && state != PlaybackStateCompat.STATE_STOPPED
 
-    override var episodeLocation: EpisodeLocation? = null
+    private var episodeLocation: EpisodeLocation? = null
+
+    private val episode get() = episodeLocation?.episode
 
     override val url: String?
         get() = (episodeLocation as? EpisodeLocation.Stream)?.uri
@@ -225,12 +226,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     }
 
     override fun setEpisode(episode: BaseEpisode) {
-        this.episode = episode
-        this.episodeLocation =
-            EpisodeLocation.Stream(
-                episode.downloadUrl,
-            )
-
+        this.episodeLocation = EpisodeLocation.Stream(episode, episode.downloadUrl)
         localEpisodeUuid = episode.uuid
         buildCustomData()
     }

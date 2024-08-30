@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.LoadTranscriptSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesChapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
@@ -25,7 +25,7 @@ class ShowNotesProcessor @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val chapterManager: ChapterManager,
     private val transcriptsManager: TranscriptsManager,
-    private val service: PodcastCacheServer,
+    private val service: PodcastCacheService,
 ) {
     fun process(
         episodeUuid: String,

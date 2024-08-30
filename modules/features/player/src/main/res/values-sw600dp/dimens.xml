@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="seekbar_width_percentage" format="float" type="dimen">0.8</item>
+    <dimen name="large_play_button_margin_bottom">40dp</dimen>
+    <dimen name="transcript_text_bottom_padding">125dp</dimen>
+    <dimen name="seekbar_margin_bottom">0dp</dimen>
 </resources>

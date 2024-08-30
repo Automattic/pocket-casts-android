@@ -4,6 +4,8 @@ import androidx.room.Room
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -15,11 +17,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SubscribeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
-import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import com.squareup.moshi.Moshi
 import io.reactivex.Single
 import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
@@ -61,17 +64,19 @@ class PodcastManagerTest {
         }
 
         val application = context
-        val podcastCacheServer = mock<PodcastCacheServerManager> {
+        val podcastCacheService = mock<PodcastCacheServiceManager> {
             on { getPodcast(uuid) } doReturn Single.just(Podcast(uuid))
         }
-        val staticServerManager = mock<StaticServerManager> {
+        val staticServiceManager = mock<StaticServiceManager> {
             on { getColorsSingle(uuid) } doReturn Single.just(Optional.empty())
         }
 
-        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
 
-        val refreshServerManager = mock<RefreshServerManager> {}
-        val subscribeManager = SubscribeManager(appDatabase, podcastCacheServer, staticServerManager, syncManagerSignedOut, application, settings)
+        val refreshServiceManager = mock<RefreshServiceManager> {}
+        val subscribeManager = SubscribeManager(appDatabase, podcastCacheService, staticServiceManager, syncManagerSignedOut, application, settings)
         podcastDao = appDatabase.podcastDao()
         podcastManagerSignedOut = PodcastManagerImpl(
             episodeManager = episodeManager,
@@ -79,8 +84,8 @@ class PodcastManagerTest {
             settings = settings,
             context = application,
             subscribeManager = subscribeManager,
-            cacheServerManager = podcastCacheServer,
-            refreshServerManager = refreshServerManager,
+            cacheServiceManager = podcastCacheService,
+            refreshServiceManager = refreshServiceManager,
             syncManager = syncManagerSignedOut,
             appDatabase = appDatabase,
             applicationScope = CoroutineScope(Dispatchers.Default),
@@ -92,8 +97,8 @@ class PodcastManagerTest {
             settings = settings,
             context = application,
             subscribeManager = subscribeManager,
-            cacheServerManager = podcastCacheServer,
-            refreshServerManager = refreshServerManager,
+            cacheServiceManager = podcastCacheService,
+            refreshServiceManager = refreshServiceManager,
             syncManager = syncManagerSignedIn,
             applicationScope = CoroutineScope(Dispatchers.Default),
             appDatabase = appDatabase,

@@ -17,13 +17,14 @@ fun CloseButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     tintColor: Color = Color.White,
+    contentDescription: String = stringResource(NavigationButton.Close.contentDescription),
 ) = IconButton(
     onClick = onClick,
     modifier = modifier,
 ) {
     Icon(
         imageVector = NavigationButton.Close.image,
-        contentDescription = stringResource(NavigationButton.Close.contentDescription),
+        contentDescription = contentDescription,
         tint = tintColor,
     )
 }

@@ -7,7 +7,7 @@
         errorLine1="                val responseDebug = String.format(&quot;Post response %d %s&quot;, response.code, call.request().url)"
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServerManager.kt"
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/servers/ServiceManager.kt"
             line="239"
             column="37"/>
     </issue>

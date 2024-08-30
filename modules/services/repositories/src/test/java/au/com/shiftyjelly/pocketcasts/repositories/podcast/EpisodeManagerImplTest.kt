@@ -45,7 +45,7 @@ class EpisodeManagerImplTest {
             fileStorage = mock(),
             downloadManager = mock(),
             context = mock(),
-            podcastCacheServerManager = mock(),
+            podcastCacheServiceManager = mock(),
             userEpisodeManager = mock(),
             ioDispatcher = mock(),
             episodeAnalytics = mock(),

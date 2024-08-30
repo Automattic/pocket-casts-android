@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.colors
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import timber.log.Timber
 
 @Singleton
 class ColorManager @Inject constructor(
-    private val staticServerManager: StaticServerManagerImpl,
+    private val staticServiceManager: StaticServiceManagerImpl,
     private val podcastManager: PodcastManager,
 ) {
 
@@ -35,7 +35,7 @@ class ColorManager @Inject constructor(
     }
 
     fun downloadColors(podcastUuid: String): Single<Optional<ArtworkColors>> {
-        return staticServerManager.getColorsSingle(podcastUuid)
+        return staticServiceManager.getColorsSingle(podcastUuid)
     }
 
     suspend fun updateColors(podcasts: List<Podcast>) {
@@ -50,7 +50,7 @@ class ColorManager @Inject constructor(
         }
 
         try {
-            val colors = staticServerManager.getColors(podcast.uuid) ?: return
+            val colors = staticServiceManager.getColors(podcast.uuid) ?: return
             podcastManager.updateColors(
                 podcast.uuid,
                 colors.background,

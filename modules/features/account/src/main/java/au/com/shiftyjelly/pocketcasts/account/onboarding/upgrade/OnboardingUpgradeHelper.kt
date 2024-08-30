@@ -7,7 +7,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -85,7 +87,38 @@ object OnboardingUpgradeHelper {
                 .fillMaxWidth()
                 .background(backgroundColor, RoundedCornerShape(12.dp)),
         ) {
-            UpgradeButtonContent(onClick, primaryText, textColor, fontWeight, secondaryText)
+            Button(
+                onClick = onClick,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Transparent,
+                    contentColor = Color.Transparent,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                elevation = ButtonDefaults.elevation(0.dp),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    AutoResizeText(
+                        text = primaryText,
+                        color = textColor,
+                        maxFontSize = 18.sp,
+                        lineHeight = 21.sp,
+                        fontWeight = fontWeight,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                    )
+                    secondaryText?.let {
+                        TextP60(
+                            text = it,
+                            textAlign = TextAlign.Center,
+                            color = textColor,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -102,32 +135,14 @@ object OnboardingUpgradeHelper {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(gradientBackgroundColor, RoundedCornerShape(12.dp)),
-        ) {
-            UpgradeButtonContent(onClick, primaryText, textColor, fontWeight, secondaryText)
-        }
-    }
-
-    @Composable
-    private fun UpgradeButtonContent(
-        onClick: () -> Unit,
-        primaryText: String,
-        textColor: Color,
-        fontWeight: FontWeight,
-        secondaryText: String?,
-    ) {
-        Button(
-            onClick = onClick,
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Transparent,
-                contentColor = Color.Transparent,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            elevation = ButtonDefaults.elevation(0.dp),
+                .background(gradientBackgroundColor, RoundedCornerShape(12.dp))
+                .clickable(onClick = onClick)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
                 AutoResizeText(
                     text = primaryText,

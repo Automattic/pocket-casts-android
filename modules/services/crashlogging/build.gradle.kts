@@ -17,4 +17,6 @@ android {
 dependencies {
     api(libs.crashlogging)
     api(libs.encryptedlogging)
+
+    implementation(project(":modules:services:utils"))
 }

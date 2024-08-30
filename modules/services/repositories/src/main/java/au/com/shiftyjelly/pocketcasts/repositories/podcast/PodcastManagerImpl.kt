@@ -29,8 +29,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.wasCached
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
-import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -62,8 +62,8 @@ class PodcastManagerImpl @Inject constructor(
     private val settings: Settings,
     @ApplicationContext private val context: Context,
     private val subscribeManager: SubscribeManager,
-    private val cacheServerManager: PodcastCacheServerManager,
-    private val refreshServerManager: RefreshServerManager,
+    private val cacheServiceManager: PodcastCacheServiceManager,
+    private val refreshServiceManager: RefreshServiceManager,
     private val syncManager: SyncManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase,
@@ -231,7 +231,7 @@ class PodcastManagerImpl @Inject constructor(
                     LogBuffer.TAG_BACKGROUND_TASKS,
                     "Refreshing podcast ${existingPodcast.uuid}",
                 )
-                val updatedPodcast = cacheServerManager.getPodcastResponse(existingPodcast.uuid)
+                val updatedPodcast = cacheServiceManager.getPodcastResponse(existingPodcast.uuid)
                     .map {
                         val responsePodcast = it.body()?.toPodcast()
                         if (it.wasCached()) {
@@ -812,7 +812,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun refreshPodcastFeed(podcastUuid: String): Boolean {
-        return refreshServerManager.refreshPodcastFeed(podcastUuid).isSuccessful
+        return refreshServiceManager.refreshPodcastFeed(podcastUuid).isSuccessful
     }
 
     override suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast> =

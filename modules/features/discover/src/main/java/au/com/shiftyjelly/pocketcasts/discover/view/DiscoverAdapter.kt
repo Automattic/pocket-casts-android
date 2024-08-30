@@ -50,7 +50,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory.Companion.ALL_CATEGORIES_ID
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
@@ -109,7 +109,7 @@ internal data class CategoryAdRow(val categoryId: Int, val categoryName: String,
 internal class DiscoverAdapter(
     val context: Context,
     val service: ListRepository,
-    val staticServerManager: StaticServerManagerImpl,
+    val staticServiceManager: StaticServiceManagerImpl,
     val listener: Listener,
     val theme: Theme,
     loadPodcastList: (source: String) -> Flowable<PodcastList>,
@@ -619,7 +619,7 @@ internal class DiscoverAdapter(
                                         podcast.color = backgroundColor
                                         podcast
                                     }
-                                    Single.zip(Single.just(discoverPodcast), staticServerManager.getColorsSingle(discoverPodcast.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
+                                    Single.zip(Single.just(discoverPodcast), staticServiceManager.getColorsSingle(discoverPodcast.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
                                 }
                                 .toList().toFlowable()
                         }
