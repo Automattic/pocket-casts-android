@@ -2095,6 +2095,31 @@
     <string name="paywall_layout_reviews_subtitle">See why people have upgraded to Plus</string>
     <string name="paywall_layout_reviews_stars_content_description">Stars</string>
     <string name="paywall_layout_reviews_rating">4.1 Rating (5.7K Reviews)</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">See all reviews in the Play Store</string>
+
+    <string name="paywall_layout_reviews_review_one_title">Best Podcast App By FAR</string>
+    <string name="paywall_layout_reviews_review_one_message">I\'ve been a long time user and the amount of functionality and customization you get with the free version is astounding. I love that it syncs across devices so I can start listening on my phone and then pick up on an Alexa device. It\'s my recommendation for anyone who listens to podcasts. Also love the stats!</string>
+    <string name="paywall_layout_reviews_review_one_date">Jul 10</string>
+
+    <string name="paywall_layout_reviews_review_two_title">The essential podcast app</string>
+    <string name="paywall_layout_reviews_review_two_message">8 years of excellence and continuous improvement</string>
+    <string name="paywall_layout_reviews_review_two_date">Jun 15</string>
+
+    <string name="paywall_layout_reviews_review_three_title">Best podcast app out there</string>
+    <string name="paywall_layout_reviews_review_three_message">I\'ve been a Pocket Casts user since 2017. \n\nThis is hands down the best app to listen to podcasts. It\'s feature rich and actively developed. There have been some complaints about the Ul change but I haven\'t really noticed it too much. \n\nThis app can be as simple or difficult to use as you\'d like it to be. So either let it be a plug and play or set up skip outro and intro timers and any other little feature you want to enable.</string>
+    <string name="paywall_layout_reviews_review_three_date">Jun 9</string>
+
+    <string name="paywall_layout_reviews_review_four_title">Fantastic app</string>
+    <string name="paywall_layout_reviews_review_four_message">The sync function is magic. Don\'t know what special magic this app has going on but it\'s better than any other app I\'ve used.</string>
+    <string name="paywall_layout_reviews_review_four_date">Jun 1</string>
+
+    <string name="paywall_layout_reviews_review_five_title">Works great and easy to find or add new pods</string>
+    <string name="paywall_layout_reviews_review_five_message">Been using this app for 6 years or better, started on android and now I have been on iOS for almost a year. Works the same on both platforms. Easy to find new podcasts to listen to, very nice Ul, can add podcasts by rss feed url too. The watch app is functional, but I mostly use for my play/pause. Sign in with an account to sync across devices but no requirement to do so.</string>
+    <string name="paywall_layout_reviews_review_five_date">May 6</string>
+
+    <string name="paywall_layout_reviews_review_six_title">Go-To Podcast App</string>
+    <string name="paywall_layout_reviews_review_six_message">PC has been my go-to for years. I\'ve tried other podcast apps and always come back to PC for their simplicity, Ul and support. Definitely worth checking it out, especially if you have grown tired of your current podcast app.</string>
+    <string name="paywall_layout_reviews_review_six_date">Mar 8</string>
 
     <!-- Engage SDK -->
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
