@@ -8,7 +8,6 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.discover.worker.CuratedPodcastsSyncWorker
-import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.nova.NovaLauncherBridge
@@ -117,8 +116,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
     @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
-
-    @Inject lateinit var engageSdkBridge: EngageSdkBridge
 
     @Inject lateinit var databaseExportHelper: DatabaseExportHelper
 
@@ -263,7 +260,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
         novaLauncherBridge.monitorNovaLauncherIntegration()
-        engageSdkBridge.registerIntegration()
         CuratedPodcastsSyncWorker.enqueuPeriodicWork(this)
 
         settings.useDynamicColorsForWidget.flow
