@@ -9,32 +9,17 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
-import android.os.Build
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil.size.Size
 import coil.transform.Transformation
-import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
-import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
-import java.security.MessageDigest
-import timber.log.Timber
 
-class ThemedImageTintTransformation(context: Context) : BitmapTransformation(), Transformation {
+class ThemedImageTintTransformation(context: Context) : Transformation {
     private val isActive = Theme.isImageTintEnabled(context)
     private val themeTag = Theme.imageTintThemeTag(context)
 
-    private val density = context.resources.displayMetrics.density
     private val id = "au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation.$themeTag" // + Date().time
-    private val idBytes: ByteArray = id.toByteArray()
-    private val paint = Paint().apply {
-        color = 0xFF119B00.toInt()
-        alpha = 58
-    }
-
-    override fun updateDiskCacheKey(messageDigest: MessageDigest) {
-        messageDigest.update(idBytes)
-    }
 
     override val cacheKey: String
         get() = id
@@ -90,17 +75,5 @@ class ThemedImageTintTransformation(context: Context) : BitmapTransformation(), 
         canvas.drawRect(0f, 0f, canvas.width.toFloat(), canvas.height.toFloat(), darkenPaint)
         canvas.drawRect(0f, 0f, canvas.width.toFloat(), canvas.height.toFloat(), paintBlendColor)
         canvas.drawRect(0f, 0f, canvas.width.toFloat(), canvas.height.toFloat(), paintBlend2Color)
-    }
-
-    override fun transform(bitmapPool: BitmapPool, original: Bitmap, width: Int, height: Int): Bitmap {
-        val result: Bitmap = bitmapPool.get(width, height, Bitmap.Config.ARGB_8888)
-        if (!isActive) return original
-
-        Timber.i("Transform width $width height $height density $density q? ${Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q} sdk ${Build.VERSION.SDK_INT}")
-
-        // Create a Canvas backed by the result Bitmap.
-        val canvas = Canvas(result)
-        version1(original, canvas)
-        return result
     }
 }

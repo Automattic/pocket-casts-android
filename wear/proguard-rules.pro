@@ -67,14 +67,6 @@
 -keep class androidx.mediarouter.app.MediaRouteActionProvider { *; }
 -keep class au.com.shiftyjelly.pocketcasts.CastOptionsProvider { *; }
 
-# glide
--keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
-  **[] $VALUES;
-  public *;
-}
-
 -keepclassmembers enum * {
     <fields>;
     public static **[] values();
