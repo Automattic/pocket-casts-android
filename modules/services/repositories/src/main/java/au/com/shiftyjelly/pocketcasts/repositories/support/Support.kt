@@ -272,12 +272,9 @@ class Support @Inject constructor(
                 }
             }
 
-            runCatching {
-                val features = Feature.entries.map { "${it.key}: ${FeatureFlag.isEnabled(it)}" }
-                output.append("Feature flags").append(eol)
-                features.forEach { output.append(it).append(eol) }
-                output.append(eol)
-            }
+            val features = Feature.entries.map { "${it.key}: ${FeatureFlag.isEnabled(it)}" }
+            output.append("Feature flags").append(eol)
+            features.forEach { output.append(it).append(eol) }
 
             val podcastsOutput = StringBuilder()
             podcastsOutput.append("Podcasts").append(eol).append("--------").append(eol).append(eol)
