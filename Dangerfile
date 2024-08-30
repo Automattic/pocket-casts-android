@@ -28,8 +28,8 @@ end
 
 labels_checker.check(
   do_not_merge_labels: ['do not merge'],
-  required_labels: [//],
-  required_labels_error: 'PR requires at least one label.'
+  required_labels: [/^\[Type\]/, /^(\[Area\]|\[Project\])/],
+  required_labels_error: 'PR requires a [Type] label and either a [Area] or [Project] label.',
 )
 
 milestone_checker.check_milestone_due_date(days_before_due: 2)
