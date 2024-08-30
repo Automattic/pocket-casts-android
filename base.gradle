@@ -232,8 +232,6 @@ dependencies {
     implementation libs.core.ktx
     implementation libs.device.names
     implementation libs.flexbox
-    implementation libs.glide
-    implementation libs.glide.okhttp
     implementation libs.guava
     implementation libs.material
     implementation libs.material.dialogs
@@ -255,7 +253,6 @@ dependencies {
     implementation libs.viewpager
 
     ksp libs.moshi.kotlin.codegen
-    ksp libs.glide.compiler
     ksp libs.showkase.processor
     ksp libs.hilt.compiler
     ksp libs.dagger.hilt.compiler

@@ -11,7 +11,6 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaDescriptionCompat.EXTRA_DOWNLOAD_STATUS
 import android.support.v4.media.MediaDescriptionCompat.STATUS_DOWNLOADED
 import android.support.v4.media.MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
@@ -38,11 +37,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import coil.executeBlocking
 import coil.imageLoader
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import java.io.File
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -170,17 +164,6 @@ object AutoConverter {
         if (folder == null) return null
 
         return getBitmapUri(drawable = folder.automotiveDrawableId, context = context)
-    }
-
-    val autoImageLoaderListener = object : RequestListener<File> {
-        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<File>?, isFirstResource: Boolean): Boolean {
-            Log.e("AutoConverter", "Could not load image in automotive $e")
-            return false
-        }
-
-        override fun onResourceReady(resource: File?, model: Any?, target: Target<File>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-            return true
-        }
     }
 
     /**

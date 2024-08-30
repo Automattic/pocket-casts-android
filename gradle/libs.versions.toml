@@ -30,7 +30,6 @@ espresso = "3.4.0"
 firebase = "30.5.0"
 fragment = "1.8.2"
 glance = "1.1.0"
-glide = "4.13.2"
 google-services = "4.3.14"
 hilt = "2.52"
 hilt-compiler = "1.2.0"
@@ -121,11 +120,6 @@ firebase-config = { module = "com.google.firebase:firebase-config-ktx" }
 # Fragments
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragment" }
-
-# Glide
-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
-glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
-glide-okhttp = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
 
 # Google Play Services OSS Licenses - (The following line is still needed as there is no plugin marker available as of yet)
 ossLicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.5"
