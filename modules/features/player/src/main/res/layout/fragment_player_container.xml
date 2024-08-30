@@ -62,6 +62,7 @@
                         android:layout_height="match_parent"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:layout_gravity="center"
+                        android:contentDescription="@string/player_up_next"
                         app:srcCompat="@drawable/mini_player_upnext_badge"
                         app:tint="?attr/player_contrast_01" />
                     <TextView
@@ -74,6 +75,7 @@
                         app:autoSizeMinTextSize="8sp"
                         app:autoSizeMaxTextSize="16sp"
                         app:autoSizeStepGranularity="1sp"
+                        android:importantForAccessibility="no"
                         android:letterSpacing="-0.05"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"

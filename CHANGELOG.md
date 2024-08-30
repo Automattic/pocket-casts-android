@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix create filter crash
         ([#2677](https://github.com/Automattic/pocket-casts-android/pull/2677))
+    *   Improved full screen player Talkback
+        ([#2742](https://github.com/Automattic/pocket-casts-android/pull/2742))
     *   Fix multi-select toolbar action order
         ([#2737](https://github.com/Automattic/pocket-casts-android/pull/2737))
 *   New Features
