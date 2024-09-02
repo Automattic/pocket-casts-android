@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSett
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getParcelableExtraCompat
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
@@ -230,9 +231,10 @@ class NotificationsSettingsFragment :
     }
 
     @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_ALERT_RINGTONE && data != null) {
-            val ringtone = data.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            val ringtone: Uri? = data.getParcelableExtraCompat(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
             val value = ringtone?.toString() ?: ""
             context?.let {
                 settings.notificationSound.set(NotificationSound(value, it), updateModifiedAt = false)
