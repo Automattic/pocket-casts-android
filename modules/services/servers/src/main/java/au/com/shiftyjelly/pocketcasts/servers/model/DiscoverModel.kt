@@ -254,7 +254,7 @@ data class DiscoverCategory(
     override val title: String
         get() = name
     override val type: ListType
-        get() = ListType.PodcastList()
+        get() = ListType.PodcastList
     override val displayStyle: DisplayStyle
         get() = DisplayStyle.SmallList()
     override val expandedStyle: ExpandedStyle

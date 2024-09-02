@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -46,7 +46,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var staticServerManager: StaticServerManagerImpl
+    @Inject lateinit var staticServiceManager: StaticServiceManagerImpl
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
@@ -133,7 +133,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val categoryWithRegionUpdated =
             viewModel.transformNetworkLoadableList(selectedCategory.discoverCategory, resources)
 
-        viewModel.filterPodcasts(categoryWithRegionUpdated.source, categoryWithRegionUpdated.source) {
+        viewModel.filterPodcasts(categoryWithRegionUpdated.source) {
             val podcasts = it.podcasts
 
             val mostPopularPodcasts =
@@ -194,7 +194,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
             adapter = DiscoverAdapter(
                 context = requireContext(),
                 service = viewModel.repository,
-                staticServerManager = staticServerManager,
+                staticServiceManager = staticServiceManager,
                 listener = this,
                 theme = theme,
                 loadPodcastList = viewModel::loadPodcastList,

@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.LoadTranscriptSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptsManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServer
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.RawChaptersResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesChapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesEpisode
@@ -34,7 +34,7 @@ class ShowNotesProcessTest {
     private val episodeManager = mock<EpisodeManager>()
     private val chapterManager = mock<ChapterManager>()
     private val transcriptsManager = mock<TranscriptsManager>()
-    private val service = mock<PodcastCacheServer>()
+    private val service = mock<PodcastCacheService>()
 
     @Test
     fun `update episodes with image URLs`() = runTest(coroutineRule.testDispatcher) {
@@ -462,7 +462,7 @@ class ShowNotesProcessTest {
                 language = "Language 2",
             ),
         )
-        verify(transcriptsManager).updateTranscripts("episode-id", expected1, LoadTranscriptSource.DEFAULT)
+        verify(transcriptsManager).updateTranscripts("podcast-id", "episode-id", expected1, LoadTranscriptSource.DEFAULT)
     }
 
     @Test
@@ -490,7 +490,7 @@ class ShowNotesProcessTest {
         processor.process("episode-id", showNotes)
 
         val expected2 = emptyList<Transcript>()
-        verify(transcriptsManager).updateTranscripts("episode-id", expected2, LoadTranscriptSource.DEFAULT)
+        verify(transcriptsManager).updateTranscripts("podcast-id", "episode-id", expected2, LoadTranscriptSource.DEFAULT)
     }
 
     @Test
@@ -511,6 +511,6 @@ class ShowNotesProcessTest {
         processor.process("episode-id", showNotes)
 
         val expected2 = emptyList<Transcript>()
-        verify(transcriptsManager, never()).updateTranscripts("episode-id", expected2, LoadTranscriptSource.DEFAULT)
+        verify(transcriptsManager, never()).updateTranscripts("podcast-id", "episode-id", expected2, LoadTranscriptSource.DEFAULT)
     }
 }

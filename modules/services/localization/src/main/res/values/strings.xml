@@ -165,6 +165,7 @@
     <string name="go_to_bottom">Go to bottom</string>
     <string name="go_to_previous">Go to previous</string>
     <string name="go_to_next">Go to next</string>
+    <string name="got_it">Got it</string>
     <string name="submit">Submit</string>
     <string name="report">Report</string>
     <string name="report_subtitle">Report inappropriate content</string>
@@ -340,7 +341,7 @@
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
     <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
     <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>
-up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
+    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="player_sleep_in_chapters">Sleeping in %d chapters</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Sleep timer restarted after device shake</string>
     <string name="player_sleep_timer_stopped_your_podcast">Sleep timer stopped your podcast.</string>
@@ -387,6 +388,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
+    <string name="player_played_up_to">Played up to %s</string>
+    <string name="player_time_remaining">Time remaining %s</string>
 
     <!-- Chapters -->
 
@@ -632,9 +635,6 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="not_allowed_to_rate_description">Only listeners of this podcast can give it a rating. Have a listen to a few episodes and then come back to give your rating. We look forward to hearing what you think!</string>
     <string name="thank_you_for_rating">Thank you for rating!</string>
     <string name="something_went_wrong_to_rate_this_podcast">Something went wrong. Please try again later</string>
-    <string name="whats_new_new_rating_title">Now Available: Podcast Ratings &#127881;</string>
-    <string name="whats_new_new_rating_message">Rate your top podcasts and let creators know how much you appreciate their work. Plus, your ratings help others find new favorite shows!</string>
-    <string name="star_rating_animation">Star Rating Animation</string>
     <string name="podcast_star_rating_content_description">Podcast Star Rating</string>
 
     <!-- Episodes -->
@@ -1515,8 +1515,6 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="settings_advanced_prioritize_seek_accuracy_summary">Prioritizing seek accuracy can significantly slow down seek responsiveness and cause Pocket Casts to consume more data.</string>
     <string name="settings_advanced_cache_entire_playing_episode">Cache playing episode</string>
     <string name="settings_advanced_cache_entire_playing_episode_summary">Entire playing episode is temporarily cached to minimize streaming.</string>
-    <!-- Used in a button meaning that the user understood the message. -->
-    <string name="whats_new_got_it_button">Got it</string>
     <!-- Button title to upgrade to Plus. Don't translate "Plus" -->
     <string name="upgrade_to_plus">Upgrade to Plus</string>
     <!-- Button title to upgrade to Patron. Don't translate "Patron" -->
@@ -1808,7 +1806,7 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
     <string name="onboarding_patron_subscribe">Subscribe to Pocket&#160;Casts Patron</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
-    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop &amp; web apps</string>
+    <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop &amp; Web apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_folders_and_bookmarks_title">Folders &amp; Bookmarks</string>
     <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
@@ -1821,12 +1819,14 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
     <!-- Do not translate Slumber Studios -->
     <string name="onboarding_plus_feature_slumber_studios_title"><![CDATA[1 year of exclusive content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios"><![CDATA[<a href="https://slumberstudios.com/">Dream with Slumber Studios content</a>]]></string>
     <string name="onboarding_plus_become_a_plus_member">Become a Plus member and unlock all Pocket&#160;Casts features</string>
     <string name="onboarding_plus_continuing_agrees_to">By continuing, you agree to our %1$s and %2$s.</string>
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
     <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
     <string name="onboarding_plus_subscribe">Subscribe to Pocket&#160;Casts Plus</string>
+    <string name="onboarding_subscribe_to_plus">Subscribe to Plus</string>
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
     <string name="onboarding_plus_recurring_after_intro_offer">Recurring payment at %s</string>
     <string name="onboarding_plus_recurring_after_intro_offer_sufix">after your first year</string>
@@ -1900,6 +1900,9 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="error_transcript_format_not_supported">Sorry, but this transcript format is not supported: %s</string>
     <string name="error_transcript_failed_to_parse">Sorry, but something went wrong while parsing this transcript.</string>
     <string name="transcript_empty">Transcript is empty.</string>
+    <string name="transcript_close">Close transcript</string>
+    <string name="transcript_search">Search transcript</string>
+    <string name="transcript_search_close">Close search</string>
 
     <!--    Tasker Plugin-->
 
@@ -2038,6 +2041,8 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="share_end_minutes">Clip end minutes</string>
     <!-- Content description of a text field that allows to control clip's end seconds position in hh:mm:ss format -->
     <string name="share_end_seconds">Clip end seconds</string>
+    <string name="share_whats_new_title">Clip&#160;sharing available&#160;now!</string>
+    <string name="share_whats_new_message">You can now share clips of your favorite bits from any episode. We’ve also made it easier to share any content to all social media apps.</string>
 
     <!-- Pocket Casts Champion -->
     <string name="pocket_casts_champion_dialog_title">You’re a true champion of Pocket Casts!</string>
@@ -2061,4 +2066,67 @@ up    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
     <string name="swipe_affordance_icon">Swipe Affordance Icon</string>
     <string name="thank_you_for_your_feedback">Thank you for your feedback!</string>
     <string name="something_went_wrong_when_sending_feedback">Something went wrong. Please try submitting your feedback again.</string>
+
+    <!-- Paywall -->
+    <string name="paywall_save_50_off">Save 50% off your first year.</string>
+    <string name="paywall_free_1_month_trial">Free 1-month trial.</string>
+    <string name="paywall_desktop_and_web_title">Desktop and web apps</string>
+    <string name="paywall_desktop_and_web_description">Listen in more places with our Windows, macOS and Web apps.</string>
+    <string name="paywall_desktop_and_web_content_description">Desktop and web apps image</string>
+    <string name="paywall_folders_title">Folders</string>
+    <string name="paywall_folders_description">Organize your podcasts in folders, and keep them in sync across all your devices.</string>
+    <string name="paywall_folders_content_description">Folders image</string>
+    <string name="paywall_bookmarks_title">Bookmarks</string>
+    <string name="paywall_bookmarks_description">Save your favorite bits from any episode and go back to them.</string>
+    <string name="paywall_bookmarks_content_description">Bookmarks image</string>
+    <string name="paywall_watch_title">Apple Watch and Wear OS playback</string>
+    <string name="paywall_watch_description">Ditch the phone and go for a run.</string>
+    <string name="paywall_watch_content_description">Apple Watch and Wear OS playback image</string>
+    <string name="paywall_slumber_studios_title">Dream with Slumber Studios</string>
+    <string name="paywall_slumber_studios_description">Get 1 year of premium content from Slumber Studios.</string>
+    <string name="paywall_slumber_studios_content_description">Dream with Slumber Studios image</string>
+    <string name="paywall_storage_title">20 GB of storage</string>
+    <string name="paywall_storage_description">Upload your audio files to cloud storage and have them available everywhere.</string>
+    <string name="paywall_storage_content_description">20 GB of storage image</string>
+    <string name="paywall_themes_title">Extra themes and icons</string>
+    <string name="paywall_themes_description">Fly your true colors. Exclusive icons and themes for our subscribers.</string>
+    <string name="paywall_themes_content_description">Extra themes and icons image</string>
+    <string name="paywall_layout_reviews_title">\"Quite simply the best way to listen to podcasts\"</string>
+    <string name="paywall_layout_reviews_subtitle">See why people have upgraded to Plus</string>
+    <string name="paywall_layout_reviews_stars_content_description">Stars</string>
+    <string name="paywall_layout_reviews_rating">4.1 Rating (5.7K Reviews)</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">See all reviews in the Play Store</string>
+
+    <string name="paywall_layout_reviews_review_one_title">Best Podcast App By FAR</string>
+    <string name="paywall_layout_reviews_review_one_message">I\'ve been a long time user and the amount of functionality and customization you get with the free version is astounding. I love that it syncs across devices so I can start listening on my phone and then pick up on an Alexa device. It\'s my recommendation for anyone who listens to podcasts. Also love the stats!</string>
+    <string name="paywall_layout_reviews_review_one_date">Jul 10</string>
+
+    <string name="paywall_layout_reviews_review_two_title">The essential podcast app</string>
+    <string name="paywall_layout_reviews_review_two_message">8 years of excellence and continuous improvement</string>
+    <string name="paywall_layout_reviews_review_two_date">Jun 15</string>
+
+    <string name="paywall_layout_reviews_review_three_title">Best podcast app out there</string>
+    <string name="paywall_layout_reviews_review_three_message">I\'ve been a Pocket Casts user since 2017. \n\nThis is hands down the best app to listen to podcasts. It\'s feature rich and actively developed. There have been some complaints about the Ul change but I haven\'t really noticed it too much. \n\nThis app can be as simple or difficult to use as you\'d like it to be. So either let it be a plug and play or set up skip outro and intro timers and any other little feature you want to enable.</string>
+    <string name="paywall_layout_reviews_review_three_date">Jun 9</string>
+
+    <string name="paywall_layout_reviews_review_four_title">Fantastic app</string>
+    <string name="paywall_layout_reviews_review_four_message">The sync function is magic. Don\'t know what special magic this app has going on but it\'s better than any other app I\'ve used.</string>
+    <string name="paywall_layout_reviews_review_four_date">Jun 1</string>
+
+    <string name="paywall_layout_reviews_review_five_title">Works great and easy to find or add new pods</string>
+    <string name="paywall_layout_reviews_review_five_message">Been using this app for 6 years or better, started on android and now I have been on iOS for almost a year. Works the same on both platforms. Easy to find new podcasts to listen to, very nice Ul, can add podcasts by rss feed url too. The watch app is functional, but I mostly use for my play/pause. Sign in with an account to sync across devices but no requirement to do so.</string>
+    <string name="paywall_layout_reviews_review_five_date">May 6</string>
+
+    <string name="paywall_layout_reviews_review_six_title">Go-To Podcast App</string>
+    <string name="paywall_layout_reviews_review_six_message">PC has been my go-to for years. I\'ve tried other podcast apps and always come back to PC for their simplicity, Ul and support. Definitely worth checking it out, especially if you have grown tired of your current podcast app.</string>
+    <string name="paywall_layout_reviews_review_six_date">Mar 8</string>
+
+    <!-- Engage SDK -->
+    <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
+    <string name="engage_sdk_new_releases" translatable="false">@string/nova_launcher_new_releases</string>
+    <string name="engage_sdk_trending" translatable="false">@string/discover_trending</string>
+
+    <!-- Referrals -->
+    <string name="gift">Gift</string>
+
 </resources>

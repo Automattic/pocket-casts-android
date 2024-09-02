@@ -12,8 +12,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
-import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -37,8 +37,8 @@ import timber.log.Timber
 @Singleton
 class SubscribeManager @Inject constructor(
     val appDatabase: AppDatabase,
-    val podcastCacheServerManager: PodcastCacheServerManager,
-    private val staticServerManager: StaticServerManager,
+    val podcastCacheServiceManager: PodcastCacheServiceManager,
+    private val staticServiceManager: StaticServiceManager,
     private val syncManager: SyncManager,
     @ApplicationContext val context: Context,
     val settings: Settings,
@@ -160,11 +160,11 @@ class SubscribeManager @Inject constructor(
 
     private fun downloadPodcast(podcastUuid: String): Single<Podcast> {
         // download the podcast
-        val serverPodcastObservable = podcastCacheServerManager.getPodcast(podcastUuid)
+        val serverPodcastObservable = podcastCacheServiceManager.getPodcast(podcastUuid)
             .subscribeOn(Schedulers.io())
             .doOnSuccess { Timber.i("Downloaded episodes success podcast $podcastUuid") }
         // download the colors
-        val colorObservable = staticServerManager.getColorsSingle(podcastUuid)
+        val colorObservable = staticServiceManager.getColorsSingle(podcastUuid)
             .subscribeOn(Schedulers.io())
             .doOnSuccess { Timber.i("Downloaded colors success podcast $podcastUuid") }
             .onErrorReturn { Optional.empty() }

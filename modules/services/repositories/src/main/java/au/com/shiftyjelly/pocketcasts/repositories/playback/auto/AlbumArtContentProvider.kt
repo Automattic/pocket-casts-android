@@ -6,10 +6,17 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
-import android.util.Log
-import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.autoImageLoaderListener
-import com.bumptech.glide.Glide
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import java.io.File
+import java.io.IOException
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okio.sink
+import timber.log.Timber
 
 class AlbumArtContentProvider : ContentProvider() {
 
@@ -23,7 +30,7 @@ class AlbumArtContentProvider : ContentProvider() {
 
     override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
         val context = this.context ?: return null
-        Log.d("AUTO_IMAGE", "Content uri received: ${uri.lastPathSegment}")
+        Timber.tag("AlbumArtProvider").d("Content uri received ${uri.lastPathSegment}")
 
         // Extract the image uri e.g. https://static.pocketcasts.net/discover/images/webp/480/220e7cc0-d53e-0133-2e9f-6dc413d6d41d.webp
         val imageUri = Uri.parse(uri.lastPathSegment)
@@ -33,14 +40,22 @@ class AlbumArtContentProvider : ContentProvider() {
         val file = File(context.cacheDir, cachePath)
         // Cache the image
         if (!file.exists()) {
-            val cacheFile = Glide.with(context)
-                .downloadOnly()
-                .addListener(autoImageLoaderListener)
-                .load(imageUri)
-                .submit()
-                .get()
-
-            cacheFile.renameTo(file)
+            Timber.tag("AlbumArtProvider").d("Executing call for $imageUri")
+            val appContext = context.applicationContext
+            val entryPoint = EntryPointAccessors.fromApplication(appContext, AlbumArtEntryPoint::class.java)
+            val client = entryPoint.okHttpClient()
+            val request = Request.Builder().url(imageUri.toString()).build()
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        file.sink().use { sink ->
+                            response.body?.source()?.readAll(sink)
+                        }
+                    }
+                }
+            } catch (e: IOException) {
+                Timber.tag("AlbumArtProvider").d(e, "Failed to load image $imageUri")
+            }
         }
         return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
     }
@@ -65,4 +80,11 @@ class AlbumArtContentProvider : ContentProvider() {
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?) = 0
 
     override fun getType(uri: Uri): String? = null
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface AlbumArtEntryPoint {
+        @Downloads
+        fun okHttpClient(): OkHttpClient
+    }
 }

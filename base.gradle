@@ -5,11 +5,13 @@
 def SERVER_MAIN_URL_PROD = "\"https://refresh.pocketcasts.com\""
 def SERVER_API_URL_PROD = "\"https://api.pocketcasts.com\""
 def SERVER_CACHE_URL_PROD = "\"https://cache.pocketcasts.com\""
+def SERVER_CACHE_HOST_PROD = "\"cache.pocketcasts.com\""
 def SERVER_STATIC_URL_PROD = "\"https://static.pocketcasts.com\""
 def SERVER_SHARING_URL_PROD = "\"https://sharing.pocketcasts.com\""
 def SERVER_LIST_URL_PROD = "\"https://lists.pocketcasts.com\""
 def SERVER_LIST_HOST_PROD = "\"lists.pocketcasts.com\""
 def SERVER_SHORT_URL_PROD = "\"https://pca.st\""
+def SERVER_SHORT_HOST_PROD = "\"pca.st\""
 def WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
 
 android {
@@ -75,7 +77,7 @@ android {
         jvmTarget = javaVersion.toString()
         // disable Kotlin warnings for Coroutines, working with the annotation @OptIn(DelicateCoroutinesApi::class)
         freeCompilerArgs += [
-            "-opt-in=kotlin.RequiresOptIn"
+                "-opt-in=kotlin.RequiresOptIn"
         ]
         kotlinOptions.allWarningsAsErrors = true
     }
@@ -91,12 +93,12 @@ android {
     packagingOptions {
         resources {
             excludes += [
-                "META-INF/rxjava.properties",
-                "META-INF/AL2.0",
-                "META-INF/LGPL2.1",
-                "META-INF/licenses/ASM",
-                // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
-                "**/attach_hotspot_windows.dll"
+                    "META-INF/rxjava.properties",
+                    "META-INF/AL2.0",
+                    "META-INF/LGPL2.1",
+                    "META-INF/licenses/ASM",
+                    // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
+                    "**/attach_hotspot_windows.dll"
             ]
         }
     }
@@ -133,9 +135,11 @@ android {
             buildConfigField "String", "SERVER_MAIN_URL", "\"https://refresh.pocketcasts.net\""
             buildConfigField "String", "SERVER_API_URL", "\"https://api.pocketcasts.net\""
             buildConfigField "String", "SERVER_CACHE_URL", "\"https://podcast-api.pocketcasts.net\""
+            buildConfigField "String", "SERVER_CACHE_HOST", "\"podcast-api.pocketcasts.net\""
             buildConfigField "String", "SERVER_STATIC_URL", "\"https://static.pocketcasts.net\""
             buildConfigField "String", "SERVER_SHARING_URL", "\"https://sharing.pocketcasts.net\""
             buildConfigField "String", "SERVER_SHORT_URL", "\"https://pcast.pocketcasts.net\""
+            buildConfigField "String", "SERVER_SHORT_HOST", "\"pcast.pocketcasts.net\""
             buildConfigField "String", "WEB_BASE_HOST", "\"pocket-casts-main-development.mystagingwebsite.com\""
             buildConfigField "String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\""
             buildConfigField "String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\""
@@ -153,9 +157,11 @@ android {
             buildConfigField "String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD
             buildConfigField "String", "SERVER_API_URL", SERVER_API_URL_PROD
             buildConfigField "String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD
+            buildConfigField "String", "SERVER_CACHE_HOST", SERVER_CACHE_HOST_PROD
             buildConfigField "String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD
             buildConfigField "String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD
             buildConfigField "String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD
+            buildConfigField "String", "SERVER_SHORT_HOST", SERVER_SHORT_HOST_PROD
             buildConfigField "String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD
             buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
             buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
@@ -171,9 +177,11 @@ android {
             buildConfigField "String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD
             buildConfigField "String", "SERVER_API_URL", SERVER_API_URL_PROD
             buildConfigField "String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD
+            buildConfigField "String", "SERVER_CACHE_HOST", SERVER_CACHE_HOST_PROD
             buildConfigField "String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD
             buildConfigField "String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD
             buildConfigField "String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD
+            buildConfigField "String", "SERVER_SHORT_HOST", SERVER_SHORT_HOST_PROD
             buildConfigField "String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD
             buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
             buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
@@ -193,6 +201,7 @@ dependencies {
     implementation libs.bundles.billing
     implementation libs.bundles.coroutines
     implementation libs.bundles.firebase
+    implementation libs.bundles.fragment
     implementation libs.bundles.hilt
     implementation libs.bundles.lifecycle
     implementation libs.bundles.lottie
@@ -223,9 +232,6 @@ dependencies {
     implementation libs.core.ktx
     implementation libs.device.names
     implementation libs.flexbox
-    implementation libs.fragment.ktx
-    implementation libs.glide
-    implementation libs.glide.okhttp
     implementation libs.guava
     implementation libs.material
     implementation libs.material.dialogs
@@ -247,7 +253,6 @@ dependencies {
     implementation libs.viewpager
 
     ksp libs.moshi.kotlin.codegen
-    ksp libs.glide.compiler
     ksp libs.showkase.processor
     ksp libs.hilt.compiler
     ksp libs.dagger.hilt.compiler

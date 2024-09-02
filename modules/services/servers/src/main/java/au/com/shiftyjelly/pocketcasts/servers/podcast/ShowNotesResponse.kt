@@ -4,6 +4,11 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
+data class ShowNotesLocationResponse(
+    @Json(name = "url") val url: String,
+)
+
+@JsonClass(generateAdapter = true)
 data class ShowNotesResponse(
     @Json(name = "podcast") val podcast: ShowNotesPodcast?,
 ) {

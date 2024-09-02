@@ -4,7 +4,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.concurrent.TimeUnit
@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class EpisodeSearchHandler @Inject constructor(
     settings: Settings,
-    private val cacheServerManager: PodcastCacheServerManagerImpl,
+    private val cacheServiceManager: PodcastCacheServiceManagerImpl,
     private val analyticsTracker: AnalyticsTracker,
 ) : SearchHandler<BaseEpisode>() {
     private val searchDebounce = settings.getEpisodeSearchDebounceMs()
@@ -28,7 +28,7 @@ class EpisodeSearchHandler @Inject constructor(
             }
         }.switchMapSingle { searchTerm ->
             if (searchTerm.length > 2) {
-                cacheServerManager.searchEpisodes(podcastUuid, searchTerm)
+                cacheServiceManager.searchEpisodes(podcastUuid, searchTerm)
                     .map { SearchResult(searchTerm, it) }
                     .onErrorReturnItem(noSearchResult)
             } else {

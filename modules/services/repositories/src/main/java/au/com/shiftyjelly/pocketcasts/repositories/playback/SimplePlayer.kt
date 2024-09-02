@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
-import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -9,22 +8,15 @@ import android.view.SurfaceView
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.media3.common.C
-import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.extractor.DefaultExtractorsFactory
-import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.media3.ui.WearUnsuitableOutputPlaybackSuppressionResolverListener
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -32,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -42,7 +33,7 @@ class SimplePlayer(
     val settings: Settings,
     val statsManager: StatsManager,
     val context: Context,
-    private val exoPlayerHelper: ExoPlayerHelper,
+    private val dataSourceFactory: ExoPlayerDataSourceFactory,
     override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
 ) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
@@ -249,68 +240,16 @@ class SimplePlayer(
 
         addVideoListener(player)
 
-        val httpDataSourceFactory = exoPlayerHelper.getDataSourceFactory()
-        val dataSourceFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
-        val extractorsFactory = DefaultExtractorsFactory()
-            .setConstantBitrateSeekingEnabled(true)
-        if (settings.prioritizeSeekAccuracy.value) {
-            extractorsFactory.setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
+        val episodeLocation = episodeLocation
+        if (episodeLocation == null) {
+            onError(PlayerEvent.PlayerError("No episode location found"))
+            return
         }
-        val location = episodeLocation
-        if (location == null) {
+        val source = dataSourceFactory.createMediaSource(episodeLocation)
+        if (source == null) {
             onError(PlayerEvent.PlayerError("Episode has no source"))
             return
         }
-
-        val uri: Uri = when (location) {
-            is EpisodeLocation.Stream -> {
-                if (location.uri != null) {
-                    Uri.parse(location.uri)
-                } else {
-                    onError(PlayerEvent.PlayerError("Stream has no uri"))
-                    return
-                }
-            }
-            is EpisodeLocation.Downloaded -> {
-                val filePath = location.filePath
-                if (filePath != null) {
-                    Uri.fromFile(File(filePath))
-                } else {
-                    onError(PlayerEvent.PlayerError("File has no file path"))
-                    return
-                }
-            }
-        } ?: return
-
-        val sourceFactory = exoPlayerHelper.getSimpleCache()?.let { cache ->
-            if (location is EpisodeLocation.Stream &&
-                !isDownloading &&
-                settings.cacheEntirePlayingEpisode.value
-            ) {
-                val cacheDataSourceFactory = CacheDataSource.Factory()
-                    .setUpstreamDataSourceFactory(httpDataSourceFactory)
-                    .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-                    .setCache(cache)
-                    .setCacheWriteDataSinkFactory(null) // Disable on-the-fly caching
-
-                CacheWorker.startCachingEntireEpisode(context, location.uri, episodeUuid)
-
-                cacheDataSourceFactory
-            } else {
-                dataSourceFactory
-            }
-        } ?: dataSourceFactory
-
-        val mediaItem = MediaItem.Builder()
-            .setUri(uri)
-            .setCustomCacheKey(episodeUuid)
-            .build()
-
-        val source = if (isHLS) {
-            HlsMediaSource.Factory(sourceFactory)
-        } else {
-            ProgressiveMediaSource.Factory(sourceFactory, extractorsFactory)
-        }.createMediaSource(mediaItem)
 
         player.setMediaSource(source)
         player.prepare()

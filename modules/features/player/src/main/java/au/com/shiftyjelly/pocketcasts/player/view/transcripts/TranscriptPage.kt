@@ -52,10 +52,11 @@ import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomMenuItemOption
 import au.com.shiftyjelly.pocketcasts.compose.toolbars.textselection.CustomTextToolbar
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
-import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.ScrollToHighlightedTextOffset
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptColors
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.TranscriptFontFamily
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.bottomPadding
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptDefaults.scrollToHighlightedTextOffset
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel.SearchUiState
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.DisplayItem
@@ -82,7 +83,7 @@ fun TranscriptPage(
     val searchState = searchViewModel.searchState.collectAsStateWithLifecycle()
     val refreshing = transcriptViewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(refreshing.value, {
-        transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, forceRefresh = true)
+        transcriptViewModel.parseAndLoadTranscript(isTranscriptViewOpen = true, pulledToRefresh = true)
     })
     val playerBackgroundColor = Color(theme.playerBackgroundColor(uiState.value.podcastAndEpisode?.podcast))
     val colors = TranscriptColors(playerBackgroundColor)
@@ -129,7 +130,7 @@ fun TranscriptPage(
                     onRetry = {
                         transcriptViewModel.parseAndLoadTranscript(
                             isTranscriptViewOpen = true,
-                            forceRefresh = true,
+                            retryOnFail = true,
                         )
                     },
                     colors = colors,
@@ -139,14 +140,14 @@ fun TranscriptPage(
         }
     }
 
-    LaunchedEffect(uiState.value.transcript?.episodeUuid + transitionState.value) {
+    LaunchedEffect(uiState.value.transcript?.episodeUuid, uiState.value.transcript?.type, transitionState.value) {
         transcriptViewModel.parseAndLoadTranscript(transitionState.value is TransitionState.OpenTranscript)
     }
 
     if (uiState.value is UiState.TranscriptLoaded) {
         val state = uiState.value as UiState.TranscriptLoaded
         LaunchedEffect(state.displayInfo.text) {
-            searchViewModel.setSearchSourceText(state.displayInfo.text)
+            searchViewModel.setSearchInput(state.displayInfo.text, state.podcastAndEpisode)
         }
     }
 }
@@ -257,6 +258,7 @@ private fun ScrollableTranscriptView(
     // Scroll to highlighted text
     if (searchState.searchResultIndices.isNotEmpty()) {
         val density = LocalDensity.current
+        val scrollToHighlightedTextOffset = density.run { scrollToHighlightedTextOffset().roundToPx() }
         LaunchedEffect(searchState.searchTerm, searchState.currentSearchIndex) {
             val displayItems = state.displayInfo.items
             val targetSearchResultIndexIndex = searchState.searchResultIndices[searchState.currentSearchIndex]
@@ -265,7 +267,7 @@ private fun ScrollableTranscriptView(
             }?.let { displayItemWithCurrentSearchText ->
                 scrollState.animateScrollToItem(
                     displayItems.indexOf(displayItemWithCurrentSearchText),
-                    scrollOffset = -(density.run { ScrollToHighlightedTextOffset.roundToPx() }),
+                    scrollOffset = -scrollToHighlightedTextOffset,
                 )
             }
         }
@@ -282,11 +284,19 @@ private fun TranscriptItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp)
-            .padding(bottom = 16.dp),
+            .padding(bottom = if (item.isSpeaker) 8.dp else 16.dp)
+            .padding(top = if (item.isSpeaker) 16.dp else 0.dp),
     ) {
         Text(
             text = buildAnnotatedString {
                 withStyle(defaultTextStyle) { append(item.text) }
+                if (item.isSpeaker) {
+                    addStyle(
+                        style = defaultTextStyle.copy(fontSize = 12.sp),
+                        start = 0,
+                        end = item.text.length,
+                    )
+                }
                 if (searchState.searchTerm.isNotEmpty()) {
                     // Highlight search occurrences
                     searchState.searchResultIndices
@@ -297,9 +307,10 @@ private fun TranscriptItem(
                             } else {
                                 TranscriptDefaults.SearchOccurrenceDefaultSpanStyle
                             }
+
                             val start = searchResultIndex - item.startIndex
                             addStyle(
-                                style = style,
+                                style = if (item.isSpeaker) style.copy(fontSize = 12.sp) else style,
                                 start = start,
                                 end = start + searchState.searchTerm.length,
                             )
@@ -376,24 +387,26 @@ private fun TranscriptContentPreview(
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
                 ),
-                cuesWithTimingSubtitle =
-                ImmutableList.of(
-                    CuesWithTiming(
-                        ImmutableList.of(
-                            Cue.Builder().setText(
-                                "Lorem ipsum odor amet, consectetuer adipiscing elit. Sodales sem fusce elementum commodo risus purus auctor neque. Maecenas fermentum senectus penatibus senectus integer per vulputate tellus sed.",
-                            ).build(),
+                cuesInfo = ImmutableList.of(
+                    TranscriptCuesInfo(
+                        CuesWithTiming(
+                            ImmutableList.of(
+                                Cue.Builder().setText(
+                                    "Speaker 1",
+                                ).build(),
+                            ),
+                            0,
+                            0,
                         ),
-                        0,
-                        0,
                     ),
                 ),
                 displayInfo = DisplayInfo(
                     text = "",
                     items = listOf(
-                        DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", 0, 52),
-                        DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", 53, 114),
-                        DisplayItem("Maecenas fermentum senectus penatibus tenectus integer per vulputate tellus ted.", 115, 195),
+                        DisplayItem("Speaker 1", true, 0, 8),
+                        DisplayItem("Lorem ipsum odor amet, consectetuer adipiscing elit.", false, 0, 52),
+                        DisplayItem("Sodales sem fusce elementum commodo risus purus auctor neque.", false, 53, 114),
+                        DisplayItem("Maecenas fermentum senectus penatibus tenectus integer per vulputate tellus ted.", false, 115, 195),
                     ),
                 ),
             ),
@@ -417,7 +430,7 @@ private fun TranscriptEmptyContentPreview() {
                     type = TranscriptFormat.HTML.mimeType,
                     url = "url",
                 ),
-                cuesWithTimingSubtitle = emptyList(),
+                cuesInfo = emptyList(),
                 displayInfo = DisplayInfo(
                     text = "",
                     items = emptyList(),

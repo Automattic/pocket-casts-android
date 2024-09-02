@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.Moshi
@@ -46,26 +47,26 @@ data class AnonymousBumpStat(
         const val uuidValue = "ANONYMOUS"
     }
 
-    class CustomEventPropsTypeConverter {
-
-        private val moshi = Moshi.Builder()
-            .build()
-            .adapter<Map<String, Any>>(
-                Types.newParameterizedType(
-                    Map::class.java,
-                    String::class.java,
-                    Any::class.java,
-                ),
-            )
+    @ProvidedTypeConverter
+    class CustomEventPropsTypeConverter(
+        moshi: Moshi,
+    ) {
+        private val adapter = moshi.adapter<Map<String, Any>>(
+            Types.newParameterizedType(
+                Map::class.java,
+                String::class.java,
+                Any::class.java,
+            ),
+        )
 
         @TypeConverter
         fun toCustomEventProps(value: String?): Map<String, Any>? =
             value?.let {
-                moshi.fromJson(it)
+                adapter.fromJson(it)
             }
 
         @TypeConverter
-        fun toJsonString(value: Map<String, Any>?): String? = moshi.toJson(value)
+        fun toJsonString(value: Map<String, Any>?): String? = adapter.toJson(value)
     }
 
     object Adapter {

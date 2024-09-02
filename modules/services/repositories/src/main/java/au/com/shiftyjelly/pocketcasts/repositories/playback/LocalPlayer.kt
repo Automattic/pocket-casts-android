@@ -26,18 +26,19 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
     private var seekingToPositionMs: Int = 0
     private var seekRetryAllowed: Boolean = false
 
-    protected var isHLS: Boolean = false
+    protected var episodeLocation: EpisodeLocation? = null
 
-    override var episodeUuid: String? = null
+    private val episode get() = episodeLocation?.episode
 
-    override var episodeLocation: EpisodeLocation? = null
+    override val episodeUuid: String? get() = episode?.uuid
+
+    override val isDownloading: Boolean get() = episode?.isDownloaded == true
+
     override val url: String?
         get() = (episodeLocation as? EpisodeLocation.Stream)?.uri
 
-    override var isDownloading: Boolean = false
-
     override val filePath: String?
-        get() = (episodeLocation as? EpisodeLocation.Downloaded)?.filePath
+        get() = (episodeLocation as? EpisodeLocation.Downloaded)?.uri
 
     override val isRemote: Boolean
         get() = false
@@ -185,14 +186,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
     }
 
     override fun setEpisode(episode: BaseEpisode) {
-        this.episodeUuid = episode.uuid
-        this.isHLS = episode.isHLS
-        this.isDownloading = episode.isDownloading
-        episodeLocation = if (episode.isDownloaded) {
-            EpisodeLocation.Downloaded(episode.downloadedFilePath)
-        } else {
-            EpisodeLocation.Stream(episode.downloadUrl)
-        }
+        episodeLocation = EpisodeLocation.create(episode)
     }
 
     override suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects) {}

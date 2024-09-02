@@ -8,10 +8,14 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCardsState
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeLayout
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -21,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +44,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
+    private val experimentProvider: ExperimentProvider,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(app) {
 
@@ -94,6 +101,21 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         val showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS
 
+        val upgradeLayout = when {
+            showPatronOnly -> UpgradeLayout.Original
+            FeatureFlag.isEnabled(Feature.PAYWALL_AB_EXPERIMENT) -> UpgradeLayout.Reviews
+            FeatureFlag.isEnabled(Feature.PAYWALL_AA_EXPERIMENT) -> {
+                val variation = experimentProvider.getVariation(Experiment.PaywallAATest)
+                // For the A/A test show the same layout for both variations
+                if (variation == Variation.Control) {
+                    UpgradeLayout.Original
+                } else {
+                    UpgradeLayout.Original
+                }
+            }
+            else -> UpgradeLayout.Original
+        }
+
         selectedSubscription?.let {
             val currentSubscriptionFrequency = selectedSubscription.recurringPricingPhase.toSubscriptionFrequency()
             val currentTier = SubscriptionMapper.mapProductIdToTier(selectedSubscription.productDetails.productId)
@@ -109,6 +131,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     currentFeatureCard = currentFeatureCard,
                     currentSubscriptionFrequency = currentSubscriptionFrequency,
                     showNotNow = showNotNow,
+                    upgradeLayout = upgradeLayout,
                 )
             }
         } ?: _state.update { // In ideal world, we should never get here
@@ -252,6 +275,7 @@ sealed class OnboardingUpgradeFeaturesState {
         val currentSubscription: Subscription,
         val purchaseFailed: Boolean = false,
         val showNotNow: Boolean,
+        val upgradeLayout: UpgradeLayout,
     ) : OnboardingUpgradeFeaturesState() {
         val subscriptionFrequencies =
             listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)

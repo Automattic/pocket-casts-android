@@ -19,42 +19,42 @@
 aboutlibraries = "11.2.1"
 # Android Gradle Plugin - https://developer.android.com/studio/releases/gradle-plugin
 android-application = "8.5.2"
-billing = "6.0.1"
+billing = "7.0.0"
 coil = "2.5.0"
 compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.android.com/jetpack/compose/bom/bom-mapping
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
-compose-kotlin-compiler = "1.5.9"
+compose-kotlin-compiler = "1.5.14"
 dependency-analysis = "1.28.0"
-espresso = "3.4.0"
+espresso = "3.6.1"
 firebase = "30.5.0"
-glance = "1.0.0"
-glide = "4.13.2"
+fragment = "1.8.2"
+glance = "1.1.0"
 google-services = "4.3.14"
-hilt = "2.51"
+hilt = "2.52"
 hilt-compiler = "1.2.0"
 horologist = "0.5.26"
-kotlin = "1.9.22"
+kotlin = "1.9.24"
 kotlin-coroutines = "1.8.1-Beta"
 ktlint = "0.50.0"
-ksp = "1.9.22-1.0.17"
-lifecycle = "2.6.0"
-lottie = "6.3.0"
-media3 = "1.4.0"
+ksp = "1.9.24-1.0.20"
+lifecycle = "2.8.4"
+lottie = "6.5.0"
+media3 = "1.4.1"
 mockito = "5.2.0"
 mockito-android = "5.12.0"
-moshi = "1.13.0"
-navigation = "2.5.1"
+moshi = "1.15.1"
+navigation = "2.7.7"
 okhttp = "4.12.0"
-protobuf = "3.23.4"
+protobuf = "4.28.0"
 protobuf-plugin = "0.9.4"
-retrofit = "2.9.0"
-room = "2.5.1"
+retrofit = "2.11.0"
+room = "2.6.1"
 sentry-plugin = "4.5.1"
 showkase = "1.0.2"
 test = "1.6.1"
 tracks = "5.1.2"
-wear-compose = "1.3.0"
+wear-compose = "1.3.1"
 work = "2.8.1"
 java = "17"
 tasker-plugin = "0.4.10"
@@ -117,10 +117,9 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 firebase-config = { module = "com.google.firebase:firebase-config-ktx" }
 
-# Glide
-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
-glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
-glide-okhttp = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
+# Fragments
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragment" }
 
 # Google Play Services OSS Licenses - (The following line is still needed as there is no plugin marker available as of yet)
 ossLicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.5"
@@ -243,7 +242,7 @@ annotation = "androidx.annotation:annotation:1.3.0"
 appcompat = "androidx.appcompat:appcompat:1.5.0"
 arch-core = "androidx.arch.core:core-testing:2.2.0"
 auth = "com.google.android.gms:play-services-auth:20.4.0"
-barista = "com.adevinta.android:barista:4.2.0"
+barista = "com.adevinta.android:barista:4.3.0"
 browser = "androidx.browser:browser:1.4.0"
 browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
 capturable = "dev.shreyaspatil:capturable:2.1.0"
@@ -255,9 +254,9 @@ core-ktx = "androidx.core:core-ktx:1.10.1"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
 device-names = "com.jaredrummler:android-device-names:2.1.0"
 encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
+engage = "com.google.android.engage:engage-core:1.5.4"
 ffmpeg = "com.arthenica:ffmpeg-kit-full:6.0-2"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
-fragment-ktx = "androidx.fragment:fragment-ktx:1.5.2"
 guava = "com.google.guava:guava:33.1.0-android" # Required to fix conflict between versions in exoplayer and workmanager
 jsonassert = "org.skyscreamer:jsonassert:1.5.0"
 junit = "junit:junit:4.13.2"
@@ -271,12 +270,12 @@ oss-licenses = "com.google.android.gms:play-services-oss-licenses:17.0.0"
 palette = "androidx.palette:palette:1.0.0"
 play-review = "com.google.android.play:review-ktx:2.0.1"
 play-services-wearable = "com.google.android.gms:play-services-wearable:18.0.0"
-preference = "androidx.preference:preference:1.2.0"
-preference-ktx = "androidx.preference:preference-ktx:1.2.0"
+preference = "androidx.preference:preference:1.2.1"
+preference-ktx = "androidx.preference:preference-ktx:1.2.1"
 recyclerview = "androidx.recyclerview:recyclerview:1.3.0"
 swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
-turbine = "app.cash.turbine:turbine:0.12.1"
+turbine = "app.cash.turbine:turbine:1.1.0"
 uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
 viewpager = "androidx.viewpager2:viewpager2:1.0.0"
 wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
@@ -328,6 +327,11 @@ firebase = [
     "firebase-config"
 ]
 
+fragment = [
+    "fragment-ktx",
+    "fragment-compose"
+]
+
 hilt = [
     "hilt-android",
     "hilt-navigation-compose",
@@ -367,6 +371,7 @@ lottie = [
 media3 = [
     "media3-cast",
     "media3-datasource",
+    "media3-datasource-okhttp",
     "media3-exoplayer",
     "media3-exoplayer-hls",
     "media3-extractor",

@@ -6,7 +6,6 @@ import androidx.annotation.OptIn
 import androidx.hilt.work.HiltWorker
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSpec
-import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.CacheWriter
 import androidx.work.Constraints
 import androidx.work.Data
@@ -25,7 +24,7 @@ import timber.log.Timber
 class CacheWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
-    private val exoPlayerHelper: ExoPlayerHelper,
+    private val sourceFactory: ExoPlayerDataSourceFactory,
 ) : Worker(context, params) {
     private var cacheWriter: CacheWriter? = null
     private val episodeUuid get() = inputData.getString(EPISODE_UUID_KEY)
@@ -39,15 +38,9 @@ class CacheWorker @AssistedInject constructor(
             }
             val uri = Uri.parse(downloadUrl)
 
-            val dataSourceFactory = exoPlayerHelper.getDataSourceFactory()
             val dataSpec = DataSpec(uri).buildUpon().setKey(episodeUuid).build()
 
-            val cacheDataSourceFactory = CacheDataSource.Factory()
-                .setUpstreamDataSourceFactory(dataSourceFactory)
-                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-            exoPlayerHelper.getSimpleCache()?.let {
-                cacheDataSourceFactory.setCache(it)
-            }
+            val cacheDataSourceFactory = sourceFactory.cacheFactory
 
             cacheWriter = CacheWriter(
                 cacheDataSourceFactory.createDataSource(),

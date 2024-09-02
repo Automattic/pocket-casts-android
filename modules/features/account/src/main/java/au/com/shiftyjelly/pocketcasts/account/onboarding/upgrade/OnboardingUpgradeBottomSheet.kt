@@ -205,7 +205,7 @@ fun OnboardingUpgradeBottomSheet(
 
             UpgradeRowButton(
                 primaryText = selectedTier.toSubscribeButton(resources),
-                backgroundColor = colorResource(state.upgradeButton.backgroundColorRes),
+                gradientBackgroundColor = state.upgradeButton.gradientBackgroundColor,
                 textColor = colorResource(state.upgradeButton.textColorRes),
                 onClick = onClickSubscribe,
             )
@@ -217,6 +217,8 @@ fun OnboardingUpgradeBottomSheet(
             color = Color.White,
             textAlign = TextAlign.Center,
         )
+
+        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -258,13 +260,13 @@ private fun recurringAfterIntroString(
     "${recurringSubscriptionPricingPhase.formattedPrice} ${res.getString(LR.string.onboarding_plus_recurring_after_intro_offer_sufix)} (${offerSubscriptionPricingPhase.offerEnd()})"
 
 fun SubscriptionTier.toSubscribeTitle() = when (this) {
-    SubscriptionTier.PLUS -> R.string.onboarding_plus_subscribe
+    SubscriptionTier.PLUS -> R.string.onboarding_subscribe_to_plus
     SubscriptionTier.PATRON -> R.string.onboarding_patron_subscribe
     SubscriptionTier.UNKNOWN -> throw IllegalStateException(UNKNOWN_TIER)
 }
 fun SubscriptionTier.toSubscribeButton(res: Resources) =
     res.getString(
-        LR.string.upgrade_to,
+        LR.string.subscribe_to,
         when (this) {
             SubscriptionTier.PATRON -> res.getString(LR.string.pocket_casts_patron_short)
             SubscriptionTier.PLUS -> res.getString(LR.string.pocket_casts_plus_short)

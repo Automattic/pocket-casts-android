@@ -7,7 +7,7 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -19,7 +19,7 @@ import timber.log.Timber
 class UpdateEpisodeTask @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
-    val podcastCacheServerManager: PodcastCacheServerManager,
+    val podcastCacheServiceManager: PodcastCacheServiceManager,
     val appDatabase: AppDatabase,
 ) : CoroutineWorker(context, params) {
     companion object {
@@ -44,7 +44,7 @@ class UpdateEpisodeTask @AssistedInject constructor(
                 return Result.success()
             }
 
-            val serverPodcast = podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid)
+            val serverPodcast = podcastCacheServiceManager.getPodcastAndEpisode(podcastUuid, episodeUuid)
 
             val episode = episodeDao.findByUuid(episodeUuid)
             val serverEpisodeUrl = serverPodcast.episodes.firstOrNull()?.downloadUrl

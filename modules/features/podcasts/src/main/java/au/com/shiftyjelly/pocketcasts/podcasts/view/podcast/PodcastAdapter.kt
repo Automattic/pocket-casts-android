@@ -270,7 +270,7 @@ class PodcastAdapter(
         }
 
         val imageView = holder.binding.top.artwork
-        // stopping the artwork flickering when Glide reloads the image
+        // stopping the artwork flickering when the image is reloaded
         if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
             holder.lastImagePodcastUuid = podcast.uuid
             imageRequestFactory.create(podcast).loadInto(imageView)

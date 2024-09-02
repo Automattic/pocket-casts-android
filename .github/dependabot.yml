@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    open-pull-requests-limit: 6
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "[Type] Tech Debt"
+      - "[Area] Dependencies"
+    ignore:
+      # Automattic libraries have a custom versioning scheme which doesn't work with Dependabot.
+      - dependency-name: "com.automattic:Automattic-Tracks-Android"
+      - dependency-name: "com.automattic:encryptedlogging"
+      - dependency-name: "com.automattic.tracks:crashlogging"
+      - dependency-name: "com.automattic.android.measure-builds"

@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncoming
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -33,7 +33,7 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
 
     @Inject lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var serviceManager: ServiceManager
 
     @Inject lateinit var settings: Settings
 
@@ -43,15 +43,22 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
 
     companion object {
         const val EXTRA_URL = "EXTRA_URL"
+        const val EXTRA_SOURCE = "EXTRA_SOURCE"
 
-        fun newInstance(listPath: String): ShareListIncomingFragment {
+        fun newInstance(
+            listPath: String,
+            sourceView: SourceView = SourceView.UNKNOWN,
+        ): ShareListIncomingFragment {
             return ShareListIncomingFragment().apply {
                 arguments = bundleOf(
                     EXTRA_URL to listPath,
+                    EXTRA_SOURCE to sourceView.analyticsValue,
                 )
             }
         }
     }
+
+    val source get() = SourceView.fromString(arguments?.getString(EXTRA_SOURCE))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,7 +120,7 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
         }
 
         if (!viewModel.isFragmentChangingConfigurations) {
-            viewModel.trackShareEvent(AnalyticsEvent.INCOMING_SHARE_LIST_SHOWN)
+            viewModel.trackShareEvent(AnalyticsEvent.INCOMING_SHARE_LIST_SHOWN, mapOf("source" to source.analyticsValue))
         }
     }
 

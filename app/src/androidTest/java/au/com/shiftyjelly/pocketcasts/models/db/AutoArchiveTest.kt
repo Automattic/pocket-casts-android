@@ -6,6 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -23,7 +25,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import com.squareup.moshi.Moshi
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -48,7 +51,7 @@ class AutoArchiveTest {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val fileStorage = mock<FileStorage> {}
     val downloadManager = mock<DownloadManager> {}
-    val podcastCacheServerManager = mock<PodcastCacheServerManager> {}
+    val podcastCacheServiceManager = mock<PodcastCacheServiceManager> {}
     val userEpisodeManager = mock<UserEpisodeManager> {}
     val episodeAnalytics = EpisodeAnalytics(mock())
 
@@ -58,7 +61,9 @@ class AutoArchiveTest {
     @Before
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
         episodeDao = testDb.episodeDao()
     }
 
@@ -85,7 +90,7 @@ class AutoArchiveTest {
             downloadManager = downloadManager,
             context = context,
             appDatabase = db,
-            podcastCacheServerManager = podcastCacheServerManager,
+            podcastCacheServiceManager = podcastCacheServiceManager,
             userEpisodeManager = userEpisodeManager,
             ioDispatcher = testDispatcher,
             episodeAnalytics = episodeAnalytics,

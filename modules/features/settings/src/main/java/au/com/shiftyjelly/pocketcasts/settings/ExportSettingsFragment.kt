@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ExportSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class ExportSettingsFragment : PreferenceFragmentCompat() {
 
-    @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var serviceManager: ServiceManager
 
     @Inject lateinit var settings: Settings
 
@@ -97,7 +97,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
             viewModel.onExportByEmail()
             exporter = OpmlExporter(
                 fragment = this@ExportSettingsFragment,
-                serverManager = serverManager,
+                serviceManager = serviceManager,
                 podcastManager = podcastManager,
                 syncManager = syncManager,
                 context = activity,
@@ -113,7 +113,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
             viewModel.onExportFile()
             exporter = OpmlExporter(
                 fragment = this@ExportSettingsFragment,
-                serverManager = serverManager,
+                serviceManager = serviceManager,
                 podcastManager = podcastManager,
                 syncManager = syncManager,
                 context = activity,

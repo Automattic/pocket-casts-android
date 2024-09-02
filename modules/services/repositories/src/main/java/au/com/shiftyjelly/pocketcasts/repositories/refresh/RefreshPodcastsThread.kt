@@ -45,9 +45,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerResponseException
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -76,13 +76,13 @@ class RefreshPodcastsThread(
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface RefreshPodcastsThreadEntryPoint {
-        fun serverManager(): ServerManager
+        fun serviceManager(): ServiceManager
         fun podcastManager(): PodcastManager
         fun playlistManager(): PlaylistManager
         fun bookmarkManager(): BookmarkManager
         fun statsManager(): StatsManager
         fun fileStorage(): FileStorage
-        fun podcastCacheServerManager(): PodcastCacheServerManagerImpl
+        fun podcastCacheServiceManager(): PodcastCacheServiceManagerImpl
         fun userEpisodeManager(): UserEpisodeManager
         fun subscriptionManager(): SubscriptionManager
         fun folderManager(): FolderManager
@@ -170,10 +170,10 @@ class RefreshPodcastsThread(
     private fun refresh() {
         val entryPoint = getEntryPoint()
         val podcastManager = entryPoint.podcastManager()
-        val serverManager = entryPoint.serverManager()
+        val serviceManager = entryPoint.serviceManager()
         val podcasts = podcastManager.findSubscribed()
         val startTime = SystemClock.elapsedRealtime()
-        runBlocking { serverManager.refreshPodcastsSync(podcasts) }
+        runBlocking { serviceManager.refreshPodcastsSync(podcasts) }
             .onSuccess { response ->
                 val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
@@ -252,7 +252,7 @@ class RefreshPodcastsThread(
             statsManager = entryPoint.statsManager(),
             fileStorage = entryPoint.fileStorage(),
             playbackManager = playbackManager,
-            podcastCacheServerManager = entryPoint.podcastCacheServerManager(),
+            podcastCacheServiceManager = entryPoint.podcastCacheServiceManager(),
             userEpisodeManager = entryPoint.userEpisodeManager(),
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
@@ -477,6 +477,7 @@ class RefreshPodcastsThread(
                 episodeUuid = episode.uuid,
                 podcastUuid = podcast.uuid,
                 sourceView = EpisodeViewSource.NOTIFICATION.value,
+                autoPlay = false,
             ).toIntent(context).apply {
                 action = action + System.currentTimeMillis() + intentId
             }

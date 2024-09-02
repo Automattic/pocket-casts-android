@@ -34,9 +34,6 @@ class EpisodeManagerImplTest {
     @Mock
     lateinit var episodeDao: EpisodeDao
 
-    @Mock
-    lateinit var episode: PodcastEpisode
-
     private lateinit var episodeManagerImpl: EpisodeManagerImpl
 
     @Before
@@ -48,7 +45,7 @@ class EpisodeManagerImplTest {
             fileStorage = mock(),
             downloadManager = mock(),
             context = mock(),
-            podcastCacheServerManager = mock(),
+            podcastCacheServiceManager = mock(),
             userEpisodeManager = mock(),
             ioDispatcher = mock(),
             episodeAnalytics = mock(),
@@ -67,7 +64,7 @@ class EpisodeManagerImplTest {
                 assertEquals(episode to index, awaitItem())
             }
 
-            expectNoEvents()
+            awaitComplete()
         }
 
         verify(episodeDao).getAllPodcastEpisodes(10, 0)

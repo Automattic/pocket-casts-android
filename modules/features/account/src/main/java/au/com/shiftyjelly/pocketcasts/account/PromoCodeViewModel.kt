@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Single
@@ -23,6 +24,7 @@ import retrofit2.HttpException
 class PromoCodeViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val subscriptionManager: SubscriptionManager,
+    private val moshi: Moshi,
 ) : ViewModel() {
     sealed class ViewState {
         object Loading : ViewState()
@@ -76,7 +78,7 @@ class PromoCodeViewModel @Inject constructor(
         return Function {
             when (it) {
                 is HttpException -> {
-                    val errorResponse = it.parseErrorResponse()
+                    val errorResponse = it.parseErrorResponse(moshi)
                     var message = errorResponse?.messageLocalized(resources) ?: "Unknown error"
                     if (it.code() == 404) {
                         message = if (isSignedIn) {

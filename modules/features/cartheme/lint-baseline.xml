@@ -13,17 +13,6 @@
     </issue>
 
     <issue
-        id="PrivateResource"
-        message="The resource `@layout/preference_dialog_edittext` is marked as private in androidx.preference:preference:1.2.0"
-        errorLine1="        &lt;item name=&quot;android:dialogLayout&quot;>@layout/preference_dialog_edittext&lt;/item>"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/styles.xml"
-            line="644"
-            column="43"/>
-    </issue>
-
-    <issue
         id="ObsoleteSdkInt"
         message="This folder configuration (`v24`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `layout`.">
         <location
