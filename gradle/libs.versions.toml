@@ -37,7 +37,7 @@ horologist = "0.5.26"
 kotlin = "2.0.20"
 kotlin-coroutines = "1.8.1-Beta"
 ktlint = "0.50.0"
-ksp = "1.9.24-1.0.20"
+ksp = "2.0.20-1.0.24"
 lifecycle = "2.8.4"
 lottie = "6.5.0"
 media3 = "1.4.1"
@@ -449,3 +449,4 @@ measure-builds = "com.automattic.android.measure-builds:3.0.0"
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 spotless = "com.diffplug.spotless:6.23.3"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

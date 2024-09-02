@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.sentry)
     alias(libs.plugins.aboutlibraries)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.compose.compiler)
 }
 
 apply(from = "../base.gradle")
