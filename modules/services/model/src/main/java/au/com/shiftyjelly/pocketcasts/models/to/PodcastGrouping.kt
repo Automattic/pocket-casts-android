@@ -5,7 +5,6 @@ import android.content.res.Resources
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping.Season.getSeasonGroupId
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -13,7 +12,7 @@ sealed class PodcastGrouping(
     @StringRes val groupName: Int,
     val index: Int,
     val serverId: Int,
-    val sortFunction: ((PodcastEpisode) -> Int)?,
+    var sortFunction: ((PodcastEpisode) -> Int)?,
 ) {
     companion object {
         val All
@@ -75,9 +74,14 @@ sealed class PodcastGrouping(
         groupName = LR.string.podcast_group_season,
         index = 3,
         serverId = 3,
-        sortFunction = { getSeasonGroupId(it) },
+        sortFunction = null,
     ) {
         lateinit var groupTitlesList: List<String>
+
+        init {
+            sortFunction = { getSeasonGroupId(it) }
+        }
+
         override fun groupTitles(index: Int, context: Context): String {
             return groupTitlesList.getOrNull(index) ?: context.getString(LR.string.podcast_no_season)
         }
