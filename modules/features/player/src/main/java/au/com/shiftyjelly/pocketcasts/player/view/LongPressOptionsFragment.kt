@@ -41,6 +41,7 @@ class LongPressOptionsFragment : BaseDialogFragment() {
         return binding.root
     }
 
+    @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
