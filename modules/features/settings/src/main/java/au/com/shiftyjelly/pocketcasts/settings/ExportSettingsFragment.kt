@@ -135,6 +135,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
         startActivityForResult(Intent.createChooser(intent, getString(LR.string.settings_import_choose_file)), IMPORT_PICKER_REQUEST_CODE)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         val activity = activity
         if (activity == null || resultCode != Activity.RESULT_OK || resultData == null) {
