@@ -85,38 +85,31 @@ object OnboardingUpgradeHelper {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(backgroundColor, RoundedCornerShape(12.dp)),
+                .background(backgroundColor, RoundedCornerShape(12.dp))
+                .clickable(onClick = onClick)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center,
         ) {
-            Button(
-                onClick = onClick,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Transparent,
-                    contentColor = Color.Transparent,
-                ),
-                modifier = Modifier.fillMaxWidth(),
-                elevation = ButtonDefaults.elevation(0.dp),
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    AutoResizeText(
-                        text = primaryText,
-                        color = textColor,
-                        maxFontSize = 18.sp,
-                        lineHeight = 21.sp,
-                        fontWeight = fontWeight,
-                        maxLines = 1,
+                AutoResizeText(
+                    text = primaryText,
+                    color = textColor,
+                    maxFontSize = 18.sp,
+                    lineHeight = 21.sp,
+                    fontWeight = fontWeight,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                )
+                secondaryText?.let {
+                    TextP60(
+                        text = it,
                         textAlign = TextAlign.Center,
+                        color = textColor,
+                        modifier = Modifier.padding(top = 4.dp),
                     )
-                    secondaryText?.let {
-                        TextP60(
-                            text = it,
-                            textAlign = TextAlign.Center,
-                            color = textColor,
-                            modifier = Modifier.padding(top = 4.dp),
-                        )
-                    }
                 }
             }
         }
