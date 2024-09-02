@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-16 09:54:03+0000
+Translation-Revision-Date: 2024-08-29 12:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">使用 Pocket Casts Plus 解鎖獨家功能</string>
-    <string name="whats_new_new_rating_message">為你最愛的 Podcast 評分，讓創作者知道你有多喜歡他們的作品。 此外，你的評分也可以幫助其他人找到新的最愛節目！</string>
-    <string name="whats_new_new_rating_title">全新推出：Podcast 評分 🎉</string>
+    <string name="got_it">知道了</string>
+    <string name="onboarding_subscribe_to_plus">訂閱 Plus</string>
+    <string name="paywall_themes_content_description">其他佈景主題和圖示圖片</string>
+    <string name="paywall_themes_description">展現你最真實的色彩。 自家訂閱者的專屬圖示和佈景主題。</string>
+    <string name="paywall_themes_title">其他佈景主題和圖示</string>
+    <string name="paywall_storage_content_description">20 GB 圖片儲存空間</string>
+    <string name="paywall_storage_description">可將音訊檔案上傳至雲端儲存空間，隨時隨地使用。</string>
+    <string name="paywall_storage_title">20 GB 儲存空間</string>
+    <string name="paywall_slumber_studios_content_description">「Slumber Studios 伴你進入夢鄉」圖片</string>
+    <string name="paywall_slumber_studios_description">獲得 1 年份 Slumber Studios 的 Premium 版內容。</string>
+    <string name="paywall_slumber_studios_title">Slumber Studios 伴你進入夢鄉</string>
+    <string name="paywall_watch_content_description">「Apple Watch 和 Wear OS 播放」圖片</string>
+    <string name="paywall_watch_description">拋開手機出門跑步。</string>
+    <string name="paywall_watch_title">Apple Watch 和 Wear OS 播放</string>
+    <string name="paywall_bookmarks_content_description">「書籤」圖片</string>
+    <string name="paywall_bookmarks_description">儲存任何單集的最愛段落，方便返回聆聽。</string>
+    <string name="paywall_bookmarks_title">書籤</string>
+    <string name="paywall_folders_content_description">「資料夾」圖片</string>
+    <string name="paywall_folders_description">在資料夾中整理你的 Podcast，並在所有裝置間同步。</string>
+    <string name="paywall_folders_title">資料夾</string>
+    <string name="paywall_desktop_and_web_content_description">「桌面和網頁版應用程式」圖片</string>
+    <string name="paywall_desktop_and_web_description">使用我們的 Windows、macOS 和網頁版應用程式，在更多地方收聽。</string>
+    <string name="paywall_desktop_and_web_title">桌面和網頁版應用程式</string>
+    <string name="paywall_free_1_month_trial">1 個月免費試用。</string>
+    <string name="paywall_save_50_off">首年享五折優惠。</string>
+    <string name="error_transcript_failed_to_parse">不好意思，解析此逐字稿時發生錯誤。</string>
+    <string name="error_transcript_format_not_supported">不好意思，不支援此逐字稿格式：%s</string>
+    <string name="error_transcript_failed_to_load">不好意思，載入此逐字稿時發生錯誤。</string>
+    <string name="try_again">再試一次</string>
+    <string name="podcast_star_rating_content_description">Podcast 星級評分</string>
+    <string name="get_pocket_casts_plus">取得 Pocket Casts Plus</string>
+    <string name="share_end_seconds">片段結束秒數</string>
+    <string name="share_end_minutes">片段結束分鐘數</string>
+    <string name="share_end_hours">片段結束小時數</string>
+    <string name="share_start_seconds">片段開始秒數</string>
+    <string name="share_start_minutes">片段開始分鐘數</string>
+    <string name="share_start_hours">片段開始小時數</string>
+    <string name="share_end_position">結束</string>
+    <string name="share_start_position">開始</string>
+    <string name="share_clip_too_long_message">片段超過單集時間長度：%s</string>
+    <string name="share_invalid_clip_message">片段開始時間必須早於結束時間</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">解鎖 Pocket Casts Plus 的獨家功能</string>
     <string name="go_to_next">下一個</string>
     <string name="go_to_previous">上一個</string>
     <string name="share_error_message">無法分享。 請稍後再試。</string>
@@ -22,7 +61,6 @@ Language: zh_TW
     <string name="share_clip_duration">「%s」時間長度</string>
     <string name="share_clip_start_position">「%s」開始</string>
     <string name="transcript_empty">逐字稿沒有內容。</string>
-    <string name="star_rating_animation">星級評分動畫</string>
     <string name="share_link_clip">片段連結</string>
     <string name="swipe_affordance_icon">滑動操作暗示圖示</string>
     <string name="feedback_form_placeholder">我想要用於篩選單集的條件</string>
@@ -60,8 +98,6 @@ Language: zh_TW
     <string name="not_allowed_to_rate_title">請先聆聽此 Podcast</string>
     <string name="episode_cover_description">「%s」單集封面</string>
     <string name="podcast_share_clip_description">從 %2$d 至 %3$d 的片段建立「%1$s」單集</string>
-    <string name="error_transcript_format_not_supported">不支援逐字稿格式：%s</string>
-    <string name="error_transcript_failed_to_load">無法載入逐字稿</string>
     <string name="transcript">逐字稿</string>
     <string name="no_ratings">無評分</string>
     <string name="rate_button">評分</string>
@@ -140,7 +176,6 @@ Language: zh_TW
     <string name="discover_all_categories">所有類別</string>
     <string name="upgrade_to_patron">升級至 Patron</string>
     <string name="upgrade_to_plus">升級至 Plus</string>
-    <string name="whats_new_got_it_button">知道了</string>
     <string name="skip_chapters_patron_prompt">訂閱 Pocket Casts Patron，就能預先選取章節並享有更多功能</string>
     <string name="skip_chapters_plus_prompt">訂閱 Pocket Casts Plus，就能預先選取章節並享有更多功能</string>
     <string name="number_of_chapters_summary_singular">1 個章節 • %d 個章節已隱藏</string>

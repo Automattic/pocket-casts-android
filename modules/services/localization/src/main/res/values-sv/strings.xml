@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-16 09:54:03+0000
+Translation-Revision-Date: 2024-08-29 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="got_it">Uppfattat</string>
+    <string name="onboarding_subscribe_to_plus">Prenumerera på Plus</string>
+    <string name="paywall_themes_content_description">Extra teman och ikoner – bild</string>
+    <string name="paywall_themes_description">Välj dina egna färger. Exklusiva ikoner och teman för våra prenumeranter.</string>
+    <string name="paywall_themes_title">Extra teman och ikoner</string>
+    <string name="paywall_storage_content_description">20 GB lagringsutrymme – bild</string>
+    <string name="paywall_storage_description">Ladda upp dina ljudfiler till molnlagringen och ha dem tillgängliga överallt.</string>
+    <string name="paywall_storage_title">20 GB lagringsutrymme</string>
+    <string name="paywall_slumber_studios_content_description">Dröm med Slumber Studios – bild</string>
+    <string name="paywall_slumber_studios_description">Få 1 år av premiuminnehåll från Slumber Studios.</string>
+    <string name="paywall_slumber_studios_title">Dröm med Slumber Studios</string>
+    <string name="paywall_watch_content_description">Apple Watch- och Wear OS-uppspelning – bild</string>
+    <string name="paywall_watch_description">Lämna telefonen hemma och ta en löptur.</string>
+    <string name="paywall_watch_title">Apple Watch- och Wear OS-uppspelning</string>
+    <string name="paywall_bookmarks_content_description">Bokmärken – bild</string>
+    <string name="paywall_bookmarks_description">Spara dina favoritdelar från avsnitt och återkom till dem.</string>
+    <string name="paywall_bookmarks_title">Bokmärken</string>
+    <string name="paywall_folders_content_description">Mappar – bild</string>
+    <string name="paywall_folders_description">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
+    <string name="paywall_folders_title">Mappar</string>
+    <string name="paywall_desktop_and_web_content_description">Dator- och webbappar – bild</string>
+    <string name="paywall_desktop_and_web_description">Lyssna på fler platser med våra Windows-, macOS- och webbappar.</string>
+    <string name="paywall_desktop_and_web_title">Dator- och webbappar</string>
+    <string name="paywall_free_1_month_trial">Gratis provperiod på 1 månad.</string>
+    <string name="paywall_save_50_off">Få 50 % rabatt på ditt första år.</string>
+    <string name="error_transcript_failed_to_parse">Något gick tyvärr fel när kopian tolkades.</string>
+    <string name="error_transcript_format_not_supported">Formatet på kopian stöds tyvärr inte: %s</string>
+    <string name="error_transcript_failed_to_load">Något gick tyvärr fel när kopian laddades.</string>
+    <string name="try_again">Försök igen</string>
+    <string name="podcast_star_rating_content_description">Stjärnbetyg för podcast</string>
+    <string name="get_pocket_casts_plus">Få Pocket Casts Plus</string>
+    <string name="share_end_seconds">Klippets slutsekunder</string>
+    <string name="share_end_minutes">Klippets slutminuter</string>
+    <string name="share_end_hours">Klippets sluttimmar</string>
+    <string name="share_start_seconds">Klippets startsekunder</string>
+    <string name="share_start_minutes">Klippets startminuter</string>
+    <string name="share_start_hours">Klippets starttimmar</string>
+    <string name="share_end_position">Sluta</string>
+    <string name="share_start_position">Starta</string>
+    <string name="share_clip_too_long_message">Klippet är längre än avsnittet: %s</string>
+    <string name="share_invalid_clip_message">Klippets början måste vara före klippets slut</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Lås upp exklusiva funktioner med Pocket Casts Plus</string>
-    <string name="whats_new_new_rating_message">Betygsätt dina favoritpodcasts och låt kreatörerna få veta hur mycket du uppskattar deras arbete. Dina betyg hjälper dessutom andra att hitta nya favoritshower.</string>
-    <string name="whats_new_new_rating_title">Nu tillgängligt: Podcastbetyg 🎉</string>
     <string name="go_to_next">Gå till nästa</string>
     <string name="go_to_previous">Gå till föregående</string>
     <string name="share_error_message">Kan inte dela. Försök igen senare.</string>
@@ -22,7 +61,6 @@ Language: sv_SE
     <string name="share_clip_duration">%s Varaktighet</string>
     <string name="share_clip_start_position">%s Starta</string>
     <string name="transcript_empty">Transkriptionen är tom.</string>
-    <string name="star_rating_animation">Sjärnbetygsanimation</string>
     <string name="share_link_clip">Klipplänk</string>
     <string name="swipe_affordance_icon">Swipe Affordance-ikon</string>
     <string name="feedback_form_placeholder">Jag vill filtrera avsnitt efter</string>
@@ -60,8 +98,6 @@ Language: sv_SE
     <string name="not_allowed_to_rate_title">Lyssna på den här podcasten först</string>
     <string name="episode_cover_description">Omslag för avsnitt %s</string>
     <string name="podcast_share_clip_description">Skapa klipp mellan %2$d och %3$d sekunder för avsnitt %1$s</string>
-    <string name="error_transcript_format_not_supported">Transkriptionsformatet stöds inte: %s</string>
-    <string name="error_transcript_failed_to_load">Det gick inte att läsa in transkriptionen</string>
     <string name="transcript">Transkription</string>
     <string name="no_ratings">Inga betyg</string>
     <string name="rate_button">Betygsätt</string>
@@ -140,7 +176,6 @@ Language: sv_SE
     <string name="discover_all_categories">Alla kategorier</string>
     <string name="upgrade_to_patron">Uppgradera till Patron</string>
     <string name="upgrade_to_plus">Uppgradera till Plus</string>
-    <string name="whats_new_got_it_button">Uppfattat</string>
     <string name="skip_chapters_patron_prompt">Välj kapitel och mer i förväg med Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Välj kapitel och mer i förväg med Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 kapitel • %d dolda</string>

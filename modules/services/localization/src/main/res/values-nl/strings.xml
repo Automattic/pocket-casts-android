@@ -1,11 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-14 14:54:07+0000
+Translation-Revision-Date: 2024-08-28 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="got_it">Duidelijk</string>
+    <string name="onboarding_subscribe_to_plus">Abonneren op Plus</string>
+    <string name="paywall_themes_content_description">Afbeelding extra thema\'s en pictogrammen</string>
+    <string name="paywall_themes_description">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor onze abonnees.</string>
+    <string name="paywall_themes_title">Extra thema\'s en pictogrammen</string>
+    <string name="paywall_storage_content_description">Afbeelding 20 GB opslag</string>
+    <string name="paywall_storage_description">Wanneer je je audiobestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>
+    <string name="paywall_storage_title">20 GB opslag</string>
+    <string name="paywall_slumber_studios_content_description">Afbeelding Droom met Slumber Studios</string>
+    <string name="paywall_slumber_studios_description">Krijg 1 jaar premium content van Slumber Studios.</string>
+    <string name="paywall_slumber_studios_title">Droom met Slumber Studios</string>
+    <string name="paywall_watch_content_description">Afbeelding Afspelen op Apple Watch en Wear OS</string>
+    <string name="paywall_watch_description">Leg je telefoon aan de kant en ga hardlopen.</string>
+    <string name="paywall_watch_title">Afspelen op Apple Watch en Wear OS</string>
+    <string name="paywall_bookmarks_content_description">Afbeelding Bladwijzers</string>
+    <string name="paywall_bookmarks_description">Sla je favoriete stukjes uit afleveringen op en beluister ze later opnieuw.</string>
+    <string name="paywall_bookmarks_title">Bladwijzers</string>
+    <string name="paywall_folders_content_description">Afbeelding Mappen</string>
+    <string name="paywall_folders_description">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
+    <string name="paywall_folders_title">Mappen</string>
+    <string name="paywall_desktop_and_web_content_description">Afbeelding Desktop- en webapps</string>
+    <string name="paywall_desktop_and_web_description">Luister op meer plekken met Windows en macOS en webapps.</string>
+    <string name="paywall_desktop_and_web_title">Desktop- en web-apps</string>
+    <string name="paywall_free_1_month_trial">Gratis proefperiode van 1 maand.</string>
+    <string name="paywall_save_50_off">50% korting op je eerste jaar.</string>
+    <string name="error_transcript_failed_to_parse">Er is helaas iets misgegaan met de parsing van deze transcriptie.</string>
+    <string name="error_transcript_format_not_supported">Deze transcriptie-indeling wordt helaas niet ondersteund: %s</string>
+    <string name="error_transcript_failed_to_load">Er is helaas iets misgegaan bij het laden van deze transcriptie.</string>
+    <string name="try_again">Opnieuw proberen</string>
+    <string name="podcast_star_rating_content_description">Sterwaardering van podcasts</string>
+    <string name="get_pocket_casts_plus">Neem Pocket Casts Plus</string>
+    <string name="share_end_seconds">Seconden einde clip</string>
+    <string name="share_end_minutes">Minuten einde clip</string>
+    <string name="share_end_hours">Uren einde clip</string>
+    <string name="share_start_seconds">Seconden begin clip</string>
+    <string name="share_start_minutes">Minuten begin clip</string>
+    <string name="share_start_hours">Uren begin clip</string>
+    <string name="share_end_position">Einde</string>
+    <string name="share_start_position">Begin</string>
+    <string name="share_clip_too_long_message">Clip overschrijdt duur van aflevering: %s</string>
+    <string name="share_invalid_clip_message">Begin van clip moet voor eind van clip liggen</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Ontgrendel exclusieve functies met Pocket Casts Plus</string>
+    <string name="go_to_next">Ga naar volgende</string>
+    <string name="go_to_previous">Ga naar vorige</string>
     <string name="share_error_message">Delen is mislukt. Probeer het later opnieuw.</string>
     <string name="share_clip_sharing_clip">Clip aanmaken …</string>
     <string name="something_went_wrong_when_sending_feedback">Er is iets fout gegaan. Probeer je feedback opnieuw in te dienen.</string>
@@ -17,7 +61,6 @@ Language: nl
     <string name="share_clip_duration">Duur %s</string>
     <string name="share_clip_start_position">Start %s</string>
     <string name="transcript_empty">Transcriptie is leeg.</string>
-    <string name="star_rating_animation">Animatie voor sterwaardering</string>
     <string name="share_link_clip">Link clip</string>
     <string name="swipe_affordance_icon">Affordance-pictogram vegen</string>
     <string name="feedback_form_placeholder">Ik wil afleveringen filteren op</string>
@@ -55,8 +98,6 @@ Language: nl
     <string name="not_allowed_to_rate_title">Luister eerst naar deze podcast</string>
     <string name="episode_cover_description">Omslagafbeelding van %s aflevering</string>
     <string name="podcast_share_clip_description">Clip maken tussen %2$d en %3$d seconden voor %1$s aflevering</string>
-    <string name="error_transcript_format_not_supported">Transcriptie format niet ondersteund: %s</string>
-    <string name="error_transcript_failed_to_load">Transcriptie kon niet geladen worden</string>
     <string name="transcript">Transcriptie</string>
     <string name="no_ratings">Geen beoordelingen</string>
     <string name="rate_button">Beoordelen</string>
@@ -135,7 +176,6 @@ Language: nl
     <string name="discover_all_categories">Alle categorieën</string>
     <string name="upgrade_to_patron">Upgrade naar Patron</string>
     <string name="upgrade_to_plus">Upgraden naar Plus</string>
-    <string name="whats_new_got_it_button">Duidelijk</string>
     <string name="skip_chapters_patron_prompt">Selecteer hoofdstukken voor en geniet van extra functies met Pocket Casts Patron</string>
     <string name="skip_chapters_plus_prompt">Selecteer hoofdstukken voor en geniet van extra functies met Pocket Casts Plus</string>
     <string name="number_of_chapters_summary_singular">1 hoofdstuk • %d verborgen</string>

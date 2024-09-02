@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-16 09:54:03+0000
+Translation-Revision-Date: 2024-08-29 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="got_it">알겠습니다</string>
+    <string name="onboarding_subscribe_to_plus">Plus 구독</string>
+    <string name="paywall_themes_content_description">추가 테마 및 아이콘 이미지</string>
+    <string name="paywall_themes_description">트루 컬러를 이용하세요. 구독자에게는 전용 아이콘과 테마가 제공됩니다.</string>
+    <string name="paywall_themes_title">추가 테마 및 아이콘</string>
+    <string name="paywall_storage_content_description">20GB 저장 공간 이미지</string>
+    <string name="paywall_storage_description">오디오 파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
+    <string name="paywall_storage_title">20GB 저장 공간</string>
+    <string name="paywall_slumber_studios_content_description">Slumber Studios로 꿈꾸는 이미지</string>
+    <string name="paywall_slumber_studios_description">Slumber Studios의 프리미엄 콘텐츠를 1년간 이용하세요.</string>
+    <string name="paywall_slumber_studios_title">Slumber Studios로 꿈꾸는 이미지</string>
+    <string name="paywall_watch_content_description">Apple Watch 및 Wear OS 재생 이미지</string>
+    <string name="paywall_watch_description">스마트폰은 두고 달려 나가세요.</string>
+    <string name="paywall_watch_title">Apple Watch 및 Wear OS 재생</string>
+    <string name="paywall_bookmarks_content_description">북마크 이미지</string>
+    <string name="paywall_bookmarks_description">특정 에피소드에서 마음에 드는 부분을 저장해 뒀다가 다시 돌려 보세요.</string>
+    <string name="paywall_bookmarks_title">북마크</string>
+    <string name="paywall_folders_content_description">폴더 이미지</string>
+    <string name="paywall_folders_description">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
+    <string name="paywall_folders_title">폴더</string>
+    <string name="paywall_desktop_and_web_content_description">데스크톱 및 웹 앱 이미지</string>
+    <string name="paywall_desktop_and_web_description">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
+    <string name="paywall_desktop_and_web_title">데스크톱 및 웹 앱</string>
+    <string name="paywall_free_1_month_trial">1개월간 무료로 체험해 보세요.</string>
+    <string name="paywall_save_50_off">첫해에 50%를 절약하세요.</string>
+    <string name="error_transcript_failed_to_parse">죄송합니다. 이 대본의 구문 분석 중에 문제가 발생했습니다.</string>
+    <string name="error_transcript_format_not_supported">죄송합니다. 이 대본 형식이 지원되지 않습니다: %s</string>
+    <string name="error_transcript_failed_to_load">죄송합니다. 이 대본을 로드하는 중에 문제가 발생했습니다.</string>
+    <string name="try_again">다시 시도</string>
+    <string name="podcast_star_rating_content_description">팟캐스트 별점 평가</string>
+    <string name="get_pocket_casts_plus">Pocket Casts Plus 구독</string>
+    <string name="share_end_seconds">클립 종료 시간(초)</string>
+    <string name="share_end_minutes">클립 종료 시간(분)</string>
+    <string name="share_end_hours">클립 종료 시간(시)</string>
+    <string name="share_start_seconds">클립 시작 시간(초)</string>
+    <string name="share_start_minutes">클립 시작 시간(분)</string>
+    <string name="share_start_hours">클립 시작 시간(시)</string>
+    <string name="share_end_position">종료</string>
+    <string name="share_start_position">시작</string>
+    <string name="share_clip_too_long_message">클립이 에피소드 길이를 초과합니다: %s</string>
+    <string name="share_invalid_clip_message">클립 시작 시간은 클립 종료 시간 이전이어야 합니다</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts 플러스로 독점 기능 잠금 해제</string>
-    <string name="whats_new_new_rating_message">회원님이 청취하는 상위 팟캐스트의 평점을 매겨 팟캐스트에 대한 고마움을 제작자에게 표하세요. 회원님의 평가는 즐겨 들을 만한 새로운 프로그램을 다른 사용자가 찾는 데에도 도움이 됩니다!</string>
-    <string name="whats_new_new_rating_title">지금 사용 가능: 팟캐스트 평점 매기기 🎉</string>
     <string name="go_to_next">다음으로 이동</string>
     <string name="go_to_previous">이전으로 이동</string>
     <string name="share_error_message">공유할 수 없습니다. 나중에 다시 시도해 주세요.</string>
@@ -22,7 +61,6 @@ Language: ko_KR
     <string name="share_clip_duration">%s 지속시간</string>
     <string name="share_clip_start_position">%s 시작</string>
     <string name="transcript_empty">대본이 비어 있습니다.</string>
-    <string name="star_rating_animation">별점 평가 애니메이션</string>
     <string name="share_link_clip">클립 링크</string>
     <string name="swipe_affordance_icon">밀기 유도 아이콘</string>
     <string name="feedback_form_placeholder">에피소드 필터링 기준:</string>
@@ -60,8 +98,6 @@ Language: ko_KR
     <string name="not_allowed_to_rate_title">먼저 이 팟캐스트를 청취하세요</string>
     <string name="episode_cover_description">%s 에피소드 커버</string>
     <string name="podcast_share_clip_description">%1$s 에피소드에 대해 %2$d~%3$d초 분량의 클립을 제작하세요</string>
-    <string name="error_transcript_format_not_supported">대본 형식이 지원되지 않음: %s</string>
-    <string name="error_transcript_failed_to_load">대본을 로드하지 못했습니다</string>
     <string name="transcript">대본</string>
     <string name="no_ratings">평점 없음</string>
     <string name="rate_button">평가</string>
@@ -140,7 +176,6 @@ Language: ko_KR
     <string name="discover_all_categories">모든 카테고리</string>
     <string name="upgrade_to_patron">Patron으로 업그레이드</string>
     <string name="upgrade_to_plus">Plus로 업그레이드</string>
-    <string name="whats_new_got_it_button">알겠습니다.</string>
     <string name="skip_chapters_patron_prompt">Pocket Casts Patron으로 챕터 미리 선택 등</string>
     <string name="skip_chapters_plus_prompt">Pocket Casts Plus로 챕터 미리 선택 등</string>
     <string name="number_of_chapters_summary_singular">1개 챕터 • %d개 숨김</string>

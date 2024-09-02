@@ -77,7 +77,7 @@ android {
         jvmTarget = javaVersion.toString()
         // disable Kotlin warnings for Coroutines, working with the annotation @OptIn(DelicateCoroutinesApi::class)
         freeCompilerArgs += [
-            "-opt-in=kotlin.RequiresOptIn"
+                "-opt-in=kotlin.RequiresOptIn"
         ]
         kotlinOptions.allWarningsAsErrors = true
     }
@@ -93,12 +93,12 @@ android {
     packagingOptions {
         resources {
             excludes += [
-                "META-INF/rxjava.properties",
-                "META-INF/AL2.0",
-                "META-INF/LGPL2.1",
-                "META-INF/licenses/ASM",
-                // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
-                "**/attach_hotspot_windows.dll"
+                    "META-INF/rxjava.properties",
+                    "META-INF/AL2.0",
+                    "META-INF/LGPL2.1",
+                    "META-INF/licenses/ASM",
+                    // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
+                    "**/attach_hotspot_windows.dll"
             ]
         }
     }

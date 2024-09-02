@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-15 09:54:03+0000
+Translation-Revision-Date: 2024-08-28 14:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="got_it">OK</string>
+    <string name="onboarding_subscribe_to_plus">Plus に登録</string>
+    <string name="paywall_themes_content_description">追加のテーマとアイコン画像</string>
+    <string name="paywall_themes_description">あなたの個性を表現しましょう。 購読者限定のアイコンとテーマです。</string>
+    <string name="paywall_themes_title">追加のテーマとアイコン</string>
+    <string name="paywall_storage_content_description">20GB のストレージ画像</string>
+    <string name="paywall_storage_description">音声ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
+    <string name="paywall_storage_title">20GB のストレージ</string>
+    <string name="paywall_slumber_studios_content_description">Dream with Slumber Studios の画像</string>
+    <string name="paywall_slumber_studios_description">Slumber Studios のプレミアムコンテンツ1年分をご利用ください。</string>
+    <string name="paywall_slumber_studios_title">Dream with Slumber Studios</string>
+    <string name="paywall_watch_content_description">Apple Watch と Wear OS での再生画像</string>
+    <string name="paywall_watch_description">スマートフォンを手放してランニングに出かけましょう。</string>
+    <string name="paywall_watch_title">Apple Watch と Wear OS での再生</string>
+    <string name="paywall_bookmarks_content_description">ブックマーク画像</string>
+    <string name="paywall_bookmarks_description">どのエピソードでもお気に入りの部分を保存して、後で見返すことができます。</string>
+    <string name="paywall_bookmarks_title">ブックマーク</string>
+    <string name="paywall_folders_content_description">フォルダー画像</string>
+    <string name="paywall_folders_description">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
+    <string name="paywall_folders_title">フォルダー</string>
+    <string name="paywall_desktop_and_web_content_description">デスクトップアプリとウェブアプリの画像</string>
+    <string name="paywall_desktop_and_web_description">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
+    <string name="paywall_desktop_and_web_title">デスクトップアプリとウェブアプリ</string>
+    <string name="paywall_free_1_month_trial">1か月の無料トライアル。</string>
+    <string name="paywall_save_50_off">初年度は50% オフ。</string>
+    <string name="error_transcript_failed_to_parse">申し訳ありません、このトランスクリプトの解析中に問題が発生しました。</string>
+    <string name="error_transcript_format_not_supported">申し訳ありません、このトランスクリプトのフォーマットはサポートされていません: %s</string>
+    <string name="error_transcript_failed_to_load">申し訳ありません、このトランスクリプトの読み込み中に問題が発生しました。</string>
+    <string name="try_again">もう一度試す</string>
+    <string name="podcast_star_rating_content_description">ポッドキャストの星評価</string>
+    <string name="get_pocket_casts_plus">Pocket Casts Plus を入手</string>
+    <string name="share_end_seconds">クリップの終了秒</string>
+    <string name="share_end_minutes">クリップの終了分</string>
+    <string name="share_end_hours">クリップの終了時間</string>
+    <string name="share_start_seconds">クリップの開始秒</string>
+    <string name="share_start_minutes">クリップの開始分</string>
+    <string name="share_start_hours">クリップの開始時間</string>
+    <string name="share_end_position">終了</string>
+    <string name="share_start_position">開始</string>
+    <string name="share_clip_too_long_message">クリップがエピソード時間を超えています: %s</string>
+    <string name="share_invalid_clip_message">クリップの開始はクリップの終了より前にする必要があります</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts Plus で限定機能を利用しましょう</string>
-    <string name="whats_new_new_rating_message">お気に入りのポッドキャストを評価して、作品をどの程度気に入っているかをクリエイターに伝えましょう。 さらに、あなたの評価は他のユーザーが新しいお気に入り番組を見つけるのに役立ちます !</string>
-    <string name="whats_new_new_rating_title">ポッドキャストの評価が利用可能になりました 🎉</string>
     <string name="go_to_next">次に移動</string>
     <string name="go_to_previous">前に移動</string>
     <string name="share_error_message">共有できませんでした。 後でもう一度お試しください。</string>
@@ -22,7 +61,6 @@ Language: ja_JP
     <string name="share_clip_duration">%s 期間</string>
     <string name="share_clip_start_position">%s 開始</string>
     <string name="transcript_empty">トランスクリプトが空です。</string>
-    <string name="star_rating_animation">星評価のアニメーション</string>
     <string name="share_link_clip">クリップへのリンク</string>
     <string name="swipe_affordance_icon">アフォーダンスアイコンをスワイプ</string>
     <string name="feedback_form_placeholder">次でエピソードをフィルター:</string>
@@ -60,8 +98,6 @@ Language: ja_JP
     <string name="not_allowed_to_rate_title">まずこちらのポッドキャストをお聴きください</string>
     <string name="episode_cover_description">%s件のエピソードのカバー</string>
     <string name="podcast_share_clip_description">%1$s件のエピソードについて%2$d～%3$d秒のクリップを作成</string>
-    <string name="error_transcript_format_not_supported">トランスクリプトフォーマットがサポートされていません: %s</string>
-    <string name="error_transcript_failed_to_load">トランスクリプトの読み込みに失敗しました</string>
     <string name="transcript">トランスクリプト</string>
     <string name="no_ratings">評価なし</string>
     <string name="rate_button">評価する</string>
@@ -140,7 +176,6 @@ Language: ja_JP
     <string name="discover_all_categories">カテゴリー一覧</string>
     <string name="upgrade_to_patron">Patron にアップグレード</string>
     <string name="upgrade_to_plus">Plus にアップグレード</string>
-    <string name="whats_new_got_it_button">OK</string>
     <string name="skip_chapters_patron_prompt">Pocket Casts Patron でチャプターの事前選択やその他の機能を利用</string>
     <string name="skip_chapters_plus_prompt">Pocket Casts Plus でチャプターの事前選択やその他の機能を利用</string>
     <string name="number_of_chapters_summary_singular">1個のチャプター • %d個が非表示</string>
