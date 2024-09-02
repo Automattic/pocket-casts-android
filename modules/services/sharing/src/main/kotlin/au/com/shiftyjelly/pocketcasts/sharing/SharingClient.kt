@@ -233,8 +233,8 @@ class SharingClient(
     }
 }
 
-data class SharingRequest internal constructor(
-    val data: SharingRequest.Data,
+class SharingRequest internal constructor(
+    val data: Data,
     val platform: SocialPlatform,
     val cardType: CardType?,
     val backgroundImage: File?,
@@ -291,7 +291,7 @@ data class SharingRequest internal constructor(
     }
 
     class Builder internal constructor(
-        private var data: SharingRequest.Data,
+        private var data: Data,
     ) {
         private var platform = More
         private var cardType: CardType? = null
