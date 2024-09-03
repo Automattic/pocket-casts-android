@@ -183,6 +183,8 @@
     <string name="widget_preview_time_left_2">12m left</string>
     <string name="widget_preview_time_left_3">55m left</string>
     <string name="widget_preview_time_left_4">1h 36m left</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

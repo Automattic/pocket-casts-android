@@ -202,7 +202,6 @@ class PlaybackSettingsFragment : BaseFragment() {
                         primaryText = stringResource(LR.string.settings_media_notification_controls),
                         secondaryText = stringResource(LR.string.settings_customize_buttons_displayed_in_android_13_notification_and_android_auto),
                         modifier = Modifier.clickable {
-                            // (activity as? FragmentHostListener)?.addFragment(MediaNotificationControlsFragment())
                             (activity as? FragmentHostListener)?.addFragment(MediaActionsFragment())
                         },
                     )
