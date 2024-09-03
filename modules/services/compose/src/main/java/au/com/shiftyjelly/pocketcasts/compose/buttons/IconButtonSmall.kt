@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 object IconButtonDefaults {
-    val RippleRadius = 24.dp
+    val RippleRadius = 20.dp
     val ComponentSize: DpSize = DpSize(32.dp, 32.dp)
 }
 @Composable
