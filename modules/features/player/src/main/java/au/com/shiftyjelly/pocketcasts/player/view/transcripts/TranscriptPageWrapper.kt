@@ -113,12 +113,7 @@ fun TranscriptPageWrapper(
 
             TranscriptToolbar(
                 onCloseClick = {
-                    if (expandSearch) {
-                        expandSearch = false
-                        searchViewModel.onSearchDone()
-                    } else {
-                        playerViewModel.closeTranscript(withTransition = true)
-                    }
+                    playerViewModel.closeTranscript(withTransition = true)
                 },
                 showSearch = showSearch,
                 onSearchDoneClicked = {
