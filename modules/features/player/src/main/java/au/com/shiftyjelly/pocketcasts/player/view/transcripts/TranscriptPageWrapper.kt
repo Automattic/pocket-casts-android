@@ -234,7 +234,7 @@ fun TranscriptToolbar(
                             .width(SearchBarMaxWidth)
                             .height(SearchBarHeight)
                             .focusRequester(focusRequester)
-                            .padding(start = 56.dp, end = 16.dp),
+                            .padding(start = 85.dp, end = 16.dp),
                         colors = SearchBarDefaults.colors(
                             leadingIconColor = SearchBarIconColor,
                             trailingIconColor = SearchBarIconColor,
