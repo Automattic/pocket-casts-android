@@ -238,7 +238,7 @@ fun TranscriptToolbar(
                             top = 0.dp,
                             bottom = 0.dp,
                             start = 0.dp,
-                        )
+                        ),
                     )
                 }
             }

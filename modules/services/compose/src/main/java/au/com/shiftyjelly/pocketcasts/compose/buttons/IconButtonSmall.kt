@@ -20,13 +20,14 @@ object IconButtonDefaults {
     val RippleRadius = 20.dp
     val ComponentSize: DpSize = DpSize(32.dp, 32.dp)
 }
+
 @Composable
 fun IconButtonSmall(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -36,9 +37,9 @@ fun IconButtonSmall(
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = IconButtonDefaults.RippleRadius)
+                indication = rememberRipple(bounded = false, radius = IconButtonDefaults.RippleRadius),
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
         CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)
