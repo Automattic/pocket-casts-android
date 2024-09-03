@@ -14,16 +14,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.rearrange.MenuAction
 import au.com.shiftyjelly.pocketcasts.compose.rearrange.MenuActionRearrange
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.settings.notification.MediaActionsViewModel.State
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -56,7 +60,7 @@ fun MediaActionsPage(
             onActionMoved = onActionMoved,
             chooseCount = 3,
             otherActionsTitle = stringResource(LR.string.settings_other_media_actions),
-            contentPadding = PaddingValues(bottom = bottomInset),
+            contentPadding = PaddingValues(top = 8.dp, bottom = bottomInset + 8.dp),
         )
     }
 }
@@ -89,13 +93,14 @@ private fun PageHeader(
 private fun ShowCustomActionsSettings(
     customActionsVisibility: Boolean,
     onShowCustomActionsChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_media_actions_show_title),
         secondaryText = stringResource(LR.string.settings_media_actions_show_subtitle),
         toggle = SettingRowToggle.Switch(checked = customActionsVisibility),
         indent = false,
-        modifier = Modifier
+        modifier = modifier
             .padding(top = 8.dp)
             .toggleable(
                 value = customActionsVisibility,
@@ -108,21 +113,23 @@ private fun ShowCustomActionsSettings(
 
 @Preview
 @Composable
-fun MediaActionsPagePreview() {
-    MediaActionsPage(
-        bottomInset = 0.dp,
-        state = State(
-            actions = listOf(
-                MenuAction("1", LR.string.archive, R.drawable.ic_archive),
-                MenuAction("2", LR.string.mark_as_played, R.drawable.ic_markasplayed),
-                MenuAction("3", LR.string.play_next, R.drawable.ic_skip_next),
-                MenuAction("4", LR.string.playback_speed, R.drawable.ic_speed_number),
-                MenuAction("5", LR.string.star, R.drawable.ic_star),
+fun MediaActionsPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+    AppTheme(themeType) {
+        MediaActionsPage(
+            bottomInset = 0.dp,
+            state = State(
+                actions = listOf(
+                    MenuAction("1", LR.string.archive, R.drawable.ic_archive),
+                    MenuAction("2", LR.string.mark_as_played, R.drawable.ic_markasplayed),
+                    MenuAction("3", LR.string.play_next, R.drawable.ic_skip_next),
+                    MenuAction("4", LR.string.playback_speed, R.drawable.ic_speed_number),
+                    MenuAction("5", LR.string.star, R.drawable.ic_star),
+                ),
+                customActionsVisibility = true,
             ),
-            customActionsVisibility = true,
-        ),
-        onBackClick = {},
-        onShowCustomActionsChanged = {},
-        onActionsOrderChanged = {},
-    )
+            onBackClick = {},
+            onShowCustomActionsChanged = {},
+            onActionsOrderChanged = {},
+        )
+    }
 }

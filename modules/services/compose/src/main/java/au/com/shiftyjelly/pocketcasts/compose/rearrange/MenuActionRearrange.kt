@@ -86,7 +86,7 @@ fun MenuActionRearrange(
     LazyColumn(
         state = lazyListState,
         contentPadding = contentPadding,
-        modifier = modifier.padding(vertical = 8.dp),
+        modifier = modifier,
     ) {
         item {
             Column {
@@ -123,7 +123,7 @@ fun MenuActionRearrange(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .draggableHandle()
+                                .longPressDraggableHandle()
                                 .clickable {}
                                 .semantics {
                                     customActions = accessibilityActions(index = index, menuActions = menuActions, onActionsOrderChanged = onActionsOrderChanged, resources = resources)
@@ -148,7 +148,11 @@ fun MenuActionRearrange(
                                     .clearAndSetSemantics {},
                                 onClick = {},
                             ) {
-                                Icon(painter = painterResource(IR.drawable.ic_reorder), contentDescription = "Reorder")
+                                Icon(
+                                    painter = painterResource(IR.drawable.ic_reorder),
+                                    contentDescription = null,
+                                    tint = iconColor,
+                                )
                             }
                             Spacer(Modifier.width(8.dp))
                         }
