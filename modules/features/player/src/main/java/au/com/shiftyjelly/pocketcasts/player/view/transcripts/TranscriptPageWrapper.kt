@@ -10,6 +10,7 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.IconButtonSmall
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -259,7 +261,7 @@ private fun SearchBarLeadingIcons(
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(
+        IconButtonSmall(
             onClick = {
                 onDoneClicked()
             },
@@ -288,7 +290,7 @@ private fun SearchBarTrailingIcons(
                 text = searchState.searchOccurrencesText,
                 color = SearchBarIconColor,
             )
-            IconButton(
+            IconButtonSmall(
                 onClick = {
                     onSearchCleared()
                 },
@@ -300,7 +302,7 @@ private fun SearchBarTrailingIcons(
             }
         }
 
-        IconButton(
+        IconButtonSmall(
             onClick = onPrevious,
             enabled = searchState.prevNextArrowButtonsEnabled,
         ) {
@@ -309,7 +311,7 @@ private fun SearchBarTrailingIcons(
                 contentDescription = stringResource(LR.string.go_to_previous),
             )
         }
-        IconButton(
+        IconButtonSmall(
             onClick = onNext,
             enabled = searchState.prevNextArrowButtonsEnabled,
         ) {
@@ -318,6 +320,7 @@ private fun SearchBarTrailingIcons(
                 contentDescription = stringResource(LR.string.go_to_next),
             )
         }
+        Spacer(modifier = Modifier.width(8.dp))
     }
 }
 
