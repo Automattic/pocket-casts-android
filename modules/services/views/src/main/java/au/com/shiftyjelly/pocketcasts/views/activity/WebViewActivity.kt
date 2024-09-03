@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
@@ -64,6 +65,20 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (binding.webview.canGoBack()) {
+                        binding.webview.goBack()
+                    } else {
+                        isEnabled = false
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            },
+        )
+
         binding.webview.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
@@ -103,15 +118,6 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
             extraUrl?.let { url ->
                 binding.webview.loadUrl(url)
             }
-        }
-    }
-
-    override fun onBackPressed() {
-        if (binding.webview.canGoBack()) {
-            binding.webview.goBack()
-        } else {
-            @Suppress("DEPRECATION")
-            super.onBackPressed()
         }
     }
 
