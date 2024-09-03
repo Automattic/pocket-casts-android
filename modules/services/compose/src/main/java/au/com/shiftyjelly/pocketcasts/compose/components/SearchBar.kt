@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -98,6 +99,10 @@ fun SearchBar(
     textStyle: TextStyle = LocalTextStyle.current,
     cornerRadius: Dp = 10.dp,
     colors: TextFieldColors = SearchBarDefaults.colors(),
+    contentPadding: PaddingValues = TextFieldDefaults.textFieldWithoutLabelPadding(
+        top = 0.dp,
+        bottom = 0.dp,
+    ),
 ) {
     val focusManager = LocalFocusManager.current
     val textColor = textStyle.color.takeOrElse {
@@ -174,10 +179,7 @@ fun SearchBar(
                 singleLine = true,
                 interactionSource = remember { MutableInteractionSource() },
                 visualTransformation = VisualTransformation.None,
-                contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-                    top = 0.dp,
-                    bottom = 0.dp,
-                ),
+                contentPadding = contentPadding,
             )
         },
     )

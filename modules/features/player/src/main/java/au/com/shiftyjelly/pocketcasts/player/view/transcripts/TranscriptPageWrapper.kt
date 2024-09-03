@@ -16,10 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -144,7 +146,7 @@ fun TranscriptPageWrapper(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun TranscriptToolbar(
     onCloseClick: () -> Unit,
@@ -241,6 +243,11 @@ fun TranscriptToolbar(
                             disabledTrailingIconColor = SearchBarIconColor.copy(alpha = 0.7f),
                             placeholderColor = SearchBarPlaceholderColor,
                         ),
+                        contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
+                            top = 0.dp,
+                            bottom = 0.dp,
+                            start = 0.dp,
+                        )
                     )
                 }
             }
