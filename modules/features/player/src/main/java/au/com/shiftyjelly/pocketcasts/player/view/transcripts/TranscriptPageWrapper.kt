@@ -63,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val SearchBarMaxWidth = 500.dp
+private val SearchBarHeight = 43.dp
 private val SearchViewCornerRadius = 38.dp
 private val SearchBarIconColor = Color.Gray.copy(alpha = 0.8f)
 private val SearchBarPlaceholderColor = SearchBarIconColor
@@ -231,6 +232,7 @@ fun TranscriptToolbar(
                         cornerRadius = SearchViewCornerRadius,
                         modifier = Modifier
                             .width(SearchBarMaxWidth)
+                            .height(SearchBarHeight)
                             .focusRequester(focusRequester)
                             .padding(start = 56.dp, end = 16.dp),
                         colors = SearchBarDefaults.colors(
