@@ -14,8 +14,8 @@ android {
     namespace = "au.com.shiftyjelly.pocketcasts"
 
     defaultConfig {
+        minSdk = project.property("minSdkVersionAutomotive") as Int
         applicationId = project.property("applicationId").toString()
-        minSdk = 28
     }
 
     buildFeatures {
@@ -26,27 +26,15 @@ android {
 
     buildTypes {
         named("debug") {
-            applicationIdSuffix = ".debug"
-
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
         }
 
         named("debugProd") {
-            initWith(getByName("debug"))
-            isDebuggable = true
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
         }
 
         named("release") {
-            isMinifyEnabled = true
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-
-            proguardFiles.addAll(
-                listOf(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro"),
-                ),
-            )
-            isShrinkResources = true
         }
     }
 }
