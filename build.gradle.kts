@@ -150,6 +150,11 @@ subprojects {
         configureSentry()
     }
 
+    configurations.configureEach {
+        // Exclude the NDK from the Sentry Android SDK as we don't use it.
+        exclude("io.sentry", "sentry-android-ndk")
+    }
+
     tasks.withType<JavaCompile>().configureEach {
         sourceCompatibility = javaTarget.target
         targetCompatibility = javaTarget.target
