@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.util)
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
     implementation(platform(libs.compose.bom))
 
     ksp(libs.dagger.hilt.compiler)

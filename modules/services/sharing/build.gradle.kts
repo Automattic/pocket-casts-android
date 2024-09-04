@@ -16,7 +16,7 @@ android {
 
 dependencies {
     implementation(libs.coroutines.core)
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
     implementation(libs.coil)
     implementation(libs.timber)
     implementation(platform(libs.compose.bom))

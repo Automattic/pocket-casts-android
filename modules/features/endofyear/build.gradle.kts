@@ -15,15 +15,15 @@ android {
 }
 
 dependencies {
-    implementation(libs.appcompat)
+    implementation(libs.androidx.appcompat)
     implementation(libs.compose.activity)
     implementation(libs.compose.material)
-    implementation(libs.compose.constraint)
+    implementation(libs.compose.constraintlayout)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
-    api(libs.hilt.android)
-    implementation(libs.core.ktx)
+    api(libs.dagger.hilt.android)
+    implementation(libs.androidx.core.ktx)
     api(libs.showkase)
     implementation(libs.timber)
     api(libs.crashlogging)

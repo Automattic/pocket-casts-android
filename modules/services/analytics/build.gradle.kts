@@ -13,10 +13,10 @@ android {
 }
 
 dependencies {
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.config)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.config.ktx)
 
     debugImplementation(libs.compose.ui.tooling)
 

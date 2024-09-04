@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
     api(libs.hilt.work)
     implementation(libs.coroutines.play.services)
     implementation(libs.lifecycle.process)

@@ -13,7 +13,7 @@ android {
 }
 
 dependencies {
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)

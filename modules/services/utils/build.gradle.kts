@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.utils.addToStdlib.butIf
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -19,23 +17,23 @@ android {
 
 dependencies {
     api(libs.coil.base)
-    implementation(libs.lifecycle.livedata)
+    implementation(libs.lifecycle.livedata.ktx)
     testImplementation(libs.mockito.core)
 
-    api(libs.appcompat)
-    implementation(libs.auth)
+    api(libs.androidx.appcompat)
+    implementation(libs.play.auth)
     implementation(libs.coroutines.core)
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.config)
-    api(libs.hilt.android)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.config.ktx)
+    api(libs.dagger.hilt.android)
     api(libs.okhttp)
-    implementation(libs.rxandroid)
-    api(libs.rxjava)
-    implementation(libs.car)
-    implementation(libs.annotation)
-    implementation(libs.cast)
+    implementation(libs.rx2.android)
+    api(libs.rx2.java)
+    implementation(libs.androidx.car)
+    implementation(libs.androidx.annotation)
+    implementation(libs.play.cast)
     implementation(libs.compose.ui.graphics)
-    implementation(libs.core.ktx)
+    implementation(libs.androidx.core.ktx)
     api(libs.material)
     api(libs.timber)
     implementation(platform(libs.compose.bom))

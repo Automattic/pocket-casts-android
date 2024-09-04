@@ -11,7 +11,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.rxandroid)
+    implementation(libs.rx2.android)
 
 
     implementation(libs.coroutines.test)

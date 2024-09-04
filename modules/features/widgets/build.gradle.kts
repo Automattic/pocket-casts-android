@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
     api(libs.moshi)
     implementation(libs.moshi.adapters)
     implementation(libs.coil)
@@ -25,8 +25,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     ksp(libs.moshi.kotlin.codegen)
 
-    implementation(libs.compose.glance.appwidget)
-    implementation(libs.compose.glance.material3)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
     implementation(libs.compose.material3)
     api(project(":modules:services:analytics"))
     implementation(project(":modules:services:images"))

@@ -15,7 +15,7 @@ android {
 dependencies {
     implementation(libs.compose.activity)
     implementation(libs.compose.animation)
-    implementation(libs.compose.icons)
+    implementation(libs.compose.material.icons)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)

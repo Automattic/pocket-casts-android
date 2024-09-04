@@ -31,5 +31,5 @@ protobuf {
 
 dependencies {
     api(libs.protobuf.javalite)
-    api(libs.protobuf.kotlin.lite)
+    api(libs.protobuf.kotlinlite)
 }

@@ -16,11 +16,11 @@ android {
 
 dependencies {
     implementation(libs.coroutines.play.services)
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.config)
-    api(libs.hilt.android)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.config.ktx)
+    api(libs.dagger.hilt.android)
     implementation(libs.lifecycle.process)
-    implementation(libs.play.services.wearable)
+    implementation(libs.play.wearable)
     implementation(libs.timber)
     implementation(platform(libs.firebase.bom))
 

@@ -11,8 +11,8 @@ android {
 }
 
 dependencies {
-    api(libs.rxjava)
+    api(libs.rx2.java)
     api(libs.material)
 
-    implementation(libs.rxextensions)
+    implementation(libs.rx2.extensions)
 }

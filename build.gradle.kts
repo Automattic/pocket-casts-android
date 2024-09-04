@@ -22,7 +22,7 @@ buildscript {
     // Gradle Plugins
     dependencies {
         // Open source licenses plugin
-        classpath(libs.ossLicenses.plugin)
+        classpath(libs.osslicenses.plugin)
     }
 }
 

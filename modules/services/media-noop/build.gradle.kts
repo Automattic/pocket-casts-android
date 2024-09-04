@@ -19,7 +19,7 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
 
 
     api(project(":modules:services:sharing"))

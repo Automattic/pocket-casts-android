@@ -15,7 +15,7 @@ android {
 
 dependencies {
     implementation(libs.coroutines.core)
-    api(libs.hilt.android)
+    api(libs.dagger.hilt.android)
     api(libs.moshi)
     implementation(libs.moshi.adapters)
     api(libs.okhttp)
@@ -23,9 +23,9 @@ dependencies {
     api(libs.protobuf.javalite)
     api(libs.retrofit)
     implementation(libs.retrofit.moshi)
-    implementation(libs.retrofit.rxjava2)
-    api(libs.rxjava)
-    implementation(libs.rxandroid)
+    implementation(libs.retrofit.rx2)
+    api(libs.rx2.java)
+    implementation(libs.rx2.android)
     api(libs.work.runtime)
     implementation(libs.retrofit.protobuf) { exclude(group = "com.google.protobuf", module = "protobuf-java") }
     implementation(libs.timber)

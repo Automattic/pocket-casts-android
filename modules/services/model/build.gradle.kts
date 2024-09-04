@@ -17,19 +17,19 @@ android {
 }
 
 dependencies {
-    implementation(libs.hilt.core)
+    implementation(libs.dagger.hilt.core)
 
-    implementation(libs.auth)
+    implementation(libs.play.auth)
     implementation(libs.coroutines.core)
     api(libs.billing.ktx)
     api(libs.media3.extractor)
     api(libs.moshi)
     api(libs.okhttp)
     api(libs.room)
-    implementation(libs.room.rxjava2)
-    api(libs.rxjava)
-    implementation(libs.cast)
-    implementation(libs.core.ktx)
+    implementation(libs.room.rx2)
+    api(libs.rx2.java)
+    implementation(libs.play.cast)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.timber)
     compileOnly(libs.media3.common)
 
@@ -44,14 +44,14 @@ dependencies {
     ksp(libs.hilt.compiler)
     ksp(libs.moshi.kotlin.codegen)
 
-    androidTestImplementation(libs.annotation)
+    androidTestImplementation(libs.androidx.annotation)
     androidTestImplementation(platform(libs.compose.bom))
 
     implementation(project(":modules:services:localization"))
     api(project(":modules:services:utils"))
 
     implementation(libs.room.ktx)
-    implementation(libs.room.rxjava2)
+    implementation(libs.room.rx2)
     testImplementation(project(":modules:services:sharedtest"))
 
     testImplementation(libs.mockito.core)
