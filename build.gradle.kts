@@ -67,6 +67,13 @@ dependencyAnalysis {
                 severity("ignore")
             }
         }
+
+        project(":wear") {
+            onIncorrectConfiguration {
+                severity("warn")
+                exclude("org.jetbrains.kotlin:kotlin-stdlib")
+            }
+        }
     }
 }
 

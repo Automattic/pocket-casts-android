@@ -5,10 +5,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "../base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
@@ -49,11 +46,64 @@ android {
 }
 
 dependencies {
+    implementation(libs.core)
+    implementation(libs.coroutines.reactive)
+    implementation(libs.coroutines.android)
+    implementation(libs.crashlogging)
+    implementation(libs.encryptedlogging)
+    implementation(libs.hilt.core)
+    implementation(libs.horologist.auth.data.phone)
+    implementation(libs.navigation.runtime)
+    implementation(libs.rxjava)
+    implementation(libs.work.runtime.java)
+
+    implementation(libs.auth)
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.rx2)
+    implementation(libs.firebase.config)
+    implementation(libs.hilt.android)
+    implementation(libs.lottie.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.palette)
+    implementation(libs.appcompat)
+    implementation(libs.core.ktx)
+    implementation(libs.guava)
+    implementation(libs.hilt.work)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lottie)
+    implementation(libs.media3.extractor)
+    implementation(libs.moshi)
+    implementation(libs.navigation.compose)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.rxrelay)
+    implementation(libs.timber)
+    implementation(platform(libs.compose.bom))
+    implementation(platform(libs.firebase.bom))
+
+    debugImplementation(libs.compose.ui.tooling)
+
+    debugProdImplementation(libs.compose.ui.tooling)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.turbine)
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
     implementation(libs.wear.input)
     implementation(libs.wear.remote.interactions)
     implementation(libs.wear.tooling.preview)
 
     // General Compose dependencies
+    implementation(libs.compose.animation)
+    implementation(libs.compose.icons)
+    implementation(libs.compose.livedata)
+    implementation(libs.compose.material)
+    implementation(libs.compose.rxjava2)
     implementation(libs.compose.activity)
     implementation(libs.compose.ui)
     implementation(libs.compose.icons)
@@ -65,6 +115,8 @@ dependencies {
     implementation(libs.wear.compose.foundation)
     implementation(libs.wear.compose.navigation)
 
+    testImplementation("org.mockito:mockito-core:5.7.0")
+
 
     implementation(libs.horologist.audio.ui)
     implementation(libs.horologist.auth.composables)
@@ -74,11 +126,11 @@ dependencies {
     implementation(libs.horologist.compose.material)
     implementation(libs.horologist.datalayer)
     implementation(libs.horologist.media)
-    implementation(libs.horologist.media.data)
+    implementation(libs.horologist.audio)
+    implementation(libs.horologist.media.outputswitcher)
     implementation(libs.horologist.media.ui)
-    implementation(libs.horologist.media3.backend)
     implementation(libs.horologist.metwork.awarness.okhttp)
-    implementation(libs.media3.datasource.okhttp)
+
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))
     implementation(project(":modules:services:crashlogging"))
@@ -99,4 +151,7 @@ dependencies {
     implementation(project(":modules:features:profile"))
     implementation(project(":modules:features:settings"))
     implementation(project(":modules:features:shared"))
+    implementation(project(":modules:features:player"))
+    implementation(project(":modules:features:search"))
+    implementation(project(":modules:services:sharing"))
 }

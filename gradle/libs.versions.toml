@@ -136,6 +136,8 @@ horologist-compose-layout = { module = "com.google.android.horologist:horologist
 horologist-compose-material = { module = "com.google.android.horologist:horologist-compose-material", version.ref = "horologist"}
 horologist-datalayer = { module = "com.google.android.horologist:horologist-datalayer", version.ref = "horologist"}
 horologist-media = { module = "com.google.android.horologist:horologist-media", version.ref = "horologist"}
+horologist-audio = { module = "com.google.android.horologist:horologist-audio", version.ref = "horologist"}
+horologist-media-outputswitcher = { module = "com.google.android.horologist:horologist-media3-outputswitcher", version.ref = "horologist"}
 horologist-media-data = { module = "com.google.android.horologist:horologist-media-data", version.ref = "horologist"}
 horologist-media-ui = { module = "com.google.android.horologist:horologist-media-ui", version.ref = "horologist"}
 horologist-media3-backend = { module = "com.google.android.horologist:horologist-media3-backend", version.ref = "horologist"}
