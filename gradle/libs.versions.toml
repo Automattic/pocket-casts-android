@@ -234,6 +234,7 @@ wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation",
 wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "wear-compose" }
 
 # Work Manager
+work-runtime-java = { module = "androidx.work:work-runtime", version.ref = "work" }
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 work-rxjava2 = { module = "androidx.work:work-rxjava2", version.ref = "work" }
 work-test = { module = "androidx.work:work-testing", version.ref = "work" }

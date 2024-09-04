@@ -3,10 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.preferences"
@@ -16,9 +13,27 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:services:crashlogging"))
+    implementation(libs.coroutines.core)
+    api(libs.hilt.android)
+    api(libs.moshi)
+    api(libs.rxjava)
+    api(libs.rxrelay)
+    implementation(libs.core.ktx)
+    implementation(libs.preference)
+    api(libs.work.runtime.java)
+    implementation(libs.timber)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.config)
+    implementation(libs.cast)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:utils"))
+    api(project(":modules:services:model"))
+    api(project(":modules:services:utils"))
 }
