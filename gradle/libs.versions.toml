@@ -179,8 +179,10 @@ moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", ver
 # Navigation
 navigation-runtime = { module = "androidx.navigation:navigation-runtime", version.ref = "navigation" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+navigation-fragment-java = { module = "androidx.navigation:navigation-fragment", version.ref = "navigation" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigation" }
+navigation-ui-java = { module = "androidx.navigation:navigation-ui", version.ref = "navigation" }
 navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 
 # OkHttp

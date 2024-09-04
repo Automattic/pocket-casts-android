@@ -3,10 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.account"
@@ -18,26 +15,84 @@ android {
 }
 
 dependencies {
+    api(libs.appcompat)
+    implementation(libs.auth)
+    implementation(libs.compose.activity)
+    implementation(libs.compose.animation)
+    implementation(libs.compose.constraint)
+    implementation(libs.compose.livedata)
+    api(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.ui.util)
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.play.services)
+    implementation(libs.coroutines.rx2)
+    api(libs.navigation.runtime)
+    implementation(libs.fragment.ktx)
+    api(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    api(libs.moshi)
+    api(libs.navigation.runtime)
+    implementation(libs.navigation.fragment.java)
+    implementation(libs.navigation.ui.java)
+    implementation(libs.navigation.compose)
+    implementation(libs.retrofit)
+    implementation(libs.rxandroid)
+    implementation(libs.rxjava)
+    implementation(libs.rxrelay)
+    implementation(libs.rxkotlin)
+    implementation(libs.cast)
+    implementation(libs.coil)
+    api(libs.constraintlayout)
+    implementation(libs.lifecycle.reactivestreams.java)
+    implementation(libs.core.ktx)
+    api(libs.material)
+    implementation(libs.oss.licenses)
+    implementation(libs.play.services.wearable)
+    implementation(libs.preference)
+    api(libs.showkase)
+    implementation(libs.timber)
+    implementation(platform(libs.compose.bom))
+
+    debugImplementation(libs.compose.ui.tooling)
+
+    debugProdImplementation(libs.compose.ui.tooling)
+
+    testImplementation("org.mockito:mockito-core:5.7.0")
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.turbine)
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+    ksp(libs.showkase.processor)
+
     // features
     implementation(project(":modules:features:cartheme"))
-    implementation(project(":modules:features:settings"))
-    implementation(project(":modules:features:search"))
+    api(project(":modules:features:settings"))
+    api(project(":modules:features:search"))
 
     // services
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:compose"))
+    api(project(":modules:services:analytics"))
+    api(project(":modules:services:compose"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:servers"))
-    implementation(project(":modules:services:ui"))
+    api(project(":modules:services:model"))
+    api(project(":modules:services:preferences"))
+    api(project(":modules:services:repositories"))
+    api(project(":modules:services:servers"))
+    api(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:views"))
+    api(project(":modules:services:views"))
     testImplementation(project(":modules:services:sharedtest"))
 
     // android libs
-    implementation(libs.horologist.auth.data.phone)
-    implementation(libs.horologist.datalayer)
+    api(libs.horologist.auth.data.phone)
+    api(libs.horologist.datalayer)
 }
