@@ -37,7 +37,6 @@ dependencies {
     implementation(libs.compose.ui.graphics)
     implementation(libs.core.ktx)
     api(libs.material)
-    implementation(libs.play.services.wearable)
     api(libs.timber)
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.firebase.bom))

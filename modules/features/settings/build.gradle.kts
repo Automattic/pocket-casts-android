@@ -46,7 +46,6 @@ dependencies {
     api(libs.material)
     implementation(libs.material.dialogs)
     implementation(libs.oss.licenses)
-    implementation(libs.play.services.wearable)
     api(libs.preference.ktx)
     api(libs.recyclerview)
     implementation(libs.showkase)

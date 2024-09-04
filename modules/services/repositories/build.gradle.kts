@@ -49,7 +49,6 @@ dependencies {
     implementation(libs.device.names)
     implementation(libs.guava)
     implementation(libs.material)
-    implementation(libs.play.services.wearable)
     implementation(libs.preference.ktx)
     implementation(libs.timber)
 

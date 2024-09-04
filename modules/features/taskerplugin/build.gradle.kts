@@ -21,7 +21,6 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.util)
     api(libs.hilt.android)
-    implementation(libs.play.services.wearable)
     implementation(platform(libs.compose.bom))
 
     ksp(libs.dagger.hilt.compiler)

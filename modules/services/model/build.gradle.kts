@@ -30,7 +30,6 @@ dependencies {
     api(libs.rxjava)
     implementation(libs.cast)
     implementation(libs.core.ktx)
-    implementation(libs.play.services.wearable)
     implementation(libs.timber)
     compileOnly(libs.media3.common)
 

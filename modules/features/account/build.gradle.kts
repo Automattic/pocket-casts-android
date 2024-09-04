@@ -50,7 +50,6 @@ dependencies {
     implementation(libs.lifecycle.reactivestreams)
     implementation(libs.core.ktx)
     api(libs.material)
-    implementation(libs.play.services.wearable)
     implementation(libs.preference.ktx)
     api(libs.showkase)
     implementation(libs.timber)
