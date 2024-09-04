@@ -60,16 +60,18 @@ class ProfileEpisodeListViewModel @Inject constructor(
             ) { episodeList, searchResults ->
                 val searchQuery = searchQueryFlow.value
                 val results = if (searchQuery.isNotEmpty()) searchResults else episodeList
+                val showSearchBar = mode.showSearch &&
+                    FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY) &&
+                    (results.isNotEmpty() || searchQuery.isNotEmpty())
                 _state.value = if (results.isEmpty()) {
                     State.Empty(
                         titleRes = State.Empty.titleRes(mode, searchQuery.isNotEmpty()),
                         summaryRes = State.Empty.summaryRes(mode, searchQuery.isNotEmpty()),
+                        showSearchBar = showSearchBar,
                     )
                 } else {
                     State.Loaded(
-                        showSearch = mode.showSearch &&
-                            FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY) &&
-                            results.isNotEmpty(),
+                        showSearchBar = showSearchBar,
                         results = results,
                     )
                 }
@@ -89,14 +91,17 @@ class ProfileEpisodeListViewModel @Inject constructor(
     }
 
     sealed class State {
+        open val showSearchBar: Boolean = false
+
         data class Loaded(
-            val showSearch: Boolean = false,
+            override val showSearchBar: Boolean = false,
             val results: List<PodcastEpisode>? = null,
         ) : State()
 
         data class Empty(
             @StringRes val titleRes: Int,
             @StringRes val summaryRes: Int,
+            override val showSearchBar: Boolean = false,
         ) : State() {
             companion object {
                 fun titleRes(mode: Mode, isSearchEmpty: Boolean): Int = if (isSearchEmpty) {

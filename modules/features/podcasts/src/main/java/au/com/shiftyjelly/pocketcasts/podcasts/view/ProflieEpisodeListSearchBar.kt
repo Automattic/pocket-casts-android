@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -22,17 +23,20 @@ fun ProfileEpisodeListSearchBar(
     viewModel: ProfileEpisodeListViewModel = hiltViewModel<ProfileEpisodeListViewModel>(),
 ) {
     AppTheme(activeTheme) {
-        val searchQueryFlow = viewModel.searchQueryFlow.collectAsStateWithLifecycle()
+        val searchQueryFlow by viewModel.searchQueryFlow.collectAsStateWithLifecycle()
+        val state by viewModel.state.collectAsStateWithLifecycle()
         val focusRequester = remember { FocusRequester() }
-        SearchBar(
-            text = searchQueryFlow.value,
-            placeholder = stringResource(R.string.search),
-            onTextChanged = { viewModel.updateSearchQuery(it) },
-            onSearch = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .focusRequester(focusRequester),
-        )
+        if (state.showSearchBar) {
+            SearchBar(
+                text = searchQueryFlow,
+                placeholder = stringResource(R.string.search),
+                onTextChanged = { viewModel.updateSearchQuery(it) },
+                onSearch = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .focusRequester(focusRequester),
+            )
+        }
     }
 }

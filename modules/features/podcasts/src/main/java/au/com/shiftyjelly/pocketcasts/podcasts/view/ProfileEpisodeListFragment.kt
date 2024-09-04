@@ -236,6 +236,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             itemTouchHelper.attachToRecyclerView(it)
         }
 
+        binding?.layoutSearch?.setContent {
+            ProfileEpisodeListSearchBar(
+                activeTheme = theme.activeTheme,
+            )
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
@@ -251,18 +257,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
                         is State.Loaded -> {
                             binding?.recyclerView?.updatePadding(
-                                top = if (state.showSearch) 0 else 16.dpToPx(requireContext()),
+                                top = if (state.showSearchBar) 0 else 16.dpToPx(requireContext()),
                             )
                             binding?.recyclerView?.isVisible = true
                             binding?.emptyLayout?.isVisible = false
                             adapter.submitList(state.results)
-                            binding?.layoutSearch?.setContent {
-                                if (state.showSearch) {
-                                    ProfileEpisodeListSearchBar(
-                                        activeTheme = theme.activeTheme,
-                                    )
-                                }
-                            }
                         }
                     }
                 }

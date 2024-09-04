@@ -107,7 +107,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.History)
 
         viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -119,7 +119,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.History)
 
         viewModel.state.test {
-            assertEquals(true, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(true, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -130,7 +130,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.Starred)
 
         viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -141,7 +141,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.Downloaded)
 
         viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -186,6 +186,7 @@ class ProfileEpisodeListViewModelTest {
                 State.Empty(
                     titleRes = R.string.search_episodes_not_found_title,
                     summaryRes = R.string.search_episodes_not_found_summary,
+                    showSearchBar = true,
                 ),
             )
         }
