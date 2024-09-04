@@ -14,9 +14,12 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -29,12 +32,14 @@ class ProfileEpisodeListViewModel @Inject constructor(
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
     private val _searchQueryFlow = MutableStateFlow("")
     val searchQueryFlow = _searchQueryFlow.asStateFlow()
 
     private val _state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
     val state: StateFlow<State> = _state
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun setup(mode: ProfileEpisodeListFragment.Mode) {
         val episodeListFlowable = when (mode) {
             is ProfileEpisodeListFragment.Mode.Downloaded -> episodeManager.observeDownloadEpisodes()
@@ -42,20 +47,26 @@ class ProfileEpisodeListViewModel @Inject constructor(
             is ProfileEpisodeListFragment.Mode.History -> episodeManager.observePlaybackHistoryEpisodes()
         }
         viewModelScope.launch {
-            episodeListFlowable.asFlow()
-                .stateIn(viewModelScope)
-                .collect { episodeList ->
-                    _state.value = if (episodeList.isEmpty()) {
-                        State.Empty
-                    } else {
-                        State.Loaded(
-                            showSearch = mode.showSearch &&
-                                FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY) &&
-                                (episodeList.isNotEmpty() || searchQueryFlow.value.isNotEmpty()),
-                            results = episodeList,
-                        )
-                    }
+            val searchResultsFlow = _searchQueryFlow
+                .flatMapLatest { searchQuery ->
+                    episodeManager.filteredPlaybackHistoryEpisodesFlow(searchQuery)
                 }
+            combine(
+                episodeListFlowable.asFlow(),
+                searchResultsFlow,
+            ) { episodeList, searchResults ->
+                val results = if (searchQueryFlow.value.isNotEmpty()) searchResults else episodeList
+                _state.value = if (results.isEmpty()) {
+                    State.Empty
+                } else {
+                    State.Loaded(
+                        showSearch = mode.showSearch
+                                && FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY)
+                                && results.isNotEmpty(),
+                        results = results,
+                    )
+                }
+            }.stateIn(viewModelScope)
         }
     }
 
