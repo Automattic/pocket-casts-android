@@ -230,7 +230,7 @@ private val SHELF_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
     }
 }
 
-class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(SHELF_ITEM_DIFF) {
+class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem, Boolean) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(SHELF_ITEM_DIFF) {
     var episode: BaseEpisode? = null
         set(value) {
             field = value
@@ -303,13 +303,12 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
             binding.imgIcon.setImageResource(item.iconId(episode))
 
             val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
-            binding.root.isEnabled = isEnabled
             binding.root.alpha = if (isEnabled || editable) 1f else 0.5f
 
             binding.dragHandle.isVisible = editable
 
             if (listener != null) {
-                holder.itemView.setOnClickListener { listener.invoke(item) }
+                holder.itemView.setOnClickListener { listener.invoke(item, isEnabled) }
             }
 
             val subtitle = item.subtitleId(episode)

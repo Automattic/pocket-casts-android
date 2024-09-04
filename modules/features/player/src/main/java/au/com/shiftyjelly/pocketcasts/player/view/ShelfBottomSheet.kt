@@ -35,15 +35,19 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
@@ -167,7 +171,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         }, FLASH_ANIMATION_DELAY)
     }
 
-    private fun onClick(item: ShelfItem) {
+    private fun onClick(item: ShelfItem, enabled: Boolean) {
         when (item) {
             ShelfItem.Effects -> {
                 EffectsFragment().show(parentFragmentManager, "effects")
@@ -182,7 +186,17 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Transcript -> {
-                playerViewModel.openTranscript()
+                if (!enabled) {
+                    parentFragment?.view?.let {
+                        val message = getString(LR.string.transcript_error_not_available)
+                        Snackbar.make(it, message, Snackbar.LENGTH_SHORT)
+                            .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
+                            .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
+                            .show()
+                    }
+                } else {
+                    playerViewModel.openTranscript()
+                }
             }
 
             ShelfItem.Share -> {
@@ -225,10 +239,12 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 openUrl(settings.getReportViolationUrl())
             }
         }
-        analyticsTracker.track(
-            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to item.analyticsValue),
-        )
+        if (enabled) {
+            analyticsTracker.track(
+                AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
+                mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to item.analyticsValue),
+            )
+        }
         dismiss()
     }
 
