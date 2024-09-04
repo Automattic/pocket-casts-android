@@ -61,6 +61,10 @@ measureBuilds {
 }
 
 dependencyAnalysis {
+    structure {
+        ignoreKtx(true)
+    }
+
     issues {
         all {
             onUsedTransitiveDependencies {
