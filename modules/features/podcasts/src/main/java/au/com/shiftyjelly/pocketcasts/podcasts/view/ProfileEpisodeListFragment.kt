@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentProfileEpisodeListBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
@@ -43,8 +44,6 @@ import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -90,23 +89,32 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         }
     }
 
-    @Inject lateinit var downloadManager: DownloadManager
+    @Inject
+    lateinit var downloadManager: DownloadManager
 
-    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject
+    lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject
+    lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var playButtonListener: PlayButton.OnClickListener
+    @Inject
+    lateinit var playButtonListener: PlayButton.OnClickListener
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
-    @Inject lateinit var upNextQueue: UpNextQueue
+    @Inject
+    lateinit var upNextQueue: UpNextQueue
 
-    @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
+    @Inject
+    lateinit var multiSelectHelper: MultiSelectEpisodesHelper
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var bookmarkManager: BookmarkManager
+    @Inject
+    lateinit var bookmarkManager: BookmarkManager
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
@@ -227,16 +235,31 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             itemTouchHelper.attachToRecyclerView(it)
         }
 
-        viewModel.episodeList.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-            binding?.emptyLayout?.isVisible = it.isEmpty()
-            binding?.layoutSearch?.setContent {
-                ProfileEpisodeListSearchBar(
-                    show = it.isNotEmpty() &&
-                        FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY) &&
-                        mode.showSearch,
-                    activeTheme = theme.activeTheme,
-                )
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    when (state) {
+                        State.Empty -> {
+                            binding?.recyclerView?.isVisible = false
+                            binding?.emptyLayout?.isVisible = true
+                        }
+
+                        State.Loading -> Unit
+
+                        is State.Loaded -> {
+                            binding?.recyclerView?.isVisible = true
+                            binding?.emptyLayout?.isVisible = false
+                            adapter.submitList(state.results)
+                            binding?.layoutSearch?.setContent {
+                                if (state.showSearch) {
+                                    ProfileEpisodeListSearchBar(
+                                        activeTheme = theme.activeTheme,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -281,7 +304,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
-                val episodes = viewModel.episodeList.value
+                val episodes = (viewModel.state.value as? State.Loaded)?.results
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
                     adapter.notifyDataSetChanged()
@@ -290,7 +313,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
 
             override fun multiSelectSelectNone() {
-                val episodes = viewModel.episodeList.value
+                val episodes = (viewModel.state.value as? State.Loaded)?.results
                 if (episodes != null) {
                     multiSelectHelper.deselectAllInList(episodes)
                     adapter.notifyDataSetChanged()
@@ -299,7 +322,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
 
             override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.episodeList.value
+                val episodes = (viewModel.state.value as? State.Loaded)?.results
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -312,7 +335,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
 
             override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.episodeList.value
+                val episodes = (viewModel.state.value as? State.Loaded)?.results
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -325,7 +348,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
 
             override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.episodeList.value
+                val episodes = (viewModel.state.value as? State.Loaded)?.results
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -337,7 +360,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             }
 
             override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
-                val episodes = viewModel.episodeList.value
+                val episodes = (viewModel.state.value as? State.Loaded)?.results
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {

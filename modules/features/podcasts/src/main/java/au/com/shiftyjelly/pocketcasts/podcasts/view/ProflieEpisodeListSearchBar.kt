@@ -18,24 +18,21 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun ProfileEpisodeListSearchBar(
-    show: Boolean,
     activeTheme: Theme.ThemeType,
     viewModel: ProfileEpisodeListViewModel = hiltViewModel<ProfileEpisodeListViewModel>(),
 ) {
     AppTheme(activeTheme) {
         val searchQueryFlow = viewModel.searchQueryFlow.collectAsStateWithLifecycle()
-        if (show || searchQueryFlow.value.isNotEmpty()) {
-            val focusRequester = remember { FocusRequester() }
-            SearchBar(
-                text = searchQueryFlow.value,
-                placeholder = stringResource(R.string.search),
-                onTextChanged = { viewModel.updateSearchQuery(it) },
-                onSearch = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .focusRequester(focusRequester),
-            )
-        }
+        val focusRequester = remember { FocusRequester() }
+        SearchBar(
+            text = searchQueryFlow.value,
+            placeholder = stringResource(R.string.search),
+            onTextChanged = { viewModel.updateSearchQuery(it) },
+            onSearch = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .focusRequester(focusRequester),
+        )
     }
 }
