@@ -8,6 +8,7 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.automattic.android.measure.reporters.InternalA8cCiReporter
 import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
 import com.google.devtools.ksp.gradle.KspExtension
+import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import java.util.EnumSet
@@ -113,6 +114,12 @@ subprojects {
         }
     }
 
+    plugins.withType<KspGradleSubplugin>().configureEach {
+        configure<KspExtension> {
+            arg("skipPrivatePreviews", "true")
+        }
+    }
+
     plugins.withId(rootProject.libs.plugins.sentry.get().pluginId) {
         configureSentry()
     }
@@ -156,12 +163,6 @@ subprojects {
     val WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
 
     plugins.withType<BasePlugin>().configureEach {
-        afterEvaluate {
-            configure<KspExtension> {
-                arg("skipPrivatePreviews", "true")
-            }
-        }
-
         configure<BaseExtension> {
             compileOptions {
                 isCoreLibraryDesugaringEnabled = true
