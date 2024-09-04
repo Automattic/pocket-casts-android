@@ -66,6 +66,11 @@ dependencyAnalysis {
             onUsedTransitiveDependencies {
                 severity("ignore")
             }
+
+            onRuntimeOnly {
+                severity("warn")
+                exclude("org.jetbrains.kotlinx:kotlinx-coroutines-android")
+            }
         }
 
         project(":app") {
