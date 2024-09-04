@@ -16,6 +16,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.room.ktx)
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:deeplink"))

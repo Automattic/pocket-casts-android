@@ -2,11 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.model"
@@ -21,13 +17,46 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:utils"))
+    implementation(libs.hilt.core)
 
-    api(libs.room.ktx)
+    implementation(libs.auth)
+    implementation(libs.coroutines.core)
+    api(libs.billing)
+    api(libs.media3.extractor)
+    api(libs.moshi)
+    api(libs.okhttp)
+    api(libs.room)
+    implementation(libs.room.rxjava2)
+    api(libs.rxjava)
+    implementation(libs.cast)
+    implementation(libs.core.ktx)
+    implementation(libs.oss.licenses)
+    implementation(libs.play.services.wearable)
+    implementation(libs.timber)
+    compileOnly(libs.media3.common)
+
+    debugImplementation(libs.compose.ui.tooling)
+
+    debugProdImplementation(libs.compose.ui.tooling)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+
+    androidTestImplementation(libs.annotation)
+    androidTestImplementation(platform(libs.compose.bom))
+
+    implementation(project(":modules:services:localization"))
+    api(project(":modules:services:utils"))
+
     implementation(libs.room.ktx)
     implementation(libs.room.rxjava2)
     testImplementation(project(":modules:services:sharedtest"))
+
+    testImplementation("org.mockito:mockito-core:5.7.0")
 
     ksp(libs.room.compiler)
 }

@@ -100,6 +100,7 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 
 # Dagger / Hilt
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
 hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
@@ -155,6 +156,7 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "
 
 # Media3
 media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
+media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
 media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
 media3-datasource-okhttp = { module = "androidx.media3:media3-datasource-okhttp", version.ref = "media3" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
@@ -199,6 +201,7 @@ retrofit-rxjava2 = { module = "com.squareup.retrofit2:adapter-rxjava2", version.
 
 # Room
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-rxjava2 = { module = "androidx.room:room-rxjava2", version.ref = "room" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
@@ -288,6 +291,7 @@ android-application = { id = "com.android.application", version.ref = "android-a
 android-library = { id = "com.android.library", version.ref = "android-application" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency-analysis" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+hilt-java = { id = "com.google.dagger.hilt", version.ref = "hilt" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
