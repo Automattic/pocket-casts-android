@@ -18,5 +18,5 @@ dependencies {
     implementation(project(":modules:services:utils"))
 
     api(libs.crashlogging)
-    api(libs.junit) { exclude(group = "org.hamcrest") }
+    api(libs.junit)
 }

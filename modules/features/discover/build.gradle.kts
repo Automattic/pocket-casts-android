@@ -44,7 +44,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
     testImplementation(libs.okHttp.mockwebserver)
 
     ksp(libs.dagger.hilt.compiler)

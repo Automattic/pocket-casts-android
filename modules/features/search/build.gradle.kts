@@ -34,7 +34,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
     testImplementation("org.mockito:mockito-core:5.7.0")
 

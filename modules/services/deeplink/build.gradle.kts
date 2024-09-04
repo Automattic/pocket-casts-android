@@ -17,5 +17,5 @@ dependencies {
     implementation(libs.timber)
 
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
 }

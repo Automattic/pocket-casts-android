@@ -25,7 +25,7 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
 
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:deeplink"))

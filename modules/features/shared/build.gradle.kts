@@ -25,7 +25,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
 
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
     testImplementation(libs.lifecycle.runtime.testing)
     testImplementation(libs.mockito.kotlin)
     testImplementation("org.mockito:mockito-core:5.7.0")

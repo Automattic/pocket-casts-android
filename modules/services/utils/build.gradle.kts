@@ -42,7 +42,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
 
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
 
     ksp(libs.dagger.hilt.compiler)

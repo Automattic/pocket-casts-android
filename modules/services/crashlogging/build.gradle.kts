@@ -16,7 +16,7 @@ dependencies {
     api(libs.hilt.android)
 
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
     testImplementation(libs.turbine)
 
     ksp(libs.dagger.hilt.compiler)

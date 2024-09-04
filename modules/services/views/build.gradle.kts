@@ -45,7 +45,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
     api(libs.crashlogging)
 
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:5.7.0")
     testImplementation(libs.mockito.kotlin)
 

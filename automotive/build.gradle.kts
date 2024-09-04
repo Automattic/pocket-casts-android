@@ -49,7 +49,7 @@ dependencies {
 
     debugProdImplementation(libs.compose.ui.tooling)
 
-    androidTestImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    androidTestImplementation(libs.junit)
 
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)

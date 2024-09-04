@@ -87,7 +87,7 @@ dependencies {
     debugProdImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.turbine)
 
