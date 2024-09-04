@@ -37,7 +37,7 @@ dependencies {
     api(libs.material)
     implementation(libs.material.dialogs)
     implementation(libs.material.progressbar)
-    implementation(libs.preference)
+    implementation(libs.preference.ktx)
     api(libs.recyclerview)
     implementation(libs.timber)
     api(libs.crashlogging)

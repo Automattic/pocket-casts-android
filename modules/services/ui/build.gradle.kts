@@ -26,10 +26,10 @@ dependencies {
     implementation(libs.material.dialogs)
     implementation(libs.material.progressbar)
     implementation(libs.mediarouter)
-    implementation(libs.preference)
+    implementation(libs.preference.ktx)
     implementation(libs.timber)
     implementation(platform(libs.compose.bom))
-    api("androidx.compose.ui:ui-graphics:1.6.2")
+    api(libs.compose.ui.graphics)
 
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)

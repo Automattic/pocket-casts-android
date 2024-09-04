@@ -21,7 +21,7 @@ dependencies {
 
     implementation(libs.auth)
     implementation(libs.coroutines.core)
-    api(libs.billing)
+    api(libs.billing.ktx)
     api(libs.media3.extractor)
     api(libs.moshi)
     api(libs.okhttp)
@@ -30,7 +30,6 @@ dependencies {
     api(libs.rxjava)
     implementation(libs.cast)
     implementation(libs.core.ktx)
-    implementation(libs.oss.licenses)
     implementation(libs.play.services.wearable)
     implementation(libs.timber)
     compileOnly(libs.media3.common)
@@ -56,7 +55,7 @@ dependencies {
     implementation(libs.room.rxjava2)
     testImplementation(project(":modules:services:sharedtest"))
 
-    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation(libs.mockito.core)
 
     ksp(libs.room.compiler)
 }

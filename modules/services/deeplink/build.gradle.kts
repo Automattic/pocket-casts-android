@@ -13,7 +13,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.core)
+    implementation(libs.core.ktx)
     implementation(libs.timber)
 
     testImplementation(libs.coroutines.test)

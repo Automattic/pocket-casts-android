@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.utils.addToStdlib.butIf
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -16,9 +18,9 @@ android {
 }
 
 dependencies {
-    api("io.coil-kt:coil-base:2.5.0")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.8.4")
-    testImplementation("org.mockito:mockito-core:5.7.0")
+    api(libs.coil.base)
+    implementation(libs.lifecycle.livedata)
+    testImplementation(libs.mockito.core)
 
     api(libs.appcompat)
     implementation(libs.auth)
@@ -32,10 +34,9 @@ dependencies {
     implementation(libs.car)
     implementation(libs.annotation)
     implementation(libs.cast)
-    implementation("androidx.compose.ui:ui-graphics:1.6.2")
+    implementation(libs.compose.ui.graphics)
     implementation(libs.core.ktx)
     api(libs.material)
-    implementation(libs.oss.licenses)
     implementation(libs.play.services.wearable)
     api(libs.timber)
     implementation(platform(libs.compose.bom))

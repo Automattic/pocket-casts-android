@@ -46,7 +46,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.core)
+    implementation(libs.core.ktx)
     implementation(libs.coroutines.reactive)
     implementation(libs.coroutines.android)
     implementation(libs.crashlogging)
@@ -55,7 +55,7 @@ dependencies {
     implementation(libs.horologist.auth.data.phone)
     implementation(libs.navigation.runtime)
     implementation(libs.rxjava)
-    implementation(libs.work.runtime.java)
+    implementation(libs.work.runtime)
 
     implementation(libs.auth)
     implementation(libs.coroutines.core)
@@ -115,7 +115,7 @@ dependencies {
     implementation(libs.wear.compose.foundation)
     implementation(libs.wear.compose.navigation)
 
-    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation(libs.mockito.core)
 
 
     implementation(libs.horologist.audio.ui)

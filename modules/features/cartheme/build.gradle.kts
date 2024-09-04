@@ -11,5 +11,5 @@ android {
 
 dependencies {
     implementation(libs.material)
-    implementation(libs.preference)
+    implementation(libs.preference.ktx)
 }

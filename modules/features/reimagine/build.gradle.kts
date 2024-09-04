@@ -33,7 +33,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
-    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation(libs.mockito.core)
     testImplementation(libs.turbine)
 
     ksp(libs.dagger.hilt.compiler)

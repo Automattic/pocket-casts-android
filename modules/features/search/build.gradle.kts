@@ -29,14 +29,14 @@ dependencies {
     implementation(libs.rxrelay)
     implementation(libs.rxkotlin)
     implementation(libs.core.ktx)
-    implementation(libs.lifecycle.reactivestreams.java)
+    implementation(libs.lifecycle.reactivestreams)
     implementation(libs.timber)
     implementation(platform(libs.compose.bom))
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
-    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation(libs.mockito.core)
 
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)

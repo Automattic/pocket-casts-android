@@ -14,5 +14,5 @@ dependencies {
     api(libs.rxjava)
     api(libs.material)
 
-    implementation("com.github.akarnokd:rxjava2-extensions:0.20.10")
+    implementation(libs.rxextensions)
 }
