@@ -10,15 +10,18 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -49,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.IconButtonSmall
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -61,6 +65,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val SearchBarMaxWidth = 500.dp
+private val SearchBarHeight = 43.dp
 private val SearchViewCornerRadius = 38.dp
 private val SearchBarIconColor = Color.Gray.copy(alpha = 0.8f)
 private val SearchBarPlaceholderColor = SearchBarIconColor
@@ -108,12 +113,7 @@ fun TranscriptPageWrapper(
 
             TranscriptToolbar(
                 onCloseClick = {
-                    if (expandSearch) {
-                        expandSearch = false
-                        searchViewModel.onSearchDone()
-                    } else {
-                        playerViewModel.closeTranscript(withTransition = true)
-                    }
+                    playerViewModel.closeTranscript(withTransition = true)
                 },
                 showSearch = showSearch,
                 onSearchDoneClicked = {
@@ -141,7 +141,7 @@ fun TranscriptPageWrapper(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun TranscriptToolbar(
     onCloseClick: () -> Unit,
@@ -174,11 +174,7 @@ fun TranscriptToolbar(
                         .padding(start = 16.dp),
                     onClick = onCloseClick,
                     tintColor = TranscriptColors.iconColor(),
-                    contentDescription = if (expandSearch) {
-                        stringResource(LR.string.transcript_search_close)
-                    } else {
-                        stringResource(LR.string.transcript_close)
-                    },
+                    contentDescription = stringResource(LR.string.transcript_close),
                 )
             }
 
@@ -229,13 +225,19 @@ fun TranscriptToolbar(
                         cornerRadius = SearchViewCornerRadius,
                         modifier = Modifier
                             .width(SearchBarMaxWidth)
+                            .height(SearchBarHeight)
                             .focusRequester(focusRequester)
-                            .padding(start = 56.dp, end = 16.dp),
+                            .padding(start = 85.dp, end = 16.dp),
                         colors = SearchBarDefaults.colors(
                             leadingIconColor = SearchBarIconColor,
                             trailingIconColor = SearchBarIconColor,
                             disabledTrailingIconColor = SearchBarIconColor.copy(alpha = 0.7f),
                             placeholderColor = SearchBarPlaceholderColor,
+                        ),
+                        contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
+                            top = 0.dp,
+                            bottom = 0.dp,
+                            start = 0.dp,
                         ),
                     )
                 }
@@ -259,7 +261,7 @@ private fun SearchBarLeadingIcons(
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(
+        IconButtonSmall(
             onClick = {
                 onDoneClicked()
             },
@@ -288,7 +290,7 @@ private fun SearchBarTrailingIcons(
                 text = searchState.searchOccurrencesText,
                 color = SearchBarIconColor,
             )
-            IconButton(
+            IconButtonSmall(
                 onClick = {
                     onSearchCleared()
                 },
@@ -300,7 +302,7 @@ private fun SearchBarTrailingIcons(
             }
         }
 
-        IconButton(
+        IconButtonSmall(
             onClick = onPrevious,
             enabled = searchState.prevNextArrowButtonsEnabled,
         ) {
@@ -309,7 +311,7 @@ private fun SearchBarTrailingIcons(
                 contentDescription = stringResource(LR.string.go_to_previous),
             )
         }
-        IconButton(
+        IconButtonSmall(
             onClick = onNext,
             enabled = searchState.prevNextArrowButtonsEnabled,
         ) {
@@ -318,6 +320,7 @@ private fun SearchBarTrailingIcons(
                 contentDescription = stringResource(LR.string.go_to_next),
             )
         }
+        Spacer(modifier = Modifier.width(8.dp))
     }
 }
 
