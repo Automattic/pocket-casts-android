@@ -5,8 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
-apply(from = "${project.rootDir}/base.gradle")
-
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.widget"
     buildFeatures {
@@ -17,13 +15,23 @@ android {
 }
 
 dependencies {
+    api(libs.hilt.android)
+    api(libs.moshi)
+    implementation(libs.moshi.adapters)
+    implementation(libs.coil)
+    implementation(libs.timber)
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+
     implementation(libs.compose.glance.appwidget)
     implementation(libs.compose.glance.material3)
     implementation(libs.compose.material3)
-    implementation(project(":modules:services:analytics"))
+    api(project(":modules:services:analytics"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
+    api(project(":modules:services:model"))
+    api(project(":modules:services:preferences"))
+    api(project(":modules:services:repositories"))
 }
