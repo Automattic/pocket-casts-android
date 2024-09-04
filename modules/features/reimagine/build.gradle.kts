@@ -6,8 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-apply(from = "${project.rootDir}/base.gradle")
-
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.reimagine"
     buildFeatures {
@@ -18,17 +16,42 @@ android {
 }
 
 dependencies {
+    implementation(libs.compose.animation)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.ui.util)
+    implementation(libs.coroutines.core)
+    implementation(libs.fragment.ktx)
+    api(libs.hilt.android)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.core.ktx)
+    api(libs.showkase)
+    implementation(libs.timber)
+    implementation(platform(libs.compose.bom))
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.mockito.kotlin)
+    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation(libs.turbine)
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+    ksp(libs.showkase.processor)
+
     api(project(":modules:services:sharing"))
-    implementation(project(":modules:services:analytics"))
+    api(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))
     implementation(project(":modules:services:images"))
     implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:ui"))
+    api(project(":modules:services:model"))
+    api(project(":modules:services:preferences"))
+    api(project(":modules:services:repositories"))
+    api(project(":modules:services:ui"))
     implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:views"))
+    api(project(":modules:services:views"))
 
     implementation(libs.capturable)
 
