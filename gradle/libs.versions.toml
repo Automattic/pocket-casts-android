@@ -25,7 +25,7 @@ compose = "2024.02.00" # uses compose version 1.6.1, see https://developer.andro
 # @keep
 # Compose to Kotlin Compatibility Map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
 compose-kotlin-compiler = "1.5.14"
-dependency-analysis = "1.28.0"
+dependency-analysis = "2.0.1"
 espresso = "3.6.1"
 firebase = "30.5.0"
 fragment = "1.8.2"

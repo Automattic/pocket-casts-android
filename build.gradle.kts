@@ -81,6 +81,8 @@ spotless {
 val javaTarget = JvmTarget.fromTarget(libs.versions.java.get())
 
 subprojects {
+    apply(plugin = rootProject.libs.plugins.dependency.analysis.get().pluginId)
+
     plugins.withType<KotlinBasePlugin>().configureEach {
         tasks.withType<KotlinCompilationTask<KotlinJvmCompilerOptions>>().configureEach {
             compilerOptions {
@@ -271,6 +273,11 @@ subprojects {
                     }
                 }
             }
+        }
+
+        dependencies {
+            val coreLibraryDesugaring by configurations
+            coreLibraryDesugaring(libs.desugar.jdk)
         }
     }
 
