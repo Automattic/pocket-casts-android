@@ -5,8 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
-apply(from = "${project.rootDir}/base.gradle")
-
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.crashlogging"
     buildFeatures {
@@ -15,8 +13,18 @@ android {
 }
 
 dependencies {
+    api(libs.hilt.android)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.turbine)
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+
     api(libs.crashlogging)
     api(libs.encryptedlogging)
 
-    implementation(project(":modules:services:utils"))
+    api(project(":modules:services:utils"))
 }
