@@ -251,7 +251,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
                         is State.Loaded -> {
                             binding?.recyclerView?.updatePadding(
-                                top = if (state.showSearch) 0 else 16.dpToPx(requireContext())
+                                top = if (state.showSearch) 0 else 16.dpToPx(requireContext()),
                             )
                             binding?.recyclerView?.isVisible = true
                             binding?.emptyLayout?.isVisible = false
