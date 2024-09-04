@@ -59,6 +59,16 @@ measureBuilds {
     attachGradleScanId = false
 }
 
+dependencyAnalysis {
+    issues {
+        all {
+            onUsedTransitiveDependencies {
+                severity("ignore")
+            }
+        }
+    }
+}
+
 val ktlintVersion = libs.versions.ktlint.get()
 
 spotless {
