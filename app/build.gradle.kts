@@ -145,6 +145,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.jsonassert)
     androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.core)
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.navigation.compose)

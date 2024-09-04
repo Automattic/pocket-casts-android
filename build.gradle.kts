@@ -157,6 +157,11 @@ subprojects {
     configurations.configureEach {
         // Exclude the NDK from the Sentry Android SDK as we don't use it.
         exclude("io.sentry", "sentry-android-ndk")
+
+        // https://github.com/android/android-test/issues/999
+        if (name == "androidTestImplementation") {
+            exclude("com.google.protobuf","protobuf-lite")
+        }
     }
 
     tasks.withType<JavaCompile>().configureEach {
