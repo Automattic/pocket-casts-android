@@ -3,10 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.media"
@@ -18,5 +15,12 @@ android {
 }
 
 dependencies {
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    api(libs.hilt.android)
+
+
     api(project(":modules:services:sharing"))
 }
