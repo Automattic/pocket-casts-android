@@ -47,12 +47,12 @@ dependencies {
     androidTestImplementation(libs.androidx.annotation)
     androidTestImplementation(platform(libs.compose.bom))
 
-    implementation(project(":modules:services:localization"))
-    api(project(":modules:services:utils"))
+    implementation(projects.modules.services.localization)
+    api(projects.modules.services.utils)
 
     implementation(libs.room.ktx)
     implementation(libs.room.rx2)
-    testImplementation(project(":modules:services:sharedtest"))
+    testImplementation(projects.modules.services.sharedtest)
 
     testImplementation(libs.mockito.core)
 

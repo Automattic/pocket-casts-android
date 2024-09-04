@@ -15,7 +15,7 @@ dependencies {
 
 
     implementation(libs.coroutines.test)
-    implementation(project(":modules:services:utils"))
+    implementation(projects.modules.services.utils)
 
     api(libs.crashlogging)
     api(libs.junit)

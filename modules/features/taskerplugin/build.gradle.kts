@@ -27,14 +27,14 @@ dependencies {
     ksp(libs.hilt.compiler)
 
 
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:localization"))
-    api(project(":modules:services:ui"))
-    implementation(project(":modules:services:compose"))
-    api(project(":modules:services:repositories"))
-    api(project(":modules:services:model"))
-    implementation(project(":modules:services:images"))
-    api(project(":modules:services:preferences"))
-    implementation(project(":modules:services:utils"))
+    implementation(projects.modules.services.analytics)
+    implementation(projects.modules.services.localization)
+    api(projects.modules.services.ui)
+    implementation(projects.modules.services.compose)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.model)
+    implementation(projects.modules.services.images)
+    api(projects.modules.services.preferences)
+    implementation(projects.modules.services.utils)
     api(libs.tasker)
 }

@@ -26,5 +26,5 @@ dependencies {
     api(libs.crashlogging)
     api(libs.encryptedlogging)
 
-    api(project(":modules:services:utils"))
+    api(projects.modules.services.utils)
 }

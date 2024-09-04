@@ -27,12 +27,12 @@ dependencies {
 
     testImplementation(libs.junit)
 
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:deeplink"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    api(project(":modules:services:repositories"))
-    implementation(project(":modules:services:utils"))
+    implementation(projects.modules.services.analytics)
+    implementation(projects.modules.services.deeplink)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.model)
+    api(projects.modules.services.repositories)
+    implementation(projects.modules.services.utils)
 
     implementation(libs.engage)
 }

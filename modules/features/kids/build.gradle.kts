@@ -35,12 +35,12 @@ dependencies {
     ksp(libs.showkase.processor)
 
 
-    implementation(project(":modules:services:compose"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:images"))
-    api(project(":modules:services:ui"))
-    api(project(":modules:services:repositories"))
-    api(project(":modules:services:analytics"))
+    implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.images)
+    api(projects.modules.services.ui)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.analytics)
 
-    testImplementation(project(":modules:services:sharedtest"))
+    testImplementation(projects.modules.services.sharedtest)
 }

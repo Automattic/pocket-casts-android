@@ -38,16 +38,16 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // features
-    api(project(":modules:features:podcasts"))
+    api(projects.modules.features.podcasts)
 
     // services
-    api(project(":modules:services:analytics"))
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    api(project(":modules:services:model"))
-    api(project(":modules:services:preferences"))
-    api(project(":modules:services:repositories"))
-    implementation(project(":modules:services:utils"))
-    api(project(":modules:services:ui"))
-    api(project(":modules:services:views"))
+    api(projects.modules.services.analytics)
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    implementation(projects.modules.services.utils)
+    api(projects.modules.services.ui)
+    api(projects.modules.services.views)
 }

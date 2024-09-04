@@ -28,7 +28,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     implementation(libs.tracks)
-    api(project(":modules:services:utils"))
-    api(project(":modules:services:preferences"))
-    api(project(":modules:services:model"))
+    api(projects.modules.services.utils)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.model)
 }

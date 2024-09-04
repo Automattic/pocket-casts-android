@@ -39,9 +39,9 @@ dependencies {
     implementation(libs.crashlogging)
 
 
-    implementation(project(":modules:services:localization"))
-    api(project(":modules:services:model"))
-    api(project(":modules:services:preferences"))
-    api(project(":modules:services:protobuf"))
-    implementation(project(":modules:services:utils"))
+    implementation(projects.modules.services.localization)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.protobuf)
+    implementation(projects.modules.services.utils)
 }

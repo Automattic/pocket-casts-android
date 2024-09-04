@@ -28,11 +28,11 @@ dependencies {
 
     ksp(libs.showkase.processor)
 
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    api(project(":modules:services:model"))
-    api(project(":modules:services:preferences"))
-    api(project(":modules:services:repositories"))
-    api(project(":modules:services:ui"))
-    implementation(project(":modules:services:utils"))
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.ui)
+    implementation(projects.modules.services.utils)
 }

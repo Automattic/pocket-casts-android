@@ -15,8 +15,8 @@ android {
 }
 
 dependencies {
-    api(project(":modules:services:sharing"))
-    implementation(project(":modules:services:utils"))
+    api(projects.modules.services.sharing)
+    implementation(projects.modules.services.utils)
 
     implementation(libs.ffmpeg)
 

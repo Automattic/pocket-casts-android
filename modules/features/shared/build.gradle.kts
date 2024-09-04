@@ -33,10 +33,10 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    api(project(":modules:services:analytics"))
-    api(project(":modules:services:crashlogging"))
-    api(project(":modules:services:preferences"))
-    api(project(":modules:services:repositories"))
-    api(project(":modules:services:utils"))
-    api(project(":modules:services:model"))
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.crashlogging)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.utils)
+    api(projects.modules.services.model)
 }

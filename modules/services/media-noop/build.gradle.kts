@@ -22,5 +22,5 @@ dependencies {
     api(libs.dagger.hilt.android)
 
 
-    api(project(":modules:services:sharing"))
+    api(projects.modules.services.sharing)
 }

@@ -72,23 +72,23 @@ dependencies {
     ksp(libs.showkase.processor)
 
     // features
-    implementation(project(":modules:features:cartheme"))
-    api(project(":modules:features:settings"))
-    api(project(":modules:features:search"))
+    implementation(projects.modules.features.cartheme)
+    api(projects.modules.features.settings)
+    api(projects.modules.features.search)
 
     // services
-    api(project(":modules:services:analytics"))
-    api(project(":modules:services:compose"))
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    api(project(":modules:services:model"))
-    api(project(":modules:services:preferences"))
-    api(project(":modules:services:repositories"))
-    api(project(":modules:services:servers"))
-    api(project(":modules:services:ui"))
-    implementation(project(":modules:services:utils"))
-    api(project(":modules:services:views"))
-    testImplementation(project(":modules:services:sharedtest"))
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.compose)
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.servers)
+    api(projects.modules.services.ui)
+    implementation(projects.modules.services.utils)
+    api(projects.modules.services.views)
+    testImplementation(projects.modules.services.sharedtest)
 
     // android libs
     api(libs.horologist.auth.data.phone)
