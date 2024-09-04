@@ -5,10 +5,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
     alias(libs.plugins.aboutlibraries)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "../base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
@@ -40,19 +37,63 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
+    implementation(libs.coroutines.rx2)
+    implementation(libs.hilt.android)
+    implementation(libs.lifecycle.reactivestreams.java)
+    implementation(platform(libs.compose.bom))
+    implementation(platform(libs.firebase.bom))
 
-    // Commented out the Automotive library as it clashes with the Material library and we don't use it. Duplicate value for resource attr/navigationIconTint.
-    // implementation "androidx.car:car:1.0.0-alpha7"
-    implementation(libs.appcompat)
+    debugImplementation(libs.compose.ui.tooling)
+
+    debugProdImplementation(libs.compose.ui.tooling)
+
+    androidTestImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    androidTestImplementation(libs.annotation)
+    androidTestImplementation(libs.test.core)
+    androidTestImplementation(libs.test.rules)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation("org.mockito:mockito-core:5.7.0")
+
     implementation(libs.core.ktx)
-    implementation(libs.material)
-    implementation(libs.constraintlayout)
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutLibraries.compose)
-    testImplementation(libs.junit)
     androidTestImplementation(libs.junit.ext)
-    androidTestImplementation(libs.espresso.core)
+
+    implementation(libs.appcompat)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.constraintlayout)
+    implementation(libs.core)
+    implementation(libs.crashlogging)
+    implementation(libs.encryptedlogging)
+    implementation(libs.guava)
+    implementation(libs.hilt.core)
+    implementation(libs.hilt.work)
+    implementation(libs.material)
+    implementation(libs.material.progressbar)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.extractor)
+    implementation(libs.media3.ui)
+    implementation(libs.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.preference)
+    implementation(libs.retrofit)
+    implementation(libs.rxjava)
+    implementation(libs.swiperefreshlayout)
+    implementation(libs.timber)
+    implementation(libs.viewpager)
+    implementation(libs.work.runtime.java)
+    implementation(project(":modules:features:player"))
+    implementation(project(":modules:features:search"))
+    implementation(project(":modules:services:sharing"))
 
     implementation(project(":modules:services:crashlogging"))
     implementation(project(":modules:services:localization"))

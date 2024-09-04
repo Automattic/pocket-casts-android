@@ -74,6 +74,13 @@ dependencyAnalysis {
                 exclude("org.jetbrains.kotlin:kotlin-stdlib")
             }
         }
+
+        project(":automotive") {
+            onIncorrectConfiguration {
+                severity("warn")
+                exclude("org.jetbrains.kotlin:kotlin-stdlib")
+            }
+        }
     }
 }
 
