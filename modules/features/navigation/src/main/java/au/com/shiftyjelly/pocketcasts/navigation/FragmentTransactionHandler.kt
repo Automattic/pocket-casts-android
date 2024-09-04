@@ -213,7 +213,8 @@ internal class FragmentTransactionHandler(
 /**
  * Info that gets serialized into the FragmentManager's fragment tag string
  */
-internal class TagStructure private constructor(
+@ConsistentCopyVisibility
+internal data class TagStructure private constructor(
     val className: String?,
     val detachable: Boolean?,
     val uuid: String?,

@@ -233,7 +233,8 @@ class SharingClient(
     }
 }
 
-class SharingRequest internal constructor(
+@ConsistentCopyVisibility
+data class SharingRequest internal constructor(
     val data: Data,
     val platform: SocialPlatform,
     val cardType: CardType?,
