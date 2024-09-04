@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -249,6 +250,9 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                         State.Loading -> Unit
 
                         is State.Loaded -> {
+                            binding?.recyclerView?.updatePadding(
+                                top = if (state.showSearch) 0 else 16.dpToPx(requireContext())
+                            )
                             binding?.recyclerView?.isVisible = true
                             binding?.emptyLayout?.isVisible = false
                             adapter.submitList(state.results)
