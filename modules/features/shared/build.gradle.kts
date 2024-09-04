@@ -3,27 +3,40 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.shared"
     buildFeatures {
         buildConfig = true
-        viewBinding = true
-        compose = true
+        viewBinding = false
+        compose = false
     }
 }
 
 dependencies {
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:crashlogging"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:model"))
-    testImplementation(project(":modules:services:sharedtest"))
+    implementation(libs.coroutines.play.services)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.config)
+    api(libs.hilt.android)
+    implementation(libs.lifecycle.process)
+    implementation(libs.play.services.wearable)
+    implementation(libs.timber)
+    implementation(platform(libs.firebase.bom))
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit) { exclude(group = "org.hamcrest") }
+    testImplementation(libs.lifecycle.runtime.testing)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation("org.mockito:mockito-core:5.7.0")
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    api(project(":modules:services:analytics"))
+    api(project(":modules:services:crashlogging"))
+    api(project(":modules:services:preferences"))
+    api(project(":modules:services:repositories"))
+    api(project(":modules:services:utils"))
+    api(project(":modules:services:model"))
 }
