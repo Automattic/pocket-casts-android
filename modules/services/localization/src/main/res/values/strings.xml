@@ -1902,6 +1902,7 @@
     <string name="transcript_empty">Transcript is empty.</string>
     <string name="transcript_close">Close transcript</string>
     <string name="transcript_search">Search transcript</string>
+    <string name="transcript_error_not_available">Sorry, but a transcript is not available for this episode.</string>
 
     <!--    Tasker Plugin-->
 
