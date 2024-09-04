@@ -43,6 +43,8 @@ import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -64,10 +66,10 @@ private const val ARG_MODE = "profile_list_mode"
 
 @AndroidEntryPoint
 class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
-    sealed class Mode(val index: Int, val showMenu: Boolean) {
-        object Downloaded : Mode(0, true)
-        object Starred : Mode(1, false)
-        object History : Mode(2, true)
+    sealed class Mode(val index: Int, val showMenu: Boolean, val showSearch: Boolean) {
+        data object Downloaded : Mode(0, true, false)
+        data object Starred : Mode(1, false, false)
+        data object History : Mode(2, true, true)
     }
 
     companion object {
@@ -228,6 +230,14 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         viewModel.episodeList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             binding?.emptyLayout?.isVisible = it.isEmpty()
+            binding?.layoutSearch?.setContent {
+                ProfileEpisodeListSearchBar(
+                    show = it.isNotEmpty() &&
+                        FeatureFlag.isEnabled(Feature.SEARCH_IN_LISTENING_HISTORY) &&
+                        mode.showSearch,
+                    activeTheme = theme.activeTheme,
+                )
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

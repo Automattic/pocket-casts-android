@@ -13,6 +13,8 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -23,6 +25,9 @@ class ProfileEpisodeListViewModel @Inject constructor(
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    private val _searchQueryFlow = MutableStateFlow("")
+    val searchQueryFlow = _searchQueryFlow.asStateFlow()
 
     lateinit var episodeList: LiveData<List<PodcastEpisode>>
 
@@ -41,5 +46,9 @@ class ProfileEpisodeListViewModel @Inject constructor(
             analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_CLEARED)
             episodeManager.clearAllEpisodeHistory()
         }
+    }
+
+    fun updateSearchQuery(searchQuery: String) {
+        _searchQueryFlow.value = searchQuery.trim()
     }
 }
