@@ -7,21 +7,63 @@ dependencies {
 //    debugImplementation libs.leakcanary
 //    debugProdImplementation libs.leakcanary
 
-    implementation libs.bundles.billing
-    implementation libs.bundles.coroutines
-    implementation libs.bundles.firebase
-    implementation libs.bundles.fragment
-    implementation libs.bundles.hilt
-    implementation libs.bundles.lifecycle
-    implementation libs.bundles.lottie
-    implementation libs.bundles.media3
-    implementation libs.bundles.moshi
-    implementation libs.bundles.navigation
-    implementation libs.bundles.okhttp
-    implementation libs.bundles.protobuf
-    implementation libs.bundles.retrofit
-    implementation libs.bundles.rxjava
-    implementation libs.bundles.work
+    implementation libs.billing
+    implementation libs.billing.ktx
+    implementation libs.compose.activity
+    implementation libs.compose.animation
+    implementation libs.compose.constraint
+    implementation libs.compose.icons
+    implementation libs.compose.livedata
+    implementation libs.compose.material
+    implementation libs.compose.rxjava2
+    implementation libs.compose.ui
+    implementation libs.compose.ui.tooling.preview
+    implementation libs.compose.ui.util
+    implementation libs.coroutines.core
+    implementation libs.coroutines.android
+    implementation libs.coroutines.play.services
+    implementation libs.coroutines.rx2
+    implementation libs.firebase.analytics
+    implementation libs.firebase.config
+    implementation libs.fragment.ktx
+    implementation libs.fragment.compose
+    implementation libs.hilt.android
+    implementation libs.hilt.navigation.compose
+    implementation libs.hilt.work
+    implementation libs.lifecycle.livedata
+    implementation libs.lifecycle.process
+    implementation libs.lifecycle.reactivestreams
+    implementation libs.lifecycle.runtime
+    implementation libs.lifecycle.runtime.compose
+    implementation libs.lifecycle.viewmodel
+    implementation libs.lifecycle.viewmodel.compose
+    implementation libs.lottie
+    implementation libs.lottie.compose
+    implementation libs.media3.cast
+    implementation libs.media3.datasource
+    implementation libs.media3.datasource.okhttp
+    implementation libs.media3.exoplayer
+    implementation libs.media3.exoplayer.hls
+    implementation libs.media3.extractor
+    implementation libs.media3.ui
+    implementation libs.moshi
+    implementation libs.moshi.adapters
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
+    implementation libs.navigation.compose
+    implementation libs.okhttp
+    implementation libs.okHttp.logging
+    implementation libs.protobuf.kotlin.lite
+    implementation libs.protobuf.javalite
+    implementation libs.retrofit
+    implementation libs.retrofit.moshi
+    implementation libs.retrofit.rxjava2
+    implementation libs.rxandroid
+    implementation libs.rxjava
+    implementation libs.rxrelay
+    implementation libs.rxkotlin
+    implementation libs.work.runtime
+    implementation libs.work.rxjava2
 
     implementation platform(libs.compose.bom)
     androidTestImplementation platform(libs.compose.bom)
@@ -36,7 +78,6 @@ dependencies {
     implementation libs.cast
     implementation libs.coil
     implementation libs.coil.compose
-    implementation libs.bundles.compose
     implementation libs.constraintlayout
     implementation libs.core.ktx
     implementation libs.device.names
@@ -76,8 +117,6 @@ dependencies {
     androidTestImplementation(libs.barista) {
         exclude group: "org.jetbrains.kotlin"
     }
-    androidTestImplementation libs.bundles.espresso
-    androidTestImplementation libs.bundles.test
     androidTestImplementation libs.compose.ui.test.junit4
     androidTestImplementation libs.jsonassert
     androidTestImplementation libs.mockito.android
@@ -88,6 +127,14 @@ dependencies {
     androidTestImplementation libs.uiautomator
     androidTestImplementation libs.work.test
     androidTestImplementation libs.turbine
+    androidTestImplementation libs.espresso.core
+    androidTestImplementation libs.espresso.contrib
+    androidTestImplementation libs.espresso.web
+    androidTestImplementation libs.espresso.idling.concurrent
+    androidTestImplementation libs.espresso.idling.resource
+    androidTestImplementation libs.test.core
+    androidTestImplementation libs.test.runner
+    androidTestImplementation libs.test.rules
 
     testImplementation libs.arch.core
     testImplementation libs.coroutines.test

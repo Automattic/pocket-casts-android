@@ -61,9 +61,23 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     // Compose for Wear OS Dependencies
-    implementation(libs.bundles.wear.compose)
+    implementation(libs.wear.compose.material)
+    implementation(libs.wear.compose.foundation)
+    implementation(libs.wear.compose.navigation)
 
-    implementation(libs.bundles.horologist)
+
+    implementation(libs.horologist.audio.ui)
+    implementation(libs.horologist.auth.composables)
+    implementation(libs.horologist.auth.data)
+    implementation(libs.horologist.auth.ui)
+    implementation(libs.horologist.compose.layout)
+    implementation(libs.horologist.compose.material)
+    implementation(libs.horologist.datalayer)
+    implementation(libs.horologist.media)
+    implementation(libs.horologist.media.data)
+    implementation(libs.horologist.media.ui)
+    implementation(libs.horologist.media3.backend)
+    implementation(libs.horologist.metwork.awarness.okhttp)
     implementation(libs.media3.datasource.okhttp)
     implementation(project(":modules:services:analytics"))
     implementation(project(":modules:services:compose"))

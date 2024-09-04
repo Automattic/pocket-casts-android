@@ -25,7 +25,8 @@ dependencies {
     implementation(project(":modules:services:utils"))
 
     api(libs.room.ktx)
-    implementation(libs.bundles.room)
+    implementation(libs.room.ktx)
+    implementation(libs.room.rxjava2)
     testImplementation(project(":modules:services:sharedtest"))
 
     ksp(libs.room.compiler)
