@@ -303,7 +303,7 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem, Boolean) ->
             binding.imgIcon.setImageResource(item.iconId(episode))
 
             val isEnabled = item != ShelfItem.Transcript || isTranscriptAvailable
-            binding.root.alpha = if (isEnabled || editable) 1f else 0.5f
+            binding.root.alpha = if (isEnabled || editable) 1f else 0.4f
 
             binding.dragHandle.isVisible = editable
 

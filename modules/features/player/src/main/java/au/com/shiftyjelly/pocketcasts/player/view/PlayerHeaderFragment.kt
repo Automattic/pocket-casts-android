@@ -174,7 +174,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     transcriptViewModel.uiState.collect { uiState ->
                         val transcriptAvailable = uiState !is TranscriptViewModel.UiState.Empty
-                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.5f
+                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.4f
                         binding.transcript.setOnClickListener {
                             if (!transcriptAvailable) {
                                 val message = getString(LR.string.transcript_error_not_available)
