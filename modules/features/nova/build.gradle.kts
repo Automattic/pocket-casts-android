@@ -5,8 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
-apply(from = "${project.rootDir}/base.gradle")
-
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.nova"
     buildFeatures {
@@ -17,6 +15,21 @@ android {
 }
 
 dependencies {
+    implementation(libs.coroutines.core)
+    api(libs.hilt.android)
+    api(libs.hilt.work)
+    implementation(libs.lifecycle.process)
+    implementation(libs.work.runtime)
+
+    debugImplementation(libs.compose.ui.tooling)
+
+    debugProdImplementation(libs.compose.ui.tooling)
+
+    testImplementation(libs.coroutines.test)
+
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
     // AAR dependencies cannot be resolved with Version Catalogs https://github.com/gradle/gradle/issues/20074
     implementation("io.branch.engage:conduit-source:0.2.3-pocketcasts.9@aar") { isTransitive = true }
 
@@ -24,7 +37,6 @@ dependencies {
     implementation(project(":modules:services:deeplink"))
     implementation(project(":modules:services:localization"))
     implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:preferences"))
+    api(project(":modules:services:repositories"))
     implementation(project(":modules:services:utils"))
 }
