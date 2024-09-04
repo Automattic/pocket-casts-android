@@ -14,33 +14,35 @@ android {
 }
 
 dependencies {
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.showkase.processor)
+
+    api(libs.dagger.hilt.android)
+    api(libs.material)
+    api(libs.showkase)
+
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.ui)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.androidx.core.ktx)
     implementation(libs.compose.animation)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.fragment.ktx)
-    api(libs.dagger.hilt.android)
-    implementation(libs.androidx.core.ktx)
-    api(libs.material)
-    api(libs.showkase)
-    implementation(platform(libs.compose.bom))
+
+    implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
-    testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.core)
-
-    ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.compiler)
-    ksp(libs.showkase.processor)
-
-
-    implementation(projects.modules.services.compose)
-    implementation(projects.modules.services.localization)
-    implementation(projects.modules.services.images)
-    api(projects.modules.services.ui)
-    api(projects.modules.services.repositories)
-    api(projects.modules.services.analytics)
+    testImplementation(libs.mockito.kotlin)
 
     testImplementation(projects.modules.services.sharedtest)
 }

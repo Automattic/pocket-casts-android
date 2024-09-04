@@ -15,24 +15,25 @@ android {
 }
 
 dependencies {
-    api(libs.dagger.hilt.android)
-    api(libs.hilt.work)
-    implementation(libs.coroutines.play.services)
-    implementation(libs.lifecycle.process)
-    implementation(libs.work.runtime)
-    implementation(libs.timber)
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    testImplementation(libs.junit)
+    api(libs.dagger.hilt.android)
+    api(libs.hilt.work)
+
+    api(projects.modules.services.repositories)
+
+    implementation(libs.coroutines.play.services)
+    implementation(libs.engage)
+    implementation(libs.lifecycle.process)
+    implementation(libs.timber)
+    implementation(libs.work.runtime)
 
     implementation(projects.modules.services.analytics)
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.model)
-    api(projects.modules.services.repositories)
     implementation(projects.modules.services.utils)
 
-    implementation(libs.engage)
+    testImplementation(libs.junit)
 }

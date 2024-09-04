@@ -15,26 +15,28 @@ android {
 }
 
 dependencies {
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    api(libs.dagger.hilt.android)
+    api(libs.tasker)
+
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.ui)
+
+    implementation(platform(libs.compose.bom))
+
     implementation(libs.compose.activity)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.util)
-    api(libs.dagger.hilt.android)
-    implementation(platform(libs.compose.bom))
-
-    ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.compiler)
-
 
     implementation(projects.modules.services.analytics)
-    implementation(projects.modules.services.localization)
-    api(projects.modules.services.ui)
     implementation(projects.modules.services.compose)
-    api(projects.modules.services.repositories)
-    api(projects.modules.services.model)
     implementation(projects.modules.services.images)
-    api(projects.modules.services.preferences)
+    implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
-    api(libs.tasker)
 }

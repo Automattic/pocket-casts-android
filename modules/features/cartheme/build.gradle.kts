@@ -10,6 +10,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.material)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.material)
 }

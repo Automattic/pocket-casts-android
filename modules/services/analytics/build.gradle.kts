@@ -13,8 +13,18 @@ android {
 }
 
 dependencies {
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
     api(libs.dagger.hilt.android)
+
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.utils)
+
     implementation(platform(libs.firebase.bom))
+
+    implementation(libs.automattic.tracks)
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.config.ktx)
 
@@ -23,12 +33,4 @@ dependencies {
     debugProdImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
-
-    ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.compiler)
-
-    implementation(libs.tracks)
-    api(projects.modules.services.utils)
-    api(projects.modules.services.preferences)
-    api(projects.modules.services.model)
 }

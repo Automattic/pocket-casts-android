@@ -13,31 +13,34 @@ android {
 }
 
 dependencies {
-    api(libs.androidx.appcompat)
-    implementation(libs.browser.helper)
-    implementation(libs.coroutines.core)
-    api(libs.dagger.hilt.android)
-    api(libs.hilt.work)
-    implementation(libs.media3.cast)
-    api(libs.work.runtime)
-    implementation(libs.coil)
-    implementation(libs.androidx.constraintlayout)
-    api(libs.material)
-    implementation(libs.material.dialogs)
-    implementation(libs.material.progressbar)
-    implementation(libs.androidx.mediarouter)
-    implementation(libs.androidx.preference.ktx)
-    implementation(libs.timber)
-    implementation(platform(libs.compose.bom))
-    api(libs.compose.ui.graphics)
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    implementation(projects.modules.services.images)
-    implementation(projects.modules.services.localization)
+    api(libs.androidx.appcompat)
+    api(libs.compose.ui.graphics)
+    api(libs.dagger.hilt.android)
+    api(libs.hilt.work)
+    api(libs.material)
+    api(libs.work.runtime)
+
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.mediarouter)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.browser.helper)
+    implementation(libs.coil)
+    implementation(libs.coroutines.core)
+    implementation(libs.material.dialogs)
+    implementation(libs.material.progressbar)
+    implementation(libs.media3.cast)
+    implementation(libs.timber)
+
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 }

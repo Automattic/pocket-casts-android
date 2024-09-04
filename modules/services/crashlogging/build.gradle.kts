@@ -13,18 +13,17 @@ android {
 }
 
 dependencies {
-    api(libs.dagger.hilt.android)
-
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit)
-    testImplementation(libs.turbine)
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
     ksp(libs.moshi.kotlin.codegen)
 
-    api(libs.crashlogging)
+    api(libs.automattic.crashlogging)
+    api(libs.dagger.hilt.android)
     api(libs.encryptedlogging)
 
     api(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.turbine)
 }

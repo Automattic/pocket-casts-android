@@ -31,10 +31,11 @@ google-services = "4.3.14"
 hilt = "2.52"
 hilt-compiler = "1.2.0"
 horologist = "0.5.26"
+java = "17"
 kotlin = "1.9.24"
 kotlin-coroutines = "1.8.1-Beta"
-ktlint = "0.50.0"
 ksp = "1.9.24-1.0.20"
+ktlint = "0.50.0"
 lifecycle = "2.8.4"
 lottie = "6.5.0"
 media3 = "1.4.1"
@@ -49,12 +50,11 @@ retrofit = "2.11.0"
 room = "2.6.1"
 sentry-plugin = "4.5.1"
 showkase = "1.0.2"
+tasker-plugin = "0.4.10"
 test = "1.6.1"
 tracks = "5.1.2"
 wear-compose = "1.3.1"
 work = "2.8.1"
-java = "17"
-tasker-plugin = "0.4.10"
 
 [libraries]
 # About Libraries
@@ -70,11 +70,13 @@ coil-base = { module = "io.coil-kt:coil-base", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 # Compose
-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
+compose-activity = "androidx.activity:activity-compose:1.8.2"
 compose-animation = { module = "androidx.compose.animation:animation" }
-compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
+compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-material = { module = "androidx.compose.material:material" }
+compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
 compose-ui = { module = "androidx.compose.ui:ui" }
@@ -83,10 +85,6 @@ compose-ui-test-junit = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-ui-util = { module = "androidx.compose.ui:ui-util" }
-compose-activity = "androidx.activity:activity-compose:1.8.2"
-compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 
 # Coroutines
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
@@ -97,16 +95,16 @@ coroutines-rx2 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2", vers
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 
 # Dagger / Hilt
+dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 dagger-hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
-dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
 hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 hilt-work = "androidx.hilt:hilt-work:1.2.0"
 
 # Espresso
-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
@@ -114,26 +112,30 @@ firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx"
 firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx" }
 
 # Fragments
-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragment" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+
+# Glance
+glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 
 # Google Play Services OSS Licenses - (The following line is still needed as there is no plugin marker available as of yet)
 osslicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.5"
 
 # Horologist
-horologist-audio-ui = { module = "com.google.android.horologist:horologist-audio-ui", version.ref = "horologist"}
-horologist-auth-composables = { module = "com.google.android.horologist:horologist-auth-composables", version.ref = "horologist"}
-horologist-auth-data = { module = "com.google.android.horologist:horologist-auth-data", version.ref = "horologist"}
-horologist-auth-data-phone = { module = "com.google.android.horologist:horologist-auth-data-phone", version.ref = "horologist"}
-horologist-auth-ui = { module = "com.google.android.horologist:horologist-auth-ui", version.ref = "horologist"}
-horologist-compose-layout = { module = "com.google.android.horologist:horologist-compose-layout", version.ref = "horologist"}
-horologist-compose-material = { module = "com.google.android.horologist:horologist-compose-material", version.ref = "horologist"}
-horologist-datalayer = { module = "com.google.android.horologist:horologist-datalayer", version.ref = "horologist"}
-horologist-media = { module = "com.google.android.horologist:horologist-media", version.ref = "horologist"}
-horologist-audio = { module = "com.google.android.horologist:horologist-audio", version.ref = "horologist"}
-horologist-media3-outputswitcher = { module = "com.google.android.horologist:horologist-media3-outputswitcher", version.ref = "horologist"}
-horologist-media-ui = { module = "com.google.android.horologist:horologist-media-ui", version.ref = "horologist"}
-horologist-network-awarness-okhttp = { module = "com.google.android.horologist:horologist-network-awareness-okhttp", version.ref = "horologist"}
+horologist-audio-ui = { module = "com.google.android.horologist:horologist-audio-ui", version.ref = "horologist" }
+horologist-audio = { module = "com.google.android.horologist:horologist-audio", version.ref = "horologist" }
+horologist-auth-composables = { module = "com.google.android.horologist:horologist-auth-composables", version.ref = "horologist" }
+horologist-auth-data = { module = "com.google.android.horologist:horologist-auth-data", version.ref = "horologist" }
+horologist-auth-data-phone = { module = "com.google.android.horologist:horologist-auth-data-phone", version.ref = "horologist" }
+horologist-auth-ui = { module = "com.google.android.horologist:horologist-auth-ui", version.ref = "horologist" }
+horologist-compose-layout = { module = "com.google.android.horologist:horologist-compose-layout", version.ref = "horologist" }
+horologist-compose-material = { module = "com.google.android.horologist:horologist-compose-material", version.ref = "horologist" }
+horologist-datalayer = { module = "com.google.android.horologist:horologist-datalayer", version.ref = "horologist" }
+horologist-media = { module = "com.google.android.horologist:horologist-media", version.ref = "horologist" }
+horologist-media-ui = { module = "com.google.android.horologist:horologist-media-ui", version.ref = "horologist" }
+horologist-media3-outputswitcher = { module = "com.google.android.horologist:horologist-media3-outputswitcher", version.ref = "horologist" }
+horologist-network-awarness-okhttp = { module = "com.google.android.horologist:horologist-network-awareness-okhttp", version.ref = "horologist" }
 
 # Lifecycle
 lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
@@ -149,12 +151,12 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "
 
 # Media3
 media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
+media3-common = { module = "androidx.media3:media3-common", version.ref = "media3" }
 media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
 media3-datasource-okhttp = { module = "androidx.media3:media3-datasource-okhttp", version.ref = "media3" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
-media3-extractor= { module = "androidx.media3:media3-extractor", version.ref = "media3" }
+media3-extractor = { module = "androidx.media3:media3-extractor", version.ref = "media3" }
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 
 # Mockito
@@ -182,9 +184,9 @@ okHttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.
 # For Android users, it's recommended to use protobuf Java Lite runtime because of its smaller code size.
 # Java Lite runtime also works better with Proguard because it doesn't rely on Java reflection and is optimized
 # to allow as much code stripping as possible.
-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
-protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
 protobuf-kotlinlite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
+protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
+protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 
 # Retrofit
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
@@ -201,10 +203,10 @@ room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 
 # RxJava
 rx2-android = "io.reactivex.rxjava2:rxandroid:2.1.1"
+rx2-extensions = "com.github.akarnokd:rxjava2-extensions:0.20.10"
 rx2-java = "io.reactivex.rxjava2:rxjava:2.2.21"
 rx2-kotlin = "io.reactivex.rxjava2:rxkotlin:2.4.0"
 rx2-relay = "com.jakewharton.rxrelay2:rxrelay:2.1.1"
-rx2-extensions = "com.github.akarnokd:rxjava2-extensions:0.20.10"
 
 # Showkase
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
@@ -215,17 +217,22 @@ tasker = { module = "com.joaomgcd:taskerpluginlibrary", version.ref = "tasker-pl
 
 # Test
 androidx-test-core = { module = "androidx.test:core", version.ref = "test" }
+androidx-test-junit-ext = "androidx.test.ext:junit:1.1.3"
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "test" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "test" }
-androidx-test-junit-ext = "androidx.test.ext:junit:1.1.3"
 
 # Tracks
-tracks = { module = "com.automattic:Automattic-Tracks-Android", version.ref = "tracks" }
-crashlogging = { module = "com.automattic.tracks:crashlogging", version.ref = "tracks" }
+automattic-crashlogging = { module = "com.automattic.tracks:crashlogging", version.ref = "tracks" }
+automattic-tracks = { module = "com.automattic:Automattic-Tracks-Android", version.ref = "tracks" }
+
+# Wear
+wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
+wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.0.0"
+wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
 # Wear Compose
-wear-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "wear-compose" }
 wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "wear-compose" }
+wear-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "wear-compose" }
 wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "wear-compose" }
 
 # Work Manager
@@ -234,20 +241,24 @@ work-rx2 = { module = "androidx.work:work-rxjava2", version.ref = "work" }
 work-test = { module = "androidx.work:work-testing", version.ref = "work" }
 
 # Other dependencies
-
 androidx-annotation = "androidx.annotation:annotation:1.3.0"
 androidx-appcompat = "androidx.appcompat:appcompat:1.5.0"
 androidx-arch-core = "androidx.arch.core:core-testing:2.2.0"
-play-auth = "com.google.android.gms:play-services-auth:20.4.0"
-barista = "com.adevinta.android:barista:4.3.0"
 androidx-browser = "androidx.browser:browser:1.4.0"
-browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
-capturable = "dev.shreyaspatil:capturable:2.1.0"
 androidx-car = "androidx.car.app:app:1.4.0-rc02"
 androidx-cardview = "androidx.cardview:cardview:1.0.0"
-play-cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidx-core-ktx = "androidx.core:core-ktx:1.10.1"
+androidx-mediarouter = "androidx.mediarouter:mediarouter:1.3.1"
+androidx-palette = "androidx.palette:palette:1.0.0"
+androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
+androidx-recyclerview = "androidx.recyclerview:recyclerview:1.3.0"
+androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
+androidx-viewpager = "androidx.viewpager2:viewpager2:1.0.0"
+barista = "com.adevinta.android:barista:4.3.0"
+browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
+capturable = "dev.shreyaspatil:capturable:2.1.0"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
 device-names = "com.jaredrummler:android-device-names:2.1.0"
 encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
@@ -257,26 +268,17 @@ flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 guava = "com.google.guava:guava:33.1.0-android" # Required to fix conflict between versions in exoplayer and workmanager
 jsonassert = "org.skyscreamer:jsonassert:1.5.3"
 junit = "junit:junit:4.13.2"
-
 leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 material = "com.google.android.material:material:1.9.0"
 material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
-androidx-mediarouter = "androidx.mediarouter:mediarouter:1.3.1"
+play-auth = "com.google.android.gms:play-services-auth:20.4.0"
+play-cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 play-oss-licenses = "com.google.android.gms:play-services-oss-licenses:17.0.0"
-androidx-palette = "androidx.palette:palette:1.0.0"
 play-review = "com.google.android.play:review-ktx:2.0.1"
 play-wearable = "com.google.android.gms:play-services-wearable:18.0.0"
-androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
-androidx-recyclerview = "androidx.recyclerview:recyclerview:1.3.0"
-androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.1.0"
-androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
-androidx-viewpager = "androidx.viewpager2:viewpager2:1.0.0"
-wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
-wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.0.0"
-wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
@@ -285,11 +287,11 @@ android-library = { id = "com.android.library", version.ref = "android-gradle-pl
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency-analysis" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:3.0.0"
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 spotless = "com.diffplug.spotless:6.23.3"
-protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }

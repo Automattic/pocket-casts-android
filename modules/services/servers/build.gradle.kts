@@ -14,34 +14,35 @@ android {
 }
 
 dependencies {
-    implementation(libs.coroutines.core)
-    api(libs.dagger.hilt.android)
-    api(libs.moshi)
-    implementation(libs.moshi.adapters)
-    api(libs.okhttp)
-    implementation(libs.okHttp.logging)
-    api(libs.protobuf.javalite)
-    api(libs.retrofit)
-    implementation(libs.retrofit.moshi)
-    implementation(libs.retrofit.rx2)
-    api(libs.rx2.java)
-    implementation(libs.rx2.android)
-    api(libs.work.runtime)
-    implementation(libs.retrofit.protobuf) { exclude(group = "com.google.protobuf", module = "protobuf-java") }
-    implementation(libs.timber)
-
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit)
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
     ksp(libs.moshi.kotlin.codegen)
-    implementation(libs.crashlogging)
 
+    api(libs.dagger.hilt.android)
+    api(libs.moshi)
+    api(libs.okhttp)
+    api(libs.protobuf.javalite)
+    api(libs.retrofit)
+    api(libs.rx2.java)
+    api(libs.work.runtime)
 
-    implementation(projects.modules.services.localization)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.protobuf)
+
+    implementation(libs.automattic.crashlogging)
+    implementation(libs.coroutines.core)
+    implementation(libs.moshi.adapters)
+    implementation(libs.okHttp.logging)
+    implementation(libs.retrofit.moshi)
+    implementation(libs.retrofit.protobuf) { exclude(group = "com.google.protobuf", module = "protobuf-java") }
+    implementation(libs.retrofit.rx2)
+    implementation(libs.rx2.android)
+    implementation(libs.timber)
+
+    implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
 }

@@ -11,12 +11,11 @@ android {
 }
 
 dependencies {
-    implementation(libs.rx2.android)
-
+    api(libs.automattic.crashlogging)
+    api(libs.junit)
 
     implementation(libs.coroutines.test)
-    implementation(projects.modules.services.utils)
+    implementation(libs.rx2.android)
 
-    api(libs.crashlogging)
-    api(libs.junit)
+    implementation(projects.modules.services.utils)
 }

@@ -15,36 +15,15 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.appcompat)
-    implementation(libs.compose.activity)
-    implementation(libs.compose.material)
-    implementation(libs.compose.constraintlayout)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.coroutines.core)
-    api(libs.dagger.hilt.android)
-    implementation(libs.androidx.core.ktx)
-    api(libs.showkase)
-    implementation(libs.timber)
-    api(libs.crashlogging)
-    implementation(platform(libs.compose.bom))
-
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.mockito.core)
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
     ksp(libs.showkase.processor)
 
-    // features
-    implementation(projects.modules.features.settings)
-    // services
+    api(libs.automattic.crashlogging)
+    api(libs.dagger.hilt.android)
+    api(libs.showkase)
+
     api(projects.modules.services.analytics)
-    implementation(projects.modules.services.compose)
-    implementation(projects.modules.services.images)
-    implementation(projects.modules.services.localization)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)
@@ -52,5 +31,28 @@ dependencies {
     api(projects.modules.services.ui)
     api(projects.modules.services.utils)
     api(projects.modules.services.views)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.compose.activity)
+    implementation(libs.compose.constraintlayout)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.coroutines.core)
+    implementation(libs.timber)
+
+    implementation(projects.modules.features.settings)
+    implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
     testImplementation(projects.modules.services.sharedtest)
 }

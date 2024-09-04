@@ -17,44 +17,44 @@ android {
 }
 
 dependencies {
-    implementation(libs.dagger.hilt.core)
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+    ksp(libs.room.compiler)
 
-    implementation(libs.play.auth)
-    implementation(libs.coroutines.core)
     api(libs.billing.ktx)
     api(libs.media3.extractor)
     api(libs.moshi)
     api(libs.okhttp)
     api(libs.room)
-    implementation(libs.room.rx2)
     api(libs.rx2.java)
-    implementation(libs.play.cast)
+
+    api(projects.modules.services.utils)
+
     implementation(libs.androidx.core.ktx)
+    implementation(libs.coroutines.core)
+    implementation(libs.dagger.hilt.core)
+    implementation(libs.play.auth)
+    implementation(libs.play.cast)
+    implementation(libs.room.ktx)
+    implementation(libs.room.rx2)
     implementation(libs.timber)
-    compileOnly(libs.media3.common)
+
+    implementation(projects.modules.services.localization)
 
     debugImplementation(libs.compose.ui.tooling)
 
     debugProdImplementation(libs.compose.ui.tooling)
 
+    compileOnly(libs.media3.common)
+
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
-
-    ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.compiler)
-    ksp(libs.moshi.kotlin.codegen)
-
-    androidTestImplementation(libs.androidx.annotation)
-    androidTestImplementation(platform(libs.compose.bom))
-
-    implementation(projects.modules.services.localization)
-    api(projects.modules.services.utils)
-
-    implementation(libs.room.ktx)
-    implementation(libs.room.rx2)
-    testImplementation(projects.modules.services.sharedtest)
-
     testImplementation(libs.mockito.core)
 
-    ksp(libs.room.compiler)
+    testImplementation(projects.modules.services.sharedtest)
+
+    androidTestImplementation(platform(libs.compose.bom))
+
+    androidTestImplementation(libs.androidx.annotation)
 }

@@ -15,12 +15,10 @@ android {
 }
 
 dependencies {
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
     api(libs.dagger.hilt.android)
-
 
     api(projects.modules.services.sharing)
 }

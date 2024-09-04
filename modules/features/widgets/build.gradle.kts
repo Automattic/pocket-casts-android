@@ -15,23 +15,25 @@ android {
 }
 
 dependencies {
-    api(libs.dagger.hilt.android)
-    api(libs.moshi)
-    implementation(libs.moshi.adapters)
-    implementation(libs.coil)
-    implementation(libs.timber)
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
     ksp(libs.moshi.kotlin.codegen)
 
-    implementation(libs.glance.appwidget)
-    implementation(libs.glance.material3)
-    implementation(libs.compose.material3)
+    api(libs.dagger.hilt.android)
+    api(libs.moshi)
+
     api(projects.modules.services.analytics)
-    implementation(projects.modules.services.images)
-    implementation(projects.modules.services.localization)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)
+
+    implementation(libs.coil)
+    implementation(libs.compose.material3)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+    implementation(libs.moshi.adapters)
+    implementation(libs.timber)
+
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
 }

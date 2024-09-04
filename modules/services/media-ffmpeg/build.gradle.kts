@@ -15,14 +15,14 @@ android {
 }
 
 dependencies {
-    api(projects.modules.services.sharing)
-    implementation(projects.modules.services.utils)
-
-    implementation(libs.ffmpeg)
-
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
     api(libs.dagger.hilt.android)
+
+    api(projects.modules.services.sharing)
+
+    implementation(libs.ffmpeg)
+
+    implementation(projects.modules.services.utils)
 }

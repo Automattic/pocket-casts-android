@@ -15,22 +15,25 @@ android {
 }
 
 dependencies {
-    implementation(libs.coroutines.core)
-    api(libs.dagger.hilt.android)
-    implementation(libs.coil)
-    implementation(libs.timber)
-    implementation(platform(libs.compose.bom))
-
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit)
-
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    api(projects.modules.services.model)
+    api(libs.dagger.hilt.android)
+
     api(projects.modules.services.analytics)
+    api(projects.modules.services.model)
+    api(projects.modules.services.repositories)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.coil)
+    implementation(libs.coroutines.core)
+    implementation(libs.timber)
+
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
-    api(projects.modules.services.repositories)
     implementation(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
 }

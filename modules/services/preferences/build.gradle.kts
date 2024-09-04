@@ -13,27 +13,30 @@ android {
 }
 
 dependencies {
-    implementation(libs.coroutines.core)
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
     api(libs.dagger.hilt.android)
     api(libs.moshi)
     api(libs.rx2.java)
     api(libs.rx2.relay)
+    api(libs.work.runtime)
+
+    api(projects.modules.services.model)
+    api(projects.modules.services.utils)
+
+    implementation(platform(libs.firebase.bom))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
-    api(libs.work.runtime)
-    implementation(libs.timber)
-    implementation(platform(libs.firebase.bom))
+    implementation(libs.coroutines.core)
     implementation(libs.firebase.config.ktx)
     implementation(libs.play.cast)
-
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit)
-
-    ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.compiler)
+    implementation(libs.timber)
 
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
-    api(projects.modules.services.model)
-    api(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
 }

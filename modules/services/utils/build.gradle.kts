@@ -16,33 +16,34 @@ android {
 }
 
 dependencies {
-    api(libs.coil.base)
-    implementation(libs.lifecycle.livedata.ktx)
-    testImplementation(libs.mockito.core)
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     api(libs.androidx.appcompat)
-    implementation(libs.play.auth)
-    implementation(libs.coroutines.core)
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.config.ktx)
+    api(libs.coil.base)
     api(libs.dagger.hilt.android)
-    api(libs.okhttp)
-    implementation(libs.rx2.android)
-    api(libs.rx2.java)
-    implementation(libs.androidx.car)
-    implementation(libs.androidx.annotation)
-    implementation(libs.play.cast)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.androidx.core.ktx)
     api(libs.material)
+    api(libs.okhttp)
+    api(libs.rx2.java)
     api(libs.timber)
+
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.firebase.bom))
 
+    implementation(libs.androidx.annotation)
+    implementation(libs.androidx.car)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.coroutines.core)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.config.ktx)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.play.auth)
+    implementation(libs.play.cast)
+    implementation(libs.rx2.android)
+
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
-
-    ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.compiler)
 }

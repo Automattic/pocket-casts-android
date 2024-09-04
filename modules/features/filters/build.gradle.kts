@@ -15,39 +15,38 @@ android {
 }
 
 dependencies {
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
     api(libs.androidx.appcompat)
+    api(libs.androidx.cardview)
+    api(libs.androidx.recyclerview)
+    api(libs.androidx.viewpager)
+    api(libs.dagger.hilt.android)
+    api(libs.flexbox)
+    api(libs.material)
+    api(libs.rx2.java)
+
+    api(projects.modules.features.podcasts)
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.ui)
+    api(projects.modules.services.views)
+
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.preference.ktx)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
-    api(libs.dagger.hilt.android)
     implementation(libs.rx2.android)
-    api(libs.rx2.java)
     implementation(libs.rx2.kotlin)
-    api(libs.androidx.cardview)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.core.ktx)
-    api(libs.flexbox)
-    api(libs.material)
-    implementation(libs.androidx.preference.ktx)
-    api(libs.androidx.recyclerview)
     implementation(libs.timber)
-    api(libs.androidx.viewpager)
 
-    ksp(libs.dagger.hilt.compiler)
-    ksp(libs.hilt.compiler)
-
-    // features
-    api(projects.modules.features.podcasts)
-
-    // services
-    api(projects.modules.services.analytics)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
-    api(projects.modules.services.model)
-    api(projects.modules.services.preferences)
-    api(projects.modules.services.repositories)
     implementation(projects.modules.services.utils)
-    api(projects.modules.services.ui)
-    api(projects.modules.services.views)
 }
