@@ -102,8 +102,6 @@ dependencies {
 
     debugProdImplementation(libs.compose.ui.tooling)
 
-    androidTestImplementation(platform(libs.compose.bom))
-
     androidTestImplementation(libs.androidx.annotation)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.junit.ext)

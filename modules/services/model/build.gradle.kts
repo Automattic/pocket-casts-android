@@ -54,7 +54,5 @@ dependencies {
 
     testImplementation(projects.modules.services.sharedtest)
 
-    androidTestImplementation(platform(libs.compose.bom))
-
     androidTestImplementation(libs.androidx.annotation)
 }

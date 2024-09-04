@@ -160,7 +160,7 @@ subprojects {
 
         // https://github.com/android/android-test/issues/999
         if (name == "androidTestImplementation") {
-            exclude("com.google.protobuf","protobuf-lite")
+            exclude("com.google.protobuf", "protobuf-lite")
         }
     }
 
