@@ -150,9 +150,9 @@
 #    public static *** sql(...);
 #}
 
-# Resolve AGP 8.0 update missing class errors by keeping the current behavior 
+# Resolve AGP 8.0 update missing class errors by keeping the current behavior
 # Example failure:
-# 
+#
 # > Task :modules:services:model:minifyReleaseWithR8 FAILED
 # ERROR: Missing classes detected while running R8. Please add the missing classes or apply additional keep rules that are generated in ~/pocket-casts-android/modules/services/model/build/outputs/mapping/release/missing_rules.txt.
 # ERROR: R8: Missing class au.com.shiftyjelly.pocketcasts.localization.R$string (referenced from: void au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency.<clinit>())
@@ -182,3 +182,8 @@
 
 # Protocol Buffers - keep the field names
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+
+# Hilt, https://github.com/google/dagger/issues/4323
+-keepclasseswithmembers,includedescriptorclasses class * {
+   @dagger.internal.KeepFieldType <fields>;
+}
