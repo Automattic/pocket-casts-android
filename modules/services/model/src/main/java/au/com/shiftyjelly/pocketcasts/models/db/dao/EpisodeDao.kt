@@ -277,6 +277,20 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun observePlaybackHistory(): Flowable<List<PodcastEpisode>>
 
+    @Query(
+        """
+        SELECT podcast_episodes.*
+        FROM podcast_episodes
+        LEFT JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
+        WHERE last_playback_interaction_date IS NOT NULL
+          AND last_playback_interaction_date > 0
+          AND (UPPER(podcast_episodes.title) LIKE UPPER(:query)
+               OR UPPER(podcasts.title) LIKE UPPER(:query))
+        ORDER BY last_playback_interaction_date DESC
+    """,
+    )
+    abstract fun filteredPlaybackHistoryFlow(query: String): Flow<List<PodcastEpisode>>
+
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode>

@@ -214,6 +214,10 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.observePlaybackHistory()
     }
 
+    override fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>> {
+        return episodeDao.filteredPlaybackHistoryFlow("%$query%")
+    }
+
     override suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode> {
         return episodeDao.findPlaybackHistoryEpisodes()
     }
