@@ -36,6 +36,8 @@ dependencyResolutionManagement {
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+rootProject.name = "pocket-casts-android"
+
 include(":app")
 include(":automotive")
 include(":wear")
