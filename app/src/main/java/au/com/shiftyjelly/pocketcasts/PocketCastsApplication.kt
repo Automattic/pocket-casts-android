@@ -40,7 +40,9 @@ import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
 import coil.Coil
 import coil.ImageLoader
+import com.automattic.android.experimentation.Experiment
 import com.automattic.android.experimentation.VariationsRepository
+import com.automattic.android.experimentation.domain.Variation
 import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
@@ -149,7 +151,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         setupApp()
         cleanupDatabaseExportFileIfExists()
         variationsRepository.initialize(
-            anonymousId = "current user id"
+            anonymousId = "current user id",
         )
     }
 
@@ -180,6 +182,16 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     private fun setupApp() {
         LogBuffer.i("Application", "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
+
+        val variation = variationsRepository.getVariation(Experiment("my first experiment"))
+        when (variation) {
+            is Variation.Control -> {
+                LogBuffer.i("", "Variation: Control")
+            }
+            is Variation.Treatment -> {
+                LogBuffer.i("", "Variation Treatment: ${variation.name}")
+            }
+        }
 
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)

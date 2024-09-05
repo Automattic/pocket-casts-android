@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.di
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.core.content.getSystemService
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import com.automattic.android.experimentation.Experiment
@@ -44,7 +43,7 @@ abstract class AppModule {
             platform = "pcandroid",
             experiments = setOf(
                 Experiment("my first experiment"),
-                Experiment("or my second experiment")
+                Experiment("or my second experiment"),
             ),
             logger = object : ExperimentLogger {
                 override fun d(message: String) = Timber.d(message)
@@ -53,7 +52,7 @@ abstract class AppModule {
             },
             failFast = BuildConfig.DEBUG,
             cacheDir = application.cacheDir,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
         )
     }
 
