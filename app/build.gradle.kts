@@ -67,6 +67,7 @@ dependencies {
     implementation(project(":modules:features:taskerplugin"))
     implementation(project(":modules:features:widgets"))
     implementation(project(":modules:features:nova"))
+    implementation(libs.experimentation)
 
     // services
     implementation(project(":modules:services:analytics"))

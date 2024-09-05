@@ -224,6 +224,7 @@ test-runner = { module = "androidx.test:runner", version.ref = "test" }
 # Tracks
 tracks = { module = "com.automattic:Automattic-Tracks-Android", version.ref = "tracks" }
 crashlogging = { module = "com.automattic.tracks:crashlogging", version.ref = "tracks" }
+experimentation = { module = "com.automattic.tracks:experimentation", version = "244-87dfdcf59774635393274d0359393b718207156a" }
 
 # Wear Compose
 wear-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "wear-compose" }

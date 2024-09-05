@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
 import coil.Coil
 import coil.ImageLoader
+import com.automattic.android.experimentation.VariationsRepository
 import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
@@ -119,6 +120,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var databaseExportHelper: DatabaseExportHelper
 
+    @Inject lateinit var variationsRepository: VariationsRepository
+
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
@@ -145,6 +148,9 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         setupAnalytics()
         setupApp()
         cleanupDatabaseExportFileIfExists()
+        variationsRepository.initialize(
+            anonymousId = "current user id"
+        )
     }
 
     private fun setupAnalytics() {
