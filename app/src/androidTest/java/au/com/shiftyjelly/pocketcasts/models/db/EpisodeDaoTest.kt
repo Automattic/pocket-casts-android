@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatis
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.util.Date
@@ -166,37 +167,60 @@ class EpisodeDaoTest {
 
     @Test
     fun getFilteredPlaybackHistoryResultForMatchedEpisodeTitle() = runTest {
-        val query = "%test%"
+        val query = "test"
         val episodes = listOf(PodcastEpisode(uuid = "1", title = "Test Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000))
         val podcast = Podcast(uuid = "podcast_uuid")
         episodeDao.insertAll(episodes)
         podcastDao.insert(podcast)
 
-        val result = episodeDao.filteredPlaybackHistoryFlow(query).first()
+        val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(episodes, result)
     }
 
     @Test
     fun getFilteredPlaybackHistoryResultForMatchedPodcastTitle() = runTest {
-        val query = "%test%"
+        val query = "test"
         val episodes = listOf(PodcastEpisode(uuid = "1", title = "Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000))
         val podcast = Podcast(uuid = "podcast_uuid", title = "Test Podcast")
         episodeDao.insertAll(episodes)
         podcastDao.insert(podcast)
 
-        val result = episodeDao.filteredPlaybackHistoryFlow(query).first()
+        val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(episodes, result)
     }
 
     @Test
     fun getOrderedFilteredPlaybackHistoryResults() = runTest {
-        val query = "%test%"
+        val query = "test"
         val episode1 = PodcastEpisode(uuid = "1", title = "Test Episode 1", publishedDate = Date(), lastPlaybackInteraction = 1000)
         val episode2 = PodcastEpisode(uuid = "2", title = "Test Episode 2", publishedDate = Date(), lastPlaybackInteraction = 2000)
         val episodes = listOf(episode2, episode1)
         episodeDao.insertAll(episodes)
 
-        val result = episodeDao.filteredPlaybackHistoryFlow(query).first()
+        val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(episodes, result)
+    }
+
+    @Test
+    fun getFilteredPlaybackHistoryResultForNoMatch() = runTest {
+        val query = "test"
+        val episodes = listOf(PodcastEpisode(uuid = "1", title = "Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000))
+        episodeDao.insertAll(episodes)
+
+        val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
+        assertEquals(emptyList<PodcastEpisode>(), result)
+    }
+
+    @Test
+    fun getFilteredPlaybackHistorydResultForMatchSpecialChars() = runTest {
+        val query = "%test_"
+
+        val episode1 = PodcastEpisode(uuid = "1", title = "%Test_ Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000)
+        val episode2 = PodcastEpisode(uuid = "3", title = "Test Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000)
+        val episodes = listOf(episode1, episode2)
+        episodeDao.insertAll(episodes)
+
+        val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
+        assertEquals(listOf(episode1), result)
     }
 }
