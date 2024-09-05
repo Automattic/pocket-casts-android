@@ -124,7 +124,7 @@ internal class FFmpegMediaService(
         podcast: Podcast,
         episode: PodcastEpisode,
         clipRange: Clip.Range,
-        cardType: VisualCardType?
+        cardType: VisualCardType?,
     ) = buildString {
         append(podcast.title.replace(sanitizedFileNameRegex, " "))
         append(" - ")
