@@ -22,19 +22,9 @@ abstract class UserSetting<T>(
         Instant.parse(getModifiedAtServerString())
     }.getOrNull()
 
-    /**
-     * Returns the value to sync. If sync is not needed or the modification timestamp is unknown
-     * it provides [Instant.EPOCH] plus one millisecond as the modification timestamp.
-     */
-    fun <U> getSyncSetting(f: (T, Instant) -> U): U {
-        return f(value, modifiedAt ?: DefaultFallbackTimestamp)
-    }
-
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
-    @Deprecated("This can be removed when Feature.SETTINGS_SYNC flag is removed")
-    fun getSyncValue(): T? {
-        val needsSync = getModifiedAtServerString() != null
-        return if (needsSync) value else null
+    fun getSyncValue(lastSyncTime: Instant): T? {
+        return modifiedAt?.let { if (it >= lastSyncTime) value else null }
     }
 
     // These are lazy because (1) the class needs to initialize before calling get() and
