@@ -28,8 +28,6 @@ import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
 import com.pocketcasts.service.api.SupportFeedbackRequest
-import com.pocketcasts.service.api.SyncUpdateRequest
-import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.bookmarkRequest
 import com.pocketcasts.service.api.userPodcastListRequest
@@ -128,15 +126,9 @@ open class SyncServiceManager @Inject constructor(
     fun validatePromoCode(code: String): Single<PromoCodeResponse> =
         service.validatePromoCode(PromoCodeRequest(code))
 
-    @Suppress("DEPRECATION")
-    @Deprecated("This method can be removed when the sync settings feature flag is removed")
     suspend fun namedSettings(request: NamedSettingsRequest, token: AccessToken): NamedSettingsResponse =
         service.namedSettings(addBearer(token), request)
 
-    suspend fun changedNamedSettings(request: ChangedNamedSettingsRequest, token: AccessToken): ChangedNamedSettingsResponse =
-        service.namedSettings(addBearer(token), request)
-
-    @Deprecated("This should no longer be used once the SETTINGS_SYNC feature flag is removed/permanently-enabled.")
     fun syncUpdate(email: String, data: String, lastSyncTime: Instant, token: AccessToken): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse> {
         val fields = mutableMapOf(
             "email" to email,
@@ -147,15 +139,8 @@ open class SyncServiceManager @Inject constructor(
         )
         addDeviceFields(fields)
 
-        @Suppress("DEPRECATION")
         return service.syncUpdate(fields)
     }
-
-    suspend fun userSyncUpdate(
-        token: AccessToken,
-        request: SyncUpdateRequest,
-    ): SyncUpdateResponse =
-        service.userSyncUpdate(addBearer(token), request)
 
     fun upNextSync(request: UpNextSyncRequest, token: AccessToken): Single<UpNextSyncResponse> =
         service.upNextSync(addBearer(token), request)
