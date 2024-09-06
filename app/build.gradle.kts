@@ -91,6 +91,7 @@ dependencies {
 
     implementation(projects.modules.features.account)
     implementation(projects.modules.features.discover)
+    implementation(projects.modules.features.engage)
     implementation(projects.modules.features.endofyear)
     implementation(projects.modules.features.filters)
     implementation(projects.modules.features.navigation)
