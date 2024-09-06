@@ -148,7 +148,7 @@ internal abstract class ClusterSyncWorker(
         } catch (e: Throwable) {
             Timber.tag(TAG).d(e, "Failed to sync '$type' cluster.")
             if (e.isRecoverable) {
-                Timber.d("Will retry to sync '$type' cluster.")
+                Timber.tag(TAG).d("Will retry to sync '$type' cluster.")
                 WorkerResult.retry()
             } else {
                 WorkerResult.failure()
