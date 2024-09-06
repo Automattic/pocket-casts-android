@@ -1,12 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.navigation"
@@ -16,5 +11,8 @@ android {
 }
 
 dependencies {
-    implementation("com.github.akarnokd:rxjava2-extensions:0.20.10")
+    api(libs.material)
+    api(libs.rx2.java)
+
+    implementation(libs.rx2.extensions)
 }

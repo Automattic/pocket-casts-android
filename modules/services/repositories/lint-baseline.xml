@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
 
     <issue
         id="MissingPermission"
@@ -19,7 +19,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="562"
+            line="568"
             column="13"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="652"
+            line="658"
             column="13"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="        ^">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/SubscribeManager.kt"
-            line="60"
+            line="59"
             column="9"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="467"
+            line="472"
             column="27"/>
     </issue>
 
@@ -228,7 +228,7 @@
         errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/support/Support.kt"
-            line="342"
+            line="348"
             column="59"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
-            line="199"
+            line="198"
             column="13"/>
     </issue>
 
@@ -279,7 +279,7 @@
         errorLine2="            ~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt"
-            line="268"
+            line="269"
             column="13"/>
     </issue>
 
@@ -290,7 +290,7 @@
         errorLine2="                ~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/SimplePlayer.kt"
-            line="233"
+            line="224"
             column="17"/>
     </issue>
 
@@ -352,28 +352,6 @@
     <issue
         id="LogNotTimber"
         message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
-        errorLine1="        Log.d(&quot;AUTO_IMAGE&quot;, &quot;Content uri received: ${uri.lastPathSegment}&quot;)"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/AlbumArtContentProvider.kt"
-            line="26"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="LogNotTimber"
-        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
-        errorLine1="            Log.e(&quot;AutoConverter&quot;, &quot;Could not load image in automotive $e&quot;)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/auto/AutoConverter.kt"
-            line="177"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="LogNotTimber"
-        message="Using &apos;Log&apos; instead of &apos;Timber&apos;"
         errorLine1="            Log.e(TAG, &quot;Could not read allowed callers from XML.&quot;, xmlException)"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -422,7 +400,7 @@
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt"
-            line="247"
+            line="248"
             column="21"/>
     </issue>
 
@@ -433,7 +411,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="523"
+            line="529"
             column="17"/>
     </issue>
 

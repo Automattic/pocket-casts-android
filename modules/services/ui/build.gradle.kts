@@ -3,10 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.ui"
@@ -16,10 +13,34 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:utils"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    api(libs.androidx.appcompat)
+    api(libs.compose.ui.graphics)
+    api(libs.dagger.hilt.android)
+    api(libs.hilt.work)
+    api(libs.material)
+    api(libs.work.runtime)
+
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.mediarouter)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.browser.helper)
+    implementation(libs.coil)
+    implementation(libs.coroutines.core)
+    implementation(libs.material.dialogs)
+    implementation(libs.material.progressbar)
+    implementation(libs.media3.cast)
+    implementation(libs.timber)
+
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.utils)
 }

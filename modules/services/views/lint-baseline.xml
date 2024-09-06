@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
 
     <issue
         id="SuspiciousImport"
@@ -43,6 +43,28 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/views/adapter/FolderItemDiffCallback.kt"
             line="23"
             column="50"/>
+    </issue>
+
+    <issue
+        id="PrivateResource"
+        message="The resource `@style/Theme_MediaRouter` is marked as private in androidx.mediarouter:mediarouter:1.6.0-beta01"
+        errorLine1="    val castContext = ContextThemeWrapper(context, R.style.Theme_MediaRouter)"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/MediaRouteButton.kt"
+            line="11"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="PrivateResource"
+        message="The resource `@attr/mediaRouteButtonStyle` is marked as private in androidx.mediarouter:mediarouter:1.6.0-beta01"
+        errorLine1="    val attrs = castContext.obtainStyledAttributes(null, R.styleable.MediaRouteButton, R.attr.mediaRouteButtonStyle, 0)"
+        errorLine2="                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/MediaRouteButton.kt"
+            line="12"
+            column="88"/>
     </issue>
 
     <issue
@@ -153,39 +175,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/views/fragments/PodcastSelectFragment.kt"
             line="275"
             column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        if (Build.VERSION.SDK_INT >= 21) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/MultiSwipeHelper.kt"
-            line="1222"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        if (Build.VERSION.SDK_INT >= 21) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/MultiSwipeHelper.kt"
-            line="2600"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        if (Build.VERSION.SDK_INT >= 21) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/MultiSwipeHelper.kt"
-            line="2628"
-            column="13"/>
     </issue>
 
     <issue

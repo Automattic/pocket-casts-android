@@ -8,6 +8,7 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.automattic.android.measure.reporters.InternalA8cCiReporter
 import com.automattic.android.measure.reporters.SlowSlowTasksMetricsReporter
 import com.google.devtools.ksp.gradle.KspExtension
+import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import java.util.EnumSet
@@ -21,7 +22,7 @@ buildscript {
     // Gradle Plugins
     dependencies {
         // Open source licenses plugin
-        classpath(libs.ossLicenses.plugin)
+        classpath(libs.osslicenses.plugin)
     }
 }
 
@@ -59,6 +60,46 @@ measureBuilds {
     attachGradleScanId = false
 }
 
+dependencyAnalysis {
+    structure {
+        ignoreKtx(true)
+    }
+
+    issues {
+        all {
+            onUsedTransitiveDependencies {
+                severity("ignore")
+            }
+
+            onRuntimeOnly {
+                severity("warn")
+                exclude("org.jetbrains.kotlinx:kotlinx-coroutines-android")
+            }
+        }
+
+        project(":app") {
+            onIncorrectConfiguration {
+                severity("warn")
+                exclude("org.jetbrains.kotlin:kotlin-stdlib")
+            }
+        }
+
+        project(":wear") {
+            onIncorrectConfiguration {
+                severity("warn")
+                exclude("org.jetbrains.kotlin:kotlin-stdlib")
+            }
+        }
+
+        project(":automotive") {
+            onIncorrectConfiguration {
+                severity("warn")
+                exclude("org.jetbrains.kotlin:kotlin-stdlib")
+            }
+        }
+    }
+}
+
 val ktlintVersion = libs.versions.ktlint.get()
 
 spotless {
@@ -80,7 +121,19 @@ spotless {
 
 val javaTarget = JvmTarget.fromTarget(libs.versions.java.get())
 
+allprojects {
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.name.startsWith("kotlin-stdlib")) {
+                useVersion(libs.versions.kotlin.asProvider().get())
+            }
+        }
+    }
+}
+
 subprojects {
+    apply(plugin = rootProject.libs.plugins.dependency.analysis.get().pluginId)
+
     plugins.withType<KotlinBasePlugin>().configureEach {
         tasks.withType<KotlinCompilationTask<KotlinJvmCompilerOptions>>().configureEach {
             compilerOptions {
@@ -91,8 +144,24 @@ subprojects {
         }
     }
 
+    plugins.withType<KspGradleSubplugin>().configureEach {
+        configure<KspExtension> {
+            arg("skipPrivatePreviews", "true")
+        }
+    }
+
     plugins.withId(rootProject.libs.plugins.sentry.get().pluginId) {
         configureSentry()
+    }
+
+    configurations.configureEach {
+        // Exclude the NDK from the Sentry Android SDK as we don't use it.
+        exclude("io.sentry", "sentry-android-ndk")
+
+        // https://github.com/android/android-test/issues/999
+        if (name == "androidTestImplementation") {
+            exclude("com.google.protobuf", "protobuf-lite")
+        }
     }
 
     tasks.withType<JavaCompile>().configureEach {
@@ -134,12 +203,6 @@ subprojects {
     val WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
 
     plugins.withType<BasePlugin>().configureEach {
-        afterEvaluate {
-            configure<KspExtension> {
-                arg("skipPrivatePreviews", "true")
-            }
-        }
-
         configure<BaseExtension> {
             compileOptions {
                 isCoreLibraryDesugaringEnabled = true
@@ -272,6 +335,11 @@ subprojects {
                 }
             }
         }
+
+        dependencies {
+            val coreLibraryDesugaring by configurations
+            coreLibraryDesugaring(libs.desugar.jdk)
+        }
     }
 
     plugins.withType<LibraryPlugin>().configureEach {
@@ -309,6 +377,16 @@ subprojects {
                     )
                     isShrinkResources = true
                 }
+            }
+        }
+
+        // Set Gradle property 'au.com.shiftyjelly.pocketcasts.leakcanary=true' to enable Leak Canary.
+        // You can do this using the local.properties file or any other avaialable Gradle mechanism.
+        // See: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
+        if (properties["au.com.shiftyjelly.pocketcasts.leakcanary"]?.toString().toBoolean()) {
+            dependencies {
+                val implementation by configurations
+                implementation(libs.leakcanary)
             }
         }
     }
