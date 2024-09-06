@@ -156,6 +156,35 @@ class ReferralsViewModelTest {
         }
     }
 
+    @Test
+    fun `tooltip is shown for paid account on launch`() = runTest {
+        initViewModel()
+
+        viewModel.state.test {
+            assertEquals(true, awaitItem().showTooltip)
+        }
+    }
+
+    @Test
+    fun `tooltip is not shown for free account on launch`() = runTest {
+        initViewModel(SignInState.SignedOut)
+
+        viewModel.state.test {
+            assertEquals(false, awaitItem().showTooltip)
+        }
+    }
+
+    @Test
+    fun `tooltip is hidden on icon click`() = runTest {
+        initViewModel()
+
+        viewModel.onIconClick()
+
+        viewModel.state.test {
+            assertEquals(false, awaitItem().showTooltip)
+        }
+    }
+
     private fun initViewModel(
         signInState: SignInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
     ) {
