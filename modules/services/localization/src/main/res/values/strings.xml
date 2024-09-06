@@ -2127,5 +2127,10 @@
 
     <!-- Referrals -->
     <string name="gift">Gift</string>
+    <plurals name="referrals_tooltip_heading">
+        <item quantity="one">You have %d pass to share!</item>
+        <item quantity="other">You have %d passes to share!</item>
+    </plurals>
+    <string name="referrals_tooltip_message">Give 30 days of Plus to friends and family.</string>
 
 </resources>

@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -32,6 +34,7 @@ class ReferralsViewModelTest {
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val userManager: UserManager = mock()
+    private val settings: Settings = mock()
     private lateinit var viewModel: ReferralsViewModel
     private val email = "support@pocketcasts.com"
     private val statusAndroidPaidSubscription = SubscriptionStatus.Paid(
@@ -49,6 +52,7 @@ class ReferralsViewModelTest {
     @Before
     fun setUp() {
         FeatureFlag.setEnabled(Feature.REFERRALS, true)
+        whenever(settings.showReferralsTooltip).thenReturn(UserSetting.Mock(true, mock()))
     }
 
     @Test
@@ -117,7 +121,7 @@ class ReferralsViewModelTest {
     fun `updateBadgeCount decreases badge count when greater than zero`() = runTest {
         initViewModel() // badge count is 3 by default
 
-        viewModel.updateBadgeCount()
+        viewModel.onIconClick()
 
         assertEquals(2, viewModel.state.value.badgeCount)
     }
@@ -143,9 +147,9 @@ class ReferralsViewModelTest {
     @Test
     fun `showBadge is false when badgeCount is zero`() = runTest {
         initViewModel()
-        viewModel.updateBadgeCount()
-        viewModel.updateBadgeCount()
-        viewModel.updateBadgeCount()
+        viewModel.onIconClick()
+        viewModel.onIconClick()
+        viewModel.onIconClick()
 
         viewModel.state.test {
             assertEquals(false, awaitItem().showBadge)
@@ -156,6 +160,6 @@ class ReferralsViewModelTest {
         signInState: SignInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
     ) {
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
-        viewModel = ReferralsViewModel(userManager)
+        viewModel = ReferralsViewModel(userManager, settings)
     }
 }

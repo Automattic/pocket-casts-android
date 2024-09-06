@@ -113,6 +113,8 @@ interface Settings {
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
 
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
+
+        const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -537,4 +539,6 @@ interface Settings {
 
     fun automotiveConnectedToMediaSession(): Boolean
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
+
+    val showReferralsTooltip: UserSetting<Boolean>
 }

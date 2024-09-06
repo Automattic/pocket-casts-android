@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentProfileBinding
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIconWithTooltip
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
@@ -79,7 +79,6 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: ProfileViewModel by viewModels()
-    private val referralsViewModel: ReferralsViewModel by viewModels()
 
     private var binding: FragmentProfileBinding? = null
     private val sections = arrayListOf(
@@ -218,6 +217,7 @@ class ProfileFragment : BaseFragment() {
         if (FeatureFlag.isEnabled(Feature.REFERRALS)) {
             binding.btnGift.setContent {
                 AppTheme(theme.activeTheme) {
+                    ReferralsIconWithTooltip()
                 }
             }
         }

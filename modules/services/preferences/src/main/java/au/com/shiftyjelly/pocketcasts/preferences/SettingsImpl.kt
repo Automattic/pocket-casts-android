@@ -1473,4 +1473,10 @@ class SettingsImpl @Inject constructor(
         editor.putBoolean(Settings.AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION, isLoaded)
         editor.apply()
     }
+
+    override val showReferralsTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SHOW_REFERRALS_TOOLTIP,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 }
