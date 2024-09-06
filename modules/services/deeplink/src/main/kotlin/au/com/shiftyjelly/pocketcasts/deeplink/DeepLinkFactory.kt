@@ -52,6 +52,7 @@ class DeepLinkFactory(
         UpdageAccountAdapter(),
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
+        SignInAdapter(shareHost),
         ShareLinkAdapter(shareHost),
         OpmlAdapter(listOf(listHost, shareHost)),
         PodcastUrlSchemeAdapter(listOf(listHost, shareHost)),
@@ -486,6 +487,24 @@ private class AssistantAdapter : DeepLinkAdapter {
     override fun create(intent: Intent): DeepLink? {
         return if (intent.extras?.getBoolean("extra_accl_intent", false) == true || intent.extras?.getBoolean("handled_by_nga", false) == true) {
             AssistantDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class SignInAdapter(
+    private val webBaseHost: String,
+) : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data
+        val scheme = uriData?.scheme
+        val host = uriData?.host
+        val path = uriData?.path?.takeIf { it != "/" }
+        val source = uriData?.getQueryParameter(EXTRA_SOURCE_VIEW)
+
+        return if (intent.action == ACTION_VIEW && scheme in listOf("http", "https") && host == webBaseHost && path == "/sign-in") {
+            SignInDeepLink(source)
         } else {
             null
         }
