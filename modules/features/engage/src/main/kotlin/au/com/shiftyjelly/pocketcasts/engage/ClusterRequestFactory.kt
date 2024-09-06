@@ -29,9 +29,9 @@ internal class ClusterRequestFactory(
     private val context: Context,
 ) {
     fun createRecommendations(
-        recommendationsData: RecommendationsData,
+        recommendations: Recommendations,
     ): PublishRecommendationClustersRequest {
-        val recentlyPlayed = recommendationsData.recentlyPlayed.takeIf { it.isNotEmpty() }?.let { podcasts ->
+        val recentlyPlayed = recommendations.recentlyPlayed.takeIf { it.isNotEmpty() }?.let { podcasts ->
             val entities = podcasts.map { podcast ->
                 PodcastSeriesEntity.Builder()
                     .setName(podcast.title)
@@ -48,7 +48,7 @@ internal class ClusterRequestFactory(
                 .apply { entities.forEach { addEntity(it) } }
                 .build()
         }
-        val newReleases = recommendationsData.newReleases.takeIf { it.isNotEmpty() }?.let { episodes ->
+        val newReleases = recommendations.newReleases.takeIf { it.isNotEmpty() }?.let { episodes ->
             val entities = episodes.map { episode ->
                 PodcastEpisodeEntity.Builder()
                     .setName(episode.title)
@@ -71,7 +71,7 @@ internal class ClusterRequestFactory(
                 .apply { entities.forEach { addEntity(it) } }
                 .build()
         }
-        val trending = recommendationsData.trending.takeIf { it.podcasts.isNotEmpty() }?.let { list ->
+        val trending = recommendations.trending.takeIf { it.podcasts.isNotEmpty() }?.let { list ->
             val entities = list.podcasts.map { podcast ->
                 PodcastSeriesEntity.Builder()
                     .setName(podcast.title)
@@ -86,7 +86,7 @@ internal class ClusterRequestFactory(
                 .apply { entities.forEach { addEntity(it) } }
                 .build()
         }
-        val curated = recommendationsData.curatedRecommendations.map { recommendation ->
+        val curated = recommendations.curatedRecommendations.map { recommendation ->
             recommendation.takeIf { it.podcasts.isNotEmpty() }?.let { list ->
                 val entities = list.podcasts.map { podcast ->
                     PodcastSeriesEntity.Builder()

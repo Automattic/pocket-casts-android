@@ -83,7 +83,7 @@ internal class RecommendationsSyncWorker @AssistedInject constructor(
         val newReleases = externalDataManager.getNewEpisodes(limit = 50)
         val discoverRecommendations = externalDataManager.getCuratedPodcastGroups(limitPerGroup = 50)
         val trending = discoverRecommendations.trendingGroup() ?: ExternalPodcastList("", "", emptyList())
-        val data = RecommendationsData.create(recentlyPlayedPodcasts, newReleases, trending, discoverRecommendations.genericGroups())
+        val data = Recommendations.create(recentlyPlayedPodcasts, newReleases, trending, discoverRecommendations.genericGroups())
         return client.publishRecommendationClusters(clusterRequestFactory.createRecommendations(data))
     }
 }

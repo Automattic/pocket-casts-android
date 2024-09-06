@@ -4,7 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ExternalEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
 
-internal data class RecommendationsData(
+internal data class Recommendations(
     val recentlyPlayed: List<ExternalPodcast>,
     val newReleases: List<ExternalEpisode.Podcast>,
     val trending: ExternalPodcastList,
@@ -16,12 +16,12 @@ internal data class RecommendationsData(
             newReleases: List<ExternalEpisode.Podcast>,
             trending: ExternalPodcastList,
             recommendations: Map<String, ExternalPodcastList>,
-        ): RecommendationsData {
+        ): Recommendations {
             val sortedRecommendations = recommendations.values
                 .filter { it.podcasts.isNotEmpty() }
                 .sortedByDescending { it.podcasts.size }
                 .take(5 - recentlyPlayed.size.coerceAtMost(1) - newReleases.size.coerceAtMost(1) - trending.podcasts.size.coerceAtMost(1))
-            return RecommendationsData(recentlyPlayed, newReleases, trending, sortedRecommendations)
+            return Recommendations(recentlyPlayed, newReleases, trending, sortedRecommendations)
         }
     }
 }
