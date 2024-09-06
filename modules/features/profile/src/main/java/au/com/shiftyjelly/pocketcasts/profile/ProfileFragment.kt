@@ -13,7 +13,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -57,10 +56,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.views.component.createCountBadge
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import com.google.android.material.badge.BadgeDrawable
-import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
@@ -123,9 +119,6 @@ class ProfileFragment : BaseFragment() {
 
         val binding = binding ?: return
 
-        binding.btnGift.setOnClickListener {
-            referralsViewModel.updateBadgeCount()
-        }
         binding.btnSettings.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
             (activity as FragmentHostListener).addFragment(SettingsFragment())
@@ -222,19 +215,9 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
-        var referralsCountBadge: BadgeDrawable? = null
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                referralsViewModel.state.collect { state ->
-                    binding.btnGift.isVisible = state.showIcon
-                    if (referralsCountBadge == null) {
-                        referralsCountBadge = createCountBadge(requireContext())
-                        binding.btnGift.doOnLayout {
-                            BadgeUtils.attachBadgeDrawable(requireNotNull(referralsCountBadge), binding.btnGift)
-                        }
-                    }
-                    referralsCountBadge?.number = state.badgeCount
-                    referralsCountBadge?.isVisible = state.showBadge
+        if (FeatureFlag.isEnabled(Feature.REFERRALS)) {
+            binding.btnGift.setContent {
+                AppTheme(theme.activeTheme) {
                 }
             }
         }
