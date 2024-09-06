@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -41,7 +40,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
@@ -197,12 +195,26 @@ object TooltipDefaults {
 }
 
 @ShowkaseComposable(name = "Tooltip", group = "Popup")
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PortraitRegular, name = "Light")
+@Composable
+fun TooltipLightPreview(
+) {
+    TooltipPreview(Theme.ThemeType.LIGHT)
+}
+
+@ShowkaseComposable(name = "Tooltip", group = "Popup")
+@Preview(device = Devices.PortraitRegular, name = "Dark")
+@Composable
+fun TooltipDarkPreview(
+) {
+    TooltipPreview(Theme.ThemeType.DARK)
+}
+
 @Composable
 fun TooltipPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+    type: Theme.ThemeType
 ) {
-    AppThemeWithBackground(themeType) {
+    AppThemeWithBackground(type) {
         TooltipContent(
             shape = TooltipShape(30f),
             alpha = 1.0f,
