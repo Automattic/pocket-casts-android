@@ -6,10 +6,12 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,17 +27,22 @@ class ReferralsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userManager.getSignInState().asFlow()
-                .stateIn(viewModelScope)
-                .collect { signInState ->
-                    val showIcon = FeatureFlag.isEnabled(Feature.REFERRALS) && signInState.isSignedInAsPlusOrPatron
-                    _state.update {
-                        it.copy(
-                            showIcon = showIcon,
-                            showTooltip = showIcon && settings.showReferralsTooltip.value,
-                        )
-                    }
+            combine(
+                userManager.getSignInState().asFlow(),
+                settings.playerOrUpNextBottomSheetState,
+            ) { signInState, playerBottomSheetState ->
+                val showIcon = FeatureFlag.isEnabled(Feature.REFERRALS) && signInState.isSignedInAsPlusOrPatron
+                _state.update {
+                    it.copy(
+                        showIcon = showIcon,
+                        showTooltip = if (playerBottomSheetState == BottomSheetBehavior.STATE_COLLAPSED) {
+                            showIcon && settings.showReferralsTooltip.value
+                        } else {
+                            false
+                        },
+                    )
                 }
+            }.stateIn(this)
         }
     }
 

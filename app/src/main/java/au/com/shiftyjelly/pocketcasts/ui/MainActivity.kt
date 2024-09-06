@@ -904,6 +904,7 @@ class MainActivity :
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {

@@ -541,4 +541,7 @@ interface Settings {
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
 
     val showReferralsTooltip: UserSetting<Boolean>
+
+    val playerOrUpNextBottomSheetState: Flow<Int>
+    fun updatePlayerOrUpNextBottomSheetState(state: Int)
 }
