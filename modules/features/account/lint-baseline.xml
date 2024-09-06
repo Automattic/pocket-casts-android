@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
 
     <issue
         id="MissingSuperCall"
@@ -217,7 +217,7 @@
         errorLine2="                                                   ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/account/onboarding/upgrade/OnboardingUpgradeFeaturesPage.kt"
-            line="317"
+            line="341"
             column="52"/>
     </issue>
 
@@ -250,17 +250,6 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account.xml"
-            line="8"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/primary_ui_01` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;?attr/primary_ui_01&quot; >"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_create_account.xml"
             line="8"
             column="5"/>
     </issue>
@@ -317,17 +306,6 @@
         <location
             file="src/main/res/layout/fragment_create_email.xml"
             line="7"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/primary_ui_01` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;?attr/primary_ui_01&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_create_tos.xml"
-            line="8"
             column="5"/>
     </issue>
 
@@ -409,17 +387,6 @@
         message="Found bitmap drawable `res/drawable/upgrade_background_plus_glows.webp` in densityless folder">
         <location
             file="src/main/res/drawable/upgrade_background_plus_glows.webp"/>
-    </issue>
-
-    <issue
-        id="SmallSp"
-        message="Avoid using sizes smaller than `11sp`: `8sp`"
-        errorLine1="                android:layout_height=&quot;8sp&quot; />"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_create_tos.xml"
-            line="58"
-            column="17"/>
     </issue>
 
     <issue
@@ -827,13 +794,6 @@
             file="src/main/res/layout-land/fragment_sign_in.xml"
             line="102"
             column="21"/>
-    </issue>
-
-    <issue
-        id="RtlEnabled"
-        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
-        <location
-            file="src/main/AndroidManifest.xml"/>
     </issue>
 
 </issues>

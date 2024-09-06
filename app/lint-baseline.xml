@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
+
+    <issue
+        id="MissingClass"
+        message="Class referenced in the manifest, `com.google.android.gms.oss.licenses.OssLicensesMenuActivity`, was not found in the project or the libraries"
+        errorLine1="        &lt;activity android:name=&quot;com.google.android.gms.oss.licenses.OssLicensesMenuActivity&quot;"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="511"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="MissingClass"
+        message="Class referenced in the manifest, `com.google.android.gms.oss.licenses.OssLicensesActivity`, was not found in the project or the libraries"
+        errorLine1="        &lt;activity android:name=&quot;com.google.android.gms.oss.licenses.OssLicensesActivity&quot;"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="513"
+            column="33"/>
+    </issue>
 
     <issue
         id="ScopedStorage"
@@ -19,7 +41,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/au/com/shiftyjelly/pocketcasts/models/db/PodcastDaoTest.kt"
-            line="59"
+            line="54"
             column="9"/>
     </issue>
 
@@ -30,7 +52,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/au/com/shiftyjelly/pocketcasts/models/db/PodcastManagerTest.kt"
-            line="112"
+            line="117"
             column="9"/>
     </issue>
 
@@ -41,7 +63,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidTest/java/au/com/shiftyjelly/pocketcasts/models/db/PodcastManagerTest.kt"
-            line="119"
+            line="124"
             column="9"/>
     </issue>
 
@@ -118,7 +140,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="134"
+            line="133"
             column="17"/>
     </issue>
 
@@ -129,7 +151,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="139"
+            line="138"
             column="17"/>
     </issue>
 
@@ -140,7 +162,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="144"
+            line="143"
             column="17"/>
     </issue>
 
@@ -151,7 +173,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="149"
+            line="148"
             column="17"/>
     </issue>
 
@@ -162,7 +184,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="188"
+            line="187"
             column="17"/>
     </issue>
 
@@ -173,7 +195,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="192"
+            line="191"
             column="17"/>
     </issue>
 
@@ -184,7 +206,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="196"
+            line="195"
             column="17"/>
     </issue>
 
@@ -195,7 +217,7 @@
         errorLine2="                ^">
         <location
             file="src/main/AndroidManifest.xml"
-            line="200"
+            line="199"
             column="17"/>
     </issue>
 
@@ -206,7 +228,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="252"
+            line="251"
             column="17"/>
     </issue>
 
@@ -217,7 +239,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="253"
+            line="252"
             column="17"/>
     </issue>
 
@@ -228,7 +250,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="969"
+            line="959"
             column="55"/>
     </issue>
 
@@ -239,7 +261,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="976"
+            line="966"
             column="55"/>
     </issue>
 
@@ -261,11 +283,11 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1533"
+            line="1527"
             column="70"/>
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1537"
+            line="1531"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -277,7 +299,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="533"
+            line="538"
             column="10"/>
     </issue>
 
@@ -288,7 +310,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="546"
+            line="551"
             column="10"/>
     </issue>
 
@@ -299,7 +321,7 @@
         errorLine2="         ~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="559"
+            line="564"
             column="10"/>
     </issue>
 

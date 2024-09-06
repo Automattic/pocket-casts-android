@@ -3,10 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.sharing"
@@ -18,12 +15,25 @@ android {
 }
 
 dependencies {
-    api(project(":modules:services:model"))
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:utils"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
-    testImplementation(project(":modules:services:sharedtest"))
+    api(libs.dagger.hilt.android)
+
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.model)
+    api(projects.modules.services.repositories)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.coil)
+    implementation(libs.coroutines.core)
+    implementation(libs.timber)
+
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
 }
