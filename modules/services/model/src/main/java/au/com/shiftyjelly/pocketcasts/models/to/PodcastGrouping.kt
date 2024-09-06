@@ -12,7 +12,6 @@ sealed class PodcastGrouping(
     @StringRes val groupName: Int,
     val index: Int,
     val serverId: Int,
-    var sortFunction: ((PodcastEpisode) -> Int)?,
 ) {
     companion object {
         val All
@@ -23,14 +22,17 @@ sealed class PodcastGrouping(
         fun fromIndex(index: Int) = All.find { it.index == index }
     }
 
+    abstract val sortFunction: ((PodcastEpisode) -> Int)?
+
     abstract fun groupTitles(index: Int, context: Context): String
 
     data object None : PodcastGrouping(
         groupName = LR.string.none,
         index = 0,
         serverId = 0,
-        sortFunction = null,
     ) {
+        override val sortFunction: ((PodcastEpisode) -> Int)? = null
+
         override fun groupTitles(index: Int, context: Context): String {
             return context.getString(LR.string.none)
         }
@@ -40,8 +42,10 @@ sealed class PodcastGrouping(
         groupName = LR.string.podcast_group_downloaded,
         index = 1,
         serverId = 1,
-        sortFunction = { if (it.isDownloaded || it.isDownloading || it.isQueued) 0 else 1 },
     ) {
+        override val sortFunction: ((PodcastEpisode) -> Int)
+            get() = { if (it.isDownloaded || it.isDownloading || it.isQueued) 0 else 1 }
+
         override fun groupTitles(index: Int, context: Context): String {
             return if (index == 0) {
                 context.getString(LR.string.podcast_group_downloaded)
@@ -57,8 +61,10 @@ sealed class PodcastGrouping(
         groupName = LR.string.podcast_group_unplayed,
         index = 2,
         serverId = 2,
-        sortFunction = { if (it.isUnplayed || it.isInProgress) 0 else 1 },
     ) {
+        override val sortFunction: ((PodcastEpisode) -> Int)
+            get() = { if (it.isUnplayed || it.isInProgress) 0 else 1 }
+
         override fun groupTitles(index: Int, context: Context): String {
             return if (index == 0) {
                 context.getString(LR.string.podcast_group_unplayed)
@@ -74,13 +80,11 @@ sealed class PodcastGrouping(
         groupName = LR.string.podcast_group_season,
         index = 3,
         serverId = 3,
-        sortFunction = null,
     ) {
         lateinit var groupTitlesList: List<String>
 
-        init {
-            sortFunction = { getSeasonGroupId(it) }
-        }
+        override val sortFunction: ((PodcastEpisode) -> Int)
+            get() = { getSeasonGroupId(it) }
 
         override fun groupTitles(index: Int, context: Context): String {
             return groupTitlesList.getOrNull(index) ?: context.getString(LR.string.podcast_no_season)
@@ -114,8 +118,10 @@ sealed class PodcastGrouping(
         groupName = LR.string.profile_navigation_starred,
         index = 4,
         serverId = 4,
-        sortFunction = { if (it.isStarred) 0 else 1 },
     ) {
+        override val sortFunction: (PodcastEpisode) -> Int
+            get() = { if (it.isStarred) 0 else 1 }
+
         override fun groupTitles(index: Int, context: Context): String {
             return if (index == 0) {
                 context.getString(LR.string.profile_navigation_starred)
