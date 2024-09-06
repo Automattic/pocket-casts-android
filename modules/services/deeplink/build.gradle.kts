@@ -1,11 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.deeplink"
@@ -14,4 +10,12 @@ android {
         viewBinding = false
         compose = false
     }
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.timber)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
 }

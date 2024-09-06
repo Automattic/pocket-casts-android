@@ -8,156 +8,6 @@ option java_multiple_files = true;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
-message Int32Setting {
-  google.protobuf.Int32Value value = 1;
-  google.protobuf.BoolValue changed = 2;
-  google.protobuf.Timestamp modified_at = 3;
-}
-
-message BoolSetting {
-  google.protobuf.BoolValue value = 1;
-  google.protobuf.BoolValue changed = 2;
-  google.protobuf.Timestamp modified_at = 3;
-}
-
-message DoubleSetting {
-  google.protobuf.DoubleValue value = 1;
-  google.protobuf.BoolValue changed = 2;
-  google.protobuf.Timestamp modified_at = 3;
-}
-
-message SyncUpdateRequest {
-  int64 device_utc_time_ms = 1;
-  int64 last_modified = 2;
-  string country = 3;
-  string device_id = 4;
-  repeated Record records = 5;
-}
-
-message SyncUpdateResponse {
-  int64 last_modified = 1;
-  repeated Record records = 2;
-}
-
-message Record {
-  oneof record {
-    SyncUserPodcast podcast = 1;
-    SyncUserEpisode episode = 2;
-    SyncUserPlaylist playlist = 3;
-    SyncUserDevice device = 4;
-    SyncUserFolder folder = 5;
-    SyncUserBookmark bookmark = 6;
-  }
-}
-
-message SyncUserPodcast {
-  reserved 4, 5, 6; // Not used by mobile client
-
-  string uuid = 1;
-  google.protobuf.BoolValue is_deleted = 2;
-  google.protobuf.BoolValue subscribed = 3;
-  google.protobuf.StringValue folder_uuid = 7;
-  google.protobuf.Int32Value sort_position = 8;
-  google.protobuf.Timestamp date_added = 9;
-  PodcastSettings settings = 10;
-}
-
-message PodcastSettings {
-  BoolSetting notification = 1;
-  BoolSetting add_to_up_next = 2;
-  Int32Setting add_to_up_next_position = 3;
-  BoolSetting auto_archive = 4;
-  BoolSetting playback_effects = 5;
-  DoubleSetting playback_speed = 6;
-  Int32Setting trim_silence = 7;
-  BoolSetting volume_boost = 8;
-  Int32Setting auto_start_from = 9;
-  Int32Setting auto_skip_last = 10;
-  Int32Setting episodes_sort_order = 11;
-  Int32Setting auto_archive_played = 12;
-  Int32Setting auto_archive_inactive = 13;
-  Int32Setting auto_archive_episode_limit = 14;
-  Int32Setting episode_grouping = 15;
-  BoolSetting show_archived = 16;
-}
-
-message SyncUserEpisode {
-  string uuid = 1;
-  string podcast_uuid = 2;
-  google.protobuf.BoolValue is_deleted = 3;
-  google.protobuf.Int64Value is_deleted_modified = 4;
-  google.protobuf.Int64Value duration = 5;
-  google.protobuf.Int64Value duration_modified = 6;
-  google.protobuf.Int32Value playing_status = 7;
-  google.protobuf.Int64Value playing_status_modified = 8;
-  google.protobuf.Int64Value played_up_to = 9;
-  google.protobuf.Int64Value played_up_to_modified = 10;
-  google.protobuf.BoolValue starred = 11;
-  google.protobuf.Int64Value starred_modified = 12;
-  string deselected_chapters = 13;
-  google.protobuf.Int64Value deselected_chapters_modified = 14;
-}
-
-message SyncUserDevice {
-  google.protobuf.StringValue device_id = 1;
-  google.protobuf.Int32Value device_type = 2;
-  // times in seconds
-  google.protobuf.Int64Value times_started_at = 3;
-  google.protobuf.Int64Value time_silence_removal = 4;
-  google.protobuf.Int64Value time_variable_speed = 5;
-  google.protobuf.Int64Value time_intro_skipping = 6;
-  google.protobuf.Int64Value time_skipping = 7;
-  google.protobuf.Int64Value time_listened = 8;
-}
-
-message SyncUserPlaylist {
-  string uuid = 1;
-  google.protobuf.BoolValue is_deleted = 2;
-  google.protobuf.StringValue title = 3;
-  google.protobuf.BoolValue all_podcasts = 4;
-  google.protobuf.StringValue podcast_uuids = 5;
-  google.protobuf.StringValue episode_uuids = 6;
-  google.protobuf.Int32Value audio_video = 7;
-  google.protobuf.BoolValue not_downloaded = 8;
-  google.protobuf.BoolValue downloaded = 9;
-  google.protobuf.BoolValue downloading = 10;
-  google.protobuf.BoolValue finished = 11;
-  google.protobuf.BoolValue partially_played = 12;
-  google.protobuf.BoolValue unplayed = 13;
-  google.protobuf.BoolValue starred = 14;
-  google.protobuf.BoolValue manual = 15;
-  google.protobuf.Int32Value sort_position = 16;
-  google.protobuf.Int32Value sort_type = 17;
-  google.protobuf.Int32Value icon_id = 18;
-  google.protobuf.Int32Value filter_hours = 19;
-  string original_uuid = 20;
-  google.protobuf.BoolValue filter_duration = 21;
-  google.protobuf.Int32Value longer_than = 22;
-  google.protobuf.Int32Value shorter_than = 23;
-}
-
-message SyncUserFolder {
-  string folder_uuid = 1;
-  bool is_deleted = 2;
-  string name = 3;
-  int32 color = 4;
-  int32 sort_position = 5;
-  int32 podcasts_sort_type = 6;
-  google.protobuf.Timestamp date_added = 7;
-}
-
-message SyncUserBookmark {
-  string bookmark_uuid = 1;
-  string podcast_uuid = 2;
-  string episode_uuid = 3;
-  google.protobuf.Timestamp created_at = 4;
-  google.protobuf.Int32Value time = 5;
-  google.protobuf.StringValue title = 6;
-  google.protobuf.Int64Value title_modified = 7;
-  google.protobuf.BoolValue is_deleted = 8;
-  google.protobuf.Int64Value is_deleted_modified = 9;
-}
-
 message BookmarkRequest {
   string podcast_uuid = 1;
   string episode_uuid = 2;
@@ -189,7 +39,7 @@ message UserPodcastListResponse {
 }
 
 message UserPodcastResponse {
-  reserved 2, 4, 5, 6, 7, 8, 9, 10, 11, 12; // Not used by mobile client
+  reserved 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 17; // Not used by mobile client
 
   string uuid = 1;
   int32 auto_start_from = 3;
@@ -197,7 +47,6 @@ message UserPodcastResponse {
   google.protobuf.StringValue folder_uuid = 14;
   google.protobuf.Int32Value sort_position = 15;
   google.protobuf.Timestamp date_added = 16;
-  PodcastSettings settings = 17;
 }
 
 message PodcastFolder {

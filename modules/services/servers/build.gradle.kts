@@ -6,8 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-apply(from = "${project.rootDir}/base.gradle")
-
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.servers"
     buildFeatures {
@@ -16,11 +14,35 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:crashlogging"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:protobuf"))
-    implementation(project(":modules:services:utils"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+
+    api(libs.dagger.hilt.android)
+    api(libs.moshi)
+    api(libs.okhttp)
+    api(libs.protobuf.javalite)
+    api(libs.retrofit)
+    api(libs.rx2.java)
+    api(libs.work.runtime)
+
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.protobuf)
+
+    implementation(libs.automattic.crashlogging)
+    implementation(libs.coroutines.core)
+    implementation(libs.moshi.adapters)
+    implementation(libs.okHttp.logging)
+    implementation(libs.retrofit.moshi)
+    implementation(libs.retrofit.protobuf) { exclude(group = "com.google.protobuf", module = "protobuf-java") }
+    implementation(libs.retrofit.rx2)
+    implementation(libs.rx2.android)
+    implementation(libs.timber)
+
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
 }

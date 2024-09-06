@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
 
     <issue
         id="ComposableNaming"
@@ -62,17 +62,6 @@
         errorLine1="    modifier: Modifier = Modifier,"
         errorLine2="    ~~~~~~~~">
         <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/SearchBar.kt"
-            line="58"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ModifierParameter"
-        message="Modifier parameter should be the first optional parameter"
-        errorLine1="    modifier: Modifier = Modifier,"
-        errorLine2="    ~~~~~~~~">
-        <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/bars/ThemedTopAppBar.kt"
             line="80"
             column="5"/>
@@ -96,7 +85,7 @@
         errorLine2="                                  ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/HorizontalPagerWrapper.kt"
-            line="57"
+            line="50"
             column="35"/>
     </issue>
 
@@ -107,7 +96,7 @@
         errorLine2="                                         ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/HorizontalPagerWrapper.kt"
-            line="64"
+            line="60"
             column="42"/>
     </issue>
 

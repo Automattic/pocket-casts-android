@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.4.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.4.1)" variant="all" version="8.4.1">
+<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
 
     <issue
         id="MissingSuperCall"
@@ -19,7 +19,7 @@
         errorLine2="                                       ^">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/AccountDetailsFragment.kt"
-            line="209"
+            line="226"
             column="40"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="            ^">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="291"
+            line="345"
             column="13"/>
     </issue>
 
@@ -120,28 +120,6 @@
             file="src/main/res/layout/fragment_create_done.xml"
             line="140"
             column="5"/>
-    </issue>
-
-    <issue
-        id="UseAppTint"
-        message="Must use `app:tint` instead of `android:tint`"
-        errorLine1="                android:tint=&quot;?attr/primary_text_01&quot; />"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_profile.xml"
-            line="174"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="UseAppTint"
-        message="Must use `app:tint` instead of `android:tint`"
-        errorLine1="        android:tint=&quot;?attr/primary_text_01&quot; />"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/fragment_profile.xml"
-            line="179"
-            column="9"/>
     </issue>
 
     <issue
@@ -705,7 +683,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="52"
+            line="53"
             column="14"/>
     </issue>
 
@@ -716,7 +694,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="98"
+            line="106"
             column="14"/>
     </issue>
 
@@ -727,7 +705,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="150"
+            line="152"
             column="14"/>
     </issue>
 
@@ -738,7 +716,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="201"
+            line="204"
             column="14"/>
     </issue>
 
@@ -749,7 +727,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="344"
+            line="255"
             column="14"/>
     </issue>
 
@@ -760,7 +738,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="390"
+            line="398"
             column="14"/>
     </issue>
 
@@ -771,7 +749,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="455"
+            line="444"
             column="14"/>
     </issue>
 
@@ -782,7 +760,18 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_account_details.xml"
-            line="518"
+            line="509"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="            &lt;ImageView"
+        errorLine2="             ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/fragment_account_details.xml"
+            line="572"
             column="14"/>
     </issue>
 
@@ -982,17 +971,6 @@
             file="src/main/res/layout/fragment_create_email.xml"
             line="121"
             column="21"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        android:layout_gravity=&quot;right&quot;"
-        errorLine2="                                ~~~~~">
-        <location
-            file="src/main/res/layout-land/fragment_profile.xml"
-            line="172"
-            column="33"/>
     </issue>
 
     <issue

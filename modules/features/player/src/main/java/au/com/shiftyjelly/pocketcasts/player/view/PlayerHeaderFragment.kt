@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
@@ -429,7 +428,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
-        val flingGestureDetector = GestureDetectorCompat(
+        val flingGestureDetector = GestureDetector(
             requireContext(),
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
