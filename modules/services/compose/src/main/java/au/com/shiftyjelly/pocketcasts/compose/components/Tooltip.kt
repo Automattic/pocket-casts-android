@@ -197,22 +197,20 @@ object TooltipDefaults {
 @ShowkaseComposable(name = "Tooltip", group = "Popup")
 @Preview(device = Devices.PortraitRegular, name = "Light")
 @Composable
-fun TooltipLightPreview(
-) {
+fun TooltipLightPreview() {
     TooltipPreview(Theme.ThemeType.LIGHT)
 }
 
 @ShowkaseComposable(name = "Tooltip", group = "Popup")
 @Preview(device = Devices.PortraitRegular, name = "Dark")
 @Composable
-fun TooltipDarkPreview(
-) {
+fun TooltipDarkPreview() {
     TooltipPreview(Theme.ThemeType.DARK)
 }
 
 @Composable
 fun TooltipPreview(
-    type: Theme.ThemeType
+    type: Theme.ThemeType,
 ) {
     AppThemeWithBackground(type) {
         TooltipContent(
