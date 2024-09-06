@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.profile
+package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState

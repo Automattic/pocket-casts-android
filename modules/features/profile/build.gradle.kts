@@ -69,17 +69,10 @@ dependencies {
     implementation(projects.modules.features.endofyear)
     implementation(projects.modules.features.kids)
     implementation(projects.modules.features.player)
+    implementation(projects.modules.features.referrals)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
-
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.junit)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.turbine)
-
-    testImplementation(projects.modules.services.sharedtest)
 }

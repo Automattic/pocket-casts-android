@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.profile
+package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +16,7 @@ import kotlinx.coroutines.reactive.asFlow
 
 @HiltViewModel
 class ReferralsViewModel @Inject constructor(
-    val userManager: UserManager,
+    private val userManager: UserManager,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
