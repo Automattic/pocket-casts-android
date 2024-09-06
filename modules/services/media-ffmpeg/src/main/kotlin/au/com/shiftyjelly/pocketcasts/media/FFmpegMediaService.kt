@@ -134,15 +134,15 @@ internal class FFmpegMediaService(
         append('-')
         append(clipRange.end.toSecondsWithSingleMilli())
         if (cardType != null) {
-            append('-')
+            append(" - ")
             append(cardType.id)
         }
     }
 
     private val VisualCardType.id get() = when (this) {
-        CardType.Horizontal -> "h"
-        CardType.Square -> "s"
-        CardType.Vertical -> "v"
+        CardType.Horizontal -> "horizontal"
+        CardType.Square -> "square"
+        CardType.Vertical -> "vertical"
     }
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->
