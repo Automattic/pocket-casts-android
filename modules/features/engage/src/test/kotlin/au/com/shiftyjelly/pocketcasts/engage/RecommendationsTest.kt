@@ -46,7 +46,7 @@ class RecommendationsTest {
             ),
         )
 
-        assertEquals(2, data?.curatedRecommendations?.size)
+        assertEquals(2, data.curatedRecommendations.size)
     }
 
     @Test
@@ -65,7 +65,7 @@ class RecommendationsTest {
             createCuratedList("key-2", 8),
             createCuratedList("key-1", 2),
         )
-        assertEquals(expected, data?.curatedRecommendations)
+        assertEquals(expected, data.curatedRecommendations)
     }
 
     @Test
@@ -87,7 +87,7 @@ class RecommendationsTest {
             createCuratedList("key-2", 5),
             createCuratedList("key-3", 4),
         )
-        assertEquals(expected, data?.curatedRecommendations)
+        assertEquals(expected, data.curatedRecommendations)
     }
 
     @Test
@@ -109,7 +109,7 @@ class RecommendationsTest {
             createCuratedList("key-2", 5),
             createCuratedList("key-3", 4),
         )
-        assertEquals(expected, data?.curatedRecommendations)
+        assertEquals(expected, data.curatedRecommendations)
     }
 
     @Test
@@ -131,7 +131,7 @@ class RecommendationsTest {
             createCuratedList("key-2", 5),
             createCuratedList("key-3", 4),
         )
-        assertEquals(expected, data?.curatedRecommendations)
+        assertEquals(expected, data.curatedRecommendations)
     }
 
     @Test
@@ -157,7 +157,7 @@ class RecommendationsTest {
             createCuratedList("key-4", 3),
             createCuratedList("key-5", 2),
         )
-        assertEquals(expected, data?.curatedRecommendations)
+        assertEquals(expected, data.curatedRecommendations)
     }
 
     @Test
