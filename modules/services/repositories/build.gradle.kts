@@ -57,7 +57,6 @@ dependencies {
     implementation(libs.play.auth)
     implementation(libs.play.cast)
     implementation(libs.protobuf.javalite)
-    implementation(libs.protobuf.kotlinlite)
     implementation(libs.retrofit)
     implementation(libs.room.ktx)
     implementation(libs.rx2.android)

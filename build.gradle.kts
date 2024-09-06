@@ -75,6 +75,12 @@ dependencyAnalysis {
                 severity("warn")
                 exclude("org.jetbrains.kotlinx:kotlinx-coroutines-android")
             }
+
+            onUnusedDependencies {
+                // Mockito Android is incorrectly reported
+                // We need it to run instrumentation tests that mock Android classes
+                exclude("org.mockito:mockito-android")
+            }
         }
 
         project(":app") {
