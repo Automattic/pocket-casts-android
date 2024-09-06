@@ -13,6 +13,7 @@ data class ExternalPodcast(
     @ColumnInfo(name = "last_used_timestamp") val lastUsedTimestampMs: Long?,
     @ColumnInfo(name = "podcast_category") private val _categories: String,
 ) {
+    val coverSize get() = 960
     val coverUrl get() = podcastCover(id)
     val categories get() = _categories.split('\n')
 }
@@ -79,6 +80,7 @@ sealed interface ExternalEpisode {
     val isDownloaded: Boolean
     val isVideo: Boolean
 
+    val coverSize get() = 960
     val coverUrl: String
 
     data class Podcast(
@@ -96,7 +98,7 @@ sealed interface ExternalEpisode {
         @ColumnInfo(name = "episode_number") val episodeNumber: Int?,
     ) : ExternalEpisode {
         override val coverUrl get() = podcastCover(podcastId)
-        val percentComplete get() = (playbackPositionMs.toDouble() / durationMs.coerceAtLeast(1)).coerceIn(0.0..100.0)
+        val percentComplete get() = ((playbackPositionMs.toDouble() / durationMs.coerceAtLeast(1)) * 100).coerceIn(0.0..100.0)
     }
 
     data class User(
@@ -116,12 +118,31 @@ sealed interface ExternalEpisode {
 
 data class ExternalPodcastMap(
     private val map: Map<String, ExternalPodcastList>,
+    private val limitPerGroup: Int,
 ) {
-    fun trendingGroup() = map[CuratedPodcast.TRENDING_LIST_ID]
+    fun trendingGroup(limit: Int = limitPerGroup) = map[CuratedPodcast.TRENDING_LIST_ID]?.let {
+        if (limit != limitPerGroup) {
+            it.copy(podcasts = it.podcasts.take(limit))
+        } else {
+            it
+        }
+    }
 
-    fun featuruedGroup() = map[CuratedPodcast.FEATURED_LIST_ID]
+    fun featuruedGroup(limit: Int = limitPerGroup) = map[CuratedPodcast.FEATURED_LIST_ID]?.let {
+        if (limit != limitPerGroup) {
+            it.copy(podcasts = it.podcasts.take(limit))
+        } else {
+            it
+        }
+    }
 
-    fun genericGroups() = map - CuratedPodcast.specialListIds
+    fun genericGroups(limit: Int = limitPerGroup) = (map - CuratedPodcast.specialListIds).let {
+        if (limit != limitPerGroup) {
+            it.mapValues { (_, group) -> group.copy(podcasts = group.podcasts.take(limit)) }
+        } else {
+            it
+        }
+    }
 }
 
 data class ExternalPodcastList(
@@ -135,6 +156,7 @@ data class ExternalPodcastView(
     val title: String,
     val description: String?,
 ) {
+    val coverSize get() = 960
     val coverUrl get() = podcastCover(id)
 }
 
