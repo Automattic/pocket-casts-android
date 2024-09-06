@@ -10,6 +10,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -59,6 +60,7 @@ fun MediaActionsPage(
             onActionsOrderChanged = onActionsOrderChanged,
             onActionMoved = onActionMoved,
             chooseCount = 3,
+            enabled = state.customActionsVisibility,
             otherActionsTitle = stringResource(LR.string.settings_other_media_actions),
             contentPadding = PaddingValues(top = 8.dp, bottom = bottomInset + 8.dp),
         )
@@ -83,7 +85,9 @@ private fun PageHeader(
             primaryText = stringResource(LR.string.settings_media_actions_prioritize_title),
             secondaryText = stringResource(LR.string.settings_media_actions_prioritize_subtitle),
             indent = false,
-            modifier = Modifier.semantics(mergeDescendants = true) {},
+            modifier = Modifier
+                .then(if (customActionsVisibility) Modifier else Modifier.alpha(0.4f))
+                .semantics(mergeDescendants = true) {},
         )
         Spacer(Modifier.height(8.dp))
     }

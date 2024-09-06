@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -57,6 +58,7 @@ fun MenuActionRearrange(
     chooseCount: Int,
     actionsTitle: String? = null,
     otherActionsTitle: String,
+    enabled: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     hoverColor: Color = MaterialTheme.theme.colors.primaryUi02Active,
     textColor: Color = MaterialTheme.theme.colors.primaryText01,
@@ -82,6 +84,8 @@ fun MenuActionRearrange(
         }
         onActionsOrderChanged(actions)
     }
+
+    val alphaModifier = if (enabled) Modifier else Modifier.alpha(0.4f)
 
     LazyColumn(
         state = lazyListState,
@@ -109,7 +113,9 @@ fun MenuActionRearrange(
                     TextH40(
                         text = otherActionsTitle,
                         color = titleTextColor,
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .then(alphaModifier),
                     )
                 }
             }
@@ -119,12 +125,13 @@ fun MenuActionRearrange(
                     val color = if (isDragging) hoverColor else Color.Transparent
                     val resources = LocalContext.current.resources
                     Surface(elevation = elevation, color = color) {
+                        val rowDraggableModifier = if (enabled) Modifier.longPressDraggableHandle().clickable {} else Modifier
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .longPressDraggableHandle()
-                                .clickable {}
+                                .then(rowDraggableModifier)
+                                .then(alphaModifier)
                                 .semantics {
                                     customActions = accessibilityActions(index = index, menuActions = menuActions, onActionsOrderChanged = onActionsOrderChanged, resources = resources)
                                 },
@@ -144,9 +151,10 @@ fun MenuActionRearrange(
                             Spacer(Modifier.weight(1f))
                             IconButton(
                                 modifier = Modifier
-                                    .draggableHandle()
+                                    .then(if (enabled) Modifier.draggableHandle() else Modifier)
                                     .clearAndSetSemantics {},
                                 onClick = {},
+                                enabled = enabled,
                             ) {
                                 Icon(
                                     painter = painterResource(IR.drawable.ic_reorder),
