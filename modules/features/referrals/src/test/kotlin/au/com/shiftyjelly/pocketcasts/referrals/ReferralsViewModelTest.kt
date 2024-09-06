@@ -14,9 +14,11 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -53,6 +55,7 @@ class ReferralsViewModelTest {
     fun setUp() {
         FeatureFlag.setEnabled(Feature.REFERRALS, true)
         whenever(settings.showReferralsTooltip).thenReturn(UserSetting.Mock(true, mock()))
+        whenever(settings.playerOrUpNextBottomSheetState).thenReturn(flowOf(BottomSheetBehavior.STATE_COLLAPSED))
     }
 
     @Test
