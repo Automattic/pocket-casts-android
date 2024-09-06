@@ -7,9 +7,11 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,12 +30,20 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 /**
  * The Material3 TooltipBox comes with a couple of constraints:
@@ -184,4 +194,30 @@ object TooltipDefaults {
 
     const val InTransitionDuration = 120
     const val OutTransitionDuration = 75
+}
+
+@ShowkaseComposable(name = "Tooltip", group = "Popup")
+@Preview(device = Devices.PortraitRegular)
+@Composable
+fun TooltipPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        TooltipContent(
+            shape = TooltipShape(30f),
+            alpha = 1.0f,
+            modifier = Modifier,
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 24.dp, bottom = 16.dp),
+            ) {
+                TextH40(
+                    text = "This is a tooltip!",
+                    fontWeight = FontWeight.W700,
+                )
+            }
+        }
+    }
 }

@@ -114,9 +114,9 @@ private fun IconWithBadge(
     }
 }
 
-@Preview(device = Devices.PortraitTablet)
+@Preview(device = Devices.PortraitRegular)
 @Composable
-fun IconWithBadgePreview(
+private fun IconWithBadgePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -131,7 +131,7 @@ fun IconWithBadgePreview(
     }
 }
 
-@Preview(device = Devices.PortraitTablet)
+@Preview(device = Devices.PortraitRegular)
 @Composable
 fun TooltipContentPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
