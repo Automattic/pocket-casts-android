@@ -1,4 +1,4 @@
-@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER", "UNUSED_PARAMETER")
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
 package au.com.shiftyjelly.pocketcasts.compose.components
 
@@ -48,11 +48,11 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 /**
  * The Material3 TooltipBox comes with a couple of constraints:
  * Both TooltipBox and RichTooltipBox lack an onDismissRequest property: https://issuetracker.google.com/issues/349864868
- * Interaction with the rest of the screen is blocked until the tooltip is dismissed
+ * It dismisses on tapping outside the component. Even if you re-display it, interaction with the rest of the screen is blocked until the tooltip is dismissed.
  *
  * This is a custom Tooltip implementation using Popup based on
  * https://stackoverflow.com/a/69664787/193545
- * It permits screen interaction even when the tooltip is visible.
+ * It permits screen interaction even when the tooltip is visible and can be used with rest of the M2 components.
  */
 
 @Composable
