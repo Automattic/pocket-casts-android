@@ -51,6 +51,7 @@ android {
 dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
+    ksp(libs.showkase.processor)
 
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.firebase.bom))
@@ -105,6 +106,7 @@ dependencies {
     implementation(projects.modules.features.taskerplugin)
     implementation(projects.modules.features.widgets)
     implementation(projects.modules.services.analytics)
+    implementation(projects.modules.services.compose)
     implementation(projects.modules.services.crashlogging)
     implementation(projects.modules.services.deeplink)
     implementation(projects.modules.services.localization)
@@ -158,6 +160,5 @@ dependencies {
     androidTestImplementation(libs.turbine)
     androidTestImplementation(libs.work.test)
 
-    androidTestImplementation(projects.modules.services.compose)
     androidTestImplementation(projects.modules.services.sharedtest)
 }
