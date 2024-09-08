@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 
@@ -43,7 +42,6 @@ class ProfileEpisodeListViewModel @Inject constructor(
         }
         viewModelScope.launch {
             episodeListFlowable.asFlow()
-                .stateIn(viewModelScope)
                 .collect { episodeList ->
                     _state.value = if (episodeList.isEmpty()) {
                         State.Empty
