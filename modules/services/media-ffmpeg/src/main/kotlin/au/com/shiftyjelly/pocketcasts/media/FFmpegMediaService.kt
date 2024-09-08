@@ -25,7 +25,7 @@ internal class FFmpegMediaService(
     private val sessionFiles = LinkedHashSet<File>()
 
     override suspend fun clipAudio(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): Result<File> = withContext(Dispatchers.IO) {
-        val outputFile = File(context.cacheDir, "${sanitizedFileName(podcast, episode, clipRange)}.mp3")
+        val outputFile = File(context.cacheDir, "${sanitizedFileName(podcast, episode, clipRange, cardType = null)}.mp3")
         if (outputFile in sessionFiles && outputFile.exists()) {
             return@withContext Result.success(outputFile)
         }
@@ -120,18 +120,29 @@ internal class FFmpegMediaService(
         return executeAsyncCommand(command).map { outputFile }.getOrNull()
     }
 
-    private fun sanitizedFileName(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range): String {
-        return "${podcast.title} - ${episode.title} - ${clipRange.start.toSecondsWithSingleMilli()}–${clipRange.end.toSecondsWithSingleMilli()}".replace("""\W+""".toRegex(), "_")
-    }
-
-    private fun sanitizedFileName(podcast: Podcast, episode: PodcastEpisode, clipRange: Clip.Range, cardType: VisualCardType): String {
-        return "${podcast.title} - ${episode.title} - ${clipRange.start.toSecondsWithSingleMilli()}–${clipRange.end.toSecondsWithSingleMilli()}-${cardType.id}".replace("""\W+""".toRegex(), "_")
+    private fun sanitizedFileName(
+        podcast: Podcast,
+        episode: PodcastEpisode,
+        clipRange: Clip.Range,
+        cardType: VisualCardType?,
+    ) = buildString {
+        append(podcast.title.replace(sanitizedFileNameRegex, " "))
+        append(" - ")
+        append(episode.title.replace(sanitizedFileNameRegex, " "))
+        append(" - ")
+        append(clipRange.start.toSecondsWithSingleMilli())
+        append('-')
+        append(clipRange.end.toSecondsWithSingleMilli())
+        if (cardType != null) {
+            append(" - ")
+            append(cardType.id)
+        }
     }
 
     private val VisualCardType.id get() = when (this) {
-        CardType.Horizontal -> "h"
-        CardType.Square -> "s"
-        CardType.Vertical -> "v"
+        CardType.Horizontal -> "horizontal"
+        CardType.Square -> "square"
+        CardType.Vertical -> "vertical"
     }
 
     private suspend fun executeAsyncCommand(command: String): Result<Unit> = suspendCancellableCoroutine { continuation ->
@@ -156,5 +167,9 @@ internal class FFmpegMediaService(
             },
         )
         continuation.invokeOnCancellation { session.cancel() }
+    }
+
+    private companion object {
+        val sanitizedFileNameRegex = """\W+ *""".toRegex()
     }
 }
