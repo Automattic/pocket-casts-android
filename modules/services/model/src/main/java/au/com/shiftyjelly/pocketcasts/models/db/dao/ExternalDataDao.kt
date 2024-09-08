@@ -108,7 +108,7 @@ abstract class ExternalDataDao {
                 }
                 ExternalPodcastList(listId, listTitle, podcasts)
             }
-        return ExternalPodcastMap(listsMap)
+        return ExternalPodcastMap(listsMap, limitPerGroup)
     }
 
     @Query(

@@ -10,7 +10,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge.Companion.TAG
-import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
 import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
 import com.google.android.engage.service.AppEngageErrorCode
 import com.google.android.engage.service.AppEngageException
@@ -19,6 +18,8 @@ import com.google.android.gms.tasks.Task
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import androidx.work.ListenableWorker.Result as WorkerResult
@@ -65,6 +66,7 @@ internal object EngageSdkWorkers {
     private inline fun <reified T : ClusterSyncWorker> enqueuePeriodicWork(context: Context, tag: String) {
         val request = PeriodicWorkRequestBuilder<T>(6, TimeUnit.HOURS)
             .addTag(tag)
+            .setInitialDelay(5, TimeUnit.MINUTES) // Set initial delay so that the work doesn't start immmediately with the app launch
             .build()
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(tag, ExistingPeriodicWorkPolicy.KEEP, request)
     }
@@ -76,15 +78,10 @@ internal class RecommendationsSyncWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val externalDataManager: ExternalDataManager,
 ) : ClusterSyncWorker(context, params, "Recommendations") {
-    private val clusterRequestFactory = ClusterRequestFactory(context)
 
-    override suspend fun submitCluster(client: AppEngagePublishClient): Task<Void> {
-        val recentlyPlayedPodcasts = externalDataManager.getRecentlyPlayedPodcasts(limit = 50)
-        val newReleases = externalDataManager.getNewEpisodes(limit = 50)
-        val discoverRecommendations = externalDataManager.getCuratedPodcastGroups(limitPerGroup = 50)
-        val trending = discoverRecommendations.trendingGroup() ?: ExternalPodcastList("", "", emptyList())
-        val data = RecommendationsData.create(recentlyPlayedPodcasts, newReleases, trending, discoverRecommendations.genericGroups())
-        return client.publishRecommendationClusters(clusterRequestFactory.createRecommendations(data))
+    override suspend fun submitCluster(service: ClusterService): Task<Void> {
+        val engageData = externalDataManager.getEngageData()
+        return service.updateRecommendations(engageData)
     }
 }
 
@@ -94,11 +91,10 @@ internal class ContinuationSyncWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val externalDataManager: ExternalDataManager,
 ) : ClusterSyncWorker(context, params, "Continuation") {
-    private val clusterRequestFactory = ClusterRequestFactory(context)
 
-    override suspend fun submitCluster(client: AppEngagePublishClient): Task<Void> {
-        val inProgressEpisodes = externalDataManager.getInProgressEpisodes(limit = 10)
-        return client.publishContinuationCluster(clusterRequestFactory.createContinuation(inProgressEpisodes))
+    override suspend fun submitCluster(service: ClusterService): Task<Void> {
+        val engageData = externalDataManager.getEngageData()
+        return service.updateContinuation(engageData)
     }
 }
 
@@ -108,11 +104,10 @@ internal class FeaturedWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val externalDataManager: ExternalDataManager,
 ) : ClusterSyncWorker(context, params, "Featured") {
-    private val clusterRequestFactory = ClusterRequestFactory(context)
 
-    override suspend fun submitCluster(client: AppEngagePublishClient): Task<Void> {
-        val featuredList = externalDataManager.getCuratedPodcastGroups(limitPerGroup = 10).featuruedGroup()
-        return client.publishFeaturedCluster(clusterRequestFactory.createFeatured(featuredList))
+    override suspend fun submitCluster(service: ClusterService): Task<Void> {
+        val engageData = externalDataManager.getEngageData()
+        return service.updateFeatured(engageData)
     }
 }
 
@@ -122,8 +117,9 @@ internal abstract class ClusterSyncWorker(
     protected val type: String,
 ) : CoroutineWorker(context, params) {
     private val client = AppEngagePublishClient(context)
+    private val service = ClusterService(context, client)
 
-    abstract suspend fun submitCluster(client: AppEngagePublishClient): Task<Void>
+    abstract suspend fun submitCluster(service: ClusterService): Task<Void>
 
     final override suspend fun doWork(): WorkerResult {
         Timber.tag(TAG).d("Syncing '$type' cluster")
@@ -136,7 +132,7 @@ internal abstract class ClusterSyncWorker(
                 Timber.tag(TAG).d("Engage SDK service is not avaialable. Failing '$type' cluster sync.")
                 Result.failure()
             }
-            else -> submitCluster(client).awaitSafe()
+            else -> submitCluster(service).awaitSafe()
         }
     }
 
@@ -148,7 +144,7 @@ internal abstract class ClusterSyncWorker(
         } catch (e: Throwable) {
             Timber.tag(TAG).d(e, "Failed to sync '$type' cluster.")
             if (e.isRecoverable) {
-                Timber.d("Will retry to sync '$type' cluster.")
+                Timber.tag(TAG).d("Will retry to sync '$type' cluster.")
                 WorkerResult.retry()
             } else {
                 WorkerResult.failure()
@@ -166,4 +162,18 @@ internal abstract class ClusterSyncWorker(
         }
         else -> false
     }
+}
+
+private suspend fun ExternalDataManager.getEngageData() = coroutineScope {
+    val recentlyPlayedPodcasts = async { getRecentlyPlayedPodcasts(limit = 50) }
+    val newReleases = async { getNewEpisodes(limit = 50) }
+    val discoverRecommendations = async { getCuratedPodcastGroups(limitPerGroup = 50) }
+    val inProgressEpisodes = async { getInProgressEpisodes(limit = 10) }
+
+    EngageData.create(
+        recentlyPlayed = recentlyPlayedPodcasts.await(),
+        newReleases = newReleases.await(),
+        continuation = inProgressEpisodes.await(),
+        curatedPodcasts = discoverRecommendations.await(),
+    )
 }
