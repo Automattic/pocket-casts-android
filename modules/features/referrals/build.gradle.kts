@@ -17,10 +17,6 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    api(libs.dagger.hilt.android)
-    api(projects.modules.services.compose)
-    api(projects.modules.services.localization)
-    api(projects.modules.services.model)
     api(projects.modules.services.repositories)
     api(projects.modules.services.ui)
 
@@ -30,10 +26,13 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.reactive)
+    implementation(libs.dagger.hilt.android)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.lifecycle.runtime.compose)
 
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.model)
     implementation(projects.modules.services.utils)
 
     testImplementation(libs.coroutines.test)
