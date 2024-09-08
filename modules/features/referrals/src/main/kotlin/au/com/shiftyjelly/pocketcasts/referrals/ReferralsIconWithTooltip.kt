@@ -39,12 +39,20 @@ fun ReferralsIconWithTooltip(
     viewModel: ReferralsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    ReferralsIconWithTooltip(
+        state = state,
+        onIconClick = viewModel::onIconClick,
+    )
+}
 
+@Composable
+private fun ReferralsIconWithTooltip(
+    state: ReferralsViewModel.UiState,
+    onIconClick: () -> Unit,
+) {
     if (state.showIcon) {
         IconWithBadge(
-            onIconClick = {
-                viewModel.onIconClick()
-            },
+            onIconClick = onIconClick,
             colors = LocalColors.current.colors,
             state = state,
         )
