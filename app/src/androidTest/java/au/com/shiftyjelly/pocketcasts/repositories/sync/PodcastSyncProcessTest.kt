@@ -22,9 +22,6 @@ import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureProvider
 import com.squareup.moshi.Moshi
 import java.net.HttpURLConnection
 import java.time.Instant
@@ -70,16 +67,6 @@ class PodcastSyncProcessTest {
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
             .build()
-
-        FeatureFlag.initialize(
-            listOf(object : FeatureProvider {
-                override val priority = 0
-
-                override fun hasFeature(feature: Feature) = feature == Feature.SETTINGS_SYNC
-
-                override fun isEnabled(feature: Feature) = false
-            }),
-        )
 
         val okHttpClient = OkHttpClient.Builder().build()
         retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)

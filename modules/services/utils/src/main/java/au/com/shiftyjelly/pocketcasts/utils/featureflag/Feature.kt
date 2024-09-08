@@ -27,14 +27,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    SETTINGS_SYNC(
-        key = "settings_sync",
-        title = "Settings Sync",
-        defaultValue = false,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     REPORT_VIOLATION(
         key = "report_violation",
         title = "Report Violation",

@@ -5,7 +5,6 @@ import android.content.res.Resources
 import android.icu.text.RelativeDateTimeFormatter
 import android.os.Build
 import android.text.format.DateUtils
-import androidx.annotation.RequiresApi
 import au.com.shiftyjelly.pocketcasts.localization.R
 import java.util.Calendar
 import java.util.Date
@@ -54,7 +53,6 @@ class RelativeDateFormatter(val context: Context) {
         return DateUtils.formatDateTime(context, calendar.timeInMillis, format)
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun formatCloseDays(calendar: Calendar): String? {
         val relativeDateFormatter = this.relativeDateFormatter ?: RelativeDateTimeFormatter.getInstance()
         if (this.relativeDateFormatter == null) {

@@ -3,35 +3,56 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.endofyear"
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        viewBinding = false
         compose = true
     }
 }
 
 dependencies {
-    // features
-    implementation(project(":modules:features:settings"))
-    // services
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:compose"))
-    implementation(project(":modules:services:crashlogging"))
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:servers"))
-    implementation(project(":modules:services:ui"))
-    implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:views"))
-    testImplementation(project(":modules:services:sharedtest"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.showkase.processor)
+
+    api(libs.automattic.crashlogging)
+    api(libs.dagger.hilt.android)
+    api(libs.showkase)
+
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.servers)
+    api(projects.modules.services.ui)
+    api(projects.modules.services.utils)
+    api(projects.modules.services.views)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.compose.activity)
+    implementation(libs.compose.constraintlayout)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.coroutines.core)
+    implementation(libs.timber)
+
+    implementation(projects.modules.features.settings)
+    implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
+    testImplementation(projects.modules.services.sharedtest)
 }

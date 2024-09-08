@@ -3,33 +3,50 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.filters"
     buildFeatures {
         buildConfig = true
         viewBinding = true
-        compose = true
+        compose = false
     }
 }
 
 dependencies {
-    // features
-    implementation(project(":modules:features:podcasts"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
-    // services
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:compose"))
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:ui"))
-    implementation(project(":modules:services:views"))
+    api(libs.androidx.appcompat)
+    api(libs.androidx.cardview)
+    api(libs.androidx.recyclerview)
+    api(libs.androidx.viewpager)
+    api(libs.dagger.hilt.android)
+    api(libs.flexbox)
+    api(libs.material)
+    api(libs.rx2.java)
+
+    api(projects.modules.features.podcasts)
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.ui)
+    api(projects.modules.services.views)
+
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.rx2)
+    implementation(libs.fragment.ktx)
+    implementation(libs.lifecycle.reactivestreams.ktx)
+    implementation(libs.rx2.android)
+    implementation(libs.rx2.kotlin)
+    implementation(libs.timber)
+
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.utils)
 }
