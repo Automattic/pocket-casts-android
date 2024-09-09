@@ -54,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.settings.notification.MediaActionsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -201,7 +202,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                         primaryText = stringResource(LR.string.settings_media_notification_controls),
                         secondaryText = stringResource(LR.string.settings_customize_buttons_displayed_in_android_13_notification_and_android_auto),
                         modifier = Modifier.clickable {
-                            (activity as? FragmentHostListener)?.addFragment(MediaNotificationControlsFragment())
+                            (activity as? FragmentHostListener)?.addFragment(MediaActionsFragment())
                         },
                     )
                 }

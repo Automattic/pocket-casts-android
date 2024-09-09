@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
+import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -212,6 +213,10 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun observePlaybackHistoryEpisodes(): Flowable<List<PodcastEpisode>> {
         return episodeDao.observePlaybackHistory()
+    }
+
+    override fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>> {
+        return episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\'))
     }
 
     override suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode> {

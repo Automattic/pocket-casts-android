@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,30 +8,51 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/secondary_ui_01"
-            android:minHeight="?android:attr/actionBarSize" />
-
-        <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
-            android:id="@+id/multiSelectToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:minHeight="?android:attr/actionBarSize"
-            android:visibility="gone"/>
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:titleEnabled="false">
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/layoutSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="?attr/actionBarSize" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/secondary_ui_01"
+                android:minHeight="?android:attr/actionBarSize"
+                app:layout_collapseMode="pin" />
+
+            <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+                android:id="@+id/multiSelectToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?android:attr/actionBarSize"
+                android:visibility="gone"
+                app:layout_collapseMode="pin" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?android:actionBarSize"
         android:clipToPadding="false"
         android:background="?attr/primary_ui_02"
         android:paddingTop="16dp"
-        android:paddingBottom="16dp" />
+        android:paddingBottom="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <LinearLayout
         android:id="@+id/emptyLayout"
@@ -60,4 +81,4 @@
             android:gravity="center" />
     </LinearLayout>
 
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

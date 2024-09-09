@@ -64,6 +64,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
 class SettingsImpl @Inject constructor(
@@ -1472,5 +1473,19 @@ class SettingsImpl @Inject constructor(
         val editor = sharedPreferences.edit()
         editor.putBoolean(Settings.AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION, isLoaded)
         editor.apply()
+    }
+
+    override val showReferralsTooltip: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = Settings.SHOW_REFERRALS_TOOLTIP,
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    private val _playerOrUpNextBottomSheetState = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+    override val playerOrUpNextBottomSheetState: Flow<Int>
+        get() = _playerOrUpNextBottomSheetState.asSharedFlow().distinctUntilChanged()
+
+    override fun updatePlayerOrUpNextBottomSheetState(state: Int) {
+        _playerOrUpNextBottomSheetState.tryEmit(state)
     }
 }

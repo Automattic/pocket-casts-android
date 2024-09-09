@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.compose.ui.util)
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
+    implementation(libs.reorderable)
 
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)

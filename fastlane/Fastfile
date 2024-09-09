@@ -522,7 +522,7 @@ platform :android do
     prerelease = options[:prerelease] || false
     release_assets = options[:release_assets]
 
-    create_release(
+    create_github_release(
       repository: GH_REPOSITORY,
       version: version,
       release_notes_file_path: nil,
