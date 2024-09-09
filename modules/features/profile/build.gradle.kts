@@ -51,7 +51,6 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
-    implementation(libs.coroutines.reactive)
     implementation(libs.coroutines.rx2)
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.config.ktx)
