@@ -65,6 +65,8 @@ steps:
     artifact_paths:
       - "build/reports/dependency-analysis/build-health-report.*"
     notify:
+      - github_commit_status:
+        context: Dependency Analysis
       - slack: "#android-core-notifs"
         if: build.state == "failed"
 
