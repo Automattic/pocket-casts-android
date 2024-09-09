@@ -57,6 +57,17 @@ steps:
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
 
+  - label: "Dependency Analysis"
+    command: |
+      echo "--- 📊 Analyzing"
+      ./gradlew buildHealth
+    plugins: [$CI_TOOLKIT]
+    artifact_paths:
+      - "build/reports/dependency-analysis/build-health-report.*"
+    notify:
+      - slack: "#android-core-notifs"
+        if: build.state == "failed"
+
   - label: "Assemble release APK"
     command: |
       echo "--- :rubygems: Setting up Gems"
