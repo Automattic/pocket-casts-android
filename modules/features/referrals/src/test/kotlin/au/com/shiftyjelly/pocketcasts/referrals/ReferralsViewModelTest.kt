@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.profile
+package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -7,14 +7,18 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -32,6 +36,7 @@ class ReferralsViewModelTest {
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val userManager: UserManager = mock()
+    private val settings: Settings = mock()
     private lateinit var viewModel: ReferralsViewModel
     private val email = "support@pocketcasts.com"
     private val statusAndroidPaidSubscription = SubscriptionStatus.Paid(
@@ -49,6 +54,8 @@ class ReferralsViewModelTest {
     @Before
     fun setUp() {
         FeatureFlag.setEnabled(Feature.REFERRALS, true)
+        whenever(settings.showReferralsTooltip).thenReturn(UserSetting.Mock(true, mock()))
+        whenever(settings.playerOrUpNextBottomSheetState).thenReturn(flowOf(BottomSheetBehavior.STATE_COLLAPSED))
     }
 
     @Test
@@ -117,7 +124,7 @@ class ReferralsViewModelTest {
     fun `updateBadgeCount decreases badge count when greater than zero`() = runTest {
         initViewModel() // badge count is 3 by default
 
-        viewModel.updateBadgeCount()
+        viewModel.onIconClick()
 
         assertEquals(2, viewModel.state.value.badgeCount)
     }
@@ -143,12 +150,41 @@ class ReferralsViewModelTest {
     @Test
     fun `showBadge is false when badgeCount is zero`() = runTest {
         initViewModel()
-        viewModel.updateBadgeCount()
-        viewModel.updateBadgeCount()
-        viewModel.updateBadgeCount()
+        viewModel.onIconClick()
+        viewModel.onIconClick()
+        viewModel.onIconClick()
 
         viewModel.state.test {
             assertEquals(false, awaitItem().showBadge)
+        }
+    }
+
+    @Test
+    fun `tooltip is shown for paid account on launch`() = runTest {
+        initViewModel()
+
+        viewModel.state.test {
+            assertEquals(true, awaitItem().showTooltip)
+        }
+    }
+
+    @Test
+    fun `tooltip is not shown for free account on launch`() = runTest {
+        initViewModel(SignInState.SignedOut)
+
+        viewModel.state.test {
+            assertEquals(false, awaitItem().showTooltip)
+        }
+    }
+
+    @Test
+    fun `tooltip is hidden on icon click`() = runTest {
+        initViewModel()
+
+        viewModel.onIconClick()
+
+        viewModel.state.test {
+            assertEquals(false, awaitItem().showTooltip)
         }
     }
 
@@ -156,6 +192,6 @@ class ReferralsViewModelTest {
         signInState: SignInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
     ) {
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
-        viewModel = ReferralsViewModel(userManager)
+        viewModel = ReferralsViewModel(userManager, settings)
     }
 }
