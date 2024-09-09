@@ -74,7 +74,7 @@ private fun PageHeader(
     Column(modifier = modifier) {
         ShowCustomActionsSettings(
             customActionsVisibility = customActionsVisibility,
-            onShowCustomActionsChanged = onShowCustomActionsChanged},
+            onShowCustomActionsChanged = onShowCustomActionsChanged,
         )
         Spacer(Modifier.height(16.dp))
         SettingRow(

@@ -1158,7 +1158,7 @@
     <string name="settings_select_filters">Select filters</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
-    <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Customize the buttons displayed in Android 13 playback notifications and Android Auto.</string>
+    <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Customize the buttons displayed in Android 13+ playback notifications and Android Auto.</string>
     <string name="settings_developer">Developer</string>
     <string name="settings_downloads_clean_up">Clean up</string>
     <string name="settings_downloads_clean_up_summary">Are you sure you want to delete these downloaded files?</string>
