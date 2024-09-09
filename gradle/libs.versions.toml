@@ -52,7 +52,7 @@ sentry-plugin = "4.11.0"
 showkase = "1.0.2"
 tasker-plugin = "0.4.10"
 test = "1.6.1"
-tracks = "5.1.2"
+tracks = "5.2.0"
 wear-compose = "1.3.1"
 work = "2.8.1"
 
@@ -262,7 +262,7 @@ browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
 capturable = "dev.shreyaspatil:capturable:2.1.0"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
 device-names = "com.jaredrummler:android-device-names:2.1.0"
-encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
+encryptedlogging = "com.automattic:encryptedlogging:0.0.2"
 engage = "com.google.android.engage:engage-core:1.5.4"
 ffmpeg = "com.arthenica:ffmpeg-kit-full:6.0-2"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
@@ -293,7 +293,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-measure-builds = "com.automattic.android.measure-builds:3.0.0"
+measure-builds = "com.automattic.android.measure-builds:3.1.0"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 spotless = "com.diffplug.spotless:6.23.3"
