@@ -278,6 +278,7 @@ play-cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 play-oss-licenses = "com.google.android.gms:play-services-oss-licenses:17.0.0"
 play-review = "com.google.android.play:review-ktx:2.0.1"
 play-wearable = "com.google.android.gms:play-services-wearable:18.0.0"
+reorderable = "sh.calvin.reorderable:reorderable:2.3.2"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.1.0"
 

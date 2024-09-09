@@ -233,14 +233,14 @@ interface Settings {
 
         data object PlayNext : MediaNotificationControls(
             controlName = LR.string.play_next,
-            iconRes = com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next,
+            iconRes = IR.drawable.ic_skip_next,
             key = PLAY_NEXT_KEY,
             serverId = "play_next",
         )
 
         data object PlaybackSpeed : MediaNotificationControls(
             controlName = LR.string.playback_speed,
-            iconRes = IR.drawable.auto_1,
+            iconRes = IR.drawable.ic_speed_number,
             key = PLAYBACK_SPEED_KEY,
             serverId = "playback_speed",
         )
