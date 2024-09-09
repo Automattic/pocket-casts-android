@@ -1,12 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.sharedtest"
@@ -16,13 +11,11 @@ android {
 }
 
 dependencies {
-    // These dependencies have to be redeclared here event though they are already in
-    // base.gradle because here they need to not be test dependencies like they are in
-    // the main app.
+    api(libs.automattic.crashlogging)
+    api(libs.junit)
+
     implementation(libs.coroutines.test)
-    implementation(libs.junit) {
-        exclude(group = "org.hamcrest")
-    }
-    implementation(project(":modules:services:utils"))
-    implementation(libs.crashlogging)
+    implementation(libs.rx2.android)
+
+    implementation(projects.modules.services.utils)
 }

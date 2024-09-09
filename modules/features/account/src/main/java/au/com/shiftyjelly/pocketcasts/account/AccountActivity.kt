@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
@@ -44,6 +45,15 @@ class AccountActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    handleBackPressed()
+                }
+            },
+        )
+
         val navController = findNavController(R.id.nav_host_fragment)
         binding.carHeader?.btnClose?.setOnClickListener {
             if (!navController.popBackStack()) {
@@ -77,7 +87,7 @@ class AccountActivity : AppCompatActivity() {
 
             val navConfiguration = AppBarConfiguration(navController.graph)
             binding.toolbar?.setupWithNavController(navController, navConfiguration)
-            binding.toolbar?.setNavigationOnClickListener { _ -> onBackPressed() }
+            binding.toolbar?.setNavigationOnClickListener { _ -> handleBackPressed() }
 
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 destination.trackShown()
@@ -105,17 +115,17 @@ class AccountActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
+    private fun handleBackPressed() {
         val currentFragment = findNavController(R.id.nav_host_fragment).currentDestination
         currentFragment?.trackDismissed()
+
         if (currentFragment?.id == R.id.createDoneFragment) {
             finish()
             return
         }
 
         UiUtil.hideKeyboard(binding.root)
-        @Suppress("DEPRECATION")
-        super.onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
     }
 
     private fun NavDestination.trackShown() {

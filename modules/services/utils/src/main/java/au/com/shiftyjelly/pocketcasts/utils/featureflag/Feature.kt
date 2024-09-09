@@ -27,14 +27,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    SETTINGS_SYNC(
-        key = "settings_sync",
-        title = "Settings Sync",
-        defaultValue = false,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     REPORT_VIOLATION(
         key = "report_violation",
         title = "Report Violation",
@@ -185,6 +177,14 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    SEARCH_IN_LISTENING_HISTORY(
+        key = "search_in_listening_history",
+        title = "Search in listening history",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
     ;

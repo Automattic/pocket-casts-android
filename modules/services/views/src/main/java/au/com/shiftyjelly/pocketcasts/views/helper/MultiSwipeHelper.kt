@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.Rect
-import android.os.Build
 import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
@@ -12,7 +11,6 @@ import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.animation.Interpolator
-import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.R
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -143,7 +141,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     moveIfNecessary(mSelected)
                 }
                 mRecyclerView!!.removeCallbacks(this)
-                ViewCompat.postOnAnimation(mRecyclerView!!, this)
+                mRecyclerView!!.postOnAnimation(this)
             }
         }
     }
@@ -181,7 +179,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Used to detect long press.
      */
-    internal var mGestureDetector: GestureDetectorCompat? = null
+    internal var mGestureDetector: GestureDetector? = null
 
     /**
      * Callback for when long press occurs.
@@ -376,7 +374,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         val gestureListener = ItemTouchHelperGestureListener().apply {
             mItemTouchHelperGestureListener = this
         }
-        mGestureDetector = GestureDetectorCompat(context, gestureListener)
+        mGestureDetector = GestureDetector(context, gestureListener)
     }
 
     private fun stopGestureDetection() {
@@ -1110,7 +1108,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         val originalMovementFlags = mCallback.getMovementFlags(mRecyclerView!!, viewHolder)
         val absoluteMovementFlags = mCallback.convertToAbsoluteDirection(
             originalMovementFlags,
-            ViewCompat.getLayoutDirection(mRecyclerView!!),
+            mRecyclerView!!.layoutDirection,
         )
         val flags =
             absoluteMovementFlags and ACTION_MODE_SWIPE_MASK shr ACTION_STATE_SWIPE * DIRECTION_FLAG_COUNT
@@ -1128,7 +1126,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     // convert to relative
                     Callback.convertToRelativeDirection(
                         swipeDir,
-                        ViewCompat.getLayoutDirection(mRecyclerView!!),
+                        mRecyclerView!!.layoutDirection,
                     )
                 } else {
                     swipeDir
@@ -1150,7 +1148,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     // convert to relative
                     Callback.convertToRelativeDirection(
                         swipeDir,
-                        ViewCompat.getLayoutDirection(mRecyclerView!!),
+                        mRecyclerView!!.layoutDirection,
                     )
                 } else {
                     swipeDir
@@ -1219,9 +1217,6 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     }
 
     private fun addChildDrawingOrderCallback() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            return // we use elevation on Lollipop
-        }
         if (mChildDrawingOrderCallback == null) {
             mChildDrawingOrderCallback = RecyclerView.ChildDrawingOrderCallback { childCount, i ->
                 if (mOverdrawChild == null) {
@@ -1408,7 +1403,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                 return flags // does not have any relative flags, good.
             }
             flags = flags and masked.inv() // remove start / end
-            if (layoutDirection == ViewCompat.LAYOUT_DIRECTION_LTR) {
+            if (layoutDirection == View.LAYOUT_DIRECTION_LTR) {
                 // no change. just OR with 2 bits shifted mask and return
                 flags =
                     flags or (masked shr 2) // START is 2 bits after LEFT, END is 2 bits after RIGHT.
@@ -1427,7 +1422,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             viewHolder: ViewHolder,
         ): Int {
             val flags = getMovementFlags(recyclerView!!, viewHolder)
-            return convertToAbsoluteDirection(flags, ViewCompat.getLayoutDirection(recyclerView))
+            return convertToAbsoluteDirection(flags, recyclerView.layoutDirection)
         }
 
         internal fun hasDragFlag(recyclerView: RecyclerView?, viewHolder: ViewHolder): Boolean {
@@ -2190,7 +2185,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     return flags // does not have any abs flags, good.
                 }
                 flags = flags and masked.inv() // remove left / right.
-                if (layoutDirection == ViewCompat.LAYOUT_DIRECTION_LTR) {
+                if (layoutDirection == View.LAYOUT_DIRECTION_LTR) {
                     // no change. just OR with 2 bits shifted mask and return
                     flags =
                         flags or (masked shl 2) // START is 2 bits after LEFT, END is 2 bits after RIGHT.
@@ -2597,15 +2592,13 @@ internal class ItemTouchUIUtilImpl : ItemTouchUIUtil {
         actionState: Int,
         isCurrentlyActive: Boolean,
     ) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (isCurrentlyActive) {
-                var originalElevation: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
-                if (originalElevation == null) {
-                    originalElevation = ViewCompat.getElevation(view)
-                    val newElevation = 1f + findMaxElevation(recyclerView, view)
-                    ViewCompat.setElevation(view, newElevation)
-                    view.setTag(R.id.item_touch_helper_previous_elevation, originalElevation)
-                }
+        if (isCurrentlyActive) {
+            var originalElevation: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
+            if (originalElevation == null) {
+                originalElevation = ViewCompat.getElevation(view)
+                val newElevation = 1f + findMaxElevation(recyclerView, view)
+                ViewCompat.setElevation(view, newElevation)
+                view.setTag(R.id.item_touch_helper_previous_elevation, originalElevation)
             }
         }
 
@@ -2625,13 +2618,11 @@ internal class ItemTouchUIUtilImpl : ItemTouchUIUtil {
     }
 
     override fun clearView(view: View) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            val tag = view.getTag(R.id.item_touch_helper_previous_elevation)
-            if (tag != null && tag is Float) {
-                ViewCompat.setElevation(view, tag)
-            }
-            view.setTag(R.id.item_touch_helper_previous_elevation, null)
+        val tag = view.getTag(R.id.item_touch_helper_previous_elevation)
+        if (tag != null && tag is Float) {
+            ViewCompat.setElevation(view, tag)
         }
+        view.setTag(R.id.item_touch_helper_previous_elevation, null)
 
         view.translationX = 0f
         view.translationY = 0f

@@ -10,9 +10,9 @@ import android.view.MenuItem
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.databinding.ActivityWebViewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,8 +49,6 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
             val intent = newInstance(context, title, url)
             context.startActivity(intent)
         }
-
-        val INTERNAL_HOSTS = listOf(BuildConfig.WEB_BASE_HOST)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +61,19 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
         binding.toolbar.title = intent.extras?.getString(EXTRA_TITLE)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(false) {
+                override fun handleOnBackPressed() {
+                    if (binding.webview.canGoBack()) {
+                        binding.webview.goBack()
+                    } else {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            },
+        )
 
         binding.webview.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -103,15 +114,6 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
             extraUrl?.let { url ->
                 binding.webview.loadUrl(url)
             }
-        }
-    }
-
-    override fun onBackPressed() {
-        if (binding.webview.canGoBack()) {
-            binding.webview.goBack()
-        } else {
-            @Suppress("DEPRECATION")
-            super.onBackPressed()
         }
     }
 

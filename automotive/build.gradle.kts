@@ -5,17 +5,14 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
     alias(libs.plugins.aboutlibraries)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "../base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
 
     defaultConfig {
+        minSdk = project.property("minSdkVersionAutomotive") as Int
         applicationId = project.property("applicationId").toString()
-        minSdk = 28
     }
 
     buildFeatures {
@@ -26,63 +23,92 @@ android {
 
     buildTypes {
         named("debug") {
-            applicationIdSuffix = ".debug"
-
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
         }
 
         named("debugProd") {
-            initWith(getByName("debug"))
-            isDebuggable = true
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_radioactive"
         }
 
         named("release") {
-            isMinifyEnabled = true
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
-
-            proguardFiles.addAll(
-                listOf(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro"),
-                ),
-            )
-            isShrinkResources = true
         }
     }
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
-    // Commented out the Automotive library as it clashes with the Material library and we don't use it. Duplicate value for resource attr/navigationIconTint.
-    // implementation "androidx.car:car:1.0.0-alpha7"
-    implementation(libs.appcompat)
-    implementation(libs.core.ktx)
+    implementation(platform(libs.compose.bom))
+    implementation(platform(libs.firebase.bom))
+
+    implementation(libs.aboutlibraries.compose)
+    implementation(libs.aboutlibraries.core)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.androidx.viewpager)
+    implementation(libs.automattic.crashlogging)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.coroutines.android)
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.rx2)
+    implementation(libs.dagger.hilt.android)
+    implementation(libs.dagger.hilt.core)
+    implementation(libs.encryptedlogging)
+    implementation(libs.guava)
+    implementation(libs.hilt.work)
+    implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.material)
-    implementation(libs.constraintlayout)
-    implementation(libs.bundles.aboutlibraries)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.junit.ext)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.material.progressbar)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.extractor)
+    implementation(libs.media3.ui)
+    implementation(libs.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.rx2.java)
+    implementation(libs.timber)
+    implementation(libs.work.runtime)
 
-    implementation(project(":modules:services:crashlogging"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:media-noop"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:ui"))
-    implementation(project(":modules:services:views"))
-    implementation(project(":modules:services:compose"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:servers"))
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:features:profile"))
-    implementation(project(":modules:features:podcasts"))
-    implementation(project(":modules:features:settings"))
-    implementation(project(":modules:features:discover"))
-    implementation(project(":modules:features:account"))
-    implementation(project(":modules:features:shared"))
+    implementation(projects.modules.features.account)
+    implementation(projects.modules.features.discover)
+    implementation(projects.modules.features.player)
+    implementation(projects.modules.features.podcasts)
+    implementation(projects.modules.features.profile)
+    implementation(projects.modules.features.search)
+    implementation(projects.modules.features.settings)
+    implementation(projects.modules.features.shared)
+    implementation(projects.modules.services.analytics)
+    implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.crashlogging)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.mediaNoop)
+    implementation(projects.modules.services.model)
+    implementation(projects.modules.services.preferences)
+    implementation(projects.modules.services.repositories)
+    implementation(projects.modules.services.servers)
+    implementation(projects.modules.services.sharing)
+    implementation(projects.modules.services.ui)
+    implementation(projects.modules.services.utils)
+    implementation(projects.modules.services.views)
+
+    debugImplementation(libs.compose.ui.tooling)
+
+    debugProdImplementation(libs.compose.ui.tooling)
+
+    androidTestImplementation(libs.androidx.annotation)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.junit.ext)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.kotlin)
 }
 
 apply(plugin = "com.google.gms.google-services")

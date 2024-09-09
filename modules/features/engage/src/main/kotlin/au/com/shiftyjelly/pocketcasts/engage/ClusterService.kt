@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.engage.BuildConfig.SERVER_LIST_HOST
 import au.com.shiftyjelly.pocketcasts.engage.BuildConfig.SERVER_SHORT_HOST
+import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge.Companion.TAG
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
@@ -19,23 +20,36 @@ import com.google.android.engage.common.datamodel.ContinuationCluster
 import com.google.android.engage.common.datamodel.FeaturedCluster
 import com.google.android.engage.common.datamodel.Image
 import com.google.android.engage.common.datamodel.RecommendationCluster
+import com.google.android.engage.service.AppEngagePublishClient
 import com.google.android.engage.service.PublishContinuationClusterRequest
 import com.google.android.engage.service.PublishFeaturedClusterRequest
 import com.google.android.engage.service.PublishRecommendationClustersRequest
+import com.google.android.engage.service.PublishStatusRequest
+import com.google.android.gms.tasks.Task
 import kotlin.math.roundToInt
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-internal class ClusterRequestFactory(
+internal class ClusterService(
     private val context: Context,
+    private val client: AppEngagePublishClient,
 ) {
-    fun createRecommendations(
-        recommendationsData: RecommendationsData,
-    ): PublishRecommendationClustersRequest {
-        val recentlyPlayed = recommendationsData.recentlyPlayed.takeIf { it.isNotEmpty() }?.let { podcasts ->
+    fun updateRecommendations(
+        data: EngageData,
+    ): Task<Void> {
+        val recommendations = data.recommendations
+
+        val recentlyPlayed = recommendations.recentlyPlayed.takeIf { it.isNotEmpty() }?.let { podcasts ->
             val entities = podcasts.map { podcast ->
                 PodcastSeriesEntity.Builder()
                     .setName(podcast.title)
-                    .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
+                    .addPosterImage(
+                        Image.Builder()
+                            .setImageUri(Uri.parse(podcast.coverUrl))
+                            .setImageWidthInPixel(podcast.coverSize)
+                            .setImageHeightInPixel(podcast.coverSize)
+                            .build(),
+                    )
                     .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .setEpisodeCount(podcast.episodeCount)
                     .addGenres(podcast.categories)
@@ -48,11 +62,17 @@ internal class ClusterRequestFactory(
                 .apply { entities.forEach { addEntity(it) } }
                 .build()
         }
-        val newReleases = recommendationsData.newReleases.takeIf { it.isNotEmpty() }?.let { episodes ->
+        val newReleases = recommendations.newReleases.takeIf { it.isNotEmpty() }?.let { episodes ->
             val entities = episodes.map { episode ->
                 PodcastEpisodeEntity.Builder()
                     .setName(episode.title)
-                    .addPosterImage(Image.Builder().setImageUri(Uri.parse(episode.coverUrl)).build())
+                    .addPosterImage(
+                        Image.Builder()
+                            .setImageUri(Uri.parse(episode.coverUrl))
+                            .setImageWidthInPixel(episode.coverSize)
+                            .setImageHeightInPixel(episode.coverSize)
+                            .build(),
+                    )
                     .setPlayBackUri(episode.uri(autoPlay = true, SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .setPodcastSeriesTitle(episode.podcastTitle)
                     .setDurationMillis(episode.durationMs)
@@ -71,11 +91,17 @@ internal class ClusterRequestFactory(
                 .apply { entities.forEach { addEntity(it) } }
                 .build()
         }
-        val trending = recommendationsData.trending.takeIf { it.podcasts.isNotEmpty() }?.let { list ->
+        val trending = recommendations.trending.let { list ->
             val entities = list.podcasts.map { podcast ->
                 PodcastSeriesEntity.Builder()
                     .setName(podcast.title)
-                    .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
+                    .addPosterImage(
+                        Image.Builder()
+                            .setImageUri(Uri.parse(podcast.coverUrl))
+                            .setImageWidthInPixel(podcast.coverSize)
+                            .setImageHeightInPixel(podcast.coverSize)
+                            .build(),
+                    )
                     .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                     .addDescription(podcast.description)
                     .build()
@@ -86,12 +112,18 @@ internal class ClusterRequestFactory(
                 .apply { entities.forEach { addEntity(it) } }
                 .build()
         }
-        val curated = recommendationsData.curatedRecommendations.map { recommendation ->
+        val curated = recommendations.curatedRecommendations.map { recommendation ->
             recommendation.takeIf { it.podcasts.isNotEmpty() }?.let { list ->
                 val entities = list.podcasts.map { podcast ->
                     PodcastSeriesEntity.Builder()
                         .setName(podcast.title)
-                        .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
+                        .addPosterImage(
+                            Image.Builder()
+                                .setImageUri(Uri.parse(podcast.coverUrl))
+                                .setImageWidthInPixel(podcast.coverSize)
+                                .setImageHeightInPixel(podcast.coverSize)
+                                .build(),
+                        )
                         .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_RECOMMENDATIONS))
                         .addDescription(podcast.description)
                         .build()
@@ -110,21 +142,40 @@ internal class ClusterRequestFactory(
             trending,
         ) + curated
 
-        return PublishRecommendationClustersRequest.Builder()
-            .let { builder ->
-                clusters.forEach { builder.addRecommendationCluster(it) }
-                builder
+        return if (clusters.isNotEmpty()) {
+            val request = PublishRecommendationClustersRequest.Builder()
+                .let { builder ->
+                    clusters.forEach { builder.addRecommendationCluster(it) }
+                    builder
+                }
+                .build()
+            updateClient(data) {
+                Timber.tag(TAG).d("Publish recommendations cluster")
+                client.publishRecommendationClusters(request)
             }
-            .build()
+        } else {
+            updateClient(data) {
+                Timber.tag(TAG).d("Delete recommendations cluster")
+                client.deleteRecommendationsClusters()
+            }
+        }
     }
 
-    fun createContinuation(
-        episodes: List<ExternalEpisode.Podcast>,
-    ): PublishContinuationClusterRequest {
+    fun updateContinuation(
+        data: EngageData,
+    ): Task<Void> {
+        val episodes = data.continuation.episodes
+
         val unfinishedEpisodes = episodes.map { episode ->
             PodcastEpisodeEntity.Builder()
                 .setName(episode.title)
-                .addPosterImage(Image.Builder().setImageUri(Uri.parse(episode.coverUrl)).build())
+                .addPosterImage(
+                    Image.Builder()
+                        .setImageUri(Uri.parse(episode.coverUrl))
+                        .setImageWidthInPixel(episode.coverSize)
+                        .setImageHeightInPixel(episode.coverSize)
+                        .build(),
+                )
                 .setPlayBackUri(episode.uri(autoPlay = true, SourceView.ENGAGE_SDK_CONTINUATION))
                 .setPodcastSeriesTitle(episode.podcastTitle)
                 .setDurationMillis(episode.durationMs)
@@ -138,31 +189,74 @@ internal class ClusterRequestFactory(
                 .setProgressPercentComplete(episode.percentComplete.roundToInt())
                 .build()
         }
-        val unfinishedCluster = ContinuationCluster.Builder()
-            .apply { unfinishedEpisodes.forEach { addEntity(it) } }
-            .build()
-        return PublishContinuationClusterRequest.Builder()
-            .setContinuationCluster(unfinishedCluster)
-            .build()
+
+        return if (unfinishedEpisodes.isNotEmpty()) {
+            val cluster = ContinuationCluster.Builder()
+                .apply { unfinishedEpisodes.forEach { addEntity(it) } }
+                .build()
+            val request = PublishContinuationClusterRequest.Builder()
+                .setContinuationCluster(cluster)
+                .build()
+            updateClient(data) {
+                Timber.tag(TAG).d("Publish continuation cluster")
+                client.publishContinuationCluster(request)
+            }
+        } else {
+            updateClient(data) {
+                Timber.tag(TAG).d("Delete continuation cluster")
+                client.deleteContinuationCluster()
+            }
+        }
     }
 
-    fun createFeatured(
-        featuredList: ExternalPodcastList?,
-    ): PublishFeaturedClusterRequest {
-        val featuredPodcasts = featuredList?.podcasts.orEmpty().map { podcast ->
+    fun updateFeatured(
+        data: EngageData,
+    ): Task<Void> {
+        val featuredList = data.featured.list
+
+        val featuredPodcasts = featuredList.podcasts.map { podcast ->
             PodcastSeriesEntity.Builder()
                 .setName(podcast.title)
-                .addPosterImage(Image.Builder().setImageUri(Uri.parse(podcast.coverUrl)).build())
+                .addPosterImage(
+                    Image.Builder()
+                        .setImageUri(Uri.parse(podcast.coverUrl))
+                        .setImageWidthInPixel(podcast.coverSize)
+                        .setImageHeightInPixel(podcast.coverSize)
+                        .build(),
+                )
                 .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_FEATURED))
                 .addDescription(podcast.description)
                 .build()
         }
-        val featuredCluster = FeaturedCluster.Builder()
-            .apply { featuredPodcasts.forEach { addEntity(it) } }
-            .build()
-        return PublishFeaturedClusterRequest.Builder()
-            .setFeaturedCluster(featuredCluster)
-            .build()
+
+        return if (featuredPodcasts.isNotEmpty()) {
+            val featuredCluster = FeaturedCluster.Builder()
+                .apply { featuredPodcasts.forEach { addEntity(it) } }
+                .build()
+            val request = PublishFeaturedClusterRequest.Builder()
+                .setFeaturedCluster(featuredCluster)
+                .build()
+            updateClient(data) {
+                Timber.tag(TAG).d("Publish featured cluster")
+                client.publishFeaturedCluster(request)
+            }
+        } else {
+            updateClient(data) {
+                Timber.tag(TAG).d("Delete featured cluster")
+                client.deleteFeaturedCluster()
+            }
+        }
+    }
+
+    private fun updateClient(
+        data: EngageData,
+        task: () -> Task<Void>,
+    ): Task<Void> {
+        return task().continueWithTask {
+            Timber.tag(TAG).d("Update publish status: ${data.publishStatus}")
+            val stausRequest = PublishStatusRequest.Builder().setStatusCode(data.publishStatus).build()
+            client.updatePublishStatus(stausRequest)
+        }
     }
 
     private fun ExternalPodcast.uri(source: SourceView) = ShowPodcastDeepLink(

@@ -63,6 +63,7 @@ project.apply {
         // Android
         set("minSdkVersion", 24)
         set("minSdkVersionWear", 26)
+        set("minSdkVersionAutomotive", 28)
         set("targetSdkVersion", 34)
         set("compileSdkVersion", 34)
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")

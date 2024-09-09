@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.engage
 
+import au.com.shiftyjelly.pocketcasts.engage.EngageData.Recommendations
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
@@ -7,10 +8,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastView
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class RecommendationsDataTest {
+class RecommendationsTest {
     @Test
     fun `create recommendations data`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 2),
@@ -20,7 +21,7 @@ class RecommendationsDataTest {
             ),
         )
 
-        val expected = RecommendationsData(
+        val expected = Recommendations(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 2),
@@ -34,7 +35,7 @@ class RecommendationsDataTest {
 
     @Test
     fun `limit number of curated recommnedations`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 2),
@@ -50,7 +51,7 @@ class RecommendationsDataTest {
 
     @Test
     fun `sort curated recommendations by list size`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 2),
@@ -69,7 +70,7 @@ class RecommendationsDataTest {
 
     @Test
     fun `include more curated recommendations if recently played is empty`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = emptyList(),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 2),
@@ -91,7 +92,7 @@ class RecommendationsDataTest {
 
     @Test
     fun `include more curated recommendations if new releases are empty`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = emptyList(),
             trending = createCuratedList("trending", 2),
@@ -113,7 +114,7 @@ class RecommendationsDataTest {
 
     @Test
     fun `include more curated recommendations if trending are empty`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 0),
@@ -135,7 +136,7 @@ class RecommendationsDataTest {
 
     @Test
     fun `include more curated recommendations if they are the only present`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = emptyList(),
             newReleases = emptyList(),
             trending = createCuratedList("trending", 0),
@@ -161,7 +162,7 @@ class RecommendationsDataTest {
 
     @Test
     fun `do not include empty recommendations`() {
-        val data = RecommendationsData.create(
+        val data = Recommendations.create(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 2),
@@ -171,7 +172,7 @@ class RecommendationsDataTest {
             ),
         )
 
-        val expected = RecommendationsData(
+        val expected = Recommendations(
             recentlyPlayed = createRecentlyPlayed(5),
             newReleases = createNewReleases(3),
             trending = createCuratedList("trending", 2),
