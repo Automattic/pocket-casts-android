@@ -51,9 +51,7 @@ fun MediaActionsPage(
             header = {
                 PageHeader(
                     customActionsVisibility = state.customActionsVisibility,
-                    onShowCustomActionsChanged = {
-                        onShowCustomActionsChanged(it)
-                    },
+                    onShowCustomActionsChanged = onShowCustomActionsChanged,
                 )
             },
             menuActions = state.actions,
@@ -76,9 +74,7 @@ private fun PageHeader(
     Column(modifier = modifier) {
         ShowCustomActionsSettings(
             customActionsVisibility = customActionsVisibility,
-            onShowCustomActionsChanged = {
-                onShowCustomActionsChanged(it)
-            },
+            onShowCustomActionsChanged = onShowCustomActionsChanged},
         )
         Spacer(Modifier.height(16.dp))
         SettingRow(
