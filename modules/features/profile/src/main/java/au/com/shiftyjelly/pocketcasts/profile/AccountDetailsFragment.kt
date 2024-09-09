@@ -156,6 +156,7 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
                         if (showUpgradeBanner) {
                             ProfileUpgradeBanner(
                                 onClick = {
+                                    analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
                                     val source = OnboardingUpgradeSource.PROFILE
                                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
                                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)

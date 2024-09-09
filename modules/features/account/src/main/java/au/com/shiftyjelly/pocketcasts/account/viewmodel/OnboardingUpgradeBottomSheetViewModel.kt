@@ -104,8 +104,6 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
         source: OnboardingUpgradeSource,
         onComplete: () -> Unit,
     ) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
-
         (state.value as? Loaded)?.let { loadedState ->
             _state.update { loadedState.copy(purchaseFailed = false) }
             val subscription = loadedState.selectedSubscription
