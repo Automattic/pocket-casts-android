@@ -118,6 +118,7 @@ interface EpisodeManager {
     fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
     fun unarchiveAllInList(episodes: List<PodcastEpisode>)
     fun observePlaybackHistoryEpisodes(): Flowable<List<PodcastEpisode>>
+    fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>>
     suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode>
     fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?)
     fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?)

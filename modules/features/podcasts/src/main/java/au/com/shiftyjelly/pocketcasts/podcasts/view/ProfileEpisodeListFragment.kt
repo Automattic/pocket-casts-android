@@ -236,31 +236,32 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             itemTouchHelper.attachToRecyclerView(it)
         }
 
+        binding?.layoutSearch?.setContent {
+            ProfileEpisodeListSearchBar(
+                activeTheme = theme.activeTheme,
+            )
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
                     when (state) {
-                        State.Empty -> {
+                        is State.Empty -> {
                             binding?.recyclerView?.isVisible = false
                             binding?.emptyLayout?.isVisible = true
+                            binding?.lblEmptyTitle?.setText(state.titleRes)
+                            binding?.lblEmptySummary?.setText(state.summaryRes)
                         }
 
                         State.Loading -> Unit
 
                         is State.Loaded -> {
                             binding?.recyclerView?.updatePadding(
-                                top = if (state.showSearch) 0 else 16.dpToPx(requireContext()),
+                                top = if (state.showSearchBar) 0 else 16.dpToPx(requireContext()),
                             )
                             binding?.recyclerView?.isVisible = true
                             binding?.emptyLayout?.isVisible = false
                             adapter.submitList(state.results)
-                            binding?.layoutSearch?.setContent {
-                                if (state.showSearch) {
-                                    ProfileEpisodeListSearchBar(
-                                        activeTheme = theme.activeTheme,
-                                    )
-                                }
-                            }
                         }
                     }
                 }
@@ -275,20 +276,6 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
         }
-
-        val emptyTitleId = when (mode) {
-            is Mode.Downloaded -> LR.string.profile_empty_downloaded
-            is Mode.Starred -> LR.string.profile_empty_starred
-            is Mode.History -> LR.string.profile_empty_history
-        }
-        val emptySummaryId = when (mode) {
-            is Mode.Downloaded -> LR.string.profile_empty_downloaded_summary
-            is Mode.Starred -> LR.string.profile_empty_starred_summary
-            is Mode.History -> LR.string.profile_empty_history_summary
-        }
-
-        binding?.lblEmptyTitle?.setText(emptyTitleId)
-        binding?.lblEmptySummary?.setText(emptySummaryId)
 
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             val wasMultiSelecting = binding?.multiSelectToolbar?.isVisible == true

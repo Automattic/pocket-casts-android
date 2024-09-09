@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Mode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListViewModel.State
@@ -20,6 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -89,7 +91,10 @@ class ProfileEpisodeListViewModelTest {
         viewModel.state.test {
             assertEquals(
                 awaitItem(),
-                State.Empty,
+                State.Empty(
+                    titleRes = R.string.profile_empty_history,
+                    summaryRes = R.string.profile_empty_history_summary,
+                ),
             )
         }
     }
@@ -102,7 +107,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.History)
 
         viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -114,7 +119,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.History)
 
         viewModel.state.test {
-            assertEquals(true, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(true, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -125,7 +130,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.Starred)
 
         viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -136,7 +141,7 @@ class ProfileEpisodeListViewModelTest {
         viewModel.setup(Mode.Downloaded)
 
         viewModel.state.test {
-            assertEquals(false, (awaitItem() as State.Loaded).showSearch)
+            assertEquals(false, (awaitItem() as State.Loaded).showSearchBar)
         }
     }
 
@@ -152,6 +157,41 @@ class ProfileEpisodeListViewModelTest {
         }
     }
 
+    @Test
+    fun `search returns filtered playback history episodes`() = runTest {
+        initViewModel()
+        val filteredEpisodes = listOf(mock<PodcastEpisode>())
+        whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow("query")).thenReturn(flowOf(filteredEpisodes))
+        viewModel.setup(Mode.History)
+
+        viewModel.updateSearchQuery("query")
+
+        viewModel.state.test {
+            assertEquals(filteredEpisodes, (awaitItem() as State.Loaded).results)
+        }
+    }
+
+    @Test
+    fun `empty state is shown if no search results available`() = runTest {
+        initViewModel()
+        val filteredEpisodes = emptyList<PodcastEpisode>()
+        whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow("query")).thenReturn(flowOf(filteredEpisodes))
+        viewModel.setup(Mode.History)
+
+        viewModel.updateSearchQuery("query")
+
+        viewModel.state.test {
+            assertEquals(
+                awaitItem(),
+                State.Empty(
+                    titleRes = R.string.search_episodes_not_found_title,
+                    summaryRes = R.string.search_episodes_not_found_summary,
+                    showSearchBar = true,
+                ),
+            )
+        }
+    }
+
     private fun initViewModel(
         downloadedEpisodes: List<PodcastEpisode> = downloadedEpisodesMock,
         starredEpisodes: List<PodcastEpisode> = starredEpisodesMock,
@@ -160,6 +200,7 @@ class ProfileEpisodeListViewModelTest {
         whenever(episodeManager.observeDownloadEpisodes()).thenReturn(flowOf(downloadedEpisodes).asFlowable())
         whenever(episodeManager.observeStarredEpisodes()).thenReturn(flowOf(starredEpisodes).asFlowable())
         whenever(episodeManager.observePlaybackHistoryEpisodes()).thenReturn(flowOf(listeningHistoryEpisodes).asFlowable())
+        whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow(anyOrNull())).thenReturn(flowOf(emptyList()))
         doNothing().whenever(analyticsTracker).track(any(), any())
 
         viewModel = ProfileEpisodeListViewModel(
