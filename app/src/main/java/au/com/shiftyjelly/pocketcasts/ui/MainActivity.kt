@@ -68,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -584,6 +585,7 @@ class MainActivity :
         mediaRouter?.removeCallback(mediaRouterCallback)
     }
 
+    @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
         if (isUpNextShowing()) {
@@ -1163,6 +1165,7 @@ class MainActivity :
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
@@ -1327,6 +1330,13 @@ class MainActivity :
                 is AssistantDeepLink -> {
                     // This is what the assistant sends us when it doesn't know what to do and just opens the app. Assume the user wants to play.
                     playbackManager.playQueue()
+                }
+                is SignInDeepLink -> {
+                    val onboardingFlow = when (SourceView.fromString(deepLink.sourceView)) {
+                        SourceView.ENGAGE_SDK_SIGN_IN -> OnboardingFlow.EngageSdk
+                        else -> OnboardingFlow.LoggedOut
+                    }
+                    openOnboardingFlow(onboardingFlow)
                 }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.compose.compiler)
 }
 
 apply(plugin = "com.google.android.gms.oss-licenses-plugin")

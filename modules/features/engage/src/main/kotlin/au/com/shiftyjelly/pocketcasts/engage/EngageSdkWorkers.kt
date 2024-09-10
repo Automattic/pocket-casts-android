@@ -11,6 +11,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge.Companion.TAG
 import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.google.android.engage.service.AppEngageErrorCode
 import com.google.android.engage.service.AppEngageException
 import com.google.android.engage.service.AppEngagePublishClient
@@ -77,11 +78,11 @@ internal class RecommendationsSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val externalDataManager: ExternalDataManager,
+    private val syncManager: SyncManager,
 ) : ClusterSyncWorker(context, params, "Recommendations") {
 
     override suspend fun submitCluster(service: ClusterService): Task<Void> {
-        val engageData = externalDataManager.getEngageData()
-        return service.updateRecommendations(engageData)
+        return service.updateRecommendations(getEngageData(externalDataManager, syncManager))
     }
 }
 
@@ -90,11 +91,11 @@ internal class ContinuationSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val externalDataManager: ExternalDataManager,
+    private val syncManager: SyncManager,
 ) : ClusterSyncWorker(context, params, "Continuation") {
 
     override suspend fun submitCluster(service: ClusterService): Task<Void> {
-        val engageData = externalDataManager.getEngageData()
-        return service.updateContinuation(engageData)
+        return service.updateContinuation(getEngageData(externalDataManager, syncManager))
     }
 }
 
@@ -103,12 +104,18 @@ internal class FeaturedWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val externalDataManager: ExternalDataManager,
+    private val syncManager: SyncManager,
 ) : ClusterSyncWorker(context, params, "Featured") {
 
     override suspend fun submitCluster(service: ClusterService): Task<Void> {
-        val engageData = externalDataManager.getEngageData()
-        return service.updateFeatured(engageData)
+        return service.updateFeatured(getEngageData(externalDataManager, syncManager))
     }
+}
+
+private suspend fun getEngageData(dataManager: ExternalDataManager, syncManager: SyncManager): EngageData {
+    // Do not use isLoggedIn() method https://github.com/Automattic/pocket-casts-android/issues/2409
+    val isSignedIn = syncManager.isLoggedInObservable.value == true
+    return dataManager.getEngageData(isSignedIn)
 }
 
 internal abstract class ClusterSyncWorker(
@@ -164,7 +171,7 @@ internal abstract class ClusterSyncWorker(
     }
 }
 
-private suspend fun ExternalDataManager.getEngageData() = coroutineScope {
+internal suspend fun ExternalDataManager.getEngageData(isSignedIn: Boolean) = coroutineScope {
     val recentlyPlayedPodcasts = async { getRecentlyPlayedPodcasts(limit = 50) }
     val newReleases = async { getNewEpisodes(limit = 50) }
     val discoverRecommendations = async { getCuratedPodcastGroups(limitPerGroup = 50) }
@@ -175,5 +182,6 @@ private suspend fun ExternalDataManager.getEngageData() = coroutineScope {
         newReleases = newReleases.await(),
         continuation = inProgressEpisodes.await(),
         curatedPodcasts = discoverRecommendations.await(),
+        isSignedIn = isSignedIn,
     )
 }

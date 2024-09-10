@@ -99,6 +99,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         context?.let {
             menu.tintIcons(it.getThemeColor(UR.attr.secondary_icon_01))

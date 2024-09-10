@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.engage.BuildConfig.SERVER_LIST_HOST
 import au.com.shiftyjelly.pocketcasts.engage.BuildConfig.SERVER_SHORT_HOST
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge.Companion.TAG
@@ -20,11 +21,13 @@ import com.google.android.engage.common.datamodel.ContinuationCluster
 import com.google.android.engage.common.datamodel.FeaturedCluster
 import com.google.android.engage.common.datamodel.Image
 import com.google.android.engage.common.datamodel.RecommendationCluster
+import com.google.android.engage.common.datamodel.SignInCardEntity
 import com.google.android.engage.service.AppEngagePublishClient
 import com.google.android.engage.service.PublishContinuationClusterRequest
 import com.google.android.engage.service.PublishFeaturedClusterRequest
 import com.google.android.engage.service.PublishRecommendationClustersRequest
 import com.google.android.engage.service.PublishStatusRequest
+import com.google.android.engage.service.PublishUserAccountManagementRequest
 import com.google.android.gms.tasks.Task
 import kotlin.math.roundToInt
 import timber.log.Timber
@@ -244,6 +247,32 @@ internal class ClusterService(
             updateClient(data) {
                 Timber.tag(TAG).d("Delete featured cluster")
                 client.deleteFeaturedCluster()
+            }
+        }
+    }
+
+    fun updateUserAccount(
+        data: EngageData,
+    ): Task<Void> {
+        return updateClient(data) {
+            if (data.isSignedIn) {
+                Timber.tag(TAG).d("Delete user management cluster")
+                client.deleteUserManagementCluster()
+            } else {
+                Timber.tag(TAG).d("Publish user management cluster")
+                val entity = SignInCardEntity.Builder()
+                    .addPosterImage(
+                        Image.Builder()
+                            .setImageUri(Uri.parse("https://static.pocketcasts.com/assets/engage-sdk-banner.png"))
+                            .setImageWidthInPixel(1264)
+                            .setImageHeightInPixel(712)
+                            .build(),
+                    )
+                    .setActionText(context.getString(LR.string.engage_sdk_sign_in))
+                    .setActionUri(SignInDeepLink(SourceView.ENGAGE_SDK_SIGN_IN.analyticsValue).toUri(SERVER_SHORT_HOST).also { Timber.tag(TAG).d(it.toString()) })
+                    .build()
+                val request = PublishUserAccountManagementRequest.Builder().setSignInCardEntity(entity).build()
+                client.publishUserAccountManagementRequest(request)
             }
         }
     }

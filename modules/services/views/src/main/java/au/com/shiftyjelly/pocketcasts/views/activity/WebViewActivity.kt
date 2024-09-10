@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.activity
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -51,6 +52,7 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

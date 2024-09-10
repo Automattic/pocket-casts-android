@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -140,17 +142,20 @@ fun SubscriptionBadgeForTier(
             shortNameRes = LR.string.pocket_casts_plus_short,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
+                SubscriptionBadgeDisplayMode.Colored -> MaterialTheme.theme.colors.primaryUi01
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
+                SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
                 -> SubscriptionTierColor.plusGold
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.plusGold
+                SubscriptionBadgeDisplayMode.Colored -> MaterialTheme.theme.colors.primaryUi01
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
@@ -163,18 +168,23 @@ fun SubscriptionBadgeForTier(
             shortNameRes = LR.string.pocket_casts_patron_short,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> SubscriptionTierColor.patronPurpleLight
-                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+                SubscriptionBadgeDisplayMode.Colored,
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
+                -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
+                SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
                 -> SubscriptionTierColor.patronPurple
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
-                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+                SubscriptionBadgeDisplayMode.Colored,
+                SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
+                -> Color.White
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
         )
@@ -248,6 +258,7 @@ fun OfferBadge(
 
 enum class SubscriptionBadgeDisplayMode {
     Black,
+    Colored,
     ColoredWithWhiteForeground,
     ColoredWithBlackForeground,
 }
@@ -258,10 +269,34 @@ object SubscriptionTierColor {
     val patronPurpleLight = Color(0xFFAFA2FA)
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored", defaultStyle = true)
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored on light theme", defaultStyle = true)
 @Preview(name = "Colored")
 @Composable
-fun SubscriptionBadgePlusColoredPreview() {
+fun SubscriptionBadgePlusColoredLightThemePreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SubscriptionBadgeForTier(
+            tier = SubscriptionTier.PLUS,
+            displayMode = SubscriptionBadgeDisplayMode.Colored,
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored on dark theme")
+@Preview(name = "Colored")
+@Composable
+fun SubscriptionBadgePlusColoredDarkThemePreview() {
+    AppThemeWithBackground(Theme.ThemeType.DARK) {
+        SubscriptionBadgeForTier(
+            tier = SubscriptionTier.PLUS,
+            displayMode = SubscriptionBadgeDisplayMode.Colored,
+        )
+    }
+}
+
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with white foreground")
+@Preview(name = "Colored")
+@Composable
+fun SubscriptionBadgePlusColoredWhiteForegroundPreview() {
     SubscriptionBadgeForTier(
         tier = SubscriptionTier.PLUS,
         displayMode = SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
@@ -278,7 +313,7 @@ fun SubscriptionBadgePlusBlackPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored")
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored with white foreground")
 @Preview(name = "Colored")
 @Composable
 fun SubscriptionBadgePatronColoredPreview() {

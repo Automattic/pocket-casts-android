@@ -46,6 +46,8 @@ class CloudSettingsFragment : BaseFragment() {
         return binding?.root
     }
 
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         menu.clear()

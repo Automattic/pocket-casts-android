@@ -1,12 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
-import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -212,7 +212,7 @@ class NotificationsSettingsFragment :
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         val ringtoneKey = ringtonePreference?.key
         if (preference.key == ringtoneKey) {
-            val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+            val intent = android.content.Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
@@ -229,10 +229,11 @@ class NotificationsSettingsFragment :
         }
     }
 
+    @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
         if (requestCode == REQUEST_CODE_ALERT_RINGTONE && data != null) {
-            val ringtone = data.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            val ringtone: Uri? = getParcelableExtra(data, RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java)
             val value = ringtone?.toString() ?: ""
             context?.let {
                 settings.notificationSound.set(NotificationSound(value, it), updateModifiedAt = false)

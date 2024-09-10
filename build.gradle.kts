@@ -40,6 +40,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize) apply false
     alias(libs.plugins.measure.builds)
     alias(libs.plugins.protobuf) apply false
+    alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.dependency.analysis)
 }
 

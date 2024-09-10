@@ -550,6 +550,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.ENGAGE_SDK_CONTINUATION,
             SourceView.ENGAGE_SDK_FEATURED,
             SourceView.ENGAGE_SDK_RECOMMENDATIONS,
+            SourceView.ENGAGE_SDK_SIGN_IN,
             SourceView.FULL_SCREEN_VIDEO,
             SourceView.MINIPLAYER,
             SourceView.MULTI_SELECT,

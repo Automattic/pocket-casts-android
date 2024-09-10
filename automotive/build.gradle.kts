@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.sentry)
     alias(libs.plugins.aboutlibraries)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {

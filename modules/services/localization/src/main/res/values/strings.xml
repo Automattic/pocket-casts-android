@@ -2129,6 +2129,7 @@
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
     <string name="engage_sdk_new_releases" translatable="false">@string/nova_launcher_new_releases</string>
     <string name="engage_sdk_trending" translatable="false">@string/discover_trending</string>
+    <string name="engage_sdk_sign_in" translatable="false">@string/sign_in</string>
 
     <!-- Referrals -->
     <string name="gift">Gift</string>
