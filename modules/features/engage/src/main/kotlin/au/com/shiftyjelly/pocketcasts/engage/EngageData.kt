@@ -10,8 +10,9 @@ internal data class EngageData(
     val recommendations: Recommendations,
     val continuation: Continuation,
     val featured: Featured,
+    val isSignedIn: Boolean,
 ) {
-    val publishStatus get() = if (recommendations.isEmpty() && continuation.isEmpty() && featured.isEmpty()) {
+    val publishStatus get() = if (recommendations.isEmpty() && continuation.isEmpty() && featured.isEmpty() && isSignedIn) {
         AppEngagePublishStatusCode.NOT_PUBLISHED_NO_ELIGIBLE_CONTENT
     } else {
         AppEngagePublishStatusCode.PUBLISHED
@@ -23,6 +24,7 @@ internal data class EngageData(
             newReleases: List<ExternalEpisode.Podcast>,
             continuation: List<ExternalEpisode.Podcast>,
             curatedPodcasts: ExternalPodcastMap,
+            isSignedIn: Boolean,
         ): EngageData {
             val trending = curatedPodcasts.trendingGroup(limit = 10) ?: ExternalPodcastList("", "", emptyList())
             val recommendations = curatedPodcasts.genericGroups(limit = 50)
@@ -32,6 +34,7 @@ internal data class EngageData(
                 Recommendations.create(recentlyPlayed, newReleases, trending, recommendations),
                 Continuation(continuation),
                 Featured(featured),
+                isSignedIn,
             )
         }
     }
