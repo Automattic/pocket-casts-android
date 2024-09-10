@@ -48,6 +48,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
+import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
@@ -125,37 +126,15 @@ object OnboardingUpgradeHelper {
         fontWeight: FontWeight = FontWeight.W600,
         secondaryText: String? = null,
     ) {
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(gradientBackgroundColor, RoundedCornerShape(12.dp))
-                .clickable(onClick = onClick)
-                .padding(16.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                AutoResizeText(
-                    text = primaryText,
-                    color = textColor,
-                    maxFontSize = 18.sp,
-                    lineHeight = 21.sp,
-                    fontWeight = fontWeight,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center,
-                )
-                secondaryText?.let {
-                    TextP60(
-                        text = it,
-                        textAlign = TextAlign.Center,
-                        color = textColor,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                }
-            }
-        }
+        GradientRowButton(
+            primaryText = primaryText,
+            secondaryText = secondaryText,
+            fontWeight = fontWeight,
+            textColor = textColor,
+            gradientBackgroundColor = gradientBackgroundColor,
+            onClick = onClick,
+            modifier = modifier,
+        )
     }
 
     @Composable
