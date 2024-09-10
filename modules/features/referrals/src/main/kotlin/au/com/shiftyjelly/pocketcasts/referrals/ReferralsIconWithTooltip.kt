@@ -47,7 +47,7 @@ fun ReferralsIconWithTooltip(
         state = state,
         onIconClick = {
             viewModel.onIconClick()
-            val fragment = ReferralsSendPassFragment
+            val fragment = ReferralsSendGuestPassFragment
                 .newInstance(viewModel.state.value.badgeCount)
             (activity as FragmentHostListener).showBottomSheet(fragment)
         },

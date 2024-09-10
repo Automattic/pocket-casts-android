@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil.setBackgroundColor
@@ -19,7 +20,7 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 private const val NEW_INSTANCE_ARG = "ReferralsSendPassFragmentArgs"
 
 @AndroidEntryPoint
-class ReferralsSendPassFragment : BaseFragment() {
+class ReferralsSendGuestPassFragment : BaseFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
     override fun onCreateView(
@@ -28,12 +29,12 @@ class ReferralsSendPassFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         setBackgroundColor(view, ComposeColor.Transparent.toArgb())
-//        ReferralsSendPassPage(
-//            passCount = args.passCount,
-//            onDismiss = {
-//                (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
-//            },
-//        )
+        ReferralsSendGuestPassPage(
+            passCount = args.passCount,
+            onDismiss = {
+                (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
+            },
+        )
     }
 
     override fun onResume() {
@@ -60,7 +61,7 @@ class ReferralsSendPassFragment : BaseFragment() {
     companion object {
         fun newInstance(
             passCount: Int,
-        ) = ReferralsSendPassFragment().apply {
+        ) = ReferralsSendGuestPassFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(passCount),
             )
