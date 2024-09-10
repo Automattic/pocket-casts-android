@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -31,7 +32,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -39,9 +42,15 @@ fun ReferralsIconWithTooltip(
     viewModel: ReferralsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val activity = LocalContext.current.getActivity()
     ReferralsIconWithTooltip(
         state = state,
-        onIconClick = viewModel::onIconClick,
+        onIconClick = {
+            viewModel.onIconClick()
+            val fragment = ReferralsSendPassFragment
+                .newInstance(viewModel.state.value.badgeCount)
+            (activity as FragmentHostListener).showBottomSheet(fragment)
+        },
     )
 }
 
@@ -76,7 +85,7 @@ private fun TooltipContent(
     ) {
         TextH40(
             text = pluralStringResource(
-                LR.plurals.referrals_tooltip_heading,
+                LR.plurals.referrals_remaining_passes,
                 state.badgeCount,
                 state.badgeCount,
             ),
