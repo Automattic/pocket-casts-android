@@ -14,6 +14,7 @@ enum class SourceView(val analyticsValue: String) {
     ENGAGE_SDK_CONTINUATION("engage_sdk_continuation"),
     ENGAGE_SDK_FEATURED("engage_sdk_featured"),
     ENGAGE_SDK_RECOMMENDATIONS("engage_sdk_recommendations"),
+    ENGAGE_SDK_SIGN_IN("engage_sdk_sign_in"),
     EPISODE_DETAILS("episode_details"),
     EPISODE_SWIPE_ACTION("episode_swipe_action"),
     FILES("files"),

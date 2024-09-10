@@ -9,6 +9,10 @@ import java.util.Locale
 import java.util.TimeZone
 import timber.log.Timber
 
+fun String.escapeLike(escapeChar: Char) = replace("$escapeChar", "$escapeChar$escapeChar")
+    .replace("%", "$escapeChar%")
+    .replace("_", "${escapeChar}_")
+
 val ISO_DATE_FORMATS = object : ThreadLocal<List<SimpleDateFormat>>() {
     override fun initialValue(): List<SimpleDateFormat> {
         return listOf(

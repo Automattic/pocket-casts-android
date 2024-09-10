@@ -113,6 +113,8 @@ interface Settings {
         const val APP_REVIEW_REQUESTED_DATES = "in_app_review_requested_dates"
 
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
+
+        const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -231,14 +233,14 @@ interface Settings {
 
         data object PlayNext : MediaNotificationControls(
             controlName = LR.string.play_next,
-            iconRes = com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next,
+            iconRes = IR.drawable.ic_skip_next,
             key = PLAY_NEXT_KEY,
             serverId = "play_next",
         )
 
         data object PlaybackSpeed : MediaNotificationControls(
             controlName = LR.string.playback_speed,
-            iconRes = IR.drawable.auto_1,
+            iconRes = IR.drawable.ic_speed_number,
             key = PLAYBACK_SPEED_KEY,
             serverId = "playback_speed",
         )
@@ -537,4 +539,9 @@ interface Settings {
 
     fun automotiveConnectedToMediaSession(): Boolean
     fun setAutomotiveConnectedToMediaSession(isLoaded: Boolean)
+
+    val showReferralsTooltip: UserSetting<Boolean>
+
+    val playerOrUpNextBottomSheetState: Flow<Int>
+    fun updatePlayerOrUpNextBottomSheetState(state: Int)
 }

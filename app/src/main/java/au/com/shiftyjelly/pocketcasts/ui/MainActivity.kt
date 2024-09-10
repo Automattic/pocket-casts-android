@@ -68,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -904,6 +905,7 @@ class MainActivity :
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
@@ -1326,6 +1328,13 @@ class MainActivity :
                 is AssistantDeepLink -> {
                     // This is what the assistant sends us when it doesn't know what to do and just opens the app. Assume the user wants to play.
                     playbackManager.playQueue()
+                }
+                is SignInDeepLink -> {
+                    val onboardingFlow = when (SourceView.fromString(deepLink.sourceView)) {
+                        SourceView.ENGAGE_SDK_SIGN_IN -> OnboardingFlow.EngageSdk
+                        else -> OnboardingFlow.LoggedOut
+                    }
+                    openOnboardingFlow(onboardingFlow)
                 }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")

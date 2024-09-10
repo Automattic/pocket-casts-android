@@ -224,15 +224,13 @@ class EpisodeFragment : BaseFragment() {
 
         binding?.loadingGroup?.isInvisible = true
 
-        if (savedInstanceState == null) {
-            viewModel.setup(
-                episodeUuid = episodeUUID,
-                podcastUuid = podcastUuid,
-                timestamp = timestamp,
-                autoPlay = autoPlay,
-                forceDark = forceDarkTheme,
-            )
-        }
+        viewModel.setup(
+            episodeUuid = episodeUUID,
+            podcastUuid = podcastUuid,
+            timestamp = timestamp,
+            autoPlay = autoPlay && savedInstanceState == null,
+            forceDark = forceDarkTheme,
+        )
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->

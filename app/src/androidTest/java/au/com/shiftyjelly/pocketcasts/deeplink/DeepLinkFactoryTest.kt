@@ -919,4 +919,37 @@ class DeepLinkFactoryTest {
 
         assertEquals(AssistantDeepLink, deepLink)
     }
+
+    @Test
+    fun signIn() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/sign-in"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(SignInDeepLink(sourceView = null), deepLink)
+    }
+
+    @Test
+    fun signInHttp() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("http://pca.st/sign-in"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(SignInDeepLink(sourceView = null), deepLink)
+    }
+
+    @Test
+    fun signInWithSource() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pca.st/sign-in?source_view=hello"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(SignInDeepLink(sourceView = "hello"), deepLink)
+    }
 }

@@ -173,8 +173,19 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     transcriptViewModel.uiState.collect { uiState ->
                         val transcriptAvailable = uiState !is TranscriptViewModel.UiState.Empty
-                        binding.transcript.isEnabled = transcriptAvailable
-                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.5f
+                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.4f
+                        binding.transcript.setOnClickListener {
+                            if (!transcriptAvailable) {
+                                val message = getString(LR.string.transcript_error_not_available)
+                                Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+                                    .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
+                                    .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
+                                    .show()
+                            } else {
+                                trackShelfAction(ShelfItem.Transcript.analyticsValue)
+                                viewModel.openTranscript()
+                            }
+                        }
                     }
                 }
             }
@@ -199,10 +210,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
             onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
-        }
-        binding.transcript.setOnClickListener {
-            trackShelfAction(ShelfItem.Transcript.analyticsValue)
-            viewModel.openTranscript()
         }
         binding.report?.setOnClickListener {
             trackShelfAction(ShelfItem.Report.analyticsValue)
