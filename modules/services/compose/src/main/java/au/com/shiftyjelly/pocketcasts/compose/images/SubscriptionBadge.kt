@@ -281,7 +281,7 @@ fun SubscriptionBadgePlusColoredLightThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored on dark theme", defaultStyle = true)
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored on dark theme")
 @Preview(name = "Colored")
 @Composable
 fun SubscriptionBadgePlusColoredDarkThemePreview() {
@@ -293,7 +293,7 @@ fun SubscriptionBadgePlusColoredDarkThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with white foreground", defaultStyle = true)
+@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with white foreground")
 @Preview(name = "Colored")
 @Composable
 fun SubscriptionBadgePlusColoredWhiteForegroundPreview() {
