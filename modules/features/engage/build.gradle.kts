@@ -24,6 +24,7 @@ dependencies {
     api(projects.modules.services.repositories)
 
     implementation(libs.coroutines.play.services)
+    implementation(libs.coroutines.rx2)
     implementation(libs.engage)
     implementation(libs.lifecycle.process)
     implementation(libs.timber)

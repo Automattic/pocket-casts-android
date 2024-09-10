@@ -71,6 +71,7 @@ private fun Content(
         OnboardingFlow.LoggedOut,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         OnboardingFlow.InitialOnboarding,
+        OnboardingFlow.EngageSdk,
         -> OnboardingNavRoute.logInOrSignUp
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
@@ -131,6 +132,7 @@ private fun Content(
 
                         OnboardingFlow.InitialOnboarding,
                         OnboardingFlow.LoggedOut,
+                        OnboardingFlow.EngageSdk,
                         -> exitOnboarding(OnboardingExitInfo())
                     }
                 },
@@ -281,6 +283,7 @@ private fun onLoginToExistingAccount(
     when (flow) {
         OnboardingFlow.InitialOnboarding,
         OnboardingFlow.LoggedOut,
+        OnboardingFlow.EngageSdk,
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
 
         is OnboardingFlow.PlusAccountUpgrade,

@@ -231,6 +231,19 @@ data class PlayFromSearchDeepLink(
 
 data object AssistantDeepLink : DeepLink
 
+data class SignInDeepLink(
+    val sourceView: String?,
+) : UriDeepLink {
+    override fun toUri(shareHost: String): Uri {
+        return Uri.Builder()
+            .scheme("https")
+            .authority(shareHost)
+            .appendPath("sign-in")
+            .let { if (sourceView != null) it.appendQueryParameter(EXTRA_SOURCE_VIEW, sourceView) else it }
+            .build()
+    }
+}
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }
