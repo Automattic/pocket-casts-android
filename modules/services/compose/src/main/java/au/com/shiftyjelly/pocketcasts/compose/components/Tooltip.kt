@@ -183,13 +183,13 @@ class TooltipShape(
 internal data class DropdownMenuPositionProvider(
     val contentOffset: DpOffset,
     val density: Density,
-    val onPositionCalculated: (IntRect, IntRect) -> Unit = { _, _ -> }
+    val onPositionCalculated: (IntRect, IntRect) -> Unit = { _, _ -> },
 ) : PopupPositionProvider {
     override fun calculatePosition(
         anchorBounds: IntRect,
         windowSize: IntSize,
         layoutDirection: LayoutDirection,
-        popupContentSize: IntSize
+        popupContentSize: IntSize,
     ): IntOffset {
         // The min margin above and below the menu, relative to the screen.
         val verticalMargin = with(density) { 48.dp.roundToPx() }
@@ -210,7 +210,7 @@ internal data class DropdownMenuPositionProvider(
                 rightToAnchorRight,
                 // If the anchor gets outside of the window on the left, we want to position
                 // toDisplayLeft for proximity to the anchor. Otherwise, toDisplayRight.
-                if (anchorBounds.left >= 0) rightToWindowRight else leftToWindowLeft
+                if (anchorBounds.left >= 0) rightToWindowRight else leftToWindowLeft,
             )
         } else {
             sequenceOf(
@@ -218,7 +218,7 @@ internal data class DropdownMenuPositionProvider(
                 leftToAnchorLeft,
                 // If the anchor gets outside of the window on the right, we want to position
                 // toDisplayRight for proximity to the anchor. Otherwise, toDisplayLeft.
-                if (anchorBounds.right <= windowSize.width) leftToWindowLeft else rightToWindowRight
+                if (anchorBounds.right <= windowSize.width) leftToWindowLeft else rightToWindowRight,
             )
         }.firstOrNull {
             it >= 0 && it + popupContentSize.width <= windowSize.width
@@ -233,15 +233,15 @@ internal data class DropdownMenuPositionProvider(
             topToAnchorBottom,
             bottomToAnchorTop,
             centerToAnchorTop,
-            bottomToWindowBottom
+            bottomToWindowBottom,
         ).firstOrNull {
             it >= verticalMargin &&
-                    it + popupContentSize.height <= windowSize.height - verticalMargin
+                it + popupContentSize.height <= windowSize.height - verticalMargin
         } ?: bottomToAnchorTop
 
         onPositionCalculated(
             anchorBounds,
-            IntRect(x, y, x + popupContentSize.width, y + popupContentSize.height)
+            IntRect(x, y, x + popupContentSize.width, y + popupContentSize.height),
         )
         return IntOffset(x, y)
     }
