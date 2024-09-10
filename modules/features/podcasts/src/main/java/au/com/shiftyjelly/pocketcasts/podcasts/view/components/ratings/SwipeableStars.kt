@@ -51,8 +51,8 @@ private const val numStars = 5
 @Composable
 fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
-    initialRate: Int? = null,
     modifier: Modifier = Modifier,
+    initialRate: Int? = null,
 ) {
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
