@@ -98,6 +98,7 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonCancelEndOfEpisodeOrChapter.setOnClickListener { cancelTimer() }
         binding.sleepTimeSettings.setOnClickListener {
             close()
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_SETTINGS_TAPPED)
             val fragment = PlaybackSettingsFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(SCROLL_TO_SLEEP_TIMER, true)
