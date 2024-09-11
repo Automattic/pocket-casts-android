@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,6 +43,12 @@ fun GiveRatingScreen(
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val submitButtonAlphaAnimation by animateFloatAsState(
+        targetValue = if (state.previousRate != state.currentSelectedRate) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "submit-button-alpha-animation",
+    )
 
     CallOnce {
         viewModel.trackOnGiveRatingScreenShown(state.podcastUuid)
@@ -97,7 +106,7 @@ fun GiveRatingScreen(
                     backgroundColor = MaterialTheme.theme.colors.primaryText01,
                     disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive03,
                 ),
-                modifier = Modifier.alpha(if (state.previousRate != state.currentSelectedRate) 1f else 0f),
+                modifier = Modifier.alpha(submitButtonAlphaAnimation),
             )
         }
 
