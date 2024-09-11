@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ object ReferralGuestPassCardDefaults {
 fun ReferralGuestPassCardView(
     modifier: Modifier = Modifier,
 ) {
+    val cardTitle = stringResource(LR.string.referrals_send_guest_pass_card_title)
     Box(
         modifier = modifier
             .background(
@@ -43,10 +46,11 @@ fun ReferralGuestPassCardView(
                 width = 1.dp,
                 color = ReferralGuestPassCardDefaults.cardStrokeColor,
                 shape = RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius),
-            ),
+            )
+            .semantics { contentDescription = cardTitle },
     ) {
         TextH60(
-            text = stringResource(LR.string.referrals_send_guest_pass_card_title),
+            text = cardTitle,
             color = Color.White,
             modifier = Modifier
                 .align(Alignment.BottomStart)

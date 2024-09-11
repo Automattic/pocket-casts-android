@@ -91,7 +91,7 @@ private fun ReferralsSendGuestPassContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = windowWidthSizeClass == WindowWidthSizeClass.Compact ||
-                windowHeightSizeClass == WindowHeightSizeClass.Compact
+            windowHeightSizeClass == WindowHeightSizeClass.Compact
         val cardCornerRadius = if (showFullScreen) 0.dp else 8.dp
         val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * .5).dp
         val cardModifier = if (showFullScreen) {
