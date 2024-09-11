@@ -342,6 +342,7 @@
     <string name="player_sleep_timer_in_chapter_plural">In %d chapters</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
+    <string name="player_sleep_timer_settings">Sleep timer Settings</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
     <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
     <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>

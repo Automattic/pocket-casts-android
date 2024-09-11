@@ -61,6 +61,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+            android:id="@+id/sleepTimeSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:clickable="true"
+            android:contentDescription="@string/player_sleep_timer_settings"
+            android:focusable="true"
+            android:minWidth="24dp"
+            android:minHeight="24dp"
+            android:padding="8dp"
+            android:src="@drawable/sleep_timer_cog"
+            app:layout_constraintBottom_toBottomOf="@+id/sleepTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/sleepTitle"
+            app:tint="?attr/player_contrast_01" />
+
         <TextView
             android:id="@+id/labelMins15"
             style="@style/DarkSubtitle1"
