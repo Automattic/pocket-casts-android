@@ -37,7 +37,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -417,7 +417,7 @@ private fun DescriptionContent(
                         .defaultMinSize(minHeight = 24.dp)
                         .clickable(
                             interactionSource = remember(::MutableInteractionSource),
-                            indication = rememberRipple(color = shareColors.accent),
+                            indication = ripple(color = shareColors.accent),
                             onClickLabel = stringResource(LR.string.share_clip_edit_label),
                             role = Role.Button,
                             onClick = listener::onShowClipSelection,

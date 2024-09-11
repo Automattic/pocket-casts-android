@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 import android.content.res.Configuration
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -83,7 +83,7 @@ fun Tooltip(
         }
 
         // Tooltip open/close animation
-        val transition = updateTransition(expandedStates, "Tooltip")
+        val transition = rememberTransition(expandedStates, "Tooltip")
         val alpha by transition.animateFloat(
             label = "alpha",
             transitionSpec = {
@@ -152,7 +152,7 @@ class TooltipShape(
             // Start from top-left corner
             moveTo(0f, arrowHeightPx + cornerRadiusPx)
             // Top-left corner
-            quadraticBezierTo(0f, arrowHeightPx, cornerRadiusPx, arrowHeightPx)
+            quadraticTo(0f, arrowHeightPx, cornerRadiusPx, arrowHeightPx)
             // Line to start of the arrow
             lineTo(anchorPointX - arrowWidthPx, arrowHeightPx)
             // Up to the tip of the arrow
@@ -162,15 +162,15 @@ class TooltipShape(
             // Line to top-right corner
             lineTo(width - cornerRadiusPx, arrowHeightPx)
             // Top-right corner
-            quadraticBezierTo(width, arrowHeightPx, width, arrowHeightPx + cornerRadiusPx)
+            quadraticTo(width, arrowHeightPx, width, arrowHeightPx + cornerRadiusPx)
             // Line to bottom-right corner
             lineTo(width, height - cornerRadiusPx)
             // Bottom-right corner
-            quadraticBezierTo(width, height, width - cornerRadiusPx, height)
+            quadraticTo(width, height, width - cornerRadiusPx, height)
             // Line to bottom-left corner
             lineTo(cornerRadiusPx, height)
             // Bottom-left corner
-            quadraticBezierTo(0f, height, 0f, height - cornerRadiusPx)
+            quadraticTo(0f, height, 0f, height - cornerRadiusPx)
             close()
         }
 
