@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -20,18 +21,22 @@ dependencies {
 
     api(projects.modules.services.repositories)
     api(projects.modules.services.ui)
+    api(projects.modules.services.views)
 
     implementation(platform(libs.compose.bom))
 
     implementation(libs.compose.material)
+    implementation(libs.compose.material3.window.size)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.reactive)
     implementation(libs.dagger.hilt.android)
+    implementation(libs.fragment.compose)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.lifecycle.runtime.compose)
 
     implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.model)
     implementation(projects.modules.services.utils)
