@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,15 +53,15 @@ private const val numStars = 5
 @Composable
 fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
-    initialRate: Int? = null,
     modifier: Modifier = Modifier,
+    initialRate: Int? = null,
 ) {
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
     var stopPointType by remember { mutableStateOf(StopPointType.InitialStars) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
-    var touchX by remember { mutableStateOf(0f) }
+    var touchX by remember { mutableFloatStateOf(0f) }
     var iconPositions by remember { mutableStateOf(listOf<Position>()) }
 
     val stopPoints: List<Double> = stopPointsFromIconPositions(iconPositions)
@@ -139,7 +141,7 @@ fun SwipeableStars(
             Stars(
                 filled = true,
                 modifier = { index ->
-                    var right by remember { mutableStateOf(0f) }
+                    var right by remember { mutableFloatStateOf(0f) }
                     Modifier
                         // We could have applied this onGloballyPositioned modifier to the empty stars with the same effect
                         .onGloballyPositioned {
@@ -158,6 +160,7 @@ fun SwipeableStars(
                                     .clickable {
                                         touchX = right // select the full star
                                     }
+                                    .focusable()
                                     .semantics {
                                         contentDescription = "${index + 1} Stars"
                                         role = Role.Button
