@@ -189,7 +189,7 @@ subprojects {
         checkAllWarnings = false
         warningsAsErrors = false
 
-        checkDependencies = false
+        checkDependencies = true
         checkTestSources = false
         checkGeneratedSources = false
 
@@ -352,8 +352,6 @@ subprojects {
 
     plugins.withType<LibraryPlugin>().configureEach {
         configure<LibraryExtension> {
-            lint(configureLint)
-
             buildTypes {
                 named("release") {
                     isMinifyEnabled = false
