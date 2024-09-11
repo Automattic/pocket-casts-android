@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +33,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -79,105 +79,97 @@ private fun ReferralsSendGuestPassContent(
     windowHeightSizeClass: WindowHeightSizeClass,
     onDismiss: () -> Unit,
 ) {
-    BoxWithConstraints {
-        val cardCornerRadius = if (windowWidthSizeClass == WindowWidthSizeClass.Compact ||
+    BoxWithConstraints(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .background(Color.Transparent)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onDismiss,
+            )
+            .fillMaxSize(),
+    ) {
+        val showFullScreen = windowWidthSizeClass == WindowWidthSizeClass.Compact ||
             windowHeightSizeClass == WindowHeightSizeClass.Compact
-        ) {
-            0.dp
-        } else {
-            8.dp
-        }
-
-        val cardModifier = if (windowWidthSizeClass == WindowWidthSizeClass.Compact ||
-            windowHeightSizeClass == WindowHeightSizeClass.Compact
-        ) {
+        val cardCornerRadius = if (showFullScreen) 0.dp else 8.dp
+        val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * .5).dp
+        val cardModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
         } else {
             Modifier
-                .width((maxWidth.value * 0.6).dp)
+                .width(cardWidth)
                 .wrapContentSize()
         }
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .background(Color.Transparent)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
+        Card(
+            elevation = 8.dp,
+            shape = RoundedCornerShape(cardCornerRadius),
+            backgroundColor = Color.Black,
+            modifier = cardModifier,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+            ) {
+                CloseButton(
+                    modifier = Modifier
+                        .align(Alignment.End),
                     onClick = onDismiss,
                 )
-                .fillMaxSize(),
-        ) {
-            Card(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(cardCornerRadius),
-                backgroundColor = Color.Black,
-                modifier = cardModifier,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                ) {
-                    CloseButton(
-                        modifier = Modifier
-                            .align(Alignment.End),
-                        onClick = onDismiss,
-                    )
 
-                    SubscriptionBadge(
-                        fontSize = 16.sp,
-                        padding = 4.dp,
-                        iconRes = IR.drawable.ic_plus,
-                        shortNameRes = LR.string.pocket_casts_plus_short,
-                        iconColor = Color.Black,
-                        backgroundBrush = plusBackgroundBrush,
-                        textColor = Color.Black,
-                    )
+                SubscriptionBadge(
+                    fontSize = 16.sp,
+                    padding = 4.dp,
+                    iconRes = IR.drawable.ic_plus,
+                    shortNameRes = LR.string.pocket_casts_plus_short,
+                    iconColor = Color.Black,
+                    backgroundBrush = plusBackgroundBrush,
+                    textColor = Color.Black,
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                    TextH10(
-                        text = stringResource(LR.string.referrals_send_guest_pass_title),
-                        textAlign = TextAlign.Center,
-                    )
+                TextH10(
+                    text = stringResource(LR.string.referrals_send_guest_pass_title),
+                    textAlign = TextAlign.Center,
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                    TextH50(
-                        text = pluralStringResource(
-                            LR.plurals.referrals_remaining_passes,
-                            passCount,
-                            passCount,
-                        ),
-                    )
+                TextH50(
+                    text = pluralStringResource(
+                        LR.plurals.referrals_remaining_passes,
+                        passCount,
+                        passCount,
+                    ),
+                )
 
-                    if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
-                        Spacer(modifier = Modifier.height(16.dp))
+                if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                        ReferralsPassCardsStack(
-                            passCount = passCount,
-                        )
-                    }
-
-                    if (windowWidthSizeClass == WindowWidthSizeClass.Compact
-                        || windowHeightSizeClass == WindowHeightSizeClass.Compact) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    } else {
-                        Spacer(modifier = Modifier.height(32.dp))
-                    }
-
-                    GradientRowButton(
-                        primaryText = stringResource(LR.string.referrals_share_guest_pass),
-                        textColor = Color.Black,
-                        gradientBackgroundColor = plusBackgroundBrush,
-                        modifier = Modifier.padding(16.dp),
-                        onClick = {},
+                    ReferralsPassCardsStack(
+                        passCount = passCount,
+                        width = cardWidth,
                     )
                 }
+
+                if (showFullScreen) {
+                    Spacer(modifier = Modifier.weight(1f))
+                } else {
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+
+                GradientRowButton(
+                    primaryText = stringResource(LR.string.referrals_share_guest_pass),
+                    textColor = Color.Black,
+                    gradientBackgroundColor = plusBackgroundBrush,
+                    modifier = Modifier.padding(16.dp),
+                    onClick = {},
+                )
             }
         }
     }
@@ -186,21 +178,22 @@ private fun ReferralsSendGuestPassContent(
 @Composable
 private fun ReferralsPassCardsStack(
     passCount: Int,
+    width: Dp,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
+    BoxWithConstraints(
+        contentAlignment = Alignment.TopCenter,
+        modifier = Modifier
+            .width(width),
     ) {
-        (0..<passCount).forEach { index ->
-            val cardWidth = (ReferralGuestPassCardView.cardSize.width.value * (1 + index * 0.125)).dp
-            val cardHeight = (ReferralGuestPassCardView.cardSize.height.value * (1 + index * 0.125)).dp
+        (0..<passCount).reversed().forEach { index ->
+            val cardWidth = (maxWidth.value * 0.8 * (1 - index * 0.125)).dp
+            val cardHeight = (cardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
+            val cardOffset = (10 * ((passCount - 1) - index)).dp
             ReferralGuestPassCardView(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .size(
-                        cardWidth,
-                        cardHeight,
-                    )
-                    .offset(y = (20 * index).dp),
+                    .padding(horizontal = 16.dp)
+                    .size(cardWidth, cardHeight)
+                    .offset(y = cardOffset),
             )
         }
     }

@@ -22,9 +22,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object ReferralGuestPassCardView {
+object ReferralGuestPassCardDefaults {
     val cardRadius = 13.dp
-    val cardSize = DpSize(315.dp, 200.dp)
+    val cardAspectRatio = 200f / 315f
     val cardBackgroundColor = Color(0xFF140833)
     val cardStrokeColor = Color(0xFF3A3A3A)
 }
@@ -36,13 +36,13 @@ fun ReferralGuestPassCardView(
     Box(
         modifier = modifier
             .background(
-                color = ReferralGuestPassCardView.cardBackgroundColor,
-                shape = RoundedCornerShape(ReferralGuestPassCardView.cardRadius),
+                color = ReferralGuestPassCardDefaults.cardBackgroundColor,
+                shape = RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius),
             )
             .border(
                 width = 1.dp,
-                color = ReferralGuestPassCardView.cardStrokeColor,
-                shape = RoundedCornerShape(ReferralGuestPassCardView.cardRadius),
+                color = ReferralGuestPassCardDefaults.cardStrokeColor,
+                shape = RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius),
             ),
     ) {
         TextH60(
@@ -69,6 +69,6 @@ fun ReferralGuestPassCardView(
 fun ReferralPassCardViewPreview() {
     ReferralGuestPassCardView(
         modifier = Modifier
-            .size(ReferralGuestPassCardView.cardSize),
+            .size(DpSize(315.dp, 200.dp)),
     )
 }
