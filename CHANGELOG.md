@@ -18,6 +18,9 @@
         ([#2811](https://github.com/Automattic/pocket-casts-android/pull/2811))
     *   Add a visibility animation to the submit button on the rating screen
         ([#2824](https://github.com/Automattic/pocket-casts-android/pull/2824))
+*   New Features
+    *   Add sleep timer settings to sleep timer bottom sheet
+        ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
 
 7.72
 -----
