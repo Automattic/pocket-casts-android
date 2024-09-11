@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -71,6 +72,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class PlaybackSettingsFragment : BaseFragment() {
 
+    companion object {
+        const val SCROLL_TO_SLEEP_TIMER = "scrollToSleepTimer"
+    }
+
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var podcastManager: PodcastManager
@@ -86,6 +91,8 @@ class PlaybackSettingsFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setContent {
+            val scrollToSleepTimer = arguments?.getBoolean(SCROLL_TO_SLEEP_TIMER, false) ?: false
+
             AppThemeWithBackground(theme.activeTheme) {
                 val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
                 PlaybackSettings(
@@ -94,6 +101,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
                     },
+                    scrollToSleepTimer = scrollToSleepTimer,
                     bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                 )
             }
@@ -104,8 +112,18 @@ class PlaybackSettingsFragment : BaseFragment() {
     private fun PlaybackSettings(
         settings: Settings,
         onBackClick: () -> Unit,
+        scrollToSleepTimer: Boolean,
         bottomInset: Dp,
     ) {
+        val listState = rememberLazyListState()
+
+        val sleepTimerIndex = 11
+        LaunchedEffect(scrollToSleepTimer) {
+            if (scrollToSleepTimer) {
+                listState.animateScrollToItem(index = sleepTimerIndex)
+            }
+        }
+
         LaunchedEffect(Unit) {
             analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_SHOWN)
         }
@@ -117,6 +135,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                 bottomShadow = true,
             )
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .background(MaterialTheme.theme.colors.primaryUi02),
                 contentPadding = PaddingValues(bottom = bottomInset),

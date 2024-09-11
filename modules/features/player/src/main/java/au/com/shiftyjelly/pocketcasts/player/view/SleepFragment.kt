@@ -12,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentSleepBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment.Companion.SCROLL_TO_SLEEP_TIMER
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
@@ -93,6 +96,15 @@ class SleepFragment : BaseDialogFragment() {
         }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisodeOrChapter.setOnClickListener { cancelTimer() }
+        binding.sleepTimeSettings.setOnClickListener {
+            close()
+            val fragment = PlaybackSettingsFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(SCROLL_TO_SLEEP_TIMER, true)
+                }
+            }
+            (activity as FragmentHostListener).showModal(fragment)
+        }
 
         return binding.root
     }
