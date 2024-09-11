@@ -91,7 +91,7 @@ private fun ReferralsSendGuestPassContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = windowWidthSizeClass == WindowWidthSizeClass.Compact ||
-            windowHeightSizeClass == WindowHeightSizeClass.Compact
+                windowHeightSizeClass == WindowHeightSizeClass.Compact
         val cardCornerRadius = if (showFullScreen) 0.dp else 8.dp
         val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * .5).dp
         val cardModifier = if (showFullScreen) {
@@ -201,11 +201,51 @@ private fun ReferralsPassCardsStack(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-fun ReferralsSendGuestPassContentPreview() {
-    ReferralsSendGuestPassContent(
+fun ReferralsSendGuestPassPortraitPhonePreview() {
+    ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
-        passCount = 3,
-        onDismiss = {},
     )
+}
+
+@Preview(device = Devices.LandscapeRegular)
+@Composable
+fun ReferralsSendGuestPassLandscapePhonePreview() {
+    ReferralsSendGuestPassContentPreview(
+        windowWidthSizeClass = WindowWidthSizeClass.Compact,
+        windowHeightSizeClass = WindowHeightSizeClass.Compact,
+    )
+}
+
+@Preview(device = Devices.PortraitTablet)
+@Composable
+fun ReferralsSendGuestPassPortraitTabletPreview() {
+    ReferralsSendGuestPassContentPreview(
+        windowWidthSizeClass = WindowWidthSizeClass.Medium,
+        windowHeightSizeClass = WindowHeightSizeClass.Medium,
+    )
+}
+
+@Preview(device = Devices.LandscapeTablet)
+@Composable
+fun ReferralsSendGuestPassLandscapeTabletPreview() {
+    ReferralsSendGuestPassContentPreview(
+        windowWidthSizeClass = WindowWidthSizeClass.Medium,
+        windowHeightSizeClass = WindowHeightSizeClass.Expanded,
+    )
+}
+
+@Composable
+fun ReferralsSendGuestPassContentPreview(
+    windowWidthSizeClass: WindowWidthSizeClass,
+    windowHeightSizeClass: WindowHeightSizeClass,
+) {
+    AppTheme(Theme.ThemeType.DARK) {
+        ReferralsSendGuestPassContent(
+            windowWidthSizeClass = windowWidthSizeClass,
+            windowHeightSizeClass = windowHeightSizeClass,
+            passCount = 3,
+            onDismiss = {},
+        )
+    }
 }
