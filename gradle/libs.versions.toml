@@ -19,7 +19,7 @@
 aboutlibraries = "11.2.1"
 android-gradle-plugin = "8.5.2"
 billing = "7.0.0"
-coil = "2.5.0"
+coil = "2.7.0"
 compose = "2024.02.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 compose-kotlin-compiler = "1.5.14" # Compose compatibility map: https://developer.android.com/jetpack/androidx/releases/compose-kotlin
 dependency-analysis = "2.0.1"
