@@ -107,7 +107,12 @@ private fun ReferralsSendGuestPassContent(
             elevation = 8.dp,
             shape = RoundedCornerShape(cardCornerRadius),
             backgroundColor = Color.Black,
-            modifier = cardModifier,
+            modifier = cardModifier
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = {},
+                ),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
