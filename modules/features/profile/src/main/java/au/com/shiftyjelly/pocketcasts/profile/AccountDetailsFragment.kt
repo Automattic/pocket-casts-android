@@ -120,7 +120,7 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
             binding.userView.signedInState = signInState
-            binding.changeAvatarGroup?.showIf(signInState is SignInState.SignedIn && FeatureFlag.isEnabled(Feature.GRAVATAR_CHANGE_AVATAR))
+            binding.changeAvatarGroup?.isVisible = signInState is SignInState.SignedIn
 
             if (signInState is SignInState.SignedIn) {
                 binding.btnChangeAvatar?.setOnClickListener {

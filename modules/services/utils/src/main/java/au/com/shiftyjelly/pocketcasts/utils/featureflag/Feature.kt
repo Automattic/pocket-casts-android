@@ -83,14 +83,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    GRAVATAR_CHANGE_AVATAR(
-        key = "gravatar_change_avatar",
-        title = "Gravatar change avatar",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     KIDS_PROFILE(
         key = "kids_profile",
         title = "Kids Profile",
