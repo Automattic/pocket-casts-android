@@ -55,7 +55,7 @@ fun ReferralCardAnimatedBackgroundView(
         initialValue = positionVectors[0],
         targetValue = positionVectors[1],
         typeConverter = TwoWayConverter(
-            convertToVector = { position -> position },
+            convertToVector = { vector -> vector },
             convertFromVector = { vector ->
                 AnimationVector2D(vector.v1, vector.v2)
             },
