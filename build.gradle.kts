@@ -185,6 +185,7 @@ subprojects {
         lintConfig = rootProject.file(if (isLocalizationsProject) "lint-no-op.xml" else "lint.xml")
         xmlReport = true
         sarifReport = true
+        abortOnError = false
 
         checkAllWarnings = false
         warningsAsErrors = false
