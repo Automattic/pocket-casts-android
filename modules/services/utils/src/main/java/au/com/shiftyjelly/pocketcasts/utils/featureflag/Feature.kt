@@ -51,14 +51,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    UPNEXT_IN_TAB_BAR(
-        key = "upnext_in_tab_bar",
-        title = "Show Up Next in tab bar",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     PODCASTS_GRID_VIEW_DESIGN_CHANGES(
         key = "podcasts_grid_view_changes",
         title = "Podcasts grid view design changes",

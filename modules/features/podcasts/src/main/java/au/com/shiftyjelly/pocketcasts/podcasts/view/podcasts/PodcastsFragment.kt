@@ -112,9 +112,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             adapter = FolderAdapter(this, settings, context, theme)
         }
 
-        if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            binding.appBarLayout.hideShadow()
-        }
+        binding.appBarLayout.hideShadow()
 
         binding.recyclerView.let {
             it.adapter = adapter

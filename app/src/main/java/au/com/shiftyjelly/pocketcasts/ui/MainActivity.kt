@@ -135,8 +135,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -351,10 +349,6 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
-        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            binding.bottomNavigation.menu.removeItem(VR.id.navigation_upnext)
-        }
-
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
@@ -375,16 +369,14 @@ class MainActivity :
             put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
             put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
-            if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                put(VR.id.navigation_upnext) {
-                    FragmentInfo(
-                        UpNextFragment.newInstance(
-                            embedded = false,
-                            source = UpNextSource.UP_NEXT_TAB,
-                        ),
-                        true,
-                    )
-                }
+            put(VR.id.navigation_upnext) {
+                FragmentInfo(
+                    UpNextFragment.newInstance(
+                        embedded = false,
+                        source = UpNextSource.UP_NEXT_TAB,
+                    ),
+                    true,
+                )
             }
         }
 
