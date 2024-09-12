@@ -25,6 +25,7 @@ updates:
       - dependency-name: "com.automattic:Automattic-Tracks-Android"
       - dependency-name: "com.automattic:encryptedlogging"
       - dependency-name: "com.automattic.tracks:crashlogging"
+      - dependency-name: "com.automattic.tracks:experimentation"
       - dependency-name: "com.automattic.android.measure-builds"
       # Ignore Compose dependencies as they often need to be updated together
       - dependency-name: "androidx.compose:compose-bom"
