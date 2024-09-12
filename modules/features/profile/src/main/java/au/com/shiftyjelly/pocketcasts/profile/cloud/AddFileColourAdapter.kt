@@ -40,7 +40,6 @@ class AddFileColourAdapter(val onSelectedChange: (Item) -> Unit, val onLockedIte
     var locked: Boolean = false
         set(value) {
             field = value
-            println("an edit")
             notifyDataSetChanged()
         }
 

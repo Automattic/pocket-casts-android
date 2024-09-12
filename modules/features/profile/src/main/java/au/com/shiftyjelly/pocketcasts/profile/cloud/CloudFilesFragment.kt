@@ -154,6 +154,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     override fun onAttach(context: Context) {
+        super.onAttach(context)
 
         imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).smallSize().themed()
 

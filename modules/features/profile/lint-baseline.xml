@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
 
-     <issue
+    <issue
+        id="MissingSuperCall"
+        message="Overriding method should call `super.onAttach`"
+        errorLine1="    override fun onAttach(context: Context) {"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/CloudFilesFragment.kt"
+            line="156"
+            column="18"/>
+    </issue>
+
+    <issue
         id="UseSwitchCompatOrMaterialCode"
         message="Use `SwitchCompat` from AppCompat or `SwitchMaterial` from Material library"
         errorLine1="            binding.swtNewsletter?.let {"
@@ -131,6 +142,17 @@
             file="src/main/AndroidManifest.xml"
             line="34"
             column="10"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
+        errorLine1="            notifyDataSetChanged()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/profile/cloud/AddFileColourAdapter.kt"
+            line="43"
+            column="13"/>
     </issue>
 
     <issue
