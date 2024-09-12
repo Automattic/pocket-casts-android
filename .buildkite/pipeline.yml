@@ -26,9 +26,7 @@ steps:
           queue: "linter"
 
       - label: 'Lint'
-        command: |
-          echo "--- 🧹 Linting"
-          ./gradlew lintDebug
+        command: ".buildkite/commands/lint.sh"
         plugins: [$CI_TOOLKIT]
         artifact_paths:
           - "**/build/reports/lint-results*.*"
