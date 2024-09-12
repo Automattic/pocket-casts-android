@@ -241,10 +241,6 @@ subprojects {
                 vectorDrawables.useSupportLibrary = true
             }
 
-            composeOptions {
-                kotlinCompilerExtensionVersion = libs.versions.compose.kotlin.compiler.get()
-            }
-
             testOptions {
                 animationsDisabled = true
             }
