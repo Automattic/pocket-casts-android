@@ -42,8 +42,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -114,12 +112,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
         binding.appBarLayout.hideShadow()
 
+        gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
         binding.recyclerView.let {
             it.adapter = adapter
-            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-                gridOuterPadding = resources.getDimensionPixelSize(VR.dimen.grid_outer_padding)
-                it.addItemDecoration(SpaceItemDecoration())
-            }
+            it.addItemDecoration(SpaceItemDecoration())
             ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
         }
 
@@ -355,12 +351,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
         viewLifecycleOwner.lifecycleScope.launch {
             settings.bottomInset.collect {
-                if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-                    val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
-                    realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + it)
-                } else {
-                    realBinding?.recyclerView?.updatePadding(bottom = it)
-                }
+                val gridOuterPadding = if (settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW) 0 else gridOuterPadding
+                realBinding?.recyclerView?.updatePadding(gridOuterPadding, gridOuterPadding, gridOuterPadding, gridOuterPadding + it)
             }
         }
 

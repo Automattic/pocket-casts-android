@@ -5,13 +5,6 @@
     android:clipToPadding="false"
     android:clipChildren="false">
 
-    <View
-        android:id="@+id/header_background"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:transitionName="header_background" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/podcast_card_view"
         android:layout_width="match_parent"
@@ -40,26 +33,6 @@
             android:transitionName="podcast_artwork"
             android:importantForAccessibility="no" />
     </androidx.cardview.widget.CardView>
-
-    <ImageView
-        android:id="@+id/unplayed_background"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:visibility="gone"
-        android:src="?attr/badgeDrawable"
-        android:importantForAccessibility="no" />
-
-    <TextView
-        android:id="@+id/unplayed_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="2dp"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        android:importantForAccessibility="no"
-        android:textSize="12dp"/>
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/badge_view"
