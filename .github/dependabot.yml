@@ -1,10 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "gradle"
-    open-pull-requests-limit: 6
+    open-pull-requests-limit: 8
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     labels:
       - "[Type] Tech Debt"
       - "[Area] Dependencies"
