@@ -13,4 +13,5 @@ updates:
       - dependency-name: "com.automattic:Automattic-Tracks-Android"
       - dependency-name: "com.automattic:encryptedlogging"
       - dependency-name: "com.automattic.tracks:crashlogging"
+      - dependency-name: "com.automattic.tracks:experimentation"
       - dependency-name: "com.automattic.android.measure-builds"
