@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
@@ -75,6 +76,7 @@ fun ReferralCardAnimatedBackgroundView(
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier
+            .blur(ReferralGuestPassCardDefaults.cardBlur)
             .background(Color.Black)
             .clipToBounds(),
     ) {
