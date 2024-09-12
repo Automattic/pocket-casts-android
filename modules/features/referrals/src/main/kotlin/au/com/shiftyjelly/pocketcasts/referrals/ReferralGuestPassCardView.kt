@@ -1,15 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -25,9 +27,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object ReferralGuestPassCardDefaults {
-    val cardRadius = 13.dp
     val cardAspectRatio = 200f / 315f
-    val cardBackgroundColor = Color(0xFF140833)
+    val cardBlur = 100.dp
+    val cardRadius = 13.dp
     val cardStrokeColor = Color(0xFF3A3A3A)
 }
 
@@ -38,10 +40,7 @@ fun ReferralGuestPassCardView(
     val cardTitle = stringResource(LR.string.referrals_send_guest_pass_card_title)
     Box(
         modifier = modifier
-            .background(
-                color = ReferralGuestPassCardDefaults.cardBackgroundColor,
-                shape = RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius),
-            )
+            .clip(RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius))
             .border(
                 width = 1.dp,
                 color = ReferralGuestPassCardDefaults.cardStrokeColor,
@@ -49,6 +48,14 @@ fun ReferralGuestPassCardView(
             )
             .semantics { contentDescription = cardTitle },
     ) {
+        BoxWithConstraints(
+            modifier = Modifier.blur(ReferralGuestPassCardDefaults.cardBlur),
+        ) {
+            ReferralCardAnimatedBackgroundView(
+                modifier = Modifier
+                    .size(maxWidth, maxHeight),
+            )
+        }
         TextH60(
             text = cardTitle,
             color = Color.White,
