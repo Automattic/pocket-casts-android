@@ -62,3 +62,6 @@ sentry.properties
 
 # Backup Files
 *.bak
+
+# Kotlin
+.kotlin

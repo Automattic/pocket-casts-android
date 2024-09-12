@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.rainbowBrush
+import au.com.shiftyjelly.pocketcasts.compose.extensions.rainbowBrush
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import kotlin.math.ceil
 import kotlin.math.max

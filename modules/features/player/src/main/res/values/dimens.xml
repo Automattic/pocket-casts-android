@@ -14,7 +14,6 @@
     <dimen name="mini_player_artwork_size">44dp</dimen>
     <dimen name="mini_player_margin">6dp</dimen>
     <dimen name="mini_player_play_button_size_40">40dp</dimen>
-    <dimen name="mini_player_play_button_size_48">48dp</dimen>
     <dimen name="mini_player_skip_button_size_56">56dp</dimen>
     <dimen name="transcript_text_bottom_padding">125dp</dimen>
 </resources>
