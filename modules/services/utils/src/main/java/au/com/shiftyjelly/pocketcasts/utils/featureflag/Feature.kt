@@ -19,14 +19,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
-    GIVE_RATINGS(
-        key = "give_ratings",
-        title = "Give Ratings",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     REPORT_VIOLATION(
         key = "report_violation",
         title = "Report Violation",
