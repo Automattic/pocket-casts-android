@@ -48,14 +48,11 @@ fun ReferralGuestPassCardView(
             )
             .semantics { contentDescription = cardTitle },
     ) {
-        BoxWithConstraints(
-            modifier = Modifier.blur(ReferralGuestPassCardDefaults.cardBlur),
-        ) {
-            ReferralCardAnimatedBackgroundView(
-                modifier = Modifier
-                    .size(maxWidth, maxHeight),
-            )
-        }
+        ReferralCardAnimatedBackgroundView(
+            modifier = Modifier
+                .blur(ReferralGuestPassCardDefaults.cardBlur)
+                .fillMaxSize(),
+        )
         TextH60(
             text = cardTitle,
             color = Color.White,
