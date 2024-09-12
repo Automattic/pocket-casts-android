@@ -14,8 +14,6 @@ import au.com.shiftyjelly.pocketcasts.images.icons.StarHalf
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
@@ -76,10 +74,8 @@ class PodcastRatingsViewModel
                 "source" to source.analyticsValue,
             ),
         )
-        if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
-            val fragment = GiveRatingFragment.newInstance(podcastUuid)
-            fragment.show(fragmentManager, "give_rating")
-        }
+        val fragment = GiveRatingFragment.newInstance(podcastUuid)
+        fragment.show(fragmentManager, "give_rating")
     }
 
     sealed class RatingState {
