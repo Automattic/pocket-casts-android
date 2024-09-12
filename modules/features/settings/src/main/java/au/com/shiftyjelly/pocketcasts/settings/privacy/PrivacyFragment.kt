@@ -41,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import android.app.Activity
+import android.content.Context
 
 @AndroidEntryPoint
 class PrivacyFragment : BaseFragment() {
@@ -49,6 +51,9 @@ class PrivacyFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
     private val viewModel: PrivacyViewModel by viewModels()
+
+    override fun onAttach(context: Context) {
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
