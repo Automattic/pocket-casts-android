@@ -128,17 +128,6 @@
         errorLine1="    override fun onAttach(context: Context) {"
         errorLine2="                 ~~~~~~~~">
         <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/settings/privacy/PrivacyFragment.kt"
-            line="55"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="MissingSuperCall"
-        message="Overriding method should call `super.onAttach`"
-        errorLine1="    override fun onAttach(context: Context) {"
-        errorLine2="                 ~~~~~~~~">
-        <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListFragment.kt"
             line="191"
             column="18"/>
