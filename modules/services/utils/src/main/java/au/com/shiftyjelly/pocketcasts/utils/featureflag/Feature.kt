@@ -51,14 +51,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    CATEGORIES_REDESIGN(
-        key = "CATEGORIES_REDESIGN",
-        title = "Podcasts by category shown in discover view",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     UPNEXT_IN_TAB_BAR(
         key = "upnext_in_tab_bar",
         title = "Show Up Next in tab bar",
