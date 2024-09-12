@@ -181,7 +181,7 @@ subprojects {
         lintConfig = rootProject.file("lint.xml")
         xmlReport = true
         sarifReport = System.getenv()["CI"].toBoolean()
-        abortOnError = false
+        abortOnError = true
 
         checkAllWarnings = false
         warningsAsErrors = false
