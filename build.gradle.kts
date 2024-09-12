@@ -193,6 +193,9 @@ subprojects {
         checkTestSources = false
         checkGeneratedSources = false
 
+        // Uncomment this when regenerating baseline files
+        // ignoreWarnings = true
+
         // There's no point in slowing down assembling of release builds
         // since we execute lint explicitly on CI in a separate action
         checkReleaseBuilds = false
