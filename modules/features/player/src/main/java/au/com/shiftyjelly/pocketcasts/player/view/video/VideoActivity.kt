@@ -89,11 +89,11 @@ class VideoActivity : AppCompatActivity() {
         playbackManager.player?.isPip = isInPictureInPictureMode
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
         // Enter Picture-in-Picture
-        if (intent?.getBooleanExtra(EXTRA_PIP, false) == true) {
+        if (intent.getBooleanExtra(EXTRA_PIP, false)) {
             enterPictureInPicture()
         } else {
             playbackManager.player?.isPip = false
