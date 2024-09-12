@@ -83,14 +83,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    KIDS_PROFILE(
-        key = "kids_profile",
-        title = "Kids Profile",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     PAYWALL_AA_EXPERIMENT(
         key = "paywall_aa_experiment",
         title = "Paywall AA Experiment",

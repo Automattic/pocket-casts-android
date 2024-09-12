@@ -296,9 +296,8 @@ class ProfileFragment : BaseFragment() {
         kidsBannerCard.setContent {
             AppTheme(theme.activeTheme) {
                 val showKidsBanner by viewModel.showKidsBanner.collectAsState()
-                val isKidsBannerVisible = showKidsBanner && FeatureFlag.isEnabled(Feature.KIDS_PROFILE)
 
-                if (isKidsBannerVisible) {
+                if (showKidsBanner) {
                     analyticsTracker.track(AnalyticsEvent.KIDS_PROFILE_BANNER_SEEN)
                     KidsProfileCard(
                         onDismiss = {
