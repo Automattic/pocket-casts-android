@@ -26,8 +26,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
@@ -108,11 +106,7 @@ sealed class CountBadgeStyle {
     open fun backgroundColor() = MaterialTheme.theme.colors.primaryInteractive01
 
     @Composable
-    open fun borderColor(): Color = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-        MaterialTheme.theme.colors.primaryUi01
-    } else {
-        MaterialTheme.theme.colors.primaryUi04
-    }
+    open fun borderColor(): Color = MaterialTheme.theme.colors.primaryUi01
 
     @Composable
     open fun textColor() = MaterialTheme.theme.colors.primaryInteractive02

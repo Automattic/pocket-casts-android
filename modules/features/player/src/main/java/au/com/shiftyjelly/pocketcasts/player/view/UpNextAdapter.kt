@@ -35,8 +35,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -63,7 +61,7 @@ class UpNextAdapter(
     private val dateFormatter = RelativeDateFormatter(context)
     private val imageRequestFactory = PocketCastsImageRequestFactory(
         context,
-        cornerRadius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) 4 else 3,
+        cornerRadius = 4,
     ).themed()
 
     var isPlaying: Boolean = false
@@ -167,14 +165,10 @@ class UpNextAdapter(
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
                 btnClear.isVisible = playbackManager.getCurrentEpisode() != null
                 lblUpNextTime.isVisible = playbackManager.getCurrentEpisode() != null
-                lblUpNextTime.text = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                    if (header.episodeCount == 0) {
-                        root.resources.getString(LR.string.player_up_next_time_left, time)
-                    } else {
-                        root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
-                    }
+                lblUpNextTime.text = if (header.episodeCount == 0) {
+                    root.resources.getString(LR.string.player_up_next_time_left, time)
                 } else {
-                    root.resources.getString(LR.string.player_up_next_time_remaining, time)
+                    root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -219,8 +213,8 @@ class UpNextAdapter(
                 applyColorFilter(ThemeColor.primaryText01(theme))
             }
 
-            binding.imageCardView.radius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardCornerRadius else 0f
-            binding.imageCardView.elevation = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardElevation else 0f
+            binding.imageCardView.radius = cardCornerRadius
+            binding.imageCardView.elevation = cardElevation
         }
     }
 
