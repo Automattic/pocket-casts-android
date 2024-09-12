@@ -141,7 +141,7 @@ private fun GradientCircle(
     }
 }
 
-sealed class Position(val vector: AnimationVector2D) {
+private sealed class Position(val vector: AnimationVector2D) {
     data object TopLeading : Position(AnimationVector2D(-1f, -1f))
     data object BottomLeading : Position(AnimationVector2D(1f, -1f))
     data object BottomTrailing : Position(AnimationVector2D(1f, 1f))
