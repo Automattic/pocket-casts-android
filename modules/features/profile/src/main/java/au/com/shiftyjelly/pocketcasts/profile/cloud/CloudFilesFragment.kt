@@ -154,7 +154,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     }
 
     override fun onAttach(context: Context) {
-        // cause a lint error
+        super.onAttach(context)
 
         imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).smallSize().themed()
 
