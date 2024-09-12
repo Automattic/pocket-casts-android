@@ -49,8 +49,8 @@
 
             <ImageButton
                 android:id="@+id/skipForward"
-                android:layout_width="@dimen/mini_player_skip_button_size_68"
-                android:layout_height="@dimen/mini_player_skip_button_size_68"
+                android:layout_width="@dimen/mini_player_skip_button_size_56"
+                android:layout_height="@dimen/mini_player_skip_button_size_56"
                 android:layout_marginStart="8dp"
                 android:background="?android:attr/actionBarItemBackground"
                 android:scaleType="centerInside"
@@ -65,10 +65,10 @@
                 android:id="@+id/miniPlayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/mini_player_play_background_48"
+                android:background="@drawable/mini_player_play_background_40"
                 android:scaleType="centerInside"
                 android:clickable="false"
-                app:lottie_rawRes="@raw/mini_player_play_button_48"
+                app:lottie_rawRes="@raw/mini_player_play_button_40"
                 app:layout_constraintBottom_toTopOf="@+id/progressBar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -76,8 +76,8 @@
 
             <ImageButton
                 android:id="@+id/skipBack"
-                android:layout_width="@dimen/mini_player_skip_button_size_68"
-                android:layout_height="@dimen/mini_player_skip_button_size_68"
+                android:layout_width="@dimen/mini_player_skip_button_size_56"
+                android:layout_height="@dimen/mini_player_skip_button_size_56"
                 android:layout_marginEnd="8dp"
                 android:background="?android:attr/actionBarItemBackground"
                 android:scaleType="centerInside"
