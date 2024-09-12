@@ -178,11 +178,7 @@ subprojects {
 
     val configureLint: Lint.() -> Unit = {
         baseline = project.file("lint-baseline.xml")
-        // We do not run Lint on localization project as it doesn't fit our release pipeline.
-        // Running it there risks potential mistakes when making releases and requiring
-        // developers to manually update the rules before submitting a release.
-        val isLocalizationsProject = project.name == "localization"
-        lintConfig = rootProject.file(if (isLocalizationsProject) "lint-no-op.xml" else "lint.xml")
+        lintConfig = rootProject.file("lint.xml")
         xmlReport = true
         sarifReport = System.getenv()["CI"].toBoolean()
         abortOnError = false
