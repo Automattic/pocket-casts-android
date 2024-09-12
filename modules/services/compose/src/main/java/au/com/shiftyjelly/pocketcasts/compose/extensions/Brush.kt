@@ -16,4 +16,3 @@ fun rainbowBrush(
     start = start,
     end = end,
 )
-
