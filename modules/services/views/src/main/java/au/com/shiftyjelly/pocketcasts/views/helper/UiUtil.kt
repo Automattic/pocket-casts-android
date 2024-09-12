@@ -6,8 +6,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.R
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -145,15 +143,11 @@ object UiUtil {
     fun getGridImageWidthPx(smallArtwork: Boolean, context: Context): Int {
         val columnCount = getGridColumnCount(smallArtwork, context)
         val contentWidthPx = getWindowWidthPx(context)
-        val spacingWidth = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-            // add the spacing between the columns and the padding on the sides of the grid
-            val resources = context.resources
-            val gridItemPadding = resources.getDimensionPixelSize(R.dimen.grid_item_padding)
-            val gridOuterPadding = resources.getDimensionPixelSize(R.dimen.grid_outer_padding)
-            ((columnCount - 1) * gridItemPadding) + (2 * gridOuterPadding)
-        } else {
-            0
-        }
+        // add the spacing between the columns and the padding on the sides of the grid
+        val resources = context.resources
+        val gridItemPadding = resources.getDimensionPixelSize(R.dimen.grid_item_padding)
+        val gridOuterPadding = resources.getDimensionPixelSize(R.dimen.grid_outer_padding)
+        val spacingWidth = ((columnCount - 1) * gridItemPadding) + (2 * gridOuterPadding)
         return ((contentWidthPx.toFloat() - spacingWidth) / columnCount).toInt()
     }
 
