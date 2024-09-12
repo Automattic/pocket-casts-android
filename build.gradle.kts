@@ -184,7 +184,7 @@ subprojects {
         val isLocalizationsProject = project.name == "localization"
         lintConfig = rootProject.file(if (isLocalizationsProject) "lint-no-op.xml" else "lint.xml")
         xmlReport = true
-        sarifReport = true
+        sarifReport = System.getenv()["CI"].toBoolean()
         abortOnError = false
 
         checkAllWarnings = false
