@@ -22,8 +22,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.request.Disposable
 import com.airbnb.lottie.LottieDrawable
@@ -70,39 +68,10 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
 
-        val elevation = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_elevation) else 0f
-        binding.miniPlayerCardView.elevation = elevation
-        val cornerRadius = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_corner_radius) else 0f
-        binding.miniPlayerCardView.radius = cornerRadius
-        val margin = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) resources.getDimension(R.dimen.mini_player_margin).toInt() else 0
+        binding.miniPlayerCardView.elevation = resources.getDimension(R.dimen.mini_player_elevation)
+        binding.miniPlayerCardView.radius = resources.getDimension(R.dimen.mini_player_corner_radius)
+        val margin = resources.getDimension(R.dimen.mini_player_margin).toInt()
         (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
-
-        val playBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
-            R.drawable.mini_player_play_background_40
-        } else {
-            R.drawable.mini_player_play_background_48
-        }
-        binding.miniPlayButton.background = ContextCompat.getDrawable(context, playBackground)
-        val playButtonLottieBackground = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
-            R.raw.mini_player_play_button_40
-        } else {
-            R.raw.mini_player_play_button_48
-        }
-        binding.miniPlayButton.setAnimation(playButtonLottieBackground)
-
-        val skipButtonSize = if (FeatureFlag.isEnabled(Feature.MINI_PLAYER_DESIGN)) {
-            R.dimen.mini_player_skip_button_size_56
-        } else {
-            R.dimen.mini_player_skip_button_size_68
-        }
-        with(binding.skipBack.layoutParams) {
-            width = resources.getDimensionPixelSize(skipButtonSize)
-            height = resources.getDimensionPixelSize(skipButtonSize)
-        }
-        with(binding.skipForward.layoutParams) {
-            width = resources.getDimensionPixelSize(skipButtonSize)
-            height = resources.getDimensionPixelSize(skipButtonSize)
-        }
 
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
