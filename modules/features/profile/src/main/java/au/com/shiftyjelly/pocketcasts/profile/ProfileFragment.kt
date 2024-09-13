@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentProfileBinding
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassBannerCard
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsIconWithTooltip
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -187,6 +188,8 @@ class ProfileFragment : BaseFragment() {
 
         binding.setupKidsBanner()
 
+        binding.setupReferralsClaimGuestPassCard()
+
         viewModel.podcastCount.observe(viewLifecycleOwner) {
             binding.lblPodcastCount.text = it.toString()
             // check if the stats have changed, causes the stats to change on first sign in
@@ -310,6 +313,14 @@ class ProfileFragment : BaseFragment() {
                         },
                     )
                 }
+            }
+        }
+    }
+
+    private fun FragmentProfileBinding.setupReferralsClaimGuestPassCard() {
+        referralsClaimGuestPassBannerCard.setContent {
+            AppTheme(theme.activeTheme) {
+                ReferralsClaimGuestPassBannerCard()
             }
         }
     }
