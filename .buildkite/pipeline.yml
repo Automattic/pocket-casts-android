@@ -37,6 +37,10 @@ steps:
       ./gradlew testDebugUnitTest
     plugins: [$CI_TOOLKIT]
 
+  - label: 'Dependency diff'
+    command: .buildkite/commands/dependency-diff.sh
+    plugins: [$CI_TOOLKIT]
+
   - label: 'Spotless formatting check'
     command: |
       echo "--- 🔎 Checking formatting with Spotless"
