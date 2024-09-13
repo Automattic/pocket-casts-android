@@ -3,30 +3,41 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.compose.compiler)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.taskerplugin"
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        viewBinding = false
         compose = true
     }
 }
 
 dependencies {
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:ui"))
-    implementation(project(":modules:services:compose"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:views"))
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:utils"))
-    implementation(libs.tasker)
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    api(libs.dagger.hilt.android)
+    api(libs.tasker)
+
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.ui)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.compose.activity)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.ui.util)
+
+    implementation(projects.modules.services.analytics)
+    implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.utils)
 }

@@ -34,6 +34,10 @@ dependencyResolutionManagement {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+rootProject.name = "pocket-casts-android"
+
 include(":app")
 include(":automotive")
 include(":wear")
@@ -54,6 +58,7 @@ include(":modules:features:search")
 include(":modules:features:settings")
 include(":modules:features:shared")
 include(":modules:features:reimagine")
+include(":modules:features:referrals")
 include(":modules:features:taskerplugin")
 include(":modules:features:widgets")
 include(":modules:features:kids")

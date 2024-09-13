@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
@@ -43,8 +41,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (view.background == null) {
-            val backgroundColor = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) UR.attr.primary_ui_01 else UR.attr.primary_ui_04
-            view.setBackgroundColor(view.context.getThemeColor(backgroundColor))
+            view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         }
         view.isClickable = true
         view.isFocusable = true
@@ -99,6 +96,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         context?.let {
             menu.tintIcons(it.getThemeColor(UR.attr.secondary_icon_01))

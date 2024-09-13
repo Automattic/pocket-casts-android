@@ -9,6 +9,8 @@ sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
 
     @Parcelize object InitialOnboarding : OnboardingFlow("initial_onboarding")
 
+    @Parcelize object EngageSdk : OnboardingFlow("engage_sdk")
+
     @Parcelize class PlusAccountUpgrade(override val source: OnboardingUpgradeSource) : PlusFlow, OnboardingFlow("plus_account_upgrade")
 
     @Parcelize object PlusAccountUpgradeNeedsLogin : OnboardingFlow("plus_account_upgrade_needs_login")

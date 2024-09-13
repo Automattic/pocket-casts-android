@@ -81,6 +81,8 @@
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="removed">Removed</string>
     <string name="search">Search</string>
+    <string name="search_episodes_not_found_title">No episodes found</string>
+    <string name="search_episodes_not_found_summary">We couldn\'t find any episode for that search. Try another keyword.</string>
     <string name="selected">Selected</string>
     <string name="sort_newest_to_oldest">Newest to oldest</string>
     <string name="sort_oldest_to_newest">Oldest to newest</string>
@@ -183,6 +185,8 @@
     <string name="widget_preview_time_left_2">12m left</string>
     <string name="widget_preview_time_left_3">55m left</string>
     <string name="widget_preview_time_left_4">1h 36m left</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -1156,7 +1160,7 @@
     <string name="settings_select_filters">Select filters</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
-    <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Customize the buttons displayed in Android 13 playback notifications and Android Auto.</string>
+    <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Customize the buttons displayed in Android 13+ playback notifications and Android Auto.</string>
     <string name="settings_developer">Developer</string>
     <string name="settings_downloads_clean_up">Clean up</string>
     <string name="settings_downloads_clean_up_summary">Are you sure you want to delete these downloaded files?</string>
@@ -1217,7 +1221,7 @@
     <string name="settings_media_actions_prioritize_subtitle">Your top actions will be available.</string>
     <string name="settings_media_actions_customise">Customize media actions</string>
     <string name="settings_media_actions_show_title">Show custom media actions</string>
-    <string name="settings_media_actions_show_subtitle">Show custom media actions in Android 13 media notifications and Android Auto.</string>
+    <string name="settings_media_actions_show_subtitle">Show custom media actions in Android 13+ media notifications and Android Auto.</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
     <string name="settings_media_notification_controls_title_archive" translatable="false">@string/archive</string>
     <string name="settings_media_notification_controls_title_mark_as_played" translatable="false">@string/mark_as_played</string>
@@ -2125,8 +2129,17 @@
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
     <string name="engage_sdk_new_releases" translatable="false">@string/nova_launcher_new_releases</string>
     <string name="engage_sdk_trending" translatable="false">@string/discover_trending</string>
+    <string name="engage_sdk_sign_in" translatable="false">@string/sign_in</string>
 
     <!-- Referrals -->
     <string name="gift">Gift</string>
+    <plurals name="referrals_remaining_passes">
+        <item quantity="one">You have %d pass to share</item>
+        <item quantity="other">You have %d passes to share</item>
+    </plurals>
+    <string name="referrals_send_guest_pass_title">Gift 2 Months of Pocket&#160;Casts&#160;Plus</string>
+    <string name="referrals_send_guest_pass_card_title">2-Month Guest Pass</string>
+    <string name="referrals_share_guest_pass">Share Guest Pass</string>
+    <string name="referrals_tooltip_message">Give 2 months of Plus to friends and family.</string>
 
 </resources>

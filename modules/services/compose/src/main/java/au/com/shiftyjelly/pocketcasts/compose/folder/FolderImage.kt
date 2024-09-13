@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.compose.folder
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,13 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +38,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val gradientTop = Color(0x00000000)
@@ -67,16 +60,14 @@ fun FolderImage(
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
 ) {
-    val cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4.dp else 0.dp
-    val elevation = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 1.dp else 0.dp
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
         val constraints = this
         Card(
-            elevation = elevation,
-            shape = RoundedCornerShape(cornerRadius),
+            elevation = 1.dp,
+            shape = RoundedCornerShape(4.dp),
             backgroundColor = color,
             modifier = Modifier
                 .fillMaxSize()
@@ -164,49 +155,14 @@ fun FolderImage(
                 }
             }
         }
-        if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-            CountBadge(
-                count = badgeCount,
-                style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Medium,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = 6.dp, y = (-6).dp),
-            )
-        } else {
-            PodcastBadge(
-                count = badgeCount,
-                modifier = Modifier.align(Alignment.TopEnd),
-                badgeType = badgeType,
-            )
-        }
-    }
-}
-
-@Composable
-private fun PodcastBadge(modifier: Modifier = Modifier, count: Int, badgeType: BadgeType) {
-    if (count == 0) {
-        return
-    }
-    val badgeColor = MaterialTheme.theme.colors.support05
-    Canvas(modifier = modifier.size(30.dp)) {
-        val badgePath = Path().apply {
-            val size = 30.dp.toPx()
-            moveTo(0f, 0f)
-            lineTo(size, 0f)
-            lineTo(size, size)
-        }
-        drawPath(
-            color = badgeColor,
-            path = badgePath,
+        CountBadge(
+            count = badgeCount,
+            style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Medium,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = 6.dp, y = (-6).dp),
         )
     }
-    Text(
-        text = if (badgeType != BadgeType.LATEST_EPISODE) count.toString() else "●",
-        fontSize = if (count > 9) 12.sp else 14.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.White,
-        modifier = modifier.padding(end = if (count > 9) 1.dp else 4.dp),
-    )
 }
 
 @Composable

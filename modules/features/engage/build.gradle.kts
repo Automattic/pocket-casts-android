@@ -5,8 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
-apply(from = "${project.rootDir}/base.gradle")
-
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.engage"
     buildFeatures {
@@ -17,12 +15,26 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:deeplink"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:utils"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
+    api(libs.dagger.hilt.android)
+    api(libs.hilt.work)
+
+    api(projects.modules.services.repositories)
+
+    implementation(libs.coroutines.play.services)
+    implementation(libs.coroutines.rx2)
     implementation(libs.engage)
+    implementation(libs.lifecycle.process)
+    implementation(libs.timber)
+    implementation(libs.work.runtime)
+
+    implementation(projects.modules.services.analytics)
+    implementation(projects.modules.services.deeplink)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.model)
+    implementation(projects.modules.services.utils)
+
+    testImplementation(libs.junit)
 }

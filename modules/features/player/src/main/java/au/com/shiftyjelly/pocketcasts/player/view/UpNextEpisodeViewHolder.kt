@@ -29,10 +29,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getAttrTextStyleColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
-import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
@@ -146,9 +143,8 @@ class UpNextEpisodeViewHolder(
             rightMargin = if (isMultiSelecting) -binding.checkbox.marginLeft else 0.dpToPx(itemView.context)
             width = if (isMultiSelecting) 16.dpToPx(itemView.context) else 52.dpToPx(itemView.context)
         }
-        binding.dividerView.showIf(FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR))
-        binding.imageCardView.radius = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardCornerRadius else 0f
-        binding.imageCardView.elevation = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) cardElevation else 0f
+        binding.imageCardView.radius = cardCornerRadius
+        binding.imageCardView.elevation = cardElevation
     }
 
     private fun bindEpisode(episode: BaseEpisode) {

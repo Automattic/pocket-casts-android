@@ -3,10 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.media"
@@ -18,8 +15,14 @@ android {
 }
 
 dependencies {
-    api(project(":modules:services:sharing"))
-    implementation(project(":modules:services:utils"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    api(libs.dagger.hilt.android)
+
+    api(projects.modules.services.sharing)
 
     implementation(libs.ffmpeg)
+
+    implementation(projects.modules.services.utils)
 }

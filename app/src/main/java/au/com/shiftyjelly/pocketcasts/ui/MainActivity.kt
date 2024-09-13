@@ -68,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowUpNextDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -134,8 +135,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -350,10 +349,6 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
-        if (!FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-            binding.bottomNavigation.menu.removeItem(VR.id.navigation_upnext)
-        }
-
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
@@ -374,16 +369,14 @@ class MainActivity :
             put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
             put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
-            if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                put(VR.id.navigation_upnext) {
-                    FragmentInfo(
-                        UpNextFragment.newInstance(
-                            embedded = false,
-                            source = UpNextSource.UP_NEXT_TAB,
-                        ),
-                        true,
-                    )
-                }
+            put(VR.id.navigation_upnext) {
+                FragmentInfo(
+                    UpNextFragment.newInstance(
+                        embedded = false,
+                        source = UpNextSource.UP_NEXT_TAB,
+                    ),
+                    true,
+                )
             }
         }
 
@@ -584,6 +577,7 @@ class MainActivity :
         mediaRouter?.removeCallback(mediaRouterCallback)
     }
 
+    @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
         if (isUpNextShowing()) {
@@ -904,6 +898,7 @@ class MainActivity :
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
@@ -1162,6 +1157,7 @@ class MainActivity :
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
@@ -1216,7 +1212,7 @@ class MainActivity :
         viewModel.signInState.observeOnce(this, observer)
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent, null)
     }
@@ -1326,6 +1322,13 @@ class MainActivity :
                 is AssistantDeepLink -> {
                     // This is what the assistant sends us when it doesn't know what to do and just opens the app. Assume the user wants to play.
                     playbackManager.playQueue()
+                }
+                is SignInDeepLink -> {
+                    val onboardingFlow = when (SourceView.fromString(deepLink.sourceView)) {
+                        SourceView.ENGAGE_SDK_SIGN_IN -> OnboardingFlow.EngageSdk
+                        else -> OnboardingFlow.LoggedOut
+                    }
+                    openOnboardingFlow(onboardingFlow)
                 }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")

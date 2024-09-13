@@ -17,7 +17,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -117,7 +117,7 @@ private fun IconToggleSquareButton(
             enabled = enabled,
             role = Role.Checkbox,
             interactionSource = interactionSource,
-            indication = rememberRipple(bounded = true, radius = RippleRadius, color = rippleColor),
+            indication = ripple(bounded = true, radius = RippleRadius, color = rippleColor),
         ).then(IconButtonSizeModifier),
         contentAlignment = Alignment.Center,
     ) {

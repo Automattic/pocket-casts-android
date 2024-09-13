@@ -9,21 +9,19 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard.PATRON.getTitleForSource as getTitleForSourcePatron
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard.PLUS.getTitleForSource as getTitleForSourcePlus
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed class UpgradeFeatureCard(
-    val titleRes: (OnboardingUpgradeSource) -> Int,
     @StringRes val shortNameRes: Int,
     @DrawableRes val backgroundGlowsRes: Int,
     @DrawableRes val iconRes: Int,
     val featureItems: (SubscriptionFrequency) -> List<UpgradeFeatureItem>,
     val subscriptionTier: SubscriptionTier,
 ) {
+    abstract val titleRes: (OnboardingUpgradeSource) -> Int
+
     data object PLUS : UpgradeFeatureCard(
-        titleRes = { source -> getTitleForSourcePlus(source) },
         shortNameRes = LR.string.pocket_casts_plus_short,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         iconRes = IR.drawable.ic_plus,
@@ -35,7 +33,9 @@ sealed class UpgradeFeatureCard(
         },
         subscriptionTier = SubscriptionTier.PLUS,
     ) {
-        fun getTitleForSource(
+        override val titleRes: (OnboardingUpgradeSource) -> Int = { source -> getTitleForSource(source) }
+
+        private fun getTitleForSource(
             source: OnboardingUpgradeSource,
         ) = when {
             (
@@ -50,7 +50,6 @@ sealed class UpgradeFeatureCard(
     }
 
     data object PATRON : UpgradeFeatureCard(
-        titleRes = { source -> getTitleForSourcePatron(source) },
         shortNameRes = LR.string.pocket_casts_patron_short,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         iconRes = IR.drawable.ic_patron,
@@ -62,7 +61,9 @@ sealed class UpgradeFeatureCard(
         },
         subscriptionTier = SubscriptionTier.PATRON,
     ) {
-        fun getTitleForSource(
+        override val titleRes: (OnboardingUpgradeSource) -> Int = { source -> getTitleForSource(source) }
+
+        private fun getTitleForSource(
             source: OnboardingUpgradeSource,
         ) = when {
             (

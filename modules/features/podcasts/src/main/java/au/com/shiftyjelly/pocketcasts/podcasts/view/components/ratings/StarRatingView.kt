@@ -36,8 +36,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -80,8 +78,7 @@ private fun Content(
         modifier = Modifier.padding(
             start = 8.dp,
             end = 4.dp,
-            top = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 8.dp else 18.dp,
-            bottom = if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) 0.dp else 18.dp,
+            top = 8.dp,
         ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -115,23 +112,21 @@ private fun Content(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
-            RowOutlinedButton(
-                text = stringResource(R.string.rate_button),
-                onClick = { onClick(RatingTappedSource.BUTTON) },
-                includePadding = false,
-                fontSize = 16.sp,
-                textPadding = 0.dp,
-                fontWeight = FontWeight.W500,
-                border = null,
-                fullWidth = false,
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent,
-                    contentColor = MaterialTheme.theme.colors.primaryText01,
-                ),
-                modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
-            )
-        }
+        RowOutlinedButton(
+            text = stringResource(R.string.rate_button),
+            onClick = { onClick(RatingTappedSource.BUTTON) },
+            includePadding = false,
+            fontSize = 16.sp,
+            textPadding = 0.dp,
+            fontWeight = FontWeight.W500,
+            border = null,
+            fullWidth = false,
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = Color.Transparent,
+                contentColor = MaterialTheme.theme.colors.primaryText01,
+            ),
+            modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
+        )
     }
 }
 

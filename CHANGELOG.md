@@ -1,6 +1,10 @@
 7.73
 -----
-
+*   Updated
+    *   Dark theme improvements on the podcast page
+        ([#2811](https://github.com/Automattic/pocket-casts-android/pull/2811))
+    *   Add a visibility animation to the submit button on the rating screen
+        ([#2824](https://github.com/Automattic/pocket-casts-android/pull/2824))
 
 7.72
 -----

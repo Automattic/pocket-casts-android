@@ -4,7 +4,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -33,12 +32,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.adapter.FolderItemDiffCallback
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
@@ -47,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import kotlin.math.min
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class FolderAdapter(
     val clickListener: ClickListener,
@@ -85,9 +80,7 @@ class FolderAdapter(
                 val podcastGridLayout = settings.podcastGridLayout.value
                 PodcastViewHolder(
                     view,
-                    imageRequestFactory.copy(
-                        cornerRadius = if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) 4 else 0,
-                    ),
+                    imageRequestFactory.copy(cornerRadius = 4),
                     podcastGridLayout,
                     theme,
                 )
@@ -179,15 +172,10 @@ class FolderAdapter(
         val button: View? = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)
         val podcastCardView = view.findViewById<CardView>(R.id.podcast_card_view)
-        val podcastBackground: View? = view.findViewById(R.id.header_background)
         val podcastTitle: TextView = view.findViewById(R.id.library_podcast_title)
         val author: TextView? = view.findViewById(R.id.podcast_author)
-        val unplayedText: TextView = view.findViewById(R.id.unplayed_count)
-        val unplayedBackground: ImageView? = view.findViewById(R.id.unplayed_background)
-        val countTextMarginSmall: Int = 2.dpToPx(view.resources.displayMetrics)
         val cardElevation: Float = 1.dpToPx(view.resources.displayMetrics).toFloat()
         val cardCornerRadius: Float = 4.dpToPx(view.resources.displayMetrics).toFloat()
-        val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
         val isListLayout: Boolean = podcastGridLayout == PodcastGridLayoutType.LIST_VIEW
         val unplayedCountBadgeView = view.findViewById<ComposeView>(R.id.badge_view)
 
@@ -207,30 +195,12 @@ class FolderAdapter(
                 BadgeType.LATEST_EPISODE -> min(1, unplayedEpisodeCount)
             }
             val displayBadgeCount = if (badgeCount > 99) 99 else badgeCount
-            if (FeatureFlag.isEnabled(Feature.PODCASTS_GRID_VIEW_DESIGN_CHANGES)) {
-                unplayedText.hide()
-                unplayedCountBadgeView?.let {
-                    it.setBadgeContent(displayBadgeCount, badgeType)
-                    it.showIf(displayBadgeCount > 0)
-                }
-                podcastCardView?.elevation = cardElevation
-                podcastCardView?.radius = cardCornerRadius
-            } else {
-                unplayedText.show()
-                setTextViewCount(unplayedBackground, unplayedText, displayBadgeCount, badgeType)
-
-                if (!isListLayout) {
-                    unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.contrast_01))
-                    podcastCardView?.elevation = 0f
-                    podcastCardView?.radius = 0f
-                } else {
-                    if (badgeType == BadgeType.LATEST_EPISODE) {
-                        unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.support_05))
-                    } else {
-                        unplayedText.setTextColor(unplayedText.context.getThemeColor(UR.attr.primary_text_02))
-                    }
-                }
+            unplayedCountBadgeView.let {
+                it.setBadgeContent(displayBadgeCount, badgeType)
+                it.showIf(displayBadgeCount > 0)
             }
+            podcastCardView?.elevation = cardElevation
+            podcastCardView?.radius = cardCornerRadius
 
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
             val contentDescription = "${podcast.title}. $badgeCountMessage Open podcast."
@@ -264,27 +234,6 @@ class FolderAdapter(
                                 .offset(x = 6.dp, y = (-6).dp)
                         },
                     )
-                }
-            }
-        }
-
-        @Suppress("NAME_SHADOWING")
-        private fun setTextViewCount(image: ImageView?, text: TextView, count: Int, badgeType: BadgeType) {
-            if (count == 0) {
-                text.hide()
-                image?.hide()
-            } else {
-                text.show()
-                image?.show()
-                if (!isListLayout) {
-                    text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, if (count > 9) 12f else 14f)
-                    (text.layoutParams as ViewGroup.MarginLayoutParams).setMargins(0, 0, if (count > 9) countTextMarginSmall else countTextMarginLarge, 0)
-                }
-
-                if (badgeType != BadgeType.LATEST_EPISODE) {
-                    text.text = count.toString()
-                } else {
-                    text.text = "●"
                 }
             }
         }

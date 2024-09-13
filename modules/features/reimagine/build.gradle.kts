@@ -4,9 +4,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.compose.compiler)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.reimagine"
@@ -18,19 +17,46 @@ android {
 }
 
 dependencies {
-    api(project(":modules:services:sharing"))
-    implementation(project(":modules:services:analytics"))
-    implementation(project(":modules:services:compose"))
-    implementation(project(":modules:services:images"))
-    implementation(project(":modules:services:localization"))
-    implementation(project(":modules:services:model"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:repositories"))
-    implementation(project(":modules:services:ui"))
-    implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:views"))
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.moshi.kotlin.codegen)
+    ksp(libs.showkase.processor)
 
+    api(libs.dagger.hilt.android)
+    api(libs.showkase)
+
+    api(projects.modules.services.analytics)
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.repositories)
+    api(projects.modules.services.sharing)
+    api(projects.modules.services.ui)
+    api(projects.modules.services.views)
+
+    implementation(platform(libs.compose.bom))
+
+    implementation(libs.androidx.core.ktx)
     implementation(libs.capturable)
+    implementation(libs.compose.animation)
+    implementation(libs.compose.material)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.ui.util)
+    implementation(libs.coroutines.core)
+    implementation(libs.fragment.ktx)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.timber)
 
-    testImplementation(project(":modules:services:sharedtest"))
+    implementation(projects.modules.services.compose)
+    implementation(projects.modules.services.images)
+    implementation(projects.modules.services.localization)
+    implementation(projects.modules.services.utils)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.turbine)
+
+    testImplementation(projects.modules.services.sharedtest)
 }

@@ -22,11 +22,10 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
@@ -42,18 +41,14 @@ fun CountBadge(
         modifier = modifier
             .defaultMinSize(minSize, minSize)
             .badgeBackground(
-                color = MaterialTheme.theme.colors.primaryInteractive01,
-                borderColor = if (FeatureFlag.isEnabled(Feature.UPNEXT_IN_TAB_BAR)) {
-                    MaterialTheme.theme.colors.primaryUi01
-                } else {
-                    MaterialTheme.theme.colors.primaryUi04
-                },
+                color = style.backgroundColor(),
+                borderColor = style.borderColor(),
                 borderWidth = borderWidthPx.toFloat(),
             ),
         contentAlignment = Alignment.Center,
     ) {
         val text = count.toString()
-        val textColor = MaterialTheme.theme.colors.primaryInteractive02
+        val textColor = style.textColor()
         when (style) {
             is CountBadgeStyle.Small -> return
             is CountBadgeStyle.Medium -> TextH60(
@@ -66,6 +61,12 @@ fun CountBadge(
             )
 
             is CountBadgeStyle.Big -> TextH50(
+                text = text,
+                color = textColor,
+                disableScale = true,
+            )
+
+            is CountBadgeStyle.Custom -> TextH70(
                 text = text,
                 color = textColor,
                 disableScale = true,
@@ -101,6 +102,15 @@ sealed class CountBadgeStyle {
     abstract val size: Dp
     abstract val borderWidth: Dp
 
+    @Composable
+    open fun backgroundColor() = MaterialTheme.theme.colors.primaryInteractive01
+
+    @Composable
+    open fun borderColor(): Color = MaterialTheme.theme.colors.primaryUi01
+
+    @Composable
+    open fun textColor() = MaterialTheme.theme.colors.primaryInteractive02
+
     data object Small : CountBadgeStyle() {
         override val size = 12.dp
         override val borderWidth = 3.dp
@@ -114,6 +124,23 @@ sealed class CountBadgeStyle {
     data object Big : CountBadgeStyle() {
         override val size = 28.dp
         override val borderWidth = 0.dp
+    }
+
+    data class Custom(
+        override val size: Dp,
+        override val borderWidth: Dp,
+        val backgroundColor: Color,
+        val borderColor: Color,
+        val textColor: Color,
+    ) : CountBadgeStyle() {
+        @Composable
+        override fun backgroundColor() = backgroundColor
+
+        @Composable
+        override fun borderColor() = borderColor
+
+        @Composable
+        override fun textColor() = textColor
     }
 }
 
@@ -141,6 +168,21 @@ fun CountBadgeMediumPreview() {
 fun CountBadgeBigPreview() {
     CountBadgePreview(
         style = CountBadgeStyle.Big,
+    )
+}
+
+@ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Custom")
+@Preview(name = "Custom")
+@Composable
+fun CountBadgeCustomPreview() {
+    CountBadgePreview(
+        style = CountBadgeStyle.Custom(
+            backgroundColor = MaterialTheme.theme.colors.primaryIcon01,
+            borderColor = Color.Transparent,
+            borderWidth = 0.dp,
+            size = 16.dp,
+            textColor = MaterialTheme.theme.colors.primaryUi01,
+        ),
     )
 }
 
