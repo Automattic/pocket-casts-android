@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment.PaywallAATest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.experimentation.Experiment
 import com.automattic.android.experimentation.ExperimentLogger
@@ -27,7 +28,7 @@ class ExperimentsProvider @Inject constructor(
     }
 
     private val experiments = setOf(
-        Experiment("pocketcasts_paywall_android_aa_test"),
+        Experiment(PaywallAATest.identifier),
     )
 
     private val cacheDir: File by lazy {
