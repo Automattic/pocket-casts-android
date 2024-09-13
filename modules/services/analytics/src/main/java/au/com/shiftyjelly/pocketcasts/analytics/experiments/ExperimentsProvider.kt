@@ -1,22 +1,26 @@
-package com.pocketcasts.experiments
+package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.experimentation.Experiment
 import com.automattic.android.experimentation.ExperimentLogger
 import com.automattic.android.experimentation.VariationsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
 @Singleton
-class ExperimentProvider @Inject constructor(
+class ExperimentsProvider @Inject constructor(
     @ApplicationContext context: Context,
-    @ApplicationScope coroutineScope: CoroutineScope,
+    private val accountStatusInfo: AccountStatusInfo,
 ) {
+
     companion object {
         const val TAG = "Experiment"
         const val PLATFORM = "pocketcasts"
@@ -39,21 +43,25 @@ class ExperimentProvider @Inject constructor(
             logger = PocketCastsExperimentLogger(),
             failFast = true,
             cacheDir = cacheDir,
-            coroutineScope = coroutineScope,
+            coroutineScope = CoroutineScope(Dispatchers.IO + Job()),
         )
     }
 
-    fun initialize(anonymousId: String) {
-        repository.initialize(anonymousId = anonymousId)
+    fun initialize() {
+        val uuid = accountStatusInfo.getUuid() ?: UUID.randomUUID().toString().replace("-", "")
+
+        LogBuffer.i(TAG, "Initializing experiments with uuid: $uuid")
+
+        repository.initialize(anonymousId = uuid)
     }
 }
 
 private class PocketCastsExperimentLogger : ExperimentLogger {
     override fun d(message: String) {
-        LogBuffer.i(ExperimentProvider.TAG, message)
+        LogBuffer.i(ExperimentsProvider.TAG, message)
     }
 
     override fun e(message: String, throwable: Throwable?) {
-        throwable?.let { LogBuffer.e(ExperimentProvider.TAG, throwable, message) } ?: LogBuffer.e(ExperimentProvider.TAG, message)
+        throwable?.let { LogBuffer.e(ExperimentsProvider.TAG, throwable, message) } ?: LogBuffer.e(ExperimentsProvider.TAG, message)
     }
 }

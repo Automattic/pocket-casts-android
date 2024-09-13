@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.automattic.tracks)
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.config.ktx)
+    implementation(libs.automattic.explat)
 
     debugImplementation(libs.compose.ui.tooling)
 
