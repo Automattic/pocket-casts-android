@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.experimentation.Experiment
 import com.automattic.android.experimentation.ExperimentLogger
 import com.automattic.android.experimentation.VariationsRepository
+import com.automattic.android.experimentation.domain.Variation.Control
+import com.automattic.android.experimentation.domain.Variation.Treatment
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.util.UUID
@@ -15,6 +17,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
 
 @Singleton
 class ExperimentsProvider @Inject constructor(
@@ -23,7 +26,7 @@ class ExperimentsProvider @Inject constructor(
 ) {
 
     companion object {
-        const val TAG = "Experiment"
+        const val TAG = "ExperimentsProvider"
         const val PLATFORM = "pocketcasts"
     }
 
@@ -59,6 +62,22 @@ class ExperimentsProvider @Inject constructor(
     fun clear() {
         LogBuffer.i(TAG, "Clearing experiments")
         repository.clear()
+    }
+
+    fun getVariation(experiment: ExperimentModel): Variation? {
+        return when (val variation = repository.getVariation(Experiment(experiment.identifier))) {
+            is Control -> {
+                Variation.Control
+            }
+
+            is Treatment -> {
+                Variation.Treatment(variation.name)
+            }
+
+            else -> {
+                null
+            }
+        }
     }
 }
 
