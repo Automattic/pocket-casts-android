@@ -2,12 +2,12 @@ package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
 sealed class Variation {
     data object Control : Variation()
-    data object Treatment : Variation()
+    data class Treatment(val name: String? = null) : Variation()
 
     companion object {
         private const val TREATMENT = "treatment"
         fun fromName(name: String) = when (name) {
-            TREATMENT -> Treatment
+            TREATMENT -> Treatment()
             else -> Control
         }
     }

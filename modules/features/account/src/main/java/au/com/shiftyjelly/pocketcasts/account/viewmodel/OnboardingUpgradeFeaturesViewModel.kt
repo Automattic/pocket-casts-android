@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatur
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentsProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -44,7 +44,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
-    private val experimentProvider: ExperimentProvider,
+    private val experiments: ExperimentsProvider,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(app) {
 
@@ -103,14 +103,13 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         val upgradeLayout = when {
             showPatronOnly -> UpgradeLayout.Original
-            FeatureFlag.isEnabled(Feature.PAYWALL_AB_EXPERIMENT) -> UpgradeLayout.Reviews
-            FeatureFlag.isEnabled(Feature.PAYWALL_AA_EXPERIMENT) -> {
-                val variation = experimentProvider.getVariation(Experiment.PaywallAATest)
+            FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT) -> {
+                val variation = experiments.getVariation(Experiment.PaywallAATest)
                 // For the A/A test show the same layout for both variations
                 if (variation == Variation.Control) {
                     UpgradeLayout.Original
                 } else {
-                    UpgradeLayout.Original
+                    UpgradeLayout.Reviews
                 }
             }
             else -> UpgradeLayout.Original
