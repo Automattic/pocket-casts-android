@@ -1975,7 +1975,7 @@ open class PlaybackManager @Inject constructor(
         val intent = application.packageManager.getLaunchIntentForPackage(application.packageName)?.apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
-        val pendingIntent = PendingIntent.getActivity(application, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+        val pendingIntent = PendingIntent.getActivity(application, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val notificationTag = NotificationBroadcastReceiver.NOTIFICATION_TAG_PLAYBACK_ERROR
 
@@ -2045,7 +2045,7 @@ open class PlaybackManager @Inject constructor(
         intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_ACTION, intentName)
         intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_EPISODE_UUID, episode.uuid)
         intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_NOTIFICATION_TAG, notificationTag)
-        return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+        return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     private suspend fun play(

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose
 
+import android.annotation.SuppressLint
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -101,6 +102,7 @@ data class PocketCastsTheme(
     val isLight: Boolean,
 )
 
+@SuppressLint("ConflictingOnColor")
 private fun buildMaterialColors(colors: ThemeColors, isLight: Boolean): Colors {
     return Colors(
         primary = colors.primaryInteractive01,
