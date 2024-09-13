@@ -105,7 +105,6 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
             showPatronOnly -> UpgradeLayout.Original
             FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT) -> {
                 val variation = experiments.getVariation(Experiment.PaywallAATest)
-                // For the A/A test show the same layout for both variations
                 if (variation == Variation.Control) {
                     UpgradeLayout.Original
                 } else {
