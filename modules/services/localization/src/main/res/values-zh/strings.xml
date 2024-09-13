@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-29 11:22:50+0000
+Translation-Revision-Date: 2024-09-11 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
+    <string name="paywall_layout_reviews_review_six_date">3 月 8 日</string>
+    <string name="paywall_layout_reviews_review_six_message">多年来，PC 一直是我的首选。 我也尝试过其他的播客应用程序，但因为它们在简洁性、Ul 和支持方面的不足，我最终总是会回到 PC。 如果您已经厌倦了当前所用的播客应用程序，这将尤其值得一试。</string>
+    <string name="paywall_layout_reviews_review_six_title">首选播客应用程序</string>
+    <string name="paywall_layout_reviews_review_five_date">5 月 6 日</string>
+    <string name="paywall_layout_reviews_review_five_message">我使用该应用程序至少有 6 年了，刚开始在安卓系统上使用，如今在 iOS 系统上也已经使用快一年。 在两个平台上，它都能提供同样卓越的性能。 我可以轻松找到要听的新播客，还可以通过 RSS 源 URL 添加播客，它的 UI 也非常好用。 Watch 应用程序很实用，但我主要用来进行播放/暂停。 使用账户登录即可在设备间同步，但这并非强制性要求。</string>
+    <string name="paywall_layout_reviews_review_five_title">不仅使用效果好，还易于查找或添加新的播客</string>
+    <string name="paywall_layout_reviews_review_four_date">6 月 1 日</string>
+    <string name="paywall_layout_reviews_review_four_message">同步功能非常神奇。 虽然不知道这个应用程序有什么特别的魔力，但它比我用过的其他任何应用程序都要好。</string>
+    <string name="paywall_layout_reviews_review_four_title">非常棒的应用程序</string>
+    <string name="paywall_layout_reviews_review_three_date">6 月 9 日</string>
+    <string name="paywall_layout_reviews_review_three_message">我从 2017 年开始使用 Pocket Casts。 \n\n毫无疑问，这是用来听播客的最佳应用程序。 它功能丰富，并且仍然在积极地开发完善。 有些人对 Ul 的改动表示不满，但对我来说好像没有太大影响。 \n\n根据你的需求，你可以采用简单或复杂的方式使用这款应用程序。 因此，你可以让它即插即用，也可以设置跳过结尾和开头计时器，以及任何其他您想启用的小功能。</string>
+    <string name="paywall_layout_reviews_review_three_title">最好用的播客应用程序</string>
+    <string name="paywall_layout_reviews_review_two_date">6 月 15 日</string>
+    <string name="paywall_layout_reviews_review_two_message">8 年来表现卓越且在持续改进</string>
+    <string name="paywall_layout_reviews_review_two_title">必不可少的播客应用程序</string>
+    <string name="paywall_layout_reviews_review_one_date">7 月 10 日</string>
+    <string name="paywall_layout_reviews_review_one_message">我是该应用程序的长期用户，免费版支持的功能和自定义设置之多令人震惊。 我喜欢它的设备间同步功能，这样即使我从手机切换到 Alexa 设备，也可以实现无缝收听。 我会向所有播客听众推荐这款应用程序。 我还很喜欢它的统计信息功能！</string>
+    <string name="paywall_layout_reviews_review_one_title">迄今为止最好的播客应用程序</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">查看 Play 商店中的所有评论</string>
+    <string name="player_time_remaining">剩余时间为 %s</string>
+    <string name="player_played_up_to">已播放到 %s</string>
+    <string name="paywall_layout_reviews_rating">4.1 评分（5700 条评论）</string>
+    <string name="paywall_layout_reviews_stars_content_description">星级</string>
+    <string name="paywall_layout_reviews_subtitle">了解用户升级到 Plus 的原因</string>
+    <string name="paywall_layout_reviews_title">“简直是收听播客的最佳方式”</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;通过 Slumber Studios 的内容圆梦&lt;/a&gt;</string>
+    <string name="gift">礼品</string>
+    <string name="share_whats_new_message">您现在可以共享您在任何剧集中的喜爱片段。 我们还简化了将任何内容共享到各社交媒体应用程序的操作流程。</string>
+    <string name="share_whats_new_title">片段共享功能现已推出！</string>
     <string name="got_it">知道了</string>
+    <string name="transcript_search">搜索文字转录稿</string>
+    <string name="transcript_close">关闭文字转录稿</string>
     <string name="onboarding_subscribe_to_plus">订阅 Plus</string>
     <string name="paywall_themes_content_description">其他主题和图标图片</string>
     <string name="paywall_themes_description">表现出您的真实一面。 为我们的订阅者提供的独家图标和主题。</string>

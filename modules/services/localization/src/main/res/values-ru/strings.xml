@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-28 15:54:03+0000
+Translation-Revision-Date: 2024-09-12 21:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
+    <string name="paywall_layout_reviews_review_six_date">8 марта</string>
+    <string name="paywall_layout_reviews_review_six_message">PC уже много лет остаётся моим любимым приложением. Я пробовал другие приложения для подкастов, но всегда возвращался к PC: это самый простой вариант с лучшим пользовательским интерфейсом и поддержкой. Безусловно, стоит попробовать, особенно если вам надоело ваше нынешнее приложение для подкастов.</string>
+    <string name="paywall_layout_reviews_review_six_title">Лучшее приложение для подкастов</string>
+    <string name="paywall_layout_reviews_review_five_date">6 мая</string>
+    <string name="paywall_layout_reviews_review_five_message">Пользуюсь приложением уже 6 лет или даже больше, начинал на Android, а теперь уже почти год — на iOS. Работает одинаково на обеих платформах. Легко искать и находить новые подкасты, отличный пользовательский интерфейс, можно добавлять подкасты по URL-адресу в RSS-ленте. Приложение в часах тоже работает, но я чаще всего пользуюсь им как кнопкой воспроизведения или паузы. Можно войти с данными учётной записи, чтобы синхронизировать приложение на всех устройствах, но это делать необязательно.</string>
+    <string name="paywall_layout_reviews_review_five_title">Работает отлично, легко находить и добавлять новые подкасты.</string>
+    <string name="paywall_layout_reviews_review_four_date">1 июня</string>
+    <string name="paywall_layout_reviews_review_four_message">Синхронизация просто супер. Не знаю, что там за волшебство, но это приложение определённо лучше всех, которыми я пользовался.</string>
+    <string name="paywall_layout_reviews_review_four_title">Потрясающая штука.</string>
+    <string name="paywall_layout_reviews_review_three_date">9 июня</string>
+    <string name="paywall_layout_reviews_review_three_message">Я пользуюсь Pocket Casts с 2017 года. \n\nМогу поклясться, что это лучшее приложение для прослушивания подкастов. В нём много полезных функций, и оно активно развивается. Были жалобы на то, что изменился интерфейс, но я не заметил никаких серьёзных изменений. \n\nПриложение может быть настолько простым или сложным, насколько это вам нужно. Так что вы можете либо пользоваться только функцией plug and play, либо настроить пропуск заставок, либо включить любую другую функцию, которая вам нравится.</string>
+    <string name="paywall_layout_reviews_review_three_title">Это лучшее приложение для подкастов.</string>
+    <string name="paywall_layout_reviews_review_two_date">15 июня</string>
+    <string name="paywall_layout_reviews_review_two_message">Пользуюсь 8 лет, и за это время отличное приложение стало ещё лучше.</string>
+    <string name="paywall_layout_reviews_review_two_title">В нём есть всё, что нужно любителям подкастов.</string>
+    <string name="paywall_layout_reviews_review_one_date">10 июля</string>
+    <string name="paywall_layout_reviews_review_one_message">Как давний пользователь, я могу сказать, что набор функций и возможности настройки даже в бесплатной версии просто безграничны. Мне нравится, что приложение синхронизируется на всех устройствах, и я могу начать прослушивание с телефона, а затем продолжить при помощи Alexa. Я рекомендую его всем, кто слушает подкасты. А ещё здесь крутая статистика!</string>
+    <string name="paywall_layout_reviews_review_one_title">САМОЕ лучшее приложение для подкастов</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">Читать другие отзывы в Play Store</string>
+    <string name="player_time_remaining">Оставшееся время: %s</string>
+    <string name="player_played_up_to">Воспроизведено: %s</string>
+    <string name="paywall_layout_reviews_rating">Оценка 4,1 (всего 5,7 тыс. отзывов)</string>
+    <string name="paywall_layout_reviews_stars_content_description">Звёзды</string>
+    <string name="paywall_layout_reviews_subtitle">Почему люди переходят на версию Plus</string>
+    <string name="paywall_layout_reviews_title">«Просто это лучший способ слушать подкасты»</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Содержание: Slumber Studios — мы помогаем вам мечтать&lt;/a&gt;</string>
+    <string name="gift">Подарок</string>
+    <string name="share_whats_new_message">Теперь вы можете публиковать клипы из ваших любимых фрагментов любого выпуска. Мы также упростили публикацию контента во всех социальных сетях.</string>
+    <string name="share_whats_new_title">Теперь можно делиться клипами!</string>
     <string name="got_it">Понятно</string>
+    <string name="transcript_search">Поиск расшифровки</string>
+    <string name="transcript_close">Закрыть расшифровку</string>
     <string name="onboarding_subscribe_to_plus">Подписаться на Plus</string>
     <string name="paywall_themes_content_description">Изображение: дополнительные темы и значки</string>
     <string name="paywall_themes_description">Покажите себя во всей красе. Эксклюзивные значки и темы для наших подписчиков.</string>

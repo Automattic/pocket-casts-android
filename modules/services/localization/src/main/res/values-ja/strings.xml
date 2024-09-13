@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-28 14:10:08+0000
+Translation-Revision-Date: 2024-09-10 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
+    <string name="paywall_layout_reviews_review_six_date">3月8日</string>
+    <string name="paywall_layout_reviews_review_six_message">PC は長年のお気に入りです。 他のポッドキャストアプリも試しましたが、PC はシンプルさ、Ul、サポートが優れているため、いつも PC に戻ってきます。 特に、今使っているポッドキャストアプリに飽きてしまった人は、PC をチェックする価値があります。</string>
+    <string name="paywall_layout_reviews_review_six_title">お気に入りのポッドキャストアプリ</string>
+    <string name="paywall_layout_reviews_review_five_date">5月6日</string>
+    <string name="paywall_layout_reviews_review_five_message">このアプリを6年以上使っています。使い始めたのは Android 版で、今は iOS 版を1年近く使っています。 両方のプラットフォームで同じように動作します。 新しいポッドキャストを簡単に見つけて再生できます。Ul が使いやすく、RSS フィードの URL でもポッドキャストを追加できます。 Watch アプリも便利ですが、私はほとんど再生や一時停止のために使っています。 端末間での同期にはアカウントでサインインする必要がありますが、そうしなくても使えます。</string>
+    <string name="paywall_layout_reviews_review_five_title">使いやすく、新しいポッドキャストを簡単に見つけて再生できる</string>
+    <string name="paywall_layout_reviews_review_four_date">6月1日</string>
+    <string name="paywall_layout_reviews_review_four_message">同期機能は魔法のようです。 このアプリでどんな特別な魔法が使われているかはわかりませんが、今まで使ったどのアプリよりも優れています。</string>
+    <string name="paywall_layout_reviews_review_four_title">素晴らしいアプリ</string>
+    <string name="paywall_layout_reviews_review_three_date">6月9日</string>
+    <string name="paywall_layout_reviews_review_three_message">2017年から Pocket Casts のユーザーです。 \n\nPocket Casts は間違いなく、ポッドキャストを聴くための最高のアプリです。 機能が豊富で、積極的な開発が行われています。 Ul の変更について不満の声があるようですが、私はあまり気になっていません。 \n\nこのアプリは自分の思いどおりにシンプルにも複雑にもできます。 すぐに使い始めることも、アウトロのスキップやイントロのタイマーを設定することも、その他の細かい機能を有効にすることも可能です。</string>
+    <string name="paywall_layout_reviews_review_three_title">最高のポッドキャストアプリ</string>
+    <string name="paywall_layout_reviews_review_two_date">6月15日</string>
+    <string name="paywall_layout_reviews_review_two_message">8年間の卓越性と継続的な改善</string>
+    <string name="paywall_layout_reviews_review_two_title">必須のポッドキャストアプリ</string>
+    <string name="paywall_layout_reviews_review_one_date">7月10日</string>
+    <string name="paywall_layout_reviews_review_one_message">長い間愛用していますが、無料版の機能性とカスタマイズの多さには驚かされます。 端末間で同期されるので、スマートフォンで聴き始めたあとに Alexa 端末で続きを聴くことができるのも気に入っています。 ポッドキャストを聴く人全員におすすめのアプリです。 また、統計機能も気に入っています !</string>
+    <string name="paywall_layout_reviews_review_one_title">今までで一番のポッドキャストアプリ</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">Play ストアのレビューをすべて見る</string>
+    <string name="player_time_remaining">残り時間 %s</string>
+    <string name="player_played_up_to">%s まで再生</string>
+    <string name="paywall_layout_reviews_rating">評価4.1 (5,700件のレビュー)</string>
+    <string name="paywall_layout_reviews_stars_content_description">星</string>
+    <string name="paywall_layout_reviews_subtitle">Plus にアップグレードした理由を見る</string>
+    <string name="paywall_layout_reviews_title">「ポッドキャストを聴くのにまさに最適な方法」</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;「Slumber Studios でぐっすり眠る」のコンテンツ&lt;/a&gt;</string>
+    <string name="gift">ギフト</string>
+    <string name="share_whats_new_message">どのエピソードからでも、お気に入りの部分のクリップを共有できるようになりました。 また、すべてのソーシャルメディアアプリにコンテンツを簡単に共有できるようになりました。</string>
+    <string name="share_whats_new_title">クリップの共有が利用できるようになりました !</string>
     <string name="got_it">OK</string>
+    <string name="transcript_search">トランスクリプトを検索</string>
+    <string name="transcript_close">トランスクリプトを閉じる</string>
     <string name="onboarding_subscribe_to_plus">Plus に登録</string>
     <string name="paywall_themes_content_description">追加のテーマとアイコン画像</string>
     <string name="paywall_themes_description">あなたの個性を表現しましょう。 購読者限定のアイコンとテーマです。</string>
