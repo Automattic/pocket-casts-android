@@ -2133,13 +2133,9 @@
 
     <!-- Referrals -->
     <string name="gift">Gift</string>
-    <plurals name="referrals_remaining_passes">
-        <item quantity="one">You have %d pass to share</item>
-        <item quantity="other">You have %d passes to share</item>
-    </plurals>
     <string name="referrals_send_guest_pass_title">Gift 2 Months of Pocket&#160;Casts&#160;Plus</string>
     <string name="referrals_send_guest_pass_card_title">2-Month Guest Pass</string>
     <string name="referrals_share_guest_pass">Share Guest Pass</string>
-    <string name="referrals_tooltip_message">Give 2 months of Plus to friends and family.</string>
+    <string name="referrals_tooltip_message">Give 2 months of Plus to friends and family!</string>
 
 </resources>

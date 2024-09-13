@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -14,9 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -27,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.LocalColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
@@ -83,15 +78,6 @@ private fun TooltipContent(
             .padding(horizontal = 16.dp)
             .padding(top = 24.dp, bottom = 16.dp),
     ) {
-        TextH40(
-            text = pluralStringResource(
-                LR.plurals.referrals_remaining_passes,
-                state.badgeCount,
-                state.badgeCount,
-            ),
-            fontWeight = FontWeight.W700,
-        )
-        Spacer(modifier = Modifier.height(4.dp))
         TextC70(
             text = stringResource(LR.string.referrals_tooltip_message, state.badgeCount),
             isUpperCase = false,
