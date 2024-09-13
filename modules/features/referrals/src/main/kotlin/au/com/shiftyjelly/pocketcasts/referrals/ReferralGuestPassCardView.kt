@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object ReferralGuestPassCardDefaults {
     val cardAspectRatio = 200f / 315f
-    val cardBlur = 100.dp
     val cardRadius = 13.dp
     val cardStrokeColor = Color(0xFF3A3A3A)
 }

@@ -74,39 +74,43 @@ fun ReferralCardAnimatedBackgroundView(
     )
 
     BoxWithConstraints(
-        contentAlignment = Alignment.Center,
         modifier = modifier
-            .blur(ReferralGuestPassCardDefaults.cardBlur)
-            .background(Color.Black)
-            .clipToBounds(),
     ) {
-        val density = LocalDensity.current
-        val circleSize = maxHeight
-        val circleSizePx = density.run { circleSize.toPx() }
-        val maxWidthPx = density.run { maxWidth.toPx() }
-        val maxHeightPx = density.run { maxHeight.toPx() }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .blur(maxWidth/ 3)
+                .background(Color.Black)
+                .clipToBounds(),
+        ) {
+            val density = LocalDensity.current
+            val circleSize = this@BoxWithConstraints.maxHeight
+            val circleSizePx = density.run { circleSize.toPx() }
+            val maxWidthPx = density.run { this@BoxWithConstraints.maxWidth.toPx() }
+            val maxHeightPx = density.run { this@BoxWithConstraints.maxHeight.toPx() }
 
-        val offsetX = (animatePosition.v1 * maxWidthPx) / 2f
-        val offsetY = (animatePosition.v2 * maxHeightPx) / 2f
+            val offsetX = (animatePosition.v1 * maxWidthPx) / 2f
+            val offsetY = (animatePosition.v2 * maxHeightPx) / 2f
 
-        GradientCircle(
-            circleSize = circleSize,
-            backgroundBrush = rainbowBrush(
-                start = Offset(0.12f * circleSizePx, 0f * circleSizePx),
-                end = Offset(0.89f * circleSizePx, 0.95f * circleSizePx),
-            ),
-            offset = IntOffset(offsetX.toInt(), offsetY.toInt()),
-        )
+            GradientCircle(
+                circleSize = circleSize,
+                backgroundBrush = rainbowBrush(
+                    start = Offset(0.12f * circleSizePx, 0f * circleSizePx),
+                    end = Offset(0.89f * circleSizePx, 0.95f * circleSizePx),
+                ),
+                offset = IntOffset(offsetX.toInt(), offsetY.toInt()),
+            )
 
-        GradientCircle(
-            circleSize = circleSize,
-            backgroundBrush = rainbowBrush(
-                start = Offset(0.29f * circleSizePx, 0.19f * circleSizePx),
-                end = Offset(0.87f * circleSizePx, 1.18f * circleSizePx),
-            ),
-            offset = IntOffset(-offsetX.toInt(), -offsetY.toInt()),
-            rotation = 45f,
-        )
+            GradientCircle(
+                circleSize = circleSize,
+                backgroundBrush = rainbowBrush(
+                    start = Offset(0.29f * circleSizePx, 0.19f * circleSizePx),
+                    end = Offset(0.87f * circleSizePx, 1.18f * circleSizePx),
+                ),
+                offset = IntOffset(-offsetX.toInt(), -offsetY.toInt()),
+                rotation = 45f,
+            )
+        }
     }
 }
 
