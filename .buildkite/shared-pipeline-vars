@@ -3,4 +3,4 @@
 # This file is `source`'d before calling `buildkite-agent pipeline upload`, and can be used
 # to set up some variables that will be interpolated in the `.yml` pipeline before uploading it.
 
-export CI_TOOLKIT="automattic/a8c-ci-toolkit#05b0c1e2a67065a6365ada57a09730111a94561f"
+export CI_TOOLKIT="automattic/a8c-ci-toolkit#0eb94ecba4d18a66a30076123d3c15964afa2be5"
