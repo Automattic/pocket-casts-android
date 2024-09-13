@@ -74,12 +74,12 @@ fun ReferralCardAnimatedBackgroundView(
     )
 
     BoxWithConstraints(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
-                .blur(maxWidth/ 3)
+                .blur(maxWidth / 3)
                 .background(Color.Black)
                 .clipToBounds(),
         ) {

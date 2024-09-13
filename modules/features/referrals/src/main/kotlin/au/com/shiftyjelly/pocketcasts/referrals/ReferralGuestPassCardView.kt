@@ -65,7 +65,7 @@ fun ReferralGuestPassCardView(
                     Modifier.semantics { contentDescription = cardTitle }
                 } else {
                     Modifier
-                }
+                },
             ),
     ) {
         ReferralCardAnimatedBackgroundView(
