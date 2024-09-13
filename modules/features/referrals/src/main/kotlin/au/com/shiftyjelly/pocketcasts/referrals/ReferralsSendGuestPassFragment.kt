@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.referrals
 import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -13,8 +12,6 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.os.BundleCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -22,14 +19,10 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil.setBackgroundColor
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.parcelize.Parcelize
 import androidx.compose.ui.graphics.Color as ComposeColor
-
-private const val NEW_INSTANCE_ARG = "ReferralsSendPassFragmentArgs"
 
 @AndroidEntryPoint
 class ReferralsSendGuestPassFragment : BaseFragment() {
-    private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreateView(
@@ -42,7 +35,6 @@ class ReferralsSendGuestPassFragment : BaseFragment() {
 
         setBackgroundColor(view, ComposeColor.Transparent.toArgb())
         ReferralsSendGuestPassPage(
-            passCount = args.passCount,
             onDismiss = {
                 (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
             },
@@ -68,18 +60,7 @@ class ReferralsSendGuestPassFragment : BaseFragment() {
         }
     }
 
-    @Parcelize
-    private class Args(
-        val passCount: Int,
-    ) : Parcelable
-
     companion object {
-        fun newInstance(
-            passCount: Int,
-        ) = ReferralsSendGuestPassFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(passCount),
-            )
-        }
+        fun newInstance() = ReferralsSendGuestPassFragment()
     }
 }

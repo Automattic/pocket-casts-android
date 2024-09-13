@@ -54,7 +54,6 @@ private val plusBackgroundBrush = Brush.horizontalGradient(
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ReferralsSendGuestPassPage(
-    passCount: Int,
     onDismiss: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
@@ -62,7 +61,6 @@ fun ReferralsSendGuestPassPage(
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
 
         ReferralsSendGuestPassContent(
-            passCount = passCount,
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
@@ -72,7 +70,6 @@ fun ReferralsSendGuestPassPage(
 
 @Composable
 private fun ReferralsSendGuestPassContent(
-    passCount: Int,
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
     onDismiss: () -> Unit,
@@ -145,7 +142,6 @@ private fun ReferralsSendGuestPassContent(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     ReferralsPassCardsStack(
-                        passCount = passCount,
                         width = cardWidth,
                     )
                 }
@@ -170,7 +166,7 @@ private fun ReferralsSendGuestPassContent(
 
 @Composable
 private fun ReferralsPassCardsStack(
-    passCount: Int,
+    cardsCount: Int = 3,
     width: Dp,
 ) {
     BoxWithConstraints(
@@ -178,10 +174,10 @@ private fun ReferralsPassCardsStack(
         modifier = Modifier
             .width(width),
     ) {
-        (0..<passCount).reversed().forEach { index ->
+        (0..<cardsCount).reversed().forEach { index ->
             val cardWidth = (maxWidth.value * 0.8 * (1 - index * 0.125)).dp
             val cardHeight = (cardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
-            val cardOffset = (10 * ((passCount - 1) - index)).dp
+            val cardOffset = (10 * ((cardsCount - 1) - index)).dp
             ReferralGuestPassCardView(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -237,7 +233,6 @@ fun ReferralsSendGuestPassContentPreview(
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
-            passCount = 3,
             onDismiss = {},
         )
     }
