@@ -54,6 +54,11 @@ class ExperimentsProvider @Inject constructor(
 
         repository.initialize(anonymousId = uuid)
     }
+
+    fun clear() {
+        LogBuffer.i(TAG, "Clearing experiments")
+        repository.clear()
+    }
 }
 
 private class PocketCastsExperimentLogger : ExperimentLogger {

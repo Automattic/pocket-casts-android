@@ -6,6 +6,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentsProvider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -51,6 +52,7 @@ class UserManagerImpl @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
+    private val experimentsProvider: ExperimentsProvider,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -124,6 +126,7 @@ class UserManagerImpl @Inject constructor(
                 analyticsTracker.flush()
                 analyticsTracker.clearAllData()
                 analyticsTracker.refreshMetadata()
+                experimentsProvider.clear()
             }
         }
         settings.setFullySignedOut(true)
