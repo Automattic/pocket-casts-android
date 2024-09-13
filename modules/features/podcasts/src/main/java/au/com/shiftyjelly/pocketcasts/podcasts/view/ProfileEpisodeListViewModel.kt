@@ -42,8 +42,11 @@ class ProfileEpisodeListViewModel @Inject constructor(
     private val _state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
     val state: StateFlow<State> = _state
 
+    private var mode: Mode? = null
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun setup(mode: Mode) {
+        this.mode = mode
         val episodeListFlowable = when (mode) {
             is Mode.Downloaded -> episodeManager.observeDownloadEpisodes()
             is Mode.Starred -> episodeManager.observeStarredEpisodes()
@@ -86,8 +89,17 @@ class ProfileEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun updateSearchQuery(searchQuery: String) {
-        _searchQueryFlow.value = searchQuery.trim()
+    fun onSearchQueryChanged(searchQuery: String) {
+        val oldValue = _searchQueryFlow.value
+        val newValue = searchQuery.trim()
+        _searchQueryFlow.value = newValue
+
+        // Track search events
+        if (oldValue.isEmpty() && newValue.isNotEmpty()) {
+            track(AnalyticsEvent.SEARCH_PERFORMED)
+        } else if (oldValue.isNotEmpty() && newValue.isEmpty()) {
+            track(AnalyticsEvent.SEARCH_CLEARED)
+        }
     }
 
     sealed class State {
@@ -127,5 +139,11 @@ class ProfileEpisodeListViewModel @Inject constructor(
         }
 
         data object Loading : State()
+    }
+
+    private fun track(
+        analyticsEvent: AnalyticsEvent,
+    ) {
+        mode?.let { analyticsTracker.track(analyticsEvent, mapOf("source" to it.source.analyticsValue)) }
     }
 }
