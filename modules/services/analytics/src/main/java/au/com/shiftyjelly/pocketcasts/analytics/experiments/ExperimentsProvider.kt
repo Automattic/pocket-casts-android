@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment.PaywallAATest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.experimentation.Experiment
-import com.automattic.android.experimentation.ExperimentLogger
 import com.automattic.android.experimentation.VariationsRepository
 import com.automattic.android.experimentation.domain.Variation.Control
 import com.automattic.android.experimentation.domain.Variation.Treatment
@@ -23,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as Experi
 class ExperimentsProvider @Inject constructor(
     @ApplicationContext context: Context,
     private val accountStatusInfo: AccountStatusInfo,
+    private val logger: ExperimentLogger,
 ) {
 
     companion object {
@@ -44,7 +44,7 @@ class ExperimentsProvider @Inject constructor(
         VariationsRepository.create(
             platform = PLATFORM,
             experiments = experiments,
-            logger = PocketCastsExperimentLogger(),
+            logger = logger,
             failFast = true,
             cacheDir = cacheDir,
             coroutineScope = CoroutineScope(Dispatchers.IO + Job()),
@@ -78,15 +78,5 @@ class ExperimentsProvider @Inject constructor(
                 null
             }
         }
-    }
-}
-
-private class PocketCastsExperimentLogger : ExperimentLogger {
-    override fun d(message: String) {
-        LogBuffer.i(ExperimentsProvider.TAG, message)
-    }
-
-    override fun e(message: String, throwable: Throwable?) {
-        throwable?.let { LogBuffer.e(ExperimentsProvider.TAG, throwable, message) } ?: LogBuffer.e(ExperimentsProvider.TAG, message)
     }
 }
