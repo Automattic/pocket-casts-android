@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.LocalColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -70,9 +71,8 @@ private fun TooltipContent() {
             .padding(horizontal = 16.dp)
             .padding(top = 24.dp, bottom = 16.dp),
     ) {
-        TextC70(
+        TextH40(
             text = stringResource(LR.string.referrals_tooltip_message),
-            isUpperCase = false,
         )
     }
 }
