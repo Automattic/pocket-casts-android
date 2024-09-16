@@ -26,7 +26,7 @@ class ExperimentsProvider @Inject constructor(
 
         LogBuffer.i(TAG, "Initializing experiments with uuid: $uuid")
 
-        repository.initialize(anonymousId = uuid)
+        repository.initialize(anonymousId = uuid, oAuthToken = null)
     }
 
     fun clear() {
