@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -72,8 +73,14 @@ private fun ReferralsClaimGuestPassBannerCard(
                         .weight(1f),
                     verticalArrangement = Arrangement.Center,
                 ) {
+                    val language = Locale.current.language
+                    val textResId = if (language == "en") {
+                        LR.string.referrals_claim_guess_pass_banner_card_title_english_only
+                    } else {
+                        LR.string.referrals_claim_guess_pass_banner_card_title
+                    }
                     TextH40(
-                        text = stringResource(LR.string.referrals_claim_guess_pass_banner_card_title),
+                        text = stringResource(textResId),
                     )
 
                     Spacer(modifier = modifier.height(8.dp))
