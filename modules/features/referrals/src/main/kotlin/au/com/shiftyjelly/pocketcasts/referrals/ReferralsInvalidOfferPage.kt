@@ -82,13 +82,13 @@ private fun ReferralsInvalidOfferPageContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
-        val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
-        val cardModifier = if (showFullScreen) {
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
         } else {
             Modifier
-                .width(cardWidth)
+                .width(pageWidth)
                 .wrapContentSize()
         }
 
@@ -96,7 +96,7 @@ private fun ReferralsInvalidOfferPageContent(
             elevation = 8.dp,
             shape = RoundedCornerShape(pageCornerRadius(showFullScreen)),
             backgroundColor = Color.Black,
-            modifier = cardModifier
+            modifier = pageModifier
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
@@ -137,7 +137,7 @@ private fun ReferralsInvalidOfferPageContent(
                 TextH50(
                     text = stringResource(LR.string.referrals_invalid_offer_description),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.width(cardWidth * 0.8f),
+                    modifier = Modifier.width(pageWidth * 0.8f),
                 )
 
                 if (showFullScreen) {
