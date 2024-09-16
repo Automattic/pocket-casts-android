@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +32,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -40,9 +44,15 @@ fun ReferralsClaimGuestPassBannerCard(
     viewModel: ReferralsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val activity = LocalContext.current.getActivity()
+
     ReferralsClaimGuestPassBannerCard(
         state = state,
         modifier = modifier,
+        onClick = {
+            val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim)
+            (activity as FragmentHostListener).showBottomSheet(fragment)
+        },
     )
 }
 
@@ -50,6 +60,7 @@ fun ReferralsClaimGuestPassBannerCard(
 private fun ReferralsClaimGuestPassBannerCard(
     state: ReferralsViewModel.UiState,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     if (state.showProfileBanner) {
         BoxWithConstraints(
@@ -58,7 +69,7 @@ private fun ReferralsClaimGuestPassBannerCard(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .clickable(
-                    onClick = {},
+                    onClick = onClick,
                 ),
         ) {
             Row(
@@ -112,6 +123,7 @@ private fun ReferralsClaimGuestPassBannerCardPreview(
     AppTheme(themeType) {
         ReferralsClaimGuestPassBannerCard(
             state = ReferralsViewModel.UiState(showProfileBanner = true),
+            onClick = {},
         )
     }
 }

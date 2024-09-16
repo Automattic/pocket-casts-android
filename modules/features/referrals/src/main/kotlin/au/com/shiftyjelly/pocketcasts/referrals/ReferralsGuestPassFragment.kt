@@ -89,6 +89,6 @@ class ReferralsGuestPassFragment : BaseFragment() {
 
     enum class ReferralsPageType {
         Send,
-        Claim
+        Claim,
     }
 }
