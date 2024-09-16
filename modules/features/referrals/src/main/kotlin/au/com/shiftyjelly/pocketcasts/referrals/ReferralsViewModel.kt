@@ -52,7 +52,6 @@ class ReferralsViewModel @Inject constructor(
         }
         _state.update {
             it.copy(
-                badgeCount = if (it.badgeCount > 0) it.badgeCount - 1 else 3,
                 showTooltip = false,
             )
         }
@@ -61,9 +60,5 @@ class ReferralsViewModel @Inject constructor(
     data class UiState(
         val showIcon: Boolean = false,
         val showTooltip: Boolean = false,
-        val badgeCount: Int = 3,
-    ) {
-        val showBadge: Boolean
-            get() = showIcon && badgeCount > 0
-    }
+    )
 }
