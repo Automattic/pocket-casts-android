@@ -1371,6 +1371,17 @@
         errorLine1="    modifier: Modifier = Modifier,"
         errorLine2="    ~~~~~~~~">
         <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/ClickableTextHelper.kt"
+            line="38"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ModifierParameter"
+        message="Modifier parameter should be the first optional parameter"
+        errorLine1="    modifier: Modifier = Modifier,"
+        errorLine2="    ~~~~~~~~">
+        <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/EmailAndPasswordFields.kt"
             line="69"
             column="5"/>
@@ -1429,6 +1440,17 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/bars/ThemedTopAppBar.kt"
             line="80"
             column="5"/>
+    </issue>
+
+    <issue
+        id="ReturnFromAwaitPointerEventScope"
+        message="Returning from awaitPointerEventScope may cause some input events to be dropped"
+        errorLine1="                        awaitPointerEventScope {"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/endofyear/StoriesPage.kt"
+            line="441"
+            column="25"/>
     </issue>
 
     <issue

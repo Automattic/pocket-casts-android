@@ -1355,6 +1355,55 @@
     </issue>
 
     <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
+        id="UnsafeOptInUsageError"
+        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
+        <location
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
+    </issue>
+
+    <issue
         id="ComposableNaming"
         message="Composable functions that return Unit should start with an uppercase letter"
         errorLine1="    fun handle("
@@ -1396,6 +1445,17 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/bookmark/BookmarksFragment.kt"
             line="109"
             column="22"/>
+    </issue>
+
+    <issue
+        id="ModifierParameter"
+        message="Modifier parameter should be the first optional parameter"
+        errorLine1="    modifier: Modifier = Modifier,"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/components/ClickableTextHelper.kt"
+            line="38"
+            column="5"/>
     </issue>
 
     <issue
@@ -1473,6 +1533,17 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/compose/bars/ThemedTopAppBar.kt"
             line="80"
             column="5"/>
+    </issue>
+
+    <issue
+        id="ReturnFromAwaitPointerEventScope"
+        message="Returning from awaitPointerEventScope may cause some input events to be dropped"
+        errorLine1="                        awaitPointerEventScope {"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/au/com/shiftyjelly/pocketcasts/endofyear/StoriesPage.kt"
+            line="441"
+            column="25"/>
     </issue>
 
     <issue
