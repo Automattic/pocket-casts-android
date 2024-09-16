@@ -154,7 +154,7 @@ private fun ReferralsClaimGuestPassContent(
                     ReferralGuestPassCardView(
                         modifier = Modifier
                             .size(guestPassCardWidth, guestPassCardHeight),
-                        source = ReferralGuestPassCardViewSource.Send,
+                        source = ReferralGuestPassCardViewSource.Claim,
                     )
                 }
 
