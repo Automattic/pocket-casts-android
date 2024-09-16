@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -152,11 +151,15 @@ private fun ReferralsClaimGuestPassContent(
                     textAlign = TextAlign.Center,
                 )
 
+                val guestPassCardWidth = cardWidth * 0.8f
                 if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    ReferralsPassCard(
-                        width = cardWidth,
+                    val guestPassCardHeight = (guestPassCardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
+                    ReferralGuestPassCardView(
+                        modifier = Modifier
+                            .size(guestPassCardWidth, guestPassCardHeight),
+                        source = ReferralGuestPassCardViewSource.Send,
                     )
                 }
 
@@ -165,7 +168,7 @@ private fun ReferralsClaimGuestPassContent(
                 TextP60(
                     text = stringResource(LR.string.referrals_claim_guest_pass_description, price),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.width(cardWidth * 0.8f - 32.dp),
+                    modifier = Modifier.width(guestPassCardWidth),
                 )
 
                 if (showFullScreen) {
@@ -184,19 +187,6 @@ private fun ReferralsClaimGuestPassContent(
             }
         }
     }
-}
-
-@Composable
-private fun ReferralsPassCard(
-    width: Dp,
-) {
-    val cardWidth = (width.value * 0.8).dp
-    val cardHeight = (cardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
-    ReferralGuestPassCardView(
-        modifier = Modifier
-            .size(cardWidth, cardHeight),
-        source = ReferralGuestPassCardViewSource.Send,
-    )
 }
 
 @Preview(device = Devices.PortraitRegular)
