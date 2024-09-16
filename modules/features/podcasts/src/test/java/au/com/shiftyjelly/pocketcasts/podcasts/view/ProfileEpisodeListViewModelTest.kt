@@ -146,11 +146,11 @@ class ProfileEpisodeListViewModelTest {
     }
 
     @Test
-    fun `updateSearchQuery updates search query flow`() = runTest {
+    fun `onSearchQueryChanged updates search query flow`() = runTest {
         initViewModel()
 
         val searchQuery = "test query"
-        viewModel.updateSearchQuery(searchQuery)
+        viewModel.onSearchQueryChanged(searchQuery)
 
         viewModel.searchQueryFlow.test {
             assertEquals(searchQuery, awaitItem())
@@ -164,7 +164,7 @@ class ProfileEpisodeListViewModelTest {
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow("query")).thenReturn(flowOf(filteredEpisodes))
         viewModel.setup(Mode.History)
 
-        viewModel.updateSearchQuery("query")
+        viewModel.onSearchQueryChanged("query")
 
         viewModel.state.test {
             assertEquals(filteredEpisodes, (awaitItem() as State.Loaded).results)
@@ -178,7 +178,7 @@ class ProfileEpisodeListViewModelTest {
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow("query")).thenReturn(flowOf(filteredEpisodes))
         viewModel.setup(Mode.History)
 
-        viewModel.updateSearchQuery("query")
+        viewModel.onSearchQueryChanged("query")
 
         viewModel.state.test {
             assertEquals(

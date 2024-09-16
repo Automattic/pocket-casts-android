@@ -126,9 +126,9 @@ enum class Feature(
     SEARCH_IN_LISTENING_HISTORY(
         key = "search_in_listening_history",
         title = "Search in listening history",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;

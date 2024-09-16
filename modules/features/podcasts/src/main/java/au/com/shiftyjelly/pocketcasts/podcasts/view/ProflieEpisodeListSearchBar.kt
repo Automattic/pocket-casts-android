@@ -30,7 +30,7 @@ fun ProfileEpisodeListSearchBar(
             SearchBar(
                 text = searchQueryFlow,
                 placeholder = stringResource(R.string.search),
-                onTextChanged = { viewModel.updateSearchQuery(it) },
+                onTextChanged = { viewModel.onSearchQueryChanged(it) },
                 onSearch = {},
                 modifier = Modifier
                     .fillMaxWidth()
