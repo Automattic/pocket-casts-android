@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatur
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentsProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -44,7 +44,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
-    private val experiments: ExperimentsProvider,
+    private val experiments: ExperimentProvider,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(app) {
 

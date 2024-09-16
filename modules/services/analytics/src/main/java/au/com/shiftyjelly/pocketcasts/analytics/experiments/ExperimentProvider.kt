@@ -12,7 +12,7 @@ import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
 
 @Singleton
-class ExperimentsProvider @Inject constructor(
+class ExperimentProvider @Inject constructor(
     private val accountStatusInfo: AccountStatusInfo,
     private val repository: VariationsRepository,
 ) {

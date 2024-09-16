@@ -19,11 +19,11 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
 
-class ExperimentsProviderTest {
+class ExperimentProviderTest {
 
     private lateinit var accountStatusInfo: AccountStatusInfo
     private lateinit var repository: VariationsRepository
-    private lateinit var experimentsProvider: ExperimentsProvider
+    private lateinit var experimentProvider: ExperimentProvider
 
     @Before
     fun setUp() {
@@ -31,7 +31,7 @@ class ExperimentsProviderTest {
 
         accountStatusInfo = mock(AccountStatusInfo::class.java)
         repository = mock(VariationsRepository::class.java)
-        experimentsProvider = ExperimentsProvider(accountStatusInfo, repository)
+        experimentProvider = ExperimentProvider(accountStatusInfo, repository)
     }
 
     @Test
@@ -39,7 +39,7 @@ class ExperimentsProviderTest {
         val uuid = "test-uuid"
         `when`(accountStatusInfo.getUuid()).thenReturn(uuid)
 
-        experimentsProvider.initialize()
+        experimentProvider.initialize()
 
         verify(repository).initialize(uuid)
         verify(accountStatusInfo).getUuid()
@@ -49,7 +49,7 @@ class ExperimentsProviderTest {
     fun `initialize should generate uuid if accountStatusInfo getUuid is null`() {
         `when`(accountStatusInfo.getUuid()).thenReturn(null)
 
-        experimentsProvider.initialize()
+        experimentProvider.initialize()
 
         verify(repository).initialize(anyString(), eq(null))
         verify(accountStatusInfo).getUuid()
@@ -57,7 +57,7 @@ class ExperimentsProviderTest {
 
     @Test
     fun `clear should call repository clear`() {
-        experimentsProvider.clear()
+        experimentProvider.clear()
 
         verify(repository).clear()
     }
@@ -67,7 +67,7 @@ class ExperimentsProviderTest {
         val experiment = ExperimentModel.PaywallAATest
         `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Control)
 
-        val variation = experimentsProvider.getVariation(experiment)
+        val variation = experimentProvider.getVariation(experiment)
 
         assertEquals(Control, variation)
     }
@@ -77,7 +77,7 @@ class ExperimentsProviderTest {
         val experiment = ExperimentModel.PaywallAATest
         `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Treatment(experiment.identifier))
 
-        val variation = experimentsProvider.getVariation(experiment)
+        val variation = experimentProvider.getVariation(experiment)
 
         assertTrue(variation is Treatment)
         assertEquals(ExperimentModel.PaywallAATest.identifier, (variation as Treatment).name)
@@ -88,7 +88,7 @@ class ExperimentsProviderTest {
         val experiment = ExperimentModel.PaywallAATest
         `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(null)
 
-        val variation = experimentsProvider.getVariation(experiment)
+        val variation = experimentProvider.getVariation(experiment)
 
         assertNull(variation)
     }

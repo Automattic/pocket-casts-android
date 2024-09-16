@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentsProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -31,7 +31,7 @@ class OnboardingLogInViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val subscriptionManager: SubscriptionManager,
     private val syncManager: SyncManager,
-    private val experiments: ExperimentsProvider,
+    private val experiments: ExperimentProvider,
     @ApplicationContext context: Context,
 ) : AndroidViewModel(context as Application), CoroutineScope {
 

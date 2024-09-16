@@ -6,7 +6,7 @@ import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentsProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.discover.worker.CuratedPodcastsSyncWorker
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
@@ -123,7 +123,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var engageSdkBridge: EngageSdkBridge
 
-    @Inject lateinit var experimentsProvider: ExperimentsProvider
+    @Inject lateinit var experimentProvider: ExperimentProvider
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -267,7 +267,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         novaLauncherBridge.monitorNovaLauncherIntegration()
         CuratedPodcastsSyncWorker.enqueuPeriodicWork(this)
         engageSdkBridge.registerIntegration()
-        experimentsProvider.initialize()
+        experimentProvider.initialize()
 
         settings.useDynamicColorsForWidget.flow
             .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }

@@ -5,10 +5,10 @@ import com.automattic.android.experimentation.ExperimentLogger
 
 class ExperimentLogger : ExperimentLogger {
     override fun d(message: String) {
-        LogBuffer.i(ExperimentsProvider.TAG, message)
+        LogBuffer.i(ExperimentProvider.TAG, message)
     }
 
     override fun e(message: String, throwable: Throwable?) {
-        throwable?.let { LogBuffer.e(ExperimentsProvider.TAG, throwable, message) } ?: LogBuffer.e(ExperimentsProvider.TAG, message)
+        throwable?.let { LogBuffer.e(ExperimentProvider.TAG, throwable, message) } ?: LogBuffer.e(ExperimentProvider.TAG, message)
     }
 }

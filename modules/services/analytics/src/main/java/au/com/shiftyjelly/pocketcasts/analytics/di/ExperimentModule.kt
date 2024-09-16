@@ -4,7 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentLogger
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentsProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
 import com.automattic.android.experimentation.VariationsRepository
 import dagger.Module
@@ -28,7 +28,7 @@ object ExperimentModule {
     fun provideExperimentProvider(
         accountStatusInfo: AccountStatusInfo,
         repository: VariationsRepository,
-    ): ExperimentsProvider = ExperimentsProvider(accountStatusInfo, repository)
+    ): ExperimentProvider = ExperimentProvider(accountStatusInfo, repository)
 
     @Provides
     @Singleton
@@ -52,7 +52,7 @@ object ExperimentModule {
         }.toSet()
 
         return VariationsRepository.create(
-            platform = ExperimentsProvider.PLATFORM,
+            platform = ExperimentProvider.PLATFORM,
             experiments = experiments,
             logger = logger,
             failFast = true,
