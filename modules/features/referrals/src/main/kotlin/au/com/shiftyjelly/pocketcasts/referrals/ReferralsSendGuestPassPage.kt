@@ -183,6 +183,7 @@ private fun ReferralsPassCardsStack(
                     .padding(horizontal = 16.dp)
                     .size(cardWidth, cardHeight)
                     .offset(y = cardOffset),
+                source = ReferralGuestPassCardViewSource.Send,
             )
         }
     }

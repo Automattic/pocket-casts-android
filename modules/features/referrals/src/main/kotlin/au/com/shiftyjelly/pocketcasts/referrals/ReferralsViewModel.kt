@@ -31,15 +31,17 @@ class ReferralsViewModel @Inject constructor(
                 userManager.getSignInState().asFlow(),
                 settings.playerOrUpNextBottomSheetState,
             ) { signInState, playerBottomSheetState ->
-                val showIcon = FeatureFlag.isEnabled(Feature.REFERRALS) && signInState.isSignedInAsPlusOrPatron
+                val eligibleToSendPass = FeatureFlag.isEnabled(Feature.REFERRALS) && signInState.isSignedInAsPlusOrPatron
+                val eligibleToClaimPass = FeatureFlag.isEnabled(Feature.REFERRALS) // TODO: Fix condition to claim pass when it's implemented
                 _state.update {
                     it.copy(
-                        showIcon = showIcon,
+                        showIcon = eligibleToSendPass,
                         showTooltip = if (playerBottomSheetState == BottomSheetBehavior.STATE_COLLAPSED) {
-                            showIcon && settings.showReferralsTooltip.value
+                            eligibleToSendPass && settings.showReferralsTooltip.value
                         } else {
                             false
                         },
+                        showProfileBanner = eligibleToClaimPass,
                     )
                 }
             }.stateIn(this)
@@ -60,5 +62,6 @@ class ReferralsViewModel @Inject constructor(
     data class UiState(
         val showIcon: Boolean = false,
         val showTooltip: Boolean = false,
+        val showProfileBanner: Boolean = false,
     )
 }

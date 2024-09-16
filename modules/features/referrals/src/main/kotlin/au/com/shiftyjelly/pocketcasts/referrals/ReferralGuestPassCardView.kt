@@ -27,54 +27,99 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object ReferralGuestPassCardDefaults {
     val cardAspectRatio = 200f / 315f
-    val cardBlur = 100.dp
-    val cardRadius = 13.dp
     val cardStrokeColor = Color(0xFF3A3A3A)
+    fun cardRadius(source: ReferralGuestPassCardViewSource) = when (source) {
+        ReferralGuestPassCardViewSource.Send -> 13.dp
+        ReferralGuestPassCardViewSource.ProfileBanner -> 3.dp
+    }
+    fun plusIconSize(source: ReferralGuestPassCardViewSource) = when (source) {
+        ReferralGuestPassCardViewSource.Send -> 16.dp
+        ReferralGuestPassCardViewSource.ProfileBanner -> 10.dp
+    }
+    fun plusIconPadding(source: ReferralGuestPassCardViewSource) = when (source) {
+        ReferralGuestPassCardViewSource.Send -> 16.dp
+        ReferralGuestPassCardViewSource.ProfileBanner -> 6.dp
+    }
+    fun cardBorder(source: ReferralGuestPassCardViewSource) = when (source) {
+        ReferralGuestPassCardViewSource.Send -> 1.dp
+        ReferralGuestPassCardViewSource.ProfileBanner -> 0.25.dp
+    }
 }
 
 @Composable
 fun ReferralGuestPassCardView(
     modifier: Modifier = Modifier,
+    source: ReferralGuestPassCardViewSource,
 ) {
     val cardTitle = stringResource(LR.string.referrals_send_guest_pass_card_title)
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius))
+            .clip(RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius(source)))
             .border(
-                width = 1.dp,
+                width = ReferralGuestPassCardDefaults.cardBorder(source),
                 color = ReferralGuestPassCardDefaults.cardStrokeColor,
-                shape = RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius),
+                shape = RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius(source)),
             )
-            .semantics { contentDescription = cardTitle },
+            .then(
+                if (source == ReferralGuestPassCardViewSource.Send) {
+                    Modifier.semantics { contentDescription = cardTitle }
+                } else {
+                    Modifier
+                },
+            ),
     ) {
         ReferralCardAnimatedBackgroundView(
             modifier = Modifier
                 .fillMaxSize(),
         )
-        TextH60(
-            text = cardTitle,
-            color = Color.White,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp),
-        )
 
-        Image(
-            painter = painterResource(IR.drawable.ic_plus),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(Color.White),
+        if (source == ReferralGuestPassCardViewSource.Send) {
+            TextH60(
+                text = cardTitle,
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp),
+            )
+        }
+
+        Box(
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp),
-        )
+                .padding(ReferralGuestPassCardDefaults.plusIconPadding(source))
+                .align(Alignment.TopEnd),
+        ) {
+            Image(
+                painter = painterResource(IR.drawable.ic_plus),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier
+                    .size(ReferralGuestPassCardDefaults.plusIconSize(source)),
+            )
+        }
     }
 }
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-fun ReferralPassCardViewPreview() {
+fun ReferralPassCardSendViewPreview() {
     ReferralGuestPassCardView(
         modifier = Modifier
             .size(DpSize(315.dp, 200.dp)),
+        source = ReferralGuestPassCardViewSource.Send,
     )
+}
+
+@Preview(device = Devices.PortraitRegular)
+@Composable
+fun ReferralPassCardProfileBannerViewPreview() {
+    ReferralGuestPassCardView(
+        modifier = Modifier
+            .size(DpSize(150.dp, 150.dp * ReferralGuestPassCardDefaults.cardAspectRatio)),
+        source = ReferralGuestPassCardViewSource.ProfileBanner,
+    )
+}
+
+enum class ReferralGuestPassCardViewSource {
+    Send,
+    ProfileBanner,
 }
