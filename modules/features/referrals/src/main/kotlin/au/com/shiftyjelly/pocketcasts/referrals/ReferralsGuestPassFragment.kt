@@ -53,6 +53,10 @@ class ReferralsGuestPassFragment : BaseFragment() {
             ReferralsPageType.Claim -> ReferralsClaimGuestPassPage(
                 onDismiss = { onDismiss() },
             )
+
+            ReferralsPageType.InvalidOffer -> ReferralsInvalidOfferPage(
+                onDismiss = { onDismiss() },
+            )
         }
 
         LaunchedEffect(Unit) {
@@ -90,5 +94,6 @@ class ReferralsGuestPassFragment : BaseFragment() {
     enum class ReferralsPageType {
         Send,
         Claim,
+        InvalidOffer,
     }
 }
