@@ -220,7 +220,7 @@ class WidgetManagerImpl @Inject constructor(
         Intent(context, PodcastWidget::class.java).apply {
             action = PodcastWidget.PLAY_ACTION
         },
-        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
     private fun getPauseIntent(): PendingIntent? = PendingIntent.getBroadcast(
@@ -229,7 +229,7 @@ class WidgetManagerImpl @Inject constructor(
         Intent(context, PodcastWidget::class.java).apply {
             action = PodcastWidget.PAUSE_ACTION
         },
-        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
     private fun getSkipBackIntent(): PendingIntent? = PendingIntent.getBroadcast(
@@ -238,7 +238,7 @@ class WidgetManagerImpl @Inject constructor(
         Intent(context, PodcastWidget::class.java).apply {
             action = PodcastWidget.SKIP_BACKWARD_ACTION
         },
-        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
     private fun getSkipForwardIntent(): PendingIntent? = PendingIntent.getBroadcast(
@@ -247,7 +247,7 @@ class WidgetManagerImpl @Inject constructor(
         Intent(context, PodcastWidget::class.java).apply {
             action = PodcastWidget.SKIP_FORWARD_ACTION
         },
-        PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 
     private fun getRemoteViewsLayoutId() = if (settings.useDynamicColorsForWidget.value) {

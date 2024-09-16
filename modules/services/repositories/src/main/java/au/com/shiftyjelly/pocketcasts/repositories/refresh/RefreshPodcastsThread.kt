@@ -481,7 +481,7 @@ class RefreshPodcastsThread(
             ).toIntent(context).apply {
                 action = action + System.currentTimeMillis() + intentId
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             intentId += 1
 
             val notificationTag = if (isGroupNotification) {
@@ -574,13 +574,13 @@ class RefreshPodcastsThread(
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_ACTION, intentName)
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_EPISODE_UUID, episode.uuid)
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_NOTIFICATION_TAG, notificationTag)
-            return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         private fun getDeletePendingIntent(context: Context): PendingIntent {
             val deleteIntent = Intent(context, NotificationBroadcastReceiver::class.java)
             deleteIntent.action = NotificationBroadcastReceiver.INTENT_ACTION_NOTIFICATION_DELETED
-            return PendingIntent.getBroadcast(context, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            return PendingIntent.getBroadcast(context, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         @Suppress("DEPRECATION")
@@ -608,7 +608,7 @@ class RefreshPodcastsThread(
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            val pendingIntent = PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             intentIndex += 1
 
             val inboxStyle = NotificationCompat.InboxStyle()
