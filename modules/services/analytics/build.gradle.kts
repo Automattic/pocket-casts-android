@@ -21,6 +21,7 @@ dependencies {
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
     api(projects.modules.services.utils)
+    implementation(projects.modules.services.servers)
 
     implementation(platform(libs.firebase.bom))
 

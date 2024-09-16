@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentLogger
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentsProvider
+import au.com.shiftyjelly.pocketcasts.servers.di.Cached
 import com.automattic.android.experimentation.VariationsRepository
 import dagger.Module
 import dagger.Provides
@@ -16,6 +17,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import okhttp3.OkHttpClient
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -39,6 +41,7 @@ object ExperimentModule {
     fun provideVariationsRepository(
         @ApplicationContext context: Context,
         logger: ExperimentLogger,
+        @Cached okHttpClient: OkHttpClient,
     ): VariationsRepository {
         val cacheDir = File(context.cacheDir, "experiments_cache").apply {
             if (!exists()) mkdirs()
@@ -55,6 +58,7 @@ object ExperimentModule {
             failFast = true,
             cacheDir = cacheDir,
             coroutineScope = CoroutineScope(Dispatchers.IO + Job()),
+            okhttpClient = okHttpClient,
         )
     }
 }
