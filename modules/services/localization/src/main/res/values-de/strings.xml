@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-29 14:54:02+0000
+Translation-Revision-Date: 2024-09-11 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="transcript_error_not_available">Für diese Folge ist kein Transkript verfügbar.</string>
+    <string name="paywall_layout_reviews_review_six_date">8. März</string>
+    <string name="paywall_layout_reviews_review_six_message">Ich nutze seit Jahren Pocket Casts. Zwar habe ich andere Podcast-Apps ausprobiert, aber ich kehre immer wieder zu Pocket Casts zurück. Die App ist unkompliziert, die Benutzeroberfläche ansprechend und der Support hervorragend. Man sollte sich die App auf jeden Fall angesehen haben, besonders, wenn man mit der derzeitigen Podcast-App nicht zufrieden ist.</string>
+    <string name="paywall_layout_reviews_review_six_title">Die Go-To-Podcast-App</string>
+    <string name="paywall_layout_reviews_review_five_date">6. Mai</string>
+    <string name="paywall_layout_reviews_review_five_message">Ich benutze die App seit über 6 Jahren. Damals bin ich auf Android gestartet und seit knapp einem Jahr nutze ich sie auf iOS. Sie funktioniert auf beiden Betriebssystemen gleich. Es ist einfach, Podcasts zu finden, die man sich anhören will. Die Benutzeroberfläche ist ansprechend und man kann sogar Podcasts über RSS-Feed-URL hinzufügen. Die Watch-App ist praktisch, aber ich nutze sie eigentlich nur zum Abspielen/Anhalten. Man kann sich mit einem Konto anmelden und eine geräteübergreifende Synchronisation durchführen. Das ist aber kein Muss.</string>
+    <string name="paywall_layout_reviews_review_five_title">Die App funktioniert wunderbar und es ist einfach, neue Podcasts zu finden und hinzuzufügen</string>
+    <string name="paywall_layout_reviews_review_four_date">1. Juni</string>
+    <string name="paywall_layout_reviews_review_four_message">Die Synchronisationsfunktion ist unglaublich gut. Ich weiß wirklich nicht, welche Magie in dieser App steckt, aber es ist die beste App, die ich je benutzt habe.</string>
+    <string name="paywall_layout_reviews_review_four_title">Fantastische App</string>
+    <string name="paywall_layout_reviews_review_three_date">9. Juni</string>
+    <string name="paywall_layout_reviews_review_three_message">Ich benutze Pocket Casts seit 2017. \n\nPocket Casts ist mit Abstand die beste App zum Anhören von Podcasts. Sie bietet viele Funktionen und wird ständig weiterentwickelt. Es gab einige Beschwerden über die Änderungen an der Benutzeroberfläche, aber mir ist nichts Negatives aufgefallen. \n\nDie Nutzung dieser App kann ganz einfach oder sehr kompliziert sein – das hängt allein vom Benutzer ab. Entweder man nutzt sie einfach als „Plug &amp; Play“ oder man richtet verschiedene Funktionen ein, wie Timer für das Überspringen von Intros und Outros.</string>
+    <string name="paywall_layout_reviews_review_three_title">Die beste Podcast-App auf dem Markt</string>
+    <string name="paywall_layout_reviews_review_two_date">15. Juni</string>
+    <string name="paywall_layout_reviews_review_two_message">8 Jahre exzellente Erfahrungen und kontinuierliche Verbesserungen</string>
+    <string name="paywall_layout_reviews_review_two_title">Die essenzielle Podcast-App</string>
+    <string name="paywall_layout_reviews_review_one_date">10. Juli</string>
+    <string name="paywall_layout_reviews_review_one_message">Ich verwende die App schon lange. Es ist wirklich erstaunlich, wie viele Funktionen und Anpassungsoptionen auch in der kostenlosen Version zur Verfügung stehen. Ich bin begeistert davon, dass sie sich über mehrere Geräte hinweg synchronisieren lässt: Ich kann einen Podcast auf meinem Handy beginnen und ihn dann auf einem Alexa-Gerät weiterhören. Meine klare Empfehlung für jeden Podcast-Fan. Die Statistiken finde ich auch super!</string>
+    <string name="paywall_layout_reviews_review_one_title">Die BEI WEITEM beste Podcast-App</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">Schau dir alle Reviews im Play Store an</string>
+    <string name="player_time_remaining">Verbleibende Zeit: %s</string>
+    <string name="player_played_up_to">Abgespielt bis: %s</string>
+    <string name="paywall_layout_reviews_rating">Bewertung: 4,1 (5.700 Rezensionen)</string>
+    <string name="paywall_layout_reviews_stars_content_description">Sterne</string>
+    <string name="paywall_layout_reviews_subtitle">Erfahre, warum sich Benutzer zum Upgrade auf Plus entschieden haben</string>
+    <string name="paywall_layout_reviews_title">„Ganz einfach die beste Art und Weise, Podcasts zu hören“</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Erholsamer Schlaf mit Inhalten von Slumber Studios&lt;/a&gt;</string>
+    <string name="gift">Geschenk</string>
+    <string name="share_whats_new_message">Du kannst jetzt Clips zu deinen Lieblingsstellen jeglicher Episoden teilen. Wir haben es außerdem einfach gemacht, jegliche Inhalte in den sozialen Medien zu teilen.</string>
+    <string name="share_whats_new_title">Das Teilen von Clips ist jetzt verfügbar!</string>
     <string name="got_it">Verstanden</string>
+    <string name="transcript_search">Transkript suchen</string>
+    <string name="transcript_close">Transkript schließen</string>
     <string name="onboarding_subscribe_to_plus">Plus abonnieren</string>
     <string name="paywall_themes_content_description">Zusätzliche Themes und Icon-Bilder</string>
     <string name="paywall_themes_description">Zeit, Farbe zu bekennen. Exklusive Icons und Themes für unsere Abonnenten.</string>

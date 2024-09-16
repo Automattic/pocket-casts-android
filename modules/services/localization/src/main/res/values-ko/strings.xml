@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-29 09:54:03+0000
+Translation-Revision-Date: 2024-09-12 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="transcript_error_not_available">죄송합니다. 이 에피소드에 대본을 사용할 수 없습니다.</string>
+    <string name="paywall_layout_reviews_review_six_date">3월 8일</string>
+    <string name="paywall_layout_reviews_review_six_message">PC는 저의 오랜 동반자입니다. 다른 팟캐스트 앱을 사용하다가 언제나 단순성, Ul 및 지원 때문에 PC로 되돌아왔습니다. 특히 현재 팟캐스트 앱에 지쳤다면 분명히 확인해 볼 만한 가치가 있습니다.</string>
+    <string name="paywall_layout_reviews_review_six_title">Go-To 팟캐스트 앱</string>
+    <string name="paywall_layout_reviews_review_five_date">5월 6일</string>
+    <string name="paywall_layout_reviews_review_five_message">이 앱을 6년 넘게 사용하고 있으며, Android에서 시작하여 지금은 거의 1년 동안 iOS에 머물러 있습니다. 작업은 두 플랫폼에서 동일합니다. 청취할 새 팟캐스트를 찾기 쉽고, Ul가 아주 훌륭하고, RSS 피드 URL을 통해 팟캐스트를 추가할 수도 있습니다. 시계 앱 기능이 우수하지만, 저는 주로 재생/일시 중지를 사용합니다. 계정을 통해 로그인하여 전체 기기를 동기화하지만, 꼭 그렇게 할 필요는 없습니다.</string>
+    <string name="paywall_layout_reviews_review_five_title">훌륭하게 작동하며 쉽게 새 팟캐스트를 찾거나 추가</string>
+    <string name="paywall_layout_reviews_review_four_date">6월 1일</string>
+    <string name="paywall_layout_reviews_review_four_message">동기화 기능이 마법적입니다. 이 앱이 특별한 마법을 부리는지는 모르지만, 지금까지 사용한 그 어떤 앱보다도 좋습니다.</string>
+    <string name="paywall_layout_reviews_review_four_title">환상적인 앱</string>
+    <string name="paywall_layout_reviews_review_three_date">6월 9일</string>
+    <string name="paywall_layout_reviews_review_three_message">저는 2017년부터 Pocket Casts 사용자였습니다. \n\n분명히 팟캐스트를 청취하기에 가장 좋은 앱입니다. 기능이 풍부하고 적극적으로 개발되었습니다. Ul 변경에 대한 몇 가지 불만 사항이 있었다지만, 저에는 별로 눈에 띄지 않았습니다. \n\n이 앱은 원하는 대로 간단하거나 까다롭게 사용할 수 있습니다. 따라서 플러그 앤 플레이 방식으로 사용하거나 아웃트로 및 인트로 건너뛰기 타이머와 활성화하고 싶은 기타 소소한 기능을 설정할 수 있습니다.</string>
+    <string name="paywall_layout_reviews_review_three_title">현존 최고의 팟캐스트 앱</string>
+    <string name="paywall_layout_reviews_review_two_date">6월 15일</string>
+    <string name="paywall_layout_reviews_review_two_message">8년의 우수성과 지속적인 개선</string>
+    <string name="paywall_layout_reviews_review_two_title">필수 팟캐스트 앱</string>
+    <string name="paywall_layout_reviews_review_one_date">7월 10일</string>
+    <string name="paywall_layout_reviews_review_one_message">저는 오랫동안 사용자였으며, 무료 버전을 통해 이용할 수 있는 기능과 사용자 정의 기능의 양이 엄청납니다. 기기 사이에 동기화되어서 내 전화기에서 청취를 시작하고 Alexa 기기에서 계속 들을 수 있습니다. 팟캐스트를 청취하는 모든 사람에게 추천합니다. 통계도 마음에 듭니다!</string>
+    <string name="paywall_layout_reviews_review_one_title">지금껏 최고의 팟캐스트 앱</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">Play 스토어의 모든 리뷰 보기</string>
+    <string name="player_time_remaining">남은 시간 %s</string>
+    <string name="player_played_up_to">%s까지 재생됨</string>
+    <string name="paywall_layout_reviews_rating">4.1 평가(5,700개 리뷰)</string>
+    <string name="paywall_layout_reviews_stars_content_description">별</string>
+    <string name="paywall_layout_reviews_subtitle">사람들이 Plus로 업그레이드한 이유 참조</string>
+    <string name="paywall_layout_reviews_title">\"한마디로 팟캐스트를 청취하는 가장 좋은 방법\"</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios 콘텐츠로 꿈꾸기&lt;/a&gt;</string>
+    <string name="gift">선물</string>
+    <string name="share_whats_new_message">이제 특정 에피소드 중에서 마음에 드는 부분의 클립을 공유할 수 있습니다. 모든 소셜 미디어 앱에서 더 쉽게 콘텐츠를 공유할 수도 있습니다.</string>
+    <string name="share_whats_new_title">이제 클립 공유를 이용할 수 있습니다!</string>
     <string name="got_it">알겠습니다</string>
+    <string name="transcript_search">대본 검색</string>
+    <string name="transcript_close">대본 닫기</string>
     <string name="onboarding_subscribe_to_plus">Plus 구독</string>
     <string name="paywall_themes_content_description">추가 테마 및 아이콘 이미지</string>
     <string name="paywall_themes_description">트루 컬러를 이용하세요. 구독자에게는 전용 아이콘과 테마가 제공됩니다.</string>

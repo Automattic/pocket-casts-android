@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-28 14:10:08+0000
+Translation-Revision-Date: 2024-09-12 17:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="transcript_error_not_available">Lo sentimos, pero no hay transcripción disponible para este episodio.</string>
+    <string name="paywall_layout_reviews_review_six_date">8 de marzo</string>
+    <string name="paywall_layout_reviews_review_six_message">PC ha sido mi opción durante años. He probado otras aplicaciones de podcasts y siempre vuelvo a PC por su sencillez, IU y soporte. Merece la pena echarle un vistazo, sobre todo si te has cansado de tu actual aplicación de podcasts.</string>
+    <string name="paywall_layout_reviews_review_six_title">Aplicación de podcasts favorita</string>
+    <string name="paywall_layout_reviews_review_five_date">6 de mayo</string>
+    <string name="paywall_layout_reviews_review_five_message">Llevo usando esta aplicación 6 años o más; empecé en Android y ahora llevo casi un año en iOS. Funciona igual en ambas plataformas. Es fácil encontrar nuevos podcasts para escuchar; tiene una IU muy agradable. También puedes añadir podcasts por URL de feed de RSS. La aplicación Watch es funcional, pero yo la utilizo principalmente para reproducir/pausar. Puedes iniciar sesión con una cuenta para sincronizar todos los dispositivos, pero no es obligatorio.</string>
+    <string name="paywall_layout_reviews_review_five_title">Funciona muy bien; es fácil encontrar o añadir nuevos podcasts</string>
+    <string name="paywall_layout_reviews_review_four_date">1 de junio</string>
+    <string name="paywall_layout_reviews_review_four_message">La función de sincronización es mágica. No sé qué magia especial tiene esta aplicación, pero es mejor que cualquier otra que haya utilizado.</string>
+    <string name="paywall_layout_reviews_review_four_title">Una aplicación fantástica</string>
+    <string name="paywall_layout_reviews_review_three_date">9 de junio</string>
+    <string name="paywall_layout_reviews_review_three_message">Soy usuario de Pocket Casts desde 2017. \n\nEsta es sin duda la mejor aplicación para escuchar podcasts. Tiene muchas funciones y se desarrolla activamente. Ha habido algunas quejas sobre el cambio de IU, pero la verdad es que yo no lo he notado demasiado. \n\nEsta aplicación puede ser tan sencilla o difícil de usar como tú quieras. Puedes instalarla automáticamente o puedes configurar temporizadores para saltar la música de la introducción y del final, entre otras funciones que quieras habilitar.</string>
+    <string name="paywall_layout_reviews_review_three_title">La mejor aplicación de podcasts</string>
+    <string name="paywall_layout_reviews_review_two_date">15 de junio</string>
+    <string name="paywall_layout_reviews_review_two_message">8 años de excelencia y mejora continua</string>
+    <string name="paywall_layout_reviews_review_two_title">La aplicación de podcasts imprescindible</string>
+    <string name="paywall_layout_reviews_review_one_date">10 de julio</string>
+    <string name="paywall_layout_reviews_review_one_message">Soy usuario desde hace mucho tiempo y la cantidad de funcionalidades y personalización que obtienes con la versión gratuita es asombrosa. Me encanta que se sincronice entre dispositivos; de este modo, puedo empezar a escuchar un podcast en mi teléfono y luego seguir en un dispositivo Alexa. Es mi recomendación para cualquiera que escuche podcasts. También me encantan las estadísticas.</string>
+    <string name="paywall_layout_reviews_review_one_title">La mejor aplicación de podcasts con diferencia</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">Ver todas las reseñas en la Play Store</string>
+    <string name="player_time_remaining">Tiempo restante %s</string>
+    <string name="player_played_up_to">Reproducido hasta %s</string>
+    <string name="paywall_layout_reviews_rating">Puntuación: 4.1 (5700 reseñas)</string>
+    <string name="paywall_layout_reviews_stars_content_description">Estrellas</string>
+    <string name="paywall_layout_reviews_subtitle">Descubre por qué la gente se ha pasado a Plus</string>
+    <string name="paywall_layout_reviews_title">«Sencillamente, la mejor forma de escuchar podcasts»</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Contenido de Sueña con Slumber Studios&lt;/a&gt;</string>
+    <string name="gift">Regalo</string>
+    <string name="share_whats_new_message">Ahora puedes compartir clips de tus fragmentos favoritos de cualquier episodio. También hemos facilitado la tarea de compartir cualquier contenido en todas las aplicaciones de redes sociales.</string>
+    <string name="share_whats_new_title">Ya está disponible el intercambio de clips.</string>
     <string name="got_it">De acuerdo</string>
+    <string name="transcript_search">Buscar transcripción</string>
+    <string name="transcript_close">Cerrar transcripción</string>
     <string name="onboarding_subscribe_to_plus">Suscribirse a Plus</string>
     <string name="paywall_themes_content_description">Imagen de temas e iconos adicionales</string>
     <string name="paywall_themes_description">Muéstrate tal y como eres. Iconos y temas exclusivos para nuestros suscriptores.</string>

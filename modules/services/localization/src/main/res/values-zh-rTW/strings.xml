@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-29 12:54:03+0000
+Translation-Revision-Date: 2024-09-10 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="transcript_error_not_available">不好意思，此單集不提供逐字稿。</string>
+    <string name="paywall_layout_reviews_review_six_date">3 月 8 日</string>
+    <string name="paywall_layout_reviews_review_six_message">這幾年來電腦一直是我的必備工具。 我嘗試過其他 Podcast 應用程式，但總是會回頭使用電腦，因為電腦用起來較簡單，加上其 UI 設計及支援服務。 絕對值得一試，要是你對目前的 Podcast 應用程式感到厭倦，那尤其更該試試。</string>
+    <string name="paywall_layout_reviews_review_six_title">必備 Podcast 應用程式</string>
+    <string name="paywall_layout_reviews_review_five_date">5 月 6 日</string>
+    <string name="paywall_layout_reviews_review_five_message">使用此應用程式 6 年以上了，起初是用 Android，現在則是用 iOS 一年了。 兩個平台上的運作方式都一樣。 可以輕鬆找到新 Podcast 來聽，具有十分出色的 UI 設計，也能夠透過 RSS 摘要 URL 來新增 Podcast。 Watch 應用程式功能強大，但我大部分都只有用播放/暫停功能。 登入帳號就能同步不同裝置，不過這非必要。</string>
+    <string name="paywall_layout_reviews_review_five_title">功能完美，也能輕鬆找到或新增新的 Podcast</string>
+    <string name="paywall_layout_reviews_review_four_date">6 月 1 日</string>
+    <string name="paywall_layout_reviews_review_four_message">登入功能非常神奇。 不知道這款應用程式有什麼魔法，但這比我用過的任何其他應用程式都還更棒。</string>
+    <string name="paywall_layout_reviews_review_four_title">這款應用程式超棒</string>
+    <string name="paywall_layout_reviews_review_three_date">6 月 9 日</string>
+    <string name="paywall_layout_reviews_review_three_message">我從 2017 起就是 Pocket Casts 使用者。 \n\n這無疑是聆聽 Podcast 最棒的應用程式。 功能豐富，並且積極開發更新。 部分使用者對於 UI 變更有一些抱怨，但我還沒有意識到太多改變。 \n\n你可以依照喜好調整此應用程式的使用複雜度。 可以隨插播放，或設定跳過尾奏和前奏、設定計時器以及任何其他供你啟用的小功能。</string>
+    <string name="paywall_layout_reviews_review_three_title">市面上最棒的 Podcast 應用程式</string>
+    <string name="paywall_layout_reviews_review_two_date">6 月 15 日</string>
+    <string name="paywall_layout_reviews_review_two_message">累積 8 年卓越經驗並且不懈地提升品質</string>
+    <string name="paywall_layout_reviews_review_two_title">必備的 Podcast 應用程式</string>
+    <string name="paywall_layout_reviews_review_one_date">7 月 10 日</string>
+    <string name="paywall_layout_reviews_review_one_message">我用這款應用程式好一段時間了，很驚訝免費版的功能和自訂選項竟如此完善。 我認為可以同步到所有裝置的功能非常棒，讓我能在聆聽時從手機轉換到 Alexa 裝置。 我推薦任何 Podcast 聽眾使用這款應用程式。 統計功能也非常優秀！</string>
+    <string name="paywall_layout_reviews_review_one_title">至今最讚的 Podcast 應用程式</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">在 Play Store 上查看所有評論</string>
+    <string name="player_time_remaining">總計剩餘時間：%s</string>
+    <string name="player_played_up_to">播放次數高達 %s</string>
+    <string name="paywall_layout_reviews_rating">評分 4.1 (5.7K 則評論)</string>
+    <string name="paywall_layout_reviews_stars_content_description">星級評分</string>
+    <string name="paywall_layout_reviews_subtitle">了解其他使用者升級至 Plus 的原因</string>
+    <string name="paywall_layout_reviews_title">「直接就是 Podcast 最棒的聆聽方式」</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;「Slumber Studios 伴你進入夢鄉」內容&lt;/a&gt;</string>
+    <string name="gift">送禮</string>
+    <string name="share_whats_new_message">你現在可以分享任何單集中最愛的片段。 我們簡化了分享功能，方便你輕鬆將任何內容分享到所有社群媒體應用程式。</string>
+    <string name="share_whats_new_title">現已推出片段分享功能！</string>
     <string name="got_it">知道了</string>
+    <string name="transcript_search">搜尋逐字稿</string>
+    <string name="transcript_close">關閉逐字稿</string>
     <string name="onboarding_subscribe_to_plus">訂閱 Plus</string>
     <string name="paywall_themes_content_description">其他佈景主題和圖示圖片</string>
     <string name="paywall_themes_description">展現你最真實的色彩。 自家訂閱者的專屬圖示和佈景主題。</string>
