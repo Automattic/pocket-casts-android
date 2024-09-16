@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -38,7 +39,7 @@ fun ReferralsIconWithTooltip(
         state = state,
         onIconClick = {
             viewModel.onIconClick()
-            val fragment = ReferralsSendGuestPassFragment.newInstance()
+            val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send)
             (activity as FragmentHostListener).showBottomSheet(fragment)
         },
     )
