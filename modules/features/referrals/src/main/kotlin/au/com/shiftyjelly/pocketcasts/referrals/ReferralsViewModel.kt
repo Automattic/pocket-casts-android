@@ -32,7 +32,7 @@ class ReferralsViewModel @Inject constructor(
                 settings.playerOrUpNextBottomSheetState,
             ) { signInState, playerBottomSheetState ->
                 val eligibleToSendPass = FeatureFlag.isEnabled(Feature.REFERRALS) && signInState.isSignedInAsPlusOrPatron
-                val eligibleToClaimPass = FeatureFlag.isEnabled(Feature.REFERRALS) // TODO: Fix condition to claim pass when it's implemented
+                val eligibleToClaimPass = FeatureFlag.isEnabled(Feature.REFERRALS) // TODO - Referrals: Fix condition to claim pass when it's implemented
                 _state.update {
                     it.copy(
                         showIcon = eligibleToSendPass,

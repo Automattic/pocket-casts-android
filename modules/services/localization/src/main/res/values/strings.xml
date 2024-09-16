@@ -2133,9 +2133,13 @@
 
     <!-- Referrals -->
     <string name="gift">Gift</string>
+    <string name="referrals_activate_my_pass">Activate my pass</string>
     <string name="referrals_claim_guess_pass_banner_card_title_english_only" translatable="false">Claim your 2-Month\nGuest Pass to Plus</string>
     <string name="referrals_claim_guess_pass_banner_card_title">Claim your 2-Month Guest Pass to Plus</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Unlock the full listening experience</string>
+    <string name="referrals_claim_guest_pass_description">This offer is for new members only. Membership will automatically renew to a paid annual membership at %s.</string>
+    <string name="referrals_claim_guest_pass_title_english_only" translatable="false">Claim your 2-Month\nGuest Pass</string>
+    <string name="referrals_claim_guest_pass_title">Claim your 2-Month Guest Pass</string>
     <string name="referrals_send_guest_pass_title">Gift 2 Months of Pocket&#160;Casts&#160;Plus</string>
     <string name="referrals_send_guest_pass_card_title">2-Month Guest Pass</string>
     <string name="referrals_share_guest_pass">Share Guest Pass</string>
