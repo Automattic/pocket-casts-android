@@ -39,6 +39,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -78,10 +81,8 @@ private fun ReferralsInvalidOfferPageContent(
             )
             .fillMaxSize(),
     ) {
-        val showFullScreen = windowWidthSizeClass == WindowWidthSizeClass.Compact ||
-            windowHeightSizeClass == WindowHeightSizeClass.Compact
-        val cardCornerRadius = if (showFullScreen) 0.dp else 8.dp
-        val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * .5).dp
+        val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
+        val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
         val cardModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
@@ -93,7 +94,7 @@ private fun ReferralsInvalidOfferPageContent(
 
         Card(
             elevation = 8.dp,
-            shape = RoundedCornerShape(cardCornerRadius),
+            shape = RoundedCornerShape(pageCornerRadius(showFullScreen)),
             backgroundColor = Color.Black,
             modifier = cardModifier
                 .clickable(
