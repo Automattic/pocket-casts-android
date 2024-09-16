@@ -21,5 +21,7 @@ steps:
     command: ".buildkite/commands/release-build.sh"
     priority: 1
     plugins: [$CI_TOOLKIT]
+    artifact_paths:
+      - "**/build/reports/lint-results*.*"
     notify:
       - slack: "#build-and-ship"
