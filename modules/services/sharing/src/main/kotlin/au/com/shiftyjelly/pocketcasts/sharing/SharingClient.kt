@@ -450,7 +450,7 @@ data class SharingRequest internal constructor(
 
             override fun linkDescription() = LR.string.share
 
-            override fun toString() = "Link(textWithLink=$textWithUrl, subject=$subject)"
+            override fun toString() = "WebLink(textWithLink=$textWithUrl, subject=$subject)"
         }
     }
 }
