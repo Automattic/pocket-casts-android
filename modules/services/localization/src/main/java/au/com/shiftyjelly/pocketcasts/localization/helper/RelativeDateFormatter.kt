@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.localization.helper
 import android.content.Context
 import android.content.res.Resources
 import android.icu.text.RelativeDateTimeFormatter
-import android.os.Build
 import android.text.format.DateUtils
 import au.com.shiftyjelly.pocketcasts.localization.R
 import java.util.Calendar
@@ -30,18 +29,10 @@ class RelativeDateFormatter(val context: Context) {
         val calendar = Calendar.getInstance()
         calendar.time = date
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // Try to add "Today" and "Yesterday"
-            val alternativeString = formatCloseDays(calendar)
-            if (alternativeString != null) {
-                return alternativeString.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-            }
-        } else if (Locale.getDefault().language == "en") {
-            // if using an old Android version but using English then add Today and Yesterday
-            val alternativeString = formatCloseDaysOld(calendar, context.resources)
-            if (alternativeString != null) {
-                return alternativeString
-            }
+        // Try to add "Today" and "Yesterday"
+        val alternativeString = formatCloseDays(calendar)
+        if (alternativeString != null) {
+            return alternativeString.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         }
 
         val format = when {

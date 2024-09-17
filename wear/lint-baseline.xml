@@ -151,7 +151,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="568"
+            line="565"
             column="13"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="658"
+            line="655"
             column="13"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="                 ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/episode/EpisodeFragment.kt"
-            line="197"
+            line="199"
             column="18"/>
     </issue>
 
@@ -294,7 +294,7 @@
         errorLine2="                                                            ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
-            line="745"
+            line="739"
             column="61"/>
     </issue>
 
@@ -305,7 +305,7 @@
         errorLine2="                   ~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
-            line="849"
+            line="843"
             column="20"/>
     </issue>
 
@@ -1008,7 +1008,7 @@
         errorLine1="&lt;Switch"
         errorLine2="^">
         <location
-            file="src/main/res/layout-v24/preference_car_switch_widget.xml"
+            file="src/main/res/layout/preference_car_switch_widget.xml"
             line="19"
             column="1"/>
     </issue>
@@ -1487,7 +1487,7 @@
         errorLine2="            ~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt"
-            line="269"
+            line="264"
             column="13"/>
     </issue>
 
@@ -1665,17 +1665,6 @@
             file="src/main/res/layout/widget.xml"
             line="147"
             column="21"/>
-    </issue>
-
-    <issue
-        id="UseCompatTextViewDrawableApis"
-        message="Use `TextViewCompat.setCompoundDrawableTintList()`"
-        errorLine1="                            binding.lblAuthor.compoundDrawableTintList = ColorStateList.valueOf(iconColor)"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/episode/EpisodeFragment.kt"
-            line="342"
-            column="29"/>
     </issue>
 
     <issue
@@ -2505,39 +2494,6 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/podcasts/view/episode/EpisodeFragment.kt"
-            line="340"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is never &lt; 24"
-        errorLine1="        if (Build.VERSION.SDK_INT &lt; 24) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/utils/Network.kt"
-            line="26"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
-        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/playback/PlaybackService.kt"
-            line="248"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
         message="Unnecessary; SDK_INT is always >= 25"
         errorLine1="    @TargetApi(Build.VERSION_CODES.N_MR1)"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -2545,72 +2501,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/shortcuts/PocketCastsShortcuts.kt"
             line="27"
             column="5"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/refresh/RefreshPodcastsThread.kt"
-            line="529"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
-        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/preferences/SettingsImpl.kt"
-            line="487"
-            column="34"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        if (Build.VERSION.SDK_INT >= 21) {"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeToArchiveCallback.kt"
-            line="407"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/SwitchExt.kt"
-            line="13"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/SwitchExt.kt"
-            line="45"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        return if (tag.length &lt;= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {"
-        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/utils/TimberDebugTree.kt"
-            line="55"
-            column="52"/>
     </issue>
 
     <issue
@@ -2633,49 +2523,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/player/view/video/VideoActivity.kt"
             line="146"
             column="5"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/extensions/View.kt"
-            line="60"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v24`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `layout`.">
-        <location
-            file="src/main/res/layout-v24"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 24"
-        errorLine1="        tools:targetApi=&quot;n&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/settings_pocketcasts_settings_fragment.xml"
-            line="25"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `values`.">
-        <location
-            file="src/main/res/values-v23"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v24`) is unnecessary; `minSdkVersion` is 24. Merge all the resources in this folder into `values`.">
-        <location
-            file="src/main/res/values-v24"/>
     </issue>
 
     <issue
@@ -8962,7 +8809,7 @@
         errorLine1="&lt;Switch"
         errorLine2="^">
         <location
-            file="../modules/features/cartheme/src/main/res/layout-v24/preference_car_switch_widget.xml"
+            file="../modules/features/cartheme/src/main/res/layout/preference_car_switch_widget.xml"
             line="19"
             column="1"/>
     </issue>
@@ -10312,7 +10159,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="404"
+            line="402"
             column="12"/>
     </issue>
 
@@ -10323,7 +10170,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="405"
+            line="403"
             column="12"/>
     </issue>
 
@@ -10334,7 +10181,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="406"
+            line="404"
             column="12"/>
     </issue>
 
@@ -10345,7 +10192,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="1635"
+            line="1634"
             column="12"/>
     </issue>
 
@@ -10356,7 +10203,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~">
         <location
             file="../modules/services/ui/src/main/res/values/themes.xml"
-            line="1683"
+            line="1682"
             column="12"/>
     </issue>
 

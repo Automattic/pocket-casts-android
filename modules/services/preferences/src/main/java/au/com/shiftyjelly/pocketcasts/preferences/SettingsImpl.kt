@@ -484,13 +484,7 @@ class SettingsImpl @Inject constructor(
             return languageCode
         }
 
-        val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.configuration.locale
-        }
-
+        val locale: Locale = context.resources.configuration.locales[0]
         val language = locale.country.lowercase(Locale.US) // e.g. de
 
         for (i in Settings.SUPPORTED_LANGUAGE_CODES.indices) {

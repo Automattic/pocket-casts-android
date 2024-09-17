@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.ContextThemeWrapper
@@ -21,6 +20,7 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.BundleCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -337,10 +337,7 @@ class EpisodeFragment : BaseFragment() {
                             binding.imgError.setImageResource(IR.drawable.ic_archive)
                         }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            // Doesn't work in data binding for some reason maybe because of the API limit
-                            binding.lblAuthor.compoundDrawableTintList = ColorStateList.valueOf(iconColor)
-                        }
+                        TextViewCompat.setCompoundDrawableTintList(binding.lblAuthor, ColorStateList.valueOf(iconColor))
                         binding.lblAuthor.setOnClickListener {
                             analyticsTracker.track(
                                 AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,

@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 
 object Network {
 
@@ -23,9 +22,6 @@ object Network {
     }
 
     fun getRestrictBackgroundStatusString(context: Context): String {
-        if (Build.VERSION.SDK_INT < 24) {
-            return "API not available"
-        }
         return when (getConnectivityManager(context).restrictBackgroundStatus) {
             ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED -> "Device is restricting metered network activity while application is running on background."
             ConnectivityManager.RESTRICT_BACKGROUND_STATUS_WHITELISTED -> "Device is restricting metered network activity while application is running on background, but application is allowed to bypass it."

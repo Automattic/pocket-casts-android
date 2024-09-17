@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Pair
@@ -525,11 +524,8 @@ class RefreshPodcastsThread(
                 builder = builder.addAction(phoneActions[1])
             }
 
-            // Don't include three action on old devices because they don't fit
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                if (phoneActions.size > 2) {
-                    builder = builder.addAction(phoneActions[2])
-                }
+            if (phoneActions.size > 2) {
+                builder = builder.addAction(phoneActions[2])
             }
 
             if (isGroupNotification) {
