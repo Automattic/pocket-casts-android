@@ -10,14 +10,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -29,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,8 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
@@ -52,14 +48,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun ReferralsClaimGuestPassPage(
+fun ReferralsInvalidOfferPage(
     onDismiss: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
 
-        ReferralsClaimGuestPassContent(
+        ReferralsInvalidOfferPageContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
@@ -68,7 +64,7 @@ fun ReferralsClaimGuestPassPage(
 }
 
 @Composable
-private fun ReferralsClaimGuestPassContent(
+private fun ReferralsInvalidOfferPageContent(
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
     onDismiss: () -> Unit,
@@ -112,23 +108,7 @@ private fun ReferralsClaimGuestPassContent(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             ) {
-                val language = Locale.current.language
-                val titleTextResId = if (language == "en") {
-                    LR.string.referrals_claim_guest_pass_title_english_only
-                } else {
-                    LR.string.referrals_claim_guest_pass_title
-                }
-                val price = "$39.99 USD" // TODO - Referrals: Make it dynamic
-
-                TextButton(
-                    modifier = Modifier
-                        .align(Alignment.End),
-                    onClick = onDismiss,
-                ) {
-                    TextP30(
-                        text = stringResource(LR.string.not_now),
-                    )
-                }
+                Spacer(modifier = Modifier.height(48.dp))
 
                 SubscriptionBadge(
                     fontSize = 16.sp,
@@ -143,28 +123,16 @@ private fun ReferralsClaimGuestPassContent(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 TextH10(
-                    text = stringResource(titleTextResId),
+                    text = stringResource(LR.string.referrals_invalid_offer_title),
                     textAlign = TextAlign.Center,
                 )
 
-                val guestPassCardWidth = pageWidth * 0.8f
-                if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    val guestPassCardHeight = (guestPassCardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
-                    ReferralGuestPassCardView(
-                        modifier = Modifier
-                            .size(guestPassCardWidth, guestPassCardHeight),
-                        source = ReferralGuestPassCardViewSource.Claim,
-                    )
-                }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextP60(
-                    text = stringResource(LR.string.referrals_claim_guest_pass_description, price),
+                TextH50(
+                    text = stringResource(LR.string.referrals_invalid_offer_description),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.width(guestPassCardWidth),
+                    modifier = Modifier.width(pageWidth * 0.8f),
                 )
 
                 if (showFullScreen) {
@@ -174,11 +142,11 @@ private fun ReferralsClaimGuestPassContent(
                 }
 
                 GradientRowButton(
-                    primaryText = stringResource(LR.string.referrals_activate_my_pass),
+                    primaryText = stringResource(LR.string.got_it),
                     textColor = Color.Black,
                     gradientBackgroundColor = plusBackgroundBrush,
                     modifier = Modifier.padding(16.dp),
-                    onClick = {},
+                    onClick = onDismiss,
                 )
             }
         }
@@ -187,8 +155,8 @@ private fun ReferralsClaimGuestPassContent(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-fun ReferralsClaimGuestPassPortraitPhonePreview() {
-    ReferralsClaimGuestPassContentPreview(
+fun ReferralsInvalidOfferPagePortraitPhonePreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
@@ -196,8 +164,8 @@ fun ReferralsClaimGuestPassPortraitPhonePreview() {
 
 @Preview(device = Devices.LandscapeRegular)
 @Composable
-fun ReferralsClaimGuestPassLandscapePhonePreview() {
-    ReferralsClaimGuestPassContentPreview(
+fun ReferralsInvalidOfferPageLandscapePhonePreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Compact,
     )
@@ -205,8 +173,8 @@ fun ReferralsClaimGuestPassLandscapePhonePreview() {
 
 @Preview(device = Devices.PortraitTablet)
 @Composable
-fun ReferralsClaimGuestPassPortraitTabletPreview() {
-    ReferralsClaimGuestPassContentPreview(
+fun ReferralsInvalidOfferPagePortraitTabletPreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
@@ -214,20 +182,20 @@ fun ReferralsClaimGuestPassPortraitTabletPreview() {
 
 @Preview(device = Devices.LandscapeTablet)
 @Composable
-fun ReferralsClaimGuestPassLandscapeTabletPreview() {
-    ReferralsClaimGuestPassContentPreview(
+fun ReferralsInvalidOfferPageLandscapeTabletPreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Expanded,
     )
 }
 
 @Composable
-fun ReferralsClaimGuestPassContentPreview(
+fun ReferralsInvalidOfferPageContentPreview(
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        ReferralsClaimGuestPassContent(
+        ReferralsInvalidOfferPageContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
             onDismiss = {},
