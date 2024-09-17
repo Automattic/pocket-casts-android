@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -31,14 +29,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
@@ -51,14 +48,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun ReferralsSendGuestPassPage(
+fun ReferralsInvalidOfferPage(
     onDismiss: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
 
-        ReferralsSendGuestPassContent(
+        ReferralsInvalidOfferPageContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
@@ -67,7 +64,7 @@ fun ReferralsSendGuestPassPage(
 }
 
 @Composable
-private fun ReferralsSendGuestPassContent(
+private fun ReferralsInvalidOfferPageContent(
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
     onDismiss: () -> Unit,
@@ -111,11 +108,7 @@ private fun ReferralsSendGuestPassContent(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             ) {
-                CloseButton(
-                    modifier = Modifier
-                        .align(Alignment.End),
-                    onClick = onDismiss,
-                )
+                Spacer(modifier = Modifier.height(48.dp))
 
                 SubscriptionBadge(
                     fontSize = 16.sp,
@@ -130,17 +123,17 @@ private fun ReferralsSendGuestPassContent(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 TextH10(
-                    text = stringResource(LR.string.referrals_send_guest_pass_title),
+                    text = stringResource(LR.string.referrals_invalid_offer_title),
                     textAlign = TextAlign.Center,
                 )
 
-                if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
-                    Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    ReferralsPassCardsStack(
-                        width = pageWidth,
-                    )
-                }
+                TextH50(
+                    text = stringResource(LR.string.referrals_invalid_offer_description),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(pageWidth * 0.8f),
+                )
 
                 if (showFullScreen) {
                     Spacer(modifier = Modifier.weight(1f))
@@ -149,46 +142,21 @@ private fun ReferralsSendGuestPassContent(
                 }
 
                 GradientRowButton(
-                    primaryText = stringResource(LR.string.referrals_share_guest_pass),
+                    primaryText = stringResource(LR.string.got_it),
                     textColor = Color.Black,
                     gradientBackgroundColor = plusBackgroundBrush,
                     modifier = Modifier.padding(16.dp),
-                    onClick = {},
+                    onClick = onDismiss,
                 )
             }
         }
     }
 }
 
-@Composable
-private fun ReferralsPassCardsStack(
-    cardsCount: Int = 3,
-    width: Dp,
-) {
-    BoxWithConstraints(
-        contentAlignment = Alignment.TopCenter,
-        modifier = Modifier
-            .width(width),
-    ) {
-        (0..<cardsCount).reversed().forEach { index ->
-            val cardWidth = (maxWidth.value * 0.8 * (1 - index * 0.125)).dp
-            val cardHeight = (cardWidth.value * ReferralGuestPassCardDefaults.cardAspectRatio).dp
-            val cardOffset = (10 * ((cardsCount - 1) - index)).dp
-            ReferralGuestPassCardView(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .size(cardWidth, cardHeight)
-                    .offset(y = cardOffset),
-                source = ReferralGuestPassCardViewSource.Send,
-            )
-        }
-    }
-}
-
 @Preview(device = Devices.PortraitRegular)
 @Composable
-fun ReferralsSendGuestPassPortraitPhonePreview() {
-    ReferralsSendGuestPassContentPreview(
+fun ReferralsInvalidOfferPagePortraitPhonePreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
@@ -196,8 +164,8 @@ fun ReferralsSendGuestPassPortraitPhonePreview() {
 
 @Preview(device = Devices.LandscapeRegular)
 @Composable
-fun ReferralsSendGuestPassLandscapePhonePreview() {
-    ReferralsSendGuestPassContentPreview(
+fun ReferralsInvalidOfferPageLandscapePhonePreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Compact,
     )
@@ -205,8 +173,8 @@ fun ReferralsSendGuestPassLandscapePhonePreview() {
 
 @Preview(device = Devices.PortraitTablet)
 @Composable
-fun ReferralsSendGuestPassPortraitTabletPreview() {
-    ReferralsSendGuestPassContentPreview(
+fun ReferralsInvalidOfferPagePortraitTabletPreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
@@ -214,20 +182,20 @@ fun ReferralsSendGuestPassPortraitTabletPreview() {
 
 @Preview(device = Devices.LandscapeTablet)
 @Composable
-fun ReferralsSendGuestPassLandscapeTabletPreview() {
-    ReferralsSendGuestPassContentPreview(
+fun ReferralsInvalidOfferPageLandscapeTabletPreview() {
+    ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Expanded,
     )
 }
 
 @Composable
-fun ReferralsSendGuestPassContentPreview(
+fun ReferralsInvalidOfferPageContentPreview(
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        ReferralsSendGuestPassContent(
+        ReferralsInvalidOfferPageContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
             onDismiss = {},

@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ripple
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,7 +39,7 @@ internal fun PlatformItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable(
             interactionSource = remember(::MutableInteractionSource),
-            indication = ripple(color = shareColors.accent, bounded = false),
+            indication = rememberRipple(color = shareColors.accent),
             onClickLabel = stringResource(LR.string.share_via, stringResource(platform.nameId)),
             role = Role.Button,
             onClick = { onClick(platform) },

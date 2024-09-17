@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-28 15:54:03+0000
+Translation-Revision-Date: 2024-09-13 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
+    <string name="paywall_layout_reviews_review_six_date">8 mrt</string>
+    <string name="paywall_layout_reviews_review_six_message">PC is al jaren mijn favoriet. Ik heb andere podcastapps geprobeerd, maar kwam altijd weer terug naar PC vanwege de eenvoud, UI en support. Deze app is het zeker waard om even te bekijken, vooral als je je huidige podcastapp zat bent geworden.</string>
+    <string name="paywall_layout_reviews_review_six_title">Favoriete podcastapp</string>
+    <string name="paywall_layout_reviews_review_five_date">6 mei</string>
+    <string name="paywall_layout_reviews_review_five_message">Ik gebruik deze app al 6 jaar, of eigenlijk ik ben ermee begonnen op Android en gebruik hem nu bijna een jaar op iOS. De app werkt op beide platforms hetzelfde. Het is makkelijk om nieuwe podcasts te vinden, de app heeft een mooie UI en je kan zelf podcasts toevoegen via een rss feed-url. De horloge-app werkt ook, maar deze gebruik voornamelijk voor afspelen/pauzeren. Maak een account aan om op verschillende apparaten te kunnen synchroniseren, maar dit is niet verplicht.</string>
+    <string name="paywall_layout_reviews_review_five_title">De app werkt geweldig en je kan gemakkelijk nieuwe pods vinden en toevoegen.</string>
+    <string name="paywall_layout_reviews_review_four_date">1 jun</string>
+    <string name="paywall_layout_reviews_review_four_message">De sync-functie is echt magisch. Ik weet niet wat voor tovenarij deze app gebruikt, maar deze app is beter dan welke andere app dan ook.</string>
+    <string name="paywall_layout_reviews_review_four_title">Fantastische app.</string>
+    <string name="paywall_layout_reviews_review_three_date">9 jun</string>
+    <string name="paywall_layout_reviews_review_three_message">Ik gebruik Pocket Casts al sinds 2017. \n\nEn dit is absoluut de beste app die er bestaat om podcasts mee te luisteren. Er zijn talloze functies en de app wordt actief verder ontwikkeld. Er hebben wat mensen geklaagd over de veranderde UI maar ik heb er zelf niet zoveel van gemerkt. \n\nDeze app kan zo eenvoudig of moeilijk te gebruiken zijn als je zelf maar wilt. Dus gebruik hem als plug-and-play of stel van alles in zoals outro\'s overslaan, timers voor intro\'s en andere kleine functies die je wilt inschakelen.</string>
+    <string name="paywall_layout_reviews_review_three_title">Beste podcastapp die er is</string>
+    <string name="paywall_layout_reviews_review_two_date">15 jun</string>
+    <string name="paywall_layout_reviews_review_two_message">Al 8 jaar uitstekend en continu vernieuwend</string>
+    <string name="paywall_layout_reviews_review_two_title">De essentiële podcastapp</string>
+    <string name="paywall_layout_reviews_review_one_date">10 jul</string>
+    <string name="paywall_layout_reviews_review_one_message">Ik gebruik de app al een hele lange tijd en het is echt verbazingwekkend hoeveel functies en aanpassingen je in de gratis versie krijgt. Ik vind het geweldig dat de app op al je apparaten synchroniseert. Nu kan ik op mijn telefoon beginnen met luisteren en thuis verdergaan op Alexa. Ik wil deze app aanbevelen aan iedereen die maar naar podcasts luistert. De statistieken zijn ook een van mijn favo onderdelen!</string>
+    <string name="paywall_layout_reviews_review_one_title">Sowieso de beste podcastapp</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">Bekijk alle beoordelingen in Play Store</string>
+    <string name="player_time_remaining">Totale resterende tijd %s</string>
+    <string name="player_played_up_to">Afgespeeld tot %s</string>
+    <string name="paywall_layout_reviews_rating">Beoordeling van 4,1 (5.700 beoordelingen)</string>
+    <string name="paywall_layout_reviews_stars_content_description">Sterren</string>
+    <string name="paywall_layout_reviews_subtitle">Ontdek waarom anderen naar Plus hebben geüpgraded</string>
+    <string name="paywall_layout_reviews_title">\"Simpelweg de beste manier om naar podcasts te luisteren\"</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Droom met content van Slumber Studios&lt;/a&gt;</string>
+    <string name="gift">Cadeau</string>
+    <string name="share_whats_new_message">Je kan nu clips van je favoriete stukjes uit een aflevering delen. We hebben het ook eenvoudiger gemaakt om content te delen op elke socialmedia-app.</string>
+    <string name="share_whats_new_title">Nu mogelijk: clips delen!</string>
     <string name="got_it">Duidelijk</string>
+    <string name="transcript_search">Transcriptie zoeken</string>
+    <string name="transcript_close">Transcriptie sluiten</string>
     <string name="onboarding_subscribe_to_plus">Abonneren op Plus</string>
     <string name="paywall_themes_content_description">Afbeelding extra thema\'s en pictogrammen</string>
     <string name="paywall_themes_description">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor onze abonnees.</string>

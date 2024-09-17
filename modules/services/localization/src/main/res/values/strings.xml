@@ -2133,13 +2133,18 @@
 
     <!-- Referrals -->
     <string name="gift">Gift</string>
-    <plurals name="referrals_remaining_passes">
-        <item quantity="one">You have %d pass to share</item>
-        <item quantity="other">You have %d passes to share</item>
-    </plurals>
+    <string name="referrals_activate_my_pass">Activate my pass</string>
+    <string name="referrals_claim_guess_pass_banner_card_title_english_only" translatable="false">Claim your 2-Month\nGuest Pass to Plus</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Claim your 2-Month Guest Pass to Plus</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Unlock the full listening experience</string>
+    <string name="referrals_claim_guest_pass_description">This offer is for new members only. Membership will automatically renew to a paid annual membership at %s.</string>
+    <string name="referrals_claim_guest_pass_title_english_only" translatable="false">Claim your 2-Month\nGuest Pass</string>
+    <string name="referrals_claim_guest_pass_title">Claim your 2-Month Guest Pass</string>
+    <string name="referrals_invalid_offer_description">This guest pass can only be redeemed once and is available for those without an active Plus or Patron subscription. Thanks for listening!</string>
+    <string name="referrals_invalid_offer_title">This offer isn\'t available</string>
     <string name="referrals_send_guest_pass_title">Gift 2 Months of Pocket&#160;Casts&#160;Plus</string>
     <string name="referrals_send_guest_pass_card_title">2-Month Guest Pass</string>
     <string name="referrals_share_guest_pass">Share Guest Pass</string>
-    <string name="referrals_tooltip_message">Give 2 months of Plus to friends and family.</string>
+    <string name="referrals_tooltip_message">Gift 2 months of Pocket&#160;Casts&#160;Plus!</string>
 
 </resources>

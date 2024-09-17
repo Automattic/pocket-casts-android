@@ -1,12 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-08-29 09:54:03+0000
+Translation-Revision-Date: 2024-09-11 12:09:42+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="move_down">Flytta ner</string>
+    <string name="move_up">Flytta upp</string>
+    <string name="search_episodes_not_found_title">Inga avsnitt hittades</string>
+    <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
+    <string name="paywall_layout_reviews_review_six_date">8 mar</string>
+    <string name="paywall_layout_reviews_review_six_message">PC har varit min favorit i flera år. Jag har provat andra podcast-appar men kommer alltid tillbaka till PC för enkelheten, Ul och supporten. Det är helt klart värt att prova, särskilt om du har tröttnat på din nuvarande podcast-app.</string>
+    <string name="paywall_layout_reviews_review_six_title">Den bästa podcast-appen</string>
+    <string name="paywall_layout_reviews_review_five_date">6 maj</string>
+    <string name="paywall_layout_reviews_review_five_message">Jag började med Android och nu har jag använt iOS i nästan ett år. Totalt har jag använt den här appen i minst 6 år. Fungerar lika bra på båda plattformarna. Det är enkelt att hitta nya podcaster att lyssna på, mycket trevlig Ul och man kan även lägga till podcaster via url för rss-flöde. Klockappen är funktionell, men jag använder den mest för att spela/pausa. Du kan logga in med ett konto för att synkronisera mellan enheter, men det är inget krav.</string>
+    <string name="paywall_layout_reviews_review_five_title">Fungerar fint och det är enkelt att hitta eller lägga till nya poddar</string>
+    <string name="paywall_layout_reviews_review_four_date">1 jun</string>
+    <string name="paywall_layout_reviews_review_four_message">Synkroniseringsfunktionen är magisk. Jag vet inte vilken slags speciell magi den här appen har, men den är bättre än alla andra appar jag har använt.</string>
+    <string name="paywall_layout_reviews_review_four_title">Fantastisk app</string>
+    <string name="paywall_layout_reviews_review_three_date">9 jun</string>
+    <string name="paywall_layout_reviews_review_three_message">Jag har använt Pocket Casts sedan 2017. \n\nDet här är utan tvekan den bästa appen för att lyssna på podcaster. Det har många funktioner och vidareutvecklas kontinuerligt. Det har förekommit en del klagomål på Ul-bytet, men jag har faktiskt inte märkt av det så mycket. \n\nAppen kan vara så enkel eller svår att använda som du själv vill att den ska vara. Så antingen använder du den bara för att ansluta and spela upp eller så ställer du in hoppa över outro- och intro-timers och alla andra små funktioner du vill aktivera.</string>
+    <string name="paywall_layout_reviews_review_three_title">Bästa podcast-appen där ute</string>
+    <string name="paywall_layout_reviews_review_two_date">15 jun</string>
+    <string name="paywall_layout_reviews_review_two_message">8 år av utmärkt kvalitet och ständiga förbättringar</string>
+    <string name="paywall_layout_reviews_review_two_title">Den oumbärliga podcast-appen</string>
+    <string name="paywall_layout_reviews_review_one_date">10 jul</string>
+    <string name="paywall_layout_reviews_review_one_message">Jag har använt appen länge och omfattningen av funktionalitet och anpassningsmöjligheter som du får med gratisversionen är häpnadsväckande. Jag älskar att den synkroniseras mellan enheter så att jag kan börja lyssna på min telefon och sedan fortsätta på en Alexa-enhet. Jag rekommenderar den till alla som lyssnar på podcaster. Jag älskar även statistiken!</string>
+    <string name="paywall_layout_reviews_review_one_title">Den överlägset bästa podcast-appen</string>
+    <string name="paywall_layout_reviews_see_all_reviews_in_store">Se alla recensioner i Play Store</string>
+    <string name="player_time_remaining">Återstående tid %s</string>
+    <string name="player_played_up_to">Spelades fram till %s</string>
+    <string name="paywall_layout_reviews_rating">4,1 i betyg (5,7 tusen recensioner)</string>
+    <string name="paywall_layout_reviews_stars_content_description">Stjärnor</string>
+    <string name="paywall_layout_reviews_subtitle">Se varför många har uppgraderat till Plus</string>
+    <string name="paywall_layout_reviews_title">\"Helt enkelt det bästa sättet att lyssna på podcaster\"</string>
+    <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Dröm med Slumber Studios-innehåll&lt;/a&gt;</string>
+    <string name="gift">Gåva</string>
+    <string name="share_whats_new_message">Nu kan du dela med dig av dina favoritsekvenser från vilket avsnitt som helst. Vi har även gjort det enklare att dela innehåll till alla appar för sociala medier.</string>
+    <string name="share_whats_new_title">Delning av klipp tillgängligt nu!</string>
     <string name="got_it">Uppfattat</string>
+    <string name="transcript_search">Sök kopia</string>
+    <string name="transcript_close">Stäng kopia</string>
     <string name="onboarding_subscribe_to_plus">Prenumerera på Plus</string>
     <string name="paywall_themes_content_description">Extra teman och ikoner – bild</string>
     <string name="paywall_themes_description">Välj dina egna färger. Exklusiva ikoner och teman för våra prenumeranter.</string>

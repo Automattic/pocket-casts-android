@@ -66,10 +66,15 @@ private const val ARG_MODE = "profile_list_mode"
 
 @AndroidEntryPoint
 class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
-    sealed class Mode(val index: Int, val showMenu: Boolean, val showSearch: Boolean) {
-        data object Downloaded : Mode(0, true, false)
-        data object Starred : Mode(1, false, false)
-        data object History : Mode(2, true, true)
+    sealed class Mode(
+        val index: Int,
+        val showMenu: Boolean,
+        val showSearch: Boolean,
+        val source: SourceView = SourceView.UNKNOWN,
+    ) {
+        data object Downloaded : Mode(0, true, false, SourceView.DOWNLOADS)
+        data object Starred : Mode(1, false, false, SourceView.STARRED)
+        data object History : Mode(2, true, true, SourceView.LISTENING_HISTORY)
     }
 
     companion object {
@@ -193,8 +198,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
         imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).smallSize().themed()
 
-        playButtonListener.source = getAnalyticsEventSource()
-        multiSelectHelper.source = getAnalyticsEventSource()
+        playButtonListener.source = mode.source
+        multiSelectHelper.source = mode.source
     }
 
     override fun onPause() {
@@ -508,11 +513,5 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             Mode.Starred -> AnalyticsEvent.STARRED_MULTI_SELECT_EXITED
         }
         analyticsTracker.track(analyticsEvent)
-    }
-
-    private fun getAnalyticsEventSource() = when (mode) {
-        Mode.Downloaded -> SourceView.DOWNLOADS
-        Mode.Starred -> SourceView.STARRED
-        Mode.History -> SourceView.LISTENING_HISTORY
     }
 }

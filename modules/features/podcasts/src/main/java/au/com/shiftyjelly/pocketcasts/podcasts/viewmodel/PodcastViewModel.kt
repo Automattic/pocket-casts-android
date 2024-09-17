@@ -148,7 +148,7 @@ class PodcastViewModel
                 Flowable.just(it).concatWith(podcastManager.observePodcastByUuid(it.uuid).skip(1))
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { newPodcast ->
+            .doOnNext { newPodcast: Podcast ->
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
                 tintColor.value = theme.getPodcastTintColor(newPodcast)
                 observableHeaderExpanded.value = !newPodcast.isSubscribed

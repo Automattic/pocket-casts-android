@@ -1,5 +1,12 @@
+7.74
+-----
+
+
 7.73
 -----
+*   New Features
+    *   Add local search in listening history
+        ([#2794](https://github.com/Automattic/pocket-casts-android/pull/2794))
 *   Updated
     *   Dark theme improvements on the podcast page
         ([#2811](https://github.com/Automattic/pocket-casts-android/pull/2811))

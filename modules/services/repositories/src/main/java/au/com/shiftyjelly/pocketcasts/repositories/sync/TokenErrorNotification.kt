@@ -25,7 +25,7 @@ open class TokenErrorNotification @Inject constructor(
             analyticsTracker.track(AnalyticsEvent.SIGNED_OUT_ALERT_SHOWN)
         }
 
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentTitle(context.getString(LR.string.token_refresh_sign_in_error_title))

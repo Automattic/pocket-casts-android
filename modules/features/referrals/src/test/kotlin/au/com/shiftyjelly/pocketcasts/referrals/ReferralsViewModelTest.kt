@@ -121,45 +121,6 @@ class ReferralsViewModelTest {
     }
 
     @Test
-    fun `updateBadgeCount decreases badge count when greater than zero`() = runTest {
-        initViewModel() // badge count is 3 by default
-
-        viewModel.onIconClick()
-
-        assertEquals(2, viewModel.state.value.badgeCount)
-    }
-
-    @Test
-    fun `showBadge is true when showIcon is true and badgeCount is greater than zero`() = runTest {
-        initViewModel()
-
-        viewModel.state.test {
-            assertEquals(true, awaitItem().showBadge)
-        }
-    }
-
-    @Test
-    fun `showBadge is false when showIcon is false`() = runTest {
-        initViewModel(SignInState.SignedOut)
-
-        viewModel.state.test {
-            assertEquals(false, awaitItem().showBadge)
-        }
-    }
-
-    @Test
-    fun `showBadge is false when badgeCount is zero`() = runTest {
-        initViewModel()
-        viewModel.onIconClick()
-        viewModel.onIconClick()
-        viewModel.onIconClick()
-
-        viewModel.state.test {
-            assertEquals(false, awaitItem().showBadge)
-        }
-    }
-
-    @Test
     fun `tooltip is shown for paid account on launch`() = runTest {
         initViewModel()
 

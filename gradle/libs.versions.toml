@@ -20,7 +20,7 @@ aboutlibraries = "11.2.1"
 android-gradle-plugin = "8.5.1"
 billing = "7.0.0"
 coil = "2.7.0"
-compose = "2024.09.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
+compose = "2024.02.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 dependency-analysis = "2.0.1"
 espresso = "3.6.1"
 firebase = "30.5.0"
@@ -35,7 +35,7 @@ kotlin = "2.0.20"
 kotlin-coroutines = "1.8.1-Beta"
 ksp = "2.0.20-1.0.24"
 ktlint = "0.50.0"
-lifecycle = "2.8.4"
+lifecycle = "2.8.5"
 lottie = "6.5.0"
 media3 = "1.4.1"
 mockito = "5.12.0"
@@ -75,8 +75,7 @@ compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose"
 compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-material = { module = "androidx.compose.material:material" }
-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-material3-window-size = { module = "androidx.compose.material3:material3-window-size-class-android" }
 compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
@@ -244,7 +243,7 @@ work-test = { module = "androidx.work:work-testing", version.ref = "work" }
 
 # Other dependencies
 androidx-annotation = "androidx.annotation:annotation:1.3.0"
-androidx-appcompat = "androidx.appcompat:appcompat:1.5.0"
+androidx-appcompat = "androidx.appcompat:appcompat:1.7.0"
 androidx-arch-core = "androidx.arch.core:core-testing:2.2.0"
 androidx-browser = "androidx.browser:browser:1.4.0"
 androidx-car = "androidx.car.app:app:1.4.0"
@@ -262,7 +261,7 @@ barista = "com.adevinta.android:barista:4.3.0"
 browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
 capturable = "dev.shreyaspatil:capturable:2.1.0"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
-device-names = "com.jaredrummler:android-device-names:2.1.0"
+device-names = "com.jaredrummler:android-device-names:2.1.1"
 encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
 engage = "com.google.android.engage:engage-core:1.5.4"
 ffmpeg = "com.arthenica:ffmpeg-kit-full:6.0-2"

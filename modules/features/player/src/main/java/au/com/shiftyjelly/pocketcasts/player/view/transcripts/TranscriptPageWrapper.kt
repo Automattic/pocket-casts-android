@@ -19,8 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalRippleConfiguration
-import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -28,7 +27,9 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -166,7 +167,7 @@ fun TranscriptToolbar(
                 .fillMaxSize(),
         ) {
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
-            CompositionLocalProvider(LocalRippleConfiguration provides ToolbarRippleConfiguration) {
+            CompositionLocalProvider(LocalRippleTheme provides ToolbarButtonRippleTheme) {
                 CloseButton(
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -323,16 +324,15 @@ private fun SearchBarTrailingIcons(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
-private val ToolbarRippleConfiguration = RippleConfiguration(
-    color = Color.White,
-    rippleAlpha = RippleAlpha(
-        pressedAlpha = 0.12f,
-        focusedAlpha = 0.12f,
-        draggedAlpha = 0.08f,
-        hoveredAlpha = 0.04f,
-    ),
-)
+private object ToolbarButtonRippleTheme : RippleTheme {
+    @Composable
+    override fun defaultColor() =
+        RippleTheme.defaultRippleColor(Color.White, lightTheme = MaterialTheme.colors.isLight)
+
+    @Composable
+    override fun rippleAlpha(): RippleAlpha =
+        RippleTheme.defaultRippleAlpha(Color.Black, lightTheme = MaterialTheme.colors.isLight)
+}
 
 @Preview("Collapsed search bar", heightDp = 100)
 @Composable

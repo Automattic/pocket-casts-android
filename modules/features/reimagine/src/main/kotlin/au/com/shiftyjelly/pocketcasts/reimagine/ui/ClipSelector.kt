@@ -37,7 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ripple
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -170,7 +170,7 @@ private fun TouchClipSelector(
                     .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
                     .clickable(
                         interactionSource = remember(::MutableInteractionSource),
-                        indication = ripple(color = shareColors.accent),
+                        indication = rememberRipple(color = shareColors.accent),
                         onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
                         role = Role.Button,
                         onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,
@@ -535,7 +535,7 @@ private fun KeyboardClipSelector(
                     .clip(RoundedCornerShape(8.dp))
                     .clickable(
                         interactionSource = remember(::MutableInteractionSource),
-                        indication = ripple(color = shareColors.accent),
+                        indication = rememberRipple(color = shareColors.accent),
                         onClickLabel = stringResource(if (isPlaying) LR.string.pause else LR.string.play),
                         role = Role.Button,
                         onClick = if (isPlaying) listener::onClickPause else listener::onClickPlay,

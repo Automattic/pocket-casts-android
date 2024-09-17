@@ -25,11 +25,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 import androidx.compose.ui.graphics.Color as ComposeColor
 
-private const val NEW_INSTANCE_ARG = "ReferralsSendPassFragmentArgs"
-
 @AndroidEntryPoint
-class ReferralsSendGuestPassFragment : BaseFragment() {
+class ReferralsGuestPassFragment : BaseFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
+    private val pageType get() = args.pageType
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreateView(
@@ -41,12 +40,24 @@ class ReferralsSendGuestPassFragment : BaseFragment() {
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
 
         setBackgroundColor(view, ComposeColor.Transparent.toArgb())
-        ReferralsSendGuestPassPage(
-            passCount = args.passCount,
-            onDismiss = {
-                (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
-            },
-        )
+
+        val onDismiss = {
+            (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
+        }
+
+        when (pageType) {
+            ReferralsPageType.Send -> ReferralsSendGuestPassPage(
+                onDismiss = { onDismiss() },
+            )
+
+            ReferralsPageType.Claim -> ReferralsClaimGuestPassPage(
+                onDismiss = { onDismiss() },
+            )
+
+            ReferralsPageType.InvalidOffer -> ReferralsInvalidOfferPage(
+                onDismiss = { onDismiss() },
+            )
+        }
 
         LaunchedEffect(Unit) {
             if (windowSize.widthSizeClass == WindowWidthSizeClass.Compact ||
@@ -70,16 +81,19 @@ class ReferralsSendGuestPassFragment : BaseFragment() {
 
     @Parcelize
     private class Args(
-        val passCount: Int,
+        val pageType: ReferralsPageType,
     ) : Parcelable
 
     companion object {
-        fun newInstance(
-            passCount: Int,
-        ) = ReferralsSendGuestPassFragment().apply {
-            arguments = bundleOf(
-                NEW_INSTANCE_ARG to Args(passCount),
-            )
+        private const val NEW_INSTANCE_ARG = "ReferralsGuestPassFragment"
+        fun newInstance(pageType: ReferralsPageType) = ReferralsGuestPassFragment().apply {
+            arguments = bundleOf(NEW_INSTANCE_ARG to Args(pageType))
         }
+    }
+
+    enum class ReferralsPageType {
+        Send,
+        Claim,
+        InvalidOffer,
     }
 }

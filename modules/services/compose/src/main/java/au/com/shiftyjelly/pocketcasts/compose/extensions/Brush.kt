@@ -16,3 +16,9 @@ fun rainbowBrush(
     start = start,
     end = end,
 )
+
+val plusBackgroundBrush =
+    Brush.horizontalGradient(
+        0f to Color(0xFFFED745),
+        1f to Color(0xFFFEB525),
+    )
