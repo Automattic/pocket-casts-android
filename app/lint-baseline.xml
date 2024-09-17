@@ -167,39 +167,6 @@
     </issue>
 
     <issue
-        id="SpecifyForegroundServiceType"
-        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
-        errorLine1="            ForegroundInfo("
-        errorLine2="            ^">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/task/DownloadEpisodeTask.kt"
-            line="198"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="SpecifyForegroundServiceType"
-        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
-        errorLine1="            ForegroundInfo(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/download/FixDownloadsWorker.kt"
-            line="74"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="SpecifyForegroundServiceType"
-        message="Missing dataSync foregroundServiceType in the AndroidManifest.xml"
-        errorLine1="            ForegroundInfo("
-        errorLine2="            ^">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/repositories/opml/OpmlImportTask.kt"
-            line="288"
-            column="13"/>
-    </issue>
-
-    <issue
         id="DiffUtilEquals"
         message="Suspicious equality check: `equals()` is not implemented in Object"
         errorLine1="        return oldItem == newItem"
