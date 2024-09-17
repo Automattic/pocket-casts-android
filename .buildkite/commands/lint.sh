@@ -1,5 +1,11 @@
 #!/bin/bash -u
 
+echo "--- :rubygems: Setting up Gems"
+install_gems
+
+echo "--- :closed_lock_with_key: Installing Secrets"
+bundle exec fastlane run configure_apply
+
 echo "--- 🧹 Linting"
 # Run lint on app module first, to make sure that the lint-results-debug.sarif file is always generated
 ./gradlew :app:lintRelease
