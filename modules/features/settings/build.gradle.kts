@@ -30,7 +30,6 @@ dependencies {
     api(libs.automattic.crashlogging)
     api(libs.dagger.hilt.android)
     api(libs.material)
-    api(libs.showkase)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.compose)
@@ -48,7 +47,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.compose.animation)
     implementation(libs.compose.material)
-    implementation(libs.compose.material.icons.extended)
+    implementation(libs.compose.material.icons)
     implementation(libs.compose.rxjava2)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
@@ -70,6 +69,7 @@ dependencies {
     implementation(libs.rx2.java)
     implementation(libs.rx2.kotlin)
     implementation(libs.rx2.relay)
+    implementation(libs.showkase)
     implementation(libs.timber)
 
     implementation(projects.modules.services.images)

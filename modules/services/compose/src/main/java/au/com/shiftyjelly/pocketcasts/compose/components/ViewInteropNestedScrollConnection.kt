@@ -180,7 +180,7 @@ private fun toOffset(consumed: IntArray, originalOffset: Offset): Offset {
 }
 
 private fun NestedScrollSource.toViewType(): Int = when (this) {
-    NestedScrollSource.UserInput -> TYPE_TOUCH
+    NestedScrollSource.Drag -> TYPE_TOUCH
     else -> TYPE_NON_TOUCH
 }
 

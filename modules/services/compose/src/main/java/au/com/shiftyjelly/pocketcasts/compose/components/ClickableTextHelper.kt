@@ -1,11 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -32,16 +32,16 @@ data class Clickable(
 fun ClickableTextHelper(
     text: String,
     clickables: List<Clickable>,
-    lineHeight: TextUnit,
-    modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Start,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    lineHeight: TextUnit,
+    textAlign: TextAlign = TextAlign.Start,
+    modifier: Modifier = Modifier,
 ) {
-    data class TextData constructor(
+    data class TextData(
         val text: String,
         val tag: String? = null,
         val data: String? = null,
-        val onClick: ((data: String) -> Unit)? = null,
+        val onClick: ((data: AnnotatedString.Range<String>) -> Unit)? = null,
     )
 
     val textData = mutableListOf<TextData>()
@@ -68,7 +68,9 @@ fun ClickableTextHelper(
                         text = link.text,
                         tag = "${link.text}_TAG",
                         data = link.data,
-                        onClick = { link.onClick(it) },
+                        onClick = {
+                            link.onClick(it.item)
+                        },
                     ),
                 )
                 startIndex = endIndex + link.text.length
@@ -86,13 +88,9 @@ fun ClickableTextHelper(
     val annotatedString = buildAnnotatedString {
         textData.forEach { linkTextData ->
             if (linkTextData.tag != null && linkTextData.data != null) {
-                pushLink(
-                    LinkAnnotation.Url(
-                        url = linkTextData.data,
-                        linkInteractionListener = { _ ->
-                            linkTextData.onClick?.invoke(linkTextData.data)
-                        },
-                    ),
+                pushStringAnnotation(
+                    tag = linkTextData.tag,
+                    annotation = linkTextData.data,
                 )
                 withStyle(
                     style = SpanStyle(
@@ -108,7 +106,7 @@ fun ClickableTextHelper(
         }
     }
 
-    BasicText(
+    ClickableText(
         text = annotatedString,
         style = TextStyle(
             color = color,
@@ -117,6 +115,19 @@ fun ClickableTextHelper(
             fontWeight = FontWeight.Normal,
             textAlign = textAlign,
         ),
+        onClick = { offset ->
+            textData.forEach { annotatedStringData ->
+                if (annotatedStringData.tag != null && annotatedStringData.data != null) {
+                    annotatedString.getStringAnnotations(
+                        tag = annotatedStringData.tag,
+                        start = offset,
+                        end = offset,
+                    ).firstOrNull()?.let {
+                        annotatedStringData.onClick?.invoke(it)
+                    }
+                }
+            }
+        },
         modifier = modifier,
     )
 }
