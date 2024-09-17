@@ -54,6 +54,10 @@ fun ReferralsClaimGuestPassBannerCard(
             (activity as FragmentHostListener).showBottomSheet(fragment)
         },
     )
+
+    activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name)?.let {
+        (activity as FragmentHostListener).showBottomSheet(it)
+    }
 }
 
 @Composable
