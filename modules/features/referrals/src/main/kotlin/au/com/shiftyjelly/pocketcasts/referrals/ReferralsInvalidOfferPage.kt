@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
@@ -109,11 +108,7 @@ private fun ReferralsInvalidOfferPageContent(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
             ) {
-                CloseButton(
-                    modifier = Modifier
-                        .align(Alignment.End),
-                    onClick = onDismiss,
-                )
+                Spacer(modifier = Modifier.height(48.dp))
 
                 SubscriptionBadge(
                     fontSize = 16.sp,
