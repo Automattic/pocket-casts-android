@@ -2146,7 +2146,7 @@
     <string name="referrals_send_guest_pass_card_title">2-Month Guest Pass</string>
     <string name="referrals_share_guest_pass">Share Guest Pass</string>
     <string name="referrals_share_subject">2-Month Guest Pass for Pocket&#160;Casts</string>
-    <string name="referrals_share_text_with_url">Hey, check out Pocket&#160;Casts! Use the link below to get a 2-month guest pass for Pocket&#160;Casts&#160;Plus and enjoy podcasts across all your devices!\n\n%1$s</string>
+    <string name="referrals_share_text_with_url">Hey! Use the link below to claim your 2-month guest pass for Pocket&#160;Casts&#160;Plus and enjoy podcasts across all your devices!\n\n%1$s</string>
     <string name="referrals_tooltip_message">Gift 2 months of Pocket&#160;Casts&#160;Plus!</string>
 
 </resources>
