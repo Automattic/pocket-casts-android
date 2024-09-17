@@ -1,7 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import android.Manifest
 import android.app.Notification
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 
 interface PlayerNotificationManager {
@@ -9,7 +12,7 @@ interface PlayerNotificationManager {
     fun notify(notificationId: Int, notification: Notification)
 }
 
-class PlayerNotificationManagerImpl(context: Context) : PlayerNotificationManager {
+class PlayerNotificationManagerImpl(private val context: Context) : PlayerNotificationManager {
     private val notificationManager = NotificationManagerCompat.from(context)
 
     override fun enteredForeground(notification: Notification) {
@@ -17,6 +20,8 @@ class PlayerNotificationManagerImpl(context: Context) : PlayerNotificationManage
     }
 
     override fun notify(notificationId: Int, notification: Notification) {
-        notificationManager.notify(notificationId, notification)
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            notificationManager.notify(notificationId, notification)
+        }
     }
 }
