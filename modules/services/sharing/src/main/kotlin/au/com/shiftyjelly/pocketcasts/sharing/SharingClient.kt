@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_STREAM
+import android.content.Intent.EXTRA_SUBJECT
 import android.content.Intent.EXTRA_TEXT
 import android.content.Intent.EXTRA_TITLE
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -100,14 +101,18 @@ class SharingClient(
                 )
             }
             WhatsApp, Telegram, X, Tumblr, More -> {
-                Intent()
+                val intent = Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("text/plain")
                     .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
                     .putExtra(EXTRA_TITLE, data.sharingTitle())
+                    .putExtra(EXTRA_SUBJECT, data.sharingSubject())
                     .setPackage(platform.packageId)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-                    .setPodcastCover(data.podcast)
+                data.podcast?.let {
+                    intent.setPodcastCover(it)
+                }
+                intent
                     .toChooserIntent()
                     .share()
                 SharingResponse(
@@ -289,6 +294,16 @@ data class SharingRequest internal constructor(
         ) = Builder(Data.ClipVideo(podcast, episode, range))
             .setCardType(cardType)
             .setBackgroundImage(backgroundImage)
+
+        fun webLink(
+            textWithUrl: String,
+            subject: String,
+        ) = Builder(
+            Data.WebLink(
+                textWithUrl = textWithUrl,
+                subject = subject,
+            ),
+        )
     }
 
     class Builder internal constructor(
@@ -329,11 +344,13 @@ data class SharingRequest internal constructor(
 
         fun sharingTitle(): String
 
+        fun sharingSubject(): String
+
         @StringRes fun linkDescription(): Int
     }
 
     sealed interface Data {
-        val podcast: PodcastModel
+        val podcast: PodcastModel?
 
         class Podcast internal constructor(
             override val podcast: PodcastModel,
@@ -341,6 +358,8 @@ data class SharingRequest internal constructor(
             override fun sharingUrl(host: String) = "$host/podcast/${podcast.uuid}"
 
             override fun sharingTitle() = podcast.title
+
+            override fun sharingSubject() = podcast.title
 
             override fun linkDescription() = LR.string.share_link_podcast
 
@@ -354,6 +373,8 @@ data class SharingRequest internal constructor(
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}"
 
             override fun sharingTitle() = episode.title
+
+            override fun sharingSubject() = episode.title
 
             override fun linkDescription() = LR.string.share_link_episode
 
@@ -369,6 +390,8 @@ data class SharingRequest internal constructor(
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${position.inWholeSeconds}"
 
             override fun sharingTitle() = episode.title
+
+            override fun sharingSubject() = episode.title
 
             override fun linkDescription() = when (type) {
                 TimestampType.Episode -> LR.string.share_link_episode_position
@@ -411,6 +434,23 @@ data class SharingRequest internal constructor(
             val range: Clip.Range,
         ) : Data {
             override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.start.toSecondsWithSingleMilli()}, end=${range.end.toSecondsWithSingleMilli()})"
+        }
+
+        class WebLink internal constructor(
+            override val podcast: PodcastModel? = null,
+            val textWithUrl: String,
+            val subject: String,
+        ) : Data, Sociable {
+
+            override fun sharingUrl(host: String) = textWithUrl
+
+            override fun sharingTitle() = ""
+
+            override fun sharingSubject() = subject
+
+            override fun linkDescription() = LR.string.share
+
+            override fun toString() = "Link(textWithLink=$textWithUrl, subject=$subject)"
         }
     }
 }

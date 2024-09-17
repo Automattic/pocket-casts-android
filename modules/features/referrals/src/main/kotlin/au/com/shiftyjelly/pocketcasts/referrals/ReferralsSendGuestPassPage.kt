@@ -24,6 +24,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,24 +45,41 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
+import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ReferralsSendGuestPassPage(
+    sharingClient: SharingClient,
     onDismiss: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
+        val scope = rememberCoroutineScope()
+
+        val shareSubject = stringResource(LR.string.referrals_share_subject)
+        val shareTextWitUrl = stringResource(LR.string.referrals_share_text_with_url, "https://pocketcasts.com")
 
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
+            onShare = {
+                val request = SharingRequest.webLink(
+                    textWithUrl = shareTextWitUrl,
+                    subject = shareSubject,
+                ).build()
+                scope.launch {
+                    sharingClient.share(request)
+                }
+            },
         )
     }
 }
@@ -71,6 +89,7 @@ private fun ReferralsSendGuestPassContent(
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
     onDismiss: () -> Unit,
+    onShare: () -> Unit,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -153,7 +172,7 @@ private fun ReferralsSendGuestPassContent(
                     textColor = Color.Black,
                     gradientBackgroundColor = plusBackgroundBrush,
                     modifier = Modifier.padding(16.dp),
-                    onClick = {},
+                    onClick = onShare,
                 )
             }
         }
@@ -231,6 +250,7 @@ fun ReferralsSendGuestPassContentPreview(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
             onDismiss = {},
+            onShare = {},
         )
     }
 }

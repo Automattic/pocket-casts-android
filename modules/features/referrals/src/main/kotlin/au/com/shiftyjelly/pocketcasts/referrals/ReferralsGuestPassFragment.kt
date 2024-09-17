@@ -16,12 +16,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil.setBackgroundColor
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import androidx.compose.ui.graphics.Color as ComposeColor
 
@@ -29,6 +31,9 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 class ReferralsGuestPassFragment : BaseFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
     private val pageType get() = args.pageType
+
+    @Inject
+    lateinit var sharingClient: SharingClient
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreateView(
@@ -46,9 +51,12 @@ class ReferralsGuestPassFragment : BaseFragment() {
         }
 
         when (pageType) {
-            ReferralsPageType.Send -> ReferralsSendGuestPassPage(
-                onDismiss = { onDismiss() },
-            )
+            ReferralsPageType.Send -> {
+                ReferralsSendGuestPassPage(
+                    sharingClient = sharingClient,
+                    onDismiss = { onDismiss() },
+                )
+            }
 
             ReferralsPageType.Claim -> ReferralsClaimGuestPassPage(
                 onDismiss = { onDismiss() },

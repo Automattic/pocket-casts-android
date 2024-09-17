@@ -31,6 +31,7 @@ internal class SharingAnalytics(
         is SharingRequest.Data.ClipLink -> "clip_link"
         is SharingRequest.Data.ClipAudio -> "clip_audio"
         is SharingRequest.Data.ClipVideo -> "clip_video"
+        is SharingRequest.Data.WebLink -> "web_link"
     }
 
     private val SocialPlatform.analyticsValue get() = when (this) {
