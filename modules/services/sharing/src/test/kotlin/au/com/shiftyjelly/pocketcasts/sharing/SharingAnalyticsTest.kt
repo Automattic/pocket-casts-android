@@ -437,6 +437,16 @@ class SharingAnalyticsTest {
         event.assertProperty("card_type", null)
     }
 
+    @Test
+    fun `log web link type property`() {
+        val request = SharingRequest.webLink("Share text: https://pocketcasts.com/","Subject").build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertProperty("type", "web_link")
+    }
+
     class TestTracker : Tracker {
         private val _events = mutableListOf<TrackEvent>()
 
