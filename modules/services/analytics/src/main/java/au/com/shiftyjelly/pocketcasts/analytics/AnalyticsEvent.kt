@@ -650,4 +650,7 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_SEARCH_SHOWN("transcript_search_shown"),
     TRANSCRIPT_SEARCH_NEXT_RESULT("transcript_search_next_result"),
     TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
+
+    /* Referrals */
+    REFERRAL_LINK_SHARED("referral_link_shared"),
 }
