@@ -299,7 +299,7 @@ data class SharingRequest internal constructor(
             textWithUrl: String,
             subject: String,
         ) = Builder(
-            Data.WebLink(
+            Data.ReferralLink(
                 textWithUrl = textWithUrl,
                 subject = subject,
             ),
@@ -436,7 +436,7 @@ data class SharingRequest internal constructor(
             override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.start.toSecondsWithSingleMilli()}, end=${range.end.toSecondsWithSingleMilli()})"
         }
 
-        class WebLink internal constructor(
+        class ReferralLink internal constructor(
             val textWithUrl: String,
             val subject: String,
         ) : Data, Sociable {
@@ -449,7 +449,7 @@ data class SharingRequest internal constructor(
 
             override fun linkDescription() = LR.string.share
 
-            override fun toString() = "WebLink(textWithLink=$textWithUrl, subject=$subject)"
+            override fun toString() = "ReferralLink(textWithLink=$textWithUrl, subject=$subject)"
         }
     }
 }
