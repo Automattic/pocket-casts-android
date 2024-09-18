@@ -245,12 +245,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
             // If we have switched to casting we need to remove the notification
             if (isForegroundService && notification == null && playbackManager.isPlaybackRemote()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                } else {
-                    @Suppress("DEPRECATION")
-                    stopForeground(true)
-                }
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground as player is remote")
             }
 
