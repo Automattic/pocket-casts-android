@@ -6,10 +6,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 internal class SharingAnalytics(
     private val tracker: AnalyticsTracker,
 ) : SharingClient.Listener {
-    override fun onShare(request: SharingRequest) {
+    override fun onShare(
+        request: SharingRequest,
+        event: AnalyticsEvent,
+        eventProperties: Map<String, Any>,
+    ) {
         tracker.track(
-            AnalyticsEvent.PODCAST_SHARED,
-            buildMap {
+            event,
+            eventProperties + buildMap {
                 put("source", request.source.analyticsValue)
                 put("type", request.data.analyticsValue)
                 put("action", request.platform.analyticsValue)
@@ -31,7 +35,7 @@ internal class SharingAnalytics(
         is SharingRequest.Data.ClipLink -> "clip_link"
         is SharingRequest.Data.ClipAudio -> "clip_audio"
         is SharingRequest.Data.ClipVideo -> "clip_video"
-        is SharingRequest.Data.ReferralLink -> "web_link"
+        is SharingRequest.Data.ReferralLink -> "referral_link"
     }
 
     private val SocialPlatform.analyticsValue get() = when (this) {

@@ -15,6 +15,7 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -61,8 +62,18 @@ class SharingClient(
 ) {
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = false).smallSize()
 
-    suspend fun share(request: SharingRequest): SharingResponse {
-        listeners.forEach { it.onShare(request) }
+    suspend fun share(
+        request: SharingRequest,
+        event: AnalyticsEvent = AnalyticsEvent.PODCAST_SHARED,
+        eventProperties: Map<String, Any> = emptyMap(),
+    ): SharingResponse {
+        listeners.forEach {
+            it.onShare(
+                request = request,
+                event = event,
+                eventProperties = eventProperties,
+            )
+        }
         val response = try {
             request.tryShare()
         } catch (error: Throwable) {
@@ -72,7 +83,14 @@ class SharingClient(
                 error = error,
             )
         }
-        listeners.forEach { it.onShared(request, response) }
+        listeners.forEach {
+            it.onShared(
+                request = request,
+                response = response,
+                event = event,
+                eventProperties = eventProperties,
+            )
+        }
         return response
     }
 
@@ -257,8 +275,8 @@ class SharingClient(
     private fun Intent.setExtraStream(file: File) = putExtra(EXTRA_STREAM, FileUtil.createUriWithReadPermissions(context, file, this))
 
     interface Listener {
-        fun onShare(request: SharingRequest) = Unit
-        fun onShared(request: SharingRequest, response: SharingResponse) = Unit
+        fun onShare(request: SharingRequest, event: AnalyticsEvent, eventProperties: Map<String, Any>) = Unit
+        fun onShared(request: SharingRequest, response: SharingResponse, event: AnalyticsEvent, eventProperties: Map<String, Any>) = Unit
     }
 }
 
