@@ -56,7 +56,7 @@ class DeepLinkFactory(
         SignInAdapter(shareHost),
         ShareLinkAdapter(shareHost),
         OpmlAdapter(listOf(listHost, shareHost)),
-        PodcastUrlSchemeAdapter(listOf(listHost, shareHost)),
+        PodcastUrlSchemeAdapter(listOf(listHost, shareHost, webBaseHost)),
         PlayFromSearchAdapter(),
         AssistantAdapter(),
     )
