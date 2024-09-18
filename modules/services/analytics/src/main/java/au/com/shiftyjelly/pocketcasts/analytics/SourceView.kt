@@ -40,6 +40,7 @@ enum class SourceView(val analyticsValue: String) {
     PODCAST_SCREEN("podcast_screen"),
     PODCAST_SETTINGS("podcast_settings"),
     PROFILE("profile"),
+    REFERRALS("referrals"),
     SEARCH("search"),
     SEARCH_RESULTS("search_results"),
     SHARE_LIST("share_list"),
