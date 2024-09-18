@@ -43,7 +43,7 @@
 # ███████ ███████  ██████  ██   ██  ██████    ██         ██████  ██████  ██   ████ ██      ██  ██████
 #
 # Configuration under this block is a legacy config that needs to be properly tested before removing.
-# If work on any of the entries please move it to above and add an appropriate comment on what it does and why do we keep it.
+# If you work on any of the entries please move them above and add an appropriate comment on what they do and why do we keep them.
 
 # No explanation was provided for this rule
 -keep public class android.support.v4.media.session.** { *; }
