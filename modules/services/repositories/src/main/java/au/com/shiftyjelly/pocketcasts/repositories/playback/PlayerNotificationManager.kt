@@ -10,7 +10,7 @@ interface PlayerNotificationManager {
     fun notify(notificationId: Int, notification: Notification)
 }
 
-class PlayerNotificationManagerImpl(private val context: Context) : PlayerNotificationManager {
+class PlayerNotificationManagerImpl(context: Context) : PlayerNotificationManager {
     private val notificationManager = NotificationManagerCompat.from(context)
 
     override fun enteredForeground(notification: Notification) {
