@@ -265,8 +265,6 @@ class SharingClient(
     }
 }
 
-typealias AnalyticsData = Pair<AnalyticsEvent, Map<String, String>>
-
 @ConsistentCopyVisibility
 data class SharingRequest internal constructor(
     val data: Data,
@@ -274,7 +272,8 @@ data class SharingRequest internal constructor(
     val cardType: CardType?,
     val backgroundImage: File?,
     val source: SourceView,
-    val analyticsData: AnalyticsData,
+    val analyticsEvent: AnalyticsEvent,
+    val analyticsProperties: Map<String, Any>,
 ) {
     companion object {
         fun podcast(
@@ -332,12 +331,8 @@ data class SharingRequest internal constructor(
                 referralCode = referralCode,
             ),
         )
-            .setAnalyticsData(
-                AnalyticsData(
-                    AnalyticsEvent.REFERRAL_LINK_SHARED,
-                    mapOf("code" to referralCode),
-                ),
-            )
+            .setAnalyticsEvent(AnalyticsEvent.REFERRAL_LINK_SHARED)
+            .setAnalyticProperties(mapOf("code" to referralCode))
     }
 
     class Builder internal constructor(
@@ -347,7 +342,8 @@ data class SharingRequest internal constructor(
         private var cardType: CardType? = null
         private var source = SourceView.UNKNOWN
         private var backgroundImage: File? = null
-        private var analyticsData: AnalyticsData = AnalyticsEvent.PODCAST_SHARED to emptyMap()
+        private var analyticsEvent: AnalyticsEvent = AnalyticsEvent.PODCAST_SHARED
+        private var analyticsProperties: Map<String, Any> = emptyMap()
 
         fun setPlatform(platform: SocialPlatform) = apply {
             this.platform = platform
@@ -365,8 +361,12 @@ data class SharingRequest internal constructor(
             this.backgroundImage = backgroundImage
         }
 
-        fun setAnalyticsData(analyticsData: AnalyticsData) = apply {
-            this.analyticsData = analyticsData
+        fun setAnalyticsEvent(analyticsEvent: AnalyticsEvent) = apply {
+            this.analyticsEvent = analyticsEvent
+        }
+
+        fun setAnalyticProperties(properties: Map<String, Any>) = apply {
+            this.analyticsProperties = properties
         }
 
         fun build() = SharingRequest(
@@ -375,7 +375,8 @@ data class SharingRequest internal constructor(
             cardType = cardType,
             backgroundImage = backgroundImage,
             source = source,
-            analyticsData = analyticsData,
+            analyticsEvent = analyticsEvent,
+            analyticsProperties = analyticsProperties,
         )
     }
 

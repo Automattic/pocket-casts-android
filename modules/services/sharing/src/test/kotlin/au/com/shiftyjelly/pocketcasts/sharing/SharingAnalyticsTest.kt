@@ -442,7 +442,6 @@ class SharingAnalyticsTest {
         val referralCode = "TEST_CODE"
         val request = SharingRequest.referralLink(referralCode)
             .setSourceView(SourceView.REFERRALS)
-            .setAnalyticsData(AnalyticsData(AnalyticsEvent.REFERRAL_LINK_SHARED, mapOf("code" to referralCode)))
             .build()
 
         analytics.onShare(request)

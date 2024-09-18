@@ -6,11 +6,10 @@ internal class SharingAnalytics(
     private val tracker: AnalyticsTracker,
 ) : SharingClient.Listener {
     override fun onShare(request: SharingRequest) {
-        val (analyticsEvent, analyticsProperties) = request.analyticsData
         tracker.track(
-            analyticsEvent,
+            request.analyticsEvent,
             buildMap {
-                putAll(analyticsProperties)
+                putAll(request.analyticsProperties)
                 put("source", request.source.analyticsValue)
                 put("type", request.data.analyticsValue)
                 put("action", request.platform.analyticsValue)
