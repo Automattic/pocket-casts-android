@@ -391,9 +391,7 @@
     <style name="ThemeLight" parent="ThemeBaseLight" tools:ignore="NewApi">
         <!-- For older APIs, leave the status bar as black, always since the APIs to tint the icons don't exist -->
         <item name="android:navigationBarColor">@color/black</item>
-
-        <!-- Only 23 and above support having a light status bar using windowLightStatusBar. There are other hacks, but too hard so just black for 21,22 -->
-        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:statusBarColor">@color/white</item>
     </style>
 
     <style name="LightToolbarTheme" parent="ThemeOverlay.AppCompat.Light"></style>
@@ -731,6 +729,7 @@
 
     <style name="BaseClassicLight" parent="ThemeBaseLight">
         <item name="toolbarTheme">@style/ClassicLight.Toolbar</item>
+        <item name="android:statusBarColor">@color/black</item>
 
         <!-- Classic light theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
         <item name="primary_ui_01">#FFFFFF</item>

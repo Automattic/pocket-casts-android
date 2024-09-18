@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.graphics.Canvas
-import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
@@ -404,15 +403,13 @@ private abstract class SwipeToArchiveCallback : MultiSwipeHelper.SimpleCallback(
         view: View,
         isCurrentlyActive: Boolean,
     ) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (isCurrentlyActive) {
-                var originalElevation: Any? = view.getTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation)
-                if (originalElevation == null) {
-                    originalElevation = ViewCompat.getElevation(view)
-                    val newElevation = 1f + findMaxElevation(recyclerView, view)
-                    ViewCompat.setElevation(view, newElevation)
-                    view.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, originalElevation)
-                }
+        if (isCurrentlyActive) {
+            var originalElevation: Any? = view.getTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation)
+            if (originalElevation == null) {
+                originalElevation = ViewCompat.getElevation(view)
+                val newElevation = 1f + findMaxElevation(recyclerView, view)
+                ViewCompat.setElevation(view, newElevation)
+                view.setTag(androidx.recyclerview.R.id.item_touch_helper_previous_elevation, originalElevation)
             }
         }
     }
