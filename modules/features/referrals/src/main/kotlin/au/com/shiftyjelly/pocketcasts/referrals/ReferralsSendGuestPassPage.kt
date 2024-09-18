@@ -35,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
@@ -45,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
+import au.com.shiftyjelly.pocketcasts.sharing.AnalyticsData
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -69,9 +72,13 @@ fun ReferralsSendGuestPassPage(
             windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
             onShare = {
+                val referralCode = "test_code" // TODO - Referrals: Make it dynamic
                 val request = SharingRequest.referralLink(
-                    referralCode = "test_code", // TODO - Referrals: Make it dynamic
-                ).build()
+                    referralCode = referralCode,
+                )
+                    .setSourceView(SourceView.REFERRALS)
+                    .setAnalyticsData(AnalyticsData(AnalyticsEvent.REFERRAL_LINK_SHARED, mapOf("code" to referralCode)))
+                    .build()
                 scope.launch {
                     sharingClient.share(request)
                 }

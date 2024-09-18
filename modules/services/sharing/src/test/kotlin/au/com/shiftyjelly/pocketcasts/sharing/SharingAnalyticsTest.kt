@@ -437,6 +437,28 @@ class SharingAnalyticsTest {
         event.assertProperty("card_type", null)
     }
 
+    @Test
+    fun `log referral link sharing`() {
+        val referralCode = "TEST_CODE"
+        val request = SharingRequest.referralLink(referralCode)
+            .setSourceView(SourceView.REFERRALS)
+            .setAnalyticsData(AnalyticsData(AnalyticsEvent.REFERRAL_LINK_SHARED, mapOf("code" to referralCode)))
+            .build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.REFERRAL_LINK_SHARED)
+        event.assertProperties(
+            mapOf(
+                "code" to referralCode,
+                "type" to "referral_link",
+                "action" to "system_sheet",
+                "source" to "referrals",
+            ),
+        )
+    }
+
     class TestTracker : Tracker {
         private val _events = mutableListOf<TrackEvent>()
 

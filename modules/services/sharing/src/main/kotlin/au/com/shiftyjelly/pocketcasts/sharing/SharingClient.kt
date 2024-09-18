@@ -15,6 +15,7 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -264,6 +265,8 @@ class SharingClient(
     }
 }
 
+typealias AnalyticsData = Pair<AnalyticsEvent, Map<String, String>>
+
 @ConsistentCopyVisibility
 data class SharingRequest internal constructor(
     val data: Data,
@@ -271,6 +274,7 @@ data class SharingRequest internal constructor(
     val cardType: CardType?,
     val backgroundImage: File?,
     val source: SourceView,
+    val analyticsData: AnalyticsData,
 ) {
     companion object {
         fun podcast(
@@ -337,6 +341,7 @@ data class SharingRequest internal constructor(
         private var cardType: CardType? = null
         private var source = SourceView.UNKNOWN
         private var backgroundImage: File? = null
+        private var analyticsData: AnalyticsData = AnalyticsEvent.PODCAST_SHARED to emptyMap()
 
         fun setPlatform(platform: SocialPlatform) = apply {
             this.platform = platform
@@ -354,12 +359,17 @@ data class SharingRequest internal constructor(
             this.backgroundImage = backgroundImage
         }
 
+        fun setAnalyticsData(analyticsData: AnalyticsData) = apply {
+            this.analyticsData = analyticsData
+        }
+
         fun build() = SharingRequest(
             data = data,
             platform = platform,
             cardType = cardType,
             backgroundImage = backgroundImage,
             source = source,
+            analyticsData = analyticsData,
         )
     }
 
