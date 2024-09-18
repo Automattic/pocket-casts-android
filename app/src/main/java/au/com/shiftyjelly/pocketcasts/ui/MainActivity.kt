@@ -137,6 +137,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -1346,6 +1348,9 @@ class MainActivity :
     }
 
     private fun openReferralClaim(code: String) {
+        if (!FeatureFlag.isEnabled(Feature.REFERRALS)) {
+            return
+        }
         // TODO decide where to store the referral code
         Timber.i("Referral code: $code")
         val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
