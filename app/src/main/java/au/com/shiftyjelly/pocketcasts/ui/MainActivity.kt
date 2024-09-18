@@ -57,7 +57,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteReferralDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
@@ -104,6 +105,7 @@ import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
@@ -1286,8 +1288,11 @@ class MainActivity :
                         }
                     }
                 }
-                is PocketCastsWebsiteDeepLink -> {
+                is PocketCastsWebsiteGetDeepLink -> {
                     // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
+                }
+                is PocketCastsWebsiteReferralDeepLink -> {
+                    openReferralClaim(deepLink.code)
                 }
                 is ShowPodcastFromUrlDeepLink -> {
                     openPodcastUrl(deepLink.url)
@@ -1338,6 +1343,13 @@ class MainActivity :
             Timber.e(e)
             crashLogging.sendReport(e)
         }
+    }
+
+    private fun openReferralClaim(code: String) {
+        // TODO decide where to store the referral code
+        Timber.i("Referral code: $code")
+        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
+        showBottomSheet(fragment)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

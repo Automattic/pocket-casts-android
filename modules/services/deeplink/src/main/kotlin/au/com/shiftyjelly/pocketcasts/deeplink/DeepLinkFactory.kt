@@ -41,7 +41,8 @@ class DeepLinkFactory(
         ShowPodcastAdapter(),
         ShowEpisodeAdapter(),
         ShowPageAdapter(),
-        PocketCastsWebsiteAdapter(webBaseHost),
+        PocketCastsWebsiteGetAdapter(webBaseHost),
+        PocketCastsWebsiteReferralAdapter(webBaseHost),
         PodloveAdapter(),
         SonosAdapter(),
         ShareListAdapter(listHost),
@@ -49,7 +50,7 @@ class DeepLinkFactory(
         SubscribeOnAndroidAdapter(),
         AppleAdapter(),
         CloudFilesAdapter(),
-        UpdageAccountAdapter(),
+        UpgradeAccountAdapter(),
         PromoCodeAdapter(),
         ShareLinkNativeAdapter(),
         SignInAdapter(shareHost),
@@ -176,13 +177,37 @@ private class ShowPageAdapter : DeepLinkAdapter {
     }
 }
 
-private class PocketCastsWebsiteAdapter(
+private class PocketCastsWebsiteGetAdapter(
     private val webBaseHost: String,
 ) : DeepLinkAdapter {
-    override fun create(intent: Intent) = if (intent.action == ACTION_VIEW && intent.data?.host == webBaseHost) {
-        PocketCastsWebsiteDeepLink
-    } else {
-        null
+    override fun create(intent: Intent): DeepLink? {
+        val data = intent.data ?: return null
+        val pathSegments = data.pathSegments
+
+        return if (intent.action == ACTION_VIEW && data.host == webBaseHost && pathSegments.isNotEmpty() && pathSegments.first() == "get") {
+            PocketCastsWebsiteGetDeepLink
+        } else {
+            null
+        }
+    }
+}
+
+private class PocketCastsWebsiteReferralAdapter(
+    private val webBaseHost: String,
+) : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val data = intent.data ?: return null
+        val pathSegments = data.pathSegments
+
+        return if (intent.action == ACTION_VIEW &&
+            data.host == webBaseHost &&
+            pathSegments.size == 2 &&
+            pathSegments.first() == "redeem-guest-pass"
+        ) {
+            PocketCastsWebsiteReferralDeepLink(code = pathSegments.last())
+        } else {
+            null
+        }
     }
 }
 
@@ -300,7 +325,7 @@ private class CloudFilesAdapter : DeepLinkAdapter {
     }
 }
 
-private class UpdageAccountAdapter : DeepLinkAdapter {
+private class UpgradeAccountAdapter : DeepLinkAdapter {
     override fun create(intent: Intent): DeepLink? {
         val uriData = intent.data
         val scheme = uriData?.scheme

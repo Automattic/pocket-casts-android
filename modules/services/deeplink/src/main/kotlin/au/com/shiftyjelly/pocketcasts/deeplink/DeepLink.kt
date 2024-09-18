@@ -173,7 +173,7 @@ data class ShowFilterDeepLink(
         .putExtra(EXTRA_FILTER_ID, filterId)
 }
 
-data object PocketCastsWebsiteDeepLink : DeepLink
+data object PocketCastsWebsiteGetDeepLink : DeepLink
 
 data class ShowPodcastFromUrlDeepLink(
     val url: String,
@@ -243,6 +243,10 @@ data class SignInDeepLink(
             .build()
     }
 }
+
+data class PocketCastsWebsiteReferralDeepLink(
+    val code: String,
+) : DeepLink
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
