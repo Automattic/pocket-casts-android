@@ -962,7 +962,7 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun pocketCastsWebsiteReferralDeepLink() {
+    fun referralDeepLink() {
         val intent = Intent()
             .setAction(ACTION_VIEW)
             .setData(Uri.parse("https://pocketcasts.com/redeem-guest-pass/abc"))

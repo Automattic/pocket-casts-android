@@ -246,7 +246,17 @@ data class SignInDeepLink(
 
 data class ReferralsDeepLink(
     val code: String,
-) : DeepLink
+) : UriDeepLink {
+    // Use the marketing website as the share host, for example https://pocketcsts.com/redeem-guest-pass/abc
+    override fun toUri(shareHost: String): Uri {
+        return Uri.Builder()
+            .scheme("https")
+            .authority(shareHost)
+            .appendPath("redeem-guest-pass")
+            .appendPath(code)
+            .build()
+    }
+}
 
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
