@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.content.Context
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 
 interface PlayerNotificationManager {
@@ -19,9 +17,10 @@ class PlayerNotificationManagerImpl(private val context: Context) : PlayerNotifi
         // Not used, just used for a testing point
     }
 
+    // Media-session notifications are exempt from the permission.
+    // https://developer.android.com/develop/ui/views/notifications/notification-permission#exemptions-media-sessions
+    @SuppressLint("MissingPermission")
     override fun notify(notificationId: Int, notification: Notification) {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            notificationManager.notify(notificationId, notification)
-        }
+        notificationManager.notify(notificationId, notification)
     }
 }
