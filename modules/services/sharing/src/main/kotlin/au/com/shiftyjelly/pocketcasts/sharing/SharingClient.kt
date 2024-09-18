@@ -437,11 +437,10 @@ data class SharingRequest internal constructor(
         }
 
         class WebLink internal constructor(
-            override val podcast: PodcastModel? = null,
             val textWithUrl: String,
             val subject: String,
         ) : Data, Sociable {
-
+            override val podcast: PodcastModel? = null
             override fun sharingUrl(host: String) = textWithUrl
 
             override fun sharingTitle() = ""
