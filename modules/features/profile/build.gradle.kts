@@ -46,7 +46,6 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
-    implementation(libs.browser.helper)
     implementation(libs.coil)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
