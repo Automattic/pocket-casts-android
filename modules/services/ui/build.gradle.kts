@@ -32,7 +32,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.mediarouter)
     implementation(libs.androidx.preference.ktx)
-    implementation(libs.browser.helper)
     implementation(libs.coil)
     implementation(libs.coroutines.core)
     implementation(libs.material.dialogs)
