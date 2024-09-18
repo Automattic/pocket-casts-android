@@ -280,7 +280,6 @@ reorderable = "sh.calvin.reorderable:reorderable:2.3.2"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.1.0"
 
-
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
