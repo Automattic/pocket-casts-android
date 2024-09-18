@@ -42,7 +42,7 @@ class DeepLinkFactory(
         ShowEpisodeAdapter(),
         ShowPageAdapter(),
         PocketCastsWebsiteGetAdapter(webBaseHost),
-        PocketCastsWebsiteReferralAdapter(webBaseHost),
+        ReferralsAdapter(webBaseHost),
         PodloveAdapter(),
         SonosAdapter(),
         ShareListAdapter(listHost),
@@ -192,7 +192,7 @@ private class PocketCastsWebsiteGetAdapter(
     }
 }
 
-private class PocketCastsWebsiteReferralAdapter(
+private class ReferralsAdapter(
     private val webBaseHost: String,
 ) : DeepLinkAdapter {
     override fun create(intent: Intent): DeepLink? {
@@ -204,7 +204,7 @@ private class PocketCastsWebsiteReferralAdapter(
             pathSegments.size == 2 &&
             pathSegments.first() == "redeem-guest-pass"
         ) {
-            PocketCastsWebsiteReferralDeepLink(code = pathSegments.last())
+            ReferralsDeepLink(code = pathSegments.last())
         } else {
             null
         }

@@ -244,7 +244,7 @@ data class SignInDeepLink(
     }
 }
 
-data class PocketCastsWebsiteReferralDeepLink(
+data class ReferralsDeepLink(
     val code: String,
 ) : DeepLink
 

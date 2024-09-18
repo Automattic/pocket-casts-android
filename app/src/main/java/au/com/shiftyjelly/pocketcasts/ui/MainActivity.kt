@@ -58,8 +58,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteReferralDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
@@ -1293,7 +1293,7 @@ class MainActivity :
                 is PocketCastsWebsiteGetDeepLink -> {
                     // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
                 }
-                is PocketCastsWebsiteReferralDeepLink -> {
+                is ReferralsDeepLink -> {
                     openReferralClaim(deepLink.code)
                 }
                 is ShowPodcastFromUrlDeepLink -> {
