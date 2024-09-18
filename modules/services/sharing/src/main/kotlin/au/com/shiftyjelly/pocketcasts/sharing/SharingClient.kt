@@ -92,6 +92,7 @@ class SharingClient(
                     error = null,
                 )
             }
+
             PocketCasts -> {
                 shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
                 SharingResponse(
@@ -100,13 +101,13 @@ class SharingClient(
                     error = null,
                 )
             }
+
             WhatsApp, Telegram, X, Tumblr, More -> {
                 val intent = Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("text/plain")
                     .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
                     .putExtra(EXTRA_TITLE, data.sharingTitle())
-                    .putExtra(EXTRA_SUBJECT, data.sharingSubject())
                     .setPackage(platform.packageId)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
                 data.podcast?.let {
@@ -122,6 +123,25 @@ class SharingClient(
                 )
             }
         }
+
+        is SharingRequest.Data.ReferralLink -> {
+            val shareText = "${context.getString(LR.string.referrals_share_text)}\n\n${data.sharingUrl(hostUrl)}"
+            val shareSubject = context.getString(LR.string.referrals_share_subject)
+            Intent()
+                .setAction(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(EXTRA_TEXT, shareText)
+                .putExtra(EXTRA_SUBJECT, shareSubject)
+                .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                .toChooserIntent()
+                .share()
+            SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
+        }
+
         is SharingRequest.Data.EpisodeFile -> {
             val file = data.episode.downloadedFilePath?.let(::File)
             if (file?.exists() == true) {
@@ -144,6 +164,7 @@ class SharingClient(
                 )
             }
         }
+
         is SharingRequest.Data.ClipLink -> {
             shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
             SharingResponse(
@@ -152,6 +173,7 @@ class SharingClient(
                 error = null,
             )
         }
+
         is SharingRequest.Data.ClipAudio -> {
             val file = mediaService.clipAudio(data.podcast, data.episode, data.range).getOrThrow()
             Intent()
@@ -167,6 +189,7 @@ class SharingClient(
                 error = null,
             )
         }
+
         is SharingRequest.Data.ClipVideo -> when (platform) {
             Instagram -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
@@ -184,6 +207,7 @@ class SharingClient(
                     error = null,
                 )
             }
+
             WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
                 val cardType = requireNotNull(cardType as VisualCardType) { "Video must be shared with a visual card" }
@@ -295,13 +319,11 @@ data class SharingRequest internal constructor(
             .setCardType(cardType)
             .setBackgroundImage(backgroundImage)
 
-        fun webLink(
-            textWithUrl: String,
-            subject: String,
+        fun referralLink(
+            referralCode: String,
         ) = Builder(
             Data.ReferralLink(
-                textWithUrl = textWithUrl,
-                subject = subject,
+                referralCode = referralCode,
             ),
         )
     }
@@ -344,8 +366,6 @@ data class SharingRequest internal constructor(
 
         fun sharingTitle(): String
 
-        fun sharingSubject(): String
-
         @StringRes fun linkDescription(): Int
     }
 
@@ -359,8 +379,6 @@ data class SharingRequest internal constructor(
 
             override fun sharingTitle() = podcast.title
 
-            override fun sharingSubject() = podcast.title
-
             override fun linkDescription() = LR.string.share_link_podcast
 
             override fun toString() = "Podcast(title=${podcast.title}, uuid=${podcast.uuid})"
@@ -373,8 +391,6 @@ data class SharingRequest internal constructor(
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}"
 
             override fun sharingTitle() = episode.title
-
-            override fun sharingSubject() = episode.title
 
             override fun linkDescription() = LR.string.share_link_episode
 
@@ -390,8 +406,6 @@ data class SharingRequest internal constructor(
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${position.inWholeSeconds}"
 
             override fun sharingTitle() = episode.title
-
-            override fun sharingSubject() = episode.title
 
             override fun linkDescription() = when (type) {
                 TimestampType.Episode -> LR.string.share_link_episode_position
@@ -437,19 +451,13 @@ data class SharingRequest internal constructor(
         }
 
         class ReferralLink internal constructor(
-            val textWithUrl: String,
-            val subject: String,
-        ) : Data, Sociable {
+            private val referralCode: String,
+        ) : Data {
             override val podcast: PodcastModel? = null
-            override fun sharingUrl(host: String) = textWithUrl
 
-            override fun sharingTitle() = ""
+            fun sharingUrl(host: String) = "$host/redeem-guest-pass/$referralCode"
 
-            override fun sharingSubject() = subject
-
-            override fun linkDescription() = LR.string.share
-
-            override fun toString() = "ReferralLink(textWithLink=$textWithUrl, subject=$subject)"
+            override fun toString() = "ReferralLink(referralCode=$referralCode"
         }
     }
 }

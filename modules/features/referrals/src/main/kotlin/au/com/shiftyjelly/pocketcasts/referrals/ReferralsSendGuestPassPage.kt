@@ -64,17 +64,13 @@ fun ReferralsSendGuestPassPage(
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
         val scope = rememberCoroutineScope()
 
-        val shareSubject = stringResource(LR.string.referrals_share_subject)
-        val shareTextWitUrl = stringResource(LR.string.referrals_share_text_with_url, "https://pocketcasts.com")
-
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
             onShare = {
-                val request = SharingRequest.webLink(
-                    textWithUrl = shareTextWitUrl,
-                    subject = shareSubject,
+                val request = SharingRequest.referralLink(
+                    referralCode = "test_code", // TODO - Referrals: Make it dynamic
                 ).build()
                 scope.launch {
                     sharingClient.share(request)
