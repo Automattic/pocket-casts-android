@@ -576,7 +576,6 @@ open class PlaybackManager @Inject constructor(
             SourceView.WIDGET_PLAYER_OLD,
             SourceView.SHARE_LIST,
             SourceView.BOTTOM_SHELF,
-            SourceView.REFERRALS,
             SourceView.SEARCH,
             SourceView.SEARCH_RESULTS,
             SourceView.NOVA_LAUNCHER_RECENTLY_PLAYED,
