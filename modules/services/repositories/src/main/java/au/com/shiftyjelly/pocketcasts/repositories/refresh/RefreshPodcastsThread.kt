@@ -1,13 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.refresh
 
+import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Pair
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -561,7 +564,9 @@ class RefreshPodcastsThread(
                 }
             }
 
-            manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            }
         }
 
         private fun buildNotificationIntent(intentId: Int, intentName: String, episode: PodcastEpisode, notificationTag: String, context: Context): PendingIntent {
@@ -651,7 +656,9 @@ class RefreshPodcastsThread(
             }
 
             val manager = NotificationManagerCompat.from(context)
-            manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            }
         }
 
         private fun getPodcastNotificationWearBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {
