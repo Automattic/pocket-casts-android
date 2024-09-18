@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.META_APP_ID
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
+import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.Instagram
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.More
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.PocketCasts
@@ -49,6 +50,7 @@ class SharingClient(
     private val displayPodcastCover: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
     private val showCustomCopyFeedback: Boolean = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
     private val hostUrl: String = SERVER_SHORT_URL,
+    private val webBasedHost: String = WEB_BASE_HOST,
     private val metaAppId: String = META_APP_ID,
     private val shareStarter: ShareStarter = object : ShareStarter {
         override fun start(context: Context, intent: Intent) {
@@ -143,7 +145,7 @@ class SharingClient(
         }
 
         is SharingRequest.Data.ReferralLink -> {
-            val shareText = "${context.getString(LR.string.referrals_share_text)}\n\n${data.sharingUrl(hostUrl)}"
+            val shareText = "${context.getString(LR.string.referrals_share_text)}\n\n${data.sharingUrl("https://$webBasedHost")}"
             val shareSubject = context.getString(LR.string.referrals_share_subject)
             Intent()
                 .setAction(Intent.ACTION_SEND)

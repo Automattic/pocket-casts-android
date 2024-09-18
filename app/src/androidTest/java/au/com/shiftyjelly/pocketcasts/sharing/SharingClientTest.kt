@@ -17,6 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.util.Date
@@ -684,7 +685,7 @@ class SharingClientTest {
 
         assertEquals(ACTION_SEND, intent.action)
         assertEquals("text/plain", intent.type)
-        assertEquals("$text\n\nhttps://pca.st/redeem-guest-pass/$referralCode", intent.getStringExtra(EXTRA_TEXT))
+        assertEquals("$text\n\nhttps://$WEB_BASE_HOST/redeem-guest-pass/$referralCode", intent.getStringExtra(EXTRA_TEXT))
         assertEquals(subject, intent.getStringExtra(EXTRA_SUBJECT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
     }
