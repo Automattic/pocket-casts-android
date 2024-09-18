@@ -332,6 +332,12 @@ data class SharingRequest internal constructor(
                 referralCode = referralCode,
             ),
         )
+            .setAnalyticsData(
+                AnalyticsData(
+                    AnalyticsEvent.REFERRAL_LINK_SHARED,
+                    mapOf("code" to referralCode),
+                ),
+            )
     }
 
     class Builder internal constructor(

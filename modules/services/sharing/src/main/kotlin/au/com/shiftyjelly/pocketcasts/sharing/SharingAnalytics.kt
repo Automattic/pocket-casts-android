@@ -9,7 +9,8 @@ internal class SharingAnalytics(
         val (analyticsEvent, analyticsProperties) = request.analyticsData
         tracker.track(
             analyticsEvent,
-            analyticsProperties + buildMap {
+            buildMap {
+                putAll(analyticsProperties)
                 put("source", request.source.analyticsValue)
                 put("type", request.data.analyticsValue)
                 put("action", request.platform.analyticsValue)
