@@ -35,8 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
@@ -71,18 +69,11 @@ fun ReferralsSendGuestPassPage(
             windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
             onShare = {
-                val referralCode = "test_code" // TODO - Referrals: Make it dynamic
                 val request = SharingRequest.referralLink(
-                    referralCode = referralCode,
-                )
-                    .setSourceView(SourceView.REFERRALS)
-                    .build()
+                    referralCode = "test_code", // TODO - Referrals: Make it dynamic
+                ).build()
                 scope.launch {
-                    sharingClient.share(
-                        request = request,
-                        event = AnalyticsEvent.REFERRAL_LINK_SHARED,
-                        eventProperties = mapOf("code" to referralCode),
-                    )
+                    sharingClient.share(request)
                 }
             },
         )
