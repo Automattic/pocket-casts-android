@@ -16,7 +16,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Setup Gradle to generate and submit dependency graphs
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           dependency-graph: generate-and-submit
       - name: Generate the dependency graph which will be submitted post-job
