@@ -1,5 +1,13 @@
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    open-pull-requests-limit: 3
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "[Type] Tech Debt"
+      - "[Area] Dependencies"
   - package-ecosystem: "gradle"
     open-pull-requests-limit: 8
     directory: "/"
