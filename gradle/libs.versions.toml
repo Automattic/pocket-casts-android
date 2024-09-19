@@ -120,7 +120,7 @@ glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = 
 glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 
 # Google Play Services OSS Licenses - (The following line is still needed as there is no plugin marker available as of yet)
-osslicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.5"
+osslicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 
 # Horologist
 horologist-audio-ui = { module = "com.google.android.horologist:horologist-audio-ui", version.ref = "horologist" }
