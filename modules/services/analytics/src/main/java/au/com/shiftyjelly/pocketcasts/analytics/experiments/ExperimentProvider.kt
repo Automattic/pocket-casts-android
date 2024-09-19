@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.ktx.get
 import javax.inject.Inject
 
 class ExperimentProvider @Inject constructor(

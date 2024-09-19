@@ -25,8 +25,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
 
     implementation(libs.automattic.tracks)
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.config.ktx)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.config)
 
     debugImplementation(libs.compose.ui.tooling)
 
