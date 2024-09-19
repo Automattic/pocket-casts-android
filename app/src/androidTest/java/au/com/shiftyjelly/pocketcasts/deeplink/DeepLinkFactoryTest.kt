@@ -245,14 +245,22 @@ class DeepLinkFactoryTest {
     }
 
     @Test
-    fun pocketCastsWebsiteDeepLink() {
-        val intent = Intent()
-            .setAction(ACTION_VIEW)
-            .setData(Uri.parse("https://pocketcasts.com"))
+    fun pocketCastsWebsiteGetDeepLink() {
+        val urls = listOf(
+            "https://pocketcasts.com/get",
+            "https://pocketcasts.com/get/",
+            "https://pocketcasts.com/get/something?query=value",
+        )
 
-        val deepLink = factory.create(intent)
+        urls.forEach { url ->
+            val intent = Intent()
+                .setAction(ACTION_VIEW)
+                .setData(Uri.parse(url))
 
-        assertEquals(PocketCastsWebsiteDeepLink, deepLink)
+            val deepLink = factory.create(intent)
+
+            assertEquals(PocketCastsWebsiteGetDeepLink, deepLink)
+        }
     }
 
     @Test
@@ -951,5 +959,16 @@ class DeepLinkFactoryTest {
         val deepLink = factory.create(intent)
 
         assertEquals(SignInDeepLink(sourceView = "hello"), deepLink)
+    }
+
+    @Test
+    fun referralDeepLink() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("https://pocketcasts.com/redeem/abc"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ReferralsDeepLink(code = "abc"), deepLink)
     }
 }
