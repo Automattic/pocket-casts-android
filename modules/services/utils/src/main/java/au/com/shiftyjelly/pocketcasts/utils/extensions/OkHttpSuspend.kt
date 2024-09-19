@@ -7,12 +7,11 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 
-@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 suspend fun Call.await(): Response {
     return suspendCancellableCoroutine { continuation ->
         enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                continuation.resume(response) {
+                continuation.resume(response) { _, _, _ ->
                     cancel()
                 }
             }
