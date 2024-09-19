@@ -218,7 +218,7 @@ tasker = { module = "com.joaomgcd:taskerpluginlibrary", version.ref = "tasker-pl
 
 # Test
 androidx-test-core = { module = "androidx.test:core", version.ref = "test" }
-androidx-test-junit-ext = "androidx.test.ext:junit:1.1.3"
+androidx-test-junit-ext = "androidx.test.ext:junit:1.2.1"
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "test" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "test" }
 
