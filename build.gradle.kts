@@ -395,7 +395,6 @@ subprojects {
             val lintChecks by configurations
             lintChecks(libs.security.lint)
         }
-
     }
 }
 
