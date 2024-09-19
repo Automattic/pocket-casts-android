@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,11 +34,8 @@ class DeveloperViewModel
     private val crashLogging: CrashLogging,
 ) : ViewModel() {
 
-    private val disposables = CompositeDisposable()
-
     fun forceRefresh() {
         podcastManager.refreshPodcasts(fromLog = "dev")
-        Toast.makeText(context, "Refresh started", Toast.LENGTH_LONG).show()
     }
 
     fun triggerNotification() {
@@ -73,6 +69,9 @@ class DeveloperViewModel
                         }
                     }
                     forceRefresh()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "Refresh started", Toast.LENGTH_LONG).show()
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -116,11 +115,6 @@ class DeveloperViewModel
                 }
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
