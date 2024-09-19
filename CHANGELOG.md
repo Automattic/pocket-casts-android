@@ -1,6 +1,8 @@
 7.74
 -----
-
+*   Bug Fixes
+    *   Fix search term persists when navigating to different podcast page
+        ([#2908](https://github.com/Automattic/pocket-casts-android/pull/2908))
 
 7.73
 -----
