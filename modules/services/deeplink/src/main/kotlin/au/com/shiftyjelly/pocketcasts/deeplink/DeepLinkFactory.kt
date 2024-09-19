@@ -202,7 +202,7 @@ private class ReferralsAdapter(
         return if (intent.action == ACTION_VIEW &&
             data.host == webBaseHost &&
             pathSegments.size == 2 &&
-            pathSegments.first() == "redeem-guest-pass"
+            pathSegments.first() == "redeem"
         ) {
             ReferralsDeepLink(code = pathSegments.last())
         } else {

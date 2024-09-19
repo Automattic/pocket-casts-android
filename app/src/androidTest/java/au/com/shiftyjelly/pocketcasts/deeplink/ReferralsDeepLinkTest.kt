@@ -12,6 +12,6 @@ class ReferralsDeepLinkTest {
     fun createSignInUri() {
         val uri = ReferralsDeepLink("abc").toUri("pocketcasts.com")
 
-        assertEquals(Uri.parse("https://pocketcasts.com/redeem-guest-pass/abc"), uri)
+        assertEquals(Uri.parse("https://pocketcasts.com/redeem/abc"), uri)
     }
 }

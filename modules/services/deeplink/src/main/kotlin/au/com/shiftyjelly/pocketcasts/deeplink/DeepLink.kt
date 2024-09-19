@@ -247,12 +247,12 @@ data class SignInDeepLink(
 data class ReferralsDeepLink(
     val code: String,
 ) : UriDeepLink {
-    // Use the marketing website as the share host, for example https://pocketcsts.com/redeem-guest-pass/abc
+    // Use the marketing website as the share host, for example https://pocketcsts.com/redeem/abc
     override fun toUri(shareHost: String): Uri {
         return Uri.Builder()
             .scheme("https")
             .authority(shareHost)
-            .appendPath("redeem-guest-pass")
+            .appendPath("redeem")
             .appendPath(code)
             .build()
     }

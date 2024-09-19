@@ -124,7 +124,7 @@
                 <data
                     android:host="pocket-casts-main-development.mystagingwebsite.com"
                     android:scheme="https"
-                    android:pathPrefix="/redeem-guest-pass" />
+                    android:pathPrefix="/redeem" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
@@ -133,7 +133,7 @@
                 <data
                     android:host="pocketcasts.com"
                     android:scheme="https"
-                    android:pathPrefix="/redeem-guest-pass" />
+                    android:pathPrefix="/redeem" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
