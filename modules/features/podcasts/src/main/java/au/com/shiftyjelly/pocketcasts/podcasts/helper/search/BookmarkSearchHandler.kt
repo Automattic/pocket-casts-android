@@ -4,10 +4,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import io.reactivex.Observable
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.rx2.rxSingle
 
-@Singleton
 class BookmarkSearchHandler @Inject constructor(
     private val bookmarkManager: BookmarkManager,
 ) : SearchHandler<Bookmark>() {
