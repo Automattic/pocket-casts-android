@@ -12,12 +12,12 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.animation.Interpolator
 import androidx.core.view.ViewCompat
-import androidx.recyclerview.R
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchUIUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.helper.MultiSwipeHelper.Callback
 import kotlin.math.abs
 
@@ -336,9 +336,9 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         if (recyclerView != null) {
             val resources = recyclerView.resources
             mSwipeEscapeVelocity = resources
-                .getDimension(R.dimen.item_touch_helper_swipe_escape_velocity)
+                .getDimension(R.dimen.multi_swipe_helper_escape_velocity)
             mMaxSwipeVelocity = resources
-                .getDimension(R.dimen.item_touch_helper_swipe_escape_max_velocity)
+                .getDimension(R.dimen.multi_swipe_helper_escape_max_velocity)
             setupCallbacks()
         }
     }
@@ -1721,7 +1721,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         private fun getMaxDragScroll(recyclerView: RecyclerView): Int {
             if (mCachedMaxScrollSpeed == -1) {
                 mCachedMaxScrollSpeed = recyclerView.resources.getDimensionPixelSize(
-                    R.dimen.item_touch_helper_max_drag_scroll_per_frame,
+                    R.dimen.multi_swipe_helper_max_drag_scroll_per_frame,
                 )
             }
             return mCachedMaxScrollSpeed
@@ -2593,12 +2593,12 @@ internal class ItemTouchUIUtilImpl : ItemTouchUIUtil {
         isCurrentlyActive: Boolean,
     ) {
         if (isCurrentlyActive) {
-            var originalElevation: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
+            var originalElevation: Any? = view.getTag(R.id.multi_swipe_helper_previous_elevation)
             if (originalElevation == null) {
                 originalElevation = ViewCompat.getElevation(view)
                 val newElevation = 1f + findMaxElevation(recyclerView, view)
                 ViewCompat.setElevation(view, newElevation)
-                view.setTag(R.id.item_touch_helper_previous_elevation, originalElevation)
+                view.setTag(R.id.multi_swipe_helper_previous_elevation, originalElevation)
             }
         }
 
@@ -2618,11 +2618,11 @@ internal class ItemTouchUIUtilImpl : ItemTouchUIUtil {
     }
 
     override fun clearView(view: View) {
-        val tag = view.getTag(R.id.item_touch_helper_previous_elevation)
+        val tag = view.getTag(R.id.multi_swipe_helper_previous_elevation)
         if (tag != null && tag is Float) {
             ViewCompat.setElevation(view, tag)
         }
-        view.setTag(R.id.item_touch_helper_previous_elevation, null)
+        view.setTag(R.id.multi_swipe_helper_previous_elevation, null)
 
         view.translationX = 0f
         view.translationY = 0f
