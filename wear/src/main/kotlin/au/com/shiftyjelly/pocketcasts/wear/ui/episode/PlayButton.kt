@@ -31,7 +31,7 @@ fun PlayButton(
             .size(52.dp)
             .clip(CircleShape)
             .background(color = backgroundColor)
-            .clickable { onClick() }
+            .clickable { onClick() },
     ) {
         Image(
             painter = painterResource(
@@ -39,10 +39,10 @@ fun PlayButton(
                     R.drawable.button_pause
                 } else {
                     R.drawable.button_play
-                }
+                },
             ),
             contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.play),
-            modifier = Modifier.size(52.dp)
+            modifier = Modifier.size(52.dp),
         )
     }
 }
@@ -55,12 +55,12 @@ private fun Preview() {
             PlayButton(
                 isPlaying = true,
                 backgroundColor = Color.Yellow,
-                onClick = {}
+                onClick = {},
             )
             PlayButton(
                 isPlaying = false,
                 backgroundColor = Color.Blue,
-                onClick = {}
+                onClick = {},
             )
         }
     }

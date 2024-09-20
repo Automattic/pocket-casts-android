@@ -53,7 +53,7 @@ fun StoryTopFivePodcastsView(
         StoryBlurredBackground(
             Offset(
                 LocalView.current.width * 0.6f,
-                -LocalView.current.height * 0.4f
+                -LocalView.current.height * 0.4f,
             ),
         )
         Column(
@@ -61,7 +61,7 @@ fun StoryTopFivePodcastsView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 30.dp)
+                .padding(vertical = 30.dp),
         ) {
             Spacer(modifier = modifier.height(40.dp))
 
@@ -129,7 +129,7 @@ fun PodcastItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp)
+            .padding(horizontal = 40.dp),
     ) {
         TextH30(
             text = "${position + 1}",
@@ -139,21 +139,21 @@ fun PodcastItem(
             disableScale = disableScale(),
             modifier = modifier
                 .padding(end = 14.dp)
-                .widthIn(min = 16.dp)
+                .widthIn(min = 16.dp),
         )
         Row(
             modifier = modifier
                 .padding(vertical = 10.dp)
                 .weight(1f),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             PodcastImage(
                 uuid = podcast.uuid,
-                modifier = modifier.size((heightInDp * 0.09f).dp)
+                modifier = modifier.size((heightInDp * 0.09f).dp),
             )
             Column(
                 modifier = modifier
-                    .padding(start = 14.dp)
+                    .padding(start = 14.dp),
             ) {
                 TextH30(
                     text = podcast.title,
@@ -163,7 +163,7 @@ fun PodcastItem(
                     fontWeight = FontWeight.Bold,
                     disableScale = disableScale(),
                     modifier = modifier
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = 3.dp),
                 )
                 TextH70(
                     text = timeText,

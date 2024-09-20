@@ -17,7 +17,7 @@ class FolderOptionsDialog(
     val onEditFolder: () -> Unit,
     val onAddOrRemovePodcast: () -> Unit,
     val fragment: Fragment,
-    val settings: Settings
+    val settings: Settings,
 ) {
 
     private var showDialog: OptionsDialog? = null
@@ -35,7 +35,7 @@ class FolderOptionsDialog(
                 click = {
                     onOpenSortOptions()
                     openSortOptions()
-                }
+                },
             )
             .addTextOption(
                 titleId = LR.string.edit_folder,
@@ -43,14 +43,14 @@ class FolderOptionsDialog(
                 click = {
                     onEditFolder()
                     dismiss()
-                }
+                },
             )
             .addTextOption(
                 titleId = LR.string.add_or_remove_podcasts,
                 imageId = R.drawable.ic_podcasts,
                 click = {
                     onAddOrRemovePodcast()
-                }
+                },
             )
         dialog.show(fragmentManager, "podcasts_options_dialog")
         showDialog = dialog
@@ -67,7 +67,7 @@ class FolderOptionsDialog(
                 checked = sortType == podcastsSortType,
                 click = {
                     onSortTypeChanged(sortType)
-                }
+                },
             )
         }
         dialog.show(fragmentManager, "podcasts_sort_dialog")

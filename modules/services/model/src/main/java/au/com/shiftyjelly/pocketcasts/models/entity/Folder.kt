@@ -17,11 +17,12 @@ data class Folder(
     // order of the podcasts in the folder. A to Z, episode release date, date added, drag and drop
     @ColumnInfo(name = "podcasts_sort_type") var podcastsSortType: PodcastsSortType,
     @ColumnInfo(name = "deleted") var deleted: Boolean,
-    @ColumnInfo(name = "sync_modified") var syncModified: Long
+    @ColumnInfo(name = "sync_modified") var syncModified: Long,
 ) {
 
     companion object {
         // server side, the home folder also needs a UUID, so again we have a predefined value for it all clients use
         const val homeFolderUuid = "973df93c-e4dc-41fb-879e-0c7b532ebb70"
+        const val SYNC_MODIFIED_FROM_SERVER = 0L
     }
 }

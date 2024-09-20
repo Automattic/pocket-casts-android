@@ -28,11 +28,10 @@
             android:id="@+id/playerBottomSheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#000000"
             android:elevation="8dp"
             android:visibility="gone"
             app:behavior_peekHeight="@dimen/miniPlayerPeekHeight"
-            app:layout_behavior="au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheetBehavior" />
+            app:layout_behavior="com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"

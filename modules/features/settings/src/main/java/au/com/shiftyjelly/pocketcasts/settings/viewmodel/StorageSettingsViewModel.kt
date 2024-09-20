@@ -7,18 +7,21 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.FixDownloadsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,20 +29,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
-import java.io.File
-import java.util.*
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class StorageSettingsViewModel
 @Inject constructor(
-    private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val fileStorage: FileStorage,
     private val fileUtil: FileUtilWrapper,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(initState())
@@ -97,7 +96,7 @@ class StorageSettingsViewModel
                 .collect { downloadedEpisodes ->
                     val downloadSize = downloadedEpisodes.sumOf { it.sizeInBytes }
                     mutableState.value = mutableState.value.copy(
-                        downloadedFilesState = mutableState.value.downloadedFilesState.copy(size = downloadSize)
+                        downloadedFilesState = mutableState.value.downloadedFilesState.copy(size = downloadSize),
                     )
                 }
         }
@@ -114,7 +113,7 @@ class StorageSettingsViewModel
                     AnalyticsEvent.SETTINGS_STORAGE_LOCATION,
                     mapOf("location" to folderLocation.analyticsLabel),
                 )
-            }
+            },
         ),
         storageFolderState = State.StorageFolderState(
             isVisible = settings.usingCustomFolderStorage(),
@@ -122,7 +121,7 @@ class StorageSettingsViewModel
             onStateChange = {
                 onStorageFolderChange(it)
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SET_FOLDER_LOCATION)
-            }
+            },
         ),
         backgroundRefreshState = State.BackgroundRefreshState(
             summary = backgroundRefreshSummary,
@@ -131,9 +130,9 @@ class StorageSettingsViewModel
                 onBackgroundRefreshCheckedChange(it)
                 analyticsTracker.track(
                     AnalyticsEvent.SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED,
-                    mapOf("enabled" to it)
+                    mapOf("enabled" to it),
                 )
-            }
+            },
         ),
         storageDataWarningState = State.StorageDataWarningState(
             isChecked = settings.warnOnMeteredNetwork.value,
@@ -141,9 +140,9 @@ class StorageSettingsViewModel
                 onStorageDataWarningCheckedChange(it)
                 analyticsTracker.track(
                     AnalyticsEvent.SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED,
-                    mapOf("enabled" to it)
+                    mapOf("enabled" to it),
                 )
-            }
+            },
         ),
     )
 
@@ -153,15 +152,27 @@ class StorageSettingsViewModel
 
     fun onClearDownloadCacheClick() {
         viewModelScope.launch {
-            val tempPath = fileStorage.tempPodcastDirectory
+            val tempPath = fileStorage.getOrCreateEpisodesTempDir()
             fileUtil.deleteDirectoryContents(tempPath.absolutePath)
             mutableSnackbarMessage.emit(LR.string.settings_storage_clear_cache)
         }
         analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE)
     }
 
+    fun fixDownloadedFiles() {
+        FixDownloadsWorker.run(context)
+        viewModelScope.launch {
+            mutableAlertDialog.emit(
+                createAlertDialogState(
+                    title = context.getString(LR.string.settings_fix_downloads_started_message),
+                    showCancel = false,
+                ),
+            )
+        }
+    }
+
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
-        settings.warnOnMeteredNetwork.set(isChecked)
+        settings.warnOnMeteredNetwork.set(isChecked, updateModifiedAt = true)
         updateMobileDataWarningState()
     }
 
@@ -169,12 +180,12 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             storageDataWarningState = mutableState.value.storageDataWarningState.copy(
                 isChecked = settings.warnOnMeteredNetwork.value,
-            )
+            ),
         )
     }
 
     private fun onBackgroundRefreshCheckedChange(isChecked: Boolean) {
-        settings.backgroundRefreshPodcasts.set(isChecked)
+        settings.backgroundRefreshPodcasts.set(isChecked, updateModifiedAt = true)
         updateBackgroundRefreshState()
     }
 
@@ -182,8 +193,8 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             backgroundRefreshState = mutableState.value.backgroundRefreshState.copy(
                 isChecked = settings.backgroundRefreshPodcasts.value,
-                summary = backgroundRefreshSummary
-            )
+                summary = backgroundRefreshSummary,
+            ),
         )
     }
 
@@ -199,8 +210,8 @@ class StorageSettingsViewModel
                     FolderLocation(
                         label = context.getString(LR.string.settings_storage_custom_folder),
                         filePath = Settings.STORAGE_ON_CUSTOM_FOLDER,
-                        analyticsLabel = "custom"
-                    )
+                        analyticsLabel = "custom",
+                    ),
                 )
             }
         }
@@ -208,7 +219,7 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
                 choices = choices,
-            )
+            ),
         )
 
         updateStorageLabels()
@@ -217,8 +228,7 @@ class StorageSettingsViewModel
     private fun onStorageChoiceChange(folderPathChosen: String?) {
         if (folderPathChosen == Settings.STORAGE_ON_CUSTOM_FOLDER) {
             try {
-                val baseDirectory = fileStorage.baseStorageDirectory
-                baseDirectory?.absolutePath?.let { basePath ->
+                fileStorage.getOrCreateBaseStorageDir()?.absolutePath?.let { basePath ->
                     settings.setStorageCustomFolder(basePath)
                     updateStorageLabels()
                 }
@@ -228,7 +238,7 @@ class StorageSettingsViewModel
                         createAlertDialogState(
                             title = context.getString(LR.string.settings_storage_folder_change_failed) + " " + e.message,
                             message = LR.string.settings_storage_android_10_custom,
-                        )
+                        ),
                     )
                     return@launch
                 }
@@ -255,15 +265,15 @@ class StorageSettingsViewModel
             val folderPaths = mutableState.value.storageChoiceState.choices.map { it.filePath }
             mutableState.value = mutableState.value.copy(
                 storageChoiceState = mutableState.value.storageChoiceState.copy(
-                    summary = folderPaths.firstOrNull() ?: ""
-                )
+                    summary = folderPaths.firstOrNull() ?: "",
+                ),
             )
             viewModelScope.launch {
                 mutableAlertDialog.emit(
                     createAlertDialogState(
                         title = context.getString(LR.string.settings_storage_folder_write_failed),
                         message = LR.string.settings_storage_android_10_custom,
-                    )
+                    ),
                 )
             }
         }
@@ -285,7 +295,7 @@ class StorageSettingsViewModel
 
             var oldDirectory: File? = null
             try {
-                oldDirectory = fileStorage.baseStorageDirectory
+                oldDirectory = fileStorage.getOrCreateBaseStorageDir()
             } catch (e: StorageException) {
                 // ignore error
             }
@@ -324,7 +334,7 @@ class StorageSettingsViewModel
         if (oldDirectory == null || newDirectory != oldDirectory) {
             viewModelScope.launch {
                 mutableAlertDialog.emit(
-                    createStorageMoveLocationAlertDialogState(oldDirectory, newDirectory)
+                    createStorageMoveLocationAlertDialogState(oldDirectory, newDirectory),
                 )
             }
         }
@@ -336,15 +346,14 @@ class StorageSettingsViewModel
         }
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
-            "Moving storage from $oldDirectory to $newDirectory"
+            "Moving storage from $oldDirectory to $newDirectory",
         )
         viewModelScope.launch(Dispatchers.IO) {
             mutableProgressDialog.emit(true)
             fileStorage.moveStorage(
                 File(oldDirectory),
                 File(newDirectory),
-                podcastManager,
-                episodeManager
+                episodeManager,
             )
             mutableProgressDialog.emit(false)
         }
@@ -354,12 +363,12 @@ class StorageSettingsViewModel
     private fun updateStorageLabels() {
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
-                summary = storageChoiceSummary
+                summary = storageChoiceSummary,
             ),
             storageFolderState = mutableState.value.storageFolderState.copy(
                 isVisible = settings.usingCustomFolderStorage(),
-                summary = storageFolderSummary
-            )
+                summary = storageFolderSummary,
+            ),
         )
     }
 
@@ -379,36 +388,41 @@ class StorageSettingsViewModel
         buttons = listOf(
             DialogButtonState(
                 text = context.getString(LR.string.settings_storage_move_cancel).uppercase(
-                    Locale.getDefault()
+                    Locale.getDefault(),
                 ),
-                onClick = {}
+                onClick = {},
 
             ),
             DialogButtonState(
                 text = context.getString(LR.string.settings_storage_move),
                 onClick = { movePodcasts(oldDirectory, newDirectory) },
-            )
-        )
+            ),
+        ),
     )
 
     private fun createAlertDialogState(
         title: String,
         @StringRes message: Int? = null,
+        showCancel: Boolean = true,
     ) = AlertDialogState(
         title = title,
         message = message?.let { context.getString(message) },
-        buttons = listOf(
-            DialogButtonState(
-                text = context.getString(LR.string.cancel).uppercase(
-                    Locale.getDefault()
+        buttons = buildList {
+            if (showCancel) {
+                add(
+                    DialogButtonState(
+                        text = context.getString(LR.string.cancel).uppercase(),
+                        onClick = {},
+                    ),
+                )
+            }
+            add(
+                DialogButtonState(
+                    text = context.getString(LR.string.ok),
+                    onClick = {},
                 ),
-                onClick = {}
-            ),
-            DialogButtonState(
-                text = context.getString(LR.string.ok),
-                onClick = {}
             )
-        )
+        },
     )
 
     fun onShown() {
@@ -430,13 +444,13 @@ class StorageSettingsViewModel
             val title: String? = null,
             val summary: String? = null,
             val choices: List<FolderLocation> = emptyList(),
-            val onStateChange: (FolderLocation) -> Unit
+            val onStateChange: (FolderLocation) -> Unit,
         )
 
         data class StorageFolderState(
             val isVisible: Boolean = false,
             val summary: String? = null,
-            val onStateChange: (newPath: String?) -> Unit
+            val onStateChange: (newPath: String?) -> Unit,
         )
 
         data class BackgroundRefreshState(
@@ -456,4 +470,8 @@ class StorageSettingsViewModel
         val message: String? = null,
         val buttons: List<DialogButtonState>,
     )
+
+    private companion object {
+        const val FIX_EPISODES_LIMIT = 10_000
+    }
 }

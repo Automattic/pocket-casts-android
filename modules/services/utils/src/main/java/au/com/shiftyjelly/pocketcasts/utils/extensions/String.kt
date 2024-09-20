@@ -1,12 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import timber.log.Timber
 import java.security.MessageDigest
+import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import timber.log.Timber
+
+fun String.escapeLike(escapeChar: Char) = replace("$escapeChar", "$escapeChar$escapeChar")
+    .replace("%", "$escapeChar%")
+    .replace("_", "${escapeChar}_")
 
 val ISO_DATE_FORMATS = object : ThreadLocal<List<SimpleDateFormat>>() {
     override fun initialValue(): List<SimpleDateFormat> {
@@ -17,7 +22,7 @@ val ISO_DATE_FORMATS = object : ThreadLocal<List<SimpleDateFormat>>() {
             // ISO dates can have milliseconds
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
                 timeZone = TimeZone.getTimeZone("UTC")
-            }
+            },
         )
     }
 }
@@ -64,6 +69,12 @@ fun CharSequence.splitIgnoreEmpty(delimiter: String): List<String> {
 fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
 }
+
+fun String.removeAccents() =
+    Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("\\p{Mn}+".toRegex(), "")
+        .replace("\u0141", "L") // Remove L with stroke
+        .replace("\u0142", "l") // Remove l with stroke
 
 fun String.sha1(): String? = hashString("SHA-1")
 fun String.sha256(): String? = hashString("SHA-256")

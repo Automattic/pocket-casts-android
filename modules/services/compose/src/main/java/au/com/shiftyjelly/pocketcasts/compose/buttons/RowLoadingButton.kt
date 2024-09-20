@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ButtonElevation
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,7 +27,8 @@ fun RowLoadingButton(
     isLoading: Boolean = false,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
-    onClick: () -> Unit
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
+    onClick: () -> Unit,
 ) {
     BaseRowButton(
         text = text,
@@ -36,16 +38,19 @@ fun RowLoadingButton(
         border = border,
         colors = colors,
         textColor = textColor,
+        elevation = elevation,
         leadingIcon = if (isLoading) {
             {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .size(24.dp),
                     color = textColor,
-                    strokeWidth = 2.dp
+                    strokeWidth = 2.dp,
                 )
             }
-        } else null,
+        } else {
+            null
+        },
         onClick = onClick@{
             if (isLoading) return@onClick
             onClick()
@@ -61,7 +66,7 @@ fun RowLoadingButtonLightPreview() {
         RowLoadingButton(
             text = "Accept",
             isLoading = true,
-            onClick = {}
+            onClick = {},
         )
     }
 }
@@ -74,7 +79,7 @@ fun RowLoadingButtonDarkPreview() {
         RowLoadingButton(
             text = "Accept",
             isLoading = true,
-            onClick = {}
+            onClick = {},
         )
     }
 }
@@ -88,7 +93,7 @@ fun RowLoadingButtonDisabledPreview() {
             text = "Accept",
             enabled = false,
             isLoading = true,
-            onClick = {}
+            onClick = {},
         )
     }
 }
@@ -102,7 +107,7 @@ fun RowLoadingButtonNoPaddingPreview() {
             text = "Accept",
             includePadding = false,
             isLoading = true,
-            onClick = {}
+            onClick = {},
         )
     }
 }

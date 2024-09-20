@@ -10,6 +10,9 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import java.util.Date
+import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -22,9 +25,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import java.util.Date
-import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class UpdateEpisodeDetailsTest {

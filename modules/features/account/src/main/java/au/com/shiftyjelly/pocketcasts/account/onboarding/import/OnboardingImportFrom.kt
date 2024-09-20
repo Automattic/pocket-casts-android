@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.import
 
+import androidx.activity.SystemBarStyle
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -17,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
@@ -27,15 +27,16 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.bars.singleAuto
+import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.androidbrowserhelper.trusted.Utils.setStatusBarColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
@@ -48,33 +49,32 @@ fun OnboardingImportFrom(
     buttonText: String? = null,
     buttonClick: (() -> Unit)? = null,
     onBackPressed: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
-    rememberSystemUiController().apply {
-        // Use the secondaryUI01 so the status bar matches the ThemedTopAppBar
-        setStatusBarColor(MaterialTheme.theme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
-        setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
-    }
+    val pocketCastsTheme = MaterialTheme.theme
+    // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+    val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.secondaryUi01) { theme.darkTheme }
+    val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
+    onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
 
     Column(
         Modifier
-            .fillMaxHeight()
+            .fillMaxHeight(),
     ) {
-
         ThemedTopAppBar(
             onNavigationClick = onBackPressed,
-            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
         )
 
         Column(
             Modifier
                 .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
-
             Image(
                 painter = painterResource(drawableRes),
                 contentDescription = null,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 16.dp),
             )
 
             TextH10(title)
@@ -120,10 +120,10 @@ private fun NumberedList(vararg texts: String) {
                     .constrainAs(numberRef) {
                         top.linkTo(
                             anchor = if (index == 0) parent.top else textRefs[index - 1].bottom,
-                            margin = if (index == 0) 0.dp else 12.dp
+                            margin = if (index == 0) 0.dp else 12.dp,
                         )
                         start.linkTo(parent.start)
-                    }
+                    },
             )
 
             // Indented text
@@ -137,7 +137,7 @@ private fun NumberedList(vararg texts: String) {
                         end.linkTo(parent.end)
                         height = Dimension.wrapContent
                         width = Dimension.fillToConstraints
-                    }
+                    },
             )
         }
     }
@@ -162,6 +162,7 @@ private fun OnboardingImportFromPreview(
             buttonText = "A button",
             buttonClick = {},
             onBackPressed = {},
+            onUpdateSystemBars = {},
         )
     }
 }

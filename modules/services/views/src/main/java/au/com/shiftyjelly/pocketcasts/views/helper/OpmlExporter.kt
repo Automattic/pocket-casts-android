@@ -11,30 +11,30 @@ import android.util.Xml
 import androidx.core.text.HtmlCompat
 import androidx.preference.PreferenceFragmentCompat
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.FileWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Call
 import timber.log.Timber
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.FileWriter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class OpmlExporter(
     private val fragment: PreferenceFragmentCompat,
-    private val serverManager: ServerManager,
+    private val serviceManager: ServiceManager,
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
     private val context: Context,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val applicationScope: CoroutineScope,
 ) {
 
@@ -42,7 +42,7 @@ class OpmlExporter(
         const val EXPORT_PICKER_REQUEST_CODE = 43
     }
 
-    private var serverTask: Call? = null
+    private var serviceTask: Call? = null
     private var progressDialog: ProgressDialog? = null
     private var sendAsEmail: Boolean = false
     private var opmlFile: File? = null
@@ -83,11 +83,12 @@ class OpmlExporter(
             Timber.e(e, "OPML export failed.")
             UiUtil.hideProgressDialog(progressDialog)
             UiUtil.displayAlertError(
-                context = context, title = context.getString(LR.string.settings_opml_export_failed_title),
+                context = context,
+                title = context.getString(LR.string.settings_opml_export_failed_title),
                 message = context.getString(
-                    LR.string.settings_opml_export_failed
+                    LR.string.settings_opml_export_failed,
                 ),
-                onComplete = null
+                onComplete = null,
             )
         }
     }
@@ -100,7 +101,7 @@ class OpmlExporter(
             val uuidToTitle = podcastManager.findSubscribed().associateBy({ it.uuid }, { it.title })
             val uuids = uuidToTitle.keys.toList()
 
-            serverTask = serverManager.exportFeedUrls(
+            serviceTask = serviceManager.exportFeedUrls(
                 uuids,
                 object : ServerCallback<Map<String, String>> {
                     override fun onFailed(
@@ -108,7 +109,7 @@ class OpmlExporter(
                         userMessage: String?,
                         serverMessageId: String?,
                         serverMessage: String?,
-                        throwable: Throwable?
+                        throwable: Throwable?,
                     ) {
                         trackFailure(reason = "server_call_failure")
                         UiUtil.hideProgressDialog(progressDialog)
@@ -124,7 +125,13 @@ class OpmlExporter(
                                 if (sendAsEmail) {
                                     sendIntentEmail(opmlFile)
                                 } else {
-                                    sendIntentFile(opmlFile)
+                                    IntentUtil.sendIntent(
+                                        context = context,
+                                        file = opmlFile,
+                                        intentType = "text/xml",
+                                        errorMessage = context.getString(LR.string.settings_opml_export_failed),
+                                        errorTitle = context.getString(LR.string.settings_no_file_browser_title),
+                                    )
                                 }
                             }
                         } catch (e: Exception) {
@@ -133,7 +140,7 @@ class OpmlExporter(
                             Timber.e(e)
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -143,23 +150,6 @@ class OpmlExporter(
             AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FAILED,
             mapOf("reason" to reason),
         )
-    }
-
-    private fun sendIntentFile(file: File) {
-        try {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/xml"
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
-            intent.putExtra(Intent.EXTRA_STREAM, uri)
-            try {
-                context.startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                Timber.e(e)
-                UiUtil.displayAlertError(context, context.getString(LR.string.settings_no_file_browser_title), context.getString(LR.string.settings_no_file_browser), null)
-            }
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
     }
 
     private fun sendIntentEmail(file: File) {
@@ -174,7 +164,7 @@ class OpmlExporter(
 
             intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(LR.string.settings_opml_email_subject))
             intent.putExtra(Intent.EXTRA_TEXT, HtmlCompat.fromHtml(context.getString(LR.string.settings_opml_email_body), HtmlCompat.FROM_HTML_MODE_COMPACT))
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
+            val uri = FileUtil.createUriWithReadPermissions(fragment.requireActivity(), file, intent)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)
@@ -192,7 +182,7 @@ class OpmlExporter(
     fun showProgressDialog() {
         UiUtil.hideProgressDialog(progressDialog)
         progressDialog = ProgressDialog.show(context, "", context.getString(LR.string.settings_opml_exporting), true, true) {
-            serverTask?.cancel()
+            serviceTask?.cancel()
         }.apply {
             show()
         }

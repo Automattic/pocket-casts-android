@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun PodcastSelectedText(
     count: Int,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.theme.colors.primaryText01
+    color: Color = MaterialTheme.theme.colors.primaryText01,
 ) {
     val selectedString = when (count) {
         0 -> stringResource(LR.string.settings_choose_podcasts)
@@ -28,7 +28,7 @@ fun PodcastSelectedText(
     TextP40(
         text = selectedString,
         color = color,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

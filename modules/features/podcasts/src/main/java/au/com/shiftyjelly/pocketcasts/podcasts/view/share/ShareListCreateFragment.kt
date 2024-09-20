@@ -41,30 +41,30 @@ class ShareListCreateFragment : BaseFragment() {
                             onNextClick = { selectedPodcastsCount ->
                                 viewModel.trackShareEvent(
                                     AnalyticsEvent.SHARE_PODCASTS_PODCASTS_SELECTED,
-                                    AnalyticsProp.countMap(selectedPodcastsCount)
+                                    AnalyticsProp.countMap(selectedPodcastsCount),
                                 )
                                 navController.navigate(NavRoutes.title)
                             },
-                            viewModel = viewModel
+                            viewModel = viewModel,
                         )
                     }
                     composable(NavRoutes.title) {
                         ShareListCreateTitlePage(
                             onBackClick = { navController.popBackStack() },
                             onNextClick = { createShareLink(navController) },
-                            viewModel = viewModel
+                            viewModel = viewModel,
                         )
                     }
                     composable(NavRoutes.building) {
                         ShareListCreateBuildingPage(
                             onCloseClick = { activity?.finish() },
-                            viewModel = viewModel
+                            viewModel = viewModel,
                         )
                     }
                     composable(NavRoutes.failed) {
                         ShareListCreateFailedPage(
                             onCloseClick = { activity?.finish() },
-                            onRetryClick = { createShareLink(navController) }
+                            onRetryClick = { createShareLink(navController) },
                         )
                     }
                 }
@@ -82,7 +82,7 @@ class ShareListCreateFragment : BaseFragment() {
             label = getString(LR.string.podcasts_share_via),
             onBefore = { navController.navigate(NavRoutes.building) },
             onSuccess = { activity?.finish() },
-            onFailure = { navController.navigate(NavRoutes.failed) }
+            onFailure = { navController.navigate(NavRoutes.failed) },
         )
     }
 

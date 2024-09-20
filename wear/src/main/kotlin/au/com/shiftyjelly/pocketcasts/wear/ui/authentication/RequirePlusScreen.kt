@@ -35,7 +35,6 @@ fun RequirePlusScreen(
     columnState: ScalingLazyColumnState,
     onContinueToLogin: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<RequirePlusViewModel>()
 
     CallOnce {
@@ -51,7 +50,7 @@ fun RequirePlusScreen(
                 shortNameRes = UpgradeFeatureCard.PLUS.shortNameRes,
                 iconColor = Color.Black,
                 backgroundColor = colorResource(UR.color.plus_gold),
-                textColor = Color.Black
+                textColor = Color.Black,
             )
         }
 
@@ -67,7 +66,7 @@ fun RequirePlusScreen(
                     }
                 },
                 textAlign = TextAlign.Center,
-                modifier = Modifier.clickable { onContinueToLogin() }
+                modifier = Modifier.clickable { onContinueToLogin() },
             )
         }
 
@@ -77,7 +76,7 @@ fun RequirePlusScreen(
             WatchListChip(
                 title = stringResource(LR.string.log_in),
                 iconRes = IR.drawable.signin,
-                onClick = onContinueToLogin
+                onClick = onContinueToLogin,
             )
         }
     }

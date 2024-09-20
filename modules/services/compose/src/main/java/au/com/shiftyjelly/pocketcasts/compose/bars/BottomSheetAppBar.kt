@@ -17,7 +17,7 @@ fun BottomSheetAppBar(
     title: String? = null,
     navigationButton: NavigationButton = NavigationButton.Back,
     actions: @Composable RowScope.() -> Unit = {},
-    onNavigationClick: () -> Unit
+    onNavigationClick: () -> Unit,
 ) {
     ThemedTopAppBar(
         title = title,
@@ -26,7 +26,7 @@ fun BottomSheetAppBar(
         backgroundColor = MaterialTheme.theme.colors.primaryUi01,
         navigationButton = navigationButton,
         actions = actions,
-        onNavigationClick = onNavigationClick
+        onNavigationClick = onNavigationClick,
     )
 }
 

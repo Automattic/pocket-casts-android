@@ -76,7 +76,7 @@ abstract class ViewModelBase<TInput : Any, TOutput : Any, THelper : TaskerPlugin
 
     open val inputFields: List<InputFieldBase<*>> get() = listOf()
     private var taskerInput
-        get() = TaskerInput(input ?: taskerHelper.inputClass.newInstance())
+        get() = TaskerInput(input ?: taskerHelper.inputClass.getDeclaredConstructor().newInstance())
         set(value) {
             input = value.regular
         }

@@ -8,6 +8,7 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import android.os.SystemClock
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -22,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -38,23 +39,32 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
-import javax.inject.Inject
 
 @AndroidEntryPoint
 @SuppressLint("SpecifyJobSchedulerIdRange")
 class UpNextSyncJob : JobService() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var syncManager: SyncManager
+
     @Inject lateinit var appDatabase: AppDatabase
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var downloadManager: DownloadManager
-    @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManagerImpl
+
+    @Inject lateinit var podcastCacheServiceManager: PodcastCacheServiceManagerImpl
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
     private val disposables = CompositeDisposable()
@@ -109,7 +119,7 @@ class UpNextSyncJob : JobService() {
                 onComplete = {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - jobFinished - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
                     jobFinished(jobParameters, false)
-                }
+                },
             )
             .addTo(disposables)
     }
@@ -149,13 +159,13 @@ class UpNextSyncJob : JobService() {
                     episode?.title,
                     episode?.downloadUrl,
                     podcastUuid,
-                    episode?.publishedDate?.toIsoString()
+                    episode?.publishedDate?.toIsoString(),
                 )
             }
             return UpNextSyncRequest.Change(
                 UpNextChange.ACTION_REPLACE,
                 change.modified,
-                episodes = episodes
+                episodes = episodes,
             )
         }
         // any other action
@@ -171,7 +181,7 @@ class UpNextSyncJob : JobService() {
                 title = episode?.title,
                 url = episode?.downloadUrl,
                 published = publishedDate,
-                podcast = podcastUuid
+                podcast = podcastUuid,
             )
         }
     }
@@ -204,7 +214,7 @@ class UpNextSyncJob : JobService() {
                     userEpisodeManager.downloadMissingUserEpisode(episodeUuid, placeholderTitle = responseEpisode.title, placeholderPublished = responseEpisode.published?.parseIsoDate()).toObservable()
                 } else {
                     val skeletonEpisode = responseEpisode.toSkeletonEpisode(podcastUuid)
-                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, skeletonEpisode, podcastManager, false).toObservable()
+                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, skeletonEpisode, podcastManager, false, source = SourceView.UP_NEXT).toObservable()
                 }
             }
         }

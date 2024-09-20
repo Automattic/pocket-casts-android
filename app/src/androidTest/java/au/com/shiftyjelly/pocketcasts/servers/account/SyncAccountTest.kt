@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.account
 import android.accounts.AccountManager
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -11,7 +12,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import java.net.HttpURLConnection
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -23,7 +25,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import retrofit2.Retrofit
-import java.net.HttpURLConnection
 
 internal class SyncAccountTest {
 
@@ -39,21 +40,22 @@ internal class SyncAccountTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val moshi = ServersModule.provideMoshiBuilder().build()
+        val moshi = ServersModule().provideMoshi()
         val okHttpClient = OkHttpClient.Builder().build()
         retrofit = ServersModule.provideRetrofit(baseUrl = mockWebServer.url("/").toString(), okHttpClient = okHttpClient, moshi = moshi)
-        okhttpCache = ServersModule.provideCache(folder = "TestCache", context = context)
+        okhttpCache = ServersModule.createCache(folder = "TestCache", context = context, cacheSizeInMB = 10)
 
         val accountManager = AccountManager.get(context)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
+        val syncServiceManager = SyncServiceManager(retrofit, mock(), okhttpCache)
         val syncAccountManager = SyncAccountManagerImpl(mock(), accountManager)
 
         syncManager = SyncManagerImpl(
-            analyticsTracker = mock(),
+            analyticsTracker = AnalyticsTracker.test(),
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,
-            syncServerManager = syncServerManager,
+            syncServiceManager = syncServiceManager,
+            moshi = moshi,
         )
         syncManager.signOut()
     }
@@ -86,7 +88,7 @@ internal class SyncAccountTest {
             syncManager.loginWithEmailAndPassword(
                 email = "support+signin@pocketcasts.com",
                 password = "password_signin",
-                signInSource = SignInSource.UserInitiated.Onboarding
+                signInSource = SignInSource.UserInitiated.Onboarding,
             )
         }
         assert(result is LoginResult.Success)

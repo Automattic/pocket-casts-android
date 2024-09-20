@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 @AndroidEntryPoint
 class FolderEditFragment : BaseDialogFragment() {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
     private val viewModel: FolderEditViewModel by viewModels()
 
     companion object {
@@ -34,7 +34,7 @@ class FolderEditFragment : BaseDialogFragment() {
         fun newInstance(folderUuid: String): FolderEditFragment {
             return FolderEditFragment().apply {
                 arguments = bundleOf(
-                    ARG_FOLDER_UUID to folderUuid
+                    ARG_FOLDER_UUID to folderUuid,
                 )
             }
         }
@@ -55,7 +55,7 @@ class FolderEditFragment : BaseDialogFragment() {
                     FolderEditPage(
                         viewModel = viewModel,
                         onDeleteClick = { confirmFolderDelete() },
-                        onBackClick = { dismiss() }
+                        onBackClick = { dismiss() },
                     )
                 }
             }
@@ -85,8 +85,8 @@ class FolderEditFragment : BaseDialogFragment() {
             AnalyticsEvent.FOLDER_EDIT_DISMISSED,
             mapOf(
                 DID_CHANGE_NAME_KEY to viewModel.isNameChanged,
-                DID_CHANGE_COLOR_KEY to viewModel.isColorIdChanged
-            )
+                DID_CHANGE_COLOR_KEY to viewModel.isColorIdChanged,
+            ),
         )
         super.onDismiss(dialog)
     }

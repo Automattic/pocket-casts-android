@@ -34,7 +34,7 @@ fun HeaderRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
+            .padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
     ) {
         TextH40(
             text = title,

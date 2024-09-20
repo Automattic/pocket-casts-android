@@ -7,5 +7,5 @@ enum class EpisodeStatusEnum {
     DOWNLOAD_FAILED,
     DOWNLOADED,
     WAITING_FOR_WIFI,
-    WAITING_FOR_POWER
+    WAITING_FOR_POWER,
 }

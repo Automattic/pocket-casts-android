@@ -60,7 +60,7 @@ fun StoryYearOverYearView(
             .fillMaxSize()
             .background(story.backgroundColor)
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 30.dp)
+            .padding(vertical = 30.dp),
     ) {
         Spacer(modifier = modifier.height(40.dp))
 
@@ -84,7 +84,7 @@ fun StoryYearOverYearView(
             paused = paused,
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
+                .weight(1f),
         )
     }
 }
@@ -102,12 +102,12 @@ private fun PrimaryText(
 
         listeningPercentage > 10 -> stringResource(
             LR.string.end_of_year_stories_year_over_year_title_went_up,
-            story.yearOverYearListeningTime.formattedPercentage
+            story.yearOverYearListeningTime.formattedPercentage,
         )
 
         listeningPercentage < 0 -> stringResource(
             LR.string.end_of_year_stories_year_over_year_title_went_down,
-            story.yearOverYearListeningTime.formattedPercentage
+            story.yearOverYearListeningTime.formattedPercentage,
         )
 
         else -> stringResource(
@@ -126,12 +126,12 @@ private fun SecondaryText(
     val text = when {
         listeningPercentage > 10 -> stringResource(
             LR.string.end_of_year_stories_year_over_year_subtitle_went_up,
-            story.yearOverYearListeningTime.formattedPercentage
+            story.yearOverYearListeningTime.formattedPercentage,
         )
 
         listeningPercentage < 0 -> stringResource(
             LR.string.end_of_year_stories_year_over_year_subtitle_went_down,
-            story.yearOverYearListeningTime.formattedPercentage
+            story.yearOverYearListeningTime.formattedPercentage,
         )
 
         else -> stringResource(
@@ -160,13 +160,13 @@ fun YearPillars(
                 paused = paused,
                 modifier = Modifier
                     .height((this@BoxWithConstraints.maxHeight.value * previousYearPillarPercentageSize(story.yearOverYearListeningTime)).dp)
-                    .weight(0.5f)
+                    .weight(0.5f),
             ) {
                 YearTextContent(
                     year = "2022",
                     textColor = story.subtitleColor,
                     playedTime = story.yearOverYearListeningTime.totalPlayedTimeLastYear,
-                    modifier = Modifier.alpha(it)
+                    modifier = Modifier.alpha(it),
                 )
             }
 
@@ -181,7 +181,7 @@ fun YearPillars(
                     year = "2023",
                     textColor = story.tintColor,
                     playedTime = story.yearOverYearListeningTime.totalPlayedTimeThisYear,
-                    modifier = Modifier.alpha(it)
+                    modifier = Modifier.alpha(it),
                 )
             }
         }
@@ -217,7 +217,7 @@ private fun YearTextContent(
             disableScale = disableScale(),
             fontFamily = StoryFontFamily,
             fontWeight = FontWeight.W600,
-            modifier = Modifier.offset(y = (-8).dp)
+            modifier = Modifier.offset(y = (-8).dp),
         )
     }
 }
@@ -228,7 +228,7 @@ private fun previousYearPillarPercentageSize(
     yearOverYearListeningTime.percentage == Double.POSITIVE_INFINITY -> 0.3
     yearOverYearListeningTime.percentage > 0.0 -> max(
         yearOverYearListeningTime.totalPlayedTimeLastYear.toDouble() / yearOverYearListeningTime.totalPlayedTimeThisYear,
-        MinimumPillarPercentage
+        MinimumPillarPercentage,
     )
 
     else -> 1.0
@@ -239,7 +239,7 @@ private fun currentYearPillarPercentageSize(
 ) = when {
     yearOverYearListeningTime.percentage < 0.0 -> max(
         yearOverYearListeningTime.totalPlayedTimeThisYear.toDouble() / yearOverYearListeningTime.totalPlayedTimeLastYear,
-        MinimumPillarPercentage
+        MinimumPillarPercentage,
     )
 
     else -> 1.0
@@ -251,7 +251,7 @@ fun YearOverYearWentDownPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         StoryYearOverYearView(
             story = StoryYearOverYear(
-                yearOverYearListeningTime = YearOverYearListeningTime(totalPlayedTimeThisYear = 200, totalPlayedTimeLastYear = 400)
+                yearOverYearListeningTime = YearOverYearListeningTime(totalPlayedTimeThisYear = 200, totalPlayedTimeLastYear = 400),
             ),
             userTier = UserTier.Plus,
             paused = true,

@@ -35,8 +35,7 @@ data class AccessToken(val value: String) {
     }
 }
 
-@JvmInline
-value class RefreshToken(val value: String) {
+data class RefreshToken(val value: String) {
     object Adapter : JsonAdapter<RefreshToken>() {
         override fun fromJson(reader: JsonReader) = RefreshToken(reader.nextString())
 

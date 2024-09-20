@@ -17,6 +17,6 @@ fun LargePageTitle(text: String, modifier: Modifier = Modifier) {
         fontSize = 31.sp,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.theme.colors.primaryText01,
-        modifier = modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
+        modifier = modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
     )
 }

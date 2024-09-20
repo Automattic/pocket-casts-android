@@ -38,7 +38,7 @@ data class ToggleButtonOption(
     val imageId: Int,
     val descriptionId: Int,
     val click: () -> Unit,
-    val isOn: () -> Boolean
+    val isOn: () -> Boolean,
 )
 
 @Composable
@@ -53,9 +53,9 @@ fun ToggleButtonGroup(options: List<ToggleButtonOption>?) {
             .border(
                 width = 2.dp,
                 color = MaterialTheme.theme.colors.primaryInteractive01,
-                shape = RoundedCornerShape(size = 8.dp)
+                shape = RoundedCornerShape(size = 8.dp),
             )
-            .clip(RoundedCornerShape(size = 8.dp))
+            .clip(RoundedCornerShape(size = 8.dp)),
     ) {
         options.forEachIndexed { index, option ->
             val backgroundColor = if (option.isOn()) MaterialTheme.theme.colors.primaryInteractive01 else Color.Transparent
@@ -69,25 +69,25 @@ fun ToggleButtonGroup(options: List<ToggleButtonOption>?) {
                 },
                 modifier = Modifier
                     .border(width = 0.dp, color = Color.Transparent, shape = RoundedCornerShape(size = 8.dp))
-                    .background(color = backgroundColor)
+                    .background(color = backgroundColor),
             ) {
                 val color = if (isSelected) MaterialTheme.theme.colors.primaryInteractive02 else MaterialTheme.theme.colors.primaryInteractive01
                 Icon(
                     painter = painterResource(id = option.imageId),
                     contentDescription = stringResource(option.descriptionId),
-                    tint = color
+                    tint = color,
                 )
                 // button divider
                 if (index <= options.size - 1) {
                     Column(
                         horizontalAlignment = Alignment.End,
-                        modifier = Modifier.fillMaxHeight().fillMaxWidth()
+                        modifier = Modifier.fillMaxHeight().fillMaxWidth(),
                     ) {
                         Box(
                             Modifier
                                 .width(2.dp)
                                 .fillMaxHeight()
-                                .background(color = MaterialTheme.theme.colors.primaryInteractive01)
+                                .background(color = MaterialTheme.theme.colors.primaryInteractive01),
                         )
                     }
                 }
@@ -108,7 +108,7 @@ private fun IconToggleSquareButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier.toggleable(
@@ -117,9 +117,9 @@ private fun IconToggleSquareButton(
             enabled = enabled,
             role = Role.Checkbox,
             interactionSource = interactionSource,
-            indication = rememberRipple(bounded = true, radius = RippleRadius, color = rippleColor)
+            indication = rememberRipple(bounded = true, radius = RippleRadius, color = rippleColor),
         ).then(IconButtonSizeModifier),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
         CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)

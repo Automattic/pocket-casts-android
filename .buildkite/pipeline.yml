@@ -1,8 +1,5 @@
-# Nodes with values to reuse in the pipeline.
-common_params:
-  # Common plugin settings to use with the `plugins` key.
-  - &common_plugins
-    - automattic/bash-cache#2.11.0
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+---
 
 agents:
   queue: "android"
@@ -11,7 +8,7 @@ steps:
   - label: "Gradle Wrapper Validation"
     command: |
       validate_gradle_wrapper
-    plugins: *common_plugins
+    plugins: [$CI_TOOLKIT]
 
   # Wait for Gradle Wrapper to be validated before running any other jobs
   - wait
@@ -19,25 +16,18 @@ steps:
   - group: "Linters"
     steps:
       - label: "☢️ Danger - PR Check"
-        command: .buildkite/commands/danger-pr-check.sh
-        plugins:
-          - docker#v5.8.0:
-              image: "public.ecr.aws/docker/library/ruby:3.2.2"
-              propagate-environment: true
-              environment:
-                - "DANGER_GITHUB_API_TOKEN"
+        command: danger
+        key: danger
         if: "build.pull_request.id != null"
-        agents:
-          queue: "default"
         retry:
           manual:
             permit_on_passed: true
+        agents:
+          queue: "linter"
 
       - label: 'Lint'
-        command: |
-          echo "--- 🧹 Linting"
-          ./gradlew lintDebug
-        plugins: *common_plugins
+        command: ".buildkite/commands/lint.sh"
+        plugins: [$CI_TOOLKIT]
         artifact_paths:
           - "**/build/reports/lint-results*.*"
 
@@ -45,13 +35,13 @@ steps:
     command: |
       echo "--- 🧪 Testing"
       ./gradlew testDebugUnitTest
-    plugins: *common_plugins
+    plugins: [$CI_TOOLKIT]
 
   - label: 'Spotless formatting check'
     command: |
       echo "--- 🔎 Checking formatting with Spotless"
       ./gradlew spotlessCheck
-    plugins: *common_plugins
+    plugins: [$CI_TOOLKIT]
 
   - label: "Instrumented tests"
     command: |
@@ -61,6 +51,26 @@ steps:
       bundle exec fastlane run configure_apply
       echo "--- 🧪 Testing"
       bundle exec fastlane build_and_instrumented_test
-    plugins: *common_plugins
+    plugins: [$CI_TOOLKIT]
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
+
+  - label: "Assemble release APK"
+    command: |
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
+      echo "--- :closed_lock_with_key: Installing Secrets"
+      bundle exec fastlane run configure_apply
+      echo "--- ⚙️ Building release variant"
+      ./gradlew assembleRelease -PskipSentryProguardMappingUpload=true
+    plugins: [ $CI_TOOLKIT ]
+    artifact_paths:
+      - "**/build/outputs/apk/**/*"
+
+  - label: "Prototype Builds"
+    if: "build.pull_request.id != null"
+    command: |
+      ".buildkite/commands/prototype-build.sh"
+    plugins: [ $CI_TOOLKIT ]
+    artifact_paths:
+      - "**/build/outputs/apk/**/*"

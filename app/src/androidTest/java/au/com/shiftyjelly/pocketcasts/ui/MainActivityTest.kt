@@ -33,6 +33,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
+import java.io.File
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
@@ -44,7 +45,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import timber.log.Timber
-import java.io.File
 import au.com.shiftyjelly.pocketcasts.discover.R as DR
 import au.com.shiftyjelly.pocketcasts.podcasts.R as PR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -56,7 +56,9 @@ private const val RUN_SCREENSHOTS = false
 class MainActivityTest {
 
     @get:Rule var activityRule: ActivityScenarioRule<MainActivity> = ActivityScenarioRule(MainActivity::class.java)
+
     @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+
     @get:Rule var permissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     lateinit var device: UiDevice
@@ -220,8 +222,8 @@ class MainActivityTest {
             allOf(
                 withId(DR.id.btnShowAll),
                 childAtPosition(childAtPosition(withClassName(`is`("android.widget.LinearLayout")), 0), 1),
-                isDisplayed()
-            )
+                isDisplayed(),
+            ),
         )
     }
 
@@ -233,8 +235,8 @@ class MainActivityTest {
                     GeneralLocation.CENTER,
                     Press.FINGER,
                     InputDevice.SOURCE_UNKNOWN,
-                    MotionEvent.BUTTON_PRIMARY
-                )
+                    MotionEvent.BUTTON_PRIMARY,
+                ),
             )
         } catch (t: Throwable) {
             // ignore error
@@ -245,8 +247,8 @@ class MainActivityTest {
         val recyclerView = onView(
             allOf(
                 withId(DR.id.rowRecyclerView),
-                withParent(withId(DR.id.carousel))
-            )
+                withParent(withId(DR.id.carousel)),
+            ),
         )
         recyclerView.perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
     }
@@ -267,9 +269,8 @@ class MainActivityTest {
 
     private fun childAtPosition(
         parentMatcher: Matcher<View>,
-        position: Int
+        position: Int,
     ): Matcher<View> {
-
         return object : TypeSafeMatcher<View>() {
             override fun describeTo(description: Description) {
                 description.appendText("Child at position $position in parent ")

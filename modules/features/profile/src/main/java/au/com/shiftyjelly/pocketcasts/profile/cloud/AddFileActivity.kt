@@ -36,6 +36,7 @@ import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
+import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -62,11 +63,6 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -75,6 +71,11 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -133,9 +134,13 @@ class AddFileActivity :
         get() = Dispatchers.Main
 
     @Inject lateinit var fileStorage: FileStorage
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var settings: Settings
 
     private val viewModel: AddFileViewModel by viewModels()
@@ -203,7 +208,7 @@ class AddFileActivity :
                     0
                 }
             },
-            onLockedItemTapped = ::openOnboardingFlow
+            onLockedItemTapped = ::openOnboardingFlow,
         )
 
         updateForm(readOnly = true, loading = true)
@@ -342,7 +347,7 @@ class AddFileActivity :
             navigationIcon = NavigationIcon.BackArrow,
             activity = this,
             theme = theme,
-            menu = R.menu.menu_addfile
+            menu = R.menu.menu_addfile,
         )
         toolbar.setOnMenuItemClickListener(this)
     }
@@ -355,7 +360,7 @@ class AddFileActivity :
                 darkThemeColors()
             } else {
                 lightThemeColors()
-            }
+            },
         )
         colorAdapter.submitList(listItems)
     }
@@ -507,8 +512,7 @@ class AddFileActivity :
                     if (isFileChooserMode) {
                         finish()
                     } else {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INTENT_LINK_CLOUD_FILES))
-                        startActivity(intent)
+                        startActivity(CloudFilesDeepLink.toIntent(this@AddFileActivity))
                         finish()
                     }
                 }
@@ -588,7 +592,7 @@ class AddFileActivity :
     private fun saveBitmapToFile(): File? {
         val bitmap = this.bitmap ?: return null
         try {
-            val outImageFile = fileStorage.getCloudFileImage(uuid)
+            val outImageFile = fileStorage.getOrCreateCloudFileImage(uuid)
             FileOutputStream(outImageFile).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream)
                 return outImageFile
@@ -681,11 +685,14 @@ class AddFileActivity :
     @UnstableApi
     private fun preparePlayer(uri: Uri) {
         val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(0, 0, 0, 0).build()
-        val player = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
+        val player = ExoPlayer.Builder(this)
+            .setLoadControl(loadControl)
+            .setReleaseTimeoutMs(settings.getPlayerReleaseTimeOutMs())
+            .build()
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 val episodeMetadata = EpisodeFileMetadata()
-                episodeMetadata.read(tracks, true, this@AddFileActivity)
+                episodeMetadata.read(tracks, useEpisodeArtwork = true, this@AddFileActivity)
                 episodeMetadata.embeddedArtworkPath?.let {
                     val artworkUri = Uri.parse(it)
                     loadImageFromUri(artworkUri, isFile = true)

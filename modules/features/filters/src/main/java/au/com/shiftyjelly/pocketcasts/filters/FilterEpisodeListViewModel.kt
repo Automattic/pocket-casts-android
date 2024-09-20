@@ -5,8 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -24,15 +23,15 @@ import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.max
-import kotlin.math.min
 
 @HiltViewModel
 class FilterEpisodeListViewModel @Inject constructor(
@@ -41,7 +40,7 @@ class FilterEpisodeListViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
 
     companion object {
@@ -118,7 +117,7 @@ class FilterEpisodeListViewModel @Inject constructor(
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
                     listOf(PlaylistProperty.Sort(sortOrder)),
-                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
                 playlistManager.update(playlist, userPlaylistUpdate)
             }
@@ -132,7 +131,7 @@ class FilterEpisodeListViewModel @Inject constructor(
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
                     listOf(PlaylistProperty.Starred),
-                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
                 playlistManager.update(playlist, userPlaylistUpdate)
             }
@@ -144,7 +143,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         val trimmedList = episodes.subList(0, min(MAX_DOWNLOAD_ALL, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "filter download all", false)
+                downloadManager.addEpisodeToQueue(it, "filter download all", fireEvent = false, source = SourceView.FILTERS)
             }
         }
     }
@@ -161,6 +160,5 @@ class FilterEpisodeListViewModel @Inject constructor(
 
     fun trackFilterShown() {
         analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
-        FirebaseAnalyticsTracker.openedFilter()
     }
 }

@@ -7,22 +7,25 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
+import androidx.core.text.isDigitsOnly
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @AndroidEntryPoint
 @SuppressLint("SpecifyJobSchedulerIdRange")
@@ -77,16 +80,55 @@ class VersionMigrationsJob : JobService() {
             jobScheduler.schedule(
                 JobInfo.Builder(JobIds.VERSION_MIGRATION_JOB_ID, ComponentName(context, VersionMigrationsJob::class.java))
                     .setOverrideDeadline(500) // don't let Android wait for more than 500ms before kicking this off
-                    .build()
+                    .build(),
             )
+        }
+
+        /**
+         * Convert the shared preference multi_select_items from resource ids to strings.
+         * From: <string name="multi_select_items">2131362844,2131362845,2131362852,2131362850,2131362831,2131362829,2131362836</string>
+         * To: <string name="multi_select_items">star,play_last,play_next,download,archive,share,mark_as_played</string>
+         */
+        fun upgradeMultiSelectItems(settings: Settings) {
+            val items = settings.getMultiSelectItems()
+            if (items.isEmpty() || !items.first().isDigitsOnly()) {
+                return
+            }
+
+            val resourceToSetting = hashMapOf(
+                // 7.70
+                "2131362859" to "star",
+                "2131362851" to "play_last",
+                "2131362852" to "play_next",
+                "2131362838" to "download",
+                "2131362836" to "archive",
+                "2131362857" to "share",
+                "2131362843" to "mark_as_played",
+                // 7.71-rc-1 and 7.71-rc-2
+                "2131362834" to "star",
+                "2131362826" to "play_last",
+                "2131362827" to "play_next",
+                "2131362813" to "download",
+                "2131362811" to "archive",
+                "2131362832" to "share",
+                "2131362818" to "mark_as_played",
+            )
+
+            val itemsUpdated = items.map { resourceToSetting[it] ?: it }
+            settings.setMultiSelectItems(itemsUpdated)
         }
     }
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var fileStorage: FileStorage
+
     @Inject lateinit var appDatabase: AppDatabase
+
     @Inject lateinit var playbackManager: PlaybackManager
 
     @Volatile private var shouldKeepRunning = true
@@ -153,12 +195,26 @@ class VersionMigrationsJob : JobService() {
         if (previousVersionCode < 6362) {
             upgradeTrimSilenceMode()
         }
+
+        if (previousVersionCode < 9209) {
+            consolidateEmbeddedArtworkSettings(applicationContext)
+        }
+
+        // Exclude 7.63-rc-3 (9227) from the migration as it was already migrated.
+        if (previousVersionCode < 9230 && previousVersionCode != 9227) {
+            migrateToGranularEpisodeArtworkSettings(applicationContext)
+        }
+
+        if (previousVersionCode < 9235) {
+            enableDynamicColors()
+        }
+
+        upgradeMultiSelectItems(settings)
     }
 
     private fun removeOldTempPodcastDirectory() {
         try {
-            val oldTempDirectory = fileStorage.oldTempPodcastDirectory
-            FileUtil.deleteDirectoryContents(oldTempDirectory.absolutePath)
+            fileStorage.getOrCreateEpisodesOldTempDir()?.absolutePath?.let(FileUtil::deleteDirContents)
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clear old podcast temp directory")
         }
@@ -172,7 +228,7 @@ class VersionMigrationsJob : JobService() {
             playbackManager.removeEpisode(
                 episodeToRemove = episode,
                 source = SourceView.UNKNOWN,
-                userInitiated = false
+                userInitiated = false,
             )
             appDatabase.episodeDao().delete(episode)
         }
@@ -182,21 +238,21 @@ class VersionMigrationsJob : JobService() {
     private fun performV7Migration() {
         // We want v6 users to keep defaulting to download, new users should get the new stream default
         val currentStreamingPreference = if (settings.contains(Settings.PREFERENCE_GLOBAL_STREAMING_MODE)) settings.streamingMode.value else false
-        settings.streamingMode.set(currentStreamingPreference)
+        settings.streamingMode.set(currentStreamingPreference, updateModifiedAt = false)
     }
 
     private fun addUpNextAutoDownload() {
-        settings.autoDownloadUpNext.set(!settings.streamingMode.value)
+        settings.autoDownloadUpNext.set(!settings.streamingMode.value, updateModifiedAt = false)
     }
 
     private fun deletePodcastImages() {
         try {
-            val thumbnailsFolder = fileStorage.getOrCreateDirectory("podcast_thumbnails")
-            if (thumbnailsFolder.exists()) {
+            val thumbnailsFolder = fileStorage.getOrCreateDir("podcast_thumbnails")
+            if (thumbnailsFolder != null && thumbnailsFolder.exists()) {
                 thumbnailsFolder.delete()
             }
-            val imageFolder = fileStorage.getOrCreateDirectory("images")
-            if (imageFolder.exists()) {
+            val imageFolder = fileStorage.getOrCreateDir("images")
+            if (imageFolder != null && imageFolder.exists()) {
                 imageFolder.delete()
             }
         } catch (e: Exception) {
@@ -230,5 +286,24 @@ class VersionMigrationsJob : JobService() {
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not migrate trimsilence mode on podcasts")
         }
+    }
+
+    private fun consolidateEmbeddedArtworkSettings(context: Context) {
+        if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+            val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
+            val useFileArtwork = settings.getBooleanForKey("useEmbeddedArtwork", false)
+            settings.setBooleanForKey("useEpisodeArtwork", useEpisodeArtwork || useFileArtwork)
+        }
+    }
+
+    private fun migrateToGranularEpisodeArtworkSettings(context: Context) {
+        if (!Util.isWearOs(context) && !Util.isAutomotive(context)) {
+            val useEpisodeArtwork = settings.getBooleanForKey("useEpisodeArtwork", false)
+            settings.artworkConfiguration.set(ArtworkConfiguration((useEpisodeArtwork)), updateModifiedAt = true)
+        }
+    }
+
+    private fun enableDynamicColors() {
+        settings.useDynamicColorsForWidget.set(true, updateModifiedAt = true)
     }
 }

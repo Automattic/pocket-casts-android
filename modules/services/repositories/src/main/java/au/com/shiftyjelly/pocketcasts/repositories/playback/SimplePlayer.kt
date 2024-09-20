@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
-import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -9,42 +8,41 @@ import android.view.SurfaceView
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.media3.common.C
-import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.extractor.DefaultExtractorsFactory
-import androidx.media3.extractor.mp3.Mp3Extractor
+import androidx.media3.ui.WearUnsuitableOutputPlaybackSuppressionResolverListener
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.util.concurrent.TimeUnit
 
-class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val context: Context, override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit) : LocalPlayer(onPlayerEvent) {
+class SimplePlayer(
+    val settings: Settings,
+    val statsManager: StatsManager,
+    val context: Context,
+    private val dataSourceFactory: ExoPlayerDataSourceFactory,
+    override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit,
+) : LocalPlayer(onPlayerEvent) {
     private val reducedBufferManufacturers = listOf("mercedes-benz")
     private val useReducedBuffer = reducedBufferManufacturers.contains(Build.MANUFACTURER.lowercase()) || Util.isWearOs(context)
-    private val bufferTimeMinMillis = if (useReducedBuffer) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(5).toInt()
-    private val bufferTimeMaxMillis = bufferTimeMinMillis
+    private val bufferTimeMinMillis = TimeUnit.MINUTES.toMillis(2).toInt()
+    private val bufferTimeMaxMillis = if (useReducedBuffer) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(4).toInt()
 
     // Be careful increasing the size of the back buffer. It can easily lead to OOM errors.
-    private val backBufferTimeMillis = if (useReducedBuffer) TimeUnit.SECONDS.toMillis(30).toInt() else TimeUnit.MINUTES.toMillis(1).toInt()
+    private val backBufferTimeMillis = if (useReducedBuffer) TimeUnit.SECONDS.toMillis(30).toInt() else TimeUnit.SECONDS.toMillis(50).toInt()
 
     private var player: ExoPlayer? = null
 
@@ -102,15 +100,18 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         prepare()
     }
 
+    @OptIn(UnstableApi::class)
     override fun handleStop() {
         try {
             player?.stop()
         } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Play failed to stop.")
         }
 
         try {
             player?.release()
         } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_PLAYBACK, e, "Play failed to release.")
         }
 
         player = null
@@ -167,6 +168,10 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         player?.volume = volume
     }
 
+    fun getVolume(): Float? {
+        return player?.volume
+    }
+
     override fun setPodcast(podcast: Podcast?) {}
 
     @OptIn(UnstableApi::class)
@@ -181,7 +186,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
                 minBufferMillis,
                 maxBufferMillis,
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
             )
             .setBackBuffer(backBufferMillis, DefaultLoadControl.DEFAULT_RETAIN_BACK_BUFFER_FROM_KEYFRAME)
             .build()
@@ -191,9 +196,11 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         val player = ExoPlayer.Builder(context, renderer)
             .setTrackSelector(trackSelector)
             .setLoadControl(loadControl)
+            .setReleaseTimeoutMs(settings.getPlayerReleaseTimeOutMs())
             .setSeekForwardIncrementMs(settings.skipForwardInSecs.value * 1000L)
             .setSeekBackIncrementMs(settings.skipBackInSecs.value * 1000L)
             .build()
+        player.addListener(WearUnsuitableOutputPlaybackSuppressionResolverListener(context))
 
         renderer.onAudioSessionId(player.audioSessionId)
 
@@ -203,8 +210,9 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         setPlayerEffects()
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
+                episodeUuid?.let { onEpisodeChanged(it) }
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
-                episodeMetadata.read(tracks, settings, context)
+                episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
             }
 
@@ -232,44 +240,17 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
 
         addVideoListener(player)
 
-        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Pocket Casts")
-            .setAllowCrossProtocolRedirects(true)
-        val dataSourceFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
-        val extractorsFactory = DefaultExtractorsFactory().setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING)
-        val location = episodeLocation
-        if (location == null) {
+        val episodeLocation = episodeLocation
+        if (episodeLocation == null) {
+            onError(PlayerEvent.PlayerError("No episode location found"))
+            return
+        }
+        val source = dataSourceFactory.createMediaSource(episodeLocation)
+        if (source == null) {
             onError(PlayerEvent.PlayerError("Episode has no source"))
             return
         }
 
-        val uri: Uri = when (location) {
-            is EpisodeLocation.Stream -> {
-                if (location.uri != null) {
-                    Uri.parse(location.uri)
-                } else {
-                    onError(PlayerEvent.PlayerError("Stream has no uri"))
-                    return
-                }
-            }
-            is EpisodeLocation.Downloaded -> {
-                val filePath = location.filePath
-                if (filePath != null) {
-                    Uri.fromFile(File(filePath))
-                } else {
-                    onError(PlayerEvent.PlayerError("File has no file path"))
-                    return
-                }
-            }
-        } ?: return
-
-        val mediaItem = MediaItem.fromUri(uri)
-        val source = if (isHLS) {
-            HlsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
-        } else {
-            ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                .createMediaSource(mediaItem)
-        }
         player.setMediaSource(source)
         player.prepare()
 

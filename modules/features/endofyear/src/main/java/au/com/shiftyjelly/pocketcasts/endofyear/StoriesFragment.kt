@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -35,7 +35,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         get() = StoriesSource.fromString(arguments?.getString(ARG_SOURCE))
 
     @Inject
-    lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    lateinit var analyticsTracker: AnalyticsTracker
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -72,7 +72,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                         onRetryClicked = {
                             viewModel.onRetryClicked()
                         },
-                        onUpsellClicked = ::onUpsellClicked
+                        onUpsellClicked = ::onUpsellClicked,
                     )
                 }
             }
@@ -104,7 +104,8 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         MODAL("modal"),
         PROFILE("profile"),
         USER_LOGIN("user_login"),
-        UNKNOWN("unknown");
+        UNKNOWN("unknown"),
+        ;
         companion object {
             fun fromString(source: String?) =
                 StoriesSource.values().find { it.value == source } ?: UNKNOWN

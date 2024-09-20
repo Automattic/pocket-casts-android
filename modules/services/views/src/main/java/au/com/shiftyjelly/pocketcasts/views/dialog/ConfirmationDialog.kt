@@ -37,9 +37,11 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     private var title: String? = null
     private var summary: String? = null
+
     @DrawableRes private var iconId: Int = 0
     private lateinit var buttonType: ButtonType
     var secondaryType: ButtonType? = null
+
     @AttrRes private var iconTintAttr: Int? = UR.attr.primary_icon_01
     private var onConfirm: (() -> Unit)? = null
     private var onSecondary: (() -> Unit)? = null

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,38 +18,47 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.HelpViewModel
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
+import java.io.File
 import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
     @Inject lateinit var support: Support
 
     val viewModel by viewModels<HelpViewModel>()
@@ -67,11 +77,17 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            menu = R.menu.menu_help
+            menu = R.menu.menu_help,
         )
         toolbar.setOnMenuItemClickListener(this)
 
-        FirebaseAnalyticsTracker.userGuideOpened()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.uiState.collect { state ->
+                    loadingView?.isVisible = state.isLoading
+                }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,12 +124,29 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
             contactSupport()
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    view?.updatePadding(bottom = it)
+                }
+            }
+        }
+
         return view
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        setupKeyboardModeResize()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        setupKeyboardModePan()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean =
         when (item.itemId) {
-
             R.id.menu_logs -> {
                 val fragment = LogsFragment()
                 (activity as? FragmentHostListener)?.addFragment(fragment)
@@ -123,6 +156,11 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
             R.id.menu_status_page -> {
                 val fragment = StatusFragment()
                 (activity as? FragmentHostListener)?.addFragment(fragment)
+                true
+            }
+
+            R.id.menu_export_database -> {
+                viewModel.onExportDatabaseMenuItemClick(::sendIntentFile)
                 true
             }
 
@@ -219,7 +257,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         }
 
         analyticsTracker.track(AnalyticsEvent.SETTINGS_LEAVE_FEEDBACK)
-        FirebaseAnalyticsTracker.userGuideEmailFeedback()
     }
 
     private fun contactSupport() {
@@ -229,7 +266,6 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
         }
 
         analyticsTracker.track(AnalyticsEvent.SETTINGS_GET_SUPPORT)
-        FirebaseAnalyticsTracker.userGuideEmailSupport()
     }
 
     private fun useForumPopup() {
@@ -261,5 +297,15 @@ class HelpFragment : BaseFragment(), HasBackstack, Toolbar.OnMenuItemClickListen
                 UiUtil.displayDialogNoEmailApp(context)
             }
         }
+    }
+
+    private fun sendIntentFile(file: File) {
+        val context = context ?: return
+        IntentUtil.sendIntent(
+            context = context,
+            file = file,
+            intentType = "application/zip",
+            errorMessage = context.getString(LR.string.settings_export_database_failed),
+        )
     }
 }

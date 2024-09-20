@@ -53,7 +53,7 @@ fun StoryListeningTimeView(
         StoryBlurredBackground(
             Offset(
                 -LocalView.current.width * 0.7f,
-                LocalView.current.height * 0.3f
+                LocalView.current.height * 0.3f,
             ),
         )
         Column(
@@ -62,7 +62,7 @@ fun StoryListeningTimeView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 30.dp)
+                .padding(vertical = 30.dp),
         ) {
             Spacer(modifier = modifier.height(40.dp))
 
@@ -135,9 +135,9 @@ private fun ListenedTimeTexts(story: StoryListeningTime) {
                     ),
                     lineHeightStyle = LineHeightStyle(
                         alignment = LineHeightStyle.Alignment.Top,
-                        trim = LineHeightStyle.Trim.Both
-                    )
-                )
+                        trim = LineHeightStyle.Trim.Both,
+                    ),
+                ),
             ),
             modifier = Modifier.paddingFromBaseline(top = 0.sp, bottom = 0.sp),
         )

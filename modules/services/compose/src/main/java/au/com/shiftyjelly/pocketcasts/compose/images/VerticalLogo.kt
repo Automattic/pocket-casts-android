@@ -18,7 +18,7 @@ fun VerticalLogo(modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(if (MaterialTheme.theme.isLight) IR.drawable.ic_logo_title_ver_light else IR.drawable.ic_logo_title_ver_dark),
         contentDescription = stringResource(LR.string.pocket_casts),
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

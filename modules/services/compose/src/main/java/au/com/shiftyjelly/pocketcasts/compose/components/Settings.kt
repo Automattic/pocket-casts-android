@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.Icons
@@ -47,8 +46,8 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
-import kotlinx.coroutines.delay
 import kotlin.time.Duration
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 object SettingsSection {
@@ -67,12 +66,14 @@ sealed class SettingRowToggle {
 fun SettingSection(
     modifier: Modifier = Modifier,
     heading: String? = null,
+    subHeading: String? = null,
     indent: Boolean = true,
+    showDivider: Boolean = true,
     content: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(vertical = verticalPadding)
+            modifier = Modifier.padding(vertical = verticalPadding),
         ) {
             if (heading != null) {
                 TextH40(
@@ -82,13 +83,28 @@ fun SettingSection(
                         start = if (indent) indentedStartPadding else horizontalPadding,
                         end = horizontalPadding,
                         top = verticalPadding,
-                        bottom = verticalPadding
-                    )
+                        bottom = verticalPadding,
+                    ),
+                )
+            }
+            if (subHeading != null) {
+                TextP50(
+                    text = subHeading,
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.padding(
+                        start = if (indent) indentedStartPadding else horizontalPadding,
+                        end = horizontalPadding,
+                        top = if (heading == null) verticalPadding else 0.dp,
+                        bottom = verticalPadding,
+                    ),
                 )
             }
             content()
         }
-        HorizontalDivider()
+        if (showDivider) {
+            HorizontalDivider()
+        }
     }
 }
 
@@ -104,14 +120,13 @@ fun <T> SettingRadioDialogRow(
     optionToLocalisedString: (T) -> String,
     onSave: (T) -> Unit,
 ) {
-
     var showDialog by remember { mutableStateOf(false) }
     SettingRow(
         primaryText = primaryText,
         secondaryText = secondaryText,
         icon = icon,
         iconGradientColors = iconGradientColors,
-        modifier = modifier.clickable { showDialog = true }
+        modifier = modifier.clickable { showDialog = true },
     ) {
         if (showDialog) {
             RadioDialog(
@@ -119,7 +134,7 @@ fun <T> SettingRadioDialogRow(
                 options = options.map { Pair(it, optionToLocalisedString(it)) },
                 savedOption = savedOption,
                 onSave = onSave,
-                dismissDialog = { showDialog = false }
+                dismissDialog = { showDialog = false },
             )
         }
     }
@@ -142,7 +157,6 @@ fun SettingRow(
     showFlashWithDelay: Duration? = null, // if null, no flash is shown
     additionalContent: @Composable () -> Unit = {},
 ) {
-
     var flashAlphaTarget by remember { mutableStateOf(0f) }
     LaunchedEffect(showFlashWithDelay) {
         if (showFlashWithDelay != null) {
@@ -158,7 +172,7 @@ fun SettingRow(
     )
 
     val backgroundColor = MaterialTheme.theme.colors.primaryInteractive01Active.copy(
-        alpha = flashAlpha
+        alpha = flashAlpha,
     )
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -168,35 +182,35 @@ fun SettingRow(
             .padding(
                 end = horizontalPadding,
                 top = verticalPadding,
-                bottom = verticalPadding
-            )
+                bottom = verticalPadding,
+            ),
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.width(if (indent || icon != null) indentedStartPadding else horizontalPadding)
+            modifier = Modifier.width(if (indent || icon != null) indentedStartPadding else horizontalPadding),
         ) {
             if (icon != null) {
                 if (iconGradientColors != null) {
                     GradientIcon(
                         painter = icon,
-                        colors = iconGradientColors
+                        colors = iconGradientColors,
                     )
                 } else {
                     Icon(
                         painter = icon,
                         contentDescription = null,
                         tint = MaterialTheme.theme.colors.primaryInteractive01,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
         }
         Column(
             modifier = Modifier
-                .weight(1f)
+                .weight(1f),
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextP40(
                     text = primaryText,
@@ -207,7 +221,7 @@ fun SettingRow(
                     Spacer(Modifier.width(8.dp))
                     Image(
                         painter = painterResource(primaryTextEndDrawable),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 }
             }
@@ -243,19 +257,43 @@ fun SettingRow(
                     colors = SwitchDefaults.colors(
                         uncheckedThumbColor = Color.Gray,
                         uncheckedTrackColor = Color.Gray,
-                    )
+                    ),
                 )
             }
-            SettingRowToggle.None -> { /* Nothing */
+            SettingRowToggle.None -> {
+                /* Nothing */
             }
         }
+    }
+}
+
+@Composable
+fun SettingInfoRow(
+    text: String,
+    modifier: Modifier = Modifier,
+    indent: Boolean = true,
+) {
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = modifier
+            .padding(
+                start = if (indent) indentedStartPadding else horizontalPadding,
+                end = horizontalPadding,
+                top = verticalPadding,
+                bottom = verticalPadding,
+            ),
+    ) {
+        TextP50(
+            text = text,
+            color = MaterialTheme.theme.colors.primaryText01,
+        )
     }
 }
 
 @Preview
 @Composable
 private fun SettingSectionPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) {
     AppTheme(theme) {
         SettingSection(heading = "Section Heading") {
@@ -266,11 +304,11 @@ private fun SettingSectionPreview(
             )
             SettingRow(
                 primaryText = "Row with switch",
-                toggle = SettingRowToggle.Switch(checked = true)
+                toggle = SettingRowToggle.Switch(checked = true),
             )
             SettingRow(
                 primaryText = "Row with checkbox",
-                toggle = SettingRowToggle.Checkbox(checked = true)
+                toggle = SettingRowToggle.Checkbox(checked = true),
             )
             SettingRow(
                 primaryText = "Such very very very very very very very long text",
@@ -315,7 +353,7 @@ fun SettingRowIconProjectPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with icon",
-            icon = painterResource(IR.drawable.ic_profile_settings)
+            icon = painterResource(IR.drawable.ic_profile_settings),
         )
     }
 }
@@ -327,7 +365,7 @@ fun SettingRowIconMaterialPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with icon",
-            icon = rememberVectorPainter(Icons.Default.Share)
+            icon = rememberVectorPainter(Icons.Default.Share),
         )
     }
 }
@@ -340,7 +378,7 @@ fun SettingRowIconGradientPreview() {
         SettingRow(
             primaryText = "Row with icon",
             icon = painterResource(IR.drawable.ic_podcasts),
-            iconGradientColors = listOf(Color.Red, Color.Yellow)
+            iconGradientColors = listOf(Color.Red, Color.Yellow),
         )
     }
 }
@@ -352,7 +390,7 @@ fun SettingRowSwitchPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with switch",
-            toggle = SettingRowToggle.Switch(checked = true)
+            toggle = SettingRowToggle.Switch(checked = true),
         )
     }
 }
@@ -364,7 +402,7 @@ fun SettingRowCheckboxPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with checkbox",
-            toggle = SettingRowToggle.Checkbox(checked = true)
+            toggle = SettingRowToggle.Checkbox(checked = true),
         )
     }
 }
@@ -388,5 +426,16 @@ fun SettingSectionDarkPreview() {
         SettingSection(heading = "Section heading") {
             SettingRow(primaryText = "Setting row")
         }
+    }
+}
+
+@ShowkaseComposable(name = "SettingInfoRow", group = "Setting")
+@Preview(name = "Info")
+@Composable
+fun SettingInfoRowPreview() {
+    AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+        SettingInfoRow(
+            text = "The quick brown fox jumps over the lazy dog",
+        )
     }
 }

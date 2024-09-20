@@ -6,26 +6,31 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 
 enum class BadgeType(
     internal val persistedInt: Int,
+    val serverId: Int,
     @StringRes val labelId: Int,
     val analyticsValue: String,
 ) {
     OFF(
         persistedInt = 0,
+        serverId = 0,
         labelId = R.string.podcasts_badges_off,
         analyticsValue = "off",
     ),
 
     LATEST_EPISODE(
         persistedInt = 1,
+        serverId = 1,
         labelId = R.string.podcasts_badges_only_latest_episode,
         analyticsValue = "only_latest_episode",
     ),
 
     ALL_UNFINISHED(
         persistedInt = 2,
+        serverId = 2,
         labelId = R.string.podcasts_badges_all_unfinished,
         analyticsValue = "unfinished_episodes",
-    );
+    ),
+    ;
 
     companion object {
         val defaultValue = OFF
@@ -36,5 +41,7 @@ enum class BadgeType(
                     LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Unknown persisted int for badge type: $value")
                     defaultValue
                 }
+
+        fun fromServerId(id: Int) = entries.find { it.serverId == id } ?: defaultValue
     }
 }

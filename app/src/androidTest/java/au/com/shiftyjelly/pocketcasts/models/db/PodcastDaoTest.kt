@@ -4,8 +4,13 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import com.squareup.moshi.Moshi
+import java.util.UUID
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -13,19 +18,22 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class PodcastDaoTest {
     lateinit var podcastDao: PodcastDao
+    lateinit var episodeDao: EpisodeDao
     lateinit var testDb: AppDatabase
 
     @Before
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
         podcastDao = testDb.podcastDao()
+        episodeDao = testDb.episodeDao()
     }
 
     @After

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync.update
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -11,25 +12,22 @@ import au.com.shiftyjelly.pocketcasts.servers.extensions.nextBooleanOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextDoubleOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrDefault
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextIntOrNull
+import au.com.shiftyjelly.pocketcasts.servers.extensions.nextLongOrNull
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextStringOrNull
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import java.util.Date
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
-import java.util.Date
 
-class SyncUpdateResponseParser(
-    private val featureFlagWrapper: FeatureFlagWrapper,
-) : JsonAdapter<SyncUpdateResponse>() {
+class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
 
     @ToJson
     override fun toJson(writer: JsonWriter, value: SyncUpdateResponse?) {}
@@ -91,11 +89,7 @@ class SyncUpdateResponseParser(
             "UserFolder" -> readFolder(reader, response)
             "UserPodcast" -> readPodcast(reader, response)
             "UserEpisode" -> readEpisode(reader, response)
-            "UserBookmark" -> if (featureFlagWrapper.isEnabled(Feature.BOOKMARKS_ENABLED)) {
-                readBookmark(reader, response)
-            } else {
-                reader.skipValue()
-            }
+            "UserBookmark" -> readBookmark(reader, response)
             null -> throw Exception("No type found for field")
             else -> reader.skipValue()
         }
@@ -112,6 +106,8 @@ class SyncUpdateResponseParser(
                 "duration" -> episode.duration = reader.nextDoubleOrNull()
                 "playing_status" -> episode.playingStatus = readPlayingStatus(reader)
                 "is_deleted" -> episode.isArchived = reader.nextBooleanOrNull()
+                "deselected_chapters" -> episode.deselectedChapters = readDeselectedChapters(reader)
+                "deselected_chapters_modified" -> episode.deselectedChaptersModified = readDeselectedChaptersModified(reader)
                 else -> reader.skipValue()
             }
         }
@@ -131,6 +127,17 @@ class SyncUpdateResponseParser(
         }
     }
 
+    private fun readDeselectedChapters(reader: JsonReader): ChapterIndices? {
+        if (reader.peek() == JsonReader.Token.NULL) {
+            return reader.nextNull()
+        }
+        return ChapterIndices.fromString(reader.nextString())
+    }
+
+    private fun readDeselectedChaptersModified(reader: JsonReader): Long? {
+        return reader.nextLongOrNull()
+    }
+
     private fun readPodcast(reader: JsonReader, response: SyncUpdateResponse) {
         val podcast = SyncUpdateResponse.PodcastSync()
         reader.beginObject()
@@ -141,10 +148,7 @@ class SyncUpdateResponseParser(
                 "auto_start_from" -> podcast.startFromSecs = reader.nextIntOrNull()
                 "episodes_sort_order" -> podcast.episodesSortOrder = reader.nextIntOrNull()
                 "auto_skip_last" -> podcast.skipLastSecs = reader.nextIntOrNull()
-                "folder_uuid" -> {
-                    val folderUuid = reader.nextStringOrNull()
-                    podcast.folderUuid = if (folderUuid == null || folderUuid == Folder.homeFolderUuid) null else folderUuid
-                }
+                "folder_uuid" -> podcast.folderUuid = reader.nextStringOrNull()
                 "sort_position" -> podcast.sortPosition = reader.nextIntOrNull()
                 "date_added" -> podcast.dateAdded = reader.nextStringOrNull()?.parseIsoDate()
                 else -> reader.skipValue()
@@ -221,7 +225,7 @@ class SyncUpdateResponseParser(
                 sortPosition = sortPosition,
                 podcastsSortType = podcastsSortType,
                 deleted = deleted,
-                syncModified = 0
+                syncModified = Folder.SYNC_MODIFIED_FROM_SERVER,
             )
             response.folders.add(folder)
         }
@@ -259,7 +263,7 @@ class SyncUpdateResponseParser(
                 title = title,
                 deleted = deleted ?: false,
                 createdAt = createdAt,
-                syncStatus = SyncStatus.SYNCED
+                syncStatus = SyncStatus.SYNCED,
             )
             response.bookmarks.add(bookmark)
         }

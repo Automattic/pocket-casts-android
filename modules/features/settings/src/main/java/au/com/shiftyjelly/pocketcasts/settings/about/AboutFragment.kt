@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings.about
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -18,6 +17,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,9 +25,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -51,8 +50,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -65,28 +65,36 @@ import au.com.shiftyjelly.pocketcasts.settings.components.RowTextButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getComposeThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.rateUs
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class AboutFragment : BaseFragment() {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var settings: Settings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
+                val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                 CallOnce {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHOWN)
                 }
 
                 AppThemeWithBackground(theme.activeTheme) {
-                    AboutPage(onBackPressed = { closeFragment() })
+                    AboutPage(
+                        onBackPressed = { closeFragment() },
+                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+                    )
                 }
             }
         }
@@ -105,7 +113,7 @@ private val icons = listOf(
         color = UR.attr.about_logo_wordpress_color,
         rotate = (-45..45).random(),
         x = 0.0,
-        y = 23.20
+        y = 23.20,
     ),
     AppIcon(
         image = UR.attr.about_logo_jetpack,
@@ -114,7 +122,7 @@ private val icons = listOf(
         color = UR.attr.about_logo_jetpack_color,
         rotate = (-45..45).random(),
         x = 6.17,
-        y = 0.0
+        y = 0.0,
     ),
     AppIcon(
         image = UR.attr.about_logo_dayone,
@@ -123,7 +131,7 @@ private val icons = listOf(
         color = UR.attr.about_logo_dayone_color,
         rotate = (-45..45).random(),
         x = 3.83,
-        y = 7.40
+        y = 7.40,
     ),
     AppIcon(
         image = UR.attr.about_logo_pocketcasts,
@@ -132,7 +140,7 @@ private val icons = listOf(
         color = UR.attr.about_logo_pocketcasts_color,
         rotate = 0,
         x = 2.77,
-        y = 0.0
+        y = 0.0,
     ),
     AppIcon(
         image = UR.attr.about_logo_woo,
@@ -141,7 +149,7 @@ private val icons = listOf(
         color = UR.attr.about_logo_woo_color,
         rotate = (-45..45).random(),
         x = 1.94,
-        y = 17.28
+        y = 17.28,
     ),
     AppIcon(
         image = UR.attr.about_logo_simplenote,
@@ -150,7 +158,7 @@ private val icons = listOf(
         color = UR.attr.about_logo_simplenote_color,
         rotate = (-45..45).random(),
         x = 1.49,
-        y = 0.0
+        y = 0.0,
     ),
     AppIcon(
         image = UR.attr.about_logo_tumblr,
@@ -159,86 +167,122 @@ private val icons = listOf(
         color = UR.attr.about_logo_tumblr_color,
         rotate = (-45..45).random(),
         x = 1.205,
-        y = 19.9
-    )
+        y = 19.9,
+    ),
 )
 
 @Composable
-private fun AboutPage(onBackPressed: () -> Unit) {
+private fun AboutPage(
+    onBackPressed: () -> Unit,
+    bottomInset: Dp,
+) {
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
-    Column(
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(MaterialTheme.theme.colors.primaryUi02)
-            .verticalScroll(scrollState)
+            .background(MaterialTheme.theme.colors.primaryUi02),
+        contentPadding = PaddingValues(bottom = bottomInset),
     ) {
-        ThemedTopAppBar(
-            title = stringResource(LR.string.settings_title_about),
-            onNavigationClick = onBackPressed
-        )
-        Image(
-            painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
-            contentDescription = stringResource(LR.string.settings_app_icon),
-            modifier = Modifier.padding(top = 56.dp)
-        )
-        Text(
-            text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier.padding(top = 8.dp),
-            color = MaterialTheme.theme.colors.primaryText02
-        )
-        HorizontalDivider(
-            modifier = Modifier.padding(top = 56.dp, bottom = 8.dp)
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_rate_us),
-            onClick = { rateUs(context) }
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_share_with_friends),
-            onClick = { shareWithFriends(context) }
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_website),
-            secondaryText = "pocketcasts.com",
-            onClick = { openUrl("https://www.pocketcasts.com", context) }
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_instagram),
-            secondaryText = "@pocketcasts",
-            onClick = { openUrl("https://www.instagram.com/pocketcasts/", context) }
-        )
-        RowTextButton(
-            text = stringResource(LR.string.settings_about_twitter),
-            secondaryText = "@pocketcasts",
-            onClick = { openUrl("https://twitter.com/pocketcasts", context) }
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        AutomatticFamilyRow()
-        HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
-        LegalAndMoreRow()
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        Column(
-            modifier = Modifier
-                .clickable { openUrl("https://automattic.com/work-with-us/", context) }
-                .fillMaxWidth()
-                .padding(all = 14.dp)
-        ) {
-            Text(
-                text = stringResource(LR.string.settings_about_work_with_us),
-                fontSize = 17.sp,
-                color = MaterialTheme.theme.colors.primaryText01
-            )
-            Text(
-                text = stringResource(LR.string.settings_about_work_from_anywhere),
-                fontSize = 14.sp,
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.theme.colors.primaryText02
+        item {
+            ThemedTopAppBar(
+                title = stringResource(LR.string.settings_title_about),
+                onNavigationClick = onBackPressed,
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Image(
+                painter = painterResource(context.getThemeDrawable(UR.attr.logo_title_vertical)),
+                contentDescription = stringResource(LR.string.settings_app_icon),
+                modifier = Modifier.padding(top = 56.dp),
+            )
+        }
+        item {
+            Text(
+                text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(top = 8.dp),
+                color = MaterialTheme.theme.colors.primaryText02,
+            )
+        }
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 56.dp, bottom = 8.dp),
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_rate_us),
+                onClick = { rateUs(context) },
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_share_with_friends),
+                onClick = { shareWithFriends(context) },
+            )
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_website),
+                secondaryText = "pocketcasts.com",
+                onClick = { openUrl("https://www.pocketcasts.com", context) },
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_instagram),
+                secondaryText = "@pocketcasts",
+                onClick = { openUrl("https://www.instagram.com/pocketcasts/", context) },
+            )
+        }
+        item {
+            RowTextButton(
+                text = stringResource(LR.string.settings_about_twitter),
+                secondaryText = "@pocketcasts",
+                onClick = { openUrl("https://twitter.com/pocketcasts", context) },
+            )
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+        item {
+            AutomatticFamilyRow()
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+        }
+        item {
+            LegalAndMoreRow()
+        }
+        item {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        }
+        item {
+            Column(
+                modifier = Modifier
+                    .clickable { openUrl("https://automattic.com/work-with-us/", context) }
+                    .fillMaxWidth()
+                    .padding(all = 14.dp),
+            ) {
+                Text(
+                    text = stringResource(LR.string.settings_about_work_with_us),
+                    fontSize = 17.sp,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                )
+                Text(
+                    text = stringResource(LR.string.settings_about_work_from_anywhere),
+                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 }
 
@@ -255,13 +299,13 @@ fun AutomatticFamilyRow() {
             .clickable { openUrl("https://automattic.com", context) }
             .height(192.dp)
             .fillMaxWidth(),
-        contentAlignment = Alignment.TopStart
+        contentAlignment = Alignment.TopStart,
     ) {
         Text(
             text = stringResource(LR.string.settings_about_automattic_family),
             fontSize = 17.sp,
             color = MaterialTheme.theme.colors.primaryText01,
-            modifier = Modifier.padding(all = 14.dp)
+            modifier = Modifier.padding(all = 14.dp),
         )
 
         val circleWidth = appIconViewWidth / 6.0
@@ -275,8 +319,8 @@ fun AutomatticFamilyRow() {
                 onClick = { openUrl(icon.url, context) },
                 modifier = Modifier.offset(
                     x = (if (icon.x == 0.0) 0.0 else appIconViewWidth / icon.x).dp,
-                    y = (192 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).dp
-                )
+                    y = (192 - circleWidth - (if (icon.y == 0.0) 0.0 else appIconViewWidth / icon.y)).dp,
+                ),
             )
         }
     }
@@ -293,33 +337,33 @@ fun LegalAndMoreRow() {
             .clickable { legalExpanded = !legalExpanded }
             .fillMaxWidth()
             .padding(all = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = stringResource(LR.string.settings_about_legal),
             fontSize = 17.sp,
-            color = MaterialTheme.theme.colors.primaryText01
+            color = MaterialTheme.theme.colors.primaryText01,
         )
         Image(
             painter = painterResource(R.drawable.row_expand_arrow),
             contentDescription = stringResource(if (legalExpanded) LR.string.expanded else LR.string.collapsed),
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
-            modifier = Modifier.rotate(rotation)
+            modifier = Modifier.rotate(rotation),
         )
     }
     AnimatedVisibility(visible = legalExpanded) {
         Column {
             RowTextButton(
                 text = stringResource(LR.string.settings_about_terms_of_serivce),
-                onClick = { openUrl(Settings.INFO_TOS_URL, context) }
+                onClick = { openUrl(Settings.INFO_TOS_URL, context) },
             )
             RowTextButton(
                 text = stringResource(LR.string.settings_about_privacy_policy),
-                onClick = { openUrl(Settings.INFO_PRIVACY_URL, context) }
+                onClick = { openUrl(Settings.INFO_PRIVACY_URL, context) },
             )
             RowTextButton(
                 text = stringResource(LR.string.settings_about_acknowledgements),
-                onClick = { openAcknowledgements(context) }
+                onClick = { openAcknowledgements(context) },
             )
         }
     }
@@ -338,19 +382,6 @@ private fun shareWithFriends(context: Context) {
         context.startActivity(Intent.createChooser(intent, context.getString(LR.string.share)))
     } catch (e: IllegalStateException) {
         // Not attached to activity anymore
-    }
-}
-
-private fun rateUs(context: Context) {
-    val packageName = context.packageName.removeSuffix(".debug")
-    val uri = Uri.parse("market://details?id=$packageName")
-    val goToMarket = Intent(Intent.ACTION_VIEW, uri)
-    // To count with Play market backstack, After pressing back button, to taken back to our application, we need to add following flags to intent.
-    goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-    try {
-        context.startActivity(goToMarket)
-    } catch (e: ActivityNotFoundException) {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=$packageName")))
     }
 }
 
@@ -379,7 +410,7 @@ private fun AppLogoImage(width: Dp, image: Painter, text: String, color: Color, 
             contentDescription = text,
             modifier = Modifier
                 .rotate(rotateImage.toFloat())
-                .fillMaxWidth(0.7f)
+                .fillMaxWidth(0.7f),
         )
     }
 }
@@ -387,5 +418,8 @@ private fun AppLogoImage(width: Dp, image: Painter, text: String, color: Color, 
 @Preview
 @Composable
 private fun AboutPagePreview() {
-    AboutPage(onBackPressed = {})
+    AboutPage(
+        onBackPressed = {},
+        bottomInset = 0.dp,
+    )
 }

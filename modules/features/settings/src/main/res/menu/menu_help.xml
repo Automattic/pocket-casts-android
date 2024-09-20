@@ -9,4 +9,8 @@
         android:title="@string/settings_status_page"
         android:icon="@drawable/ic_status_page"
         app:showAsAction="always" />
+    <item android:id="@+id/menu_export_database"
+        android:title="@string/settings_export_database"
+        android:icon="@drawable/ic_external"
+        app:showAsAction="never" />
 </menu>

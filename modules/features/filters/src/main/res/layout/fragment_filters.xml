@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:importantForAccessibility="no">
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <androidx.appcompat.widget.Toolbar

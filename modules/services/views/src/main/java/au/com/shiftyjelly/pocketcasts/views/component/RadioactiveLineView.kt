@@ -11,7 +11,7 @@ private const val GAP_COUNT = 0
 class RadioactiveLineView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
     private val lineHeight = 2.dpToPx(context)
 
@@ -20,9 +20,8 @@ class RadioactiveLineView @JvmOverloads constructor(
         alpha = 58
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (canvas == null) return
 
         val gapWidth = width / (GAP_COUNT + 1).toFloat()
         (0..GAP_COUNT).forEach {

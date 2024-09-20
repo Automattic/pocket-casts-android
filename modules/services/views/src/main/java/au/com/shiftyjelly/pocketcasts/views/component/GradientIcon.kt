@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class GradientIcon @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
     var drawableIcon: Drawable? = null
@@ -80,7 +80,7 @@ class GradientIcon @JvmOverloads constructor(
         val bitmap = Bitmap.createBitmap(
             boundsRect.width().toInt(),
             boundsRect.height().toInt(),
-            Bitmap.Config.ARGB_8888
+            Bitmap.Config.ARGB_8888,
         )
         val canvas = Canvas(bitmap)
         val w = canvas.width
@@ -90,8 +90,13 @@ class GradientIcon @JvmOverloads constructor(
 
         val paint = Paint()
         val shader = LinearGradient(
-            0f, 0f, w.toFloat(), h.toFloat(),
-            color0, color1, Shader.TileMode.CLAMP
+            0f,
+            0f,
+            w.toFloat(),
+            h.toFloat(),
+            color0,
+            color1,
+            Shader.TileMode.CLAMP,
         )
         paint.shader = shader
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)

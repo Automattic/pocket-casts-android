@@ -17,7 +17,6 @@ fun ProfileImage(
     contentDescription: String?,
     placeholder: @Composable (() -> Unit) = {},
 ) {
-
     val avatarPainter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(avatarUrl)
@@ -33,7 +32,7 @@ fun ProfileImage(
             painter = avatarPainter,
             contentDescription = contentDescription,
             modifier = modifier
-                .alpha(if (showPlaceholder) 0f else 1f)
+                .alpha(if (showPlaceholder) 0f else 1f),
         )
 
         // If the gravatar image has not loaded or fails to load (because there is no gravatar image associated

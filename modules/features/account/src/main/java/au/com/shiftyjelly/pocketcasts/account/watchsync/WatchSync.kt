@@ -7,17 +7,19 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 @SuppressLint("VisibleForTests") // https://issuetracker.google.com/issues/239451111
-class WatchSync @OptIn(ExperimentalHorologistApi::class)
-@Inject constructor(
+class WatchSync
+@OptIn(ExperimentalHorologistApi::class)
+@Inject
+constructor(
     private val syncManager: SyncManager,
     private val tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
 ) {
@@ -35,7 +37,7 @@ class WatchSync @OptIn(ExperimentalHorologistApi::class)
                     syncManager.getLoginIdentity()?.let { loginIdentity ->
                         WatchSyncAuthData(
                             refreshToken = refreshToken,
-                            loginIdentity = loginIdentity
+                            loginIdentity = loginIdentity,
                         )
                     }
                 }
@@ -51,7 +53,7 @@ class WatchSync @OptIn(ExperimentalHorologistApi::class)
             } catch (exception: Exception) {
                 LogBuffer.e(
                     LogBuffer.TAG_BACKGROUND_TASKS,
-                    "Saving refresh token to data layer failed: $exception"
+                    "Saving refresh token to data layer failed: $exception",
                 )
             }
         }
@@ -59,14 +61,13 @@ class WatchSync @OptIn(ExperimentalHorologistApi::class)
 
     suspend fun processAuthDataChange(data: WatchSyncAuthData?, onResult: (LoginResult) -> Unit) {
         if (data != null) {
-
             Timber.i("Received WatchSyncAuthData change from phone")
 
             if (!syncManager.isLoggedIn()) {
                 val result = syncManager.loginWithToken(
                     token = data.refreshToken,
                     loginIdentity = data.loginIdentity,
-                    signInSource = SignInSource.WatchPhoneSync
+                    signInSource = SignInSource.WatchPhoneSync,
                 )
                 onResult(result)
             } else {

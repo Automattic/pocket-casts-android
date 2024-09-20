@@ -56,12 +56,12 @@ fun BookmarkPage(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Color
                 navigationButton = NavigationButton.Close,
                 onNavigationClick = onClose,
                 iconColor = tintColor,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             Text(
                 text = stringResource(if (isNewBookmark) R.string.add_bookmark_title else R.string.change_title),
                 color = Color.White,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
         Content(
@@ -70,7 +70,7 @@ fun BookmarkPage(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Color
             tintColor = tintColor,
             backgroundColor = backgroundColor,
             onTitleChange = onTitleChange,
-            onSave = onSave
+            onSave = onSave,
         )
     }
 }
@@ -84,21 +84,21 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
         modifier = modifier
             .fillMaxHeight()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         val titleRes = if (isNewBookmark) R.string.add_bookmark_title_hint else R.string.change_bookmark_title_hint
         TextP40(
             text = stringResource(titleRes),
             color = Color.White.copy(alpha = 0.5f),
             textAlign = TextAlign.Center,
-            modifier = Modifier.widthIn(100.dp, 240.dp)
+            modifier = Modifier.widthIn(100.dp, 240.dp),
         )
 
         Spacer(Modifier.weight(1f))
 
         val tintTextSelectionColors = TextSelectionColors(
             handleColor = buttonColor,
-            backgroundColor = buttonColor.copy(alpha = 0.4f)
+            backgroundColor = buttonColor.copy(alpha = 0.4f),
         )
         CompositionLocalProvider(LocalTextSelectionColors provides tintTextSelectionColors) {
             TextField(
@@ -107,7 +107,7 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
                 textStyle = LocalTextStyle.current.copy(
                     // if the title is too long, reduce the font size
                     fontSize = if (title.text.length > 20) 18.sp else 26.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 ),
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.White,
@@ -121,7 +121,7 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
                     .fillMaxWidth()
                     .focusRequester(focusRequester)
                     .onEnter(onSave)
-                    .onTabMoveFocus()
+                    .onTabMoveFocus(),
             )
         }
 
@@ -134,7 +134,7 @@ private fun Content(isNewBookmark: Boolean, title: TextFieldValue, tintColor: Co
             // if the tint color is too light use the background color for the text
             textColor = if (buttonColor.luminance() > 0.5) backgroundColor else Color.White,
             includePadding = false,
-            onClick = onSave
+            onClick = onSave,
         )
     }
     LaunchedEffect(Unit) {
@@ -153,7 +153,7 @@ private fun BookmarkPagePreview() {
             backgroundColor = Color.Black,
             onTitleChange = {},
             onSave = {},
-            onClose = {}
+            onClose = {},
         )
     }
 }

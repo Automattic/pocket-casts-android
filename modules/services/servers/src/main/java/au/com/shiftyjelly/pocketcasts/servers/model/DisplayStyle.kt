@@ -10,6 +10,7 @@ sealed class DisplayStyle(val stringValue: String) {
         private const val LARGE_LIST = "large_list"
         private const val NETWORK = "network"
         private const val CATEGORY = "category"
+        private const val PILLS = "pills"
         private const val SINGLE_PODCAST = "single_podcast"
         private const val SINGLE_EPISODE = "single_episode"
         private const val COLLECTION_LIST = "collection"
@@ -21,6 +22,7 @@ sealed class DisplayStyle(val stringValue: String) {
                 LARGE_LIST -> LargeList()
                 NETWORK -> Network()
                 CATEGORY -> Category()
+                PILLS -> Pills()
                 SINGLE_PODCAST -> SinglePodcast()
                 SINGLE_EPISODE -> SingleEpisode()
                 COLLECTION_LIST -> CollectionList()
@@ -34,6 +36,7 @@ sealed class DisplayStyle(val stringValue: String) {
     class LargeList : DisplayStyle(LARGE_LIST)
     class Network : DisplayStyle(NETWORK)
     class Category : DisplayStyle(CATEGORY)
+    class Pills : DisplayStyle(PILLS)
     class SinglePodcast : DisplayStyle(SINGLE_PODCAST)
     class SingleEpisode : DisplayStyle(SINGLE_EPISODE)
     class CollectionList : DisplayStyle(COLLECTION_LIST)

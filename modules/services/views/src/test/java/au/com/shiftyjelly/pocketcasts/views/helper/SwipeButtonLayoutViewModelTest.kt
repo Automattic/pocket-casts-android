@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -41,14 +42,15 @@ class SwipeButtonLayoutViewModelTest {
     @Before
     fun setup() {
         testSubject = SwipeButtonLayoutViewModel(
-            analyticsTracker = mock(),
+            analyticsTracker = AnalyticsTracker.test(),
             context = mock(),
             episodeAnalytics = mock(),
             episodeManager = mock(),
             playbackManager = playbackManager,
             podcastManager = mock(),
             userEpisodeManager = mock(),
-            applicationScope = CoroutineScope(Dispatchers.Default)
+            applicationScope = CoroutineScope(Dispatchers.Default),
+            shareDialogFactory = mock(),
         )
     }
 
@@ -60,7 +62,7 @@ class SwipeButtonLayoutViewModelTest {
     fun `show queue buttons in user settings order when not on up next screen when defaulting to top`() {
         val topDefault = getSwipeButtonLayout(
             onUpNextScreen = false,
-            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_NEXT
+            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_NEXT,
         )
         assertEquals(buttons.addToUpNextTop, topDefault.leftPrimary())
         assertEquals(buttons.addToUpNextBottom, topDefault.leftSecondary())
@@ -70,7 +72,7 @@ class SwipeButtonLayoutViewModelTest {
     fun `show queue buttons in user setting order when not on up next screen when defaulting to bottom`() {
         val bottomDefault = getSwipeButtonLayout(
             onUpNextScreen = false,
-            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_LAST
+            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_LAST,
         )
         assertEquals(buttons.addToUpNextBottom, bottomDefault.leftPrimary())
         assertEquals(buttons.addToUpNextTop, bottomDefault.leftSecondary())
@@ -85,13 +87,13 @@ class SwipeButtonLayoutViewModelTest {
 
         val defaultNext = getSwipeButtonLayout(
             onUpNextScreen = true,
-            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_NEXT
+            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_NEXT,
         )
         verifyTopFirst(defaultNext)
 
         val defaultLast = getSwipeButtonLayout(
             onUpNextScreen = true,
-            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_LAST
+            defaultUpNextSwipeAction = Settings.UpNextAction.PLAY_LAST,
         )
         verifyTopFirst(defaultLast)
     }
@@ -106,14 +108,14 @@ class SwipeButtonLayoutViewModelTest {
         val withPodcastEpisode = getSwipeButtonLayout(
             onUpNextScreen = false,
             episode = mock<PodcastEpisode>(),
-            episodeInUpNext = true
+            episodeInUpNext = true,
         )
         verifyRemoveButton(withPodcastEpisode)
 
         val withUserEpisode = getSwipeButtonLayout(
             onUpNextScreen = false,
             episode = mock<UserEpisode>(),
-            episodeInUpNext = true
+            episodeInUpNext = true,
         )
         verifyRemoveButton(withUserEpisode)
     }
@@ -133,14 +135,14 @@ class SwipeButtonLayoutViewModelTest {
         val withPodcastEpisode = getSwipeButtonLayout(
             episode = mock<PodcastEpisode>(),
             onUpNextScreen = true,
-            episodeInUpNext = true
+            episodeInUpNext = true,
         )
         verifyRemoveButton(withPodcastEpisode)
 
         val withUserEpisode = getSwipeButtonLayout(
             episode = mock<UserEpisode>(),
             onUpNextScreen = true,
-            episodeInUpNext = true
+            episodeInUpNext = true,
         )
         verifyRemoveButton(withUserEpisode)
     }
@@ -173,7 +175,7 @@ class SwipeButtonLayoutViewModelTest {
 
         val inUpNextQueue = getSwipeButtonLayout(
             episode = mock<PodcastEpisode>(),
-            episodeInUpNext = true
+            episodeInUpNext = true,
         )
         verifyArchiveButton(inUpNextQueue)
     }
@@ -202,7 +204,7 @@ class SwipeButtonLayoutViewModelTest {
 
         val inUpNextQueue = getSwipeButtonLayout(
             episode = mock<UserEpisode>(),
-            episodeInUpNext = true
+            episodeInUpNext = true,
         )
         verifyDeleteFileButton(inUpNextQueue)
     }
@@ -215,7 +217,7 @@ class SwipeButtonLayoutViewModelTest {
     fun `shows share button when not on Up Next Screen`() {
         val withShare = getSwipeButtonLayout(
             onUpNextScreen = false,
-            showShareButton = true
+            showShareButton = true,
         )
         assertEquals(buttons.share, withShare.rightSecondary())
     }
@@ -224,7 +226,7 @@ class SwipeButtonLayoutViewModelTest {
     fun `does not show share button if showShareButton is false`() {
         val shareSetToFalse = getSwipeButtonLayout(
             onUpNextScreen = false,
-            showShareButton = false
+            showShareButton = false,
         )
         verifyNoShareButton(shareSetToFalse)
     }
@@ -234,7 +236,7 @@ class SwipeButtonLayoutViewModelTest {
         val withUserEpisode = getSwipeButtonLayout(
             episode = mock<UserEpisode>(),
             onUpNextScreen = false,
-            showShareButton = false
+            showShareButton = false,
         )
         verifyNoShareButton(withUserEpisode)
     }
@@ -244,7 +246,7 @@ class SwipeButtonLayoutViewModelTest {
         val layout = getSwipeButtonLayout(
             episode = mock<PodcastEpisode>(),
             onUpNextScreen = true,
-            showShareButton = true
+            showShareButton = true,
         )
         verifyNoShareButton(layout)
     }
@@ -267,7 +269,6 @@ class SwipeButtonLayoutViewModelTest {
         onUpNextScreen: Boolean = false,
         defaultUpNextSwipeAction: Settings.UpNextAction = Settings.UpNextAction.PLAY_NEXT,
     ): SwipeButtonLayout {
-
         if (!onUpNextScreen) {
             // Only stub these when we're not on the up next screen. Otherwise mockito gets upset about
             // unnecessary stubbings
@@ -295,7 +296,7 @@ class SwipeButtonLayoutViewModelTest {
             swipeSource = swipeSource,
             showShareButton = showShareButton,
             defaultUpNextSwipeAction = { defaultUpNextSwipeAction },
-            buttons = buttons
+            buttons = buttons,
         )
     }
 }

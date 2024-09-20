@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncHistoryTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import javax.inject.Inject
 
@@ -27,13 +27,12 @@ class CastsWorkerFactory @Inject constructor(
     val syncManager: SyncManager,
     val downloadManager: DownloadManager,
     val playbackManager: PlaybackManager,
-    val refreshServerManager: RefreshServerManager,
+    val refreshServiceManager: RefreshServiceManager,
     val notificationHelper: NotificationHelper,
     val settings: Settings,
-    val userEpisodeManager: UserEpisodeManager
+    val userEpisodeManager: UserEpisodeManager,
 ) : WorkerFactory() {
     override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
-
         val workerKlass = Class.forName(workerClassName).asSubclass(ListenableWorker::class.java)
         val constructor = workerKlass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)
         val instance = constructor.newInstance(appContext, workerParameters)
@@ -60,7 +59,7 @@ class CastsWorkerFactory @Inject constructor(
             }
             is OpmlImportTask -> {
                 instance.podcastManager = podcastManager
-                instance.refreshServerManager = refreshServerManager
+                instance.refreshServiceManager = refreshServiceManager
                 instance.notificationHelper = notificationHelper
             }
             is UpdateEpisodeDetailsTask -> {

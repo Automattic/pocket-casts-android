@@ -1,11 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.views.extensions
 
+import android.annotation.SuppressLint
 import androidx.annotation.ColorInt
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.mediarouter.R
 import androidx.mediarouter.app.MediaRouteButton
 
+@SuppressLint("PrivateResource")
 fun MediaRouteButton.updateColor(@ColorInt color: Int?) {
     color ?: return
     val castContext = ContextThemeWrapper(context, R.style.Theme_MediaRouter)

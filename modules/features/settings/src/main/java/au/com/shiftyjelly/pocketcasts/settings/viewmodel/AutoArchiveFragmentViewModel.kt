@@ -1,57 +1,66 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveAfterPlayingSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoArchiveInactiveSetting
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class AutoArchiveFragmentViewModel @Inject constructor(
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
-    @ApplicationContext private val context: Context,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
-    private var isFragmentChangingConfigurations: Boolean = false
 
-    fun onViewCreated() {
-        if (!isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_SHOWN)
-        }
+    private val mutableState = MutableStateFlow(initState())
+    val state: StateFlow<State> = mutableState
+
+    fun trackOnViewShownEvent() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_SHOWN)
     }
 
     fun onStarredChanged(newValue: Boolean) {
-        settings.autoArchiveIncludeStarred.set(newValue)
+        settings.autoArchiveIncludesStarred.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED,
-            mapOf("enabled" to newValue)
+            mapOf("enabled" to newValue),
         )
+        mutableState.update { it.copy(starredEpisodes = newValue) }
     }
 
-    fun onPlayedEpisodesAfterChanged(newStringValue: String) {
-        val newValue = AutoArchiveAfterPlayingSetting.fromString(newStringValue, context)
-        settings.autoArchiveAfterPlaying.set(newValue)
+    fun onPlayedEpisodesAfterChanged(newValue: AutoArchiveAfterPlaying) {
+        settings.autoArchiveAfterPlaying.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
-            mapOf("value" to newValue.analyticsValue)
+            mapOf("value" to newValue.analyticsValue),
         )
+        mutableState.update { it.copy(archiveAfterPlaying = newValue) }
     }
 
-    fun onInactiveChanged(newStringValue: String) {
-        val newValue = AutoArchiveInactiveSetting.fromString(newStringValue, context)
-        settings.autoArchiveInactive.set(newValue)
+    fun onInactiveChanged(newValue: AutoArchiveInactive) {
+        settings.autoArchiveInactive.set(newValue, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-            mapOf("value" to newValue.analyticsValue)
+            mapOf("value" to newValue.analyticsValue),
         )
+        mutableState.update { it.copy(archiveInactive = newValue) }
     }
 
-    fun onFragmentPause(isChangingConfigurations: Boolean?) {
-        isFragmentChangingConfigurations = isChangingConfigurations ?: false
-    }
+    private fun initState() = State(
+        starredEpisodes = settings.autoArchiveIncludesStarred.value,
+        archiveAfterPlaying = settings.autoArchiveAfterPlaying.value,
+        archiveInactive = settings.autoArchiveInactive.value,
+    )
+
+    data class State(
+        val starredEpisodes: Boolean,
+        val archiveAfterPlaying: AutoArchiveAfterPlaying = AutoArchiveAfterPlaying.Never,
+        val archiveInactive: AutoArchiveInactive = AutoArchiveInactive.Never,
+    )
 }

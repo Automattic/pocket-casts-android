@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,15 +17,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.fragment.compose.content
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -41,8 +43,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,24 +63,23 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent {
-            AppThemeWithBackground(theme.activeTheme) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                val previousAction = settings.headphoneControlsPreviousAction.flow.collectAsState().value
-                val nextAction = settings.headphoneControlsNextAction.flow.collectAsState().value
-                val confirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.flow.collectAsState().value
+    ) = content {
+        val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        AppThemeWithBackground(theme.activeTheme) {
+            val previousAction = settings.headphoneControlsPreviousAction.flow.collectAsState().value
+            val nextAction = settings.headphoneControlsNextAction.flow.collectAsState().value
+            val confirmationSound = settings.headphoneControlsPlayBookmarkConfirmationSound.flow.collectAsState().value
 
-                HeadphoneControlsSettingsPage(
-                    previousAction = previousAction,
-                    nextAction = nextAction,
-                    confirmationSound = confirmationSound,
-                    onBackPressed = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
-                    },
-                )
-            }
+            HeadphoneControlsSettingsPage(
+                previousAction = previousAction,
+                nextAction = nextAction,
+                confirmationSound = confirmationSound,
+                onBackPressed = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+                bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
+            )
         }
     }
 
@@ -90,6 +90,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         nextAction: HeadphoneAction,
         confirmationSound: Boolean,
         onBackPressed: () -> Unit,
+        bottomInset: Dp,
     ) {
         val state by viewModel.state.collectAsState()
 
@@ -104,15 +105,16 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
             onNextActionSave = { viewModel.onNextActionSave(it) },
             onPreviousActionSave = { viewModel.onPreviousActionSave(it) },
             onConfirmationSoundSave = { newValue ->
-                settings.headphoneControlsPlayBookmarkConfirmationSound.set(newValue)
+                settings.headphoneControlsPlayBookmarkConfirmationSound.set(newValue, updateModifiedAt = true)
                 if (newValue) {
-                    playbackManager.playTone()
+                    playbackManager.playBookmarkTone()
                 }
                 viewModel.onConfirmationSoundChanged(newValue)
             },
             confirmationSound = confirmationSound,
             onBackPressed = onBackPressed,
-            onOptionsDialogShown = { viewModel.onOptionsDialogShown() }
+            onOptionsDialogShown = { viewModel.onOptionsDialogShown() },
+            bottomInset = bottomInset,
         )
 
         LaunchedEffect(state) {
@@ -131,39 +133,47 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
         onConfirmationSoundSave: (Boolean) -> Unit,
         onBackPressed: () -> Unit,
         onOptionsDialogShown: () -> Unit,
+        bottomInset: Dp,
     ) {
         Column {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_headphone_controls),
                 bottomShadow = true,
-                onNavigationClick = { onBackPressed() }
+                onNavigationClick = { onBackPressed() },
             )
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = bottomInset),
             ) {
-                TextP50(
-                    text = stringResource(LR.string.settings_headphone_controls_summary),
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(16.dp)
-                )
-                PreviousActionRow(
-                    state = state,
-                    saved = previousAction,
-                    onSave = onPreviousActionSave,
-                    onOptionsDialogShown = onOptionsDialogShown
-                )
-                NextActionRow(
-                    state = state,
-                    saved = nextAction,
-                    onSave = onNextActionSave,
-                    onOptionsDialogShown = onOptionsDialogShown
-                )
-                if (previousAction == HeadphoneAction.ADD_BOOKMARK || nextAction == HeadphoneAction.ADD_BOOKMARK) {
-                    ConfirmationSoundRow(
-                        saved = confirmationSound,
-                        onSave = onConfirmationSoundSave
+                item {
+                    TextP50(
+                        text = stringResource(LR.string.settings_headphone_controls_summary),
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        modifier = Modifier.padding(16.dp),
                     )
+                }
+                item {
+                    PreviousActionRow(
+                        state = state,
+                        saved = previousAction,
+                        onSave = onPreviousActionSave,
+                        onOptionsDialogShown = onOptionsDialogShown,
+                    )
+                }
+                item {
+                    NextActionRow(
+                        state = state,
+                        saved = nextAction,
+                        onSave = onNextActionSave,
+                        onOptionsDialogShown = onOptionsDialogShown,
+                    )
+                }
+                if (previousAction == HeadphoneAction.ADD_BOOKMARK || nextAction == HeadphoneAction.ADD_BOOKMARK) {
+                    item {
+                        ConfirmationSoundRow(
+                            saved = confirmationSound,
+                            onSave = onConfirmationSoundSave,
+                        )
+                    }
                 }
             }
         }
@@ -189,25 +199,25 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                         .setIconColor(iconColor)
                         .addCheckedOption(
                             titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_FORWARD),
-                            checked = saved == HeadphoneAction.SKIP_FORWARD
+                            checked = saved == HeadphoneAction.SKIP_FORWARD,
                         ) {
                             onSave(HeadphoneAction.SKIP_FORWARD)
                         }
                         .addCheckedOption(
                             titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_BACK),
-                            checked = saved == HeadphoneAction.SKIP_BACK
+                            checked = saved == HeadphoneAction.SKIP_BACK,
                         ) {
                             onSave(HeadphoneAction.SKIP_BACK)
                         }
                         .addCheckedOption(
                             imageId = state.addBookmarkIconId,
                             titleId = headphoneActionToStringRes(HeadphoneAction.ADD_BOOKMARK),
-                            checked = saved == HeadphoneAction.ADD_BOOKMARK
+                            checked = saved == HeadphoneAction.ADD_BOOKMARK,
                         ) {
                             onSave(HeadphoneAction.ADD_BOOKMARK)
                         }
                     optionsDialog.show(childFragmentManager, "action_next_options")
-                }
+                },
         )
     }
 
@@ -231,26 +241,26 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                         .setIconColor(iconColor)
                         .addCheckedOption(
                             titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_BACK),
-                            checked = saved == HeadphoneAction.SKIP_BACK
+                            checked = saved == HeadphoneAction.SKIP_BACK,
                         ) {
                             onSave(HeadphoneAction.SKIP_BACK)
                         }
                         .addCheckedOption(
                             titleId = headphoneActionToStringRes(HeadphoneAction.SKIP_FORWARD),
-                            checked = saved == HeadphoneAction.SKIP_FORWARD
+                            checked = saved == HeadphoneAction.SKIP_FORWARD,
                         ) {
                             onSave(HeadphoneAction.SKIP_FORWARD)
                         }
                         .addCheckedOption(
                             imageId = state.addBookmarkIconId,
                             titleId = headphoneActionToStringRes(HeadphoneAction.ADD_BOOKMARK),
-                            checked = saved == HeadphoneAction.ADD_BOOKMARK
+                            checked = saved == HeadphoneAction.ADD_BOOKMARK,
                         ) {
                             onSave(HeadphoneAction.ADD_BOOKMARK)
                         }
                     optionsDialog.show(childFragmentManager, "action_previous_options")
                 }
-                .padding(vertical = 6.dp)
+                .padding(vertical = 6.dp),
         )
     }
 
@@ -263,16 +273,13 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
             primaryText = stringResource(LR.string.settings_headphone_controls_confirmation_sound),
             secondaryText = stringResource(LR.string.settings_headphone_controls_confirmation_sound_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
         )
     }
 
     private fun startUpsellFlow() {
-        val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
         val onboardingFlow = OnboardingFlow.Upsell(
-            source = source,
-            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
+            source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
@@ -302,6 +309,7 @@ class HeadphoneControlsSettingsFragment : BaseFragment() {
                 onConfirmationSoundSave = {},
                 onBackPressed = {},
                 onOptionsDialogShown = {},
+                bottomInset = 0.dp,
             )
         }
     }

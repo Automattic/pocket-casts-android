@@ -17,12 +17,12 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class UpdateEpisodeDetailsTask @AssistedInject constructor(

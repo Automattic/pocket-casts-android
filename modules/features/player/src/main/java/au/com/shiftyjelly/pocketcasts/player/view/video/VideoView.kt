@@ -22,6 +22,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
 
     private val view = LayoutInflater.from(context).inflate(R.layout.video_view, this, true)
+
     @UnstableApi
     private val aspectRatioLayout = view.findViewById<AspectRatioFrameLayout>(R.id.aspectRatioLayout).apply {
         setAspectRatio(1.78f)

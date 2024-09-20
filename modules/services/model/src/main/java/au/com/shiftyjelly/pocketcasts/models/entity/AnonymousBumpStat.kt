@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.Moshi
@@ -13,7 +14,7 @@ import timber.log.Timber
 data class AnonymousBumpStat(
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "event_time") var eventTime: Long = System.currentTimeMillis(),
-    @ColumnInfo(name = "custom_event_props") var customEventProps: Map<String, Any> = emptyMap()
+    @ColumnInfo(name = "custom_event_props") var customEventProps: Map<String, Any> = emptyMap(),
 ) {
 
     init {
@@ -37,7 +38,7 @@ data class AnonymousBumpStat(
             NAME("_en"),
             EVENT_TIME("_ts"),
             UUID("_ui"),
-            USER_TYPE("_ut")
+            USER_TYPE("_ut"),
         }
 
         private val rootJsonKeys = JsonKey.values().map { it.value }
@@ -46,26 +47,26 @@ data class AnonymousBumpStat(
         const val uuidValue = "ANONYMOUS"
     }
 
-    class CustomEventPropsTypeConverter {
-
-        private val moshi = Moshi.Builder()
-            .build()
-            .adapter<Map<String, Any>>(
-                Types.newParameterizedType(
-                    Map::class.java,
-                    String::class.java,
-                    Any::class.java
-                )
-            )
+    @ProvidedTypeConverter
+    class CustomEventPropsTypeConverter(
+        moshi: Moshi,
+    ) {
+        private val adapter = moshi.adapter<Map<String, Any>>(
+            Types.newParameterizedType(
+                Map::class.java,
+                String::class.java,
+                Any::class.java,
+            ),
+        )
 
         @TypeConverter
         fun toCustomEventProps(value: String?): Map<String, Any>? =
             value?.let {
-                moshi.fromJson(it)
+                adapter.fromJson(it)
             }
 
         @TypeConverter
-        fun toJsonString(value: Map<String, Any>?): String? = moshi.toJson(value)
+        fun toJsonString(value: Map<String, Any>?): String? = adapter.toJson(value)
     }
 
     object Adapter {
@@ -85,7 +86,6 @@ data class AnonymousBumpStat(
 
         @FromJson
         fun fromJson(bumpStatMap: Map<String, Any>): AnonymousBumpStat? {
-
             val eventProps = bumpStatMap.filterKeys { !rootJsonKeys.contains(it) }
 
             val name = bumpStatMap[JsonKey.NAME.value]
@@ -107,7 +107,7 @@ data class AnonymousBumpStat(
             return AnonymousBumpStat(
                 name = name,
                 eventTime = eventTime,
-                customEventProps = eventProps
+                customEventProps = eventProps,
             )
         }
     }

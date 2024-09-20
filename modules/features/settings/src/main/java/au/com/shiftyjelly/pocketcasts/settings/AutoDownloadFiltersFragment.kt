@@ -4,7 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.adapter.FilterAutoDownloadAdapter
@@ -15,8 +20,9 @@ import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
@@ -24,7 +30,10 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAutoDownloadAdapter.ClickListener {
 
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var theme: Theme
+
+    @Inject lateinit var settings: Settings
 
     private val filters = mutableListOf<Playlist>()
     private val adapter = FilterAutoDownloadAdapter(filters, this, theme.isDarkTheme)
@@ -49,6 +58,14 @@ class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAuto
         val columns = resources.getInteger(UR.integer.podcast_list_column_num)
         val layoutManager = androidx.recyclerview.widget.GridLayoutManager(activity, columns)
         recyclerView.layoutManager = layoutManager
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    recyclerView.updatePadding(bottom = it)
+                }
+            }
+        }
 
         return recyclerView
     }

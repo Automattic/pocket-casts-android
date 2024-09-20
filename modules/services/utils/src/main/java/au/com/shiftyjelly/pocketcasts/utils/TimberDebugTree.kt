@@ -1,10 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
-import android.os.Build
 import android.util.Log
-import timber.log.Timber
 import java.util.regex.Pattern
 import kotlin.math.min
+import timber.log.Timber
 
 class TimberDebugTree : Timber.Tree() {
 
@@ -52,9 +51,11 @@ class TimberDebugTree : Timber.Tree() {
         if (matcher.find()) tag = matcher.replaceAll("")
         tag = tag.substring(tag.lastIndexOf('.') + 1)
         // Tag length limit was removed in API 24.
-        return if (tag.length <= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        return if (tag.length <= MAX_TAG_LENGTH) {
             tag
-        } else tag.substring(0, MAX_TAG_LENGTH)
+        } else {
+            tag.substring(0, MAX_TAG_LENGTH)
+        }
     }
 
     private fun getRealTag(tag: String?): String? {

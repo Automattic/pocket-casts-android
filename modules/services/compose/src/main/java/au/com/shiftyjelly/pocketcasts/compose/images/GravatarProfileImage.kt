@@ -12,7 +12,6 @@ fun GravatarProfileImage(
     contentDescription: String?,
     placeholder: @Composable (() -> Unit) = {},
 ) {
-
     val gravatarUrl = remember(email) {
         Gravatar.getUrl(email)
     }

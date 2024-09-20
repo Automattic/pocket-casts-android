@@ -1,11 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Flowable
+import java.util.Date
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +18,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
-import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -26,7 +26,6 @@ class ManualCleanupViewModelTest {
     val coroutineRule = MainCoroutineRule()
     private lateinit var episodeManager: EpisodeManager
     private lateinit var playbackManager: PlaybackManager
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private lateinit var viewModel: ManualCleanupViewModel
 
     private val episode: PodcastEpisode = PodcastEpisode(uuid = "1", publishedDate = Date())
@@ -38,10 +37,9 @@ class ManualCleanupViewModelTest {
     fun setUp() {
         episodeManager = mock()
         playbackManager = mock()
-        analyticsTracker = mock()
         whenever(episodeManager.observeDownloadedEpisodes())
             .thenReturn(Flowable.generate { listOf(episodes) })
-        viewModel = ManualCleanupViewModel(episodeManager, playbackManager, analyticsTracker)
+        viewModel = ManualCleanupViewModel(episodeManager, playbackManager, AnalyticsTracker.test())
     }
 
     @Test
@@ -62,7 +60,7 @@ class ManualCleanupViewModelTest {
     fun `given episodes not present, when disk space size checked, then delete button is disabled`() {
         viewModel.onDiskSpaceCheckedChanged(
             isChecked = true,
-            diskSpaceView = diskSpaceView.copy(episodes = emptyList())
+            diskSpaceView = diskSpaceView.copy(episodes = emptyList()),
         )
 
         assertFalse(viewModel.state.value.deleteButton.isEnabled)

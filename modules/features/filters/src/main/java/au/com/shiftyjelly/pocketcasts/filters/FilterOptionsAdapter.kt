@@ -9,7 +9,7 @@ data class FilterOption(
     @StringRes val title: Int,
     var isChecked: Boolean,
     val onCheckedChange: (Boolean, Int) -> Unit,
-    val playlistValue: Int? = null // Value that this gets stored as in the playlist db
+    val playlistValue: Int? = null, // Value that this gets stored as in the playlist db
 )
 
 sealed class FilterOptionsAdapterType {

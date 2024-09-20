@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.dialog
 import android.content.Context
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -24,7 +24,7 @@ class MiniPlayerDialog(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val fragmentManager: FragmentManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
 ) {
     private var isOptionClicked = false
@@ -39,7 +39,7 @@ class MiniPlayerDialog(
                     isOptionClicked = true
                     analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to MARK_PLAYED))
                     markAsPlayed()
-                }
+                },
             )
             .addTextOption(
                 titleId = LR.string.player_end_playback_clear_up_next,
@@ -50,7 +50,7 @@ class MiniPlayerDialog(
                     isOptionClicked = true
                     analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to CLOSE_AND_CLEAR_UP_NEXT))
                     endPlaybackAndClearUpNext(context)
-                }
+                },
             )
             .setOnDismiss {
                 if (!isOptionClicked) {
@@ -66,7 +66,7 @@ class MiniPlayerDialog(
             removeNowPlaying = true,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
-            context = context
+            context = context,
         )
         dialog.showOrClear(fragmentManager)
     }

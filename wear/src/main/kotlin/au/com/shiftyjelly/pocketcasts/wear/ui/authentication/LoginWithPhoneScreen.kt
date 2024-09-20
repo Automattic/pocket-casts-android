@@ -54,7 +54,7 @@ fun LoginWithPhoneScreen(
                 text = "2. ${stringResource(LR.string.log_in_watch_from_phone_instructions_2)}",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 24.dp),
             )
         }
 
@@ -63,7 +63,7 @@ fun LoginWithPhoneScreen(
                 text = stringResource(LR.string.log_in_watch_from_phone_instructions_3, BuildConfig.VERSION_NAME),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 24.dp),
             )
         }
     }

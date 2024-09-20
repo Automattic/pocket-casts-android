@@ -1,13 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.parcelize)
 }
-
-apply(from = "${project.rootDir}/base.gradle")
 
 android {
     namespace = "au.com.shiftyjelly.pocketcasts.analytics"
@@ -17,8 +13,24 @@ android {
 }
 
 dependencies {
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.compiler)
+
+    api(libs.dagger.hilt.android)
+
+    api(projects.modules.services.model)
+    api(projects.modules.services.preferences)
+    api(projects.modules.services.utils)
+
+    implementation(platform(libs.firebase.bom))
+
     implementation(libs.automattic.tracks)
-    implementation(project(":modules:services:utils"))
-    implementation(project(":modules:services:preferences"))
-    implementation(project(":modules:services:model"))
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.config.ktx)
+
+    debugImplementation(libs.compose.ui.tooling)
+
+    debugProdImplementation(libs.compose.ui.tooling)
+
+    testImplementation(libs.junit)
 }

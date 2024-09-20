@@ -17,6 +17,11 @@
         android:title="@string/discover" />
 
     <item
+        android:id="@+id/navigation_upnext"
+        android:icon="@drawable/ic_upnext_tab"
+        android:title="@string/up_next" />
+
+    <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/ic_profile"
         android:title="@string/profile" />

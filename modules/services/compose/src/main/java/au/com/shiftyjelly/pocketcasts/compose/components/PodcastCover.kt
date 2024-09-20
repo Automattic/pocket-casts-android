@@ -28,7 +28,7 @@ fun PodcastCover(
         uuid = uuid,
         elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,
         cornerSize = cornerRadiusSize,
-        modifier = modifier.size(coverWidth)
+        modifier = modifier.size(coverWidth),
     )
 }
 
@@ -47,7 +47,7 @@ fun RectangleCover(
         elevation = elevation,
         shape = RoundedCornerShape(cornerRadiusSize),
         backgroundColor = backgroundColor,
-        modifier = modifier.size(coverWidth)
+        modifier = modifier.size(coverWidth),
     ) {
         imageResId?.let {
             Image(
@@ -71,5 +71,5 @@ fun Modifier.transformPodcastCover() =
 
 enum class CoverSize {
     SMALL,
-    BIG
+    BIG,
 }

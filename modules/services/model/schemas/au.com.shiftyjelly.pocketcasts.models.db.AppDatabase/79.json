@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 79,
-    "identityHash": "22ffdba49e094fe3cad9bf99e144b9df",
+    "identityHash": "27cf072e4b50fca2978749adf68636ed",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -684,7 +684,7 @@
       },
       {
         "tableName": "podcasts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `added_date` INTEGER, `thumbnail_url` TEXT, `title` TEXT NOT NULL, `podcast_url` TEXT, `podcast_description` TEXT NOT NULL, `podcast_category` TEXT NOT NULL, `podcast_language` TEXT NOT NULL, `media_type` TEXT, `latest_episode_uuid` TEXT, `author` TEXT NOT NULL, `sort_order` INTEGER NOT NULL, `episodes_sort_order` INTEGER NOT NULL, `latest_episode_date` INTEGER, `episodes_to_keep` INTEGER NOT NULL, `override_global_settings` INTEGER NOT NULL, `override_global_effects` INTEGER NOT NULL, `start_from` INTEGER NOT NULL, `playback_speed` REAL NOT NULL, `silence_removed` INTEGER NOT NULL, `volume_boosted` INTEGER NOT NULL, `is_folder` INTEGER NOT NULL, `subscribed` INTEGER NOT NULL, `show_notifications` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `auto_add_to_up_next` INTEGER NOT NULL, `most_popular_color` INTEGER NOT NULL, `primary_color` INTEGER NOT NULL, `secondary_color` INTEGER NOT NULL, `light_overlay_color` INTEGER NOT NULL, `fab_for_light_bg` INTEGER NOT NULL, `link_for_dark_bg` INTEGER NOT NULL, `link_for_light_bg` INTEGER NOT NULL, `color_version` INTEGER NOT NULL, `color_last_downloaded` INTEGER NOT NULL, `sync_status` INTEGER NOT NULL, `exclude_from_auto_archive` INTEGER NOT NULL, `override_global_archive` INTEGER NOT NULL, `auto_archive_played_after` INTEGER NOT NULL, `auto_archive_inactive_after` INTEGER NOT NULL, `auto_archive_episode_limit` INTEGER, `estimated_next_episode` INTEGER, `episode_frequency` TEXT, `grouping` INTEGER NOT NULL, `skip_last` INTEGER NOT NULL, `show_archived` INTEGER NOT NULL, `trim_silence_level` INTEGER NOT NULL, `refresh_available` INTEGER NOT NULL, `folder_uuid` TEXT, `licensing` INTEGER NOT NULL, `isPaid` INTEGER NOT NULL, `bundleuuid` TEXT, `bundlebundleUrl` TEXT, `bundlepaymentUrl` TEXT, `bundledescription` TEXT, `bundlepodcastUuid` TEXT, `bundlepaidType` TEXT, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `added_date` INTEGER, `thumbnail_url` TEXT, `title` TEXT NOT NULL, `podcast_url` TEXT, `podcast_description` TEXT NOT NULL, `podcast_category` TEXT NOT NULL, `podcast_language` TEXT NOT NULL, `media_type` TEXT, `latest_episode_uuid` TEXT, `author` TEXT NOT NULL, `sort_order` INTEGER NOT NULL, `episodes_sort_order` INTEGER NOT NULL, `latest_episode_date` INTEGER, `episodes_to_keep` INTEGER NOT NULL, `override_global_settings` INTEGER NOT NULL, `override_global_effects` INTEGER NOT NULL, `start_from` INTEGER NOT NULL, `start_from_modified` INTEGER, `playback_speed` REAL NOT NULL, `silence_removed` INTEGER NOT NULL, `volume_boosted` INTEGER NOT NULL, `is_folder` INTEGER NOT NULL, `subscribed` INTEGER NOT NULL, `show_notifications` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `auto_add_to_up_next` INTEGER NOT NULL, `most_popular_color` INTEGER NOT NULL, `primary_color` INTEGER NOT NULL, `secondary_color` INTEGER NOT NULL, `light_overlay_color` INTEGER NOT NULL, `fab_for_light_bg` INTEGER NOT NULL, `link_for_dark_bg` INTEGER NOT NULL, `link_for_light_bg` INTEGER NOT NULL, `color_version` INTEGER NOT NULL, `color_last_downloaded` INTEGER NOT NULL, `sync_status` INTEGER NOT NULL, `exclude_from_auto_archive` INTEGER NOT NULL, `override_global_archive` INTEGER NOT NULL, `auto_archive_played_after` INTEGER NOT NULL, `auto_archive_inactive_after` INTEGER NOT NULL, `auto_archive_episode_limit` INTEGER, `estimated_next_episode` INTEGER, `episode_frequency` TEXT, `grouping` INTEGER NOT NULL, `skip_last` INTEGER NOT NULL, `skip_last_modified` INTEGER, `show_archived` INTEGER NOT NULL, `trim_silence_level` INTEGER NOT NULL, `refresh_available` INTEGER NOT NULL, `folder_uuid` TEXT, `licensing` INTEGER NOT NULL, `isPaid` INTEGER NOT NULL, `bundleuuid` TEXT, `bundlebundleUrl` TEXT, `bundlepaymentUrl` TEXT, `bundledescription` TEXT, `bundlepodcastUuid` TEXT, `bundlepaidType` TEXT, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -793,6 +793,12 @@
             "columnName": "start_from",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "startFromSecsModified",
+            "columnName": "start_from_modified",
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "playbackSpeed",
@@ -955,6 +961,12 @@
             "columnName": "skip_last",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "skipLastSecsModified",
+            "columnName": "skip_last_modified",
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "showArchived",
@@ -1522,7 +1534,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '22ffdba49e094fe3cad9bf99e144b9df')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '27cf072e4b50fca2978749adf68636ed')"
     ]
   }
 }

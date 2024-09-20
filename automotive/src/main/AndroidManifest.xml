@@ -30,6 +30,10 @@
         android:appCategory="audio"
         android:usesCleartextTraffic="true"
         android:largeHeap="true">
+
+        <meta-data android:name="com.android.automotive"
+            android:resource="@xml/automotive_app_desc"/>
+
         <activity android:name=".AutomotiveSettingsActivity"
             android:exported="true">
             <intent-filter>
@@ -80,9 +84,6 @@
         <meta-data
             android:name="pocketcasts_automotive"
             android:value="true" />
-        <meta-data
-            android:name="au.com.shiftyjelly.pocketcasts.sentryDsn"
-            android:value="${sentryDsn}" />
     </application>
 
 </manifest>

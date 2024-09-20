@@ -31,11 +31,12 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -51,10 +52,14 @@ const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 class AutoPlaybackService : PlaybackService() {
 
     @Inject lateinit var listSource: ListRepository
-    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()
+        settings.setAutomotiveConnectedToMediaSession(false)
+
         RefreshPodcastsTask.runNow(this, applicationScope)
 
         Log.d(Settings.LOG_TAG_AUTO, "Auto playback service created")
@@ -126,7 +131,9 @@ class AutoPlaybackService : PlaybackService() {
             try {
                 AutoConverter.convertPlaylistToMediaItem(this, it)
             } catch (e: Exception) {
-                Log.e(Settings.LOG_TAG_AUTO, "Filter ${it.title} load failed", e)
+                val message = "Filter ${it.title} load failed"
+                Log.e(Settings.LOG_TAG_AUTO, message, e)
+                LogBuffer.e(Settings.LOG_TAG_AUTO, message, e)
                 null
             }
         }
@@ -167,7 +174,7 @@ class AutoPlaybackService : PlaybackService() {
         val region = discoverFeed.regions[discoverFeed.defaultRegionCode] ?: return emptyList()
         val replacements = mapOf(
             discoverFeed.regionCodeToken to region.code,
-            discoverFeed.regionNameToken to region.name
+            discoverFeed.regionNameToken to region.name,
         )
 
         val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, resources)

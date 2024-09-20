@@ -16,7 +16,7 @@ data class NamedSettingsSettings(
 data class NamedSettingsRequest(
     @field:Json(name = "m") val m: String = "Android",
     @field:Json(name = "v") val v: Int = 1,
-    @field:Json(name = "settings") val settings: NamedSettingsSettings
+    @field:Json(name = "settings") val settings: NamedSettingsSettings,
 )
 
 typealias NamedSettingsResponse = Map<String, SettingResponse>
@@ -24,7 +24,14 @@ typealias NamedSettingsResponse = Map<String, SettingResponse>
 @JsonClass(generateAdapter = true)
 data class SettingResponse(
     @field:Json(name = "value") val value: Any,
-    @field:Json(name = "changed") val changed: Boolean
+    @field:Json(name = "changed") val changed: Boolean,
+)
+
+@JsonClass(generateAdapter = true)
+data class ChangedSettingResponse(
+    @field:Json(name = "value") val value: Any,
+    @field:Json(name = "changed") val changed: Boolean,
+    @field:Json(name = "modifiedAt") val modifiedAt: String? = null,
 )
 
 interface NamedSettingsCaller {

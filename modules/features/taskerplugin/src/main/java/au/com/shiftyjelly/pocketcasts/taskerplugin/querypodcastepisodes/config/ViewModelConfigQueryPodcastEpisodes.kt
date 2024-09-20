@@ -11,14 +11,14 @@ import au.com.shiftyjelly.pocketcasts.taskerplugin.querypodcastepisodes.ActionHe
 import au.com.shiftyjelly.pocketcasts.taskerplugin.querypodcastepisodes.InputQueryPodcastEpisodes
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as RD
 
 @HiltViewModel
 class ViewModelConfigQueryPodcastEpisodes @Inject constructor(
-    application: Application
+    application: Application,
 ) : ViewModelBase<InputQueryPodcastEpisodes, Array<OutputQueryEpisodes>, ActionHelperQueryPodcastEpisodes>(application), TaskerPluginConfig<InputQueryPodcastEpisodes> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputQueryPodcastEpisodes>) = ActionHelperQueryPodcastEpisodes(pluginConfig)
 
@@ -30,6 +30,6 @@ class ViewModelConfigQueryPodcastEpisodes @Inject constructor(
     }
 
     override val inputFields: List<InputFieldBase<*>> = listOf(
-        InputField(R.string.podcast_id_or_title, RD.drawable.auto_tab_podcasts, { titleOrId }, { titleOrId = it })
+        InputField(R.string.podcast_id_or_title, RD.drawable.auto_tab_podcasts, { titleOrId }, { titleOrId = it }),
     )
 }

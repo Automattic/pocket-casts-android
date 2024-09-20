@@ -16,8 +16,7 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
@@ -41,7 +40,7 @@ class AccountFragment : BaseFragment() {
         fun newInstance() = AccountFragment()
     }
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private var realBinding: FragmentAccountBinding? = null
     private val binding: FragmentAccountBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
@@ -70,7 +69,7 @@ class AccountFragment : BaseFragment() {
                     binding.btnCreate.text = getString(LR.string.done)
                     binding.btnCreate.setOnClickListener { activity?.finish() }
                 }
-            }
+            },
         )
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -82,7 +81,6 @@ class AccountFragment : BaseFragment() {
 
         binding.btnClose?.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, ACCOUNT_SOURCE)
-            FirebaseAnalyticsTracker.closeAccountMissingClicked()
             activity?.finish()
         }
 
@@ -93,7 +91,7 @@ class AccountFragment : BaseFragment() {
                         flow = null,
                         fontSize = dimensionResource(CR.dimen.car_body2_size).value.sp,
                         includePadding = false,
-                        onComplete = { activity?.finish() }
+                        onComplete = { activity?.finish() },
                     )
                 }
             }
@@ -102,14 +100,11 @@ class AccountFragment : BaseFragment() {
         binding.btnCreate.setOnClickListener {
             analyticsTracker.track(
                 AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-                ACCOUNT_SOURCE + mapOf(BUTTON to CREATE_ACCOUNT)
+                ACCOUNT_SOURCE + mapOf(BUTTON to CREATE_ACCOUNT),
             )
-            FirebaseAnalyticsTracker.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 if (Util.isCarUiMode(view.context)) { // We can't sign up to plus on cars so skip that step
                     view.findNavController().navigate(R.id.action_accountFragment_to_createEmailFragment)
-                } else {
-                    view.findNavController().navigate(R.id.action_accountFragment_to_createAccountFragment)
                 }
             }
         }
@@ -117,9 +112,8 @@ class AccountFragment : BaseFragment() {
         binding.btnSignIn.setOnClickListener {
             analyticsTracker.track(
                 AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-                ACCOUNT_SOURCE + mapOf(BUTTON to SIGN_IN)
+                ACCOUNT_SOURCE + mapOf(BUTTON to SIGN_IN),
             )
-            FirebaseAnalyticsTracker.signInAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 view.findNavController().navigate(R.id.action_accountFragment_to_signInFragment)
             }

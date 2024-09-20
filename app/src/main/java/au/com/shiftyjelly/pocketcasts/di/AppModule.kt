@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.di
 
 import android.content.Context
 import android.net.ConnectivityManager
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
+import androidx.core.content.getSystemService
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,24 +13,23 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+abstract class AppModule {
 
-    @Provides
-    fun connectivityManager(@ApplicationContext application: Context): ConnectivityManager =
-        application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    companion object {
+        @Provides
+        fun connectivityManager(@ApplicationContext application: Context): ConnectivityManager {
+            return application.getSystemService<ConnectivityManager>()!!
+        }
 
-    @Provides
-    @Singleton
-    @DownloadCallFactory
-    fun downloadCallFactory(
-        @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
-    ): Call.Factory = phoneCallFactory
+        @Provides
+        @Downloads
+        fun downloadRequestBuilder(): Request.Builder = Request.Builder()
+    }
 
-    @Provides
-    @DownloadRequestBuilder
-    fun downloadRequestBuilder(): Request.Builder = Request.Builder()
+    @Binds
+    @Downloads
+    abstract fun downloadsCallFactory(@Downloads client: OkHttpClient): Call.Factory
 }

@@ -10,9 +10,9 @@ object PCVolumeScreen {
 
 @Composable
 fun PCVolumeScreen(
-    volumeViewModel: PCVolumeViewModel = hiltViewModel()
+    volumeViewModel: PCVolumeViewModel = hiltViewModel(),
 ) {
     VolumeScreen(
-        volumeViewModel = volumeViewModel
+        volumeViewModel = volumeViewModel,
     )
 }

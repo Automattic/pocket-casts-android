@@ -4,8 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ResetPasswordViewModel @Inject constructor(
@@ -60,7 +60,7 @@ class ResetPasswordViewModel @Inject constructor(
                 onError = { message ->
                     val errors = mutableSetOf(ResetPasswordError.SERVER)
                     resetPasswordState.postValue(ResetPasswordState.Failure(errors, message))
-                }
+                },
             )
         }
     }
@@ -68,7 +68,7 @@ class ResetPasswordViewModel @Inject constructor(
 
 enum class ResetPasswordError {
     INVALID_EMAIL,
-    SERVER
+    SERVER,
 }
 
 sealed class ResetPasswordState {

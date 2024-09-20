@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -18,8 +18,9 @@ import org.mockito.kotlin.verify
 class WatchListScreenViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
+
     @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Mock
     private lateinit var episodeManager: EpisodeManager

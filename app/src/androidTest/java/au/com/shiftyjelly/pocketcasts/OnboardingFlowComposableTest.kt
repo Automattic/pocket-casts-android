@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts
 
 import androidx.activity.compose.setContent
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.navigation.compose.ComposeNavigator
@@ -11,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlowComposable
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingNavRoute
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -19,6 +22,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 /**
  * This test class is in the app component so Hilt can access the application for injection.
@@ -33,21 +37,26 @@ class OnboardingFlowComposableTest {
     fun setupAppNavHost(
         flow: OnboardingFlow,
         signInState: SignInState = mock(),
-        exitOnboarding: () -> Unit = {},
+        exitOnboarding: (OnboardingExitInfo) -> Unit = {},
         completeOnboardingToDiscover: () -> Unit = {},
     ) {
         composeTestRule.activity.setContent {
-            navController = TestNavHostController(LocalContext.current).apply {
-                navigatorProvider.addNavigator(ComposeNavigator())
+            CompositionLocalProvider(
+                LocalContext provides ContextThemeWrapper(LocalContext.current, UR.style.ThemeDark),
+            ) {
+                navController = TestNavHostController(LocalContext.current).apply {
+                    navigatorProvider.addNavigator(ComposeNavigator())
+                }
+                OnboardingFlowComposable(
+                    theme = Theme.ThemeType.LIGHT,
+                    flow = flow,
+                    exitOnboarding = exitOnboarding,
+                    completeOnboardingToDiscover = completeOnboardingToDiscover,
+                    signInState = signInState,
+                    navController = navController,
+                    onUpdateSystemBars = {},
+                )
             }
-            OnboardingFlowComposable(
-                theme = Theme.ThemeType.LIGHT,
-                flow = flow,
-                exitOnboarding = exitOnboarding,
-                completeOnboardingToDiscover = completeOnboardingToDiscover,
-                signInState = signInState,
-                navController = navController,
-            )
         }
 
         // Make sure lateinit navController field is initialized before proceeding

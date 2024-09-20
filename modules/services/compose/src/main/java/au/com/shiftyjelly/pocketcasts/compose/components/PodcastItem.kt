@@ -41,7 +41,7 @@ fun PodcastItem(
             modifier = modifier
                 .fillMaxWidth()
                 .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             PodcastImage(
                 uuid = podcast.uuid,
@@ -50,25 +50,25 @@ fun PodcastItem(
             Column(
                 modifier = modifier
                     .padding(start = 12.dp, end = 16.dp)
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 TextH40(
                     text = podcast.title,
                     maxLines = maxLines,
-                    color = MaterialTheme.theme.colors.primaryText01
+                    color = MaterialTheme.theme.colors.primaryText01,
                 )
                 TextH50(
                     text = podcast.author,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(top = 2.dp)
+                    modifier = Modifier.padding(top = 2.dp),
                 )
             }
             if (subscribed && showSubscribed) {
                 Icon(
                     painter = painterResource(IR.drawable.ic_tick),
                     contentDescription = stringResource(LR.string.podcast_subscribed),
-                    tint = MaterialTheme.theme.colors.support02
+                    tint = MaterialTheme.theme.colors.support02,
                 )
             } else if (showPlusIfUnsubscribed) {
                 Icon(
@@ -76,7 +76,7 @@ fun PodcastItem(
                     contentDescription = stringResource(LR.string.subscribe),
                     tint = MaterialTheme.theme.colors.primaryIcon02,
                     modifier = modifier
-                        .then(if (onPlusClick == null) Modifier else Modifier.clickable { onPlusClick() })
+                        .then(if (onPlusClick == null) Modifier else Modifier.clickable { onPlusClick() }),
 
                 )
             }

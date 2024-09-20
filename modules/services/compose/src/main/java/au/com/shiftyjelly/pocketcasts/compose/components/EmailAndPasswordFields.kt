@@ -66,9 +66,8 @@ fun EmailAndPasswordFields(
     onDone: () -> Unit,
     onUpdateEmail: (String) -> Unit,
     onUpdatePassword: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
 
@@ -79,7 +78,6 @@ fun EmailAndPasswordFields(
     }
 
     Column(modifier) {
-
         EmailField(
             email = email,
             isError = showEmailError,
@@ -123,7 +121,7 @@ private fun ErrorText(
     TextP40(
         text = stringResource(textRes),
         color = MaterialTheme.theme.colors.support05,
-        modifier = Modifier.padding(top = 8.dp)
+        modifier = Modifier.padding(top = 8.dp),
     )
 }
 
@@ -138,9 +136,8 @@ fun EmailField(
     onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
     isCreatingAccount: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     @Suppress("NAME_SHADOWING")
     @OptIn(ExperimentalComposeUiApi::class)
     val modifier = modifier.focusRequester(focusRequester)
@@ -164,7 +161,7 @@ fun EmailField(
             keyboardType = KeyboardType.Email,
         ),
         onImeAction = onImeAction,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -179,7 +176,7 @@ fun PasswordField(
     focusRequester: FocusRequester = remember { FocusRequester() },
     isCreatingAccount: Boolean,
     onUpdatePassword: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 
 ) {
     var showPassword by remember { mutableStateOf(false) }
@@ -211,7 +208,7 @@ fun PasswordField(
         trailingIcon = {
             val icon = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
             IconButton(
-                onClick = { showPassword = !showPassword }
+                onClick = { showPassword = !showPassword },
             ) {
                 Icon(
                     imageVector = icon,
@@ -219,7 +216,7 @@ fun PasswordField(
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

@@ -31,18 +31,17 @@ fun ErrorScreen(
             imageVector = Icons.Default.Error,
             tint = Color.Red,
             contentDescription = null,
-            modifier = Modifier.size(52.dp)
+            modifier = Modifier.size(52.dp),
         )
     },
 ) {
-
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         icon()
         Spacer(modifier = Modifier.height(4.dp))
@@ -53,7 +52,7 @@ fun ErrorScreen(
             color = Color.White,
             // Adding bottom padding to make sure that long text can be scrolled up from the
             // bottom of the screen (where it gets cut off on round watches)
-            modifier = Modifier.padding(bottom = 32.dp)
+            modifier = Modifier.padding(bottom = 32.dp),
         )
     }
 }

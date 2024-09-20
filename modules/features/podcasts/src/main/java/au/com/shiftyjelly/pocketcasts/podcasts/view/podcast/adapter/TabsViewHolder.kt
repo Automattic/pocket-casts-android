@@ -24,7 +24,7 @@ class TabsViewHolder(
         val tabs = PodcastTab.values().map {
             ButtonTab(
                 labelResId = it.labelResId,
-                onClick = { tabsHeader.onTabClicked(it) }
+                onClick = { tabsHeader.onTabClicked(it) },
             )
         }
         composeView.setContent {
@@ -35,7 +35,7 @@ class TabsViewHolder(
                     modifier = Modifier
                         .background(color = MaterialTheme.theme.colors.primaryUi02)
                         .padding(start = 16.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
 
                 )
             }

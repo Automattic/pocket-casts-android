@@ -1,21 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.models.db
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.content.contentValuesOf
+import androidx.room.AutoMigration
 import androidx.room.Database
-import androidx.room.Room
+import androidx.room.DeleteColumn
+import androidx.room.OnConflictStrategy
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import au.com.shiftyjelly.pocketcasts.model.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveAfterPlayingTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveInactiveTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveLimitTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.BundlePaidTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.ChapterIndicesConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
@@ -24,17 +33,22 @@ import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
+import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
@@ -45,7 +59,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import java.io.File
 import java.util.Arrays
+import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Database(
@@ -61,10 +79,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextChange::class,
         UpNextEpisode::class,
         UserEpisode::class,
-        PodcastRatings::class
+        PodcastRatings::class,
+        DbChapter::class,
+        CuratedPodcast::class,
+        Transcript::class,
     ],
-    version = 79,
-    exportSchema = true
+    version = 100,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
+        AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
+    ],
 )
 @TypeConverters(
     AnonymousBumpStat.CustomEventPropsTypeConverter::class,
@@ -80,6 +105,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     SyncStatusConverter::class,
     TrimModeTypeConverter::class,
     UserEpisodeServerStatusConverter::class,
+    AutoArchiveAfterPlayingTypeConverter::class,
+    AutoArchiveInactiveTypeConverter::class,
+    AutoArchiveLimitTypeConverter::class,
+    PodcastGroupingTypeConverter::class,
+    ChapterIndicesConverter::class,
+    InstantConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -93,23 +124,20 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun podcastRatingsDao(): PodcastRatingsDao
     abstract fun bookmarkDao(): BookmarkDao
+    abstract fun chapterDao(): ChapterDao
+    abstract fun transcriptDao(): TranscriptDao
+    abstract fun externalDataDao(): ExternalDataDao
+
+    fun databaseFiles() =
+        openHelper.readableDatabase.path?.let {
+            listOf(
+                File(it),
+                File("$it-wal"),
+                File("$it-shm"),
+            )
+        }
 
     companion object {
-        // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
-        @Volatile private var instance: AppDatabase? = null
-        fun getInstance(context: Context): AppDatabase {
-            return instance ?: buildDatabase(context).also { instance = it }
-        }
-
-        private fun buildDatabase(context: Context): AppDatabase {
-            val databaseBuilder = Room.databaseBuilder(context, AppDatabase::class.java, "pocketcasts")
-            AppDatabase.addMigrations(databaseBuilder, context)
-            if (BuildConfig.DEBUG) {
-                databaseBuilder.fallbackToDestructiveMigration()
-            }
-            return databaseBuilder.build()
-        }
-
         val MIGRATION_45_46 = addMigration(45, 46) { database ->
             database.execSQL("CREATE TABLE IF NOT EXISTS `podcasts` (`uuid` TEXT NOT NULL, `added_date` INTEGER, `thumbnail_url` TEXT, `title` TEXT NOT NULL, `podcast_url` TEXT, `podcast_description` TEXT NOT NULL, `podcast_category` TEXT NOT NULL, `podcast_language` TEXT NOT NULL, `media_type` TEXT, `latest_episode_uuid` TEXT, `author` TEXT NOT NULL, `sort_order` INTEGER NOT NULL, `episodes_sort_order` INTEGER NOT NULL, `latest_episode_date` INTEGER, `episodes_to_keep` INTEGER NOT NULL, `override_global_settings` INTEGER NOT NULL, `start_from` INTEGER NOT NULL, `playback_speed` REAL NOT NULL, `silence_removed` INTEGER NOT NULL, `volume_boosted` INTEGER NOT NULL, `is_folder` INTEGER NOT NULL, `subscribed` INTEGER NOT NULL, `show_notifications` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `auto_add_to_up_next` INTEGER NOT NULL, `most_popular_color` INTEGER NOT NULL, `primary_color` INTEGER NOT NULL, `secondary_color` INTEGER NOT NULL, `light_overlay_color` INTEGER NOT NULL, `fab_for_light_bg` INTEGER NOT NULL, `link_for_dark_bg` INTEGER NOT NULL, `link_for_light_bg` INTEGER NOT NULL, `color_version` INTEGER NOT NULL, `color_last_downloaded` INTEGER NOT NULL, `sync_status` INTEGER NOT NULL, PRIMARY KEY(`uuid`))")
             database.execSQL("CREATE TABLE IF NOT EXISTS `episodes` (`uuid` TEXT NOT NULL, `episode_description` TEXT NOT NULL, `published_date` INTEGER NOT NULL, `title` TEXT NOT NULL, `size_in_bytes` INTEGER NOT NULL, `episode_status` INTEGER NOT NULL, `file_type` TEXT, `duration` REAL NOT NULL, `download_url` TEXT, `downloaded_file_path` TEXT, `downloaded_error_details` TEXT, `play_error_details` TEXT, `played_up_to` REAL NOT NULL, `playing_status` INTEGER NOT NULL, `podcast_id` TEXT NOT NULL, `added_date` INTEGER NOT NULL, `auto_download_status` INTEGER NOT NULL, `starred` INTEGER NOT NULL, `thumbnail_status` INTEGER NOT NULL, `archived` INTEGER NOT NULL, `last_download_attempt_date` INTEGER, `playing_status_modified` INTEGER, `played_up_to_modified` INTEGER, `duration_modified` INTEGER, `archived_modified` INTEGER, `starred_modified` INTEGER, PRIMARY KEY(`uuid`))")
@@ -371,7 +399,7 @@ abstract class AppDatabase : RoomDatabase() {
                     sync_modified INTEGER NOT NULL,
                     PRIMARY KEY(uuid)
                 );
-                """.trimIndent()
+                """.trimIndent(),
             )
             val podcastColumnNames = getColumnNames(database, "podcasts")
             if (!podcastColumnNames.contains("folder_uuid")) {
@@ -388,7 +416,7 @@ abstract class AppDatabase : RoomDatabase() {
                       custom_event_props TEXT NOT NULL,
                       PRIMARY KEY(name, event_time, custom_event_props)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -413,7 +441,7 @@ abstract class AppDatabase : RoomDatabase() {
                         episode_podcastTitle TEXT, 
                         episode_artworkUrl TEXT
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_term` ON search_history (`term`)")
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_podcast_uuid` ON search_history (`podcast_uuid`);")
@@ -430,7 +458,7 @@ abstract class AppDatabase : RoomDatabase() {
                         total INTEGER, 
                         PRIMARY KEY(`podcast_uuid`)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -454,7 +482,7 @@ abstract class AppDatabase : RoomDatabase() {
                         `sync_status` INTEGER NOT NULL, 
                         PRIMARY KEY(`uuid`)
                     );
-                """.trimIndent()
+                """.trimIndent(),
             )
             database.execSQL("CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `bookmarks` (`podcast_uuid`)")
         }
@@ -469,7 +497,7 @@ abstract class AppDatabase : RoomDatabase() {
                         `total` INTEGER, 
                         PRIMARY KEY(`podcast_uuid`)
                     )
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             database.execSQL(
@@ -477,7 +505,7 @@ abstract class AppDatabase : RoomDatabase() {
                     INSERT INTO `temp_podcast_ratings` (`podcast_uuid`, `average`, `total`)
                     SELECT `podcast_uuid`, `average`, `total` 
                     FROM `podcast_ratings`
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             database.execSQL("DROP TABLE `podcast_ratings`;")
@@ -489,8 +517,328 @@ abstract class AppDatabase : RoomDatabase() {
                 """
                     ALTER TABLE podcast_episodes
                     ADD COLUMN image_url TEXT
-                """.trimIndent()
+                """.trimIndent(),
             )
+        }
+
+        val MIGRATION_79_80 = addMigration(79, 80) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN start_from_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN skip_last_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_80_81 = addMigration(80, 81) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_add_to_up_next_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN override_global_effects_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN playback_speed_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN volume_boosted_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN trim_silence_level_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        @DeleteColumn(
+            tableName = "podcasts",
+            columnName = "silence_removed",
+        )
+        class DeleteSilenceRemovedMigration : AutoMigrationSpec
+
+        val MIGRATION_82_83 = addMigration(82, 83) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN show_notifications_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_83_84 = addMigration(83, 84) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_played_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_inactive_after_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN auto_archive_episode_limit_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN grouping_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN show_archived_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_84_85 = addMigration(84, 85) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN override_global_archive_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_85_86 = addMigration(85, 86) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE user_episodes
+                    ADD COLUMN deselected_chapters TEXT NOT NULL DEFAULT ''
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_86_87 = addMigration(86, 87) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN automatically_cached INTEGER NOT NULL DEFAULT 0
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_87_88 = addMigration(87, 88) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcasts
+                    ADD COLUMN episodes_sort_order_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        @DeleteColumn(
+            tableName = "podcast_episodes",
+            columnName = "automatically_cached",
+        )
+        class DeleteAutomaticallyCachedMigration : AutoMigrationSpec
+
+        val MIGRATION_89_90 = addMigration(89, 90) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE podcast_episodes
+                    ADD COLUMN deselected_chapters_modified INTEGER
+                """.trimIndent(),
+            )
+            database.execSQL(
+                """
+                    ALTER TABLE user_episodes
+                    ADD COLUMN deselected_chapters_modified INTEGER
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_90_91 = addMigration(90, 91) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE episode_chapters(
+                        episode_uuid TEXT NOT NULL, 
+                        start_time INTEGER NOT NULL,
+                        end_time INTEGER,
+                        title TEXT,
+                        image_url TEXT,
+                        url TEXT,
+                        PRIMARY KEY (episode_uuid, start_time)
+                    )
+                """.trimIndent(),
+            )
+            database.execSQL("CREATE INDEX chapter_episode_uuid_index ON episode_chapters(episode_uuid)")
+        }
+
+        val MIGRATION_91_92 = addMigration(91, 92) { database ->
+            database.execSQL(
+                """
+                    UPDATE podcasts
+                    SET folder_uuid = NULL 
+                    WHERE folder_uuid IS '973df93c-e4dc-41fb-879e-0c7b532ebb70'
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_92_93 = addMigration(92, 93) { database ->
+            database.execSQL(
+                """
+                    ALTER TABLE episode_chapters
+                    ADD COLUMN is_embedded INTEGER NOT NULL DEFAULT 0
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_93_94 = addMigration(93, 94) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE trending_podcasts(
+                        uuid TEXT NOT NULL PRIMARY KEY, 
+                        title TEXT NOT NULL
+                    )
+                """.trimIndent(),
+            )
+        }
+
+        val MIGRATION_94_95 = addMigration(94, 95) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    execSQL("UPDATE podcasts SET auto_archive_episode_limit = 0 WHERE auto_archive_episode_limit IS NULL")
+                    execSQL("CREATE TABLE podcasts_temp (uuid TEXT NOT NULL PRIMARY KEY, added_date INTEGER, thumbnail_url TEXT, title TEXT NOT NULL, podcast_url TEXT, podcast_description TEXT NOT NULL, podcast_category TEXT NOT NULL, podcast_language TEXT NOT NULL, media_type TEXT, latest_episode_uuid TEXT, author TEXT NOT NULL, sort_order INTEGER NOT NULL, episodes_sort_order INTEGER NOT NULL, episodes_sort_order_modified INTEGER, latest_episode_date INTEGER, episodes_to_keep INTEGER NOT NULL, override_global_settings INTEGER NOT NULL, override_global_effects INTEGER NOT NULL, override_global_effects_modified INTEGER, start_from INTEGER NOT NULL, start_from_modified INTEGER, playback_speed REAL NOT NULL, playback_speed_modified INTEGER, volume_boosted INTEGER NOT NULL, volume_boosted_modified INTEGER, is_folder INTEGER NOT NULL, subscribed INTEGER NOT NULL, show_notifications INTEGER NOT NULL, show_notifications_modified INTEGER, auto_download_status INTEGER NOT NULL, auto_add_to_up_next INTEGER NOT NULL, auto_add_to_up_next_modified INTEGER, most_popular_color INTEGER NOT NULL, primary_color INTEGER NOT NULL, secondary_color INTEGER NOT NULL, light_overlay_color INTEGER NOT NULL, fab_for_light_bg INTEGER NOT NULL, link_for_dark_bg INTEGER NOT NULL, link_for_light_bg INTEGER NOT NULL, color_version INTEGER NOT NULL, color_last_downloaded INTEGER NOT NULL, sync_status INTEGER NOT NULL, exclude_from_auto_archive INTEGER NOT NULL, override_global_archive INTEGER NOT NULL, override_global_archive_modified INTEGER, auto_archive_played_after INTEGER NOT NULL, auto_archive_played_after_modified INTEGER, auto_archive_inactive_after INTEGER NOT NULL, auto_archive_inactive_after_modified INTEGER, auto_archive_episode_limit INTEGER NOT NULL, auto_archive_episode_limit_modified INTEGER, estimated_next_episode INTEGER, episode_frequency TEXT, `grouping` INTEGER NOT NULL, grouping_modified INTEGER, skip_last INTEGER NOT NULL, skip_last_modified INTEGER, show_archived INTEGER NOT NULL, show_archived_modified INTEGER, trim_silence_level INTEGER NOT NULL, trim_silence_level_modified INTEGER, refresh_available INTEGER NOT NULL, folder_uuid TEXT, licensing INTEGER NOT NULL, isPaid INTEGER NOT NULL, bundleuuid TEXT, bundlebundleUrl TEXT, bundlepaymentUrl TEXT, bundledescription TEXT, bundlepodcastUuid TEXT, bundlepaidType TEXT)")
+                    execSQL(
+                        """
+                            INSERT INTO podcasts_temp (uuid, added_date, thumbnail_url, title, podcast_url, podcast_description, podcast_category, podcast_language, media_type, latest_episode_uuid, author, sort_order, episodes_sort_order, episodes_sort_order_modified, latest_episode_date, episodes_to_keep, override_global_settings, override_global_effects, override_global_effects_modified, start_from, start_from_modified, playback_speed, playback_speed_modified, volume_boosted, volume_boosted_modified, is_folder, subscribed, show_notifications, show_notifications_modified, auto_download_status, auto_add_to_up_next, auto_add_to_up_next_modified, most_popular_color, primary_color, secondary_color, light_overlay_color, fab_for_light_bg, link_for_dark_bg, link_for_light_bg, color_version, color_last_downloaded, sync_status, exclude_from_auto_archive, override_global_archive, override_global_archive_modified, auto_archive_played_after, auto_archive_played_after_modified, auto_archive_inactive_after, auto_archive_inactive_after_modified, auto_archive_episode_limit, auto_archive_episode_limit_modified, estimated_next_episode, episode_frequency, `grouping`, grouping_modified, skip_last, skip_last_modified, show_archived, show_archived_modified, trim_silence_level, trim_silence_level_modified, refresh_available, folder_uuid, licensing, isPaid, bundleuuid, bundlebundleUrl, bundlepaymentUrl, bundledescription, bundlepodcastUuid, bundlepaidType)
+                            SELECT uuid, added_date, thumbnail_url, title, podcast_url, podcast_description, podcast_category, podcast_language, media_type, latest_episode_uuid, author, sort_order, episodes_sort_order, episodes_sort_order_modified, latest_episode_date, episodes_to_keep, override_global_settings, override_global_effects, override_global_effects_modified, start_from, start_from_modified, playback_speed, playback_speed_modified, volume_boosted, volume_boosted_modified, is_folder, subscribed, show_notifications, show_notifications_modified, auto_download_status, auto_add_to_up_next, auto_add_to_up_next_modified, most_popular_color, primary_color, secondary_color, light_overlay_color, fab_for_light_bg, link_for_dark_bg, link_for_light_bg, color_version, color_last_downloaded, sync_status, exclude_from_auto_archive, override_global_archive, override_global_archive_modified, auto_archive_played_after, auto_archive_played_after_modified, auto_archive_inactive_after, auto_archive_inactive_after_modified, auto_archive_episode_limit, auto_archive_episode_limit_modified, estimated_next_episode, episode_frequency, `grouping`, grouping_modified, skip_last, skip_last_modified, show_archived, show_archived_modified, trim_silence_level, trim_silence_level_modified, refresh_available, folder_uuid, licensing, isPaid, bundleuuid, bundlebundleUrl, bundlepaymentUrl, bundledescription, bundlepodcastUuid, bundlepaidType
+                            FROM podcasts
+                        """.trimIndent(),
+                    )
+                    execSQL("DROP TABLE podcasts")
+                    execSQL("ALTER TABLE podcasts_temp RENAME TO podcasts")
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
+        val MIGRATION_95_96 = addMigration(95, 96) { database ->
+            val now = DateTypeConverter().toLong(Date())
+            val chaptersConverter = ChapterIndicesConverter()
+
+            with(database) {
+                beginTransaction()
+                try {
+                    val podcastEpisodes = mutableMapOf<String, ChapterIndices>()
+                    database.query("SELECT uuid, deselected_chapters FROM podcast_episodes WHERE IFNULL(deselected_chapters, '') IS NOT ''").use { cursor ->
+                        while (cursor.moveToNext()) {
+                            podcastEpisodes.put(cursor.getString(0), chaptersConverter.fromString(cursor.getString(1)).decrement())
+                        }
+                    }
+                    podcastEpisodes.forEach { episodeId, chapters ->
+                        val contentValues = ContentValues(2).apply {
+                            put("deselected_chapters", chaptersConverter.toString(chapters))
+                            put("deselected_chapters_modified", now)
+                        }
+                        database.update("podcast_episodes", OnConflictStrategy.REPLACE, contentValues, "uuid IS ?", arrayOf(episodeId))
+                    }
+
+                    val userEpisodes = mutableMapOf<String, ChapterIndices>()
+                    database.query("SELECT uuid, deselected_chapters FROM user_episodes WHERE IFNULL(deselected_chapters, '') IS NOT ''").use { cursor ->
+                        while (cursor.moveToNext()) {
+                            userEpisodes.put(cursor.getString(0), chaptersConverter.fromString(cursor.getString(1)).decrement())
+                        }
+                    }
+                    userEpisodes.forEach { episodeId, chapters ->
+                        val contentValues = ContentValues(2).apply {
+                            put("deselected_chapters", chaptersConverter.toString(chapters))
+                            put("deselected_chapters_modified", now)
+                        }
+                        database.update("user_episodes", OnConflictStrategy.REPLACE, contentValues, "uuid IS ?", arrayOf(episodeId))
+                    }
+
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
+        val MIGRATION_96_97 = addMigration(96, 97) { database ->
+            database.execSQL("CREATE INDEX up_next_episode_episodeUuid ON up_next_episodes(episodeUuid)")
+        }
+
+        val MIGRATION_97_98 = addMigration(97, 98) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS episode_transcript(
+                        episode_uuid TEXT NOT NULL, 
+                        url TEXT NOT NULL,
+                        type TEXT NOT NULL,
+                        language TEXT,
+                        PRIMARY KEY (episode_uuid, url)
+                    )
+                """.trimIndent(),
+            )
+            database.execSQL("CREATE INDEX IF NOT EXISTS transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
+        }
+
+        val MIGRATION_98_99 = addMigration(98, 99) { database ->
+            database.execSQL("DROP INDEX transcript_episode_uuid_index")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS transcript_episode_uuid_index ON episode_transcript(episode_uuid)")
+        }
+
+        val MIGRATION_99_100 = addMigration(99, 100) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    database.execSQL(
+                        """
+                        CREATE TABLE curated_podcasts(
+                            list_id TEXT NOT NULL,
+                            list_title TEXT NOT NULL,
+                            podcast_id TEXT NOT NULL,
+                            podcast_title TEXT NOT NULL,
+                            podcast_description TEXT,
+                            PRIMARY KEY (list_id, podcast_id)
+                        )
+                        """.trimIndent(),
+                    )
+                    database.execSQL("CREATE INDEX curated_podcasts_list_id_index ON curated_podcasts(list_id)")
+                    database.execSQL("CREATE INDEX curated_podcasts_podcast_id_index ON curated_podcasts(podcast_id)")
+                    database.execSQL("DROP TABLE trending_podcasts")
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
@@ -533,8 +881,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 0,
                             "syncStatus" to 1,
                             "sortPosition" to 1,
-                            "filterHours" to 336
-                        )
+                            "filterHours" to 336,
+                        ),
                     )
                     // In Progress
                     database.insert(
@@ -560,8 +908,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 0,
                             "syncStatus" to 1,
                             "sortPosition" to 2,
-                            "filterHours" to 0
-                        )
+                            "filterHours" to 0,
+                        ),
                     )
                     // Starred
                     database.insert(
@@ -587,8 +935,8 @@ abstract class AppDatabase : RoomDatabase() {
                             "starred" to 1,
                             "syncStatus" to 1,
                             "sortPosition" to 3,
-                            "filterHours" to 0
-                        )
+                            "filterHours" to 0,
+                        ),
                     )
                 },
                 addMigration(9, 10) { database ->
@@ -598,7 +946,7 @@ abstract class AppDatabase : RoomDatabase() {
                             "playlist_id INTEGER," +
                             "episode_uuid VARCHAR," +
                             "position INTEGER" +
-                            ")"
+                            ")",
                     )
                     database.execSQL("ALTER TABLE podcast ADD COLUMN is_deleted INTEGER DEFAULT 0")
                     database.execSQL("ALTER TABLE podcast ADD COLUMN sync_status INTEGER DEFAULT 0")
@@ -862,13 +1210,34 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_76_77,
                 MIGRATION_77_78,
                 MIGRATION_78_79,
+                MIGRATION_79_80,
+                MIGRATION_80_81,
+                // 81 to 82 added via auto migration
+                MIGRATION_82_83,
+                MIGRATION_83_84,
+                MIGRATION_84_85,
+                MIGRATION_85_86,
+                MIGRATION_86_87,
+                MIGRATION_87_88,
+                // 88 to 89 added via auto migration
+                MIGRATION_89_90,
+                MIGRATION_90_91,
+                MIGRATION_91_92,
+                MIGRATION_92_93,
+                MIGRATION_93_94,
+                MIGRATION_94_95,
+                MIGRATION_95_96,
+                MIGRATION_96_97,
+                MIGRATION_97_98,
+                MIGRATION_98_99,
+                MIGRATION_99_100,
             )
         }
 
         private fun addMigration(startVersion: Int, endVersion: Int, migration: (database: SupportSQLiteDatabase) -> Unit): Migration {
             return object : Migration(startVersion, endVersion) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    migration(database)
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    migration(db)
                 }
             }
         }
@@ -906,5 +1275,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
             return result
         }
+
+        private fun ChapterIndices.decrement() = ChapterIndices(map { it - 1 })
     }
 }

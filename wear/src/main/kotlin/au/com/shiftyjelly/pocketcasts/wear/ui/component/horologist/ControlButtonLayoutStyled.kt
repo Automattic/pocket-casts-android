@@ -18,12 +18,12 @@ fun ControlButtonLayoutStyled(
     middleButton: @Composable () -> Unit,
     rightButton: @Composable () -> Unit,
     sidePadding: Dp = 17.dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Absolute.Center
+        horizontalArrangement = Arrangement.Absolute.Center,
     ) {
         Box(modifier = Modifier.padding(start = sidePadding)) {
             leftButton()

@@ -43,20 +43,20 @@ fun PodcastSelectImage(
     selected: Boolean,
     onPodcastSelected: () -> Unit,
     onPodcastUnselected: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         modifier = modifier
             .aspectRatio(1f)
             .clickable { if (selected) onPodcastUnselected() else onPodcastSelected() }
             .semantics(mergeDescendants = true) {},
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         PodcastImage(
             uuid = podcast.uuid,
             title = podcast.title,
             showTitle = true,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
 
         if (selected) {
@@ -65,12 +65,12 @@ fun PodcastSelectImage(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(corners))
-                    .background(color = colorSelectedAlpha)
+                    .background(color = colorSelectedAlpha),
             )
         }
         Box(
             contentAlignment = Alignment.BottomEnd,
-            modifier = Modifier.fillMaxSize().padding(8.dp)
+            modifier = Modifier.fillMaxSize().padding(8.dp),
         ) {
             if (selected) {
                 Box(
@@ -79,13 +79,13 @@ fun PodcastSelectImage(
                         .shadow(2.dp, shape = CircleShape)
                         .size(20.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF78D549))
+                        .background(Color(0xFF78D549)),
                 ) {
                     Icon(
                         painter = painterResource(IR.drawable.ic_tick),
                         contentDescription = stringResource(LR.string.selected),
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                 }
             } else {
@@ -97,7 +97,7 @@ fun PodcastSelectImage(
                         .shadow(1.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(Color(0x75FFFFFF))
-                        .semantics { contentDescription = notSelected }
+                        .semantics { contentDescription = notSelected },
                 )
             }
         }
@@ -114,7 +114,7 @@ private fun ColorPickerLightPreview() {
                 selected = false,
                 onPodcastSelected = {},
                 onPodcastUnselected = {},
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(100.dp),
             )
             Spacer(Modifier.height(16.dp))
             PodcastSelectImage(
@@ -122,7 +122,7 @@ private fun ColorPickerLightPreview() {
                 selected = true,
                 onPodcastSelected = {},
                 onPodcastUnselected = {},
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(100.dp),
             )
         }
     }

@@ -11,17 +11,17 @@ sealed class ListType(val stringValue: String) {
 
         fun fromString(value: String): ListType {
             return when (value) {
-                PODCAST_LIST -> PodcastList()
-                EPISODE_LIST -> EpisodeList()
-                CATEGORIES -> Categories()
+                PODCAST_LIST -> PodcastList
+                EPISODE_LIST -> EpisodeList
+                CATEGORIES -> Categories
                 else -> Unknown(value)
             }
         }
     }
 
-    class PodcastList : ListType(PODCAST_LIST)
-    class EpisodeList : ListType(EPISODE_LIST)
-    class Categories : ListType(CATEGORIES)
+    data object PodcastList : ListType(PODCAST_LIST)
+    data object EpisodeList : ListType(EPISODE_LIST)
+    data object Categories : ListType(CATEGORIES)
     data class Unknown(val value: String) : ListType(value)
 
     override fun toString(): String {

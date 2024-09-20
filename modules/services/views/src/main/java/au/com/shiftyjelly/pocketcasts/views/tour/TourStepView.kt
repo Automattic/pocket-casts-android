@@ -12,7 +12,7 @@ import com.google.android.material.button.MaterialButton
 class TourStepView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater

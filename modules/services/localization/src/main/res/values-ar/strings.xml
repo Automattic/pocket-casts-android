@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-08-21 14:54:03+0000
+Translation-Revision-Date: 2024-08-29 11:49:23+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="got_it">فهمت</string>
+    <string name="try_again">حاول مرة أخرى</string>
+    <string name="send_feedback">إرسال ملاحظات</string>
+    <string name="submit">إرسال</string>
     <string name="support">الدعم</string>
     <string name="bookmark">إشارة مرجعية</string>
     <string name="details">تفاصيل</string>
@@ -30,17 +34,12 @@ Language: ar
     <string name="bookmarks_delete_plural">حذف الإشارات المرجعية</string>
     <string name="bookmarks_delete_singular">حذف الإشارة المرجعية</string>
     <string name="bookmarks_deleted_plural">تم حذف ⁦%1$d⁩ من الإشارات المرجعية</string>
-    <string name="bookmarks_deleted_singular">تم حذف إشارة مرجعية واحدة</string>
     <string name="bookmarks_delete_summary_plural">سيتم حذف %d من الإشارات المرجعية. يتعذر التراجع عن هذا.</string>
     <string name="bookmarks_delete_summary_singular">سيتم حذف هذه الإشارة المرجعية. يتعذر التراجع عن هذا.</string>
     <string name="deselect_all">إلغاء تحديد الكل</string>
     <string name="deselect_all_above">إلغاء تحديد الكل أعلاه</string>
     <string name="deselect_all_below">إلغاء تحديد الكل أدناه</string>
     <string name="edit">تعديل</string>
-    <string name="whats_new_autoplay_title">التشغيل التلقائي هنا!</string>
-    <string name="whats_new_autoplay_body">إذا بدأت حلقة بينما قائمة العناصر التالية فارغة، فإن التشغيل التلقائي سيستمر في تشغيل الحلقات من ذلك البودكاست أو تلك القائمة.</string>
-    <string name="whats_new_autoplay_enable_button">تمكينه الآن</string>
-    <string name="whats_new_autoplay_maybe_later_button">ربما لاحقًا</string>
     <string name="filters_download_limit_3">3 حلقات</string>
     <string name="settings_headphone_controls_action_next">الإجراء التالي</string>
     <string name="settings_headphone_controls_action_previous">الإجراء السابق</string>
@@ -64,7 +63,6 @@ Language: ar
     <string name="player_sleep_add_1_minute">أكثر من دقيقة واحدة</string>
     <string name="settings_autoplay">التشغيل التلقائي</string>
     <string name="onboarding_patron_feature_early_access_title">الوصول إلى الميزات مبكرًا</string>
-    <string name="onboarding_plus_feature_watch_playback">تشغيل الساعة</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">أيقونات القوالب والتطبيقات الإضافية</string>
     <string name="settings_continuous_playback_summary">في حال كانت قائمة انتظار العناصر التالية لديك فارغة، سنقوم بتشغيل حلقات من البودكاست أو القائمة نفسها التي تستمع إليه حاليًا.</string>
     <string name="renew_your_subscription">تجديد الاشتراك الخاص بك</string>
@@ -90,7 +88,6 @@ Language: ar
     <string name="error_invalid_email_address">يرجى إدخال عنوان بريد إلكتروني صالح.</string>
     <string name="error_invalid_password_length">يرجى إدخال كلمة مرور يصل طولها إلى 6 أحرف على الأقل.</string>
     <string name="error_server_failed">حدث خطأ داخلي في الخادم. ترجى المحاولة مرة أخرى لاحقًا.</string>
-    <string name="log_in_no_network">لم يتم الكشف عن اتصال الشبكة. ترجى المحاولة مرة أخرى لاحقًا.</string>
     <string name="settings_privacy_crash_link_short">ربط حسابك</string>
     <string name="log_in_watch_requires_plus">تسجيل الدخول باستخدام حساب Plus لاستخدام هذا التطبيق أو ترقية الزيارة</string>
     <string name="log_in_with_plus">يرجى تسجيل الدخول باستخدام حساب Plus</string>
@@ -179,7 +176,6 @@ Language: ar
     <string name="settings_media_actions_customise">تخصيص إجراءات الوسائط</string>
     <string name="settings_media_actions_show_title">عرض إجراءات الوسائط المخصصة</string>
     <string name="settings_media_actions_show_subtitle">اعرض إجراءات الوسائط المخصصة في تنبيهات الوسائط ضمن Android 13 وAndroid Auto.</string>
-    <string name="plus_take_your_podcasting_to_next_level">انقل تجربتك المتعلقة بالبث الصوتي إلى المستوى التالي مع وصول استثنائي إلى الميزات وخيارات التخصيص.</string>
     <string name="onboarding_recommendations_more">مزيد من %s</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">يمكن الإلغاء في أي وقت.</string>
     <string name="pocket_casts_query_podcasts">الاستعلام عن البودكاست في Pocket Casts</string>
@@ -271,12 +267,7 @@ Language: ar
     <string name="onboarding_recommendations_find_favorite_podcasts">العثور على حلقات البودكاست التي أفضّلها</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">اجعل Pocket Casts خاصًا بك من خلال تحديد حلقات البودكاست التي تفضلها أو قم باستيرادها من مشغل حلقة بودكاست أخرى. يمكنك دومًا القيام بذلك لاحقًا.</string>
     <string name="onboarding_recommendations_import">استيراد</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">كل شيء تحبه بشأن Pocket Casts، إلى جانب المزيد</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">الاستمتاع بالوصول إلى ميزات وخيارات تخصيص استثنائية </string>
-    <string name="onboarding_upgrade_unlock_all_features">فتح كل الميزات</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">تطبيقات سطح المكتب</string>
     <string name="onboarding_plus_feature_desktop_apps_text">يمكنك الاستماع في مزيد من الأماكن من خلال تطبيقاتنا التي تعمل بنظامَي التشغيل Windows وmacOS وتطبيقات الويب.</string>
-    <string name="onboarding_plus_feature_folders_title">المجلدات</string>
     <string name="onboarding_plus_feature_folders_text">يمكنك تنظيم حلقات البودكاست الخاصة بك في المجلدات وحافظ عليها قيد المزامنة عبر كل أجهزتك.</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ارفع ملفاتك إلى مساحة التخزين على السحابة واجعلها متوافرة في كل مكان.</string>
     <string name="onboarding_plus_feature_themes_icons_title">القوالب والأيقونات</string>
@@ -705,7 +696,6 @@ Language: ar
     <string name="settings_website_link">رابط موقع الويب</string>
     <string name="settings_view">عرض</string>
     <string name="settings_version">الإصدار ⁦%1$s⁩ (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">استخدام العمل الفني لبث صوتي مُضمَّن</string>
     <string name="settings_use_android_light_dark_mode">استخدام الوضع الفاتح/الداكن الخاص بنظام تشغيل Android</string>
     <string name="settings_up_next_tap_summary">إذا كان قيد التشغيل، فسيؤدي النقر على عنصر ما في قائمة انتظارك التالية إلى تشغيله. سيؤدي الضغط مطولاً إلى إظهار خيارات الحلقة.</string>
     <string name="settings_up_next_tap">تشغيل الحلقة التالية</string>
@@ -815,7 +805,6 @@ Language: ar
     <string name="settings_export_send_email">إرسال بريد إلكتروني</string>
     <string name="settings_export_save_file_summary">قم بتصدير ملف OPML إلى مساحة تخزينك.</string>
     <string name="settings_export_save_file">حفظ الملف</string>
-    <string name="settings_embedded_artwork_details">يعرض العمل الفني من الملف الذي تم تنزيله (إذا كان موجودًا) في المُشغِّل بدلاً من استخدام العمل الفني للعرض.</string>
     <string name="settings_developer">مطوّر</string>
     <string name="settings_close_upgrade_offer">إغلاق عرض الترقية</string>
     <string name="settings_choose_podcasts">اختيار البث الصوتي</string>
@@ -884,17 +873,10 @@ Language: ar
     <string name="plus_themes_icons_body">أظهر معدنك الحقيقي. أيقونات وقوالب حصرية لنادي plus فقط.</string>
     <string name="plus_themes_icons">القوالب والأيقونات</string>
     <string name="plus_thanks_for_your_support_bang">شكرًا لك على دعمك!</string>
-    <string name="plus_lifetime_member">عضو مدى الحياة</string>
     <string name="plus_learn_more_button">أعرف أكثر</string>
     <string name="plus_learn_more_about_plus">معرفة المزيد حول Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">انقل بثك الصوتي إلى أماكن أخرى باستخدام تطبيقات Windows وmacOS وتطبيقات الويب الخاصة بنا.</string>
     <string name="plus_desktop_apps">تطبيقات سطح المكتب</string>
-    <string name="plus_description_title">ميزات مُحسَّنة للمستمعين المتقدمين</string>
-    <string name="plus_description_body">احصل على المعلومات الشخصية وتوزيعها كل ذلك مرة واحدة. ارفع ملفات الصوت الشخصية الخاصة بك إلى خوادمنا السحابية، واوصل إلى حسابك من خلال مُشغِّل الويب الخاص بنا، واجعل التطبيق خاص بك.</string>
-    <string name="plus_create_marketing_features"> كل شيء</string>
     <string name="settings_logs">السجلات</string>
-    <string name="plus_cloud_storage_limit">%d جيجابايت من مساحة التخزين السحابي</string>
-    <string name="plus_cloud_storage_body">قم بتسريع محاضراتك. تخلَّص من المحتوى الآخر. كن Podcast DJ الخاص بك.</string>
     <string name="plus_cloud_storage">التخزين السحابي</string>
     <string name="profile_expiry_date_unknown">غير معروف</string>
     <string name="profile_yearly">سنوي</string>
@@ -902,7 +884,6 @@ Language: ar
     <string name="profile_welcome_to_plus">مرحبًا بك في Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">مرحبًا بك في Pocket Casts!</string>
     <string name="profile_web_player">مُشغِّل الويب</string>
-    <string name="profile_upgrade_to_plus">الترقية إلى Plus</string>
     <string name="profile_updates_ends">تنتهي التحديثات: %s</string>
     <string name="profile_updates_ended">انتهت التحديثات: %s</string>
     <string name="profile_time_free">%s مجانًا</string>
@@ -962,7 +943,6 @@ Language: ar
     <string name="profile_reset_password_failed">يتعذر إرسال كلمة مرور جديدة إليك عبر البريد الإلكتروني. يرجى المحاولة لاحقًا.</string>
     <string name="profile_reset_password">استعادة كلمة المرور</string>
     <string name="profile_regular_price">السعر العادي</string>
-    <string name="profile_regular">قياسي</string>
     <string name="profile_refreshing">جارٍ التحديث…</string>
     <string name="profile_refreshed_never">لم يتم التحديث إطلاقًا</string>
     <string name="profile_refresh_status_unknown">غير معروف</string>
@@ -1003,16 +983,14 @@ Language: ar
     <string name="profile_navigation_listening_history">تاريخ الاستماع</string>
     <string name="profile_navigation_files">الملفات</string>
     <string name="profile_monthly">شهريًا</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_last_refresh">آخر تحديث: منذ %s</string>
     <string name="profile_joined">تم الانضمام:</string>
     <string name="profile_get_plus">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة، بالإضافة إلى المزيد!</string>
     <string name="profile_free_account">حساب مجاني</string>
-    <string name="profile_free">مجانية</string>
     <string name="profile_forgot_your_password">نسيتُ كلمة المرور الخاصة بي</string>
-    <string name="profile_find_out_more">اكتشاف المزيد حول Pocket Casts Plus</string>
     <string name="profile_files_remove_image">استبدال صورة</string>
     <string name="profile_files_empty_title">لا توجد ملفات</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_files_empty_summary">هل ترغب في الاستماع إلى ملفاتك الخاصة؟\nاضغط على زر + لفتحها في Pocket Casts، وستظهر هنا.</string>
     <string name="profile_files_addfile_save">حفظ</string>
     <string name="profile_files_add_filename">الاسم</string>
@@ -1020,9 +998,6 @@ Language: ar
     <string name="profile_file_locked">مقفل</string>
     <string name="profile_file">الملف</string>
     <string name="profile_feature_requires">تتطلب هذه الميزة \nPocket Casts Plus</string>
-    <string name="profile_extra_themes">قوالب إضافية</string>
-    <string name="profile_extra_app_icons">أيقونات تطبيق إضافية</string>
-    <string name="profile_everything_unlocked">تم فتح كل شيء</string>
     <string name="profile_ends">ينتهي في %s</string>
     <string name="profile_ended">انتهى في %s</string>
     <string name="profile_end_tour">إنهاء الجولة</string>
@@ -1054,15 +1029,9 @@ Language: ar
     <string name="profile_select_account_type">تحديد نوع الحساب</string>
     <string name="profile_create_completed">إكمال الحساب</string>
     <string name="profile_create_terms_of_use">شروط الاستخدام</string>
-    <string name="profile_create_tos_full_terms_of_use">شروط الاستخدام بالكامل</string>
-    <string name="profile_create_tos_disagree">لا، شكرًا</string>
-    <string name="profile_create_tos_agree">أوافق</string>
-    <string name="profile_create_tos">قبل أن نسمح لك بالانضمام إلى نادي Plus، نحتاج منك الموافقة على شروط الاستخدام الخاصة بنا. يمكنك دراستها في وقت فراغك باستخدام الرابط الوارد أدناه.</string>
     <string name="profile_create_subscription_failed">يتعذر إنشاء حساب. يرجى المحاولة مجددًا</string>
-    <string name="profile_create_privacy_policy_title">سياسة الخصوصية</string>
     <string name="profile_create_privacy_policy">لقد وضعنا سياسة الخصوصية الخاصة بنا كذلك في رابط إذا كنت مهتمًا. لقد حاولنا أن نجعل كلاهما قصيرًا وواضحًا وقمنا بتضمين أقل قدر ممكن من المصطلحات القانونية.</string>
     <string name="profile_create_newsletter_summary">يمكنك تلقي الأخبار، وتحديثات التطبيق وقوائم بث صوتي مُنسَّقة ومقابلات والمزيد</string>
-    <string name="profile_create_license">يرجى عذرنا على إجرائاتنا الرسمية</string>
     <string name="profile_create_failed">تعذر إنشاء حساب. يرجى المحاولة مجددًا</string>
     <string name="profile_create_account_image">إنشاء صورة حساب</string>
     <string name="profile_create_account">إنشاء حساب</string>
@@ -1109,7 +1078,6 @@ Language: ar
     <string name="profile_alreadysignedindescription">يمكنك فقط تسجيل الدخول إلى حساب واحد في المرة الواحدة.</string>
     <string name="profile_alreadysignedin">لقد قمت بتسجيل الدخول بالفعل</string>
     <string name="profile_already_have_account">هل لديك حساب على Pocket Casts بالفعل؟</string>
-    <string name="profile_almost_everything">كل شيء تقريبًا</string>
     <string name="profile_account_delete_yes">نعم، احذفه</string>
     <string name="profile_account_created">تم إنشاء حساب</string>
     <string name="profile_access_ends">ينتهي الوصول: %s</string>
@@ -1351,7 +1319,6 @@ Language: ar
     <string name="podcasts">البث الصوتي</string>
     <string name="player_started_from">بدء البث الصوتي من %d من الثواني</string>
     <string name="player_skipped_last">تم تخطي آخر %d من الثواني</string>
-    <string name="player_sleep_time_fired">توقف مؤقت الإيقاف في نهاية حلقتك.\nليلة سعيدة!</string>
     <string name="player_actions_show_as_delete_for_custom">معروض كحذف للحلقات المخصصة</string>
     <string name="player_actions_hidden_for_custom">مخفي للحلقات المخصصة</string>
     <string name="player_rearrange_actions_hidden">المزيد من الإجراءات</string>
@@ -1373,7 +1340,6 @@ Language: ar
     <string name="player_time_saved_detail">لقد وفرت إجمالاً %s باستخدام هذه الميزة.</string>
     <string name="player_tab_playing_wide">ما يتم تشغيله الآن</string>
     <string name="player_tab_playing">تشغيل</string>
-    <string name="player_sleep_when_episode_ends">الإيقاف عند انتهاء الحلقة</string>
     <string name="player_sleep_timer">مؤقت الإيقاف</string>
     <string name="player_sleep_timer_title">مؤقت الإيقاف</string>
     <string name="player_sleep_end_of_episode">نهاية الحلقة</string>
@@ -1382,7 +1348,6 @@ Language: ar
     <string name="player_sleep_cancel_timer">إلغاء المؤقت</string>
     <string name="player_sleep_add_5_minutes">أكثر من 5 دقائق</string>
     <string name="player_sleep_60_minutes">60 دقيقة</string>
-    <string name="player_sleep_5_minutes">5 دقائق</string>
     <string name="player_sleep_30_minutes">30 دقيقة</string>
     <string name="player_sleep_15_minutes">15 دقيقة</string>
     <string name="player_pip">دخول صورة داخل صورة</string>

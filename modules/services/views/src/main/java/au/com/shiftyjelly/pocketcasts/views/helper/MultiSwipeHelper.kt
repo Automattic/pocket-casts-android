@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.Rect
-import android.os.Build
 import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
@@ -12,14 +11,13 @@ import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.animation.Interpolator
-import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
-import androidx.recyclerview.R
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchUIUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.helper.MultiSwipeHelper.Callback
 import kotlin.math.abs
 
@@ -66,7 +64,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Currently selected view holder
      */
-    internal /* synthetic access */ var mSelected: ViewHolder? = null
+    internal var mSelected: ViewHolder? = null
 
     /**
      * The reference coordinates for the action start. For drag & drop, this is the time long
@@ -105,7 +103,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * The pointer we are tracking.
      */
-    internal /* synthetic access */ var mActivePointerId = ACTIVE_POINTER_ID_NONE
+    internal var mActivePointerId = ACTIVE_POINTER_ID_NONE
 
     /**
      * Current mode.
@@ -117,7 +115,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * [Callback.getAbsoluteMovementFlags] for the current
      * action state.
      */
-    internal /* synthetic access */ var mSelectedFlags: Int = 0
+    internal var mSelectedFlags: Int = 0
 
     /**
      * When a View is dragged or swiped and needs to go back to where it was, we create a Recover
@@ -136,14 +134,14 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * When user drags a view to the edge, we start scrolling the LayoutManager as long as View
      * is partially out of bounds.
      */
-    internal/* synthetic access */ val mScrollRunnable: Runnable = object : Runnable {
+    internal val mScrollRunnable: Runnable = object : Runnable {
         override fun run() {
             if (mSelected != null && scrollIfNecessary()) {
                 if (mSelected != null) { // it might be lost during scrolling
                     moveIfNecessary(mSelected)
                 }
                 mRecyclerView!!.removeCallbacks(this)
-                ViewCompat.postOnAnimation(mRecyclerView!!, this)
+                mRecyclerView!!.postOnAnimation(this)
             }
         }
     }
@@ -169,19 +167,19 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * until view reaches its final position (end of recover animation), we keep a reference so
      * that it can be drawn above other children.
      */
-    internal /* synthetic access */ var mOverdrawChild: View? = null
+    internal var mOverdrawChild: View? = null
 
     /**
      * We cache the position of the overdraw child to avoid recalculating it each time child
      * position callback is called. This value is invalidated whenever a child is attached or
      * detached.
      */
-    internal /* synthetic access */ var mOverdrawChildPosition = -1
+    internal var mOverdrawChildPosition = -1
 
     /**
      * Used to detect long press.
      */
-    internal /* synthetic access */ var mGestureDetector: GestureDetectorCompat? = null
+    internal var mGestureDetector: GestureDetector? = null
 
     /**
      * Callback for when long press occurs.
@@ -191,7 +189,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     private val mOnItemTouchListener = object : RecyclerView.OnItemTouchListener {
         override fun onInterceptTouchEvent(
             recyclerView: RecyclerView,
-            event: MotionEvent
+            event: MotionEvent,
         ): Boolean {
             mGestureDetector!!.onTouchEvent(event)
             val action = event.actionMasked
@@ -215,7 +213,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                                         event.x,
                                         event.y,
                                         location[0].toFloat(),
-                                        event.y
+                                        event.y,
                                     ) // We only care about the x values
                                 }
                             } != null
@@ -338,9 +336,9 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         if (recyclerView != null) {
             val resources = recyclerView.resources
             mSwipeEscapeVelocity = resources
-                .getDimension(R.dimen.item_touch_helper_swipe_escape_velocity)
+                .getDimension(R.dimen.multi_swipe_helper_escape_velocity)
             mMaxSwipeVelocity = resources
-                .getDimension(R.dimen.item_touch_helper_swipe_escape_max_velocity)
+                .getDimension(R.dimen.multi_swipe_helper_escape_max_velocity)
             setupCallbacks()
         }
     }
@@ -376,7 +374,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         val gestureListener = ItemTouchHelperGestureListener().apply {
             mItemTouchHelperGestureListener = this
         }
-        mGestureDetector = GestureDetectorCompat(context, gestureListener)
+        mGestureDetector = GestureDetector(context, gestureListener)
     }
 
     private fun stopGestureDetection() {
@@ -411,8 +409,13 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             dy = mTmpPosition[1]
         }
         mCallback.onDrawOver(
-            c, parent, mSelected,
-            mRecoverAnimations, mActionState, dx, dy
+            c,
+            parent,
+            mSelected,
+            mRecoverAnimations,
+            mActionState,
+            dx,
+            dy,
         )
     }
 
@@ -427,8 +430,13 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             dy = mTmpPosition[1]
         }
         mCallback.onDraw(
-            c, parent, mSelected,
-            mRecoverAnimations, mActionState, dx, dy
+            c,
+            parent,
+            mSelected,
+            mRecoverAnimations,
+            mActionState,
+            dx,
+            dy,
         )
     }
 
@@ -439,7 +447,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * current action, but may not be null if actionState is ACTION_STATE_DRAG.
      * @param actionState The type of action
      */
-    internal /* synthetic access */ fun select(selected: ViewHolder?, actionState: Int) {
+    internal fun select(selected: ViewHolder?, actionState: Int) {
         if (selected === mSelected && actionState == mActionState) {
             return
         }
@@ -465,10 +473,11 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         if (mSelected != null) {
             val prevSelected = mSelected
             if (prevSelected!!.itemView.parent != null) {
-                val swipeDir = if (prevActionState == ACTION_STATE_DRAG)
+                val swipeDir = if (prevActionState == ACTION_STATE_DRAG) {
                     0
-                else
+                } else {
                     swipeIfNecessary(prevSelected)
+                }
                 releaseVelocityTracker()
                 // find where we should animate to
                 val targetTranslateX: Float
@@ -512,9 +521,13 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                 }
 
                 val rv = object : RecoverAnimation(
-                    prevSelected, animationType,
-                    prevActionState, currentTranslateX, currentTranslateY,
-                    targetTranslateX, targetTranslateY
+                    prevSelected,
+                    animationType,
+                    prevActionState,
+                    currentTranslateX,
+                    currentTranslateY,
+                    targetTranslateX,
+                    targetTranslateY,
                 ) {
                     override fun onAnimationEnd(animation: Animator) {
                         super.onAnimationEnd(animation)
@@ -542,7 +555,8 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     }
                 }
                 val duration = mCallback.getAnimationDuration(
-                    mRecyclerView!!, animationType
+                    mRecyclerView!!,
+                    animationType,
                 )
                 rv.setDuration(duration)
                 mRecoverAnimations.add(rv)
@@ -557,7 +571,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         if (selected != null) {
             mSelectedFlags = mCallback.getAbsoluteMovementFlags(
                 mRecyclerView,
-                selected
+                selected,
             ) and actionStateMask shr mActionState * DIRECTION_FLAG_COUNT
             mSelectedStartX = selected.itemView.left.toFloat()
             mSelectedStartY = selected.itemView.top.toFloat()
@@ -576,7 +590,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         mRecyclerView!!.invalidate()
     }
 
-    internal /* synthetic access */ fun postDispatchSwipe(anim: RecoverAnimation, swipeDir: Int) {
+    internal fun postDispatchSwipe(anim: RecoverAnimation, swipeDir: Int) {
         // wait until animations are complete.
         mRecyclerView!!.post(object : Runnable {
             override fun run() {
@@ -605,7 +619,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         })
     }
 
-    internal /* synthetic access */ fun hasRunningRecoverAnim(): Boolean {
+    internal fun hasRunningRecoverAnim(): Boolean {
         val size = mRecoverAnimations.size
         for (i in 0 until size) {
             if (!mRecoverAnimations[i].mEnded) {
@@ -618,16 +632,17 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * If user drags the view to the edge, trigger a scroll if necessary.
      */
-    internal /* synthetic access */ fun scrollIfNecessary(): Boolean {
+    internal fun scrollIfNecessary(): Boolean {
         if (mSelected == null) {
             mDragScrollStartTimeInMs = java.lang.Long.MIN_VALUE
             return false
         }
         val now = System.currentTimeMillis()
-        val scrollDuration = if (mDragScrollStartTimeInMs == java.lang.Long.MIN_VALUE)
+        val scrollDuration = if (mDragScrollStartTimeInMs == java.lang.Long.MIN_VALUE) {
             0
-        else
+        } else {
             now - mDragScrollStartTimeInMs
+        }
         val lm = mRecyclerView!!.layoutManager
         if (mTmpRect == null) {
             mTmpRect = Rect()
@@ -665,14 +680,14 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             scrollX = mCallback.interpolateOutOfBoundsScroll(
                 mRecyclerView!!,
                 mSelected!!.itemView.width, scrollX,
-                scrollDuration
+                scrollDuration,
             )
         }
         if (scrollY != 0) {
             scrollY = mCallback.interpolateOutOfBoundsScroll(
                 mRecyclerView!!,
                 mSelected!!.itemView.height, scrollY,
-                scrollDuration
+                scrollDuration,
             )
         }
         if (scrollX != 0 || scrollY != 0) {
@@ -739,7 +754,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Checks if we should swap w/ another view holder.
      */
-    internal /* synthetic access */ fun moveIfNecessary(viewHolder: ViewHolder?) {
+    internal fun moveIfNecessary(viewHolder: ViewHolder?) {
         if (mRecyclerView!!.isLayoutRequested) {
             return
         }
@@ -753,7 +768,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         val x = (mSelectedStartX + mDx).toInt()
         val y = (mSelectedStartY + mDy).toInt()
         if (Math.abs(y - viewHolder.itemView.top) < viewHolder.itemView.height * threshold && Math.abs(
-                x - viewHolder.itemView.left
+                x - viewHolder.itemView.left,
             ) < viewHolder.itemView.width * threshold
         ) {
             return
@@ -773,8 +788,12 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         if (mCallback.onMove(mRecyclerView!!, viewHolder, target)) {
             // keep target visible
             mCallback.onMoved(
-                mRecyclerView!!, viewHolder,
-                target, toPosition, x, y
+                mRecyclerView!!,
+                viewHolder,
+                target,
+                toPosition,
+                x,
+                y,
             )
         }
     }
@@ -797,9 +816,9 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Returns the animation type or 0 if cannot be found.
      */
-    internal /* synthetic access */ fun endRecoverAnimation(
+    internal fun endRecoverAnimation(
         viewHolder: ViewHolder?,
-        override: Boolean
+        override: Boolean,
     ) {
         val recoverAnimSize = mRecoverAnimations.size
         for (i in recoverAnimSize - 1 downTo 0) {
@@ -819,12 +838,12 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         outRect: Rect,
         view: View,
         parent: RecyclerView,
-        state: RecyclerView.State
+        state: RecyclerView.State,
     ) {
         outRect.setEmpty()
     }
 
-    internal /* synthetic access */ fun obtainVelocityTracker() {
+    internal fun obtainVelocityTracker() {
         if (mVelocityTracker != null) {
             mVelocityTracker!!.recycle()
         }
@@ -864,10 +883,10 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     /**
      * Checks whether we should select a View for swiping.
      */
-    internal /* synthetic access */ fun checkSelectForSwipe(
+    internal fun checkSelectForSwipe(
         action: Int,
         motionEvent: MotionEvent,
-        pointerIndex: Int
+        pointerIndex: Int,
     ) {
         if (mSelected != null || action != MotionEvent.ACTION_MOVE ||
             mActionState == ACTION_STATE_DRAG || !mCallback.isItemViewSwipeEnabled
@@ -924,7 +943,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         select(vh, ACTION_STATE_SWIPE)
     }
 
-    internal /* synthetic access */ fun findChildView(event: MotionEvent): View? {
+    internal fun findChildView(event: MotionEvent): View? {
         // first check elevated views, if none, then call RV
         val x = event.x
         val y = event.y
@@ -1039,7 +1058,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         select(viewHolder, ACTION_STATE_SWIPE)
     }
 
-    internal /* synthetic access */ fun findAnimation(event: MotionEvent): RecoverAnimation? {
+    internal fun findAnimation(event: MotionEvent): RecoverAnimation? {
         if (mRecoverAnimations.isEmpty()) {
             return null
         }
@@ -1053,10 +1072,10 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         return null
     }
 
-    internal /* synthetic access */ fun updateDxDy(
+    internal fun updateDxDy(
         ev: MotionEvent,
         directionFlags: Int,
-        pointerIndex: Int
+        pointerIndex: Int,
     ) {
         val x = ev.getX(pointerIndex)
         val y = ev.getY(pointerIndex)
@@ -1089,7 +1108,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         val originalMovementFlags = mCallback.getMovementFlags(mRecyclerView!!, viewHolder)
         val absoluteMovementFlags = mCallback.convertToAbsoluteDirection(
             originalMovementFlags,
-            ViewCompat.getLayoutDirection(mRecyclerView!!)
+            mRecyclerView!!.layoutDirection,
         )
         val flags =
             absoluteMovementFlags and ACTION_MODE_SWIPE_MASK shr ACTION_STATE_SWIPE * DIRECTION_FLAG_COUNT
@@ -1107,9 +1126,11 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     // convert to relative
                     Callback.convertToRelativeDirection(
                         swipeDir,
-                        ViewCompat.getLayoutDirection(mRecyclerView!!)
+                        mRecyclerView!!.layoutDirection,
                     )
-                } else swipeDir
+                } else {
+                    swipeDir
+                }
             }
             swipeDir = checkVerticalSwipe(viewHolder, flags)
             if (swipeDir > 0) {
@@ -1127,9 +1148,11 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     // convert to relative
                     Callback.convertToRelativeDirection(
                         swipeDir,
-                        ViewCompat.getLayoutDirection(mRecyclerView!!)
+                        mRecyclerView!!.layoutDirection,
                     )
-                } else swipeDir
+                } else {
+                    swipeDir
+                }
             }
         }
         return 0
@@ -1141,7 +1164,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             if (mVelocityTracker != null && mActivePointerId > -1) {
                 mVelocityTracker!!.computeCurrentVelocity(
                     PIXELS_PER_SECOND,
-                    mCallback.getSwipeVelocityThreshold(mMaxSwipeVelocity)
+                    mCallback.getSwipeVelocityThreshold(mMaxSwipeVelocity),
                 )
                 val xVelocity = mVelocityTracker!!.getXVelocity(mActivePointerId)
                 val yVelocity = mVelocityTracker!!.getYVelocity(mActivePointerId)
@@ -1170,7 +1193,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             if (mVelocityTracker != null && mActivePointerId > -1) {
                 mVelocityTracker!!.computeCurrentVelocity(
                     PIXELS_PER_SECOND,
-                    mCallback.getSwipeVelocityThreshold(mMaxSwipeVelocity)
+                    mCallback.getSwipeVelocityThreshold(mMaxSwipeVelocity),
                 )
                 val xVelocity = mVelocityTracker!!.getXVelocity(mActivePointerId)
                 val yVelocity = mVelocityTracker!!.getYVelocity(mActivePointerId)
@@ -1194,9 +1217,6 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     }
 
     private fun addChildDrawingOrderCallback() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            return // we use elevation on Lollipop
-        }
         if (mChildDrawingOrderCallback == null) {
             mChildDrawingOrderCallback = RecyclerView.ChildDrawingOrderCallback { childCount, i ->
                 if (mOverdrawChild == null) {
@@ -1216,7 +1236,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         mRecyclerView!!.setChildDrawingOrderCallback(mChildDrawingOrderCallback)
     }
 
-    internal /* synthetic access */ fun removeChildDrawingOrderCallbackIfNecessary(view: View) {
+    internal fun removeChildDrawingOrderCallbackIfNecessary(view: View) {
         if (view === mOverdrawChild) {
             mOverdrawChild = null
             // only remove if we've added
@@ -1363,7 +1383,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
          */
         abstract fun getMovementFlags(
             recyclerView: RecyclerView,
-            viewHolder: ViewHolder
+            viewHolder: ViewHolder,
         ): Int
 
         /**
@@ -1383,7 +1403,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                 return flags // does not have any relative flags, good.
             }
             flags = flags and masked.inv() // remove start / end
-            if (layoutDirection == ViewCompat.LAYOUT_DIRECTION_LTR) {
+            if (layoutDirection == View.LAYOUT_DIRECTION_LTR) {
                 // no change. just OR with 2 bits shifted mask and return
                 flags =
                     flags or (masked shr 2) // START is 2 bits after LEFT, END is 2 bits after RIGHT.
@@ -1399,10 +1419,10 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
 
         internal fun getAbsoluteMovementFlags(
             recyclerView: RecyclerView?,
-            viewHolder: ViewHolder
+            viewHolder: ViewHolder,
         ): Int {
             val flags = getMovementFlags(recyclerView!!, viewHolder)
-            return convertToAbsoluteDirection(flags, ViewCompat.getLayoutDirection(recyclerView))
+            return convertToAbsoluteDirection(flags, recyclerView.layoutDirection)
         }
 
         internal fun hasDragFlag(recyclerView: RecyclerView?, viewHolder: ViewHolder): Boolean {
@@ -1412,7 +1432,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
 
         internal fun hasSwipeFlag(
             recyclerView: RecyclerView?,
-            viewHolder: ViewHolder
+            viewHolder: ViewHolder,
         ): Boolean {
             val flags = getAbsoluteMovementFlags(recyclerView, viewHolder)
             return flags and ACTION_MODE_SWIPE_MASK != 0
@@ -1462,7 +1482,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         abstract fun onMove(
             recyclerView: RecyclerView,
             viewHolder: ViewHolder,
-            target: ViewHolder
+            target: ViewHolder,
         ): Boolean
 
         /**
@@ -1591,7 +1611,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             selected: ViewHolder,
             dropTargets: List<ViewHolder>,
             curX: Int,
-            curY: Int
+            curY: Int,
         ): ViewHolder? {
             val right = curX + selected.itemView.width
             val bottom = curY + selected.itemView.height
@@ -1676,7 +1696,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         abstract fun onSwiped(
             recyclerView: RecyclerView,
             viewHolder: ViewHolder,
-            direction: Int
+            direction: Int,
         ): Boolean
 
         /**
@@ -1701,7 +1721,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         private fun getMaxDragScroll(recyclerView: RecyclerView): Int {
             if (mCachedMaxScrollSpeed == -1) {
                 mCachedMaxScrollSpeed = recyclerView.resources.getDimensionPixelSize(
-                    R.dimen.item_touch_helper_max_drag_scroll_per_frame
+                    R.dimen.multi_swipe_helper_max_drag_scroll_per_frame,
                 )
             }
             return mCachedMaxScrollSpeed
@@ -1749,13 +1769,15 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             target: ViewHolder,
             toPos: Int,
             x: Int,
-            y: Int
+            y: Int,
         ) {
             val layoutManager = recyclerView.layoutManager
             if (layoutManager is ViewDropHandler) {
                 (layoutManager as ViewDropHandler).prepareForDrop(
                     viewHolder.itemView,
-                    target.itemView, x, y
+                    target.itemView,
+                    x,
+                    y,
                 )
                 return
             }
@@ -1791,7 +1813,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             recoverAnimationList: List<RecoverAnimation>,
             actionState: Int,
             dX: Float,
-            dY: Float
+            dY: Float,
         ) {
             val recoverAnimSize = recoverAnimationList.size
             for (i in 0 until recoverAnimSize) {
@@ -1799,8 +1821,13 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                 anim.update()
                 val count = c.save()
                 onChildDraw(
-                    c, parent, anim.mViewHolder, anim.mX, anim.mY, anim.mActionState,
-                    false
+                    c,
+                    parent,
+                    anim.mViewHolder,
+                    anim.mX,
+                    anim.mY,
+                    anim.mActionState,
+                    false,
                 )
                 c.restoreToCount(count)
             }
@@ -1818,15 +1845,20 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             recoverAnimationList: MutableList<RecoverAnimation>,
             actionState: Int,
             dX: Float,
-            dY: Float
+            dY: Float,
         ) {
             val recoverAnimSize = recoverAnimationList.size
             for (i in 0 until recoverAnimSize) {
                 val anim = recoverAnimationList[i]
                 val count = c.save()
                 onChildDrawOver(
-                    c, parent, anim.mViewHolder, anim.mX, anim.mY, anim.mActionState,
-                    false
+                    c,
+                    parent,
+                    anim.mViewHolder,
+                    anim.mX,
+                    anim.mY,
+                    anim.mActionState,
+                    false,
                 )
                 c.restoreToCount(count)
             }
@@ -1900,11 +1932,16 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             dX: Float,
             dY: Float,
             actionState: Int,
-            isCurrentlyActive: Boolean
+            isCurrentlyActive: Boolean,
         ) {
             defaultUIUtil.onDraw(
-                c, recyclerView, viewHolder.itemView, dX, dY,
-                actionState, isCurrentlyActive
+                c,
+                recyclerView,
+                viewHolder.itemView,
+                dX,
+                dY,
+                actionState,
+                isCurrentlyActive,
             )
         }
 
@@ -1942,11 +1979,16 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             dX: Float,
             dY: Float,
             actionState: Int,
-            isCurrentlyActive: Boolean
+            isCurrentlyActive: Boolean,
         ) {
             defaultUIUtil.onDrawOver(
-                c, recyclerView, viewHolder.itemView, dX, dY,
-                actionState, isCurrentlyActive
+                c,
+                recyclerView,
+                viewHolder.itemView,
+                dX,
+                dY,
+                actionState,
+                isCurrentlyActive,
             )
         }
 
@@ -1973,21 +2015,23 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
          */
         fun getAnimationDuration(
             recyclerView: RecyclerView,
-            animationType: Int
+            animationType: Int,
         ): Long {
             val itemAnimator = recyclerView.itemAnimator
             return if (itemAnimator == null) {
                 (
-                    if (animationType == ANIMATION_TYPE_DRAG)
+                    if (animationType == ANIMATION_TYPE_DRAG) {
                         DEFAULT_DRAG_ANIMATION_DURATION
-                    else
+                    } else {
                         DEFAULT_SWIPE_ANIMATION_DURATION
+                    }
                     ).toLong()
             } else {
-                if (animationType == ANIMATION_TYPE_DRAG)
+                if (animationType == ANIMATION_TYPE_DRAG) {
                     itemAnimator.moveDuration
-                else
+                } else {
                     itemAnimator.removeDuration
+                }
             }
         }
 
@@ -2020,7 +2064,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             recyclerView: RecyclerView,
             viewSize: Int,
             viewSizeOutOfBounds: Int,
-            msSinceStartScroll: Long
+            msSinceStartScroll: Long,
         ): Int {
             val maxScroll = getMaxDragScroll(recyclerView)
             val absOutOfBounds = Math.abs(viewSizeOutOfBounds)
@@ -2043,7 +2087,9 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                 ).toInt()
             return if (value == 0) {
                 if (viewSizeOutOfBounds > 0) 1 else -1
-            } else value
+            } else {
+                value
+            }
         }
 
         companion object {
@@ -2139,7 +2185,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                     return flags // does not have any abs flags, good.
                 }
                 flags = flags and masked.inv() // remove left / right.
-                if (layoutDirection == ViewCompat.LAYOUT_DIRECTION_LTR) {
+                if (layoutDirection == View.LAYOUT_DIRECTION_LTR) {
                     // no change. just OR with 2 bits shifted mask and return
                     flags =
                         flags or (masked shl 2) // START is 2 bits after LEFT, END is 2 bits after RIGHT.
@@ -2277,11 +2323,11 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
 
         override fun getMovementFlags(
             recyclerView: RecyclerView,
-            viewHolder: ViewHolder
+            viewHolder: ViewHolder,
         ): Int {
             return ItemTouchHelper.Callback.makeMovementFlags(
                 getDragDirs(),
-                getSwipeDirs()
+                getSwipeDirs(),
             )
         }
     }
@@ -2356,7 +2402,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         internal val mStartDx: Float,
         internal val mStartDy: Float,
         internal val mTargetX: Float,
-        internal val mTargetY: Float
+        internal val mTargetY: Float,
     ) : Animator.AnimatorListener {
 
         private val mValueAnimator: ValueAnimator
@@ -2544,17 +2590,15 @@ internal class ItemTouchUIUtilImpl : ItemTouchUIUtil {
         dX: Float,
         dY: Float,
         actionState: Int,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (isCurrentlyActive) {
-                var originalElevation: Any? = view.getTag(R.id.item_touch_helper_previous_elevation)
-                if (originalElevation == null) {
-                    originalElevation = ViewCompat.getElevation(view)
-                    val newElevation = 1f + findMaxElevation(recyclerView, view)
-                    ViewCompat.setElevation(view, newElevation)
-                    view.setTag(R.id.item_touch_helper_previous_elevation, originalElevation)
-                }
+        if (isCurrentlyActive) {
+            var originalElevation: Any? = view.getTag(R.id.multi_swipe_helper_previous_elevation)
+            if (originalElevation == null) {
+                originalElevation = ViewCompat.getElevation(view)
+                val newElevation = 1f + findMaxElevation(recyclerView, view)
+                ViewCompat.setElevation(view, newElevation)
+                view.setTag(R.id.multi_swipe_helper_previous_elevation, originalElevation)
             }
         }
 
@@ -2569,18 +2613,16 @@ internal class ItemTouchUIUtilImpl : ItemTouchUIUtil {
         dX: Float,
         dY: Float,
         actionState: Int,
-        isCurrentlyActive: Boolean
+        isCurrentlyActive: Boolean,
     ) {
     }
 
     override fun clearView(view: View) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            val tag = view.getTag(R.id.item_touch_helper_previous_elevation)
-            if (tag != null && tag is Float) {
-                ViewCompat.setElevation(view, tag)
-            }
-            view.setTag(R.id.item_touch_helper_previous_elevation, null)
+        val tag = view.getTag(R.id.multi_swipe_helper_previous_elevation)
+        if (tag != null && tag is Float) {
+            ViewCompat.setElevation(view, tag)
         }
+        view.setTag(R.id.multi_swipe_helper_previous_elevation, null)
 
         view.translationX = 0f
         view.translationY = 0f

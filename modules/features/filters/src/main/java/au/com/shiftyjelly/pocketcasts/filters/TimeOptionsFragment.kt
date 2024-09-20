@@ -19,11 +19,11 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
@@ -101,57 +101,63 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         val lastMonth = filterOptionForTitle(LR.string.filters_time_month, Playlist.LAST_MONTH)
 
         val downloadAll = FilterOption(
-            LR.string.all, false,
+            LR.string.all,
+            false,
             { v, position ->
                 playlist?.downloaded = true
                 playlist?.notDownloaded = true
                 onCheckedChanged(v, position)
-            }
+            },
         )
 
         val downloadedOption = FilterOption(
-            LR.string.downloaded, false,
+            LR.string.downloaded,
+            false,
             { v, position ->
                 playlist?.downloaded = true
                 playlist?.notDownloaded = false
                 onCheckedChanged(v, position)
-            }
+            },
         )
         val notDownloadedOption = FilterOption(
-            LR.string.not_downloaded, false,
+            LR.string.not_downloaded,
+            false,
             { v, position ->
                 playlist?.downloaded = false
                 playlist?.notDownloaded = true
                 onCheckedChanged(v, position)
-            }
+            },
         )
 
         val allOption = FilterOption(
-            LR.string.all, false,
+            LR.string.all,
+            false,
             { v, position ->
                 if (v) {
                     playlist?.audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL
                     onCheckedChanged(v, position)
                 }
-            }
+            },
         )
         val audioOption = FilterOption(
-            LR.string.audio, false,
+            LR.string.audio,
+            false,
             { v, position ->
                 if (v) {
                     playlist?.audioVideo = Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
                     onCheckedChanged(v, position)
                 }
-            }
+            },
         )
         val videoOption = FilterOption(
-            LR.string.video, false,
+            LR.string.video,
+            false,
             { v, position ->
                 if (v) {
                     playlist?.audioVideo = Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
                     onCheckedChanged(v, position)
                 }
-            }
+            },
         )
 
         options = when (optionType) {
@@ -240,9 +246,11 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
                     val userPlaylistUpdate = if (userChanged) {
                         UserPlaylistUpdate(
                             listOf(playlistProperty),
-                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST,
                         )
-                    } else null
+                    } else {
+                        null
+                    }
 
                     playlistManager.update(playlist, userPlaylistUpdate)
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@TimeOptionsFragment) }

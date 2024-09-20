@@ -58,7 +58,7 @@ class EndOfYearManagerImplTest {
     fun testCompletionRateStory() = runTest {
         initEndOfYearManager()
         whenever(episodeManager.countEpisodesStartedAndCompleted(anyLong(), anyLong())).thenReturn(
-            EpisodesStartedAndCompleted(100, 50)
+            EpisodesStartedAndCompleted(100, 50),
         )
         val stories = endOfYearManagerImpl.loadStories()
 
@@ -129,10 +129,10 @@ class EndOfYearManagerImplTest {
         whenever(podcastManager.findTopPodcasts(anyLong(), anyLong(), anyInt())).thenReturn(emptyList())
         whenever(episodeManager.findListenedCategories(anyLong(), anyLong())).thenReturn(emptyList())
         whenever(episodeManager.yearOverYearListeningTime(anyLong(), anyLong(), anyLong(), anyLong())).thenReturn(
-            YearOverYearListeningTime(0, 0)
+            YearOverYearListeningTime(0, 0),
         )
         whenever(episodeManager.countEpisodesStartedAndCompleted(anyLong(), anyLong())).thenReturn(
-            EpisodesStartedAndCompleted(0, 0)
+            EpisodesStartedAndCompleted(0, 0),
         )
         whenever(syncManager.isLoggedIn()).thenReturn(true)
         val historyCountResponse = mock<HistoryYearResponse>()

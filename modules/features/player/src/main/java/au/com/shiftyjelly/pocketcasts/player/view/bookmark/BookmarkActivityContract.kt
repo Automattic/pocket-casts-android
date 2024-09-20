@@ -35,7 +35,7 @@ class BookmarkActivityContract : ActivityResultContract<Intent, BookmarkActivity
         val bookmarkUuid: String? = null,
         val title: String,
         val tintColor: Int,
-        val isExistingBookmark: Boolean
+        val isExistingBookmark: Boolean,
     )
 
     override fun createIntent(context: Context, input: Intent): Intent = input

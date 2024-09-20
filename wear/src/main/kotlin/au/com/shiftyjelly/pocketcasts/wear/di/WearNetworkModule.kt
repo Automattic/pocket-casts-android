@@ -3,9 +3,7 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 import android.content.Context
 import android.net.ConnectivityManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
+import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
 import au.com.shiftyjelly.pocketcasts.wear.networking.PocketCastsNetworkingRules
 import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator
@@ -23,12 +21,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -38,10 +36,10 @@ object WearNetworkModule {
     @Provides
     fun networkRepository(
         @ApplicationContext application: Context,
-        @ApplicationScope coroutineScope: CoroutineScope
+        @ApplicationScope coroutineScope: CoroutineScope,
     ): NetworkRepository = NetworkRepositoryImpl.fromContext(
         application,
-        coroutineScope
+        coroutineScope,
     )
 
     @Provides
@@ -78,22 +76,21 @@ object WearNetworkModule {
 
     @Provides
     @Singleton
-    @DownloadCallFactory
+    @Downloads
     fun provideDownloadWearCallFactory(
         highBandwidthNetworkMediator: HighBandwidthNetworkMediator,
         networkRepository: NetworkRepository,
         networkingRulesEngine: NetworkingRulesEngine,
-        @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
+        @Downloads client: OkHttpClient,
         @ApplicationScope coroutineScope: CoroutineScope,
-        logger: NetworkStatusLogger
+        logger: NetworkStatusLogger,
     ): Call.Factory {
-
         return NetworkSelectingCallFactory(
             networkingRulesEngine = networkingRulesEngine,
             highBandwidthNetworkMediator = highBandwidthNetworkMediator,
             networkRepository = networkRepository,
             dataRequestRepository = null,
-            rootClient = phoneCallFactory,
+            rootClient = client,
             coroutineScope = coroutineScope,
             timeout = 5.seconds,
             logger = logger,
@@ -101,8 +98,8 @@ object WearNetworkModule {
     }
 
     @Provides
-    @DownloadRequestBuilder
-    fun downloadRequestBuilder(): Request.Builder =
-        Request.Builder()
-            .requestType(RequestType.MediaRequest.DownloadRequest)
+    @Downloads
+    fun downloadRequestBuilder(): Request.Builder {
+        return Request.Builder().requestType(RequestType.MediaRequest.DownloadRequest)
+    }
 }

@@ -15,7 +15,7 @@ import android.view.View
 class ChapterProgressCircle @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
     private var density = context.resources.displayMetrics.density
     private var strokeWidthDp: Float = 2.0f * density

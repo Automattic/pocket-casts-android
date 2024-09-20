@@ -12,7 +12,9 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateEpisodeTask
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -23,8 +25,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import java.util.Date
-import java.util.UUID
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class UpdateEpisodeTaskTest {
@@ -43,7 +43,7 @@ class UpdateEpisodeTaskTest {
         testDownloadUrl(
             deviceUrl = "https://www.pocketcasts.com/old_url.mp3",
             serverUrl = "https://www.pocketcasts.com/new_url.mp3",
-            shouldUpdate = true
+            shouldUpdate = true,
         )
     }
 
@@ -55,7 +55,7 @@ class UpdateEpisodeTaskTest {
         testDownloadUrl(
             deviceUrl = "https://www.pocketcasts.com/url.mp3",
             serverUrl = "https://www.pocketcasts.com/url.mp3",
-            shouldUpdate = false
+            shouldUpdate = false,
         )
     }
 
@@ -66,19 +66,19 @@ class UpdateEpisodeTaskTest {
             uuid = episodeUuid,
             publishedDate = Date(),
             podcastUuid = podcastUuid,
-            downloadUrl = deviceUrl
+            downloadUrl = deviceUrl,
         )
         val serverEpisode = PodcastEpisode(
             uuid = episodeUuid,
             publishedDate = Date(),
             podcastUuid = podcastUuid,
-            downloadUrl = serverUrl
+            downloadUrl = serverUrl,
         )
         val serverPodcast = Podcast(uuid = podcastUuid).apply {
             episodes.add(serverEpisode)
         }
 
-        val podcastCacheServerManager = mock<PodcastCacheServerManager> {
+        val podcastCacheServiceManager = mock<PodcastCacheServiceManager> {
             onBlocking { getPodcastAndEpisode(podcastUuid, episodeUuid) } doReturn serverPodcast
         }
         val episodeDao = mock<EpisodeDao> {
@@ -89,7 +89,7 @@ class UpdateEpisodeTaskTest {
         }
         val inputData = UpdateEpisodeTask.buildInputData(deviceEpisode)
         val worker = TestListenableWorkerBuilder<UpdateEpisodeTask>(context = context, inputData = inputData)
-            .setWorkerFactory(TestWorkerFactory(podcastCacheServerManager, appDatabase))
+            .setWorkerFactory(TestWorkerFactory(podcastCacheServiceManager, appDatabase))
             .build()
 
         runTest {
@@ -106,13 +106,13 @@ class UpdateEpisodeTaskTest {
         }
     }
 
-    class TestWorkerFactory(private val podcastCacheServerManager: PodcastCacheServerManager, private val appDatabase: AppDatabase) : WorkerFactory() {
+    class TestWorkerFactory(private val podcastCacheServiceManager: PodcastCacheServiceManager, private val appDatabase: AppDatabase) : WorkerFactory() {
         override fun createWorker(context: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
             return UpdateEpisodeTask(
                 context = context,
                 params = workerParameters,
-                podcastCacheServerManager = podcastCacheServerManager,
-                appDatabase = appDatabase
+                podcastCacheServiceManager = podcastCacheServiceManager,
+                appDatabase = appDatabase,
             )
         }
     }

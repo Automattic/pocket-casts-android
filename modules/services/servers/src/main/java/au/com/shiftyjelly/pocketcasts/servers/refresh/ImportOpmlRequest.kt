@@ -16,5 +16,5 @@ data class ImportOpmlRequest(
     @field:Json(name = "dt") override var deviceType: String? = null,
     @field:Json(name = "c") override var country: String? = null,
     @field:Json(name = "l") override var language: String? = null,
-    @field:Json(name = "m") override var model: String? = null
+    @field:Json(name = "m") override var model: String? = null,
 ) : BaseRequest()

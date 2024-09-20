@@ -14,6 +14,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import java.util.Date
+import java.util.UUID
+import java.util.concurrent.TimeoutException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -24,9 +27,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import java.util.Date
-import java.util.UUID
-import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
 class AutoPlaybackServiceTest {
@@ -39,7 +39,7 @@ class AutoPlaybackServiceTest {
     fun setup() {
         val serviceIntent = Intent(
             ApplicationProvider.getApplicationContext(),
-            AutoPlaybackService::class.java
+            AutoPlaybackService::class.java,
         )
 
         val binder: IBinder = serviceRule.bindService(serviceIntent)

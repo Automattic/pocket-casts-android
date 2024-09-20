@@ -6,6 +6,6 @@ interface ServerFailure {
         userMessage: String?,
         serverMessageId: String?,
         serverMessage: String?,
-        throwable: Throwable?
+        throwable: Throwable?,
     )
 }

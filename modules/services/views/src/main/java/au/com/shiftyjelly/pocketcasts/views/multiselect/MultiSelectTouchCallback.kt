@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
 class MultiSelectTouchCallback(
-    private val listener: ItemTouchHelperAdapter
+    private val listener: ItemTouchHelperAdapter,
 ) : ItemTouchHelper.Callback() {
     interface ItemTouchHelperAdapter {
         fun onItemMove(fromPosition: Int, toPosition: Int)

@@ -6,8 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -21,7 +20,7 @@ private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
             .contentDeepEquals(
                 newItem
                     .filterIsInstance(DiscoverPodcast::class.java)
-                    .map { it.uuid }.toTypedArray()
+                    .map { it.uuid }.toTypedArray(),
             ) // Checks if the list is of the same podcasts in the same order
     }
 
@@ -35,7 +34,7 @@ private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
 internal class SmallListRowAdapter(
     val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
     val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
-    val analyticsTracker: AnalyticsTrackerWrapper
+    val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<List<Any>, SmallListRowAdapter.SmallListViewHolder>(SmallListDiffer) {
     class SmallListViewHolder(val binding: ItemSmallListBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -46,7 +45,7 @@ internal class SmallListRowAdapter(
         val rows = listOf(binding.row0, binding.row1, binding.row2, binding.row3)
     }
 
-    var fromListId: String? = null
+    private var fromListId: String? = null
 
     fun submitPodcastList(list: List<DiscoverPodcast>, commitCallback: Runnable?) {
         submitList(list.chunked(SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE), commitCallback)
@@ -76,14 +75,12 @@ internal class SmallListRowAdapter(
                 podcastRow.isClickable = true
                 podcastRow.setOnClickListener {
                     fromListId?.let {
-                        FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
                         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                     }
                     onPodcastClicked(podcast, fromListId)
                 }
                 podcastRow.onSubscribeClicked = {
                     fromListId?.let {
-                        FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid)
                         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                     }
                     onPodcastSubscribe(podcast, fromListId)
@@ -93,5 +90,8 @@ internal class SmallListRowAdapter(
                 podcastRow.isClickable = false
             }
         }
+    }
+    fun setFromListId(value: String) {
+        this.fromListId = value
     }
 }

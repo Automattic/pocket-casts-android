@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import androidx.compose.runtime.Composable
@@ -5,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
 
@@ -14,14 +17,16 @@ private object AuthenticationNavRoutes {
     const val loginScreen = "login_screen"
     const val loginWithGoogle = "login_with_google"
     const val loginWithPhone = "login_with_phone"
+    const val loginWithEmail = "login_with_email"
 }
 
 fun NavGraphBuilder.authenticationNavGraph(
     navController: NavController,
+    onEmailSignInSuccess: () -> Unit,
     googleSignInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
 ) {
     navigation(startDestination = AuthenticationNavRoutes.loginScreen, route = authenticationSubGraph) {
-
+        @Suppress("DEPRECATION")
         scrollable(AuthenticationNavRoutes.loginScreen) {
             LoginScreen(
                 columnState = it.columnState,
@@ -31,9 +36,21 @@ fun NavGraphBuilder.authenticationNavGraph(
                 onLoginWithPhoneClick = {
                     navController.navigate(AuthenticationNavRoutes.loginWithPhone)
                 },
+                onLoginWithEmailClick = {
+                    navController.navigate(AuthenticationNavRoutes.loginWithEmail)
+                },
             )
         }
 
+        @Suppress("DEPRECATION")
+        scrollable(AuthenticationNavRoutes.loginWithEmail) {
+            it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+            LoginWithEmailScreen(
+                onSignInSuccess = onEmailSignInSuccess,
+            )
+        }
+
+        @Suppress("DEPRECATION")
         scrollable(AuthenticationNavRoutes.loginWithPhone) {
             LoginWithPhoneScreen(
                 columnState = it.columnState,
@@ -41,6 +58,7 @@ fun NavGraphBuilder.authenticationNavGraph(
             )
         }
 
+        @Suppress("DEPRECATION")
         composable(AuthenticationNavRoutes.loginWithGoogle) {
             LoginWithGoogleScreen(
                 signInSuccessScreen = googleSignInSuccessScreen,

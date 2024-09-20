@@ -2,29 +2,29 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import java.time.Clock
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 abstract class UserSetting<T>(
-    protected val sharedPrefKey: String,
+    val sharedPrefKey: String,
     protected val sharedPrefs: SharedPreferences,
 ) {
 
-    private val needsSyncKey = "${sharedPrefKey}NeedsSync"
+    private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
-    var needsSync: Boolean
-        get() = sharedPrefs.getBoolean(needsSyncKey, false)
-        set(value) {
-            sharedPrefs.edit().run {
-                putBoolean(needsSyncKey, value)
-                apply()
-            }
-        }
+    private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
+
+    val modifiedAt get(): Instant? = runCatching {
+        Instant.parse(getModifiedAtServerString())
+    }.getOrNull()
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
-    fun getSyncValue(): T? {
-        val needsSync = sharedPrefs.getBoolean(needsSyncKey, false)
-        return if (needsSync) value else null
+    fun getSyncValue(lastSyncTime: Instant): T? {
+        return modifiedAt?.let { if (it >= lastSyncTime) value else null }
     }
 
     // These are lazy because (1) the class needs to initialize before calling get() and
@@ -34,8 +34,7 @@ abstract class UserSetting<T>(
     val flow: StateFlow<T> by lazy { _flow }
 
     // External callers should use [value] to get the current value if they can't
-    // listen to the flow for changes. This method is solely to be used to intitialize
-    // the flow.
+    // listen to the flow for changes.
     protected abstract fun get(): T
 
     val value: T
@@ -43,18 +42,28 @@ abstract class UserSetting<T>(
 
     protected abstract fun persist(value: T, commit: Boolean)
 
-    fun set(value: T, commit: Boolean = false, needsSync: Boolean = false) {
+    open fun set(
+        value: T,
+        updateModifiedAt: Boolean,
+        commit: Boolean = false,
+        clock: Clock = Clock.systemUTC(),
+    ) {
         persist(value, commit)
-        _flow.value = value
+        _flow.value = get()
+        val modifiedAt = if (updateModifiedAt) Instant.now(clock) else null
+        updateModifiedAtServerString(modifiedAt)
+    }
 
-        // Since this parameter is defaulted to false, let's not let the default overwrite
-        // a previous request to sync.
-        if (needsSync) {
-            this.needsSync = true
+    private fun updateModifiedAtServerString(modifiedAt: Instant?) {
+        if (modifiedAt != null) {
+            sharedPrefs.edit().run {
+                putString(modifiedAtKey, modifiedAt.toString())
+                apply()
+            }
         }
     }
 
-    class BoolPref(
+    open class BoolPref(
         sharedPrefKey: String,
         private val defaultValue: Boolean,
         sharedPrefs: SharedPreferences,
@@ -87,7 +96,7 @@ abstract class UserSetting<T>(
         defaultValue = defaultValue,
         sharedPrefs = sharedPrefs,
         fromInt = { it },
-        toInt = { it }
+        toInt = { it },
     )
 
     class StringPref(
@@ -220,7 +229,7 @@ abstract class UserSetting<T>(
             sharedPrefs.edit().run {
                 val commaSeparatedString = value.joinToString(
                     separator = ",",
-                    transform = toString
+                    transform = toString,
                 )
                 putString(sharedPrefKey, commaSeparatedString)
                 if (commit) {
@@ -252,8 +261,22 @@ abstract class UserSetting<T>(
         toString = { value ->
             val intValue = if (value <= 0) defaultValue else value
             intValue.toString()
-        }
+        },
     )
+
+    // This returns shared pref value only if CACHE_ENTIRE_PLAYING_EPISODE feature flag is enabled, otherwise returns always false
+    class CacheEntirePlayingEpisodePref(
+        sharedPrefKey: String,
+        private val defaultValue: Boolean,
+        sharedPrefs: SharedPreferences,
+    ) : BoolPref(sharedPrefKey, defaultValue, sharedPrefs) {
+
+        override fun get() = if (FeatureFlag.isEnabled(Feature.CACHE_ENTIRE_PLAYING_EPISODE)) {
+            sharedPrefs.getBoolean(sharedPrefKey, defaultValue)
+        } else {
+            false
+        }
+    }
 
     // This manual mock is needed to avoid problems when accessing a lazily initialized UserSetting::flow
     // from a mocked Settings class
@@ -265,6 +288,14 @@ abstract class UserSetting<T>(
         sharedPrefs = sharedPrefs,
     ) {
         override fun get(): T = initialValue
-        override fun persist(value: T, commit: Boolean) {}
+        override fun persist(value: T, commit: Boolean) = Unit
+        override fun set(value: T, updateModifiedAt: Boolean, commit: Boolean, clock: Clock) = Unit
+    }
+
+    companion object {
+        // We use EPOCH +1 second as a default timestamp for updates because initial values of when app is installed are null.
+        // This means that if a user syncs settings that were set before we started tracking timestamps
+        // they would not update on a new device because we update settings only if the local timestamp is before remote timestamp.
+        val DefaultFallbackTimestamp: Instant = Instant.EPOCH.plusSeconds(1)
     }
 }

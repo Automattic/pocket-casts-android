@@ -14,12 +14,12 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -30,15 +30,17 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
         const val SONOS_APP_ACTIVITY_RESULT = 1007
         const val SONOS_STATE_EXTRA = "state"
 
-        fun buildIntent(intent: Intent, context: Context): Intent {
+        fun buildIntent(state: String, context: Context): Intent {
             return Intent(context, SonosAppLinkActivity::class.java).apply {
-                putExtra(SonosAppLinkActivity.SONOS_STATE_EXTRA, intent.data?.query)
+                putExtra(SONOS_STATE_EXTRA, state)
             }
         }
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var syncManager: SyncManager
 
     private lateinit var sonosState: String
@@ -61,7 +63,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
             navigationIcon = NavigationIcon.Close,
             onNavigationClick = { finish() },
             activity = this,
-            theme = theme
+            theme = theme,
         )
 
         intent.getStringExtra(SONOS_STATE_EXTRA)?.let {
@@ -105,7 +107,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
             val sonosToken = response.accessToken
 
             val code = URLEncoder.encode(sonosToken.value, "UTF-8")
-            val state = sonosState.replace("state=", "")
+            val state = sonosState
 
             val result = Intent().apply {
                 putExtra("code", code)

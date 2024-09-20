@@ -9,8 +9,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -21,11 +21,11 @@ object AuthModule {
     @Provides
     fun providesWearDataLayerRegistry(
         @ApplicationContext context: Context,
-        @ApplicationScope coroutineScope: CoroutineScope
+        @ApplicationScope coroutineScope: CoroutineScope,
     ): WearDataLayerRegistry {
         return WearDataLayerRegistry.fromContext(
             application = context,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
         )
     }
 }

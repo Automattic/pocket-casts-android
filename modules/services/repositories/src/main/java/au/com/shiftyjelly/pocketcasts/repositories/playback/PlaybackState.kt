@@ -16,7 +16,6 @@ data class PlaybackState(
     val episodeUuid: String = "",
     val podcast: Podcast? = null,
     val fileMetadata: EpisodeFileMetadata? = null,
-    val embeddedArtworkPath: String? = null,
     val showNotesImageUrl: String? = null,
     val chapters: Chapters = Chapters(),
     val lastChangeFrom: String? = null,
@@ -25,7 +24,7 @@ data class PlaybackState(
     val trimMode: TrimMode = TrimMode.OFF,
     val isVolumeBoosted: Boolean = false,
     // when transientLoss is true the foreground service won't be stopped
-    val transientLoss: Boolean = false
+    val transientLoss: Boolean = false,
 ) {
 
     enum class State {

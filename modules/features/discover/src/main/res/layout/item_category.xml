@@ -3,13 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="56dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <LinearLayout
-        android:orientation="horizontal" android:layout_width="match_parent"
+        android:id="@+id/itemCategoryLinear"
+        android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:clipToPadding="false"
+        android:focusable="true"
+        android:orientation="horizontal"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:clipToPadding="false">
+        android:paddingRight="16dp">
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="24dp"

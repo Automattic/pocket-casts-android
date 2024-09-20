@@ -28,7 +28,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class VideoActivity : AppCompatActivity() {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var theme: Theme
 
     private var pipActionsPlaying: List<RemoteAction>? = null
@@ -87,11 +89,11 @@ class VideoActivity : AppCompatActivity() {
         playbackManager.player?.isPip = isInPictureInPictureMode
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
         // Enter Picture-in-Picture
-        if (intent?.getBooleanExtra(EXTRA_PIP, false) == true) {
+        if (intent.getBooleanExtra(EXTRA_PIP, false)) {
             enterPictureInPicture()
         } else {
             playbackManager.player?.isPip = false

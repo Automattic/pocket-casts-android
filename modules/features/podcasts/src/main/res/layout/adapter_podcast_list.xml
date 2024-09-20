@@ -69,12 +69,12 @@
                 android:textAppearance="?attr/textCaption" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/unplayed_count"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/badge_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:textAppearance="?attr/textBody2" />
+            android:visibility="gone"/>
 
     </LinearLayout>
 

@@ -28,7 +28,7 @@ private const val DRAW_EMPTY = 1
 class ProfileCircleView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
     private var drawState = DRAW_EMPTY
@@ -89,7 +89,6 @@ class ProfileCircleView @JvmOverloads constructor(
         if (drawState == DRAW_EMPTY) {
             return
         } else if (drawState == DRAW_FULL) {
-
             // -- outer circle
             paint.style = Paint.Style.STROKE
             paint.strokeWidth = strokeWidth
@@ -121,7 +120,7 @@ class ProfileCircleView @JvmOverloads constructor(
                     it,
                     bounds2Rect.centerX() - it.width / 2,
                     bounds2Rect.centerY() - it.height / 2,
-                    paint
+                    paint,
                 )
             }
         }

@@ -18,8 +18,8 @@ import java.util.Date
     indices = [
         Index(name = "episode_last_download_attempt_date", value = arrayOf("last_download_attempt_date")),
         Index(name = "episode_podcast_id", value = arrayOf("podcast_id")),
-        Index(name = "episode_published_date", value = arrayOf("published_date"))
-    ]
+        Index(name = "episode_published_date", value = arrayOf("published_date")),
+    ],
 )
 data class PodcastEpisode(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") override var uuid: String,
@@ -39,7 +39,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "podcast_id") var podcastUuid: String = "",
     @ColumnInfo(name = "added_date") override var addedDate: Date = Date(),
     @ColumnInfo(name = "auto_download_status") override var autoDownloadStatus: Int = 0,
-    @ColumnInfo(name = "starred") var isStarred: Boolean = false,
+    @ColumnInfo(name = "starred") override var isStarred: Boolean = false,
     @ColumnInfo(name = "thumbnail_status") var thumbnailStatus: Int = THUMBNAIL_STATUS_UNKNOWN,
     @ColumnInfo(name = "last_download_attempt_date") override var lastDownloadAttemptDate: Date? = null,
     @ColumnInfo(name = "playing_status_modified") override var playingStatusModified: Long? = null,
@@ -59,6 +59,8 @@ data class PodcastEpisode(
     @ColumnInfo(name = "download_task_id") override var downloadTaskId: String? = null,
     @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null,
     @ColumnInfo(name = "image_url") var imageUrl: String? = null,
+    @ColumnInfo(name = "deselected_chapters") override var deselectedChapters: ChapterIndices = ChapterIndices(),
+    @ColumnInfo(name = "deselected_chapters_modified") override var deselectedChaptersModified: Date? = null,
 ) : BaseEpisode, Serializable {
 
     sealed class EpisodeType {
@@ -139,6 +141,7 @@ data class PodcastEpisode(
     // temporary variables
     @Ignore
     override var playing: Boolean = false
+
     @Ignore
     var hasBookmark: Boolean = false
 

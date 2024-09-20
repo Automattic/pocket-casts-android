@@ -1,0 +1,70 @@
+package au.com.shiftyjelly.pocketcasts.models.to
+
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.junit.MockitoJUnitRunner
+
+@ExperimentalCoroutinesApi
+@RunWith(MockitoJUnitRunner::class)
+class ChaptersTest {
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
+    @Test
+    fun `given feature flag true, then next chapter returned from selected chapters`() {
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
+        val chapters = initChapters()
+
+        val chapter = chapters.getNextSelectedChapter(150.milliseconds)
+
+        assert(chapter?.title == "5")
+    }
+
+    @Test
+    fun `given feature flag true, then prev chapter returned from selected chapters`() {
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, true)
+        val chapters = initChapters()
+
+        val chapter = chapters.getPreviousSelectedChapter(350.milliseconds)
+
+        assert(chapter?.title == "1")
+    }
+
+    @Test
+    fun `given feature flag false, then next chapter returned from all chapters`() {
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
+        val chapters = initChapters()
+
+        val chapter = chapters.getNextSelectedChapter(150.milliseconds)
+
+        assert(chapter?.title == "3")
+    }
+
+    @Test
+    fun `given feature flag false, then prev chapter returned from all chapters`() {
+        FeatureFlag.setEnabled(Feature.DESELECT_CHAPTERS, false)
+        val chapters = initChapters()
+
+        val chapter = chapters.getPreviousSelectedChapter(350.milliseconds)
+
+        assert(chapter?.title == "3")
+    }
+
+    private fun initChapters(): Chapters {
+        return Chapters(
+            items = listOf(
+                Chapter("1", 0.milliseconds, 100.milliseconds, selected = true),
+                Chapter("2", 101.milliseconds, 200.milliseconds, selected = false),
+                Chapter("3", 201.milliseconds, 300.milliseconds, selected = false),
+                Chapter("4", 301.milliseconds, 400.milliseconds, selected = false),
+                Chapter("5", 401.milliseconds, 500.milliseconds, selected = true),
+            ),
+        )
+    }
+}

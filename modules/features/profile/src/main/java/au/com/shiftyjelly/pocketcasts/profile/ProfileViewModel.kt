@@ -21,7 +21,7 @@ class ProfileViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val statsManager: StatsManager,
     val userManager: UserManager,
-    private val endOfYearManager: EndOfYearManager
+    private val endOfYearManager: EndOfYearManager,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     val podcastCount: LiveData<Int> = podcastManager.observeCountSubscribed().toLiveData()
@@ -32,6 +32,8 @@ class ProfileViewModel @Inject constructor(
         get() = signInState.value?.isSignedIn ?: false
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
+
+    val showKidsBanner = settings.showKidsBanner.flow
 
     val refreshObservable: LiveData<RefreshState> =
         settings.refreshStateObservable
@@ -53,5 +55,9 @@ class ProfileViewModel @Inject constructor(
 
         val daysListened = statsManager.mergedTotalListeningTimeSec
         daysListenedCount.value = daysListened
+    }
+
+    fun dismissKidsBanner() {
+        settings.showKidsBanner.set(value = false, updateModifiedAt = true)
     }
 }

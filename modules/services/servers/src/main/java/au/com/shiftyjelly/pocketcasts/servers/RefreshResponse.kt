@@ -17,4 +17,17 @@ class RefreshResponse {
     fun addUpdate(podcastUuid: String, episodeIds: List<PodcastEpisode>) {
         updates[podcastUuid] = episodeIds
     }
+
+    fun merge(other: RefreshResponse): RefreshResponse {
+        val newResponse = RefreshResponse()
+        newResponse.updates += this.updates
+        newResponse.updates += other.updates
+        return newResponse
+    }
+
+    override fun equals(other: Any?) = other is RefreshResponse && other.updates == updates
+
+    override fun hashCode() = updates.hashCode()
+
+    override fun toString() = "RefreshResponse(updates=$updates)"
 }

@@ -18,6 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImageSmall
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
+import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -30,7 +32,7 @@ fun FolderListRow(
     modifier: Modifier = Modifier,
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
-    onClick: (() -> Unit)?
+    onClick: (() -> Unit)?,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -39,13 +41,13 @@ fun FolderListRow(
             .fillMaxWidth()
             .background(MaterialTheme.theme.colors.primaryUi01)
             .padding(horizontal = 16.dp)
-            .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
+            .then(if (onClick == null) Modifier else Modifier.clickable { onClick() }),
     ) {
-        FolderImageSmall(color = color, podcastUuids = podcastUuids)
+        FolderImageSmall(color = color, podcastUuids = podcastUuids, folderImageSize = 64.dp)
         Column(
             modifier = Modifier
                 .padding(start = 16.dp)
-                .weight(1f)
+                .weight(1f),
         ) {
             Text(
                 text = name,
@@ -53,7 +55,7 @@ fun FolderListRow(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.theme.colors.primaryText01,
-                modifier = Modifier.padding(bottom = 2.dp)
+                modifier = Modifier.padding(bottom = 2.dp),
             )
             val podcastCount = if (podcastUuids.size == 1) {
                 stringResource(LR.string.podcasts_singular)
@@ -67,14 +69,13 @@ fun FolderListRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.padding(top = 2.dp)
+                modifier = Modifier.padding(top = 2.dp),
             )
         }
         if (badgeType != BadgeType.OFF) {
-            Text(
-                text = if (badgeType != BadgeType.LATEST_EPISODE) badgeCount.toString() else "●",
-                fontSize = 14.sp,
-                color = if (badgeType == BadgeType.LATEST_EPISODE) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02
+            CountBadge(
+                count = badgeCount,
+                style = if (badgeType == BadgeType.LATEST_EPISODE) CountBadgeStyle.Small else CountBadgeStyle.Big,
             )
         }
     }

@@ -58,10 +58,10 @@ fun ShareListCreateTitlePage(
                 IconButton(onClick = onNextClick, enabled = state.title.isNotBlank()) {
                     Icon(
                         imageVector = Icons.Filled.Check,
-                        contentDescription = stringResource(LR.string.share)
+                        contentDescription = stringResource(LR.string.share),
                     )
                 }
-            }
+            },
         )
         ShareListCreateTitleContent(
             podcasts = state.selectedPodcastsOrdered,
@@ -69,7 +69,7 @@ fun ShareListCreateTitlePage(
             description = state.description,
             onTitleChange = { viewModel.changeTitle(it) },
             onDescriptionChange = { viewModel.changeDescription(it) },
-            onDoneClick = onNextClick
+            onDoneClick = onNextClick,
         )
     }
 }
@@ -82,7 +82,7 @@ private fun ShareListCreateTitleContent(
     onTitleChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onDoneClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
     val configuration = LocalConfiguration.current
@@ -97,7 +97,7 @@ private fun ShareListCreateTitleContent(
                 onDescriptionChange = onDescriptionChange,
                 onDoneClick = onDoneClick,
                 focusRequester = focusRequester,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
         LazyVerticalGrid(
@@ -105,7 +105,7 @@ private fun ShareListCreateTitleContent(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = modifier
+            modifier = modifier,
         ) {
             if (inLandscape) {
                 header {
@@ -115,7 +115,7 @@ private fun ShareListCreateTitleContent(
                         onTitleChange = onTitleChange,
                         onDescriptionChange = onDescriptionChange,
                         onDoneClick = onDoneClick,
-                        focusRequester = focusRequester
+                        focusRequester = focusRequester,
                     )
                 }
             }
@@ -124,7 +124,7 @@ private fun ShareListCreateTitleContent(
                     uuid = podcast.uuid,
                     title = podcast.title,
                     showTitle = true,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }
@@ -142,7 +142,7 @@ private fun TitleDescriptionFields(
     onDescriptionChange: (String) -> Unit,
     onDoneClick: () -> Unit,
     focusRequester: FocusRequester,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
     Column(modifier = modifier) {
@@ -154,7 +154,7 @@ private fun TitleDescriptionFields(
                 imeAction = ImeAction.Next,
             ),
             onImeAction = { focusManager.moveFocus(FocusDirection.Down) },
-            modifier = Modifier.focusRequester(focusRequester)
+            modifier = Modifier.focusRequester(focusRequester),
         )
         Spacer(Modifier.height(8.dp))
         FormField(
@@ -165,7 +165,7 @@ private fun TitleDescriptionFields(
             keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
                 imeAction = ImeAction.Default,
             ),
-            singleLine = false
+            singleLine = false,
         )
         Spacer(Modifier.height(16.dp))
     }

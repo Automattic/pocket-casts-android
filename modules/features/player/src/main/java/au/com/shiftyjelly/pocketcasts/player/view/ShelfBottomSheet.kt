@@ -10,42 +10,75 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfBottomSheetViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
+import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var castManager: CastManager
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
+
     @Inject lateinit var playbackManager: PlaybackManager
+
+    @Inject lateinit var settings: Settings
 
     override val statusBarColor: StatusBarColor? = null
 
     private val playerViewModel: PlayerViewModel by activityViewModels()
+    private val viewModel: ShelfBottomSheetViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<ShelfBottomSheetViewModel.Factory> { factory ->
+                factory.create(episodeId)
+            }
+        },
+    )
     private val adapter = ShelfAdapter(editable = false, listener = this::onClick, dragListener = null)
     private var binding: FragmentShelfBottomSheetBinding? = null
 
     private val source: SourceView
         get() = SourceView.fromString(arguments?.getString(ARG_SOURCE))
+
+    private val episodeId: String?
+        get() = arguments?.getString(ARG_EPISODE_ID)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentShelfBottomSheetBinding.inflate(inflater, container, false)
@@ -72,6 +105,16 @@ class ShelfBottomSheet : BaseDialogFragment() {
 
             if (source == SourceView.WHATS_NEW) {
                 binding.highlightAddBookmarkMenu(shelfItemsToBeDisplayed)
+            }
+        }
+
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.uiState.collect { uiState ->
+                        adapter.isTranscriptAvailable = uiState.transcript != null
+                    }
+                }
             }
         }
 
@@ -128,61 +171,95 @@ class ShelfBottomSheet : BaseDialogFragment() {
         }, FLASH_ANIMATION_DELAY)
     }
 
-    private fun onClick(item: ShelfItem) {
+    private fun onClick(item: ShelfItem, enabled: Boolean) {
         when (item) {
-            is ShelfItem.Effects -> {
+            ShelfItem.Effects -> {
                 EffectsFragment().show(parentFragmentManager, "effects")
             }
-            is ShelfItem.Sleep -> {
+
+            ShelfItem.Sleep -> {
                 SleepFragment().show(parentFragmentManager, "sleep")
             }
-            is ShelfItem.Star -> {
+
+            ShelfItem.Star -> {
                 playerViewModel.starToggle()
             }
-            is ShelfItem.Share -> {
-                ShareFragment().show(parentFragmentManager, "sleep")
+
+            ShelfItem.Transcript -> {
+                if (!enabled) {
+                    parentFragment?.view?.let {
+                        val message = getString(LR.string.transcript_error_not_available)
+                        Snackbar.make(it, message, Snackbar.LENGTH_SHORT)
+                            .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
+                            .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
+                            .show()
+                    }
+                } else {
+                    playerViewModel.openTranscript()
+                }
             }
-            is ShelfItem.Podcast -> {
+
+            ShelfItem.Share -> {
+                val podcast = playerViewModel.podcast ?: return
+                val episode = playerViewModel.episode as? PodcastEpisode ?: return
+                ShareDialogFragment
+                    .newThemedInstance(podcast, episode, theme, SourceView.BOTTOM_SHELF)
+                    .show(parentFragmentManager, "share_sheet")
+            }
+
+            ShelfItem.Podcast -> {
                 (activity as FragmentHostListener).closePlayer()
                 val podcast = playerViewModel.podcast
                 if (podcast != null) {
-                    (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid)
+                    (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid, SourceView.BOTTOM_SHELF.analyticsValue)
                 } else {
                     (activity as? FragmentHostListener)?.openCloudFiles()
                 }
             }
-            is ShelfItem.Cast -> {
+
+            ShelfItem.Cast -> {
                 binding?.mediaRouteButton?.performClick()
             }
-            is ShelfItem.Played -> {
+
+            ShelfItem.Played -> {
                 context?.let {
                     playerViewModel.markCurrentlyPlayingAsPlayed(it)?.show(parentFragmentManager, "mark_as_played")
                 }
             }
-            is ShelfItem.Archive -> {
+
+            ShelfItem.Archive -> {
                 playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
             }
-            is ShelfItem.Bookmark -> {
-                (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick()
+
+            ShelfItem.Bookmark -> {
+                (parentFragment as? PlayerHeaderFragment)?.onAddBookmarkClick(OnboardingUpgradeSource.OVERFLOW_MENU)
             }
-            ShelfItem.Download -> {
-                Timber.e("Unexpected click on ShelfItem.Download")
+
+            ShelfItem.Report -> {
+                openUrl(settings.getReportViolationUrl())
             }
         }
-        analyticsTracker.track(
-            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to item.analyticsValue)
-        )
+        if (enabled) {
+            analyticsTracker.track(
+                AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
+                mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to item.analyticsValue),
+            )
+        }
         dismiss()
     }
 
     companion object {
         private const val ARG_SOURCE = "source"
+        private const val ARG_EPISODE_ID = "episode_id"
         private const val FLASH_ANIMATION_DURATION = 300L
         private const val FLASH_ANIMATION_DELAY = 300L
-        fun newInstance(sourceView: SourceView? = null) = ShelfBottomSheet().apply {
+        fun newInstance(
+            sourceView: SourceView? = null,
+            episodeId: String? = null,
+        ) = ShelfBottomSheet().apply {
             arguments = bundleOf(
                 ARG_SOURCE to sourceView?.analyticsValue,
+                ARG_EPISODE_ID to episodeId,
             )
         }
     }

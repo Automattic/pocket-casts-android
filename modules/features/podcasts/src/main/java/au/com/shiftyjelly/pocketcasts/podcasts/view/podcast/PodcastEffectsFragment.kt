@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
@@ -10,7 +9,7 @@ import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlaybackSpeedPreference
@@ -20,9 +19,9 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColors
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,7 +33,8 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
     @Inject lateinit var theme: Theme
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private var preferenceCustomForPodcast: SwitchPreference? = null
     private var preferencePlaybackSpeed: PlaybackSpeedPreference? = null
@@ -50,7 +50,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         fun newInstance(podcastUuid: String): PodcastEffectsFragment {
             return PodcastEffectsFragment().apply {
                 arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid
+                    ARG_PODCAST_UUID to podcastUuid,
                 )
             }
         }
@@ -81,10 +81,14 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         view.isClickable = true
 
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        toolbar.title = getString(LR.string.podcast_playback_effects)
-        toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(theme.activeTheme))
 
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        toolbar.setup(
+            title = getString(LR.string.podcast_playback_effects),
+            navigationIcon = NavigationIcon.BackArrow,
+            activity = activity,
+            theme = theme,
+            toolbarColors = ToolbarColors.theme(theme = theme, context = toolbar.context),
+        )
 
         preferencePlaybackSpeed?.isVisible = false
         preferenceTrimSilence?.isVisible = false
@@ -93,10 +97,10 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
         viewModel.podcast.observe(viewLifecycleOwner) { podcast ->
 
-            val colors = ToolbarColors.Podcast(podcast = podcast, theme = theme)
+            val colors = ToolbarColors.podcast(podcast = podcast, theme = theme)
 
             updateTintColor(colors.iconColor)
-            toolbar.updateColors(toolbarColors = colors, navigationIcon = BackArrow)
+            toolbar.updateColors(toolbarColors = colors, navigationIcon = NavigationIcon.BackArrow)
             theme.updateWindowStatusBar(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(colors.backgroundColor, true), context = requireContext())
 
             preferenceCustomForPodcast?.isChecked = podcast.overrideGlobalEffects
@@ -118,7 +122,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         preferenceCustomForPodcast?.setOnPreferenceChangeListener { _, newValue ->
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_CUSTOM_PLAYBACK_EFFECTS_TOGGLED,
-                mapOf("enabled" to newValue as Boolean)
+                mapOf("enabled" to newValue as Boolean),
             )
             viewModel.updateOverrideGlobalEffects(newValue)
             true

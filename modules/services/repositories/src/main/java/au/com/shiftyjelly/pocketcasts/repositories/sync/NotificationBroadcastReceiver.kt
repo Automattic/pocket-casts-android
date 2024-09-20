@@ -7,6 +7,7 @@ import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -14,20 +15,25 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
 class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var downloadManager: DownloadManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
 
     private val source = SourceView.NOTIFICATION
@@ -46,12 +52,12 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
         const val INTENT_ACTION_PLAY_LAST = "au.com.shiftyjelly.pocketcasts.action.INTENT_ACTION_PLAY_LAST"
         const val INTENT_ACTION_PLAY_NEXT = "au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_PLAY_NEXT"
         const val INTENT_ACTION_MARK_AS_PLAYED = "au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_MARK_AS_PLAYED"
-        const val INTENT_ACTION_STREAM_EPISODE = "au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_STREAM_EPISODE"
+        const val INTENT_ACTION_STREAM_EPISODE_FROM_STREAM_WARNING = "au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_STREAM_EPISODE"
         const val INTENT_ACTION_ARCHIVE = "au.com.shiftyjelly.pocketcasts.action.INTENT_ACTION_ARCHIVE"
         const val INTENT_ACTION_PLAY_DOWNLOADED = "au.com.shiftyjelly.pocketcasts.action.PLAY_DOWNLOADED"
 
         const val INTENT_EXTRA_ACTION = "EXTRA_ACTION"
-        const val INTENT_EXTRA_NOTIFICATION_TAG = "NOTIFICATION_TAG"
+        const val INTENT_EXTRA_NOTIFICATION_TAG = DeepLink.EXTRA_NOTIFICATION_TAG
         const val INTENT_EXTRA_EPISODE_UUID = "EPISODE_UUID"
     }
 
@@ -75,8 +81,10 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
         val extraAction = bundle.getString(INTENT_EXTRA_ACTION, null) ?: return
 
-        if (extraAction == INTENT_ACTION_PLAY_EPISODE || extraAction == INTENT_ACTION_STREAM_EPISODE) {
+        if (extraAction == INTENT_ACTION_PLAY_EPISODE) {
             playNow(episodeUuid, notificationTag == NOTIFICATION_TAG_PLAYBACK_ERROR)
+        } else if (extraAction == INTENT_ACTION_STREAM_EPISODE_FROM_STREAM_WARNING) {
+            playNow(episodeUuid, showedStreamWarning = true, forceStream = notificationTag == NOTIFICATION_TAG_PLAYBACK_ERROR)
         } else if (extraAction == INTENT_ACTION_PLAY_LAST) {
             playLast(episodeUuid, notificationTag == NOTIFICATION_TAG_PLAYBACK_ERROR)
         } else if (extraAction == INTENT_ACTION_PLAY_NEXT) {
@@ -92,10 +100,15 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
         }
     }
 
-    private fun playNow(episodeUuid: String, forceStream: Boolean) {
+    private fun playNow(episodeUuid: String, forceStream: Boolean, showedStreamWarning: Boolean = false) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNow(episode, forceStream = forceStream, sourceView = source)
+                playbackManager.playNow(
+                    episode = episode,
+                    showedStreamWarning = showedStreamWarning,
+                    forceStream = forceStream,
+                    sourceView = source,
+                )
             }
         }
     }
@@ -103,7 +116,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun downloadEpisode(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                DownloadHelper.manuallyDownloadEpisodeNow(episode, "download from intent", downloadManager, episodeManager)
+                DownloadHelper.manuallyDownloadEpisodeNow(episode, "download from intent", downloadManager, episodeManager, source = source)
             }
         }
     }

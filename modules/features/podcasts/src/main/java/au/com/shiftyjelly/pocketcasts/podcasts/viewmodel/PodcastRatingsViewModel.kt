@@ -1,21 +1,23 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.StarHalf
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.images.PocketCastsIcons
+import au.com.shiftyjelly.pocketcasts.images.icons.StarEmpty
+import au.com.shiftyjelly.pocketcasts.images.icons.StarFull
+import au.com.shiftyjelly.pocketcasts.images.icons.StarHalf
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings.GiveRatingFragment
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.IOException
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,11 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
-import java.io.IOException
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 private const val MAX_STARS = 5
 
@@ -35,7 +33,7 @@ private const val MAX_STARS = 5
 class PodcastRatingsViewModel
 @Inject constructor(
     private val ratingsManager: RatingsManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -60,36 +58,28 @@ class PodcastRatingsViewModel
 
     fun refreshPodcastRatings(uuid: String) {
         launch(Dispatchers.IO) {
-            try {
-                ratingsManager.refreshPodcastRatings(uuid)
-            } catch (e: Exception) {
-                val message = "Failed to refresh podcast ratings"
-                // don't report missing rating or network errors to Sentry
-                if (e is HttpException || e is IOException) {
-                    Timber.i(e, message)
-                } else {
-                    Timber.e(e, message)
-                }
-            }
+            ratingsManager.refreshPodcastRatings(podcastUuid = uuid, useCache = true)
         }
     }
 
     fun onRatingStarsTapped(
         podcastUuid: String,
         fragmentManager: FragmentManager,
+        source: RatingTappedSource,
     ) {
         analyticsTracker.track(
             AnalyticsEvent.RATING_STARS_TAPPED,
-            AnalyticsProp.ratingStarsTapped(podcastUuid)
+            mapOf(
+                "uuid" to podcastUuid,
+                "source" to source.analyticsValue,
+            ),
         )
-        if (FeatureFlag.isEnabled(Feature.GIVE_RATINGS)) {
-            val fragment = GiveRatingFragment.newInstance(podcastUuid)
-            fragment.show(fragmentManager, "give_rating")
-        }
+        val fragment = GiveRatingFragment.newInstance(podcastUuid)
+        fragment.show(fragmentManager, "give_rating")
     }
 
     sealed class RatingState {
-        object Loading : RatingState()
+        data object Loading : RatingState()
 
         data class Loaded(
             private val ratings: PodcastRatings,
@@ -103,6 +93,12 @@ class PodcastRatingsViewModel
                 get() = total == null || total == 0
 
             val stars: List<Star> = starsList()
+
+            val roundedAverage: String
+                get() {
+                    val rating = average ?: 0.0
+                    return (Math.round(rating * 10) / 10.0).toString()
+                }
 
             private fun starsList(): List<Star> {
                 val rating = average ?: 0.0
@@ -124,20 +120,17 @@ class PodcastRatingsViewModel
             }
         }
 
-        object Error : RatingState()
+        data object Error : RatingState()
     }
 
     enum class Star(val icon: ImageVector) {
-        FilledStar(Icons.Filled.Star),
-        HalfStar(Icons.Default.StarHalf),
-        BorderedStar(Icons.Filled.StarBorder),
+        FilledStar(PocketCastsIcons.StarFull),
+        HalfStar(PocketCastsIcons.StarHalf),
+        BorderedStar(PocketCastsIcons.StarEmpty),
     }
 
-    companion object {
-        private object AnalyticsProp {
-            private const val UUID_KEY = "uuid"
-            fun ratingStarsTapped(podcastUuid: String) =
-                mapOf(UUID_KEY to podcastUuid)
-        }
+    enum class RatingTappedSource(val analyticsValue: String) {
+        BUTTON("button"),
+        STARS("stars"),
     }
 }

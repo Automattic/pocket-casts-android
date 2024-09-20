@@ -14,8 +14,8 @@ import java.util.UUID
 @Entity(
     tableName = "bookmarks",
     indices = [
-        Index(name = "bookmarks_podcast_uuid", value = arrayOf("podcast_uuid"))
-    ]
+        Index(name = "bookmarks_podcast_uuid", value = arrayOf("podcast_uuid")),
+    ],
 )
 data class Bookmark(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") var uuid: String,
@@ -29,6 +29,7 @@ data class Bookmark(
     @ColumnInfo(name = "deleted_modified") var deletedModified: Long? = null,
     @ColumnInfo(name = "sync_status") var syncStatus: SyncStatus = SyncStatus.NOT_SYNCED,
     @Ignore val episodeTitle: String = "",
+    @Ignore val podcastTitle: String = "",
 ) : Serializable {
     constructor() : this(uuid = "")
 

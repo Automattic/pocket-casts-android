@@ -7,31 +7,46 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.view.isVisible
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import coil.request.Disposable
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
+class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    FrameLayout(context, attrs), CoroutineScope {
 
-    private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private val binding = DataBindingUtil.inflate<ViewMiniPlayerBinding>(inflater, R.layout.view_mini_player, this, true)
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
+
+    private val inflater =
+        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val binding = ViewMiniPlayerBinding.inflate(
+        inflater,
+        this,
+        true,
+    )
     private var playing = false
     private val stringPause: String = context.resources.getString(LR.string.pause)
     private val stringPlay: String = context.resources.getString(LR.string.play)
@@ -40,8 +55,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     init {
         // open full screen player on click
-        binding.root.setOnClickListener { openPlayer() }
-        binding.root.setOnLongClickListener {
+        binding.miniPlayerCardView.setOnClickListener { openPlayer() }
+        binding.miniPlayerCardView.setOnLongClickListener {
             clickListener?.onLongClick()
             true
         }
@@ -53,6 +68,11 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
 
+        binding.miniPlayerCardView.elevation = resources.getDimension(R.dimen.mini_player_elevation)
+        binding.miniPlayerCardView.radius = resources.getDimension(R.dimen.mini_player_corner_radius)
+        val margin = resources.getDimension(R.dimen.mini_player_margin).toInt()
+        (binding.miniPlayerCardView.layoutParams as MarginLayoutParams).setMargins(margin, 0, margin, margin)
+
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
                 openPlayer()
@@ -60,9 +80,13 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
     }
 
+    private val imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 2).smallSize().themed()
+
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        updatePlayButton(isPlaying = playing, animate = false)
+        if (changed) {
+            updatePlayButton(isPlaying = playing, animate = false)
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -76,7 +100,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     fun setPlaybackState(playbackState: PlaybackState) {
-        binding.playbackState = playbackState
         // set the progress bar values as we need the max to be set before progress or the initial state doesn't work
         with(binding.progressBar) {
             max = playbackState.durationMs
@@ -87,7 +110,13 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     private fun updateTintColor(tintColor: Int, theme: Theme) {
-        binding.tintColor = ThemeColor.podcastIcon03(theme.activeTheme, tintColor)
+        val tintColorStateList: ColorStateList =
+            ColorStateList.valueOf(ThemeColor.podcastIcon03(theme.activeTheme, tintColor))
+
+        binding.skipForward.imageTintList = tintColorStateList
+        binding.miniPlayButton.backgroundTintList = tintColorStateList
+        binding.skipBack.imageTintList = tintColorStateList
+        binding.upNextButton.imageTintList = tintColorStateList
 
         val colorStateList = ThemeColor.podcastUi02(theme.activeTheme, tintColor)
         binding.miniPlayerTint.setBackgroundColor(colorStateList)
@@ -109,16 +138,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
     }
 
-    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme) {
+    fun setUpNext(upNextState: UpNextQueue.State, theme: Theme, useEpisodeArtwork: Boolean) {
         if (upNextState is UpNextQueue.State.Loaded) {
-            if (binding.episode?.uuid != upNextState.episode.uuid) {
-                val imageLoader = PodcastImageLoaderThemed(context)
-                imageLoader.radiusPx = 2.dpToPx(context.resources.displayMetrics)
-                imageLoader.smallPlaceholder().load(upNextState.episode).into(binding.artwork)
-            }
-
-            binding.episode = upNextState.episode
-            binding.podcast = upNextState.podcast
+            loadEpisodeArtwork(upNextState.episode, useEpisodeArtwork, binding.artwork)
 
             val podcast = upNextState.podcast
             if (podcast != null) {
@@ -129,7 +151,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
 
         val upNextCount: Int = upNextState.queueSize()
-        binding.upNextCount = upNextCount
+        binding.countText.text = upNextCount.toString()
+        binding.countText.isVisible = upNextCount > 0
 
         val drawableId = when {
             upNextCount == 0 -> R.drawable.mini_player_upnext
@@ -193,6 +216,23 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             drawable.frame = if (isPlaying) 0 else 10
         }
         button.contentDescription = if (isPlaying) stringPause else stringPlay
+    }
+
+    private var lastLoadedBaseEpisodeId: String? = null
+    private var lastUseEpisodeArtwork: Boolean? = null
+
+    private fun loadEpisodeArtwork(
+        baseEpisode: BaseEpisode,
+        useEpisodeArtwork: Boolean,
+        imageView: ImageView,
+    ): Disposable? {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
+            return null
+        }
+
+        lastLoadedBaseEpisodeId = baseEpisode.uuid
+        lastUseEpisodeArtwork = useEpisodeArtwork
+        return imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }
 
     interface OnMiniPlayerClicked {

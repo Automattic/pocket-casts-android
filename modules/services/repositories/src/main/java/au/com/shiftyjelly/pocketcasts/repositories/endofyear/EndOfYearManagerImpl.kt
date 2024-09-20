@@ -26,17 +26,17 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class EndOfYearManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
@@ -83,7 +83,7 @@ class EndOfYearManagerImpl @Inject constructor(
                         Timber.i("End of Year: Downloading listening history for year $year")
                     }
                     async { downloadListeningHistory(year, onProgressChanged) }
-                }.toTypedArray()
+                }.toTypedArray(),
             )
         }
         if (BuildConfig.DEBUG) {

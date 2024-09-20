@@ -14,6 +14,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeDownloadError
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -41,6 +44,10 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.subjects.Subject
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -50,10 +57,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.UUID
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class DownloadManagerImpl @Inject constructor(
@@ -61,7 +64,7 @@ class DownloadManagerImpl @Inject constructor(
     private val settings: Settings,
     private val notificationHelper: NotificationHelper,
     @ApplicationContext private val context: Context,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : DownloadManager, CoroutineScope {
 
     companion object {
@@ -87,6 +90,8 @@ class DownloadManagerImpl @Inject constructor(
     override val progressUpdateRelay: Subject<DownloadProgressUpdate> = ReplaySubject.createWithSize(20)
 
     private var workManagerListener: LiveData<Pair<List<WorkInfo>, Map<String?, String>>>? = null
+
+    private var sourceView: SourceView = SourceView.UNKNOWN
 
     override fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playlistManager: PlaylistManager, playbackManager: PlaybackManager) {
         this.episodeManager = episodeManager
@@ -187,8 +192,9 @@ class DownloadManagerImpl @Inject constructor(
                                     downloadingQueue.remove(info)
                                 }
 
+                                val error = EpisodeDownloadError.fromProperties(workInfo.outputData.keyValueMap)
                                 val errorMessage = workInfo.outputData.getString(DownloadEpisodeTask.OUTPUT_ERROR_MESSAGE)
-                                episodeDidDownload(DownloadResult.failedResult(workInfo.id, errorMessage, episodeUUID))
+                                episodeDidDownload(DownloadResult.failedResult(error, errorMessage))
                             }
                         }
                         WorkInfo.State.SUCCEEDED -> {
@@ -199,10 +205,19 @@ class DownloadManagerImpl @Inject constructor(
                                 }
 
                                 val wasCancelled = workInfo.outputData.getBoolean(
-                                    DownloadEpisodeTask.OUTPUT_CANCELLED, false
+                                    DownloadEpisodeTask.OUTPUT_CANCELLED,
+                                    false,
                                 )
                                 if (!wasCancelled) {
-                                    episodeDidDownload(DownloadResult.successResult(workInfo.id, episodeUUID))
+                                    episodeDidDownload(DownloadResult.successResult(episodeUUID))
+                                } else {
+                                    episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
+                                        episodeManager.updateDownloadTaskId(episode, null)
+                                        if (!episode.isDownloaded && episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
+                                            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
+                                        }
+                                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up workmanager cancelled download task for ${episode.uuid}.")
+                                    }
                                 }
                             }
                         }
@@ -228,7 +243,11 @@ class DownloadManagerImpl @Inject constructor(
 
             try {
                 val state = workManager.getWorkInfoById(uuid).get()
-                if (state == null) {
+                val wasCancelled = state.outputData.getBoolean(
+                    DownloadEpisodeTask.OUTPUT_CANCELLED,
+                    false,
+                )
+                if (state == null || wasCancelled) {
                     episodeManager.updateDownloadTaskId(episode, null)
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up old workmanager task for ${episode.uuid}.")
                 } else {
@@ -264,7 +283,9 @@ class DownloadManagerImpl @Inject constructor(
     private val addDownloadMutex = Mutex()
 
     // We only want to be able to queue one download at a time
-    override fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean) {
+    override fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, source: SourceView) {
+        updateSource(source)
+
         launch(downloadsCoroutineContext) {
             addDownloadMutex.withLock {
                 val updatedEpisode = episodeManager.findEpisodeByUuid(episode.uuid) ?: return@launch // Get the latest episode so we can check if it's downloaded
@@ -275,7 +296,7 @@ class DownloadManagerImpl @Inject constructor(
                         "Attempted to add episode to downloads from $from but it was rejected. " +
                             "isDownloaded: ${updatedEpisode.isDownloaded} " +
                             "pendingQueueContains: ${pendingQueue.containsKey(episode.uuid)} " +
-                            "episodeTaskId: ${updatedEpisode.downloadTaskId}"
+                            "episodeTaskId: ${updatedEpisode.downloadTaskId}",
                     )
                     return@launch
                 }
@@ -337,13 +358,11 @@ class DownloadManagerImpl @Inject constructor(
             val workManager = WorkManager.getInstance(context)
 
             when (episode) {
-
                 is UserEpisode -> {
                     workManager.enqueue(downloadTask)
                 }
 
                 is PodcastEpisode -> {
-
                     UpdateShowNotesTask.enqueue(episode, constraints, context)
 
                     val updateEpisodeTask = OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
@@ -360,7 +379,14 @@ class DownloadManagerImpl @Inject constructor(
             }
         } catch (storageException: StorageException) {
             launch(downloadsCoroutineContext) {
-                episodeDidDownload(DownloadResult.failedResult(null, "Insufficient storage space", episode.uuid))
+                val error = EpisodeDownloadError(
+                    reason = EpisodeDownloadError.Reason.StorageIssue,
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    isProxy = Network.isVpnConnection(context),
+                    isCellular = Network.isCellularConnection(context),
+                )
+                episodeDidDownload(DownloadResult.failedResult(error, "Insufficient storage space"))
             }
         }
     }
@@ -414,16 +440,18 @@ class DownloadManagerImpl @Inject constructor(
 
             if (result.success) {
                 episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED, uuid = episode.uuid)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED, uuid = episode.uuid, source = sourceView)
 
                 RefreshPodcastsThread.updateNotifications(settings.getNotificationLastSeen(), settings, podcastManager, episodeManager, notificationHelper, context)
             } else {
-                episodeManager.setDownloadFailed(
-                    episode,
-                    result.errorMessage?.split(":")?.last()
-                        ?: "Download failed"
+                episodeManager.setDownloadFailed(episode, result.errorMessage?.split(":")?.last() ?: "Download failed")
+                val error = result.error ?: EpisodeDownloadError(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastOrSubstituteUuid,
+                    isProxy = Network.isVpnConnection(context),
+                    isCellular = Network.isCellularConnection(context),
                 )
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FAILED, uuid = episode.uuid)
+                episodeAnalytics.trackEpisodeDownloadFailure(error)
             }
         } catch (t: Throwable) {
             Timber.e(t)
@@ -475,7 +503,9 @@ class DownloadManagerImpl @Inject constructor(
             // user said yes to warning dialog
             return if (episode.isManualDownloadOverridingWifiSettings || !settings.warnOnMeteredNetwork.value) {
                 NetworkRequirements.runImmediately()
-            } else NetworkRequirements.needsUnmetered()
+            } else {
+                NetworkRequirements.needsUnmetered()
+            }
         } else if (episode is UserEpisode) {
             // UserEpisodes have their own auto download setting
             return if (settings.cloudDownloadOnlyOnWifi.value) {
@@ -494,10 +524,6 @@ class DownloadManagerImpl @Inject constructor(
     }
 
     private fun updateNotification() {
-
-        // Don't show these notifications on wear os
-        if (Util.isWearOs(context)) return
-
         launch(downloadsCoroutineContext) {
             var progress = 0.0
             var max = 0.0
@@ -583,13 +609,18 @@ class DownloadManagerImpl @Inject constructor(
         }
         return if (value.length <= length) {
             value
-        } else value.substring(0, length - 1) + ".."
+        } else {
+            value.substring(0, length - 1) + ".."
+        }
     }
 
     private fun openDownloadingPageIntent(): PendingIntent {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        intent?.action = Settings.INTENT_OPEN_APP_DOWNLOADING
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+        val intent = DownloadsDeepLink.toIntent(context)
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun updateSource(source: SourceView) {
+        sourceView = source
     }
 
     internal data class DownloadingInfo(val episodeUUID: String, val jobId: UUID)

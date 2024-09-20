@@ -45,7 +45,7 @@ fun StoryListenedNumbersView(
         StoryBlurredBackground(
             Offset(
                 LocalView.current.width * 0.4f,
-                LocalView.current.height * 0.3f
+                LocalView.current.height * 0.3f,
             ),
         )
         Column(
@@ -54,7 +54,7 @@ fun StoryListenedNumbersView(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(vertical = 30.dp)
+                .padding(vertical = 30.dp),
         ) {
             Spacer(modifier = modifier.height(40.dp))
 
@@ -89,7 +89,7 @@ private fun PodcastCoverStack(
             .rotate(-15f)
             .scale(PodcastCoverScaleFactor),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(spacedBy)
+        verticalArrangement = Arrangement.spacedBy(spacedBy),
     ) {
         ScrollingRow(
             scrollDirection = ScrollDirection.RIGHT,
@@ -133,7 +133,7 @@ private fun PrimaryText(
     val text = stringResource(
         id = titleResId,
         story.listenedNumbers.numberOfPodcasts,
-        story.listenedNumbers.numberOfEpisodes
+        story.listenedNumbers.numberOfEpisodes,
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }

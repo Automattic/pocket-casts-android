@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as RD
 
 @HiltViewModel
 class ViewModelConfigAddToUpNext @Inject constructor(
-    application: Application
+    application: Application,
 ) : ViewModelBase<InputAddToUpNext, Unit, ActionHelperAddToUpNext>(application), TaskerPluginConfig<InputAddToUpNext> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputAddToUpNext>) = ActionHelperAddToUpNext(pluginConfig)
 

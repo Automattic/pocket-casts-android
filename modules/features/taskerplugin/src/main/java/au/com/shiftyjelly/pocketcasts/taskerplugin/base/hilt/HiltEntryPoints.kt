@@ -18,6 +18,7 @@ import dagger.hilt.components.SingletonComponent
 interface ThemeEntryPoint {
     fun getTheme(): Theme
 }
+
 @InstallIn(SingletonComponent::class)
 @EntryPoint
 interface PlaybackManagerEntryPoint {
@@ -41,11 +42,13 @@ interface EpisodeManagerEntryPoint {
 interface SettingsEntryPoint {
     fun getSettings(): Settings
 }
+
 @InstallIn(SingletonComponent::class)
 @EntryPoint
 interface PodcastManagerEntryPoint {
     fun getPodcastManager(): PodcastManager
 }
+
 @InstallIn(SingletonComponent::class)
 @EntryPoint
 interface DownloadManagerEntryPoint {

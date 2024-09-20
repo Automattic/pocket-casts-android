@@ -15,12 +15,12 @@ fun GiveRatingLoadingScreen() {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.dp),
         )
     }
 }

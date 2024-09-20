@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="240dp"
+    android:layout_height="60dp"
+    android:background="@drawable/rounded_rectangle"
+    android:backgroundTint="?colorSecondaryContainer"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:theme="@style/Theme.Material3.DynamicColors.DayNight"
+    tools:ignore="UseAppTint">
+
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/rounded_rectangle"
+        android:backgroundTint="?colorOnSecondary">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_circle"
+            android:tint="?colorSecondary" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_logo_foreground"
+            android:tint="?colorOnSecondary" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="4dp"
+        android:layout_height="40dp"
+        tools:ignore="UselessLeaf" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_rectangle"
+        android:backgroundTint="?colorOnSecondary">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_widget_skip_back"
+            android:tint="?colorSecondary" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="4dp"
+        android:layout_height="40dp"
+        tools:ignore="UselessLeaf" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_rectangle"
+        android:backgroundTint="?colorOnSecondary">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_widget_play"
+            android:tint="?colorSecondary" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="4dp"
+        android:layout_height="40dp"
+        tools:ignore="UselessLeaf" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_rectangle"
+        android:backgroundTint="?colorOnSecondary">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_widget_skip_forward"
+            android:tint="?colorSecondary" />
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -8,14 +8,16 @@ import android.content.Intent
 import androidx.core.os.BundleCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
-import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
-import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.TokenErrorNotification
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import com.squareup.moshi.Moshi
+import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
+import java.io.File
+import java.net.HttpURLConnection
+import java.util.concurrent.TimeUnit
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -30,9 +32,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.io.File
-import java.net.HttpURLConnection
-import java.util.concurrent.TimeUnit
 
 class PocketCastsAccountAuthenticatorTest {
 
@@ -48,10 +47,7 @@ class PocketCastsAccountAuthenticatorTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val moshi = Moshi.Builder()
-            .add(AccessToken::class.java, AccessToken.Adapter)
-            .add(RefreshToken::class.java, RefreshToken.Adapter)
-            .build()
+        val moshi = ServersModule().provideMoshi()
 
         val retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
@@ -69,14 +65,15 @@ class PocketCastsAccountAuthenticatorTest {
         }
         val tokenErrorNotification = mock<TokenErrorNotification>()
         val syncAccountManager = SyncAccountManagerImpl(tokenErrorNotification, accountManager)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
+        val syncServiceManager = SyncServiceManager(retrofit, mock(), okhttpCache)
 
         val syncManager = SyncManagerImpl(
-            analyticsTracker = mock(),
+            analyticsTracker = AnalyticsTracker.test(),
             context = context,
             settings = mock(),
             syncAccountManager = syncAccountManager,
-            syncServerManager = syncServerManager,
+            syncServiceManager = syncServiceManager,
+            moshi = moshi,
         )
         // make sure the test device is signed out
         syncManager.signOut()
@@ -107,7 +104,7 @@ class PocketCastsAccountAuthenticatorTest {
                     "expiresIn": 1800,
                     "refreshToken": "refresh token"
                 }
-                """.trimIndent()
+                """.trimIndent(),
             )
         mockWebServer.enqueue(response)
 
@@ -115,7 +112,7 @@ class PocketCastsAccountAuthenticatorTest {
             response = null,
             account = account,
             authTokenType = null,
-            options = null
+            options = null,
         )
         assertNotNull(bundle)
         assertEquals(account.name, bundle.getString(AccountManager.KEY_ACCOUNT_NAME))
@@ -142,7 +139,7 @@ class PocketCastsAccountAuthenticatorTest {
                     "error_description": "The provided grant is invalid, expired or has been revoked.",
                     "error_uri": ""
                 }
-                """.trimIndent()
+                """.trimIndent(),
             )
         mockWebServer.enqueue(response)
 
@@ -150,7 +147,7 @@ class PocketCastsAccountAuthenticatorTest {
             response = null,
             account = account,
             authTokenType = null,
-            options = null
+            options = null,
         )
         assertNotNull(bundle)
 
@@ -178,7 +175,7 @@ class PocketCastsAccountAuthenticatorTest {
                 response = null,
                 account = account,
                 authTokenType = null,
-                options = null
+                options = null,
             )
         }
 

@@ -11,14 +11,14 @@ class PostCallbackDefault(private val callback: ServerCallback<String>) : PostCa
         userMessage: String?,
         serverMessageId: String?,
         serverMessage: String?,
-        throwable: Throwable?
+        throwable: Throwable?,
     ) {
         callback.onFailed(
             errorCode = errorCode,
             userMessage = userMessage,
             serverMessageId = serverMessageId,
             serverMessage = serverMessage,
-            throwable = throwable
+            throwable = throwable,
         )
     }
 }

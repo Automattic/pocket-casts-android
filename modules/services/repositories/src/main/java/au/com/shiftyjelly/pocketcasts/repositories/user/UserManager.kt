@@ -4,7 +4,7 @@ import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -20,25 +20,25 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
     fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean)
-    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, playlistManager: PlaylistManager, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean,)
+    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, playlistManager: PlaylistManager, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean)
 }
 
 class UserManagerImpl @Inject constructor(
@@ -48,8 +48,9 @@ class UserManagerImpl @Inject constructor(
     val subscriptionManager: SubscriptionManager,
     val podcastManager: PodcastManager,
     val userEpisodeManager: UserEpisodeManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val crashLogging: CrashLogging,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -68,7 +69,7 @@ class UserManagerImpl @Inject constructor(
                     signOut(playbackManager, wasInitiatedByUser = false)
                 }
             } catch (t: Throwable) {
-                SentryHelper.recordException("Account monitoring crash.", t)
+                crashLogging.sendReport(t, message = "Account monitoring crash.")
             }
         }
 
@@ -113,13 +114,12 @@ class UserManagerImpl @Inject constructor(
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
                 }
 
-                settings.marketingOptIn.set(false)
-                settings.marketingOptIn.needsSync = false
+                settings.marketingOptIn.set(false, updateModifiedAt = false)
                 settings.setEndOfYearShowModal(true)
 
                 analyticsTracker.track(
                     AnalyticsEvent.USER_SIGNED_OUT,
-                    mapOf(KEY_USER_INITIATED to wasInitiatedByUser)
+                    mapOf(KEY_USER_INITIATED to wasInitiatedByUser),
                 )
                 analyticsTracker.flush()
                 analyticsTracker.clearAllData()
@@ -151,7 +151,6 @@ class UserManagerImpl @Inject constructor(
 
         // Block while clearing data so that users cannot interact with the app until we're done clearing data
         runBlocking(Dispatchers.IO) {
-
             upNextQueue.removeAllIncludingChanges()
 
             playlistManager.resetDb()

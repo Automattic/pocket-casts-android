@@ -7,6 +7,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 object FormFieldDefaults {
     val keyboardOptions = KeyboardOptions(
         capitalization = KeyboardCapitalization.Sentences,
-        imeAction = ImeAction.Done
+        imeAction = ImeAction.Done,
     )
 }

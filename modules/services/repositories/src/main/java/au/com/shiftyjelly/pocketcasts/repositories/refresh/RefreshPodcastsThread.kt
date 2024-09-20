@@ -1,32 +1,38 @@
 package au.com.shiftyjelly.pocketcasts.repositories.refresh
 
+import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Pair
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
+import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -41,40 +47,44 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
-import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.ServerResponseException
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlagWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import coil.executeBlocking
+import coil.imageLoader
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.util.Date
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class RefreshPodcastsThread(
     private val context: Context,
     private val applicationScope: CoroutineScope,
-    private val runNow: Boolean
+    private val runNow: Boolean,
 ) {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface RefreshPodcastsThreadEntryPoint {
-        fun serverManager(): ServerManager
+        fun serviceManager(): ServiceManager
         fun podcastManager(): PodcastManager
         fun playlistManager(): PlaylistManager
         fun bookmarkManager(): BookmarkManager
         fun statsManager(): StatsManager
         fun fileStorage(): FileStorage
-        fun podcastCacheServerManager(): PodcastCacheServerManagerImpl
+        fun podcastCacheServiceManager(): PodcastCacheServiceManagerImpl
         fun userEpisodeManager(): UserEpisodeManager
         fun subscriptionManager(): SubscriptionManager
         fun folderManager(): FolderManager
@@ -85,13 +95,14 @@ class RefreshPodcastsThread(
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
         fun syncManager(): SyncManager
-        fun featureFlagWrapper(): FeatureFlagWrapper
+        fun crashLogging(): CrashLogging
+        fun analyticsTracker(): AnalyticsTracker
     }
 
     @Volatile
     private var taskHasBeenCancelled = false
 
-    fun isAllowedToRun(runNow: Boolean = false): Boolean {
+    private fun isAllowedToRun(runNow: Boolean = false): Boolean {
         val now = System.currentTimeMillis()
         return now > lastRefreshAllowedTime + if (runNow) THROTTLE_RUN_NOW_MS else THROTTLE_PERIODIC_MS
     }
@@ -127,6 +138,7 @@ class RefreshPodcastsThread(
                 } catch (e: InterruptedException) {
                 }
 
+                dispatchCurrentRefreshedState()
                 return ListenableWorker.Result.success()
             }
             lastRefreshAllowedTime = System.currentTimeMillis()
@@ -160,33 +172,23 @@ class RefreshPodcastsThread(
     private fun refresh() {
         val entryPoint = getEntryPoint()
         val podcastManager = entryPoint.podcastManager()
-        val serverManager = entryPoint.serverManager()
+        val serviceManager = entryPoint.serviceManager()
         val podcasts = podcastManager.findSubscribed()
         val startTime = SystemClock.elapsedRealtime()
-        serverManager.refreshPodcastsSync(
-            podcasts,
-            object : ServerCallback<RefreshResponse> {
-                override fun dataReturned(result: RefreshResponse?) {
-                    val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
-                    processRefreshResponse(result)
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?
-                ) {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
-                    if (throwable != null) {
-                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
-                    }
-                    refreshFailedOrCancelled("Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
-                }
+        runBlocking { serviceManager.refreshPodcastsSync(podcasts) }
+            .onSuccess { response ->
+                val elapsedTime = String.format("%d ms", SystemClock.elapsedRealtime() - startTime)
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - podcasts response - $elapsedTime")
+                processRefreshResponse(response)
             }
-        )
+            .onFailure { throwable ->
+                val serverError = throwable as? ServerResponseException
+                val message = "Not refreshing as server call failed errorCode: ${serverError?.errorCode} serverMessage: ${serverError?.serverMessage ?: ""}"
+
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, message)
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
+                refreshFailedOrCancelled(message)
+            }
     }
 
     private fun processRefreshResponse(result: RefreshResponse?) {
@@ -252,12 +254,13 @@ class RefreshPodcastsThread(
             statsManager = entryPoint.statsManager(),
             fileStorage = entryPoint.fileStorage(),
             playbackManager = playbackManager,
-            podcastCacheServerManager = entryPoint.podcastCacheServerManager(),
+            podcastCacheServiceManager = entryPoint.podcastCacheServiceManager(),
             userEpisodeManager = entryPoint.userEpisodeManager(),
             subscriptionManager = entryPoint.subscriptionManager(),
             folderManager = entryPoint.folderManager(),
             syncManager = entryPoint.syncManager(),
-            featureFlagWrapper = entryPoint.featureFlagWrapper()
+            crashLogging = entryPoint.crashLogging(),
+            analyticsTracker = entryPoint.analyticsTracker(),
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()
@@ -278,6 +281,11 @@ class RefreshPodcastsThread(
 
     private fun refreshFailedOrCancelled(message: String) {
         getEntryPoint().settings().setRefreshState(RefreshState.Failed(message))
+    }
+
+    private fun dispatchCurrentRefreshedState() {
+        val settings = getEntryPoint().settings()
+        settings.setRefreshState(settings.getLastSuccessRefreshState() ?: RefreshState.Never)
     }
 
     private fun updatePodcasts(result: RefreshResponse?): List<String> {
@@ -311,8 +319,13 @@ class RefreshPodcastsThread(
             }
             episodes = episodeManager.add(episodes, podcast.uuid, downloadMetaData)
 
-            // we now have some new episodes, update the latest episode uuid on the podcast row
-            if (episodes.isNotEmpty()) {
+            if (episodes.isEmpty()) {
+                // the server returned episodes, but none were added to the database. Update the podcast when it doesn't have the latest episode information.
+                if (podcast.latestEpisodeUuid == null) {
+                    podcastManager.updatePodcastLatestEpisode(podcast)
+                }
+            } else {
+                // we now have some new episodes, update the latest episode uuid on the podcast row
                 podcastManager.updateLatestEpisode(podcast, episodes[0])
                 for ((uuid) in episodes) {
                     episodeUuidsAdded.add(uuid)
@@ -374,8 +387,8 @@ class RefreshPodcastsThread(
 
         private const val GROUP_NEW_EPISODES = "group_new_episodes"
 
-        private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15000 // 15 seconds
-        private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5L * 60L * 1000L // 5 minutes
+        private val THROTTLE_RUN_NOW_MS: Long = if (BuildConfig.DEBUG) 0 else 15.seconds.inWholeMilliseconds
+        private val THROTTLE_PERIODIC_MS: Long = if (BuildConfig.DEBUG) 0 else 5.minutes.inWholeMilliseconds
         private var lastRefreshAllowedTime: Long = -10000
 
         fun clearLastRefreshTime() {
@@ -439,7 +452,7 @@ class RefreshPodcastsThread(
 
                 for (i in notificationsEpisodeAndPodcast.indices) {
                     val episodePodcast = notificationsEpisodeAndPodcast[i]
-                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, podcastManager, notificationHelper, settings, context)
+                    showEpisodeNotification(episodePodcast.second, episodePodcast.first, i, intentId, isGroup, notificationHelper, settings, context)
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -453,23 +466,24 @@ class RefreshPodcastsThread(
             episodeIndex: Int,
             intentId: Int,
             isGroupNotification: Boolean,
-            podcastManager: PodcastManager,
             notificationHelper: NotificationHelper,
             settings: Settings,
-            context: Context
+            context: Context,
         ) {
-
             // order by published date on Google Wear devices
             val sortKey = String.format("%04d", episodeIndex)
             var intentId = intentId
             val manager = NotificationManagerCompat.from(context)
 
-            val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                action = (System.currentTimeMillis() + intentId).toString()
-                putExtra(Settings.INTENT_OPEN_APP_EPISODE_UUID, episode.uuid)
+            val intent = ShowEpisodeDeepLink(
+                episodeUuid = episode.uuid,
+                podcastUuid = podcast.uuid,
+                sourceView = EpisodeViewSource.NOTIFICATION.value,
+                autoPlay = false,
+            ).toIntent(context).apply {
+                action = action + System.currentTimeMillis() + intentId
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             intentId += 1
 
             val notificationTag = if (isGroupNotification) {
@@ -478,12 +492,12 @@ class RefreshPodcastsThread(
                 NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY
             }
 
-            val userActions = NewEpisodeNotificationAction.loadFromSettings(settings)
+            val userActions = settings.newEpisodeNotificationActions.value
 
             val phoneActions = mutableListOf<NotificationCompat.Action>()
             val wearActions = mutableListOf<NotificationCompat.Action>()
 
-            for (action in NewEpisodeNotificationAction.values()) {
+            for (action in NewEpisodeNotificationAction.entries) {
                 if (userActions.contains(action)) {
                     intentId++
                     val label = context.resources.getString(action.labelId)
@@ -513,11 +527,8 @@ class RefreshPodcastsThread(
                 builder = builder.addAction(phoneActions[1])
             }
 
-            // Don't include three action on old devices because they don't fit
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                if (phoneActions.size > 2) {
-                    builder = builder.addAction(phoneActions[2])
-                }
+            if (phoneActions.size > 2) {
+                builder = builder.addAction(phoneActions[2])
             }
 
             if (isGroupNotification) {
@@ -534,7 +545,7 @@ class RefreshPodcastsThread(
             }
             builder.extend(wearableExtender)
 
-            val bitmap = getPodcastNotificationBitmap(podcast.uuid, podcastManager, context)
+            val bitmap = getEpisodeNotificationBitmap(episode, settings, context)
             if (bitmap != null) {
                 builder.setLargeIcon(bitmap)
             }
@@ -553,7 +564,9 @@ class RefreshPodcastsThread(
                 }
             }
 
-            manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            }
         }
 
         private fun buildNotificationIntent(intentId: Int, intentName: String, episode: PodcastEpisode, notificationTag: String, context: Context): PendingIntent {
@@ -562,13 +575,13 @@ class RefreshPodcastsThread(
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_ACTION, intentName)
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_EPISODE_UUID, episode.uuid)
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_NOTIFICATION_TAG, notificationTag)
-            return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         private fun getDeletePendingIntent(context: Context): PendingIntent {
             val deleteIntent = Intent(context, NotificationBroadcastReceiver::class.java)
             deleteIntent.action = NotificationBroadcastReceiver.INTENT_ACTION_NOTIFICATION_DELETED
-            return PendingIntent.getBroadcast(context, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            return PendingIntent.getBroadcast(context, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         @Suppress("DEPRECATION")
@@ -580,7 +593,7 @@ class RefreshPodcastsThread(
             settings: Settings,
             podcastManager: PodcastManager,
             notificationHelper: NotificationHelper,
-            context: Context
+            context: Context,
         ) {
             var intentIndex = intentId
 
@@ -596,7 +609,7 @@ class RefreshPodcastsThread(
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            val pendingIntent = PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             intentIndex += 1
 
             val inboxStyle = NotificationCompat.InboxStyle()
@@ -643,7 +656,9 @@ class RefreshPodcastsThread(
             }
 
             val manager = NotificationManagerCompat.from(context)
-            manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            }
         }
 
         private fun getPodcastNotificationWearBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {
@@ -652,7 +667,8 @@ class RefreshPodcastsThread(
             }
             val podcast = podcastManager.findPodcastByUuid(uuid) ?: return null
 
-            return PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).getBitmap(podcast, 400)
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = 400).create(podcast)
+            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
         }
 
         private fun getPodcastNotificationBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {
@@ -664,7 +680,16 @@ class RefreshPodcastsThread(
             val resources = context.resources
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
 
-            return PodcastImageLoader(context = context, isDarkTheme = true, transformations = emptyList()).getBitmap(podcast, width)
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(podcast)
+            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
+        }
+
+        private fun getEpisodeNotificationBitmap(episode: PodcastEpisode, settings: Settings, context: Context): Bitmap? {
+            val resources = context.resources
+            val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
+
+            val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.artworkConfiguration.value.useEpisodeArtwork)
+            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
         }
 
         private fun formatNotificationLine(podcastName: String?, episodeName: String?, context: Context): CharSequence {
@@ -672,15 +697,23 @@ class RefreshPodcastsThread(
                 context.resources.getString(
                     LR.string.podcast_notification_new_episode,
                     if (podcastName == null) "" else TextUtils.htmlEncode(podcastName),
-                    if (episodeName == null) "" else TextUtils.htmlEncode(episodeName)
+                    if (episodeName == null) "" else TextUtils.htmlEncode(episodeName),
                 ),
-                HtmlCompat.FROM_HTML_MODE_COMPACT
+                HtmlCompat.FROM_HTML_MODE_COMPACT,
             )
         }
     }
 }
 
 private sealed class AddToUpNext {
-    object Next : AddToUpNext()
-    object Last : AddToUpNext()
+    data object Next : AddToUpNext()
+    data object Last : AddToUpNext()
+}
+
+private val NewEpisodeNotificationAction.notificationAction: String get() = when (this) {
+    NewEpisodeNotificationAction.Play -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_EPISODE
+    NewEpisodeNotificationAction.PlayNext -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_NEXT
+    NewEpisodeNotificationAction.PlayLast -> NotificationBroadcastReceiver.INTENT_ACTION_PLAY_LAST
+    NewEpisodeNotificationAction.Archive -> NotificationBroadcastReceiver.INTENT_ACTION_ARCHIVE
+    NewEpisodeNotificationAction.Download -> NotificationBroadcastReceiver.INTENT_ACTION_DOWNLOAD_EPISODE
 }

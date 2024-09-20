@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import kotlinx.coroutines.flow.Flow
 
 interface EpisodeManager {
 
@@ -26,9 +26,6 @@ interface EpisodeManager {
     /** Find methods  */
 
     suspend fun findByUuid(uuid: String): PodcastEpisode?
-
-    @Deprecated("Use findByUuid suspended function instead")
-    fun findByUuidSync(uuid: String): PodcastEpisode?
 
     @Deprecated("Use findByUuid suspended function instead")
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
@@ -116,17 +113,19 @@ interface EpisodeManager {
     /** Utility methods  */
     suspend fun countEpisodes(): Int
     fun countEpisodesWhere(queryAfterWhere: String): Int
-    fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<BaseEpisode>
+    fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode>
 
     fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
     fun unarchiveAllInList(episodes: List<PodcastEpisode>)
     fun observePlaybackHistoryEpisodes(): Flowable<List<PodcastEpisode>>
+    fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>>
     suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode>
     fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?)
     fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?)
     fun episodeCanBeCleanedUp(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun markAsUnplayed(episodes: List<BaseEpisode>)
     suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
+    suspend fun findEpisodesByUuids(uuids: List<String>): List<BaseEpisode>
     fun observeDownloadingEpisodesRx(): Flowable<List<BaseEpisode>>
     fun setDownloadFailed(episode: BaseEpisode, errorMessage: String)
     fun observeEpisodeCount(queryAfterWhere: String): Flowable<Int>
@@ -150,4 +149,6 @@ interface EpisodeManager {
     suspend fun countEpisodesStartedAndCompleted(fromEpochMs: Long, toEpochMs: Long): EpisodesStartedAndCompleted
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
+
+    suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>>
 }

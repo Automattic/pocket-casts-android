@@ -1,183 +1,345 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import android.os.Bundle
+import android.os.Parcelable
+import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import android.view.ViewGroup
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.core.graphics.ColorUtils
+import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.preference.ListPreference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.podcasts.R
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.views.extensions.updateColors
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingInfoRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
+import au.com.shiftyjelly.pocketcasts.compose.dialogs.RadioOptionsDialog
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import kotlin.math.max
+import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
-    @Inject lateinit var theme: Theme
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+class PodcastAutoArchiveFragment : BaseFragment() {
+    private val viewModel by viewModels<PodcastAutoArchiveViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<PodcastAutoArchiveViewModel.Factory> { factory ->
+                factory.create(args.podcastUuid)
+            }
+        },
+    )
 
-    private val viewModel: PodcastAutoArchiveViewModel by viewModels()
-    private lateinit var toolbar: Toolbar
-    private var preferenceCustomForPodcast: SwitchPreference? = null
-    private var preferenceCustomCategory: PreferenceCategory? = null
-    private var preferenceEpisodeLimitCategory: PreferenceCategory? = null
-    private var preferenceAutoArchivePodcastPlayedEpisodes: ListPreference? = null
-    private var preferenceAutoArchivePodcastInactiveEpisodes: ListPreference? = null
-    private var preferenceAutoArchiveEpisodeLimit: ListPreference? = null
+    private val args get() = extractArgs(arguments) ?: error("$NEW_INSTANCE_ARGS argument is missing. Fragment must be created using newInstance function")
+    private var podcastTint: PodcastTint? = null
+    private val fallbackToolbarColors get() = podcastTint?.let { ToolbarColors.podcast(it.lightTint, it.darkTint, theme) } ?: args.toolbarColors
 
-    val afterPlayingValues
-        get() = resources.getStringArray(LR.array.settings_auto_archive_played_values)
-    val inactiveValues
-        get() = resources.getStringArray(LR.array.settings_auto_archive_inactive_values)
-    val episodeLimitValues
-        get() = resources.getStringArray(LR.array.settings_auto_archive_episode_limit_values)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        podcastTint = savedInstanceState?.let { BundleCompat.getParcelable(it, PODCAST_TINT_KEY, PodcastTint::class.java) }
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val state by viewModel.state.collectAsState(PodcastAutoArchiveViewModel.State())
 
-    var episodeLimitIndex: Int? = null
+                AppThemeWithBackground(themeType = theme.activeTheme) {
+                    AutoArchiveSettings(
+                        state = state,
+                        onBackPressed = {
+                            @Suppress("DEPRECATION")
+                            activity?.onBackPressed()
+                        },
+                    )
+                }
+            }
+        }
+    }
 
-    companion object {
-        const val ARG_PODCAST_UUID = "ARG_PODCAST_UUID"
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(PODCAST_TINT_KEY, podcastTint)
+    }
 
-        fun newInstance(podcastUuid: String): PodcastAutoArchiveFragment {
-            return PodcastAutoArchiveFragment().apply {
-                arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid
+    override fun onResume() {
+        super.onResume()
+        tintToolbar(fallbackToolbarColors.backgroundColor)
+    }
+
+    private fun tintToolbar(color: Int) {
+        theme.updateWindowStatusBar(
+            window = requireActivity().window,
+            statusBarColor = StatusBarColor.Custom(color, isWhiteIcons = ColorUtils.calculateLuminance(color) < 0.5),
+            context = requireActivity(),
+        )
+    }
+
+    @Composable
+    private fun AutoArchiveSettings(
+        state: PodcastAutoArchiveViewModel.State,
+        onBackPressed: () -> Unit,
+        modifier: Modifier = Modifier,
+    ) {
+        Column(
+            modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            val toolbarColors = if (state.podcast != null) {
+                ToolbarColors.podcast(state.podcast, theme)
+            } else {
+                fallbackToolbarColors
+            }
+            LaunchedEffect(toolbarColors.backgroundColor) {
+                if (state.podcast != null) {
+                    podcastTint = PodcastTint(state.podcast.lightThemeTint(), state.podcast.darkThemeTint())
+                }
+                tintToolbar(toolbarColors.backgroundColor)
+            }
+            ThemedTopAppBar(
+                title = stringResource(LR.string.settings_title_auto_archive),
+                onNavigationClick = onBackPressed,
+                bottomShadow = true,
+                iconColor = Color(toolbarColors.iconColor),
+                textColor = Color(toolbarColors.titleColor),
+                backgroundColor = Color(toolbarColors.backgroundColor),
+            )
+            GlobalOverrideSection(
+                overrideGlobalSettings = state.overrideAutoArchiveSettings,
+            )
+            if (state.overrideAutoArchiveSettings) {
+                AutoArchiveSection(
+                    archiveAfterPlaying = state.archiveAfterPlaying,
+                    archiveInactive = state.archiveInactive,
+                )
+                EpisodeLimitSection(
+                    limit = state.episodeLimit,
                 )
             }
         }
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preference_podcast_auto_archive, rootKey)
-        preferenceCustomForPodcast = preferenceManager.findPreference("customForPodcast")
-        preferenceCustomCategory = preferenceManager.findPreference("customCategory")
-        preferenceEpisodeLimitCategory = preferenceManager.findPreference("categoryEpisodeLimit")
-        preferenceAutoArchivePodcastPlayedEpisodes = preferenceManager.findPreference("autoArchivePodcastPlayedEpisodes")
-        preferenceAutoArchivePodcastInactiveEpisodes = preferenceManager.findPreference("autoArchivePodcastInactiveEpisodes")
-        preferenceAutoArchiveEpisodeLimit = preferenceManager.findPreference("autoArchiveEpisodeLimit")
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.setup(arguments?.getString(ARG_PODCAST_UUID)!!)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
-        view.isClickable = true
-
-        toolbar = view.findViewById(R.id.toolbar)
-        toolbar.title = getString(LR.string.settings_title_auto_archive)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-
-        preferenceCustomCategory?.isVisible = false
-        preferenceEpisodeLimitCategory?.isVisible = false
-        viewModel.podcast.observe(viewLifecycleOwner) { podcast ->
-            val colors = ToolbarColors.Podcast(podcast = podcast, theme = theme)
-
-            toolbar.updateColors(toolbarColors = colors, navigationIcon = BackArrow)
-
-            preferenceCustomForPodcast?.isChecked = podcast.overrideGlobalArchive
-            preferenceCustomCategory?.isVisible = podcast.overrideGlobalArchive
-            preferenceEpisodeLimitCategory?.isVisible = podcast.overrideGlobalArchive
-
-            preferenceAutoArchivePodcastPlayedEpisodes?.value = afterPlayingValues[podcast.autoArchiveAfterPlaying]
-            preferenceAutoArchivePodcastInactiveEpisodes?.value = inactiveValues[podcast.autoArchiveInactive]
-
-            val episodeLimitIndex = PodcastAutoArchiveViewModel.EPISODE_LIMITS.indexOf(podcast.autoArchiveEpisodeLimit)
-            preferenceAutoArchiveEpisodeLimit?.value = episodeLimitValues[episodeLimitIndex]
-        }
-
-        preferenceCustomForPodcast?.setOnPreferenceChangeListener { _, newValue ->
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_TOGGLED,
-                mapOf("enabled" to (newValue as Boolean))
+    @Composable
+    private fun GlobalOverrideSection(
+        overrideGlobalSettings: Boolean,
+        modifier: Modifier = Modifier,
+    ) {
+        SettingSection(
+            showDivider = overrideGlobalSettings,
+            modifier = modifier,
+        ) {
+            SettingRow(
+                primaryText = stringResource(LR.string.podcast_settings_auto_archive_custom),
+                secondaryText = stringResource(LR.string.podcast_settings_auto_archive_custom_summary),
+                toggle = SettingRowToggle.Switch(checked = overrideGlobalSettings),
+                modifier = Modifier.toggleable(value = overrideGlobalSettings, role = Role.Switch) { newValue ->
+                    viewModel.updateGlobalOverride(newValue)
+                },
             )
-            viewModel.updateGlobalOverride(newValue)
-            true
-        }
-
-        preferenceAutoArchivePodcastPlayedEpisodes?.setOnPreferenceChangeListener { _, newValue ->
-            val stringVal = newValue as? String ?: return@setOnPreferenceChangeListener false
-            val index = max(afterPlayingValues.indexOf(stringVal), 0) // Returns -1 on not found, default it to 0
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
-                mapOf(
-                    "value" to when (index) {
-                        0 -> "never"
-                        1 -> "after_playing"
-                        2 -> "after_24_hours"
-                        3 -> "after_2_days"
-                        4 -> "after_1_week"
-                        else -> "unknown"
-                    }
-                )
-            )
-            viewModel.updateAfterPlaying(index)
-            true
-        }
-
-        preferenceAutoArchivePodcastInactiveEpisodes?.setOnPreferenceChangeListener { _, newValue ->
-            val stringVal = newValue as? String ?: return@setOnPreferenceChangeListener false
-            val index = max(inactiveValues.indexOf(stringVal), 0) // Returns -1 on not found, default it to 0
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-                mapOf(
-                    "value" to when (index) {
-                        0 -> "never"
-                        1 -> "after_24_hours"
-                        2 -> "after_2_days"
-                        3 -> "after_1_week"
-                        4 -> "after_2_weeks"
-                        5 -> "after_30_days"
-                        6 -> "after_3_months"
-                        else -> "unknown"
-                    }
-                )
-            )
-            viewModel.updateInactive(index)
-            true
-        }
-
-        preferenceAutoArchiveEpisodeLimit?.setOnPreferenceChangeListener { _, newValue ->
-            val stringVal = newValue as? String ?: return@setOnPreferenceChangeListener false
-            val index = max(episodeLimitValues.indexOf(stringVal), 0)
-            episodeLimitIndex = index
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED,
-                mapOf(
-                    "value" to when (index) {
-                        0 -> "none"
-                        1 -> 1
-                        2 -> 2
-                        3 -> 5
-                        4 -> 10
-                        else -> "unknown"
-                    }
-                )
-            )
-            true
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        episodeLimitIndex?.let {
-            viewModel.updateEpisodeLimit(it)
+    @Composable
+    private fun AutoArchiveSection(
+        archiveAfterPlaying: AutoArchiveAfterPlaying,
+        archiveInactive: AutoArchiveInactive,
+        modifier: Modifier = Modifier,
+    ) {
+        var openArchiveAfterPlayingDialog by remember { mutableStateOf(false) }
+        var openArchiveInactiveDialog by remember { mutableStateOf(false) }
+
+        SettingSection(
+            modifier = modifier,
+        ) {
+            SettingRow(
+                primaryText = stringResource(LR.string.settings_archive_played),
+                secondaryText = stringResource(archiveAfterPlaying.stringRes),
+                toggle = SettingRowToggle.None,
+                modifier = Modifier.clickable { openArchiveAfterPlayingDialog = true },
+            )
+            SettingRow(
+                primaryText = stringResource(LR.string.settings_auto_archive_inactive),
+                secondaryText = stringResource(archiveInactive.stringRes),
+                toggle = SettingRowToggle.None,
+                modifier = Modifier.clickable { openArchiveInactiveDialog = true },
+            )
+            SettingInfoRow(
+                text = stringResource(LR.string.settings_auto_archive_time_limits),
+            )
+        }
+
+        if (openArchiveAfterPlayingDialog) {
+            AutoArchiveAfterPlayedDialog(
+                archiveAfterPlaying = archiveAfterPlaying,
+                onConfirm = { newValue ->
+                    viewModel.updateAfterPlaying(newValue)
+                    openArchiveAfterPlayingDialog = false
+                },
+                onDismiss = { openArchiveAfterPlayingDialog = false },
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+            )
+        }
+        if (openArchiveInactiveDialog) {
+            AutoArchiveInactiveDialog(
+                archiveInactive = archiveInactive,
+                onConfirm = { newValue ->
+                    viewModel.updateInactive(newValue)
+                    openArchiveInactiveDialog = false
+                },
+                onDismiss = { openArchiveInactiveDialog = false },
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+            )
+        }
+    }
+
+    @Composable
+    private fun EpisodeLimitSection(
+        limit: AutoArchiveLimit,
+        modifier: Modifier = Modifier,
+    ) {
+        var openEpisodeLimitDialog by remember { mutableStateOf(false) }
+
+        SettingSection(
+            showDivider = false,
+            modifier = modifier,
+        ) {
+            SettingRow(
+                primaryText = stringResource(LR.string.settings_auto_archive_episode_limit),
+                secondaryText = stringResource(limit.stringRes),
+                toggle = SettingRowToggle.None,
+                modifier = Modifier.clickable { openEpisodeLimitDialog = true },
+            )
+            SettingInfoRow(
+                text = stringResource(LR.string.settings_auto_archive_episode_limit_summary),
+            )
+        }
+
+        if (openEpisodeLimitDialog) {
+            EpisodeLimitDialog(
+                limit = limit,
+                onConfirm = { newValue ->
+                    viewModel.updateEpisodeLimit(newValue)
+                    openEpisodeLimitDialog = false
+                },
+                onDismiss = { openEpisodeLimitDialog = false },
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+            )
+        }
+    }
+
+    @Composable
+    private fun AutoArchiveAfterPlayedDialog(
+        archiveAfterPlaying: AutoArchiveAfterPlaying,
+        modifier: Modifier = Modifier,
+        onConfirm: (AutoArchiveAfterPlaying) -> Unit,
+        onDismiss: () -> Unit,
+    ) {
+        RadioOptionsDialog(
+            title = stringResource(LR.string.podcast_settings_played_episodes),
+            selectedOption = archiveAfterPlaying,
+            allOptions = AutoArchiveAfterPlaying.All,
+            optionName = { option -> stringResource(option.stringRes) },
+            onSelectOption = onConfirm,
+            onDismiss = onDismiss,
+            modifier = modifier,
+        )
+    }
+
+    @Composable
+    private fun AutoArchiveInactiveDialog(
+        archiveInactive: AutoArchiveInactive,
+        modifier: Modifier = Modifier,
+        onConfirm: (AutoArchiveInactive) -> Unit,
+        onDismiss: () -> Unit,
+    ) {
+        RadioOptionsDialog(
+            title = stringResource(LR.string.settings_inactive_episodes),
+            selectedOption = archiveInactive,
+            allOptions = AutoArchiveInactive.All,
+            optionName = { option -> stringResource(option.stringRes) },
+            onSelectOption = onConfirm,
+            onDismiss = onDismiss,
+            modifier = modifier,
+        )
+    }
+
+    @Composable
+    private fun EpisodeLimitDialog(
+        limit: AutoArchiveLimit,
+        modifier: Modifier = Modifier,
+        onConfirm: (AutoArchiveLimit) -> Unit,
+        onDismiss: () -> Unit,
+    ) {
+        RadioOptionsDialog(
+            title = stringResource(LR.string.settings_auto_archive_episode_limit),
+            selectedOption = limit,
+            allOptions = AutoArchiveLimit.entries,
+            optionName = { option -> stringResource(option.stringRes) },
+            onSelectOption = onConfirm,
+            onDismiss = onDismiss,
+            modifier = modifier,
+        )
+    }
+
+    @Parcelize
+    data class PodcastAutoArchiveArgs(
+        val podcastUuid: String,
+        val toolbarColors: ToolbarColors,
+    ) : Parcelable
+
+    @Parcelize
+    private data class PodcastTint(
+        val lightTint: Int,
+        val darkTint: Int,
+    ) : Parcelable
+
+    companion object {
+        private const val NEW_INSTANCE_ARGS = "PodcastAutoArchiveFragmentArg"
+        private const val PODCAST_TINT_KEY = "PodcastTintKey"
+
+        fun newInstance(
+            podcastUuid: String,
+            toolbarColors: ToolbarColors,
+        ): PodcastAutoArchiveFragment {
+            return PodcastAutoArchiveFragment().apply {
+                arguments = bundleOf(
+                    NEW_INSTANCE_ARGS to PodcastAutoArchiveArgs(
+                        podcastUuid = podcastUuid,
+                        toolbarColors = toolbarColors,
+                    ),
+                )
+            }
+        }
+
+        private fun extractArgs(bundle: Bundle?): PodcastAutoArchiveArgs? = bundle?.let {
+            BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, PodcastAutoArchiveArgs::class.java)
         }
     }
 }

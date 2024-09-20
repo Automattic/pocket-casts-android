@@ -20,10 +20,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="com.android.vending.CHECK_LICENSE"/>
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 
@@ -38,7 +40,6 @@
             android:supportsRtl="false"
             tools:replace="android:supportsRtl"
             android:theme="@style/ThemeDark"
-            android:networkSecurityConfig="@xml/network_security_config"
             android:localeConfig="@xml/locales_config"
             tools:ignore="UnusedAttribute">
 
@@ -100,7 +101,7 @@
                         android:host="*"
                         android:scheme="pktc"/>
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
@@ -108,13 +109,31 @@
                     android:host="pca.st"
                     android:scheme="https"/>
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
                     android:host="pcast.pocketcasts.net"
                     android:scheme="https"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="pocket-casts-main-development.mystagingwebsite.com"
+                    android:scheme="https"
+                    android:pathPrefix="/redeem" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="pocketcasts.com"
+                    android:scheme="https"
+                    android:pathPrefix="/redeem" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -255,14 +274,20 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="pocketcasts.com" android:path="/get" />
+                <data android:scheme="https"/>
+                <data android:host="pocketcasts.com"/>
+                <data android:path="/get"/>
+                <data android:pathPrefix="/get/"/>
             </intent-filter>
 
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="pocket-casts-main-development.mystagingwebsite.com" android:path="/get" />
+                <data android:scheme="https"/>
+                <data android:host="pocket-casts-main-development.mystagingwebsite.com"/>
+                <data android:path="/get"/>
+                <data android:pathPrefix="/get/"/>
             </intent-filter>
 
             <meta-data
@@ -629,8 +654,6 @@
 
         <!-- Disable Sentry exception tracking so we can turn it on based on the user preference -->
         <meta-data android:name="io.sentry.auto-init" android:value="false" />
-        <!-- Pass in the Sentry DSN -->
-        <meta-data android:name="au.com.shiftyjelly.pocketcasts.sentryDsn" android:value="${sentryDsn}"/>
     </application>
 
 </manifest>

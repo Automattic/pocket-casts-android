@@ -54,7 +54,7 @@ fun PodcastSubscribeImage(
             rootModifier
                 .clickable(
                     onClickLabel = onClickLabel,
-                    onClick = onSubscribeClick
+                    onClick = onSubscribeClick,
                 )
         } else {
             rootModifier
@@ -62,13 +62,13 @@ fun PodcastSubscribeImage(
     }
     BoxWithConstraints(
         modifier = rootModifier,
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         PodcastImage(
             uuid = podcastUuid,
             title = podcastTitle,
             showTitle = true,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
 
         val buttonBackgroundColor = Color.Black.copy(alpha = 0.4f)
@@ -79,7 +79,7 @@ fun PodcastSubscribeImage(
             iconModifier = if (onSubscribeClick != null) {
                 iconModifier.clickable(
                     onClickLabel = onClickLabel,
-                    onClick = onSubscribeClick
+                    onClick = onSubscribeClick,
                 )
             } else {
                 iconModifier
@@ -89,7 +89,7 @@ fun PodcastSubscribeImage(
             contentAlignment = Alignment.BottomEnd,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             if (podcastSubscribed) {
                 Box(
@@ -98,13 +98,13 @@ fun PodcastSubscribeImage(
                         .shadow(shadowSize, shape = CircleShape)
                         .size(subscribeButtonSize)
                         .clip(CircleShape)
-                        .background(buttonBackgroundColor)
+                        .background(buttonBackgroundColor),
                 ) {
                     Icon(
                         painter = painterResource(IR.drawable.ic_tick),
                         contentDescription = stringResource(LR.string.podcast_subscribed),
                         tint = Color.White,
-                        modifier = iconModifier
+                        modifier = iconModifier,
                     )
                 }
             } else {
@@ -114,13 +114,13 @@ fun PodcastSubscribeImage(
                         .shadow(shadowSize, shape = CircleShape)
                         .size(subscribeButtonSize)
                         .clip(CircleShape)
-                        .background(buttonBackgroundColor)
+                        .background(buttonBackgroundColor),
                 ) {
                     Icon(
                         painter = painterResource(IR.drawable.ic_add_black_24dp),
                         contentDescription = stringResource(LR.string.podcast_not_subscribed),
                         tint = Color.White,
-                        modifier = iconModifier
+                        modifier = iconModifier,
                     )
                 }
             }
@@ -139,7 +139,7 @@ private fun PodcastSelectImagePreview(
             podcastTitle = "A Great Podcast Title",
             podcastSubscribed = false,
             onSubscribeClick = {},
-            modifier = Modifier
+            modifier = Modifier,
         )
     }
 }

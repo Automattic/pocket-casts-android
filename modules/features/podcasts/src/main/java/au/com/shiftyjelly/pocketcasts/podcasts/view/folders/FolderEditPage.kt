@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 fun FolderEditPage(
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    viewModel: FolderEditViewModel
+    viewModel: FolderEditViewModel,
 ) {
     val folderName: String by viewModel.folderName.collectAsState()
     val colorId: Int by viewModel.colorId.collectAsState()
@@ -45,16 +45,16 @@ fun FolderEditPage(
         Column(
             modifier = Modifier
                 .padding(bottom = 16.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
             BottomSheetAppBar(
                 title = stringResource(LR.string.edit_folder),
                 navigationButton = NavigationButton.Close,
-                onNavigationClick = { onBackClick() }
+                onNavigationClick = { onBackClick() },
             )
             TextC70(
                 text = stringResource(LR.string.name),
-                modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp)
+                modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp),
             )
             FormField(
                 value = folderName,
@@ -65,22 +65,22 @@ fun FolderEditPage(
                 },
                 onImeAction = { focusManager.clearFocus() },
                 modifier = Modifier
-                    .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
             )
             TextC70(
                 text = stringResource(LR.string.color),
-                modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp)
+                modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp),
             )
             FolderColorPicker(
                 selectedId = colorId,
                 onClick = { colorId ->
                     viewModel.changeColor(colorId)
                     viewModel.saveColor()
-                }
+                },
             )
             DeleteButton(
                 onDeleteClick = onDeleteClick,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
             )
         }
         // so the bottom sheet goes full height
@@ -94,24 +94,24 @@ private fun DeleteButton(onDeleteClick: () -> Unit, modifier: Modifier = Modifie
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onDeleteClick() }
+            .clickable { onDeleteClick() },
     ) {
         Icon(
             painter = painterResource(VR.drawable.ic_delete),
             contentDescription = null,
             tint = MaterialTheme.theme.colors.support05,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
         Column(
-            modifier = Modifier.padding(vertical = 12.dp)
+            modifier = Modifier.padding(vertical = 12.dp),
         ) {
             TextP40(
                 text = stringResource(LR.string.delete_folder),
-                color = MaterialTheme.theme.colors.support05
+                color = MaterialTheme.theme.colors.support05,
             )
             TextP50(
                 text = stringResource(LR.string.delete_folder_summary),
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
     }

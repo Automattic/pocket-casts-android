@@ -10,21 +10,21 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class BookmarkViewModel
 @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val userEpisodeManager: UserEpisodeManager,
-    private val bookmarkManager: BookmarkManager
+    private val bookmarkManager: BookmarkManager,
 ) : ViewModel(), CoroutineScope {
 
     private lateinit var arguments: BookmarkArguments
@@ -41,7 +41,7 @@ class BookmarkViewModel
         val bookmarkUuid: String? = null,
         val title: TextFieldValue = buildSelectedTextFieldValue(DEFAULT_TITLE),
         val backgroundColor: Color = Color.Black,
-        val tintColor: Color = Color.Blue
+        val tintColor: Color = Color.Blue,
     ) {
         val isNewBookmark: Boolean = bookmarkUuid == null
     }
@@ -57,7 +57,7 @@ class BookmarkViewModel
         mutableUiState.value = mutableUiState.value.copy(
             bookmarkUuid = bookmarkUuid,
             backgroundColor = Color(arguments.backgroundColor),
-            tintColor = Color(arguments.tintColor)
+            tintColor = Color(arguments.tintColor),
         )
         viewModelScope.launch {
             // load the existing bookmark
@@ -65,7 +65,7 @@ class BookmarkViewModel
                 val episode = episodeManager.findEpisodeByUuid(arguments.episodeUuid) ?: return@launch
                 bookmarkManager.findByEpisodeTime(
                     episode = episode,
-                    timeSecs = arguments.timeSecs
+                    timeSecs = arguments.timeSecs,
                 )
             } else {
                 bookmarkManager.findBookmark(bookmarkUuid)
@@ -73,7 +73,7 @@ class BookmarkViewModel
             if (bookmark != null) {
                 mutableUiState.value = mutableUiState.value.copy(
                     bookmarkUuid = bookmark.uuid,
-                    title = buildSelectedTextFieldValue(bookmark.title)
+                    title = buildSelectedTextFieldValue(bookmark.title),
                 )
             }
         }

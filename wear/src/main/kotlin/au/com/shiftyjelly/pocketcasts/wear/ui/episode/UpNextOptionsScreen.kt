@@ -28,7 +28,7 @@ fun UpNextOptionsScreen(
     Content(
         columnState = columnState,
         upNextOptions = viewModel.upNextOptions,
-        onComplete = onComplete
+        onComplete = onComplete,
     )
 }
 
@@ -40,7 +40,7 @@ private fun Content(
 ) {
     ScalingLazyColumn(
         columnState = columnState,
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp),
     ) {
         item {
             ScreenHeaderChip(

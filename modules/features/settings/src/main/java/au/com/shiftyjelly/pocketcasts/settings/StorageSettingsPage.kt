@@ -6,13 +6,13 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -48,13 +49,14 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import kotlinx.coroutines.delay
 import java.util.*
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -62,6 +64,7 @@ fun StorageSettingsPage(
     viewModel: StorageSettingsViewModel,
     onBackPressed: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
+    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
     val state: StorageSettingsViewModel.State by viewModel.state.collectAsState()
@@ -71,13 +74,15 @@ fun StorageSettingsPage(
         onBackPressed = onBackPressed,
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
         onManageDownloadedFilesClick = onManageDownloadedFilesClick,
-        modifier = modifier
+        onFixDownloadsClick = { viewModel.fixDownloadedFiles() },
+        bottomInset = bottomInset,
+        modifier = modifier,
     )
     var showProgressDialog by remember { mutableStateOf(false) }
     if (showProgressDialog) {
         ProgressDialog(
             text = stringResource(LR.string.settings_storage_move_podcasts),
-            onDismiss = { showProgressDialog = false }
+            onDismiss = { showProgressDialog = false },
         )
     }
 
@@ -98,7 +103,7 @@ fun StorageSettingsPage(
     if (showAlertDialog) {
         AlertDialogView(
             alertDialogState = alertDialogState,
-            onDismiss = { showAlertDialog = false }
+            onDismiss = { showAlertDialog = false },
         )
     }
     LaunchedEffect(Unit) {
@@ -122,33 +127,40 @@ fun StorageSettingsView(
     onBackPressed: () -> Unit,
     onClearDownloadCacheClick: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
+    onFixDownloadsClick: () -> Unit,
+    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_storage),
             bottomShadow = true,
-            onNavigationClick = { onBackPressed() }
+            onNavigationClick = { onBackPressed() },
         )
 
-        Column(
+        LazyColumn(
             modifier
                 .background(MaterialTheme.theme.colors.primaryUi02)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
+                .fillMaxHeight(),
+            contentPadding = PaddingValues(bottom = bottomInset),
         ) {
-            SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_usage)) {
-                DownloadedFilesRow(
-                    state = state.downloadedFilesState,
-                    onClick = onManageDownloadedFilesClick
-                )
-                ClearDownloadCacheRow(onClearDownloadCacheClick)
-                StorageChoiceRow(state.storageChoiceState)
-                StorageFolderRow(state.storageFolderState)
+            item {
+                SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_usage)) {
+                    DownloadedFilesRow(
+                        state = state.downloadedFilesState,
+                        onClick = onManageDownloadedFilesClick,
+                    )
+                    FixDownloads(onFixDownloadsClick)
+                    ClearDownloadCacheRow(onClearDownloadCacheClick)
+                    StorageChoiceRow(state.storageChoiceState)
+                    StorageFolderRow(state.storageFolderState)
+                }
             }
-            SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
-                BackgroundRefreshRow(state.backgroundRefreshState)
-                StorageDataWarningRow(state.storageDataWarningState)
+            item {
+                SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
+                    BackgroundRefreshRow(state.backgroundRefreshState)
+                    StorageDataWarningRow(state.storageDataWarningState)
+                }
             }
         }
     }
@@ -168,7 +180,7 @@ private fun DownloadedFilesRow(
         ).replace("-", stringResource(LR.string.settings_storage_downloaded_bytes, 0)),
         modifier = modifier
             .clickable { onClick() }
-            .padding(vertical = 6.dp)
+            .padding(vertical = 6.dp),
     )
 }
 
@@ -181,14 +193,28 @@ private fun ClearDownloadCacheRow(
         primaryText = stringResource(LR.string.settings_storage_clear_download_cache),
         modifier = modifier
             .clickable { onClick() }
-            .padding(vertical = 6.dp)
+            .padding(vertical = 6.dp),
+    )
+}
+
+@Composable
+private fun FixDownloads(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = stringResource(R.string.settings_storage_fix_downloads),
+        secondaryText = stringResource(R.string.settings_storage_fix_downloads_description),
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(vertical = 6.dp),
     )
 }
 
 @Composable
 private fun StorageChoiceRow(
     storageChoiceState: StorageSettingsViewModel.State.StorageChoiceState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val defaultStorageFolderLabel = stringResource(LR.string.settings_storage_phone)
@@ -220,7 +246,7 @@ private fun StorageChoiceRow(
             } else {
                 storageChoiceState.onStateChange(folderLocation)
             }
-        }
+        },
     )
 }
 
@@ -235,7 +261,7 @@ private fun StorageFolderRow(
             primaryText = stringResource(LR.string.settings_storage_custom_folder_location),
             secondaryText = storageFolderState.summary,
             modifier = modifier
-                .clickable { showDialog = true }
+                .clickable { showDialog = true },
         ) {
             if (showDialog) {
                 val focusRequester = remember { FocusRequester() }
@@ -248,8 +274,8 @@ private fun StorageFolderRow(
                 var value by remember {
                     mutableStateOf(
                         TextFieldValue(
-                            text = storageFolderState.summary ?: ""
-                        )
+                            text = storageFolderState.summary ?: "",
+                        ),
                     )
                 }
 
@@ -263,16 +289,16 @@ private fun StorageFolderRow(
                     buttons = listOf(
                         DialogButtonState(
                             text = stringResource(LR.string.cancel).uppercase(
-                                Locale.getDefault()
+                                Locale.getDefault(),
                             ),
-                            onClick = { showDialog = false }
+                            onClick = { showDialog = false },
                         ),
                         DialogButtonState(
                             text = stringResource(LR.string.ok),
-                            onClick = onFinish
-                        )
+                            onClick = onFinish,
+                        ),
                     ),
-                    onDismissRequest = { showDialog = false }
+                    onDismissRequest = { showDialog = false },
                 ) {
                     OutlinedTextField(
                         value = value,
@@ -282,13 +308,13 @@ private fun StorageFolderRow(
                         colors = TextFieldDefaults.textFieldColors(
                             textColor = MaterialTheme.theme.colors.primaryText01,
                             placeholderColor = MaterialTheme.theme.colors.primaryText02,
-                            backgroundColor = MaterialTheme.theme.colors.primaryUi01
+                            backgroundColor = MaterialTheme.theme.colors.primaryUi01,
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         keyboardActions = KeyboardActions { onFinish() },
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
-                            .focusRequester(focusRequester)
+                            .focusRequester(focusRequester),
                     )
                 }
             }
@@ -307,8 +333,8 @@ private fun BackgroundRefreshRow(
         toggle = SettingRowToggle.Switch(state.isChecked),
         modifier = modifier.toggleable(
             value = state.isChecked,
-            role = Role.Switch
-        ) { state.onCheckedChange(it) }
+            role = Role.Switch,
+        ) { state.onCheckedChange(it) },
     )
 }
 
@@ -323,15 +349,15 @@ private fun StorageDataWarningRow(
         toggle = SettingRowToggle.Switch(checked = state.isChecked),
         modifier = modifier.toggleable(
             value = state.isChecked,
-            role = Role.Switch
-        ) { state.onCheckedChange(it) }
+            role = Role.Switch,
+        ) { state.onCheckedChange(it) },
     ) {
         TextP50(
             text = stringResource(LR.string.settings_storage_data_warning_car),
             style = MaterialTheme.typography.body1,
             color = MaterialTheme.theme.colors.primaryText02,
             modifier = modifier
-                .padding(top = 16.dp)
+                .padding(top = 16.dp),
         )
     }
 }
@@ -349,7 +375,7 @@ private fun AlertDialogView(
                 onClick = {
                     it.onClick()
                     onDismiss()
-                }
+                },
             )
         },
         onDismissRequest = { onDismiss() },
@@ -359,10 +385,10 @@ private fun AlertDialogView(
                     text = it,
                     modifier = Modifier
                         .padding(bottom = 12.dp)
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 24.dp),
                 )
             }
-        }
+        },
     )
 }
 
@@ -380,7 +406,7 @@ private fun getStorageSpaceString(
     val free = stat.availableBlocksLong * stat.blockSizeLong
     context.getString(
         LR.string.settings_storage_size_free,
-        Util.formattedBytes(free, context = context)
+        Util.formattedBytes(free, context = context),
     )
 } catch (e: Exception) {
     ""
@@ -396,24 +422,26 @@ private fun StorageSettingsPreview(
             state = StorageSettingsViewModel.State(
                 downloadedFilesState = StorageSettingsViewModel.State.DownloadedFilesState(),
                 storageChoiceState = StorageSettingsViewModel.State.StorageChoiceState(
-                    onStateChange = {}
+                    onStateChange = {},
                 ),
                 storageFolderState = StorageSettingsViewModel.State.StorageFolderState(
                     summary = "Custom Folder",
-                    onStateChange = {}
+                    onStateChange = {},
                 ),
                 backgroundRefreshState = StorageSettingsViewModel.State.BackgroundRefreshState(
                     isChecked = true,
                     summary = LR.string.settings_storage_background_refresh_on,
-                    onCheckedChange = {}
+                    onCheckedChange = {},
                 ),
                 storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
-                    onCheckedChange = {}
+                    onCheckedChange = {},
                 ),
             ),
             onBackPressed = {},
             onClearDownloadCacheClick = {},
-            onManageDownloadedFilesClick = {}
+            onManageDownloadedFilesClick = {},
+            onFixDownloadsClick = {},
+            bottomInset = 0.dp,
         )
     }
 }

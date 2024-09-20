@@ -9,7 +9,7 @@ data class Bundle(
     val paymentUrl: String?,
     val description: String?,
     val podcastUuid: String? = null,
-    val paidType: BundlePaidType? = null
+    val paidType: BundlePaidType? = null,
 )
 
 enum class BundlePaidType(@StringRes val stringRes: Int) {
@@ -18,5 +18,5 @@ enum class BundlePaidType(@StringRes val stringRes: Int) {
     NOADSEXCLUSIVE(R.string.supporter_paid_type_noads_exclusive),
     PREMIUM(R.string.supporter_paid_type_premium),
     NOADSPURCHASE(R.string.supporter_paid_type_noads_purchase),
-    PREMIUMPURCHASE(R.string.supporter_paid_type_premium_purchase)
+    PREMIUMPURCHASE(R.string.supporter_paid_type_premium_purchase),
 }

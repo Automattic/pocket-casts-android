@@ -5,13 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -27,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -44,10 +49,14 @@ class PodcastListFragment : PodcastGridListFragment() {
     }
 
     private val onPromotionClick: (DiscoverPromotion) -> Unit = { promotion ->
-        FirebaseAnalyticsTracker.podcastTappedFromList(promotion.promotionUuid, promotion.podcastUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to promotion.promotionUuid, PODCAST_UUID_KEY to promotion.podcastUuid))
 
-        val fragment = PodcastFragment.newInstance(podcastUuid = promotion.podcastUuid, fromListUuid = promotion.promotionUuid)
+        val sourceView = when (expandedStyle) {
+            is ExpandedStyle.RankedList -> SourceView.DISCOVER_RANKED_LIST
+            is ExpandedStyle.PlainList -> SourceView.DISCOVER_PLAIN_LIST
+            else -> SourceView.DISCOVER
+        }
+        val fragment = PodcastFragment.newInstance(podcastUuid = promotion.podcastUuid, fromListUuid = promotion.promotionUuid, sourceView = sourceView)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
@@ -67,6 +76,14 @@ class PodcastListFragment : PodcastGridListFragment() {
                 is PodcastListViewState.Loading -> {}
                 is PodcastListViewState.ListLoaded -> createLoadedView(state)
                 is PodcastListViewState.Error -> Timber.e("Could not load feed ${state.error.message}")
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding.mainNestedScrollView.updatePadding(bottom = it)
+                }
             }
         }
 
@@ -101,7 +118,6 @@ class PodcastListFragment : PodcastGridListFragment() {
         if (analyticsImpressionSent || impressionId == null) {
             return
         }
-        FirebaseAnalyticsTracker.listImpression(impressionId)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to impressionId))
         analyticsImpressionSent = true
     }
@@ -121,7 +137,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             bodyTextView = binding.lblBody,
             linkView = binding.linkLayout,
             linkTextView = binding.lblLinkTitle,
-            toolbar = binding.toolbar
+            toolbar = binding.toolbar,
         )
     }
 
@@ -141,7 +157,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             toolbar = toolbar,
             title = "",
             menu = R.menu.discover_share,
-            navigationIcon = BackArrow
+            navigationIcon = BackArrow,
         )
         toolbar.setOnMenuItemClickListener(this)
 
@@ -161,6 +177,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             is ExpandedStyle.RankedList -> RankedListAdapter(onPodcastClicked, onPodcastSubscribe, tagline, theme)
             is ExpandedStyle.DescriptiveList -> DescriptiveListAdapter(onPodcastClicked, onPodcastSubscribe) as ListAdapter<Any, RecyclerView.ViewHolder>
             is ExpandedStyle.GridList -> GridListAdapter(GridListAdapter.defaultImageSize, onPodcastClicked, onPodcastSubscribe) as ListAdapter<Any, RecyclerView.ViewHolder>
+            else -> PlainListAdapter(onPodcastClicked, onPodcastSubscribe, onPromotionClick, onEpisodeClick, onEpisodePlayClick, onEpisodeStopClick)
         }
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false

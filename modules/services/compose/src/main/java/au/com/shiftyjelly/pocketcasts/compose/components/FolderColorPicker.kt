@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
@@ -17,9 +19,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CircleIconButton
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.accompanist.flowlayout.FlowRow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FolderColorPicker(selectedId: Int, onClick: (Int) -> Unit, modifier: Modifier = Modifier) {
     FlowRow(modifier = modifier.padding(start = 14.dp, top = 16.dp, end = 2.dp)) {
@@ -28,12 +30,12 @@ fun FolderColorPicker(selectedId: Int, onClick: (Int) -> Unit, modifier: Modifie
                 modifier = Modifier
                     .padding(bottom = 10.dp, end = 10.dp)
                     .size(48.dp),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 ColorSelectCircle(
                     color = color,
                     selected = (id == selectedId),
-                    onClick = { onClick(id) }
+                    onClick = { onClick(id) },
                 )
             }
         }
@@ -51,7 +53,7 @@ private fun ColorSelectCircle(color: Color, selected: Boolean, onClick: () -> Un
         backgroundColor = color,
         onClick = onClick,
         contentDescription = "",
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

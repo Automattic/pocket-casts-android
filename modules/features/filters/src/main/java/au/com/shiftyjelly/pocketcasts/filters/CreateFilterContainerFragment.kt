@@ -6,17 +6,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentCreateContainerBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
+import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModeResize
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themeColors
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -69,7 +72,7 @@ class CreateFilterContainerFragment : BaseFragment() {
                     1 -> {
                         binding.toolbar.title = getString(LR.string.filters_create_filter_details)
                         binding.btnCreate.text = getString(LR.string.filters_create_save_filter)
-                        binding.btnCreate.isEnabled = !viewModel.filterName.value.isNullOrEmpty()
+                        binding.btnCreate.isEnabled = viewModel.filterName.value.isNotEmpty()
                         binding.toolbar.setNavigationOnClickListener { binding.viewPager.setCurrentItem(0, true) }
                     }
                 }
@@ -90,39 +93,15 @@ class CreateFilterContainerFragment : BaseFragment() {
         launch {
             viewModel.setup(null)
             binding.viewPager.adapter = adapter
-            viewModel.lockedToFirstPage.observe(viewLifecycleOwner) {
-                adapter.lockedToFirstPage = it
-            }
-            viewModel.playlist.observe(viewLifecycleOwner) {
-                binding.btnCreate.isEnabled = !adapter.lockedToFirstPage
-            }
-            viewModel.filterName.observe(viewLifecycleOwner) {
-                if (binding.viewPager.currentItem == 1) {
-                    binding.btnCreate.isEnabled = it.isNotEmpty()
-                }
-            }
-            viewModel.colorIndex.observe(viewLifecycleOwner) {
-                val colorResId = Playlist.themeColors.getOrNull(it) ?: UR.attr.filter_01
-                val tintColor = view.context.getThemeColor(colorResId)
-                val stateList = ColorStateList(
-                    arrayOf(
-                        intArrayOf(android.R.attr.state_enabled),
-                        intArrayOf()
-                    ),
-                    intArrayOf(
-                        tintColor,
-                        ColorUtils.colorWithAlpha(tintColor, 76)
-                    )
-                )
-                binding.btnCreate.backgroundTintList = stateList
-
-                updateToolbarColors()
-            }
+            observeColorIndex()
+            observeFilterName()
+            observeLockedFirstPage(adapter)
+            observePlaylist(adapter)
         }
     }
 
     private fun updateToolbarColors() {
-        val colorResId = Playlist.themeColors.getOrNull(viewModel.colorIndex.value ?: 0) ?: UR.attr.filter_01
+        val colorResId = Playlist.themeColors.getOrNull(viewModel.colorIndex.value) ?: UR.attr.filter_01
         val tintColor = view?.context?.getThemeColor(colorResId) ?: return
         val iconRes = if (binding.viewPager.currentItem == 0) IR.drawable.ic_close else IR.drawable.ic_arrow_back
         val backIcon = context?.getTintedDrawable(iconRes, ThemeColor.filterIcon01(theme.activeTheme, tintColor))
@@ -135,22 +114,71 @@ class CreateFilterContainerFragment : BaseFragment() {
         theme.updateWindowStatusBar(window = requireActivity().window, statusBarColor = StatusBarColor.Custom(filterUi01, theme.activeTheme.defaultLightIcons), context = requireContext())
     }
 
+    private fun observeLockedFirstPage(adapter: CreatePagerAdapter) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.lockedToFirstPage.collect {
+                    adapter.lockedToFirstPage = it
+                }
+            }
+        }
+    }
+
+    private fun observePlaylist(adapter: CreatePagerAdapter) {
+        viewModel.playlist?.observe(viewLifecycleOwner) {
+            binding.btnCreate.isEnabled = !adapter.lockedToFirstPage
+        }
+    }
+
+    private fun observeFilterName() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.filterName.collect {
+                    if (binding.viewPager.currentItem == 1) {
+                        binding.btnCreate.isEnabled = it.isNotEmpty()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeColorIndex() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.colorIndex.collect {
+                    val colorResId = Playlist.themeColors.getOrNull(it) ?: UR.attr.filter_01
+                    val tintColor = requireContext().getThemeColor(colorResId)
+                    val stateList = ColorStateList(
+                        arrayOf(
+                            intArrayOf(android.R.attr.state_enabled),
+                            intArrayOf(),
+                        ),
+                        intArrayOf(
+                            tintColor,
+                            ColorUtils.colorWithAlpha(tintColor, 76),
+                        ),
+                    )
+                    binding.btnCreate.backgroundTintList = stateList
+
+                    updateToolbarColors()
+                }
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    @Suppress("deprecation")
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        // hack: enable scrolling upon keyboard
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        setupKeyboardModeResize()
     }
 
     override fun onDetach() {
         super.onDetach()
-        // hack: enable scrolling upon keyboard
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        setupKeyboardModePan()
 
         if (!playlistSaved) {
             viewModel.clearNewFilter()

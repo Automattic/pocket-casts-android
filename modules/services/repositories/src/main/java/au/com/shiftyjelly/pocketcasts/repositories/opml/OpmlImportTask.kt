@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.opml
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
@@ -17,15 +19,22 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
-import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
+import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.io.InputStream
+import java.io.StringReader
+import java.net.URL
+import java.util.Scanner
+import java.util.regex.Pattern
+import javax.xml.parsers.SAXParserFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -33,16 +42,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
+import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
-import java.io.InputStream
-import java.io.StringReader
-import java.net.URL
-import java.util.Scanner
-import java.util.regex.Pattern
-import javax.xml.parsers.SAXParserFactory
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -51,9 +56,9 @@ class OpmlImportTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted parameters: WorkerParameters,
     var podcastManager: PodcastManager,
-    var refreshServerManager: RefreshServerManager,
+    var refreshServiceManager: RefreshServiceManager,
     var notificationHelper: NotificationHelper,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : CoroutineWorker(context, parameters) {
 
     companion object {
@@ -71,7 +76,6 @@ class OpmlImportTask @AssistedInject constructor(
         }
 
         private fun run(data: Data, context: Context) {
-            AnalyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -99,7 +103,7 @@ class OpmlImportTask @AssistedInject constructor(
                         uri: String?,
                         localName: String?,
                         qName: String?,
-                        attributes: Attributes?
+                        attributes: Attributes?,
                     ) {
                         if (localName.equals("outline", ignoreCase = true)) {
                             val url = attributes?.getValue("xmlUrl")
@@ -108,7 +112,7 @@ class OpmlImportTask @AssistedInject constructor(
                             }
                         }
                     }
-                }
+                },
             )
             return urls
         }
@@ -139,7 +143,7 @@ class OpmlImportTask @AssistedInject constructor(
                     override fun characters(charArray: CharArray, start: Int, length: Int) {
                         decodedUrl.append(String(charArray, start, length))
                     }
-                }
+                },
             )
             return decodedUrl.toString()
         }
@@ -149,6 +153,7 @@ class OpmlImportTask @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
+            analyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
             val url = inputData.getString(INPUT_URL)
             if (!url.isNullOrBlank()) {
                 val numberProcessed = processUrl(URL(url))
@@ -163,8 +168,16 @@ class OpmlImportTask @AssistedInject constructor(
             }
             val numberProcessed = processFile(uri)
             trackProcessed(numberProcessed)
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_succeeded_message), Toast.LENGTH_LONG).show()
+            }
             return Result.success()
         } catch (t: Throwable) {
+            if (t is SAXParseException) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(applicationContext, applicationContext.getString(LR.string.settings_import_opml_import_failed_message), Toast.LENGTH_LONG).show()
+                }
+            }
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
             trackFailure(reason = "unknown")
             return Result.failure()
@@ -174,14 +187,14 @@ class OpmlImportTask @AssistedInject constructor(
     private fun trackProcessed(numberParsed: Int) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FINISHED,
-            mapOf("number" to numberParsed)
+            mapOf("number" to numberParsed),
         )
     }
 
-    fun trackFailure(reason: String) {
+    private fun trackFailure(reason: String) {
         analyticsTracker.track(
             AnalyticsEvent.OPML_IMPORT_FAILED,
-            mapOf("reason" to reason)
+            mapOf("reason" to reason),
         )
     }
 
@@ -214,7 +227,8 @@ class OpmlImportTask @AssistedInject constructor(
         val resolver = applicationContext.contentResolver
         try {
             resolver.openInputStream(uri)?.use { inputStream ->
-                urls = readOpmlUrlsSax(inputStream)
+                val modifiedInputStream = PreProcessOpmlFile().replaceInvalidXmlCharacter(inputStream)
+                urls = readOpmlUrlsSax(modifiedInputStream)
             }
         } catch (e: SAXException) {
             resolver.openInputStream(uri)?.use { inputStream ->
@@ -270,7 +284,15 @@ class OpmlImportTask @AssistedInject constructor(
      * Keep the job in the foreground with a notification
      */
     private fun createForegroundInfo(progress: Int, total: Int): ForegroundInfo {
-        return ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                Settings.NotificationId.OPML.value,
+                buildNotification(progress, total),
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+            )
+        } else {
+            ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
+        }
     }
 
     private fun updateNotification(initialDatabaseCount: Int, podcastCount: Int) {
@@ -299,12 +321,12 @@ class OpmlImportTask @AssistedInject constructor(
      * - failed: the number of podcast creates that have failed
      */
     suspend fun callServer(urls: List<String>): ImportOpmlResponse? {
-        val response = refreshServerManager.importOpml(urls)
+        val response = refreshServiceManager.importOpml(urls)
         return response.body()?.result
     }
 
     suspend fun pollServer(pollUuids: List<String>): ImportOpmlResponse? {
-        val response = refreshServerManager.pollImportOpml(pollUuids)
+        val response = refreshServiceManager.pollImportOpml(pollUuids)
         return response.body()?.result
     }
 }

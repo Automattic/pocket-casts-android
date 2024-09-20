@@ -9,5 +9,5 @@ data class PodcastSearch(
     var searchEpisodesResults: MutableList<EpisodeItem> = mutableListOf(),
     var searchTerm: String = "",
     var isUrl: Boolean = false,
-    val error: Throwable? = null
+    val error: Throwable? = null,
 ) : Serializable

@@ -4,8 +4,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
-import org.junit.Test
 import java.util.Date
+import org.junit.Test
 
 class SignInStateTest {
 
@@ -21,7 +21,7 @@ class SignInStateTest {
             subscriptionList = emptyList(),
             type = SubscriptionType.PLUS,
             tier = SubscriptionTier.PLUS,
-            index = 0
+            index = 0,
         )
         // test an Android paying subscriber
         val stateAndroid = SignInState.SignedIn(email = email, subscriptionStatus = statusAndroidPaidSubscription)

@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -19,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -47,10 +52,8 @@ class PodcastGridFragment : PodcastGridListFragment() {
                 when (state) {
                     is PodcastListViewState.Loading -> {}
                     is PodcastListViewState.ListLoaded -> {
-
                         feed = state.feed
                         feed?.let {
-
                             if (displayStyle.toString() != DisplayStyle.CollectionList().toString()) {
                                 binding.headerLayout.visibility = View.GONE
                             } else {
@@ -66,7 +69,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
                                     bodyTextView = binding.lblBody,
                                     linkView = binding.linkLayout,
                                     linkTextView = binding.lblLinkTitle,
-                                    toolbar = binding.toolbar
+                                    toolbar = binding.toolbar,
                                 )
                             }
                         }
@@ -77,8 +80,16 @@ class PodcastGridFragment : PodcastGridListFragment() {
                         Timber.e("Could not load feed ${state.error.message}")
                     }
                 }
-            }
+            },
         )
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    binding?.mainNestedScrollView?.updatePadding(bottom = it)
+                }
+            }
+        }
 
         return binding?.root
     }
@@ -100,7 +111,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
             toolbar = toolbar,
             title = title,
             menu = R.menu.discover_share,
-            navigationIcon = BackArrow
+            navigationIcon = BackArrow,
         )
         toolbar.setOnMenuItemClickListener(this)
 

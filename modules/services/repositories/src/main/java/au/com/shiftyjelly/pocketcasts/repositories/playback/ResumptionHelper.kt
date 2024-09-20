@@ -16,7 +16,9 @@ class ResumptionHelper(val settings: Settings) {
         if (!settings.intelligentPlaybackResumption.value ||
             settings.getLastPausedUUID() != episode.uuid ||
             (settings.getLastPausedAt() ?: 0) != episode.playedUpToMs
-        ) return episode.playedUpToMs
+        ) {
+            return episode.playedUpToMs
+        }
 
         val lastPauseTime = this.lastPauseTime ?: return episode.playedUpToMs
 

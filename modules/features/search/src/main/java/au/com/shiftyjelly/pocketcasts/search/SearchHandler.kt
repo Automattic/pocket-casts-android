@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.search
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -13,9 +13,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -23,18 +23,18 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 class SearchHandler @Inject constructor(
-    val serverManager: ServerManager,
+    val serviceManager: ServiceManager,
     val podcastManager: PodcastManager,
     val userManager: UserManager,
     val settings: Settings,
-    private val cacheServerManager: PodcastCacheServerManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
-    folderManager: FolderManager
+    private val cacheServiceManager: PodcastCacheServiceManager,
+    private val analyticsTracker: AnalyticsTracker,
+    folderManager: FolderManager,
 ) {
     private var source: SourceView = SourceView.UNKNOWN
     private val searchQuery = BehaviorRelay.create<Query>().apply {
@@ -122,7 +122,7 @@ class SearchHandler @Inject constructor(
                 loadingObservable.accept(true)
 
                 var globalSearch = GlobalServerSearch(searchTerm = it)
-                val podcastServerSearch = serverManager
+                val podcastServerSearch = serviceManager
                     .searchForPodcastsRx(it)
                     .map { podcastSearch ->
                         globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
@@ -131,7 +131,7 @@ class SearchHandler @Inject constructor(
                     .toObservable()
 
                 if (!it.startsWith("http")) {
-                    val episodesServerSearch = cacheServerManager
+                    val episodesServerSearch = cacheServiceManager
                         .searchEpisodes(it)
                         .map { episodeSearch ->
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
@@ -179,7 +179,7 @@ class SearchHandler @Inject constructor(
                     podcasts = searchPodcastsResult,
                     episodes = searchEpisodesResult,
                     loading = loading,
-                    error = serverSearchResults.error
+                    error = serverSearchResults.error,
                 )
             } else {
                 SearchState.NoResults(searchTerm = searchTerm.string)
@@ -194,7 +194,7 @@ class SearchHandler @Inject constructor(
                 podcasts = emptyList(),
                 episodes = emptyList(),
                 loading = false,
-                error = exception
+                error = exception,
             )
         }
         .observeOn(AndroidSchedulers.mainThread())

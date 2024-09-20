@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="com.instagram.android" />
+        <package android:name="com.whatsapp" />
+        <package android:name="org.telegram.messenger" />
+        <package android:name="com.twitter.android" />
+        <package android:name="com.tumblr" />
+    </queries>
+</manifest>

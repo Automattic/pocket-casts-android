@@ -10,13 +10,13 @@ import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class TracksAnalyticsTracker @Inject constructor(
     @ApplicationContext private val appContext: Context,
@@ -66,7 +66,7 @@ class TracksAnalyticsTracker @Inject constructor(
         val paidSubscription = settings.cachedSubscriptionStatus.value as? SubscriptionStatus.Paid
         val isLoggedIn = accountStatusInfo.isLoggedIn()
         val hasSubscription = paidSubscription != null
-        val hasLifetime = paidSubscription?.isLifetimePlus
+        val isPocketCastsChampion = paidSubscription?.isPocketCastsChampion
             ?: false
         val subscriptionType = paidSubscription?.type?.toString()
             ?: INVALID_OR_NULL_VALUE
@@ -81,7 +81,7 @@ class TracksAnalyticsTracker @Inject constructor(
             PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),
             PredefinedEventProperty.USER_IS_LOGGED_IN to isLoggedIn,
             PredefinedEventProperty.PLUS_HAS_SUBSCRIPTION to hasSubscription,
-            PredefinedEventProperty.PLUS_HAS_LIFETIME to hasLifetime,
+            PredefinedEventProperty.PLUS_HAS_LIFETIME to isPocketCastsChampion,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE to subscriptionType,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_TIER to subscriptionTier,
             PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,

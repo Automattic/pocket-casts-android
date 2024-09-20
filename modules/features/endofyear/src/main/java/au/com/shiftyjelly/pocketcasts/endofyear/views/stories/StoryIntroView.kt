@@ -27,11 +27,9 @@ fun StoryIntroView(
     modifier: Modifier = Modifier,
 ) {
     Box {
-
         ConstraintLayout(
-            modifier = modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize(),
         ) {
-
             val (yearFirst2, year0, yearSecond2, year3, text, bottomLogo) = createRefs()
 
             // First 2 in 2023
@@ -46,7 +44,7 @@ fun StoryIntroView(
                     .constrainAs(yearFirst2) {
                         bottom.linkTo(text.top)
                         end.linkTo(text.start)
-                    }
+                    },
             )
 
             // 3 in 2023
@@ -61,7 +59,7 @@ fun StoryIntroView(
                     .constrainAs(year3) {
                         top.linkTo(text.bottom)
                         start.linkTo(text.end)
-                    }
+                    },
             )
 
             TitleView(
@@ -71,7 +69,7 @@ fun StoryIntroView(
                     bottom.linkTo(parent.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }
+                },
             )
 
             // 0 in 2023
@@ -86,7 +84,7 @@ fun StoryIntroView(
                     .constrainAs(year0) {
                         bottom.linkTo(text.top)
                         start.linkTo(text.end)
-                    }
+                    },
             )
 
             // Second 2 in 2023
@@ -101,7 +99,7 @@ fun StoryIntroView(
                     .constrainAs(yearSecond2) {
                         top.linkTo(text.bottom)
                         end.linkTo(text.start)
-                    }
+                    },
             )
 
             StoryAppLogo(
@@ -109,7 +107,7 @@ fun StoryIntroView(
                     bottom.linkTo(parent.bottom, margin = 30.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }
+                },
             )
         }
     }
@@ -131,7 +129,7 @@ private fun TitleView(
                 modifier = parallaxModifier,
                 alignment = biasAlignment,
             )
-        }
+        },
     )
 }
 
@@ -146,7 +144,7 @@ private fun NumberImage(
         modifier = modifier,
     ) { parallaxModifier, biasAlignment ->
         Box(
-            modifier = parallaxModifier
+            modifier = parallaxModifier,
         ) {
             Image(
                 painter = painterResource(imageRes),

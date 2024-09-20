@@ -4,11 +4,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.PodcastFolderHelper
-import org.junit.Assert.assertEquals
-import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class PodcastFolderHelperTest {
 
@@ -22,7 +22,7 @@ class PodcastFolderHelperTest {
         sortPosition = 0,
         podcastsSortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
         deleted = false,
-        syncModified = 0
+        syncModified = 0,
     )
 
     private val folderTech = Folder(
@@ -33,7 +33,7 @@ class PodcastFolderHelperTest {
         sortPosition = 0,
         podcastsSortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
         deleted = false,
-        syncModified = 0
+        syncModified = 0,
     )
 
     private val list = listOf(
@@ -43,9 +43,9 @@ class PodcastFolderHelperTest {
                 title = "The Daily",
                 author = "The New York Times",
                 addedDate = formatter.parse("2022-01-01"),
-                latestEpisodeDate = formatter.parse("2022-04-01")
+                latestEpisodeDate = formatter.parse("2022-04-01"),
             ),
-            folder = folderNews
+            folder = folderNews,
         ),
         PodcastFolder(
             podcast = Podcast(
@@ -53,8 +53,8 @@ class PodcastFolderHelperTest {
                 title = "Stuff You Should Know",
                 author = "iHeartPodcasts",
                 addedDate = formatter.parse("2022-02-02"),
-                latestEpisodeDate = formatter.parse("2022-03-01")
-            )
+                latestEpisodeDate = formatter.parse("2022-03-01"),
+            ),
         ),
         PodcastFolder(
             podcast = Podcast(
@@ -62,9 +62,9 @@ class PodcastFolderHelperTest {
                 title = "Global News Podcast",
                 author = "BBC World Service",
                 addedDate = formatter.parse("2022-01-02"),
-                latestEpisodeDate = formatter.parse("2022-02-01")
+                latestEpisodeDate = formatter.parse("2022-02-01"),
             ),
-            folder = folderTech
+            folder = folderTech,
         ),
         PodcastFolder(
             podcast = Podcast(
@@ -72,9 +72,9 @@ class PodcastFolderHelperTest {
                 title = "The World Today",
                 author = "ABC Radio",
                 addedDate = formatter.parse("2022-02-01"),
-                latestEpisodeDate = formatter.parse("2022-01-01")
-            )
-        )
+                latestEpisodeDate = formatter.parse("2022-01-01"),
+            ),
+        ),
     )
 
     @Test
@@ -103,7 +103,7 @@ class PodcastFolderHelperTest {
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.NAME_A_TO_Z,
             podcastsSortedByReleaseDate = list,
-            currentFolderUuid = null
+            currentFolderUuid = null,
         ).let {
             assertEquals("Stuff You Should Know", it[0].podcast.title)
             assertEquals("The World Today", it[1].podcast.title)
@@ -115,7 +115,7 @@ class PodcastFolderHelperTest {
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST,
             podcastsSortedByReleaseDate = list,
-            currentFolderUuid = null
+            currentFolderUuid = null,
         ).let {
             assertEquals("The World Today", it[0].podcast.title)
             assertEquals("Stuff You Should Know", it[1].podcast.title)
@@ -127,7 +127,7 @@ class PodcastFolderHelperTest {
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
             podcastsSortedByReleaseDate = list,
-            currentFolderUuid = null
+            currentFolderUuid = null,
         ).let {
             assertEquals("Stuff You Should Know", it[0].podcast.title)
             assertEquals("The World Today", it[1].podcast.title)
@@ -139,7 +139,7 @@ class PodcastFolderHelperTest {
         PodcastFolderHelper.sortForSelectingPodcasts(
             sortType = PodcastsSortType.NAME_A_TO_Z,
             podcastsSortedByReleaseDate = list,
-            currentFolderUuid = folderNews.uuid
+            currentFolderUuid = folderNews.uuid,
         ).let {
             assertEquals("The Daily", it[0].podcast.title)
             assertEquals("Stuff You Should Know", it[1].podcast.title)

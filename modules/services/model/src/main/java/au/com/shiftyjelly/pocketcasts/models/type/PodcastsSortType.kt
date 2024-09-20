@@ -28,7 +28,7 @@ enum class PodcastsSortType(
         labelId = R.string.podcasts_sort_by_date_added,
         podcastComparator = compareBy { it.addedDate },
         folderComparator = compareBy { it.addedDate },
-        analyticsValue = "date_added"
+        analyticsValue = "date_added",
     ),
     NAME_A_TO_Z(
         clientId = 2,
@@ -36,7 +36,7 @@ enum class PodcastsSortType(
         labelId = R.string.name,
         podcastComparator = compareBy { cleanStringForSortInternal(it.title) },
         folderComparator = compareBy { cleanStringForSortInternal(it.title) },
-        analyticsValue = "name"
+        analyticsValue = "name",
     ),
     EPISODE_DATE_NEWEST_TO_OLDEST(
         clientId = 5,
@@ -45,7 +45,7 @@ enum class PodcastsSortType(
         // use a query to get the podcasts ordered by episode release date
         podcastComparator = Comparator { _, _ -> 0 },
         folderComparator = Comparator { _, _ -> 0 },
-        analyticsValue = "episode_release_date"
+        analyticsValue = "episode_release_date",
     ),
     DRAG_DROP(
         clientId = 6,
@@ -53,8 +53,9 @@ enum class PodcastsSortType(
         labelId = R.string.podcasts_sort_by_drag_drop,
         podcastComparator = compareBy { it.sortPosition },
         folderComparator = compareBy { it.sortPosition },
-        analyticsValue = "drag_and_drop"
-    );
+        analyticsValue = "drag_and_drop",
+    ),
+    ;
 
     companion object {
         val default = DATE_ADDED_OLDEST_TO_NEWEST

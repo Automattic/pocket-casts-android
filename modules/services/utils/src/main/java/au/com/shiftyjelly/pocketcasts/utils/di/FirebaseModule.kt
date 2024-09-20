@@ -7,8 +7,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import timber.log.Timber
 import javax.inject.Singleton
+import timber.log.Timber
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -88,7 +88,7 @@ private fun ManageDownloadsView(
         modifier = modifier
             .padding(top = 8.dp)
             .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
         IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
@@ -118,8 +118,8 @@ private fun DiskSpaceSizeRow(
         toggle = SettingRowToggle.Checkbox(checked = diskSpaceSizeView.isChecked),
         modifier = modifier.toggleable(
             value = diskSpaceSizeView.isChecked,
-            role = Role.Checkbox
-        ) { onDiskSpaceCheckedChanged(it, diskSpaceSizeView) }
+            role = Role.Checkbox,
+        ) { onDiskSpaceCheckedChanged(it, diskSpaceSizeView) },
     )
 }
 
@@ -134,7 +134,7 @@ private fun IncludeStarredRow(
         toggle = SettingRowToggle.Switch(checked = checkedState),
         modifier = modifier.toggleable(
             value = checkedState,
-            role = Role.Switch
+            role = Role.Switch,
         ) { onStarredSwitchClicked(it) },
     )
 }
@@ -154,7 +154,7 @@ private fun TotalSelectedDownloadSizeRow(
 
 private fun getFormattedSubtitle(
     diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView,
-    context: Context
+    context: Context,
 ): String {
     val byteString = Util.formattedBytes(bytes = diskSpaceView.episodesBytesSize, context = context)
     return if (diskSpaceView.episodes.isEmpty()) {
@@ -180,7 +180,7 @@ private fun ManualCleanupPageSmallPreview() {
 
 @Composable
 private fun ManualCleanupPagePreview(
-    themeType: Theme.ThemeType = Theme.ThemeType.LIGHT
+    themeType: Theme.ThemeType = Theme.ThemeType.LIGHT,
 ) {
     AppThemeWithBackground(themeType) {
         ManageDownloadsView(

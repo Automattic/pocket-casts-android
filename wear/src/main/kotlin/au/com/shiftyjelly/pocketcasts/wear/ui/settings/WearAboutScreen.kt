@@ -24,7 +24,6 @@ fun WearAboutScreen(
     onTermsOfServiceClick: () -> Unit,
     onPrivacyClick: () -> Unit,
 ) {
-
     ScalingLazyColumn(
         columnState = columnState,
     ) {
@@ -47,14 +46,14 @@ fun WearAboutScreen(
         item {
             WatchListChip(
                 title = stringResource(LR.string.settings_about_terms_of_serivce),
-                onClick = onTermsOfServiceClick
+                onClick = onTermsOfServiceClick,
             )
         }
 
         item {
             WatchListChip(
                 title = stringResource(LR.string.settings_about_privacy_policy),
-                onClick = onPrivacyClick
+                onClick = onPrivacyClick,
             )
         }
     }

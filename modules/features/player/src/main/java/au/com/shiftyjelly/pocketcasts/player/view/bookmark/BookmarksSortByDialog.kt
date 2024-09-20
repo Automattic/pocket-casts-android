@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodcast
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -26,7 +27,7 @@ class BookmarksSortByDialog(
             dialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.key == sortOrder.key,
-                click = { changeSortOrder(order) }
+                click = { changeSortOrder(order) },
             )
         }
         dialog.show(fragmentManager, "bookmarks_sort_dialog")
@@ -35,11 +36,13 @@ class BookmarksSortByDialog(
     private fun SourceView.mapToBookmarksSortType(): BookmarksSortType = when (this) {
         SourceView.PLAYER -> settings.playerBookmarksSortType.flow.value
         SourceView.PODCAST_SCREEN -> settings.podcastBookmarksSortType.flow.value
+        SourceView.PROFILE -> settings.profileBookmarksSortType.flow.value
         else -> settings.episodeBookmarksSortType.flow.value
     }
 
     private fun getValuesToShow(): List<BookmarksSortType> = when (sourceView) {
-        SourceView.PODCAST_SCREEN -> BookmarksSortTypeForPodcast.values().toList()
-        else -> BookmarksSortTypeDefault.values().toList()
+        SourceView.PODCAST_SCREEN -> BookmarksSortTypeForPodcast.entries
+        SourceView.PROFILE -> BookmarksSortTypeForProfile.entries
+        else -> BookmarksSortTypeDefault.entries
     }
 }

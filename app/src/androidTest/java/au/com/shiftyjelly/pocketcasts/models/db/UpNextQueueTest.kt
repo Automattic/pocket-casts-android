@@ -3,16 +3,21 @@ package au.com.shiftyjelly.pocketcasts.models.db
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.preferences.model.LastPlayedList
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import com.squareup.moshi.Moshi
+import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -20,8 +25,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import java.util.Date
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class UpNextQueueTest {
@@ -32,12 +35,15 @@ class UpNextQueueTest {
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
         downloadManager = mock {}
         val episodeManager = mock<EpisodeManager> {}
         val settings = mock<Settings> {
             on { autoDownloadUpNext } doReturn UserSetting.Mock(true, mock())
-            on { lastLoadedFromPodcastOrFilterUuid } doReturn UserSetting.Mock(LastPlayedList.None, mock())
+            on { lastAutoPlaySource } doReturn UserSetting.Mock(AutoPlaySource.None, mock())
+            on { trackingAutoPlaySource } doReturn UserSetting.Mock(AutoPlaySource.None, mock())
         }
         val syncManager = mock<SyncManager> {}
 

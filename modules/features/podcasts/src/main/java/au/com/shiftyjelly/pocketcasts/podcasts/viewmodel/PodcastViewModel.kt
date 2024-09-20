@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -51,6 +51,9 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,9 +62,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -75,7 +75,7 @@ class PodcastViewModel
     private val castManager: CastManager,
     private val downloadManager: DownloadManager,
     private val userManager: UserManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     private val bookmarkManager: BookmarkManager,
     private val episodeSearchHandler: EpisodeSearchHandler,
@@ -148,7 +148,7 @@ class PodcastViewModel
                 Flowable.just(it).concatWith(podcastManager.observePodcastByUuid(it.uuid).skip(1))
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { newPodcast ->
+            .doOnNext { newPodcast: Podcast ->
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast $uuid changes")
                 tintColor.value = theme.getPodcastTintColor(newPodcast)
                 observableHeaderExpanded.value = !newPodcast.isSubscribed
@@ -171,7 +171,7 @@ class PodcastViewModel
             .loadEpisodesAndBookmarks(episodeManager, bookmarkManager, settings)
             .doOnNext {
                 if (it is UiState.Loaded) {
-                    val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
+                    val groups = it.podcast.grouping.formGroups(it.episodes, it.podcast, resources)
                     groupedEpisodes.postValue(groups)
                 } else {
                     groupedEpisodes.postValue(emptyList())
@@ -189,7 +189,7 @@ class PodcastViewModel
                         else -> it
                     }
                 },
-                onError = { Timber.e(it) }
+                onError = { Timber.e(it) },
             )
             .addTo(disposables)
     }
@@ -206,6 +206,7 @@ class PodcastViewModel
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+        podcastAndEpisodeDetailsCoordinator.onEpisodeDetailsDismissed = null
     }
 
     fun updatePodcast(existingPodcast: Podcast) {
@@ -220,7 +221,7 @@ class PodcastViewModel
             podcastManager.subscribeToPodcast(podcastUuid = it.uuid, sync = true)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SUBSCRIBED,
-                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN)
+                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN),
             )
         }
     }
@@ -230,7 +231,7 @@ class PodcastViewModel
             podcastManager.unsubscribeAsync(podcastUuid = it.uuid, playbackManager = playbackManager)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN)
+                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN),
             )
         }
     }
@@ -289,8 +290,8 @@ class PodcastViewModel
                             EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> "longest_to_shortest"
                             EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> "title_a_to_z"
                             EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> "title_z_to_a"
-                        }
-                    )
+                        },
+                    ),
                 )
             }
         }
@@ -309,8 +310,8 @@ class PodcastViewModel
                             PodcastGrouping.Season -> "season"
                             PodcastGrouping.Unplayed -> "unplayed"
                             PodcastGrouping.Starred -> "starred"
-                        }
-                    )
+                        },
+                    ),
                 )
             }
         }
@@ -374,7 +375,7 @@ class PodcastViewModel
         val trimmedList = episodes.subList(0, min(Settings.MAX_DOWNLOAD, episodes.count()))
         launch {
             trimmedList.forEach {
-                downloadManager.addEpisodeToQueue(it, "podcast download all", false)
+                downloadManager.addEpisodeToQueue(it, "podcast download all", fireEvent = false, source = SourceView.PODCAST_SCREEN)
             }
         }
     }
@@ -393,7 +394,7 @@ class PodcastViewModel
 
     fun changeSortOrder(order: BookmarksSortType) {
         if (order !is BookmarksSortTypeForPodcast) return
-        settings.podcastBookmarksSortType.set(order)
+        settings.podcastBookmarksSortType.set(order, updateModifiedAt = true)
         analyticsTracker.track(
             AnalyticsEvent.BOOKMARKS_SORT_BY_CHANGED,
             mapOf(
@@ -405,7 +406,7 @@ class PodcastViewModel
 
     fun play(bookmark: Bookmark) {
         launch {
-            val bookmarkEpisode = (uiState.value as? UiState.Loaded)?.episodes?.firstOrNull { it.uuid == bookmark.episodeUuid }
+            val bookmarkEpisode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid)
             bookmarkEpisode?.let {
                 val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
@@ -414,6 +415,14 @@ class PodcastViewModel
                 }
             }
             playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)
+        }
+    }
+
+    suspend fun getSharedBookmark(): Triple<Podcast, PodcastEpisode, Bookmark>? {
+        return multiSelectBookmarksHelper.selectedListLive.value?.firstOrNull()?.let { bookmark ->
+            val podcast = podcastManager.findPodcastByUuidSuspend(bookmark.podcastUuid) ?: return null
+            val episode = episodeManager.findEpisodeByUuid(bookmark.episodeUuid) as? PodcastEpisode ?: return null
+            Triple(podcast, episode, bookmark)
         }
     }
 
@@ -431,7 +440,7 @@ class PodcastViewModel
                     episodeUuid = episodeUuid,
                     timeSecs = bookmark.timeSecs,
                     backgroundColor = backgroundColor,
-                    tintColor = tintColor
+                    tintColor = tintColor,
                 )
                 onSuccess(arguments)
             }
@@ -463,7 +472,7 @@ class PodcastViewModel
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     multiSelectBookmarksHelper.selectAllInList(
-                        uiState.bookmarks.subList(0, startIndex + 1)
+                        uiState.bookmarks.subList(0, startIndex + 1),
                     )
                 }
             }
@@ -487,7 +496,7 @@ class PodcastViewModel
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     multiSelectBookmarksHelper.selectAllInList(
-                        uiState.bookmarks.subList(startIndex, uiState.bookmarks.size)
+                        uiState.bookmarks.subList(startIndex, uiState.bookmarks.size),
                     )
                 }
             }
@@ -520,7 +529,7 @@ class PodcastViewModel
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     multiSelectBookmarksHelper.deselectAllInList(
-                        uiState.bookmarks.subList(startIndex, uiState.bookmarks.size)
+                        uiState.bookmarks.subList(startIndex, uiState.bookmarks.size),
                     )
                 }
             }
@@ -545,7 +554,7 @@ class PodcastViewModel
                 val startIndex = uiState.bookmarks.indexOf(multiSelectable)
                 if (startIndex > -1) {
                     multiSelectBookmarksHelper.deselectAllInList(
-                        uiState.bookmarks.subList(0, startIndex + 1)
+                        uiState.bookmarks.subList(0, startIndex + 1),
                     )
                 }
             }
@@ -556,7 +565,7 @@ class PodcastViewModel
         episodeAnalytics.trackBulkEvent(
             event,
             source = SourceView.PODCAST_SCREEN,
-            count = count
+            count = count,
         )
     }
 
@@ -569,7 +578,7 @@ class PodcastViewModel
     }
 
     sealed class UiState {
-        data class Loaded(
+        data class Loaded constructor(
             val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val bookmarks: List<Bookmark>,
@@ -624,12 +633,12 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
     return this.switchMap { (podcast, showArchived, episodeSearchResults, bookmarkSearchResults) ->
         LogBuffer.i(
             LogBuffer.TAG_BACKGROUND_TASKS,
-            "Observing podcast ${podcast.uuid} episode changes"
+            "Observing podcast ${podcast.uuid} episode changes",
         )
         Flowable.combineLatest(
             episodeManager.observeEpisodesByPodcastOrderedRx(podcast)
                 .map {
-                    val sortFunction = podcast.podcastGrouping.sortFunction
+                    val sortFunction = podcast.grouping.sortFunction
                     if (sortFunction != null) {
                         it.sortedByDescending(sortFunction)
                     } else {
@@ -646,14 +655,14 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 .withSearchResult(
                     { bookmarkSearchResults.searchUuids?.contains(it.uuid) ?: false },
                     searchResults = bookmarkSearchResults,
-                )
+                ),
         ) { (searchList, episodeList), (bookmarks, _) ->
             val episodeCount = episodeList.size
             val archivedCount = episodeList.count { it.isArchived }
             val showArchivedWithSearch = episodeSearchResults.searchUuids != null || showArchived
             val filteredList =
                 if (showArchivedWithSearch) searchList else searchList.filter { !it.isArchived }
-            val episodeLimit = podcast.autoArchiveEpisodeLimit
+            val episodeLimit = podcast.autoArchiveEpisodeLimit?.value
             val episodeLimitIndex: Int?
             // if the episode limit is on, the following texting is shown the episode list 'Limited to x most recent episodes'
             if (episodeLimit != null && filteredList.isNotEmpty() && podcast.overrideGlobalArchive) {
@@ -666,7 +675,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                     if (episodeList.size - episodeLimit >= 0) {
                         mutableEpisodeList.add(
                             episodeList.size - episodeLimit,
-                            EpisodeLimitPlaceholder()
+                            EpisodeLimitPlaceholder(),
                         )
                     }
                 }
@@ -686,7 +695,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
                 archivedCount = archivedCount,
                 searchTerm = episodeSearchResults.searchTerm,
                 searchBookmarkTerm = bookmarkSearchResults.searchTerm,
-                episodeLimit = podcast.autoArchiveEpisodeLimit,
+                episodeLimit = podcast.autoArchiveEpisodeLimit?.value,
                 episodeLimitIndex = episodeLimitIndex,
             )
             state
@@ -699,7 +708,7 @@ private fun Flowable<CombinedEpisodeAndBookmarkData>.loadEpisodesAndBookmarks(
 
 private fun <T> Flowable<List<T>>.withSearchResult(
     filterCondition: (T) -> Boolean,
-    searchResults: SearchHandler.SearchResult
+    searchResults: SearchHandler.SearchResult,
 ) =
     this.flatMap { list ->
         if (searchResults.searchUuids == null) {
@@ -714,6 +723,6 @@ private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: 
         Single.defer {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Podcast $uuid not found in database")
             podcastManager.findOrDownloadPodcastRx(uuid)
-        }
+        },
     )
 }

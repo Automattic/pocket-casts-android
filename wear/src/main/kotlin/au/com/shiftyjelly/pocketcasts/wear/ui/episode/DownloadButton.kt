@@ -31,20 +31,20 @@ fun DownloadButton(
             onClick = onClick,
         ),
     ) {
-
         when (downloadButtonState) {
             is DownloadButtonState.Downloading -> downloadButtonState.progressPercent
             is DownloadButtonState.Queued -> 0f
             is DownloadButtonState.Downloaded,
             is DownloadButtonState.NotDownloaded,
-            DownloadButtonState.Errored -> null
+            DownloadButtonState.Errored,
+            -> null
         }?.let { progressPercent ->
             CircularProgressIndicator(
                 progress = progressPercent,
                 strokeWidth = 2.dp,
                 indicatorColor = tint,
                 trackColor = tint.copy(alpha = 0.5f),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
 
@@ -53,15 +53,16 @@ fun DownloadButton(
                 when (downloadButtonState) {
                     is DownloadButtonState.Downloaded -> R.drawable.ic_downloaded
                     DownloadButtonState.Queued,
-                    is DownloadButtonState.Downloading -> R.drawable.ic_downloading
+                    is DownloadButtonState.Downloading,
+                    -> R.drawable.ic_downloading
 
                     DownloadButtonState.Errored -> R.drawable.ic_retry
                     is DownloadButtonState.NotDownloaded -> R.drawable.ic_download
-                }
+                },
             ),
             tint = tint,
             contentDescription = null,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         )
     }
 }
@@ -82,7 +83,7 @@ private fun DownloadingPreview() {
                     tint = Color.White,
                     onClick = {},
                     downloadButtonState = state,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }

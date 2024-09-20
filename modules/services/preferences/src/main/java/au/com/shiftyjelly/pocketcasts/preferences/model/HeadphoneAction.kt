@@ -3,8 +3,7 @@ package au.com.shiftyjelly.pocketcasts.preferences.model
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,12 +11,35 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-enum class HeadphoneAction(val analyticsValue: String) {
-    ADD_BOOKMARK("add_bookmark"),
-    SKIP_BACK("skip_back"),
-    SKIP_FORWARD("skip_forward"),
-    NEXT_CHAPTER("next_chapter"),
-    PREVIOUS_CHAPTER("previous_chapter"),
+enum class HeadphoneAction(
+    val analyticsValue: String,
+    val serverId: Int,
+) {
+    ADD_BOOKMARK(
+        analyticsValue = "add_bookmark",
+        serverId = 0,
+    ),
+    SKIP_BACK(
+        analyticsValue = "skip_back",
+        serverId = 1,
+    ),
+    SKIP_FORWARD(
+        analyticsValue = "skip_forward",
+        serverId = 2,
+    ),
+    NEXT_CHAPTER(
+        analyticsValue = "next_chapter",
+        serverId = 3,
+    ),
+    PREVIOUS_CHAPTER(
+        analyticsValue = "previous_chapter",
+        serverId = 4,
+    ),
+    ;
+
+    companion object {
+        fun fromServerId(id: Int) = entries.find { it.serverId == id }
+    }
 }
 
 class HeadphoneActionUserSetting(
@@ -25,6 +47,7 @@ class HeadphoneActionUserSetting(
     defaultAction: HeadphoneAction,
     sharedPrefs: SharedPreferences,
     subscriptionStatusFlow: StateFlow<SubscriptionStatus?>,
+    bookmarkFeature: BookmarkFeatureControl,
 ) : UserSetting.PrefFromInt<HeadphoneAction>(
     sharedPrefKey = sharedPrefKey,
     defaultValue = defaultAction,
@@ -32,17 +55,14 @@ class HeadphoneActionUserSetting(
     fromInt = {
         val userTier = (subscriptionStatusFlow.value as? SubscriptionStatus.Paid)?.tier?.toUserTier()
             ?: UserTier.Free
-        val isAddBookmarkEnabled =
-            FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED) &&
-                Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, userTier)
-        val nextAction = HeadphoneAction.values()[it]
-        if (nextAction == HeadphoneAction.ADD_BOOKMARK && !isAddBookmarkEnabled) {
+        val nextAction = HeadphoneAction.entries[it]
+        if (nextAction == HeadphoneAction.ADD_BOOKMARK && !bookmarkFeature.isAvailable(userTier)) {
             defaultAction
         } else {
             nextAction
         }
     },
-    toInt = { it.ordinal }
+    toInt = { it.ordinal },
 ) {
 
     // Even though this coroutine scope never gets cancelled explicitly, it should

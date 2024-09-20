@@ -46,7 +46,7 @@ fun FolderChooserPage(
     podcastUuid: String?,
     onCloseClick: () -> Unit,
     onNewFolderClick: () -> Unit,
-    viewModel: FolderEditViewModel
+    viewModel: FolderEditViewModel,
 ) {
     val state: FolderEditViewModel.State by viewModel.state.collectAsState()
     Surface(modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection())) {
@@ -54,7 +54,7 @@ fun FolderChooserPage(
             BottomSheetAppBar(
                 title = null,
                 navigationButton = NavigationButton.Close,
-                onNavigationClick = onCloseClick
+                onNavigationClick = onCloseClick,
             )
             FolderList(
                 currentFolder = state.folder,
@@ -66,12 +66,12 @@ fun FolderChooserPage(
                     }
                 },
                 onNewFolderClick = onNewFolderClick,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             Card(elevation = 8.dp) {
                 RowButton(
                     text = stringResource(LR.string.done),
-                    onClick = { onCloseClick() }
+                    onClick = { onCloseClick() },
                 )
             }
         }
@@ -85,7 +85,7 @@ private fun FolderList(
     folderUuidToPodcastCount: Map<String?, Int>,
     onFolderClick: (Folder) -> Unit,
     onNewFolderClick: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     LazyColumn(modifier = modifier) {
         item {
@@ -126,26 +126,26 @@ private fun FolderSelectRow(folder: Folder, podcastCount: Int, selected: Boolean
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .height(64.dp)
-            .clickable { onClick() }
+            .clickable { onClick() },
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.width(56.dp)
+            modifier = Modifier.width(56.dp),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_folder),
                 contentDescription = null,
-                tint = Color(folder.getColor(context))
+                tint = Color(folder.getColor(context)),
             )
         }
         Column(modifier = Modifier.weight(1f)) {
             TextH30(
                 text = folder.name,
-                maxLines = 1
+                maxLines = 1,
             )
             TextH70(
                 text = context.resources.getStringPluralPodcasts(podcastCount),
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
         if (selected) {
@@ -153,7 +153,7 @@ private fun FolderSelectRow(folder: Folder, podcastCount: Int, selected: Boolean
                 painter = painterResource(id = IR.drawable.ic_tick),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.primaryIcon01,
-                modifier = Modifier.padding(end = 21.dp)
+                modifier = Modifier.padding(end = 21.dp),
             )
         }
     }
@@ -165,23 +165,23 @@ fun FolderMoveRow(modifier: Modifier = Modifier, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .height(64.dp)
-            .clickable { onClick() }
+            .clickable { onClick() },
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.width(56.dp)
+            modifier = Modifier.width(56.dp),
         ) {
             Icon(
                 painter = painterResource(R.drawable.folder_create),
                 contentDescription = null,
-                tint = MaterialTheme.theme.colors.primaryInteractive01
+                tint = MaterialTheme.theme.colors.primaryInteractive01,
             )
         }
         TextH30(
             text = stringResource(LR.string.new_folder),
             color = MaterialTheme.theme.colors.primaryInteractive01,
             maxLines = 1,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
     }
 }

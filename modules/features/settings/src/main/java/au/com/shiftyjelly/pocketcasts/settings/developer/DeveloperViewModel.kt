@@ -9,11 +9,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetails
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.disposables.CompositeDisposable
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.take
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class DeveloperViewModel
@@ -31,13 +31,11 @@ class DeveloperViewModel
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
+    private val crashLogging: CrashLogging,
 ) : ViewModel() {
-
-    private val disposables = CompositeDisposable()
 
     fun forceRefresh() {
         podcastManager.refreshPodcasts(fromLog = "dev")
-        Toast.makeText(context, "Refresh started", Toast.LENGTH_LONG).show()
     }
 
     fun triggerNotification() {
@@ -71,6 +69,9 @@ class DeveloperViewModel
                         }
                     }
                     forceRefresh()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "Refresh started", Toast.LENGTH_LONG).show()
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -116,12 +117,7 @@ class DeveloperViewModel
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
-    }
-
-    @OptIn(FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun triggerUpdateEpisodeDetails() {
         viewModelScope.launch {
             try {
@@ -155,5 +151,10 @@ class DeveloperViewModel
     fun resetEoYModalProfileBadge() {
         settings.setEndOfYearShowBadge2023(true)
         settings.setEndOfYearShowModal(true)
+    }
+
+    fun onSendCrash(crashMessage: String) {
+        crashLogging.sendReport(Exception(crashMessage))
+        Timber.d("Test crash message: \"$crashMessage\"")
     }
 }

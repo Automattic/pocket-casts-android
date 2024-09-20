@@ -39,7 +39,7 @@ fun StoryListenedCategoriesView(
             .fillMaxSize()
             .podcastDynamicBackground(story.listenedCategories[0].toPodcast())
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 30.dp)
+            .padding(vertical = 30.dp),
     ) {
         Spacer(modifier = modifier.height(40.dp))
 
@@ -73,13 +73,13 @@ private fun PodcastCoverStack(
             Box(
                 modifier = modifier
                     .padding(top = (index * (coverWidth.value * .17)).dp)
-                    .transformPodcastCover()
+                    .transformPodcastCover(),
             ) {
                 val podcastIndex = index.coerceAtMost(story.listenedCategories.size - 1)
                 PodcastCover(
                     uuid = story.listenedCategories[podcastIndex].mostListenedPodcastId,
                     coverWidth = coverWidth,
-                    coverSize = CoverSize.BIG
+                    coverSize = CoverSize.BIG,
                 )
             }
         }
@@ -99,7 +99,7 @@ private fun PrimaryText(
     }
     val text = stringResource(
         id = textResId,
-        story.listenedCategories.count()
+        story.listenedCategories.count(),
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }

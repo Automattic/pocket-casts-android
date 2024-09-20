@@ -66,7 +66,7 @@ class CreateDoneFragment : BaseFragment() {
                     }
                     else -> {}
                 }
-            }
+            },
         )
 
         val binding = binding ?: return

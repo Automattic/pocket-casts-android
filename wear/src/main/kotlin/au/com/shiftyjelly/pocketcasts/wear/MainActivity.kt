@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalFoundationApi::class)
+@file:Suppress("DEPRECATION")
 
 package au.com.shiftyjelly.pocketcasts.wear
 
@@ -17,16 +18,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.wear.compose.material.SwipeToDismissBoxState
-import androidx.wear.compose.material.rememberSwipeToDismissBoxState
+import androidx.wear.compose.foundation.SwipeToDismissBoxState
+import androidx.wear.compose.foundation.rememberSwipeToDismissBoxState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
+import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
@@ -70,7 +71,6 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
         setContent {
             WearAppTheme {
-
                 val state by viewModel.state.collectAsState()
 
                 WearApp(
@@ -100,7 +100,6 @@ fun WearApp(
     onLoggingInScreenShown: () -> Unit,
     signOut: () -> Unit,
 ) {
-
     val navController = rememberSwipeDismissableNavController()
     val swipeToDismissState = rememberSwipeToDismissBoxState()
     val navState = rememberSwipeDismissableNavHostState(swipeToDismissState)
@@ -112,7 +111,8 @@ fun WearApp(
 
     val userCanAccessWatch = when (subscriptionStatus) {
         is SubscriptionStatus.Free,
-        null -> false
+        null,
+        -> false
         is SubscriptionStatus.Paid -> true
     }
 
@@ -123,12 +123,12 @@ fun WearApp(
 
     val startDestination = if (userCanAccessWatch) WatchListScreen.route else RequirePlusScreen.route
 
+    @Suppress("DEPRECATION")
     WearNavScaffold(
         navController = navController,
         startDestination = startDestination,
         state = navState,
     ) {
-
         scrollable(RequirePlusScreen.route) {
             ScrollToTop.handle(navController, it.scrollableState)
             RequirePlusScreen(
@@ -148,7 +148,6 @@ fun WearApp(
                 swipeToDismissState = swipeToDismissState,
                 scrollableScaffoldContext = it,
             ) {
-
                 ScrollToTop.handle(navController, it.scrollableState)
 
                 WatchListScreen(
@@ -177,7 +176,7 @@ fun WearApp(
                 onFinished = { result ->
                     navController.previousBackStackEntry?.savedStateHandle?.set(
                         StreamingConfirmationScreen.resultKey,
-                        result
+                        result,
                     )
                     navController.popBackStack()
                 },
@@ -199,7 +198,7 @@ fun WearApp(
             arguments = listOf(
                 navArgument(PodcastsScreen.argumentFolderUuid) {
                     type = NavType.StringType
-                }
+                },
             ),
         ) {
             PodcastsScreenContent(
@@ -214,14 +213,13 @@ fun WearApp(
             arguments = listOf(
                 navArgument(PodcastScreen.argument) {
                     type = NavType.StringType
-                }
+                },
             ),
         ) {
-
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
-                scrollableScaffoldContext = it
+                scrollableScaffoldContext = it,
             ) {
                 PodcastScreen(
                     onEpisodeTap = { episode ->
@@ -260,7 +258,7 @@ fun WearApp(
             arguments = listOf(
                 navArgument(FilterScreen.argumentFilterUuid) {
                     type = NavType.StringType
-                }
+                },
             ),
         ) {
             NowPlayingPager(
@@ -288,7 +286,7 @@ fun WearApp(
                     onItemClick = { episode ->
                         val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
                         navController.navigate(route)
-                    }
+                    },
                 )
             }
         }
@@ -334,13 +332,16 @@ fun WearApp(
 
         authenticationNavGraph(
             navController = navController,
+            onEmailSignInSuccess = {
+                navController.navigate(LoggingInScreen.route)
+            },
             googleSignInSuccessScreen = { googleSignInAccount ->
                 LoggingInScreen(
                     avatarUrl = googleSignInAccount?.photoUrl?.toString(),
                     name = googleSignInAccount?.givenName,
-                    onClose = {}
+                    onClose = {},
                 )
-            }
+            },
         )
 
         loggingInScreens(onClose = { popToStartDestination() })
@@ -351,7 +352,7 @@ fun WearApp(
             PCVolumeScreen()
         }
 
-        scrollable(EffectsScreen.route,) {
+        scrollable(EffectsScreen.route) {
             EffectsScreen(
                 columnState = it.columnState,
             )
@@ -400,7 +401,7 @@ fun WearApp(
 fun PodcastsScreenContent(
     navController: NavHostController,
     swipeToDismissState: SwipeToDismissBoxState,
-    scrollableScaffoldContext: ScrollableScaffoldContext,
+    @Suppress("DEPRECATION") scrollableScaffoldContext: ScrollableScaffoldContext,
 ) {
     NowPlayingPager(
         navController = navController,
@@ -422,11 +423,13 @@ fun PodcastsScreenContent(
 private fun NavGraphBuilder.loggingInScreens(
     onClose: () -> Unit,
 ) {
+    @Suppress("DEPRECATION")
     composable(LoggingInScreen.route) {
         Timber.i("navigating to logging in screen")
         LoggingInScreen(onClose = onClose)
     }
 
+    @Suppress("DEPRECATION")
     composable(LoggingInScreen.routeWithDelay) {
         LoggingInScreen(
             onClose = onClose,
@@ -438,7 +441,7 @@ private fun NavGraphBuilder.loggingInScreens(
     }
 }
 
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
 @Composable
 private fun DefaultPreview() {
     WearApp(

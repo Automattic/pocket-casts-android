@@ -80,12 +80,12 @@ fun BottomSheetContent(
         modifier = modifier
             .fillMaxWidth()
             .padding(ContentPadding),
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.TopCenter,
     ) {
         Column(
             modifier = modifier
                 .widthIn(max = ContentMaxWidthDp.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val context = LocalContext.current
             val content = state.content
@@ -125,7 +125,7 @@ fun Pill(
             .size(PillSize)
             .clip(RoundedCornerShape(PillCornerRadius))
             .alpha(PillAlpha)
-            .background(MaterialTheme.theme.colors.primaryText02)
+            .background(MaterialTheme.theme.colors.primaryText02),
     )
 }
 
@@ -134,7 +134,7 @@ private fun SummaryText(content: BottomSheetContentState.Content) {
     TextH50(
         text = content.summaryText,
         color = MaterialTheme.theme.colors.primaryText02,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
     )
 }
 
@@ -147,13 +147,13 @@ private fun ConfirmButton(
         text = primaryButton.label,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.theme.colors.primaryText01,
-            contentColor = MaterialTheme.theme.colors.primaryInteractive02
+            contentColor = MaterialTheme.theme.colors.primaryInteractive02,
         ),
         includePadding = false,
         onClick = {
             onDismiss.invoke()
             primaryButton.onClick.invoke()
-        }
+        },
     )
 }
 
@@ -173,7 +173,7 @@ private fun DismissButton(
         onClick = {
             onDismiss.invoke()
             secondaryButton.onClick?.invoke()
-        }
+        },
     )
 }
 
@@ -189,14 +189,14 @@ private fun BottomSheetContentPreview(
                     summaryText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
                     primaryButton = BottomSheetContentState.Content.Button.Primary(
                         label = "Confirm",
-                        onClick = {}
+                        onClick = {},
                     ),
                     secondaryButton = BottomSheetContentState.Content.Button.Secondary(
                         label = "Not now",
                     ),
-                )
+                ),
             ),
-            onDismiss = {}
+            onDismiss = {},
         )
     }
 }

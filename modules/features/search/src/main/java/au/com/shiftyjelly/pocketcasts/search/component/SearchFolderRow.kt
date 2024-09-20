@@ -35,18 +35,18 @@ fun SearchFolderRow(folder: Folder, podcasts: List<Podcast>, onClick: (() -> Uni
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
-                .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
+                .then(if (onClick == null) Modifier else Modifier.clickable { onClick() }),
         ) {
             Box(modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 12.dp, bottom = 8.dp)) {
                 FolderImageSmall(color = color, podcastUuids = podcastUuids)
             }
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 TextH40(
                     text = folder.name,
                     maxLines = 2,
-                    modifier = Modifier.padding(bottom = 2.dp)
+                    modifier = Modifier.padding(bottom = 2.dp),
                 )
                 val podcastCount = if (podcastUuids.size == 1) {
                     stringResource(LR.string.podcasts_singular)
@@ -57,14 +57,14 @@ fun SearchFolderRow(folder: Folder, podcasts: List<Podcast>, onClick: (() -> Uni
                     text = podcastCount,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(top = 2.dp)
+                    modifier = Modifier.padding(top = 2.dp),
                 )
             }
             Icon(
                 painter = painterResource(id = IR.drawable.ic_tick),
                 contentDescription = stringResource(LR.string.podcast_subscribed),
                 tint = MaterialTheme.theme.colors.support02,
-                modifier = Modifier.padding(end = 16.dp)
+                modifier = Modifier.padding(end = 16.dp),
             )
         }
         HorizontalDivider(startIndent = 16.dp)

@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Brush
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.patronGradientBrush
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -10,6 +13,7 @@ sealed class UpgradeButton(
     @StringRes val shortNameRes: Int,
     @ColorRes val backgroundColorRes: Int,
     @ColorRes val textColorRes: Int,
+    open val gradientBackgroundColor: Brush,
     open val subscription: Subscription,
     open val planType: PlanType,
 ) {
@@ -22,6 +26,7 @@ sealed class UpgradeButton(
         textColorRes = UR.color.black,
         subscription = subscription,
         planType = planType,
+        gradientBackgroundColor = plusGradientBrush,
     )
 
     data class Patron(
@@ -33,6 +38,7 @@ sealed class UpgradeButton(
         textColorRes = UR.color.white,
         subscription = subscription,
         planType = planType,
+        gradientBackgroundColor = patronGradientBrush,
     )
 
     enum class PlanType { RENEW, SUBSCRIBE, UPGRADE }

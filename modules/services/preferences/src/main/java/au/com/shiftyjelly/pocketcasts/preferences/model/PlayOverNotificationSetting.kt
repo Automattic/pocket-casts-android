@@ -5,33 +5,40 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class PlayOverNotificationSetting(
     val preferenceInt: Int,
+    val serverId: Int,
     @StringRes val titleRes: Int,
     val analyticsString: String,
 ) {
     NEVER(
-        titleRes = LR.string.settings_notification_play_over_never,
         preferenceInt = 2,
-        analyticsString = "never"
+        serverId = 0,
+        titleRes = LR.string.settings_notification_play_over_never,
+        analyticsString = "never",
     ),
     DUCK(
-        titleRes = LR.string.settings_notification_play_over_duck,
         preferenceInt = 1,
-        analyticsString = "duck"
+        serverId = 2,
+        titleRes = LR.string.settings_notification_play_over_duck,
+        analyticsString = "duck",
     ),
     ALWAYS(
-        titleRes = LR.string.settings_notification_play_over_always,
         preferenceInt = 0,
-        analyticsString = "always"
-    );
+        serverId = 1,
+        titleRes = LR.string.settings_notification_play_over_always,
+        analyticsString = "always",
+    ),
+    ;
 
     companion object {
         fun fromPreferenceString(stringValue: String): PlayOverNotificationSetting {
             try {
                 val intValue = stringValue.toInt()
-                return values().first { it.preferenceInt == intValue }
+                return entries.first { it.preferenceInt == intValue }
             } catch (e: Exception) {
                 throw IllegalStateException("Unknown play over notification setting: $stringValue")
             }
         }
+
+        fun fromServerId(id: Int) = entries.find { it.serverId == id } ?: NEVER
     }
 }

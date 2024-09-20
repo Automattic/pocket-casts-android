@@ -7,5 +7,5 @@ import com.squareup.moshi.JsonClass
 class ApiTokenRequest(
     @field:Json(name = "email") val email: String,
     @field:Json(name = "password") val password: String,
-    @field:Json(name = "scope") val scope: String
+    @field:Json(name = "scope") val scope: String,
 )

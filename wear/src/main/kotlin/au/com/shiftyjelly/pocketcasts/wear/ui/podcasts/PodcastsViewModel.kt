@@ -7,11 +7,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class PodcastsViewModel @Inject constructor(
@@ -26,7 +26,7 @@ class PodcastsViewModel @Inject constructor(
         object Loading : UiState()
         data class Loaded(
             val folder: Folder? = null,
-            val items: List<FolderItem> = emptyList()
+            val items: List<FolderItem> = emptyList(),
         ) : UiState()
     }
 

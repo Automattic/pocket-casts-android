@@ -9,17 +9,18 @@ import javax.inject.Inject
 class PlayerFactoryImpl @Inject constructor(
     private val settings: Settings,
     private val statsManager: StatsManager,
-    @ApplicationContext private val context: Context
+    private val dataSourceFactory: ExoPlayerDataSourceFactory,
+    @ApplicationContext private val context: Context,
 ) : PlayerFactory {
 
     override fun createCastPlayer(onPlayerEvent: (Player, PlayerEvent) -> Unit): Player {
         return CastPlayer(
             context,
-            onPlayerEvent
+            onPlayerEvent,
         )
     }
 
     override fun createSimplePlayer(onPlayerEvent: (Player, PlayerEvent) -> Unit): Player {
-        return SimplePlayer(settings, statsManager, context, onPlayerEvent)
+        return SimplePlayer(settings, statsManager, context, dataSourceFactory, onPlayerEvent)
     }
 }

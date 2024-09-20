@@ -136,7 +136,7 @@ object AnimatorUtil {
         val scale = ObjectAnimator.ofPropertyValuesHolder(
             view,
             PropertyValuesHolder.ofFloat("scaleX", 1f),
-            PropertyValuesHolder.ofFloat("scaleY", 1f)
+            PropertyValuesHolder.ofFloat("scaleY", 1f),
         )
         view.scaleX = 0f
         view.scaleY = 0f
@@ -148,7 +148,7 @@ object AnimatorUtil {
         val scale = ObjectAnimator.ofPropertyValuesHolder(
             view,
             PropertyValuesHolder.ofFloat("scaleX", 0f),
-            PropertyValuesHolder.ofFloat("scaleY", 0f)
+            PropertyValuesHolder.ofFloat("scaleY", 0f),
         )
         view.scaleX = 1f
         view.scaleY = 1f

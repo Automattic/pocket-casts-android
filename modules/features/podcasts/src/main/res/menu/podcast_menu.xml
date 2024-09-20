@@ -13,4 +13,10 @@
         app:showAsAction="ifRoom"
         android:title="@string/share_podcast" />
 
+    <item
+        android:id="@+id/report"
+        android:icon="@drawable/ic_flag"
+        app:showAsAction="never"
+        android:title="@string/report" />
+
 </menu>

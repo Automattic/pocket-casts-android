@@ -97,7 +97,7 @@ fun SearchHistoryView(
     LazyColumn(
         modifier = modifier
             .background(color = MaterialTheme.theme.colors.primaryUi01)
-            .nestedScroll(nestedScrollConnection)
+            .nestedScroll(nestedScrollConnection),
     ) {
         if (state.entries.isNotEmpty()) {
             item {
@@ -105,12 +105,12 @@ fun SearchHistoryView(
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, top = 8.dp, end = 4.dp, bottom = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TextH20(
                         text = stringResource(LR.string.search_history_recent_searches),
                         color = MaterialTheme.theme.colors.primaryText01,
-                        modifier = modifier.weight(1f)
+                        modifier = modifier.weight(1f),
 
                     )
                     TextP60(
@@ -119,7 +119,7 @@ fun SearchHistoryView(
                         fontWeight = FontWeight.W700,
                         modifier = modifier
                             .clickable { onClearAllClick() }
-                            .padding(12.dp)
+                            .padding(12.dp),
                     )
                 }
             }
@@ -169,7 +169,7 @@ fun SearchHistoryRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .clickable { onRowClick() }
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Box(Modifier.weight(weight = 1f, fill = true)) {
                 content.invoke()
@@ -188,7 +188,7 @@ private fun CloseButton(
         Icon(
             imageVector = NavigationButton.Close.image,
             contentDescription = stringResource(NavigationButton.Close.contentDescription),
-            tint = MaterialTheme.theme.colors.primaryIcon02
+            tint = MaterialTheme.theme.colors.primaryIcon02,
         )
     }
 }
@@ -205,33 +205,33 @@ fun SearchHistoryEpisodeView(
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
             PodcastImage(
                 uuid = entry.podcastUuid,
-                modifier = modifier.size(IconSize)
+                modifier = modifier.size(IconSize),
             )
             val formattedDuration = TimeHelper.getTimeDurationMediumString(durationMs.toInt(), context)
             val subTitle = stringResource(
                 LR.string.search_history_row_type_episode_subtitle,
                 formattedDuration,
-                entry.podcastTitle
+                entry.podcastTitle,
             )
             Column(
                 modifier = modifier
                     .padding(start = 8.dp)
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 TextH40(
                     text = entry.title,
                     maxLines = 2,
-                    color = MaterialTheme.theme.colors.primaryText01
+                    color = MaterialTheme.theme.colors.primaryText01,
                 )
                 TextH50(
                     text = subTitle,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = modifier.padding(top = 2.dp)
+                    modifier = modifier.padding(top = 2.dp),
                 )
             }
         }
@@ -250,39 +250,39 @@ fun SearchHistoryFolderView(
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
-                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
 
         ) {
             FolderImageSmall(
                 color = color,
                 podcastUuids = entry.podcastIds,
                 folderImageSize = IconSize,
-                podcastImageSize = 20.dp
+                podcastImageSize = 20.dp,
             )
             Column(
                 modifier = modifier
                     .padding(start = 12.dp)
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 TextH40(
                     text = entry.title,
                     maxLines = 2,
                     color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = modifier.padding(bottom = 2.dp)
+                    modifier = modifier.padding(bottom = 2.dp),
                 )
                 val podcastCount = if (entry.podcastIds.size == 1) {
                     stringResource(LR.string.podcasts_singular)
                 } else {
                     stringResource(
                         LR.string.podcasts_plural,
-                        entry.podcastIds.size
+                        entry.podcastIds.size,
                     )
                 }
                 TextH50(
                     text = stringResource(LR.string.search_history_row_type_folder_subtitle, podcastCount),
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(top = 2.dp)
+                    modifier = Modifier.padding(top = 2.dp),
                 )
             }
         }
@@ -299,12 +299,12 @@ fun SearchHistoryPodcastView(
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
             PodcastImage(
                 uuid = entry.uuid,
                 modifier = modifier
-                    .size(IconSize)
+                    .size(IconSize),
             )
             val subTitle = if (entry.author.isNotEmpty()) {
                 stringResource(LR.string.search_history_row_type_podcast_subtitle, entry.author)
@@ -314,18 +314,18 @@ fun SearchHistoryPodcastView(
             Column(
                 modifier = modifier
                     .padding(start = 8.dp)
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 TextH40(
                     text = entry.title,
                     maxLines = 2,
-                    color = MaterialTheme.theme.colors.primaryText01
+                    color = MaterialTheme.theme.colors.primaryText01,
                 )
                 TextH50(
                     text = subTitle,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = modifier.padding(top = 2.dp)
+                    modifier = modifier.padding(top = 2.dp),
                 )
             }
         }
@@ -343,7 +343,7 @@ fun SearchHistoryTermView(
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
-                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
             Box(
                 modifier = modifier.size(IconSize),
@@ -352,7 +352,7 @@ fun SearchHistoryTermView(
                 Icon(
                     painter = painterResource(id = IR.drawable.ic_search),
                     contentDescription = null,
-                    tint = MaterialTheme.theme.colors.primaryIcon02
+                    tint = MaterialTheme.theme.colors.primaryIcon02,
                 )
             }
             TextH40(
@@ -361,7 +361,7 @@ fun SearchHistoryTermView(
                 maxLines = 2,
                 modifier = modifier
                     .padding(start = 12.dp)
-                    .weight(1f)
+                    .weight(1f),
             )
         }
     }
@@ -380,7 +380,7 @@ private fun SearchHistoryViewPreview(
                         uuid = UUID.randomUUID().toString(),
                         title = "Folder",
                         color = 0,
-                        podcastIds = emptyList()
+                        podcastIds = emptyList(),
                     ),
                     SearchHistoryEntry.Podcast(
                         uuid = UUID.randomUUID().toString(),
@@ -388,14 +388,14 @@ private fun SearchHistoryViewPreview(
                         author = "Author",
                     ),
                     SearchHistoryEntry.SearchTerm(
-                        term = "Search Term"
+                        term = "Search Term",
                     ),
-                )
+                ),
             ),
             onCloseClick = {},
             onClearAllClick = {},
             onRowClick = {},
-            onScroll = {}
+            onScroll = {},
         )
     }
 }

@@ -23,12 +23,14 @@ object AuthWatchModule {
     @Provides
     fun providesTokenBundleRepository(
         wearDataLayerRegistry: WearDataLayerRegistry,
+        serializer: WatchSyncAuthDataSerializer,
     ): TokenBundleRepository<WatchSyncAuthData?> {
         return TokenBundleRepositoryImpl.create(
             registry = wearDataLayerRegistry,
-            serializer = WatchSyncAuthDataSerializer
+            serializer = serializer,
         )
     }
+
     @Provides
     fun providesGoogleSignInClient(
         @ApplicationContext application: Context,
@@ -38,7 +40,7 @@ object AuthWatchModule {
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
-                .build()
+                .build(),
         )
     }
 }

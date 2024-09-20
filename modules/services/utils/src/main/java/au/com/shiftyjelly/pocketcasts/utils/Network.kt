@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.os.Build
+import android.net.NetworkCapabilities
 
 object Network {
 
@@ -22,9 +22,6 @@ object Network {
     }
 
     fun getRestrictBackgroundStatusString(context: Context): String {
-        if (Build.VERSION.SDK_INT < 24) {
-            return "API not available"
-        }
         return when (getConnectivityManager(context).restrictBackgroundStatus) {
             ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED -> "Device is restricting metered network activity while application is running on background."
             ConnectivityManager.RESTRICT_BACKGROUND_STATUS_WHITELISTED -> "Device is restricting metered network activity while application is running on background, but application is allowed to bypass it."
@@ -51,6 +48,38 @@ object Network {
         }
         return false
     }
+
+    @Suppress("DEPRECATION")
+    fun isCellularConnection(context: Context): Boolean {
+        val connectivityManager = getConnectivityManager(context)
+        val networks = connectivityManager.allNetworks
+
+        for (index in networks.indices) {
+            val network = networks[index]
+            val networkInfo = connectivityManager.getNetworkInfo(network) ?: continue
+            if (networkInfo.type == ConnectivityManager.TYPE_MOBILE && networkInfo.isConnected) {
+                return true
+            }
+        }
+        return false
+    }
+
+    @Suppress("DEPRECATION")
+    fun isVpnConnection(context: Context): Boolean {
+        val connectivityManager = getConnectivityManager(context)
+        val networks = connectivityManager.allNetworks
+
+        for (index in networks.indices) {
+            val network = networks[index]
+            val networkInfo = connectivityManager.getNetworkInfo(network) ?: continue
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: continue
+            if (networkInfo.isConnected && networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun getConnectivityManager(context: Context): ConnectivityManager {
         return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }

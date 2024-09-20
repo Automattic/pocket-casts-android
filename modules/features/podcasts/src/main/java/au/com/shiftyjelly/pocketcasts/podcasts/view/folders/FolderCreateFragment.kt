@@ -15,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditViewModel.Companion.COLOR_KEY
@@ -55,7 +54,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                                 },
                                 viewModel = viewModel,
                                 settings = settings,
-                                fragmentManager = parentFragmentManager
+                                fragmentManager = parentFragmentManager,
                             )
                         }
                         composable(NavRoutes.name) {
@@ -65,7 +64,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                                     viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_COLOR_SHOWN)
                                     navController.navigate(NavRoutes.color)
                                 },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                         composable(NavRoutes.color) {
@@ -77,11 +76,10 @@ class FolderCreateFragment : BaseDialogFragment() {
                                         sharedViewModel.folderUuid = folder.uuid
                                         val colorHex = ColorUtils.colorIntToHexString(colors.getFolderColor(folder.color).toArgb())
                                         viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_SAVED, mapOf(COLOR_KEY to colorHex))
-                                        FirebaseAnalyticsTracker.folderCreated()
                                         dismiss()
                                     }
                                 },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                     }

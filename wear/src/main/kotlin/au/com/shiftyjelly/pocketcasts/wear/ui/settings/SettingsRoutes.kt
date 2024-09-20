@@ -8,28 +8,32 @@ import com.google.android.horologist.compose.navscaffold.scrollable
 fun NavGraphBuilder.settingsRoutes(navController: NavController) {
     settingsUrlScreens()
 
+    @Suppress("DEPRECATION")
     scrollable(SettingsScreen.route) {
         SettingsScreen(
             scrollState = it.columnState,
             signInClick = { navController.navigate(authenticationSubGraph) },
             navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.route) },
             navigateToAbout = { navController.navigate(WearAboutScreen.route) },
-            navigateToHelp = { navController.navigate(HelpScreen.route) }
+            navigateToHelp = { navController.navigate(HelpScreen.route) },
         )
     }
 
+    @Suppress("DEPRECATION")
     scrollable(PrivacySettingsScreen.route) {
         PrivacySettingsScreen(scrollState = it.columnState)
     }
 
+    @Suppress("DEPRECATION")
     scrollable(WearAboutScreen.route) {
         WearAboutScreen(
             columnState = it.columnState,
             onTermsOfServiceClick = { navController.navigate(UrlScreenRoutes.termsOfService) },
-            onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) }
+            onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) },
         )
     }
 
+    @Suppress("DEPRECATION")
     scrollable(HelpScreen.route) {
         HelpScreen(columnState = it.columnState)
     }

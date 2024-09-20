@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -112,10 +113,10 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
         } else {
             val elapsedTime = TimeHelper.formattedMs(currentTimeMs)
             elapsedTimeText.text = elapsedTime
-            elapsedTimeText.contentDescription = "Played up to $elapsedTime"
+            elapsedTimeText.contentDescription = resources.getString(LR.string.player_played_up_to, elapsedTime)
             val timeRemaining = TimeHelper.getTimeLeftOnlyNumbers(currentTimeMs, durationMs)
             remainingTimeText.text = timeRemaining
-            remainingTimeText.contentDescription = timeRemaining
+            remainingTimeText.contentDescription = resources.getString(LR.string.player_time_remaining, timeRemaining.removePrefix("-"))
         }
     }
 

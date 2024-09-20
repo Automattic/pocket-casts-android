@@ -15,7 +15,7 @@ data class SubscriptionStatusResponse(
     @field:Json(name = "subscriptions") val subscriptions: List<SubscriptionResponse>?,
     @field:Json(name = "type") val type: Int,
     @field:Json(name = "tier") val tier: String?,
-    @field:Json(name = "index") val index: Int
+    @field:Json(name = "index") val index: Int,
 )
 
 @JsonClass(generateAdapter = true)
@@ -25,5 +25,5 @@ data class SubscriptionResponse(
     @field:Json(name = "frequency") val frequency: Int,
     @field:Json(name = "expiryDate") val expiryDate: Date?,
     @field:Json(name = "autoRenewing") val autoRenewing: Boolean,
-    @field:Json(name = "updateUrl") val updateUrl: String?
+    @field:Json(name = "updateUrl") val updateUrl: String?,
 )

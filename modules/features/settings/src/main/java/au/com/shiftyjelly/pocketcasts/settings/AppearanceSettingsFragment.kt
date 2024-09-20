@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -20,12 +25,14 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceState
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceViewModel
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.worker.RefreshArtworkWorker
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -37,6 +44,7 @@ class AppearanceSettingsFragment : BaseFragment() {
     }
 
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
 
     private val viewModel: SettingsAppearanceViewModel by viewModels()
@@ -150,6 +158,14 @@ class AppearanceSettingsFragment : BaseFragment() {
                 }
             }
 
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    settings.bottomInset.collect {
+                        binding.nestedScrollView.updatePadding(bottom = it)
+                    }
+                }
+            }
+
             (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlusOrPatron)
             (binding.appIconRecyclerView.adapter as? AppearanceIconSettingsAdapter)?.updatePlusSignedIn(signInState)
             binding.upgradeGroup.isVisible = !signInState.isSignedInAsPlusOrPatron && !settings.getUpgradeClosedAppearSettings()
@@ -173,6 +189,22 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtDarkUpNext.isChecked = !binding.swtDarkUpNext.isChecked
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            binding.dividerViewWidget.isVisible = true
+            binding.lblWidget.isVisible = true
+            binding.lblUseDynamicColorsForWidget.isVisible = true
+            binding.lblDynamicColorsForWidgetDetails.isVisible = true
+            binding.swtDynamicColorsForWidget.isVisible = true
+            binding.btnUseDynamicColorsForWidget.isVisible = true
+        }
+        binding.swtDynamicColorsForWidget.isChecked = settings.useDynamicColorsForWidget.value
+        binding.swtDynamicColorsForWidget.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateWidgetForDynamicColors(isChecked)
+        }
+        binding.btnUseDynamicColorsForWidget.setOnClickListener {
+            binding.swtDynamicColorsForWidget.isChecked = !binding.swtDynamicColorsForWidget.isChecked
+        }
+
         binding.swtShowArtwork.isChecked = viewModel.showArtworkOnLockScreen.value
         binding.swtShowArtwork.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateShowArtworkOnLockScreen(isChecked)
@@ -181,12 +213,16 @@ class AppearanceSettingsFragment : BaseFragment() {
             binding.swtShowArtwork.isChecked = !binding.swtShowArtwork.isChecked
         }
 
-        binding.swtUseEmbeddedArtwork.isChecked = viewModel.useEmbeddedArtwork.value
-        binding.swtUseEmbeddedArtwork.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateUseEmbeddedArtwork(isChecked)
+        binding.swtUseEpisodeArtwork.isChecked = viewModel.artworkConfiguration.value.useEpisodeArtwork
+        binding.swtUseEpisodeArtwork.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.updateUseEpisodeArtwork(isChecked)
         }
-        binding.btnUseEmbeddedArtwork.setOnClickListener {
-            binding.swtUseEmbeddedArtwork.isChecked = !binding.swtUseEmbeddedArtwork.isChecked
+        binding.btnUseEpisodeArtwork.setOnClickListener {
+            binding.swtUseEpisodeArtwork.isChecked = !binding.swtUseEpisodeArtwork.isChecked
+        }
+
+        binding.lblEpisodeArtworkConfiguration.setOnClickListener {
+            showEpisodeArtworkConfigurationFragment()
         }
 
         binding.lblRefreshAllPodcastArtwork.setOnClickListener {
@@ -224,6 +260,10 @@ class AppearanceSettingsFragment : BaseFragment() {
             val selectedIndex = adapter.selectedIconIndex() ?: 0
             binding?.appIconRecyclerView?.scrollToPosition(selectedIndex)
         }
+    }
+
+    private fun showEpisodeArtworkConfigurationFragment() {
+        (activity as? FragmentHostListener)?.addFragment(EpisodeArtworkConfigurationFragment())
     }
 
     private fun refreshArtwork() {

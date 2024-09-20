@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.dialog
 import android.content.Context
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -19,8 +19,8 @@ class ClearUpNextDialog(
     private val source: UpNextSource = UpNextSource.UNKNOWN,
     private val removeNowPlaying: Boolean,
     private val playbackManager: PlaybackManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
-    context: Context
+    private val analyticsTracker: AnalyticsTracker,
+    context: Context,
 ) : ConfirmationDialog() {
 
     init {

@@ -26,8 +26,10 @@ class LoginWithGoogleScreenViewModelTest {
 
     @Mock
     private lateinit var googleSignInClient: GoogleSignInClient
+
     @Mock
     private lateinit var podcastManager: PodcastManager
+
     @Mock
     private lateinit var syncManager: SyncManager
     private lateinit var testSubject: LoginWithGoogleScreenViewModel
@@ -38,7 +40,7 @@ class LoginWithGoogleScreenViewModelTest {
         testSubject = LoginWithGoogleScreenViewModel(
             googleSignInClient = googleSignInClient,
             podcastManager = podcastManager,
-            syncManager = syncManager
+            syncManager = syncManager,
         )
     }
 

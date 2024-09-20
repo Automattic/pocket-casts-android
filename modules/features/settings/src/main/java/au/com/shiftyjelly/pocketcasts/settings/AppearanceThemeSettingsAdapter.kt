@@ -22,7 +22,7 @@ class AppearanceThemeSettingsAdapter(
     private var isPlusOrPatronSignedIn: Boolean,
     private var selectedTheme: Theme.ThemeType,
     private var list: List<Theme.ThemeType>,
-    private val clickListener: (Theme.ThemeType, Theme.ThemeType, Boolean) -> Unit
+    private val clickListener: (Theme.ThemeType, Theme.ThemeType, Boolean) -> Unit,
 ) : RecyclerView.Adapter<AppearanceThemeSettingsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

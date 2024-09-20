@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
@@ -33,8 +32,6 @@ import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -43,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 open class UserView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
     open val layoutResource = R.layout.view_user
 
@@ -94,18 +91,18 @@ open class UserView @JvmOverloads constructor(
                     percent = percent,
                     plusOnly = signInState.isSignedInAsPlus,
                     isPatron = signInState.isSignedInAsPatron,
-                    gravatarUrl = gravatarUrl
+                    gravatarUrl = gravatarUrl,
                 )
             }
             is SignInState.SignedOut -> imgProfilePicture.setup(
                 percent = 0.0f,
                 plusOnly = false,
-                isPatron = false
+                isPatron = false,
             )
             else -> imgProfilePicture.setup(
                 percent = 0.0f,
                 plusOnly = false,
-                isPatron = false
+                isPatron = false,
             )
         }
     }
@@ -208,12 +205,15 @@ open class UserView @JvmOverloads constructor(
 class ExpandedUserView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : UserView(context, attrs, defStyleAttr) {
     override val layoutResource: Int
         get() = R.layout.view_expanded_user
+
     val lblPaymentStatus: TextView
         get() = findViewById(R.id.lblPaymentStatus)
+
+    private var onUserViewClickListener: OnUserViewClickListener? = null
 
     override fun update(signInState: SignInState?) {
         super.update(signInState)
@@ -227,11 +227,10 @@ class ExpandedUserView @JvmOverloads constructor(
             is SubscriptionStatus.Paid -> {
                 val activeSubscription = status.subscriptions.getOrNull(status.index)
                 if (activeSubscription == null ||
-                    if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-                        activeSubscription.tier in listOf(SubscriptionTier.PATRON, SubscriptionTier.PLUS)
-                    } else {
-                        activeSubscription.type == SubscriptionType.PLUS
-                    }
+                    activeSubscription.tier in listOf(
+                        SubscriptionTier.PATRON,
+                        SubscriptionTier.PLUS,
+                    )
                 ) {
                     setupLabelsForPaidUser(status, signInState)
                 } else {
@@ -239,6 +238,10 @@ class ExpandedUserView @JvmOverloads constructor(
                 }
             }
         }
+    }
+
+    fun setOnUserViewClick(onUserViewClickListener: OnUserViewClickListener?) {
+        this.onUserViewClickListener = onUserViewClickListener
     }
 
     private fun setupLabelsForPaidUser(status: SubscriptionStatus.Paid, signInState: SignInState) {
@@ -254,7 +257,7 @@ class ExpandedUserView @JvmOverloads constructor(
             lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         } else {
             if (status.platform == SubscriptionPlatform.GIFT) {
-                if (signInState.isLifetimePlus) {
+                if (signInState.isPocketCastsChampion) {
                     lblPaymentStatus.text = context.resources.getString(LR.string.plus_thanks_for_your_support_bang)
                 } else {
                     val giftDaysString = context.resources.getStringPluralDaysMonthsOrYears(status.giftDays)
@@ -264,9 +267,12 @@ class ExpandedUserView @JvmOverloads constructor(
                 lblPaymentStatus.text = context.getString(LR.string.profile_payment_cancelled)
             }
 
-            if (signInState.isLifetimePlus) {
-                lblSignInStatus?.text = context.resources.getString(LR.string.plus_lifetime_member)
+            if (signInState.isPocketCastsChampion) {
+                lblSignInStatus?.text = context.resources.getString(LR.string.pocket_casts_champion)
                 lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_02))
+                lblSignInStatus?.setOnClickListener {
+                    onUserViewClickListener?.onPocketCastsChampionClick()
+                }
             } else {
                 lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires, status.expiry.toLocalizedFormatLongStyle())
                 lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
@@ -290,4 +296,8 @@ class ExpandedUserView @JvmOverloads constructor(
             lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         }
     }
+}
+
+interface OnUserViewClickListener {
+    fun onPocketCastsChampionClick()
 }

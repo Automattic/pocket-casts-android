@@ -46,6 +46,8 @@ class CloudSettingsFragment : BaseFragment() {
         return binding?.root
     }
 
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         menu.clear()
@@ -130,7 +132,7 @@ class CloudSettingsFragment : BaseFragment() {
             binding.btnLock,
             binding.imgLogo,
             binding.lblGetMore,
-            binding.lblFindMore
+            binding.lblFindMore,
         ).forEach {
             it.setOnClickListener { openUpgradeSheet() }
         }
@@ -144,7 +146,7 @@ class CloudSettingsFragment : BaseFragment() {
     private fun openUpgradeSheet() {
         OnboardingLauncher.openOnboardingFlow(
             activity,
-            OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES)
+            OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
         )
     }
 }

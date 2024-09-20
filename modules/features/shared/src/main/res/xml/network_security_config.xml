@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <!-- Clear text traffic is required for communication with feeds that don't have SSL -->
+    <!-- https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted -->
+    <base-config
+        cleartextTrafficPermitted="true"
+        tools:ignore="InsecureBaseConfiguration">
+        <trust-anchors>
+            <certificates src="system" />
+            <!-- https://developer.android.com/privacy-and-security/security-config#TrustingAdditionalCas -->
+            <!-- https://wp.me/pdeCcb-6JD-->
+            <certificates src="@raw/isrg_root_x1" />
+            <certificates src="@raw/isrg_root_x2" />
+            <certificates src="@raw/lets_encrypt_r10" />
+        </trust-anchors>
+    </base-config>
+
+    <debug-overrides>
+        <trust-anchors>
+            <!-- Trust user added CAs while debuggable only -->
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

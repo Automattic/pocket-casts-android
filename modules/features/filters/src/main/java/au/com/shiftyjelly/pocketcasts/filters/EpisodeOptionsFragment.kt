@@ -18,12 +18,12 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
@@ -111,9 +111,11 @@ class EpisodeOptionsFragment : BaseFragment(), CoroutineScope {
                     val userPlaylistUpdate = if (userChanged) {
                         UserPlaylistUpdate(
                             listOf(PlaylistProperty.EpisodeStatus),
-                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST,
                         )
-                    } else null
+                    } else {
+                        null
+                    }
                     playlistManager.update(playlist, userPlaylistUpdate)
 
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@EpisodeOptionsFragment) }

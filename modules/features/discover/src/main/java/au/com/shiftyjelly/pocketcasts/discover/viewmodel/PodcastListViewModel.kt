@@ -23,9 +23,9 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 import kotlinx.coroutines.rx2.rxMaybe
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class PodcastListViewModel @Inject constructor(
@@ -34,7 +34,7 @@ class PodcastListViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val userManager: UserManager,
     val episodeManager: EpisodeManager,
-    val playbackManager: PlaybackManager
+    val playbackManager: PlaybackManager,
 ) : ViewModel() {
     val state: MutableLiveData<PodcastListViewState> = MutableLiveData()
     val disposables: CompositeDisposable = CompositeDisposable()
@@ -75,7 +75,7 @@ class PodcastListViewModel @Inject constructor(
                 },
                 onError = {
                     state.postValue(PodcastListViewState.Error(it))
-                }
+                },
             )
             .addTo(disposables)
     }
@@ -88,7 +88,7 @@ class PodcastListViewModel @Inject constructor(
                     .playbackStateRelay
                     .toFlowable(BackpressureStrategy.LATEST)
                     // ignore the episode progress
-                    .distinctUntilChanged { t1, t2 -> t1.episodeUuid == t2.episodeUuid && t1.isPlaying == t2.isPlaying }
+                    .distinctUntilChanged { t1, t2 -> t1.episodeUuid == t2.episodeUuid && t1.isPlaying == t2.isPlaying },
             )
             .map { (list, playbackState) ->
                 val updatedEpisodes = list.episodes?.map { episode -> episode.copy(isPlaying = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid) }
@@ -150,7 +150,7 @@ class PodcastListViewModel @Inject constructor(
                 },
                 onError = { throwable ->
                     Timber.e(throwable)
-                }
+                },
             )
             .addTo(disposables)
     }

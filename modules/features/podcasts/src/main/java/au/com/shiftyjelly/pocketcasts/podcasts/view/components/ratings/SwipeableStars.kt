@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,21 +54,22 @@ private const val numStars = 5
 fun SwipeableStars(
     onStarsChanged: (Double) -> Unit,
     modifier: Modifier = Modifier,
+    initialRate: Int? = null,
 ) {
-
     val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
-    var stopPointType by remember { mutableStateOf(StopPointType.FullAndHalfStars) }
+    var stopPointType by remember { mutableStateOf(StopPointType.InitialStars) }
     var changeType by remember { mutableStateOf(ChangeType.Animated) }
-    var touchX by remember { mutableStateOf(0f) }
+    var touchX by remember { mutableFloatStateOf(0f) }
     var iconPositions by remember { mutableStateOf(listOf<Position>()) }
 
     val stopPoints: List<Double> = stopPointsFromIconPositions(iconPositions)
     val desiredStopPoint = getDesiredStopPoint(
         touchX = touchX,
         stopPoints = stopPoints,
-        stopPointType = stopPointType
+        stopPointType = stopPointType,
+        initialRate,
     )
     onStarsChanged(getStarsDouble(stopPoints, desiredStopPoint))
 
@@ -78,7 +81,7 @@ fun SwipeableStars(
             ChangeType.Immediate -> sliderPosition.snapTo(touchX)
             ChangeType.Animated -> sliderPosition.animateTo(
                 targetValue = desiredStopPoint,
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
             )
         }
     }
@@ -94,7 +97,7 @@ fun SwipeableStars(
                         touchX += dragAmount
                     },
                     onDragEnd = {
-                        stopPointType = StopPointType.FullAndHalfStars
+                        stopPointType = StopPointType.FullStars
                         changeType = ChangeType.Animated
                     },
                 )
@@ -104,11 +107,9 @@ fun SwipeableStars(
                     // Check onPress so we can jump to the touch point as soon as a drag
                     // starts. We're using onPress instead of onDragStart because it seems better
                     // to update touchX immediately when the screen is touched instead of
-                    // waiting for the drag to start. But set this as a dragging touch state
-                    // so that the position stays at the touch point instead of jumping to a
-                    // stop point.
+                    // waiting for the drag to start.
                     onPress = {
-                        stopPointType = StopPointType.None
+                        stopPointType = StopPointType.FullStars
                         changeType = ChangeType.Animated
                         touchX = it.x
                     },
@@ -116,9 +117,9 @@ fun SwipeableStars(
                         stopPointType = StopPointType.FullStars
                         changeType = ChangeType.Animated
                         touchX = it.x
-                    }
+                    },
                 )
-            }
+            },
     ) {
         Stars(filled = false)
 
@@ -135,12 +136,12 @@ fun SwipeableStars(
                         color = Color.Transparent,
                         blendMode = BlendMode.SrcOut,
                     )
-                }
+                },
         ) {
             Stars(
                 filled = true,
                 modifier = { index ->
-                    var right by remember { mutableStateOf(0f) }
+                    var right by remember { mutableFloatStateOf(0f) }
                     Modifier
                         // We could have applied this onGloballyPositioned modifier to the empty stars with the same effect
                         .onGloballyPositioned {
@@ -159,13 +160,16 @@ fun SwipeableStars(
                                     .clickable {
                                         touchX = right // select the full star
                                     }
+                                    .focusable()
                                     .semantics {
                                         contentDescription = "${index + 1} Stars"
                                         role = Role.Button
                                     }
-                            } else Modifier
+                            } else {
+                                Modifier
+                            },
                         )
-                }
+                },
             )
         }
     }
@@ -198,31 +202,37 @@ private fun stopPointsFromIconPositions(positions: List<Position>) =
 private fun getDesiredStopPoint(
     touchX: Float,
     stopPoints: List<Double>,
-    stopPointType: StopPointType
+    stopPointType: StopPointType,
+    initialRate: Int?,
 ) = remember(stopPoints, touchX, stopPointType) {
     when (stopPointType) {
-
         StopPointType.None -> touchX // ignore stop points
 
-        StopPointType.FullAndHalfStars ->
-            stopPoints
-                .minByOrNull { abs(it - touchX) }
-                ?.toFloat()
-                ?: 0f
+        StopPointType.InitialStars -> {
+            if (initialRate == null) return@remember touchX
+            // These stop points are in between the stars, so filling to one of them will
+            // result in every star being either entirely filled or entirely unfilled
+            val betweenStarStopPoints = stopPoints.filterIndexed { i, _ -> i % 2 == 0 }
+
+            val numberOfEmptyStars = numStars - initialRate // get the number of empty stars
+
+            val indexOfFullStars = betweenStarStopPoints.lastIndex - numberOfEmptyStars
+
+            // It needs this check due a race condition that sets empty stopPoints first before setting it
+            if (betweenStarStopPoints.isEmpty()) {
+                touchX // ignore stop points
+            } else {
+                betweenStarStopPoints[indexOfFullStars].toFloat()
+            }
+        }
 
         StopPointType.FullStars -> {
-
             // These stop points are used to determine which star to fill based on the
             // the touch point. For that reason, these stop points are in the middle of the stars.
             val touchStopPoints = buildList {
                 val stopPointsInTheMiddleOfStars = stopPoints
                     .filterIndexed { i, _ -> i % 2 != 0 }
 
-                // Add the 0.0 stop point so the user can tap the first quarter
-                // of the first star to select 0 stars. Anything to further to the
-                // right will be closer to the stop point in the middle of the first
-                // star, which gets translated to the first full star.
-                add(0.0)
                 addAll(stopPointsInTheMiddleOfStars)
             }
             val nearestTouchStopPoint = touchStopPoints
@@ -269,11 +279,11 @@ fun Stars(
                 } else {
                     Icons.Filled.StarBorder
                 },
-                tint = MaterialTheme.theme.colors.primaryIcon01,
+                tint = MaterialTheme.theme.colors.primaryText01,
                 contentDescription = null,
                 modifier = modifier(index)
                     .fillMaxHeight()
-                    .aspectRatio(1f)
+                    .aspectRatio(1f),
             )
         }
     }
@@ -296,7 +306,7 @@ private fun Modifier.drawWithLayer(block: ContentDrawScope.() -> Unit) = this.th
             block()
             restoreToCount(checkPoint)
         }
-    }
+    },
 )
 
 private data class Position(
@@ -308,7 +318,7 @@ private data class Position(
 private enum class StopPointType {
     None, // No stop points
     FullStars, // stop points for full stars only
-    FullAndHalfStars, // stop points for full and half stars
+    InitialStars, // this is to set a external rate
 }
 
 private enum class ChangeType {
@@ -324,6 +334,6 @@ private fun SwipeableStarsPreview() {
         modifier = Modifier.size(
             height = 30.dp,
             width = 150.dp,
-        )
+        ),
     )
 }

@@ -4,6 +4,7 @@ import android.accounts.Account
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
+import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 
 /**

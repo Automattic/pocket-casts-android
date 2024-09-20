@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
+import android.animation.LayoutTransition
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -14,82 +14,97 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
+import androidx.core.view.plusAssign
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
+import au.com.shiftyjelly.pocketcasts.player.binding.playIfTrue
+import au.com.shiftyjelly.pocketcasts.player.binding.setSeekBarState
+import au.com.shiftyjelly.pocketcasts.player.binding.showIfPresent
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptPageWrapper
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptSearchViewModel
+import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.TransitionState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
+import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
-import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.extensions.openUrl
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
-import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureTier
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
-import coil.load
-import coil.request.Disposable
-import coil.request.ErrorResult
-import coil.request.ImageRequest
-import coil.size.Size
-import coil.transform.RoundedCornersTransformation
-import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 import kotlin.math.abs
-import kotlin.math.max
-import au.com.shiftyjelly.pocketcasts.images.R as IR
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val UPNEXT_DRAG_DISTANCE_MULTIPLIER = 1.85f // Open up next at a different rate than we are dragging
-private const val UPNEXT_HEIGHT_OPEN_THRESHOLD = 0.15f // We only have an open threshold because we only control swipe up, swipe down is the standard bottom sheet behaviour
-private const val UPNEXT_OUTLIER_THRESHOLD = 400.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
+private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
-    @Inject lateinit var castManager: CastManager
-    @Inject lateinit var playbackManager: PlaybackManager
-    @Inject lateinit var settings: Settings
-    @Inject lateinit var warningsHelper: WarningsHelper
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject
+    lateinit var castManager: CastManager
 
-    lateinit var imageLoader: PodcastImageLoaderThemed
+    @Inject
+    lateinit var playbackManager: PlaybackManager
+
+    @Inject
+    lateinit var settings: Settings
+
+    @Inject
+    lateinit var warningsHelper: WarningsHelper
+
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject
+    lateinit var bookmarkFeature: BookmarkFeatureControl
+
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private val viewModel: PlayerViewModel by activityViewModels()
+    private val transcriptViewModel by viewModels<TranscriptViewModel>({ requireParentFragment() })
+    private val transcriptSearchViewModel by viewModels<TranscriptSearchViewModel>({ requireParentFragment() })
     private var binding: AdapterPlayerHeaderBinding? = null
-    private var skippedFirstTouch: Boolean = false
-    private var hasReceivedOnTouchDown = false
     private val sourceView = SourceView.PLAYER
 
     private val activityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(BookmarkActivityContract()) { result ->
@@ -111,28 +126,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         val binding = binding ?: return
 
-        imageLoader = PodcastImageLoaderThemed(view.context)
-        imageLoader.radiusPx = 8.dpToPx(view.context)
-        imageLoader.shouldScale = false
+        imageRequestFactory = PocketCastsImageRequestFactory(view.context, cornerRadius = 8).themed().copy(isDarkTheme = true)
 
-        binding.viewModel = PlayerViewModel.PlayerHeader()
+        binding.playerControls.initPlayerControls(
+            ::onSkipBack,
+            ::onSkipForward,
+            ::onSkipForwardLongPress,
+            ::onPlayClicked,
+        )
 
-        binding.skipBack.setOnClickListener {
-            onSkipBack()
-            (it as LottieAnimationView).playAnimation()
-        }
-        binding.skipForward.setOnClickListener {
-            onSkipForward()
-            (it as LottieAnimationView).playAnimation()
-        }
-        binding.skipForward.setOnLongClickListener {
-            onSkipForwardLongPress()
-            (it as LottieAnimationView).playAnimation()
-            true
-        }
-        binding.largePlayButton.setOnPlayClicked {
-            onPlayClicked()
-        }
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
                 viewModel.seekToMs(progress, seekComplete)
@@ -146,25 +148,47 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
 
         val shelfViews = mapOf(
-            ShelfItem.Effects.id to binding.effects,
-            ShelfItem.Sleep.id to binding.sleep,
-            ShelfItem.Star.id to binding.star,
-            ShelfItem.Share.id to binding.share,
-            ShelfItem.Podcast.id to binding.podcast,
-            ShelfItem.Cast.id to binding.cast,
-            ShelfItem.Played.id to binding.played,
-            ShelfItem.Archive.id to binding.archive,
-            ShelfItem.Download.id to binding.download,
-            ShelfItem.Bookmark.id to binding.bookmark,
+            ShelfItem.Effects to binding.effects,
+            ShelfItem.Sleep to binding.sleep,
+            ShelfItem.Star to binding.star,
+            ShelfItem.Share to binding.share,
+            ShelfItem.Podcast to binding.podcast,
+            ShelfItem.Cast to binding.cast,
+            ShelfItem.Played to binding.played,
+            ShelfItem.Archive to binding.archive,
+            ShelfItem.Bookmark to binding.bookmark,
+            ShelfItem.Transcript to binding.transcript,
+            ShelfItem.Report to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            val visibleItems = it.first.subList(0, 4).map { it.id }
             binding.shelf.removeAllViews()
-            visibleItems.forEach { id ->
-                shelfViews[id]?.let { binding.shelf.addView(it) }
-            }
-
+            it.first.subList(0, 4)
+                .mapNotNull(shelfViews::get)
+                .forEach { itemView -> binding.shelf += itemView }
             binding.shelf.addView(binding.playerActions)
+        }
+
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    transcriptViewModel.uiState.collect { uiState ->
+                        val transcriptAvailable = uiState !is TranscriptViewModel.UiState.Empty
+                        binding.transcript.alpha = if (transcriptAvailable) 1f else 0.4f
+                        binding.transcript.setOnClickListener {
+                            if (!transcriptAvailable) {
+                                val message = getString(LR.string.transcript_error_not_available)
+                                Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+                                    .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
+                                    .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
+                                    .show()
+                            } else {
+                                trackShelfAction(ShelfItem.Transcript.analyticsValue)
+                                viewModel.openTranscript()
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         binding.effects.setOnClickListener { onEffectsClick() }
@@ -183,20 +207,20 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             trackShelfAction(ShelfItem.Archive.analyticsValue)
             viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
         }
-        binding.download.setOnClickListener {
-            trackShelfAction(ShelfItem.Download.analyticsValue)
-            viewModel.downloadCurrentlyPlaying()
-        }
         binding.bookmark.setOnClickListener {
             trackShelfAction(ShelfItem.Bookmark.analyticsValue)
-            onAddBookmarkClick()
+            onAddBookmarkClick(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION)
+        }
+        binding.report?.setOnClickListener {
+            trackShelfAction(ShelfItem.Report.analyticsValue)
+            openUrl(settings.getReportViolationUrl())
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
         with(binding.castButton) {
             CastButtonFactory.setUpMediaRouteButton(binding.root.context, this)
-            setAlwaysVisible(true)
+            visibility = View.VISIBLE
             updateColor(ThemeColor.playerContrast03(theme.activeTheme))
             setOnClickListener {
                 trackShelfAction(ShelfItem.Cast.analyticsValue)
@@ -204,35 +228,45 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         }
 
-        setupUpNextDrag(view, binding.topView)
+        if (FeatureFlag.isEnabled(Feature.TRANSCRIPTS)) {
+            setupTranscriptPage()
+            observeTranscriptPageTransition()
+        }
+
+        setupUpNextDrag(binding)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
-            binding.viewModel = headerViewModel
-
-            binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = true)
-
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
-            binding.largePlayButton.setCircleTintColor(playerContrast1)
-            binding.skipBackText.setTextColor(playerContrast1)
-            binding.jumpForwardText.setTextColor(playerContrast1)
-            binding.skipBack.post { // this only works the second time it's called unless it's in a post
-                binding.skipBack.addValueCallback(KeyPath("**"), LottieProperty.COLOR_FILTER) { SimpleColorFilter(playerContrast1) }
-                binding.skipForward.addValueCallback(KeyPath("**"), LottieProperty.COLOR_FILTER) { SimpleColorFilter(playerContrast1) }
-            }
+
+            binding.seekBar.setSeekBarState(
+                durationMs = headerViewModel.durationMs,
+                positionMs = headerViewModel.positionMs,
+                tintColor = headerViewModel.iconTintColor,
+                bufferedUpTo = headerViewModel.bufferedUpToMs,
+                isBuffering = headerViewModel.isBuffering,
+                theme = headerViewModel.theme,
+            )
+            binding.playerControls.updatePlayerControls(headerViewModel, playerContrast1)
+
             binding.episodeTitle.setTextColor(playerContrast1)
 
-            if (headerViewModel.embeddedArtwork == PlayerViewModel.Artwork.None && headerViewModel.podcastUuid != null) {
-                loadArtwork(headerViewModel.podcastUuid, binding.artwork)
-            } else {
-                loadEpisodeArtwork(headerViewModel.embeddedArtwork, binding.artwork)?.let { disposable ->
-                    launch {
-                        // If episode artwork fails to load, then load podcast artwork
-                        val result = disposable.job.await()
-                        if (result is ErrorResult && headerViewModel.podcastUuid != null) {
-                            loadArtwork(headerViewModel.podcastUuid, binding.artwork)
-                        }
-                    }
+            headerViewModel.episode?.let { episode ->
+                loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
+            }
+
+            binding.podcastTitle.setOnClickListener {
+                val podcastUuid = headerViewModel.podcastUuid ?: return@setOnClickListener
+                analyticsTracker.track(
+                    AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
+                    mapOf(
+                        AnalyticsProp.Key.EPISODE_UUID to headerViewModel.episodeUuid,
+                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.NOW_PLAYING.value,
+                    ),
+                )
+                (activity as? FragmentHostListener)?.let { listener ->
+                    listener.closePlayer()
+                    listener.openPodcastPage(podcastUuid, sourceView.analyticsValue)
                 }
             }
 
@@ -252,15 +286,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val starResource = if (headerViewModel.isStarred) R.drawable.ic_star_filled_32 else R.drawable.ic_star_32
             binding.star.setImageResource(starResource)
             binding.star.imageTintList = ColorStateList.valueOf(starTint)
-
-            val downloadResource = if (headerViewModel.downloadStatus == EpisodeStatusEnum.NOT_DOWNLOADED) {
-                IR.drawable.ic_download
-            } else if (headerViewModel.downloadStatus == EpisodeStatusEnum.DOWNLOADED) {
-                IR.drawable.ic_downloaded
-            } else {
-                IR.drawable.ic_cancel
-            }
-            binding.download.setImageResource(downloadResource)
 
             if (headerViewModel.isChaptersPresent) {
                 headerViewModel.chapter?.let {
@@ -299,108 +324,139 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             binding.archive.setImageResource(if (headerViewModel.isUserEpisode) R.drawable.ic_delete_32 else R.drawable.ic_archive_32)
             binding.chapterProgressCircle.progress = headerViewModel.chapterProgress
+            binding.chapterProgressCircle.isVisible = headerViewModel.isChaptersPresent
             binding.chapterTimeRemaining.text = headerViewModel.chapterTimeRemaining
 
-            binding.executePendingBindings()
+            binding.playerGroup.setBackgroundColor(headerViewModel.backgroundColor)
+            binding.artwork.isVisible = headerViewModel.isPodcastArtworkVisible()
+            binding.chapterArtwork.isVisible = headerViewModel.isChapterArtworkVisible()
+            binding.chapterUrl.showIfPresent(headerViewModel.chapter?.url)
+            binding.chapterUrlFront?.showIfPresent(headerViewModel.chapter?.url)
+            binding.videoView.isVisible = headerViewModel.isVideoVisible()
+            binding.episodeTitle.text = headerViewModel.title
+            binding.podcastTitle.text = headerViewModel.podcastTitle
+            binding.podcastTitle.isVisible = headerViewModel.podcastTitle?.isNotBlank() == true
+            binding.chapterSummary.text = headerViewModel.chapterSummary
+            binding.chapterSummary.isVisible = headerViewModel.isChaptersPresent
+            binding.previousChapter.alpha = if (headerViewModel.isFirstChapter) 0.5f else 1f
+            binding.previousChapter.isEnabled = !headerViewModel.isFirstChapter
+            binding.previousChapter.isVisible = headerViewModel.isChaptersPresent
+            binding.nextChapter.alpha = if (headerViewModel.isLastChapter) 0.5f else 1f
+            binding.nextChapter.isEnabled = !headerViewModel.isLastChapter
+            binding.nextChapter.isVisible = headerViewModel.isChaptersPresent
+            binding.seekBar.setSeekBarState(
+                durationMs = headerViewModel.durationMs,
+                positionMs = headerViewModel.positionMs,
+                tintColor = headerViewModel.iconTintColor,
+                bufferedUpTo = headerViewModel.bufferedUpToMs,
+                isBuffering = headerViewModel.isBuffering,
+                theme = headerViewModel.theme,
+            )
+            binding.sleep.playIfTrue(headerViewModel.isSleepRunning)
         }
     }
 
-    private fun setupUpNextDrag(view: View, topView: View?) {
-        val context = context ?: return
-        val swipeGesture = GestureDetectorCompat(
-            context,
-            object : GestureDetector.SimpleOnGestureListener() {
-
-                override fun onDown(e: MotionEvent) = true
-
-                override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-                    val upNextBottomSheetBehavior = (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior
-                        ?: return false
-                    if (!skippedFirstTouch) {
-                        // The first call is where the finger went down so like 600, after that its a delta.
-                        // We only want the delta.
-                        upNextBottomSheetBehavior.setPeekHeight(0, false)
-                        skippedFirstTouch = true
-                        return false
-                    }
-
-                    // Bottom sheet is already at the bottom
-                    if (upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) {
-                        return false
-                    }
-
-                    // Filtering out large deltas to avoid jumps in scrolling
-                    if (abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) {
-                        return false
-                    }
-
-                    val newPeekHeight = max(upNextBottomSheetBehavior.peekHeight + (distanceY * UPNEXT_DRAG_DISTANCE_MULTIPLIER).toInt(), 0)
-                    if (newPeekHeight != upNextBottomSheetBehavior.peekHeight) {
-                        upNextBottomSheetBehavior.peekHeight = newPeekHeight // Expensive call
-
-                        (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(true)
-                    }
-
-                    return upNextBottomSheetBehavior.peekHeight != 0
-                }
-            }
-        )
-
-        @Suppress("ClickableViewAccessibility")
-        topView?.setOnTouchListener { _, event ->
-            // Check for down events from the top view because sometimes they don't make it to
-            // the NestedScrollView's OnTouchListener and the first event we pass to our
-            // swipe gesture handler must be a down event
-            if (!hasReceivedOnTouchDown && event.actionMasked == MotionEvent.ACTION_DOWN) {
-                swipeGesture.onTouchEvent(event)
-                hasReceivedOnTouchDown = true
-            }
-            false
+    private fun setupTranscriptPage() {
+        binding?.transcriptPage?.setContent {
+            TranscriptPageWrapper(
+                playerViewModel = viewModel,
+                transcriptViewModel = transcriptViewModel,
+                searchViewModel = transcriptSearchViewModel,
+                theme = theme,
+            )
         }
+    }
 
-        view.setOnTouchListener { _, event ->
-            if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() != BottomSheetBehavior.STATE_EXPANDED) {
-                return@setOnTouchListener false
-            }
-
-            when (event.actionMasked) {
-
-                MotionEvent.ACTION_DOWN -> {
-                    hasReceivedOnTouchDown = true
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    skippedFirstTouch = false
-
-                    val playerContainerFragment = parentFragment as? PlayerContainerFragment
-                    val upNextBottomSheetBehavior =
-                        playerContainerFragment?.upNextBottomSheetBehavior
-                    if (upNextBottomSheetBehavior != null) {
-                        val peekHeight = upNextBottomSheetBehavior.peekHeight
-                        val cutOff =
-                            Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
-                        if (peekHeight > cutOff) {
-                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        } else {
-                            upNextBottomSheetBehavior.setPeekHeight(0, true)
-                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-                            if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
-                                (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(
-                                    false
-                                )
-                            }
-                        }
+    private fun observeTranscriptPageTransition() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.transitionState.collect { transitionState ->
+                    when (transitionState) {
+                        is TransitionState.OpenTranscript -> binding?.openTranscript()
+                        is TransitionState.CloseTranscript -> binding?.closeTranscript(transitionState.withTransition)
                     }
                 }
             }
+        }
+    }
 
-            // Only pass events to swipeGesture if a down event has been received to avoid
-            // this crash: https://github.com/Automattic/pocket-casts-android/issues/370
-            if (hasReceivedOnTouchDown) {
-                swipeGesture.onTouchEvent(event)
+    private fun AdapterPlayerHeaderBinding.openTranscript() {
+        updatePlayerViewsAccessibility(enable = false)
+        playerGroup.layoutTransition = LayoutTransition()
+        transcriptPage.isVisible = true
+        shelf.isVisible = false
+        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
+        seekBar.isVisible = transcriptShowSeekbarAndPlayerControls
+        playerControls.root.isVisible = transcriptShowSeekbarAndPlayerControls
+        playerControls.scale(0.6f)
+        if (transcriptShowSeekbarAndPlayerControls) {
+            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom_transcript)
+        }
+        val containerFragment = parentFragment as? PlayerContainerFragment
+        containerFragment?.updateTabsVisibility(false)
+        (root as? LockableNestedScrollView)?.setScrollingEnabled(false)
+    }
+
+    private fun AdapterPlayerHeaderBinding.closeTranscript(
+        withTransition: Boolean,
+    ) {
+        updatePlayerViewsAccessibility(enable = true)
+        playerGroup.layoutTransition = if (withTransition) LayoutTransition() else null
+        shelf.isVisible = true
+        transcriptPage.isVisible = false
+        seekBar.isVisible = true
+        playerControls.root.isVisible = true
+        playerControls.scale(1f)
+        val transcriptShowSeekbarAndPlayerControls = resources.getBoolean(R.bool.transcript_show_seekbar_and_player_controls)
+        if (transcriptShowSeekbarAndPlayerControls) {
+            (seekBar.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = resources.getDimensionPixelSize(R.dimen.seekbar_margin_bottom)
+        }
+        val containerFragment = parentFragment as? PlayerContainerFragment
+        containerFragment?.updateTabsVisibility(true)
+        (root as? LockableNestedScrollView)?.setScrollingEnabled(true)
+        playerGroup.layoutTransition = null // Reset to null to avoid animation when changing children visibility anytime later
+    }
+
+    private fun AdapterPlayerHeaderBinding.updatePlayerViewsAccessibility(enable: Boolean) {
+        val importantForAccessibility = if (enable) View.IMPORTANT_FOR_ACCESSIBILITY_YES else View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        episodeTitle.importantForAccessibility = importantForAccessibility
+        chapterTimeRemaining.importantForAccessibility = importantForAccessibility
+        chapterSummary.importantForAccessibility = importantForAccessibility
+        nextChapter.importantForAccessibility = importantForAccessibility
+        previousChapter.importantForAccessibility = importantForAccessibility
+        podcastTitle.importantForAccessibility = importantForAccessibility
+    }
+
+    private fun setupUpNextDrag(binding: AdapterPlayerHeaderBinding) {
+        val flingGestureDetector = GestureDetector(
+            requireContext(),
+            object : GestureDetector.SimpleOnGestureListener() {
+                override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                    if (binding.transcriptPage.isVisible) return false
+                    val containerFragment = parentFragment as? PlayerContainerFragment ?: return false
+                    val upNextBottomSheetBehavior = containerFragment.upNextBottomSheetBehavior
+
+                    return if (velocityY < 0 && abs(velocityY) >= UP_NEXT_FLING_VELOCITY_THRESHOLD && upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                        containerFragment.openUpNext()
+                        true
+                    } else {
+                        false
+                    }
+                }
+            },
+        )
+        @Suppress("ClickableViewAccessibility")
+        binding.root.setOnTouchListener { _, event ->
+            // This check is a workaround for a behavior between velocityY detected by flingGestureDetector and dragging player bottom sheet.
+            // When only the player is expanded and we fling down the velocityY should be positive indicating that direction.
+            // However, regardless of flinging up or down the velocityY is always negative because the player's view drags along
+            // with a finger and thus velocity computation "gets confused" because MotionEvent positions are relative to the view.
+            //
+            // Because the fling motion is detected only after we release the finger it means that the player bottom sheet
+            // is no longer in an expanded state but in a dragging or a collapsing state.
+            if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() == BottomSheetBehavior.STATE_EXPANDED) {
+                flingGestureDetector.onTouchEvent(event)
             } else {
-                Timber.w("Not passing touch event to swipe gesture handler")
                 false
             }
         }
@@ -414,51 +470,32 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         return ThemeColor.playerHighlight01(viewModel.theme, viewModel.iconTintColor)
     }
 
-    private var lastLoadedUuid: String? = null
-    private fun loadArtwork(podcastUuid: String, imageView: ImageView) {
-        if (lastLoadedUuid == podcastUuid) return
-        imageLoader.largePlaceholder().onlyDarkTheme().loadPodcastUuid(podcastUuid).into(imageView)
-        lastLoadedUuid = podcastUuid
-        lastLoadedEmbedded = null
-    }
+    private var lastLoadedBaseEpisodeId: String? = null
+    private var lastUseEpisodeArtwork: Boolean? = null
+    private var lastLoadedChapterPath: String? = null
 
-    private var lastLoadedEmbedded: PlayerViewModel.Artwork? = null
-    private fun loadEpisodeArtwork(
-        embeddedArtwork: PlayerViewModel.Artwork,
+    private fun loadArtwork(
+        baseEpisode: BaseEpisode,
+        useEpisodeArtwork: Boolean,
         imageView: ImageView,
-    ): Disposable? {
-
-        if (embeddedArtwork == PlayerViewModel.Artwork.None || lastLoadedEmbedded == embeddedArtwork) return null
-
-        var disposable: Disposable? = null
-
-        if (embeddedArtwork is PlayerViewModel.Artwork.Url || embeddedArtwork is PlayerViewModel.Artwork.Path) {
-            imageView.imageTintList = null
-
-            val imageBuilder: ImageRequest.Builder.() -> Unit = {
-                error(IR.drawable.defaultartwork_dark)
-                size(Size.ORIGINAL)
-                transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
-            }
-
-            if (embeddedArtwork is PlayerViewModel.Artwork.Path) {
-                disposable = imageView.load(data = File(embeddedArtwork.path), builder = imageBuilder)
-            } else if (embeddedArtwork is PlayerViewModel.Artwork.Url) {
-                disposable = imageView.load(data = embeddedArtwork.url, builder = imageBuilder)
-            }
-
-            lastLoadedEmbedded = embeddedArtwork
-            lastLoadedUuid = null
+    ) {
+        if (lastLoadedBaseEpisodeId == baseEpisode.uuid && lastUseEpisodeArtwork == useEpisodeArtwork) {
+            return
         }
-        return disposable
+
+        lastLoadedBaseEpisodeId = baseEpisode.uuid
+        lastUseEpisodeArtwork = useEpisodeArtwork
+        imageRequestFactory.create(baseEpisode, useEpisodeArtwork).loadInto(imageView)
     }
 
     private fun loadChapterArtwork(chapter: Chapter?, imageView: ImageView) {
-        chapter?.imagePath?.let {
-            imageView.load(File(it)) {
-                size(Size.ORIGINAL)
-                transformations(RoundedCornersTransformation(imageLoader.radiusPx.toFloat()), ThemedImageTintTransformation(imageView.context))
-            }
+        if (lastLoadedChapterPath == chapter?.imagePath) {
+            return
+        }
+
+        lastLoadedChapterPath = chapter?.imagePath
+        chapter?.imagePath?.let { pathOrUrl ->
+            imageRequestFactory.createForFileOrUrl(pathOrUrl).loadInto(imageView)
         } ?: run {
             imageView.setImageDrawable(null)
         }
@@ -496,29 +533,30 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         viewModel.starToggle()
     }
 
-    fun onAddBookmarkClick() {
-        if (Feature.isUserEntitled(Feature.BOOKMARKS_ENABLED, settings.userTier)) {
+    fun onAddBookmarkClick(source: OnboardingUpgradeSource) {
+        if (bookmarkFeature.isAvailable(settings.userTier)) {
             viewModel.buildBookmarkArguments { arguments ->
                 activityLauncher.launch(arguments.getIntent(requireContext()))
             }
         } else {
-            startUpsellFlow()
+            startUpsellFlow(source)
         }
     }
 
-    private fun startUpsellFlow() {
-        val source = OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS
+    private fun startUpsellFlow(source: OnboardingUpgradeSource) {
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
-            showPatronOnly = Feature.BOOKMARKS_ENABLED.tier == FeatureTier.Patron ||
-                Feature.BOOKMARKS_ENABLED.isCurrentlyExclusiveToPatron(),
         )
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 
     override fun onShareClick() {
         trackShelfAction(ShelfItem.Share.analyticsValue)
-        ShareFragment().show(parentFragmentManager, "share_sheet")
+        val podcast = viewModel.podcast ?: return
+        val episode = viewModel.episode as? PodcastEpisode ?: return
+        ShareDialogFragment
+            .newThemedInstance(podcast, episode, theme, SourceView.PLAYER)
+            .show(parentFragmentManager, "share_dialog")
     }
 
     private fun showPodcast() {
@@ -526,7 +564,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val podcast = viewModel.podcast
         (activity as FragmentHostListener).closePlayer()
         if (podcast != null) {
-            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid)
+            (activity as? FragmentHostListener)?.openPodcastPage(podcast.uuid, sourceView.analyticsValue)
         } else {
             (activity as? FragmentHostListener)?.openCloudFiles()
         }
@@ -548,7 +586,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             return
         }
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
-        ShelfBottomSheet.newInstance(sourceView).show(childFragmentManager, "shelf_bottom_sheet")
+        ShelfBottomSheet.newInstance(
+            sourceView = sourceView,
+            episodeId = viewModel.episode?.uuid,
+        ).show(childFragmentManager, "shelf_bottom_sheet")
     }
 
     override fun onPlayClicked() {
@@ -607,7 +648,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun trackShelfAction(analyticsAction: String) {
         analyticsTracker.track(
             AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction)
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction),
         )
     }
 

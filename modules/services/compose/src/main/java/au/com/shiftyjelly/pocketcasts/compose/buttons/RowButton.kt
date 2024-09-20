@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ButtonElevation
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -15,7 +16,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -31,6 +34,8 @@ fun RowButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
+    fontSize: TextUnit = 16.sp,
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     @DrawableRes leadingIcon: Int? = null,
@@ -38,6 +43,7 @@ fun RowButton(
     cornerRadius: Dp = 12.dp,
     textVerticalPadding: Dp = 6.dp,
     @DrawableRes textIcon: Int? = null,
+    contentDescription: String? = null,
 ) {
     BaseRowButton(
         text = text,
@@ -47,6 +53,8 @@ fun RowButton(
         border = border,
         colors = colors,
         textColor = textColor,
+        fontSize = fontSize,
+        elevation = elevation,
         fontFamily = fontFamily,
         fontWeight = fontWeight,
         leadingIcon = if (leadingIcon != null) {
@@ -59,11 +67,14 @@ fun RowButton(
                     tint = textColor,
                 )
             }
-        } else null,
+        } else {
+            null
+        },
         onClick = onClick,
         cornerRadius = cornerRadius,
         textVerticalPadding = textVerticalPadding,
         textIcon = textIcon,
+        contentDescription = contentDescription,
     )
 }
 
@@ -111,7 +122,7 @@ fun RowButtonTextIconPreview() {
         RowButton(
             text = "Share",
             textIcon = IR.drawable.ic_retry,
-            onClick = {}
+            onClick = {},
         )
     }
 }

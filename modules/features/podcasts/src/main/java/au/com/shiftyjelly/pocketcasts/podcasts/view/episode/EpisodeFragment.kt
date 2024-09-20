@@ -4,8 +4,8 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -17,14 +17,14 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
-import androidx.core.os.bundleOf
+import androidx.core.os.BundleCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -34,22 +34,23 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastAndEpisodeDetailsCoordinator
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -58,9 +59,13 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import au.com.shiftyjelly.pocketcasts.views.helper.setLongStyleDate
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -68,7 +73,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class EpisodeFragment : BaseFragment() {
     companion object {
-
+        private const val NEW_INSTANCE_ARG = "EpisodeFragmentArg"
         private object AnalyticsProp {
             object Key {
                 const val SOURCE = "source"
@@ -82,54 +87,77 @@ class EpisodeFragment : BaseFragment() {
             overridePodcastLink: Boolean = false,
             podcastUuid: String? = null,
             fromListUuid: String? = null,
-            forceDark: Boolean = false
+            forceDark: Boolean = false,
+            timestamp: Duration? = null,
+            autoPlay: Boolean = false,
         ): EpisodeFragment {
             return EpisodeFragment().apply {
-                arguments = bundleOf(
-                    EpisodeContainerFragment.ARG_EPISODE_UUID to episodeUuid,
-                    EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE to source.value,
-                    EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
-                    EpisodeContainerFragment.ARG_PODCAST_UUID to podcastUuid,
-                    EpisodeContainerFragment.ARG_FROMLIST_UUID to fromListUuid,
-                    EpisodeContainerFragment.ARG_FORCE_DARK to forceDark
-                )
+                arguments = Bundle().apply {
+                    putParcelable(
+                        NEW_INSTANCE_ARG,
+                        EpisodeFragmentArgs(
+                            episodeUuid = episodeUuid,
+                            source = source,
+                            overridePodcastLink = overridePodcastLink,
+                            podcastUuid = podcastUuid,
+                            fromListUuid = fromListUuid,
+                            forceDark = forceDark,
+                            timestamp = timestamp,
+                            autoPlay = autoPlay,
+                        ),
+                    )
+                }
             }
         }
+
+        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? =
+            bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
     override lateinit var statusBarColor: StatusBarColor
 
-    @Inject lateinit var serverManager: ServerManager
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var warningsHelper: WarningsHelper
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     @Inject lateinit var podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
-    private lateinit var imageLoader: PodcastImageLoader
+    private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
 
     private var webView: WebView? = null
     private var formattedNotes: String? = null
     private lateinit var showNotesFormatter: ShowNotesFormatter
 
-    private val episodeUUID: String?
-        get() = arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_UUID)
+    private val args: EpisodeFragmentArgs
+        get() = extractArgs(arguments) ?: throw IllegalStateException("${this::class.java.simpleName} is missing arguments. It must be created with newInstance function")
+
+    private val episodeUUID: String
+        get() = args.episodeUuid
+
+    private val timestamp: Duration?
+        get() = args.timestamp
 
     private val episodeViewSource: EpisodeViewSource
-        get() = EpisodeViewSource.fromString(arguments?.getString(EpisodeContainerFragment.ARG_EPISODE_VIEW_SOURCE))
+        get() = args.source
 
     private val overridePodcastLink: Boolean
-        get() = arguments?.getBoolean(EpisodeContainerFragment.ARG_OVERRIDE_PODCAST_LINK) ?: false
+        get() = args.overridePodcastLink
 
     val podcastUuid: String?
-        get() = arguments?.getString(EpisodeContainerFragment.ARG_PODCAST_UUID)
+        get() = args.podcastUuid
 
     val fromListUuid: String?
-        get() = arguments?.getString(EpisodeContainerFragment.ARG_FROMLIST_UUID)
+        get() = args.fromListUuid
+
+    private val autoPlay: Boolean
+        get() = args.autoPlay
 
     private val forceDarkTheme: Boolean
-        get() = arguments?.getBoolean(EpisodeContainerFragment.ARG_FORCE_DARK) ?: false
+        get() = args.forceDark
 
     var listener: FragmentHostListener? = null
     private var episodeLoadedListener: EpisodeLoadedListener? = null
@@ -150,7 +178,7 @@ class EpisodeFragment : BaseFragment() {
         showNotesFormatter = createShowNotesFormatter(contextThemeWrapper)
 
         statusBarColor = StatusBarColor.Custom(
-            context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme
+            context?.getThemeColor(R.attr.primary_ui_01) ?: Color.WHITE, theme.isDarkTheme,
         )
         return binding?.root
     }
@@ -170,18 +198,13 @@ class EpisodeFragment : BaseFragment() {
         super.onAttach(context)
         listener = context as FragmentHostListener
         episodeLoadedListener = (parentFragment as? EpisodeLoadedListener)
-        imageLoader = PodcastImageLoaderThemed(context)
+        imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        episodeUUID?.let { episodeUuid ->
-            podcastUuid?.let { podcastUuid ->
-                if (!viewModel.isFragmentChangingConfigurations) {
-                    analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
-                    FirebaseAnalyticsTracker.openedEpisode(podcastUuid, episodeUuid)
-                }
-            }
+        if (!viewModel.isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
         }
     }
 
@@ -201,14 +224,19 @@ class EpisodeFragment : BaseFragment() {
 
         binding?.loadingGroup?.isInvisible = true
 
-        viewModel.setup(episodeUUID!!, podcastUuid, forceDarkTheme)
+        viewModel.setup(
+            episodeUuid = episodeUUID,
+            podcastUuid = podcastUuid,
+            timestamp = timestamp,
+            autoPlay = autoPlay && savedInstanceState == null,
+            forceDark = forceDarkTheme,
+        )
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer { state ->
                 val binding = binding ?: return@Observer
                 when (state) {
                     is EpisodeFragmentState.Loaded -> {
-
                         binding.loadingGroup.isVisible = true
                         val iconColor = ThemeColor.podcastIcon02(activeTheme, state.tintColor)
 
@@ -218,13 +246,14 @@ class EpisodeFragment : BaseFragment() {
                                 episode = state.episode,
                                 onFavClicked = { viewModel.starClicked() },
                                 onShareClicked = { share(state) },
-                            )
+                            ),
                         )
 
-                        binding.episode = state.episode
-                        binding.podcast = state.podcast
-                        binding.tintColor = iconColor
-                        binding.podcastColor = ThemeColor.podcastIcon02(activeTheme, state.podcastColor)
+                        binding.lblTitle.text = state.episode.title
+                        binding.progressBar.progress = state.episode.playedPercentage
+                        binding.lblDate.setLongStyleDate(state.episode.publishedDate)
+                        binding.lblAuthor.text = state.podcast.title
+                        binding.lblAuthor.setTextColor(state.podcastColor)
 
                         binding.btnDownload.tintColor = iconColor
                         binding.btnAddToUpNext.tintColor = iconColor
@@ -251,8 +280,8 @@ class EpisodeFragment : BaseFragment() {
                         val downloadSize = Util.formattedBytes(bytes = state.episode.sizeInBytes, context = binding.btnDownload.context).replace(
                             "-",
                             getString(
-                                LR.string.podcasts_download_download
-                            )
+                                LR.string.podcasts_download_download,
+                            ),
                         )
                         val episodeStatus = state.episode.episodeStatus
                         binding.btnDownload.state = when (episodeStatus) {
@@ -299,29 +328,27 @@ class EpisodeFragment : BaseFragment() {
                         }
 
                         // If we aren't showing another error we can show the episode limit warning
-                        if (!state.episode.isArchived && !binding.errorLayout.isVisible && state.episode.excludeFromEpisodeLimit && state.podcast.autoArchiveEpisodeLimit != null) {
+                        val autoArchiveLimit = state.podcast.autoArchiveEpisodeLimit?.value
+                        if (!state.episode.isArchived && !binding.errorLayout.isVisible && state.episode.excludeFromEpisodeLimit && autoArchiveLimit != null) {
                             binding.errorLayout.isVisible = true
                             binding.lblErrorDetail.isVisible = true
                             binding.lblError.setText(LR.string.podcast_episode_manually_unarchived)
-                            binding.lblErrorDetail.text = getString(LR.string.podcast_episode_manually_unarchived_summary, state.podcast.autoArchiveEpisodeLimit)
+                            binding.lblErrorDetail.text = getString(LR.string.podcast_episode_manually_unarchived_summary, autoArchiveLimit)
                             binding.imgError.setImageResource(IR.drawable.ic_archive)
                         }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            // Doesn't work in data binding for some reason maybe because of the API limit
-                            binding.lblAuthor.compoundDrawableTintList = ColorStateList.valueOf(iconColor)
-                        }
+                        TextViewCompat.setCompoundDrawableTintList(binding.lblAuthor, ColorStateList.valueOf(iconColor))
                         binding.lblAuthor.setOnClickListener {
                             analyticsTracker.track(
                                 AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
                                 mapOf(
                                     AnalyticsProp.Key.EPISODE_UUID to state.episode.uuid,
-                                    AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
-                                )
+                                    AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value,
+                                ),
                             )
                             (parentFragment as? BaseDialogFragment)?.dismiss()
                             if (!overridePodcastLink) {
-                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid)
+                                (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid, SourceView.EPISODE_DETAILS.analyticsValue)
                             }
                         }
 
@@ -336,22 +363,17 @@ class EpisodeFragment : BaseFragment() {
                                 .show()
                             true
                         }
-                        binding.podcastArtwork.let { imageView ->
-                            imageLoader.largePlaceholder().loadEpisodeArtworkInto(
-                                imageView = imageView,
-                                episode = state.episode,
-                                coroutineScope = this,
-                            )
-                        }
+                        imageRequestFactory.create(state.episode, settings.artworkConfiguration.value.useEpisodeArtwork).loadInto(binding.podcastArtwork)
 
                         binding.btnPlay.setOnPlayClicked {
                             val context = binding.root.context
                             val shouldClose = if (viewModel.shouldShowStreamingWarning(context)) {
                                 warningsHelper.streamingWarningDialog(onConfirm = {
                                     val shouldCloseAfterWarning = viewModel.playClickedGetShouldClose(
-                                        warningsHelper,
+                                        warningsHelper = warningsHelper,
+                                        showedStreamWarning = true,
                                         force = true,
-                                        fromListUuid = fromListUuid
+                                        fromListUuid = fromListUuid,
                                     )
                                     if (shouldCloseAfterWarning) {
                                         (parentFragment as? BaseDialogFragment)?.dismiss()
@@ -359,7 +381,11 @@ class EpisodeFragment : BaseFragment() {
                                 }).show(parentFragmentManager, "stream warning")
                                 false
                             } else {
-                                viewModel.playClickedGetShouldClose(warningsHelper, fromListUuid = fromListUuid)
+                                viewModel.playClickedGetShouldClose(
+                                    warningsHelper = warningsHelper,
+                                    showedStreamWarning = false,
+                                    fromListUuid = fromListUuid,
+                                )
                             }
 
                             if (shouldClose) {
@@ -371,7 +397,7 @@ class EpisodeFragment : BaseFragment() {
                         Timber.e("Could not load episode $episodeUUID: ${state.error.message}")
                     }
                 }
-            }
+            },
         )
 
         viewModel.showNotesState.observe(viewLifecycleOwner) { showNotesState ->
@@ -443,7 +469,7 @@ class EpisodeFragment : BaseFragment() {
                     .addTextOption(
                         titleId = LR.string.podcast_file_remove,
                         titleColor = it.context.getThemeColor(UR.attr.support_05),
-                        click = { viewModel.deleteDownloadedEpisode() }
+                        click = { viewModel.deleteDownloadedEpisode() },
                     )
                 activity?.supportFragmentManager?.let { fragmentManager ->
                     dialog.show(fragmentManager, "confirm_archive_all")
@@ -451,7 +477,7 @@ class EpisodeFragment : BaseFragment() {
             } else {
                 context?.let { context ->
                     if (settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(context) && viewModel.shouldDownload()) {
-                        warningsHelper.downloadWarning(episodeUUID!!, "episode card")
+                        warningsHelper.downloadWarning(episodeUUID, "episode card")
                             .show(parentFragmentManager, "download warning")
                     } else {
                         viewModel.downloadEpisode()
@@ -509,8 +535,8 @@ class EpisodeFragment : BaseFragment() {
                                     AnalyticsEvent.EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED,
                                     mapOf(
                                         AnalyticsProp.Key.EPISODE_UUID to episodeUuid,
-                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
-                                    )
+                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value,
+                                    ),
                                 )
                             }
 
@@ -555,14 +581,12 @@ class EpisodeFragment : BaseFragment() {
     }
 
     private fun share(state: EpisodeFragmentState.Loaded) {
-        ShareDialog(
+        ShareDialogFragment.newInstance(
             state.podcast,
             state.episode,
-            parentFragmentManager,
-            context,
-            shouldShowPodcast = false,
-            analyticsTracker = analyticsTracker,
-        ).show(sourceView = SourceView.EPISODE_DETAILS)
+            SourceView.EPISODE_DETAILS,
+            options = listOf(ShareDialogFragment.Options.Episode),
+        ).show(parentFragmentManager, "share_dialog")
     }
 
     interface EpisodeLoadedListener {
@@ -575,4 +599,16 @@ class EpisodeFragment : BaseFragment() {
         val onShareClicked: () -> Unit,
         val onFavClicked: () -> Unit,
     )
+
+    @Parcelize
+    data class EpisodeFragmentArgs(
+        val episodeUuid: String,
+        val source: EpisodeViewSource,
+        val overridePodcastLink: Boolean = false,
+        val podcastUuid: String? = null,
+        val fromListUuid: String? = null,
+        val forceDark: Boolean = false,
+        val autoPlay: Boolean = false,
+        @TypeParceler<Duration?, DurationParceler>() val timestamp: Duration? = null,
+    ) : Parcelable
 }

@@ -6,13 +6,13 @@ import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
-import org.json.JSONArray
-import org.json.JSONObject
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import org.json.JSONArray
+import org.json.JSONObject
+import timber.log.Timber
 
 object DataParser {
 
@@ -58,8 +58,8 @@ object DataParser {
                         Podcast(
                             uuid = podcast.uuid,
                             title = podcast.title,
-                            author = podcast.author
-                        )
+                            author = podcast.author,
+                        ),
                     )
                 }
             }
@@ -95,7 +95,7 @@ object DataParser {
                 podcast = podcast,
                 episode = episode,
                 timeInSeconds = timeInSeconds,
-                message = message
+                message = message,
             )
         } catch (e: Exception) {
             Timber.e(e, "Problems parsing share item.")
@@ -152,7 +152,7 @@ object DataParser {
             fileType = getString(jsonEpisode, "file_type"),
             publishedDate = publishedAt,
             podcastUuid = podcastUuidOrJson,
-            addedDate = Date()
+            addedDate = Date(),
         )
     }
 
@@ -201,7 +201,7 @@ object DataParser {
                 return ServerResponse(
                     success = true,
                     data = getString(allData, "result"),
-                    token = getString(allData, "token")
+                    token = getString(allData, "token"),
                 )
             } else if (status == "poll") {
                 return ServerResponse(success = true, polling = true, message = message)
@@ -211,7 +211,7 @@ object DataParser {
                     success = false,
                     message = message,
                     serverMessageId = messageId,
-                    errorCode = errorCode
+                    errorCode = errorCode,
                 )
             }
         } catch (e: Exception) {
@@ -232,7 +232,7 @@ object DataParser {
                 podcastLanguage = getString(podcastJson, "language") ?: "",
                 mediaType = getString(podcastJson, "media_type"),
                 podcastUrl = getString(podcastJson, "url"),
-                author = getString(podcastJson, "author") ?: ""
+                author = getString(podcastJson, "author") ?: "",
             )
             // add the episodes
             val episodes = podcastJson.optJSONArray("episodes")

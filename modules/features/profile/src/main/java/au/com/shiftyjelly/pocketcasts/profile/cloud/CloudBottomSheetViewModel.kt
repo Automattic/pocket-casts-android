@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -23,10 +23,10 @@ import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.Flowables
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class CloudBottomSheetViewModel @Inject constructor(
@@ -35,10 +35,10 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val downloadManager: DownloadManager,
     private val podcastManager: PodcastManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    userManager: UserManager
+    userManager: UserManager,
 ) : ViewModel() {
     lateinit var state: LiveData<BottomSheetState>
     var signInState = userManager.getSignInState().toLiveData()
@@ -100,7 +100,7 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun download(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
-            DownloadHelper.manuallyDownloadEpisodeNow(episode, "cloud bottom sheet", downloadManager, episodeManager)
+            DownloadHelper.manuallyDownloadEpisodeNow(episode, "cloud bottom sheet", downloadManager, episodeManager, source = source)
         }
     }
 
@@ -177,5 +177,5 @@ class CloudBottomSheetViewModel @Inject constructor(
 data class BottomSheetState(
     val episode: UserEpisode,
     val inUpNext: Boolean,
-    val isPlaying: Boolean
+    val isPlaying: Boolean,
 )

@@ -10,14 +10,14 @@ import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.ActionHelperC
 import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.InputControlPlayback
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ViewModelConfigControlPlayback @Inject constructor(
-    application: Application
+    application: Application,
 ) : ViewModelBase<InputControlPlayback, Unit, ActionHelperControlPlayback>(application), TaskerPluginConfig<InputControlPlayback> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputControlPlayback>) = ActionHelperControlPlayback(pluginConfig)
 
@@ -44,7 +44,7 @@ class ViewModelConfigControlPlayback @Inject constructor(
         InputField(LR.string.time_to_skip_to_seconds, IR.drawable.filter_time, InputControlPlayback.PlaybackCommand.SkipToTime, { skipToSeconds }, { skipToSeconds = it }),
         InputField(LR.string.time_to_skip_seconds, IR.drawable.filter_time, listOf(InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack), { skipSeconds }, { skipSeconds = it }),
         object : InputField<Double>(LR.string.playback_speed_between_values, R.drawable.speedometer, InputControlPlayback.PlaybackCommand.SetPlaybackSpeed, { playbackSpeed }, { playbackSpeed = it }) {
-            override fun getPossibleValues() = MutableStateFlow((5..30).map { it / 10.0 })
+            override fun getPossibleValues() = MutableStateFlow((5..50).map { it / 10.0 })
         },
         object : InputField<TrimMode>(LR.string.trim_silence_mode, R.drawable.content_cut, InputControlPlayback.PlaybackCommand.SetTrimSilenceMode, { trimSilenceMode }, { trimSilenceMode = it }) {
             override fun getPossibleValues() = MutableStateFlow(TrimMode.values().toList())
@@ -57,13 +57,13 @@ class ViewModelConfigControlPlayback @Inject constructor(
                         TrimMode.LOW -> LR.string.player_effects_trim_mild
                         TrimMode.MEDIUM -> LR.string.player_effects_trim_medium
                         TrimMode.HIGH -> LR.string.player_effects_trim_mad_max
-                    }
+                    },
                 )
             }
         },
         object : InputField<Boolean>(LR.string.set_volume_boost, IR.drawable.filter_volume, InputControlPlayback.PlaybackCommand.SetVolumeBoost, { volumeBoostEnabled }, { volumeBoostEnabled = it }) {
             override fun getPossibleValues() = MutableStateFlow(listOf(true, false))
-        }
+        },
     )
 
     fun setCommand(value: String?) {

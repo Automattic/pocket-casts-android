@@ -12,18 +12,18 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.NAME_A_TO_Z
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import io.reactivex.Flowable
 import io.reactivex.Single
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 
 class FolderManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val podcastManager: PodcastManager,
-    private val settings: Settings
+    private val settings: Settings,
 ) : FolderManager, CoroutineScope {
 
     private val folderDao = appDatabase.folderDao()
@@ -42,7 +42,7 @@ class FolderManagerImpl @Inject constructor(
             sortPosition = 0,
             podcastsSortType = podcastsSortType,
             deleted = false,
-            syncModified = System.currentTimeMillis()
+            syncModified = System.currentTimeMillis(),
         )
 
         folderDao.insert(newFolder)

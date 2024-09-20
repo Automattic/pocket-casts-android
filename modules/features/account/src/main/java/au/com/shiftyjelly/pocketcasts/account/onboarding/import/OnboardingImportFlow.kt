@@ -10,6 +10,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingImportViewModel
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -23,6 +24,7 @@ object OnboardingImportFlow {
         theme: Theme.ThemeType,
         navController: NavController,
         flow: OnboardingFlow,
+        onUpdateSystemBars: (SystemBarsStyles) -> Unit,
     ) {
         navigation(
             route = this@OnboardingImportFlow.route,
@@ -45,6 +47,7 @@ object OnboardingImportFlow {
                         viewModel.onImportDismissed(flow)
                         navController.popBackStack()
                     },
+                    onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
 
@@ -68,7 +71,8 @@ object OnboardingImportFlow {
                             function()
                         }
                     },
-                    onBackPressed = { navController.popBackStack() }
+                    onBackPressed = { navController.popBackStack() },
+                    onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
 
@@ -82,7 +86,8 @@ object OnboardingImportFlow {
                         stringResource(LR.string.onboarding_import_from_other_apps_step_1),
                         stringResource(LR.string.onboarding_import_from_other_apps_step_2),
                     ),
-                    onBackPressed = { navController.popBackStack() }
+                    onBackPressed = { navController.popBackStack() },
+                    onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
         }

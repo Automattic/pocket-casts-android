@@ -2,10 +2,10 @@ package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import timber.log.Timber
 import java.text.Bidi
 import java.util.*
 import java.util.regex.Pattern
+import timber.log.Timber
 
 class ShowNotesFormatter(private val context: Context) {
 

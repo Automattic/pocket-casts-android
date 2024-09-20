@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import androidx.annotation.NonNull
 import io.reactivex.FlowableEmitter
+import java.io.File
+import java.io.IOException
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import okio.Buffer
@@ -9,8 +11,6 @@ import okio.BufferedSink
 import okio.ForwardingSink
 import okio.Sink
 import okio.buffer
-import java.io.File
-import java.io.IOException
 
 class ProgressRequestBody(private val delegate: RequestBody, private val listener: Listener) : RequestBody() {
     companion object {
@@ -23,7 +23,7 @@ class ProgressRequestBody(private val delegate: RequestBody, private val listene
                         val progress = bytesWritten.toFloat() / contentLength.toFloat()
                         emitter.onNext(progress)
                     }
-                }
+                },
             )
         }
     }

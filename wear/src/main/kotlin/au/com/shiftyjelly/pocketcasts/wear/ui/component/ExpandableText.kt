@@ -34,7 +34,6 @@ fun ExpandableText(
     textAlign: TextAlign? = null,
     onClick: (isExpanded: Boolean) -> Unit = {},
 ) {
-
     var isExpanded by remember { mutableStateOf(false) }
     var hasOverflow by remember { mutableStateOf(false) }
     var lastCharIndex by remember { mutableStateOf(0) }
@@ -47,7 +46,7 @@ fun ExpandableText(
                 isExpanded = !isExpanded
                 onClick(isExpanded)
             }
-            .then(modifier)
+            .then(modifier),
     ) {
         Text(
             modifier = textModifier.fillMaxWidth(),
@@ -65,17 +64,17 @@ fun ExpandableText(
                 }
             },
             style = style,
-            textAlign = textAlign
+            textAlign = textAlign,
         )
 
         if (showCollapsedState) {
             val gradientBrush = Brush.verticalGradient(
-                listOf(Color.Transparent, MaterialTheme.colors.background)
+                listOf(Color.Transparent, MaterialTheme.colors.background),
             )
             Box(
                 Modifier
                     .background(gradientBrush)
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         }
     }

@@ -23,7 +23,7 @@ fun CircleButton(size: Dp, onClick: () -> Unit, backgroundColor: Color, modifier
         modifier = modifier.size(size),
         shape = CircleShape,
         contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = backgroundColor, contentColor = contentColor)
+        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = backgroundColor, contentColor = contentColor),
     ) {
         content()
     }
@@ -37,7 +37,7 @@ private fun CircleButtonPreview() {
             size = 48.dp,
             onClick = {},
             backgroundColor = MaterialTheme.colors.primary,
-            contentColor = MaterialTheme.colors.onPrimary
+            contentColor = MaterialTheme.colors.onPrimary,
         ) {}
     }
 }

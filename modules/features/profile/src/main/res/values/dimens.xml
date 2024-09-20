@@ -2,4 +2,5 @@
 <resources>
     <dimen name="profile_picture_size">104dp</dimen>
     <dimen name="account_details_picture_size">64dp</dimen>
+    <dimen name="files_fab_margin_bottom">16dp</dimen>
 </resources>

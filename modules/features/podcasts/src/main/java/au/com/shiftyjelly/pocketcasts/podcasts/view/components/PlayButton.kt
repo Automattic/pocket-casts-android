@@ -8,8 +8,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.annotation.ColorInt
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -27,10 +26,10 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class PlayButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
     var listener: OnClickListener? = null
 
     private var buttonType: PlayButtonType = PlayButtonType.PLAY
@@ -87,7 +86,6 @@ class PlayButton @JvmOverloads constructor(
                 val currentFromListUuid = fromListUuid
                 val currentPodcastUuid = podcastUuid
                 if (currentFromListUuid != null && currentPodcastUuid != null) {
-                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(currentFromListUuid, currentPodcastUuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to currentFromListUuid, PODCAST_UUID_KEY to currentPodcastUuid))
                 }
                 listener?. onPlayClicked(episodeUuid)
@@ -102,7 +100,6 @@ class PlayButton @JvmOverloads constructor(
     }
 
     private fun onLongClick() {
-        FirebaseAnalyticsTracker.longPressedEpisodeButton()
         val popup = PopupMenu(context, this)
         this.setOnTouchListener(popup.dragToOpenListener)
         popup.inflate(R.menu.play_button)

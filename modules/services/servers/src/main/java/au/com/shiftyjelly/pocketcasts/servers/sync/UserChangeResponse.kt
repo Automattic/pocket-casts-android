@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class UserChangeResponse(
     @field:Json(name = "success") val success: Boolean?,
-    @field:Json(name = "message") val message: String?
+    @field:Json(name = "message") val message: String?,
 )

@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 class ToggleActionButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
     sealed class State(@StringRes val textRes: Int, @DrawableRes val iconRes: Int) {
         class Off(textRes: Int, iconRes: Int) : State(textRes, iconRes)

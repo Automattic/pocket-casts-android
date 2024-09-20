@@ -19,7 +19,7 @@ class ReleaseVersionTest {
     fun `fromString handles simple release`() {
         assertEquals(
             ReleaseVersion(1, 2),
-            ReleaseVersion.fromString("1.2")
+            ReleaseVersion.fromString("1.2"),
         )
     }
 
@@ -27,7 +27,7 @@ class ReleaseVersionTest {
     fun `fromString handles patch release`() {
         assertEquals(
             ReleaseVersion(major = 1, minor = 2, patch = 3),
-            ReleaseVersion.fromString("1.2.3")
+            ReleaseVersion.fromString("1.2.3"),
         )
     }
 
@@ -35,7 +35,7 @@ class ReleaseVersionTest {
     fun `fromString handles rc release`() {
         assertEquals(
             ReleaseVersion(major = 1, minor = 2, releaseCandidate = 3),
-            ReleaseVersion.fromString("1.2-rc-3")
+            ReleaseVersion.fromString("1.2-rc-3"),
         )
     }
 
@@ -43,7 +43,7 @@ class ReleaseVersionTest {
     fun `fromString handles rc release for patch`() {
         assertEquals(
             ReleaseVersion(major = 1, minor = 2, patch = 3, releaseCandidate = 4),
-            ReleaseVersion.fromString("1.2.3-rc-4")
+            ReleaseVersion.fromString("1.2.3-rc-4"),
         )
     }
 
@@ -51,7 +51,7 @@ class ReleaseVersionTest {
     fun `fromString handles multiple digits`() {
         assertEquals(
             ReleaseVersion(major = 1111, minor = 222222, patch = 333333333, releaseCandidate = 444444),
-            ReleaseVersion.fromString("1111.222222.333333333-rc-444444")
+            ReleaseVersion.fromString("1111.222222.333333333-rc-444444"),
         )
     }
 

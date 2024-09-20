@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ButtonColors
 import androidx.wear.compose.material.ButtonDefaults
@@ -22,7 +21,6 @@ fun PauseButtonStyled(
     colors: ButtonColors = ButtonDefaults.iconButtonColors(),
     iconSize: Dp = 30.dp,
     icon: ImageVector = Icons.Default.Pause,
-    tapTargetSize: DpSize = DpSize(60.dp, 60.dp)
 ) {
     MediaButton(
         onClick = onClick,
@@ -32,6 +30,5 @@ fun PauseButtonStyled(
         enabled = enabled,
         colors = colors,
         iconSize = iconSize,
-        tapTargetSize = tapTargetSize
     )
 }

@@ -5,7 +5,9 @@ import java.util.Locale
 
 class PlaybackEffects {
     @Volatile var playbackSpeed = 1.0
+
     @Volatile var trimMode: TrimMode = TrimMode.OFF
+
     @Volatile var isVolumeBoosted = false
 
     val usingDefaultValues: Boolean
@@ -14,4 +16,6 @@ class PlaybackEffects {
     override fun toString(): String {
         return String.format(Locale.ENGLISH, "Speed: %f Trim: %d Boost: %s", playbackSpeed, trimMode.ordinal, isVolumeBoosted)
     }
+
+    fun toData() = PlaybackEffectsData(playbackSpeed, trimMode, isVolumeBoosted)
 }

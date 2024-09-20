@@ -25,16 +25,18 @@ import retrofit2.HttpException
 class UpdateShowNotesTask @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val showNotesManager: ShowNotesManager
+    private val showNotesManager: ShowNotesManager,
 ) : CoroutineWorker(context, params) {
     companion object {
         private const val TASK_NAME = "UpdateShowNotesTask"
         const val INPUT_PODCAST_UUID = "podcast_uuid"
+        const val INPUT_EPISODE_UUID = "episode_uuid"
 
         fun enqueue(episode: PodcastEpisode, constraints: Constraints = Constraints.NONE, context: Context) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "$TASK_NAME - enqueued ${episode.uuid}")
             val cacheShowNotesData = Data.Builder()
                 .putString(INPUT_PODCAST_UUID, episode.podcastUuid)
+                .putString(INPUT_EPISODE_UUID, episode.uuid)
                 .build()
             val workRequest = OneTimeWorkRequestBuilder<UpdateShowNotesTask>()
                 .setInputData(cacheShowNotesData)
@@ -46,12 +48,13 @@ class UpdateShowNotesTask @AssistedInject constructor(
     }
 
     private val podcastUuid = inputData.getString(INPUT_PODCAST_UUID) ?: ""
+    private val episodeUuid = inputData.getString(INPUT_EPISODE_UUID) ?: ""
 
     override suspend fun doWork(): Result {
         info("Worker started - podcast: $podcastUuid")
         val startTime = SystemClock.elapsedRealtime()
         return try {
-            showNotesManager.downloadToCacheShowNotes(podcastUuid = podcastUuid)
+            showNotesManager.downloadToCacheShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
             info("Worker completed - took ${SystemClock.elapsedRealtime() - startTime} ms")
             Result.success()
         } catch (e: Exception) {

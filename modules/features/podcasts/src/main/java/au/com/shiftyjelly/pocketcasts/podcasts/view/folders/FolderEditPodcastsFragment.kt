@@ -26,7 +26,7 @@ class FolderEditPodcastsFragment : BaseDialogFragment() {
         fun newInstance(folderUuid: String): FolderEditPodcastsFragment {
             return FolderEditPodcastsFragment().apply {
                 arguments = bundleOf(
-                    ARG_FOLDER_UUID to folderUuid
+                    ARG_FOLDER_UUID to folderUuid,
                 )
             }
         }
@@ -53,7 +53,7 @@ class FolderEditPodcastsFragment : BaseDialogFragment() {
                         },
                         viewModel = viewModel,
                         settings = settings,
-                        fragmentManager = parentFragmentManager
+                        fragmentManager = parentFragmentManager,
                     )
                 }
             }

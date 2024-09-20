@@ -89,6 +89,22 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(bookmarkChannel)
 
+        val fixDownloadsChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS.id, "Fix Downloads", NotificationManager.IMPORTANCE_LOW).apply {
+            description = context.getString(LR.string.notification_channel_description_fix_downloads)
+            setShowBadge(false)
+            enableVibration(false)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(fixDownloadsChannel)
+
+        val fixDownloadsCompleteChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE.id, "Fix Downloads Complete", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(LR.string.notification_channel_description_fix_downloads_complete)
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(fixDownloadsCompleteChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 
@@ -114,6 +130,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
 
     override fun bookmarkChannelBuilder(): NotificationCompat.Builder {
         return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_BOOKMARK.id)
+    }
+
+    override fun downloadsFixChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS.id)
+    }
+
+    override fun downloadsFixCompleteChannelBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_FIX_DOWNLOADS_COMPLETE.id)
     }
 
     /**

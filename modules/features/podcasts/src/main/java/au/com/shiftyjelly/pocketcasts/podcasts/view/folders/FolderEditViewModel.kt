@@ -5,7 +5,7 @@ import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastFolder
@@ -18,6 +18,10 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
+import java.util.Locale
+import java.util.Optional
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asObservable
-import java.util.Locale
-import java.util.Optional
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -39,7 +39,7 @@ class FolderEditViewModel
     private val podcastManager: PodcastManager,
     private val folderManager: FolderManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel(), CoroutineScope {
 
     data class State(
@@ -50,7 +50,7 @@ class FolderEditViewModel
         val selectedUuids: List<String> = emptyList(),
         val searchText: String = "",
         val folder: Folder? = null,
-        val layout: PodcastGridLayoutType = PodcastGridLayoutType.LARGE_ARTWORK
+        val layout: PodcastGridLayoutType = PodcastGridLayoutType.LARGE_ARTWORK,
     ) {
         fun isSelected(podcast: Podcast): Boolean {
             return selectedUuids.contains(podcast.uuid)
@@ -128,13 +128,13 @@ class FolderEditViewModel
                         searchText = searchText,
                         sortType = sortOrder,
                         podcastsSortedByReleaseDate = podcastsWithFolders,
-                        currentFolderUuid = folder?.uuid
+                        currentFolderUuid = folder?.uuid,
                     ),
                     selectedUuids = sortPodcasts(podcastsSortedByReleaseDate = podcastsSelected).map { it.uuid },
                     searchText = searchText,
                     folders = folders,
                     folder = folder,
-                    layout = settings.podcastGridLayout.value
+                    layout = settings.podcastGridLayout.value,
                 )
             }.collect {
                 mutableState.value = it
@@ -230,7 +230,7 @@ class FolderEditViewModel
                     name = name,
                     color = colorId.value,
                     podcastsSortType = settings.podcastsSortType.value,
-                    podcastUuids = podcastUuids
+                    podcastUuids = podcastUuids,
                 )
                 onComplete(newFolder)
             }

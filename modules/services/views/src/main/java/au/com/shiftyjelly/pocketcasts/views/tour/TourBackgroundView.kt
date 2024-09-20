@@ -22,7 +22,7 @@ private const val PROP_HEIGHT = "height"
 internal class TourBackgroundView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
     private val backgroundPaint = Paint()
     private val cutoutPaint = Paint()
@@ -46,9 +46,8 @@ internal class TourBackgroundView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, null) // Cutouts seem to only work with software drawing
     }
 
-    override fun draw(canvas: Canvas?) {
+    override fun draw(canvas: Canvas) {
         super.draw(canvas)
-        val canvas = canvas ?: return
 
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backgroundPaint)
 

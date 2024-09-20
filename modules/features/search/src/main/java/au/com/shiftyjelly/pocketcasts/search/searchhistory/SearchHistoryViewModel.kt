@@ -3,26 +3,26 @@ package au.com.shiftyjelly.pocketcasts.search.searchhistory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class SearchHistoryViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     userManager: UserManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val signInState = userManager.getSignInState().asFlow()
     private var isSignedInAsPlusOrPatron = false
@@ -30,7 +30,7 @@ class SearchHistoryViewModel @Inject constructor(
     private var source: SourceView = SourceView.UNKNOWN
 
     private val mutableState = MutableStateFlow(
-        State(entries = emptyList())
+        State(entries = emptyList()),
     )
     val state: StateFlow<State> = mutableState
 
@@ -57,7 +57,7 @@ class SearchHistoryViewModel @Inject constructor(
 
     private suspend fun loadSearchHistory() {
         val entries = searchHistoryManager.findAll(
-            showFolders = isSignedInAsPlusOrPatron && !onlySearchRemote
+            showFolders = isSignedInAsPlusOrPatron && !onlySearchRemote,
         )
         mutableState.value = mutableState.value.copy(entries = entries)
     }
@@ -82,7 +82,7 @@ class SearchHistoryViewModel @Inject constructor(
             loadSearchHistory()
             analyticsTracker.track(
                 AnalyticsEvent.SEARCH_HISTORY_CLEARED,
-                AnalyticsProp.sourceMap(source = source)
+                AnalyticsProp.sourceMap(source = source),
             )
         }
     }
@@ -94,8 +94,8 @@ class SearchHistoryViewModel @Inject constructor(
             AnalyticsProp.searchHistoryEntryMap(
                 source = source,
                 type = type,
-                uuid = entry.uuid()
-            )
+                uuid = entry.uuid(),
+            ),
         )
     }
 

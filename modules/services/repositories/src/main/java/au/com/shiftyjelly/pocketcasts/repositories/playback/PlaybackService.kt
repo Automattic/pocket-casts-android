@@ -16,7 +16,8 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -25,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.items
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -39,12 +40,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
-import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -53,13 +53,16 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
+import java.util.Timer
+import java.util.TimerTask
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val MEDIA_ID_ROOT = "__ROOT__"
@@ -97,19 +100,34 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var folderManager: FolderManager
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var notificationDrawer: NotificationDrawer
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var settings: Settings
-    @Inject lateinit var serverManager: ServerManager
+
+    @Inject lateinit var serviceManager: ServiceManager
+
     @Inject lateinit var notificationHelper: NotificationHelper
+
     @Inject lateinit var subscriptionManager: SubscriptionManager
-    @Inject lateinit var listServerManager: ListServerManager
-    @Inject lateinit var podcastCacheServerManager: PodcastCacheServerManager
+
+    @Inject lateinit var listServiceManager: ListServiceManager
+
+    @Inject lateinit var podcastCacheServiceManager: PodcastCacheServiceManager
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     var mediaController: MediaControllerCompat? = null
         set(value) {
@@ -173,18 +191,19 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 accept(currentMetadataCompat)
             }
         }
+        private val artworkConfiguration = settings.artworkConfiguration.flow.asObservable()
 
         init {
-            Observables.combineLatest(playbackStatusRelay, mediaMetadataRelay)
+            Observables.combineLatest(playbackStatusRelay, mediaMetadataRelay, artworkConfiguration)
                 .observeOn(SchedulerProvider.io)
                 // only generate new notifications for a different playback state and episode. Also if we are playing but aren't a foreground service something isn't right
-                .distinctUntilChanged { oldPair: Pair<PlaybackStateCompat, MediaMetadataCompat>, newPair: Pair<PlaybackStateCompat, MediaMetadataCompat> ->
+                .distinctUntilChanged { (state1, metadata1, artworkConfiguration1), (state2, metadata2, artworkConfiguration2) ->
                     val isForegroundService = isForegroundService()
-                    (oldPair.first.state == newPair.first.state && oldPair.second.id == newPair.second.id) &&
-                        (isForegroundService && (newPair.first.state == PlaybackStateCompat.STATE_PLAYING || newPair.first.state == PlaybackStateCompat.STATE_BUFFERING))
+                    (state1.state == state2.state && metadata1.id == metadata2.id && artworkConfiguration1 == artworkConfiguration2) &&
+                        (isForegroundService && (state2.state == PlaybackStateCompat.STATE_PLAYING || state2.state == PlaybackStateCompat.STATE_BUFFERING))
                 }
                 // build the notification including artwork in the background
-                .map { (playbackState, metadata) -> playbackState to buildNotification(playbackState.state, metadata) }
+                .map { (playbackState, metadata, artworkConfiguration) -> playbackState to buildNotification(playbackState.state, metadata, artworkConfiguration.useEpisodeArtwork) }
                 .observeOn(SchedulerProvider.mainThread)
                 .subscribeBy(
                     onNext = { (state: PlaybackStateCompat, notification: Notification?) ->
@@ -193,7 +212,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                     onError = { throwable ->
                         Timber.e(throwable)
                         LogBuffer.e(LogBuffer.TAG_PLAYBACK, throwable, "Playback service error")
-                    }
+                    },
                 )
                 .addTo(disposables)
         }
@@ -226,12 +245,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
             // If we have switched to casting we need to remove the notification
             if (isForegroundService && notification == null && playbackManager.isPlaybackRemote()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                } else {
-                    @Suppress("DEPRECATION")
-                    stopForeground(true)
-                }
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground as player is remote")
             }
 
@@ -249,7 +263,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             // Transition between foreground service running and not with a notification
             when (state) {
                 PlaybackStateCompat.STATE_BUFFERING,
-                PlaybackStateCompat.STATE_PLAYING -> {
+                PlaybackStateCompat.STATE_PLAYING,
+                -> {
                     if (notification != null) {
                         try {
                             startForeground(Settings.NotificationId.PLAYING.value, notification)
@@ -257,12 +272,9 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
                         } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                                e is ForegroundServiceStartNotAllowedException
-                            ) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
                                 addBatteryWarnings()
-                                SentryHelper.recordException(e)
-                                FirebaseAnalyticsTracker.foregroundServiceStartNotAllowedException()
+                                analyticsTracker.track(AnalyticsEvent.PLAYBACK_FOREGROUND_SERVICE_ERROR)
                             }
                         }
                     } else {
@@ -272,7 +284,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_NONE,
                 PlaybackStateCompat.STATE_STOPPED,
                 PlaybackStateCompat.STATE_PAUSED,
-                PlaybackStateCompat.STATE_ERROR -> {
+                PlaybackStateCompat.STATE_ERROR,
+                -> {
                     val removeNotification = state != PlaybackStateCompat.STATE_PAUSED || settings.hideNotificationOnPause.value
                     // We have to be careful here to only call notify when moving from PLAY to PAUSE once
                     // or else the notification will come back after being swiped away
@@ -299,7 +312,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             LogBuffer.TAG_PLAYBACK,
                             "Playback state error: ${playbackStatusRelay.value?.errorCode
                                 ?: -1} ${playbackStatusRelay.value?.errorMessage
-                                ?: "Unknown error"}"
+                                ?: "Unknown error"}",
                         )
                     }
                 }
@@ -311,7 +324,11 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             settings.setTimesToShowBatteryWarning(2 + currentValue)
         }
 
-        private fun buildNotification(state: Int, metadata: MediaMetadataCompat?): Notification? {
+        private fun buildNotification(
+            state: Int,
+            metadata: MediaMetadataCompat?,
+            useEpisodeArtwork: Boolean,
+        ): Notification? {
             if (Util.isAutomotive(this@PlaybackService)) {
                 return null
             }
@@ -322,7 +339,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
             val sessionToken = sessionToken
             if (metadata == null || metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).isEmpty()) return null
-            return if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken) else null
+            return if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken, useEpisodeArtwork) else null
         }
     }
 
@@ -361,6 +378,16 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
         if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to media session") // Log things like Android Auto or Assistant connecting
+            if (Util.isAutomotive(applicationContext) && !settings.automotiveConnectedToMediaSession()) {
+                Timer().schedule(
+                    object : TimerTask() {
+                        override fun run() {
+                            settings.setAutomotiveConnectedToMediaSession(true)
+                        }
+                    },
+                    1000,
+                )
+            }
         }
 
         return if (browserRootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) == true) { // Browser root hints is nullable even though it's not declared as such, come on Google
@@ -446,7 +473,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             // find the podcast
             val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuidSuspend(episode.podcastUuid) else Podcast.userPodcast
             // convert to a media item
-            if (podcast == null) null else AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+            if (podcast == null) null else AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
         }
     }
 
@@ -496,12 +523,12 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             folderManager.getHomeFolder().mapNotNull { item ->
                 when (item) {
                     is FolderItem.Folder -> convertFolderToMediaItem(this, item.folder)
-                    is FolderItem.Podcast -> convertPodcastToMediaItem(podcast = item.podcast, context = this)
+                    is FolderItem.Podcast -> convertPodcastToMediaItem(podcast = item.podcast, context = this, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
                 }
             }
         } else {
             podcastManager.findSubscribedSorted().mapNotNull { podcast ->
-                convertPodcastToMediaItem(podcast = podcast, context = this)
+                convertPodcastToMediaItem(podcast = podcast, context = this, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
         }
     }
@@ -509,7 +536,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     suspend fun loadFolderPodcastsChildren(folderUuid: String): List<MediaBrowserCompat.MediaItem> {
         return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
             folderManager.findFolderPodcastsSorted(folderUuid).mapNotNull { podcast ->
-                convertPodcastToMediaItem(podcast = podcast, context = this)
+                convertPodcastToMediaItem(podcast = podcast, context = this, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
         } else {
             emptyList()
@@ -519,19 +546,27 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     suspend fun loadEpisodeChildren(parentId: String): List<MediaBrowserCompat.MediaItem> {
         // user tapped on a playlist or podcast, show the episodes
         val episodeItems = mutableListOf<MediaBrowserCompat.MediaItem>()
+        val autoPlaySource: AutoPlaySource
 
         val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuidSync(parentId)
         if (playlist != null) {
-            val episodeList = if (DOWNLOADS_ROOT == parentId) episodeManager.observeDownloadedEpisodes().blockingFirst() else playlistManager.findEpisodes(playlist, episodeManager, playbackManager)
+            val episodeList = if (DOWNLOADS_ROOT == parentId) {
+                autoPlaySource = AutoPlaySource.Downloads
+                episodeManager.observeDownloadedEpisodes().blockingFirst()
+            } else {
+                autoPlaySource = AutoPlaySource.fromId(parentId)
+                playlistManager.findEpisodes(playlist, episodeManager, playbackManager)
+            }
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
             if (topEpisodes.isNotEmpty()) {
                 for (episode in topEpisodes) {
                     podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)?.let { parentPodcast ->
-                        episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = playlist.uuid))
+                        episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = playlist.uuid, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork))
                     }
                 }
             }
         } else {
+            autoPlaySource = AutoPlaySource.fromId(parentId)
             val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
 
@@ -545,32 +580,41 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                     episodes.sortBy { it.episodeType !is PodcastEpisode.EpisodeType.Trailer } // Bring trailers to the top
                 }
                 episodes.forEach { episode ->
-                    episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, podcast, groupTrailers = !podcast.isSubscribed))
+                    episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, podcast, groupTrailers = !podcast.isSubscribed, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork))
                 }
             }
         }
 
+        setAutoPlaySource(autoPlaySource)
+
         return episodeItems
     }
 
+    private fun setAutoPlaySource(autoPlaySource: AutoPlaySource) {
+        settings.trackingAutoPlaySource.set(autoPlaySource, updateModifiedAt = false)
+    }
+
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
+        setAutoPlaySource(AutoPlaySource.Files)
         return userEpisodeManager.findUserEpisodes().map {
-            AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast)
+            AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
         }
     }
 
     protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
+        setAutoPlaySource(AutoPlaySource.Starred)
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
-                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
         }
     }
 
     protected suspend fun loadListeningHistoryChildren(): List<MediaBrowserCompat.MediaItem> {
         return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
+            setAutoPlaySource(AutoPlaySource.fromId(episode.podcastUuid))
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
-                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
             }
         }
     }
@@ -599,7 +643,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             if (termCleaned.length <= 1) {
                 emptyList()
             } else {
-                serverManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
+                serviceManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
             }
         } catch (ex: Exception) {
             Timber.e(ex)
@@ -612,6 +656,6 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         // merge the local and remote podcasts
         val podcasts = (localPodcasts + serverPodcasts).distinctBy { it.uuid }
         // convert podcasts to the media browser format
-        return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast) }
+        return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork) }
     }
 }

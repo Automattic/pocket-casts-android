@@ -14,60 +14,124 @@ enum class Feature(
     END_OF_YEAR_ENABLED(
         key = "end_of_year_enabled",
         title = "End of Year",
-        defaultValue = true,
+        defaultValue = false,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    REPORT_VIOLATION(
+        key = "report_violation",
+        title = "Report Violation",
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
+        hasDevToggle = false,
     ),
-    ADD_PATRON_ENABLED(
-        key = "add_patron_enabled",
-        title = "Patron",
-        defaultValue = true,
+    INTRO_PLUS_OFFER_ENABLED(
+        key = "intro_plus_offer_enabled",
+        title = "Intro Offer Plus",
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
+        hasDevToggle = false,
     ),
-    BOOKMARKS_ENABLED(
-        key = "bookmarks_enabled",
-        title = "Bookmarks",
-        defaultValue = true,
-        tier = FeatureTier.Plus(
-            patronExclusiveAccessRelease = ReleaseVersion(major = 7, minor = 52)
-        ),
+    SLUMBER_STUDIOS_YEARLY_PROMO(
+        key = "slumber_studios_yearly_promo_code",
+        title = "Slumber Studios Yearly Promo",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Plus(null),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    IN_APP_REVIEW_ENABLED(
-        key = "in_app_review_enabled",
-        title = "In App Review",
+    DESELECT_CHAPTERS(
+        key = "deselect_chapters_enabled",
+        title = "Deselect Chapters",
         defaultValue = true,
-        tier = FeatureTier.Free,
+        tier = FeatureTier.Plus(ReleaseVersion(7, 60)),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    GIVE_RATINGS(
-        key = "give_ratings",
-        title = "Give Ratings",
+    NOVA_LAUNCHER(
+        key = "nova_launcher",
+        title = "Integrate Pocket Casts with Nova Launcher",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
-        hasDevToggle = true
-    );
-
-    fun isCurrentlyExclusiveToPatron(
-        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper()
-    ): Boolean {
-        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
-        val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
-            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
-        }
-        return when (relativeToEarlyAccessState) {
-            null -> false
-            EarlyAccessState.Before,
-            EarlyAccessState.During -> !isReleaseCandidate
-            EarlyAccessState.After -> false
-        }
-    }
+        hasDevToggle = true,
+    ),
+    CACHE_ENTIRE_PLAYING_EPISODE(
+        key = "cache_entire_playing_episode",
+        title = "Cache entire playing episode",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    REIMAGINE_SHARING(
+        key = "reimagine_sharing",
+        title = "Use new sharing designs",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    TRANSCRIPTS(
+        key = "transcripts",
+        title = "Transcripts",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    PAYWALL_AA_EXPERIMENT(
+        key = "paywall_aa_experiment",
+        title = "Paywall AA Experiment",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    PAYWALL_AB_EXPERIMENT(
+        key = "paywall_ab_experiment",
+        title = "Paywall AB Experiment",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    ENGAGE_SDK(
+        key = "engage_sdk",
+        title = "Integrate Pocket Casts with Engage SDK",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
+    REFERRALS(
+        key = "referrals",
+        title = "Referrals",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    EXO_OKHTTP(
+        key = "exo_okhttp",
+        title = "Whether OkHttp should be used as an ExoPlayer client",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    SEARCH_IN_LISTENING_HISTORY(
+        key = "search_in_listening_history",
+        title = "Search in listening history",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    ;
 
     companion object {
 
@@ -76,18 +140,16 @@ enum class Feature(
             userTier: UserTier,
             releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
         ) = when (userTier) {
-
             // Patron users can use all features
             UserTier.Patron -> when (feature.tier) {
                 FeatureTier.Patron,
                 is FeatureTier.Plus,
-                FeatureTier.Free -> true
+                FeatureTier.Free,
+                -> true
             }
 
             UserTier.Plus -> {
-
                 when (feature.tier) {
-
                     // Patron features can only be used by Patrons
                     FeatureTier.Patron -> false
 
@@ -100,7 +162,8 @@ enum class Feature(
                         when (relativeToEarlyAccess) {
                             null -> true // no early access release
                             EarlyAccessState.Before,
-                            EarlyAccessState.During -> isReleaseCandidate
+                            EarlyAccessState.During,
+                            -> isReleaseCandidate
                             EarlyAccessState.After -> true
                         }
                     }
@@ -117,6 +180,23 @@ enum class Feature(
             }
         }
     }
+
+    // Please do not delete this method because sometimes we need it
+    fun isCurrentlyExclusiveToPatron(
+        releaseVersion: ReleaseVersionWrapper = ReleaseVersionWrapper(),
+    ): Boolean {
+        val isReleaseCandidate = releaseVersion.currentReleaseVersion.releaseCandidate != null
+        val relativeToEarlyAccessState = (this.tier as? FeatureTier.Plus)?.patronExclusiveAccessRelease?.let {
+            releaseVersion.currentReleaseVersion.comparedToEarlyPatronAccess(it)
+        }
+        return when (relativeToEarlyAccessState) {
+            null -> false
+            EarlyAccessState.Before,
+            EarlyAccessState.During,
+            -> !isReleaseCandidate
+            EarlyAccessState.After -> false
+        }
+    }
 }
 
 // It would be nice to be able to use Subscription.SubscriptionTier here, but that's in the
@@ -128,7 +208,7 @@ enum class UserTier {
 }
 
 sealed class FeatureTier {
-    object Patron : FeatureTier()
+    data object Patron : FeatureTier()
     class Plus(val patronExclusiveAccessRelease: ReleaseVersion?) : FeatureTier()
-    object Free : FeatureTier()
+    data object Free : FeatureTier()
 }

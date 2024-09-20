@@ -41,7 +41,6 @@ Language: en_GB
     <string name="bookmarks_sort_timestamp">Timestamp</string>
     <string name="bookmarks_select_option">Select bookmarks</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
-    <string name="bookmarks_deleted_singular">1 bookmark deleted</string>
     <string name="bookmarks_delete_singular">Delete bookmark</string>
     <string name="bookmarks_delete_plural">Delete bookmarks</string>
     <string name="bookmarks_deleted_plural">%1$d bookmarks deleted</string>
@@ -50,10 +49,6 @@ Language: en_GB
     <string name="deselect_all">Deselect all</string>
     <string name="deselect_all_above">Deselect all above</string>
     <string name="edit">Edit</string>
-    <string name="whats_new_autoplay_maybe_later_button">Maybe later</string>
-    <string name="whats_new_autoplay_body">If you start an episode while Up Next is empty, Autoplay will continue playing episodes from that podcast or list.</string>
-    <string name="whats_new_autoplay_enable_button">Enable it now</string>
-    <string name="whats_new_autoplay_title">Autoplay is here!</string>
     <string name="filters_download_limit_3">3 episodes</string>
     <string name="settings_title_headphone_controls">Headphone controls</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Play a confirmation sound after creating a bookmark with your headphones.</string>
@@ -77,7 +72,6 @@ Language: en_GB
     <string name="settings_autoplay">Autoplay</string>
     <string name="player_sleep_1_minute">1 minute</string>
     <string name="onboarding_plus_feature_extra_themes_icons_title">Extra Themes &amp; App Icons</string>
-    <string name="onboarding_plus_feature_watch_playback">Watch Playback</string>
     <string name="onboarding_patron_feature_early_access_title">Early access to features</string>
     <string name="settings_continuous_playback_summary">If your Up Next queue is empty, we\'ll play episodes from the same podcast or list you\'re currently listening to.</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
@@ -100,7 +94,6 @@ Language: en_GB
     <string name="settings_about_terms_of_service_available_at">Our Terms of service are available at %s</string>
     <string name="settings_about_privacy_policy_available_at">Our Privacy policy is available at %s</string>
     <string name="settings_open_on_phone">Open on phone</string>
-    <string name="log_in_no_network">No network connection detected. Please try again later.</string>
     <string name="error_server_failed">Internal server error occurred. Please try again later.</string>
     <string name="error_invalid_email_address">Please enter a valid email address.</string>
     <string name="error_invalid_password_length">Please enter a password that is at least 6 characters long.</string>
@@ -192,7 +185,6 @@ Language: en_GB
     <string name="settings_media_actions_prioritize_title">Prioritise your custom media actions</string>
     <string name="settings_media_actions_customise">Customise media actions</string>
     <string name="settings_media_actions_prioritize_subtitle">Your top actions will be available.</string>
-    <string name="plus_take_your_podcasting_to_next_level">Take your podcasting experience to the next level with exclusive access to features and customisation options.</string>
     <string name="onboarding_recommendations_more">More %s</string>
     <string name="podcast_url">Podcast URL</string>
     <string name="author">Author</string>
@@ -281,15 +273,10 @@ Language: en_GB
     <string name="plus_trial_duration_free_trial">%s free trial</string>
     <string name="end_of_year_stories_failed">Unable to load your end of year stories, check your internet connection.</string>
     <string name="onboarding_plus_feature_folders_text">Organise your podcasts in folders and keep them in sync across all your devices.</string>
-    <string name="onboarding_plus_feature_folders_title">Folders</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colours. Exclusive icons and themes for the Plus club only.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
-    <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
-    <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
-    <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customisation options</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket Casts, plus more</string>
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favourite podcasts or import them from another podcast player. You can always do this later.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Find your favourite podcasts</string>
@@ -719,7 +706,6 @@ Language: en_GB
     <string name="settings_website_link">website link</string>
     <string name="settings_view">View</string>
     <string name="settings_version">Version %1$s (%2$s)</string>
-    <string name="settings_use_embedded_podcast_artwork">Use embedded podcast artwork</string>
     <string name="settings_use_android_light_dark_mode">Use Android Light/Dark Mode</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>
@@ -830,7 +816,6 @@ Language: en_GB
     <string name="settings_export_send_email">Send email</string>
     <string name="settings_export_save_file_summary">Export the OPML file to your storage.</string>
     <string name="settings_export_save_file">Save file</string>
-    <string name="settings_embedded_artwork_details">Shows artwork from the downloaded file (if it exists) in the player instead of using the show\'s artwork.</string>
     <string name="settings_developer">Developer</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
@@ -900,17 +885,10 @@ Language: en_GB
     <string name="plus_themes_icons">Themes and Icons</string>
     <string name="plus_thanks_for_your_support_bang">Thanks for your support!</string>
     <string name="plus_slash_month">%s / month</string>
-    <string name="plus_lifetime_member">Lifetime Member</string>
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
-    <string name="plus_desktop_apps_body">Take your podcasts to more places with our Windows, macOS and Web apps.</string>
     <string name="plus_desktop_apps">Desktop Apps</string>
-    <string name="plus_description_title">Enhanced Features For Advanced Listeners</string>
-    <string name="plus_description_body">Get personal, and get distributed, all at once. Upload your personal audio files to our cloud servers, access your account via our web player, and make the app yours.</string>
-    <string name="plus_create_marketing_features"> Everything</string>
     <string name="settings_logs">Logs</string>
-    <string name="plus_cloud_storage_limit">%dGB Cloud Storage</string>
-    <string name="plus_cloud_storage_body">Speed up your lectures. Burn through other content. Be your own Podcast DJ.</string>
     <string name="plus_cloud_storage">Cloud Storage</string>
     <string name="profile_expiry_date_unknown">Unknown</string>
     <string name="profile_yearly">Yearly</string>
@@ -918,7 +896,6 @@ Language: en_GB
     <string name="profile_welcome_to_plus">Welcome to Pocket Casts Plus!</string>
     <string name="profile_welcome_to_free">Welcome to Pocket Casts!</string>
     <string name="profile_web_player">Web Player</string>
-    <string name="profile_upgrade_to_plus">Upgrade to Plus</string>
     <string name="profile_updates_ends">Updates end: %s</string>
     <string name="profile_updates_ended">Updates ended: %s</string>
     <string name="profile_time_free">%s free</string>
@@ -978,7 +955,6 @@ Language: en_GB
     <string name="profile_reset_password_failed">Unable to email you a new password. Please try again later.</string>
     <string name="profile_reset_password">Reset Password</string>
     <string name="profile_regular_price">Regular Price</string>
-    <string name="profile_regular">Regular</string>
     <string name="profile_refreshing">Refreshing…</string>
     <string name="profile_refreshed_never">Never refreshed</string>
     <string name="profile_refresh_status_unknown">Unknown</string>
@@ -1024,9 +1000,7 @@ Language: en_GB
     <string name="profile_joined">Joined:</string>
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
     <string name="profile_free_account">Free Account</string>
-    <string name="profile_free">Free</string>
     <string name="profile_forgot_your_password">I forgot my password</string>
-    <string name="profile_find_out_more">Find out more about Pocket Casts Plus</string>
     <string name="profile_files_remove_image">Replace Image</string>
     <string name="profile_files_empty_title">No Files</string>
     <string name="profile_files_empty_summary">Want to listen to your own files?\nTap the + button to open them in Pocket Casts, and they’ll appear here.</string>
@@ -1036,9 +1010,6 @@ Language: en_GB
     <string name="profile_file_locked">locked</string>
     <string name="profile_file">File</string>
     <string name="profile_feature_requires">This feature requires\nPocket Casts Plus</string>
-    <string name="profile_extra_themes">Extra Themes</string>
-    <string name="profile_extra_app_icons">Extra App Icons</string>
-    <string name="profile_everything_unlocked">Everything Unlocked</string>
     <string name="profile_ends">Ends %s</string>
     <string name="profile_ended">Ended %s</string>
     <string name="profile_end_tour">END TOUR</string>
@@ -1070,16 +1041,10 @@ Language: en_GB
     <string name="profile_select_account_type">Select Account Type</string>
     <string name="profile_create_completed">Complete Account</string>
     <string name="profile_create_terms_of_use">Terms of Use</string>
-    <string name="profile_create_tos_full_terms_of_use">Full Terms of Use</string>
-    <string name="profile_create_tos_disagree">No Thanks</string>
-    <string name="profile_create_tos_agree">I Agree</string>
-    <string name="profile_create_tos">Before we can let you into the Plus club we need you to agree to our Terms of Use. You can peruse them at your leisure using the link below.</string>
     <string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
-    <string name="profile_create_privacy_policy_title">Privacy Policy</string>
     <string name="profile_create_privacy_policy">We\'ve linked our Privacy Policy too in case you\'re interested. We\'ve tried to keep both short and to the point and included as little Legalese as possible.</string>
     <string name="profile_create_password_requirements">Must be at least 6 characters</string>
     <string name="profile_create_newsletter_summary">Receive news, app updates, themed podcast lists, interviews and more</string>
-    <string name="profile_create_license">Please excuse our formality</string>
     <string name="profile_create_failed">Could not create account. Please try again</string>
     <string name="profile_create_account_image">create account image</string>
     <string name="profile_create_account">Create Account</string>
@@ -1126,7 +1091,6 @@ Language: en_GB
     <string name="profile_alreadysignedindescription">You can only be signed in to one account at a time.</string>
     <string name="profile_alreadysignedin">You are already signed in</string>
     <string name="profile_already_have_account">Already have a Pocket Casts account?</string>
-    <string name="profile_almost_everything">Almost Everything</string>
     <string name="profile_account_delete_yes">Yes, delete it</string>
     <string name="profile_account_created">Account Created</string>
     <string name="profile_access_ends">Access ends: %s</string>
@@ -1371,7 +1335,6 @@ Language: en_GB
     <string name="podcasts">Podcasts</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_skipped_last">Skipped the last %d seconds</string>
-    <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.\nNight night!</string>
     <string name="player_actions_show_as_delete_for_custom">Shown as deleted for custom episodes</string>
     <string name="player_actions_hidden_for_custom">Hidden for custom episodes</string>
     <string name="player_rearrange_actions_hidden">More actions</string>
@@ -1393,7 +1356,6 @@ Language: en_GB
     <string name="player_time_saved_detail">In total you have saved %s using this feature.</string>
     <string name="player_tab_playing_wide">Now Playing</string>
     <string name="player_tab_playing">Playing</string>
-    <string name="player_sleep_when_episode_ends">Sleeping when episode ends</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_end_of_episode">End of episode</string>
@@ -1402,7 +1364,6 @@ Language: en_GB
     <string name="player_sleep_cancel_timer">Cancel timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
     <string name="player_sleep_60_minutes">60 minutes</string>
-    <string name="player_sleep_5_minutes">5 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_pip">Enter Picture-in-picture</string>

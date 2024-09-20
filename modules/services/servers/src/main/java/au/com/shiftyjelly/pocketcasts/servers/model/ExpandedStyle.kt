@@ -9,6 +9,7 @@ sealed class ExpandedStyle(val stringValue: String) {
         private const val PLAIN_LIST = "plain_list"
         private const val DESCRIPTIVE_LIST = "descriptive_list"
         private const val GRID_LIST = "grid"
+        private const val POPOVER = "popover"
 
         fun fromString(value: String?): ExpandedStyle? {
             return when (value) {
@@ -16,6 +17,7 @@ sealed class ExpandedStyle(val stringValue: String) {
                 PLAIN_LIST -> PlainList()
                 DESCRIPTIVE_LIST -> DescriptiveList()
                 GRID_LIST -> GridList()
+                POPOVER -> Popover()
                 else -> PlainList()
             }
         }
@@ -25,6 +27,7 @@ sealed class ExpandedStyle(val stringValue: String) {
     class PlainList : ExpandedStyle(PLAIN_LIST)
     class DescriptiveList : ExpandedStyle(DESCRIPTIVE_LIST)
     class GridList : ExpandedStyle(GRID_LIST)
+    class Popover : ExpandedStyle(POPOVER)
 }
 
 class ExpandedStyleMoshiAdapter {

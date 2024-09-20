@@ -5,7 +5,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,14 +23,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchHandler: SearchHandler,
     private val searchHistoryManager: SearchHistoryManager,
     private val podcastManager: PodcastManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true
@@ -50,8 +50,8 @@ class SearchViewModel @Inject constructor(
             podcasts = emptyList(),
             episodes = emptyList(),
             error = null,
-            loading = false
-        )
+            loading = false,
+        ),
     )
     val state: StateFlow<SearchState> = _state
 
@@ -67,7 +67,7 @@ class SearchViewModel @Inject constructor(
 
             combine(
                 subscribedUuidFlow,
-                searchResults.asFlow()
+                searchResults.asFlow(),
             ) { subscribedUuids, searchState ->
                 when (searchState) {
                     is SearchState.NoResults -> searchState
@@ -80,7 +80,7 @@ class SearchViewModel @Inject constructor(
                                     } else {
                                         podcast
                                     }
-                                }
+                                },
                         )
                     }
                 }
@@ -124,11 +124,11 @@ class SearchViewModel @Inject constructor(
                 } else {
                     it
                 }
-            }
+            },
         )?.let { _state.value = it }
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
-            AnalyticsProp.podcastSubscribed(uuid = podcast.uuid, source = source)
+            AnalyticsProp.podcastSubscribed(uuid = podcast.uuid, source = source),
         )
     }
 
@@ -139,11 +139,11 @@ class SearchViewModel @Inject constructor(
     fun trackSearchResultTapped(
         source: SourceView,
         uuid: String,
-        type: SearchResultType
+        type: SearchResultType,
     ) {
         analyticsTracker.track(
             AnalyticsEvent.SEARCH_RESULT_TAPPED,
-            AnalyticsProp.searchResultTapped(source = source, uuid = uuid, type = type)
+            AnalyticsProp.searchResultTapped(source = source, uuid = uuid, type = type),
         )
     }
 
@@ -153,14 +153,14 @@ class SearchViewModel @Inject constructor(
     ) {
         analyticsTracker.track(
             event,
-            AnalyticsProp.searchShownOrDismissed(source = source)
+            AnalyticsProp.searchShownOrDismissed(source = source),
         )
     }
 
     fun trackSearchListShown(source: SourceView, type: ResultsType) {
         analyticsTracker.track(
             AnalyticsEvent.SEARCH_LIST_SHOWN,
-            AnalyticsProp.searchListShown(source = source, type = type)
+            AnalyticsProp.searchListShown(source = source, type = type),
         )
     }
 

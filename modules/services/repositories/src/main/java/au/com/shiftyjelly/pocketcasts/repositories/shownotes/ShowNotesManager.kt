@@ -1,46 +1,34 @@
 package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
-import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.LoadTranscriptSource
+import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
-import kotlinx.coroutines.flow.Flow
-import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 class ShowNotesManager @Inject constructor(
-    private val serverShowNotesManager: ServerShowNotesManager,
-    private val episodeManager: EpisodeManager,
+    private val showNotesServiceManager: ShowNotesServiceManager,
+    private val showNotesProcessor: ShowNotesProcessor,
 ) {
 
     fun loadShowNotesFlow(podcastUuid: String, episodeUuid: String): Flow<ShowNotesState> =
-        serverShowNotesManager.loadShowNotesFlow(
+        showNotesServiceManager.loadShowNotesFlow(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            persistImageUrls = ::updateEpisodesWithImageUrls
+            processShowNotes = { showNotesProcessor.process(episodeUuid, it) },
         )
 
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState =
-        serverShowNotesManager.loadShowNotes(
+        showNotesServiceManager.loadShowNotes(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            persistImageUrls = ::updateEpisodesWithImageUrls
+            processShowNotes = { showNotesProcessor.process(episodeUuid, it) },
         )
 
-    suspend fun downloadToCacheShowNotes(podcastUuid: String) {
-        serverShowNotesManager.downloadToCacheShowNotes(
+    suspend fun downloadToCacheShowNotes(podcastUuid: String, episodeUuid: String) {
+        showNotesServiceManager.downloadToCacheShowNotes(
             podcastUuid = podcastUuid,
-            persistImageUrls = ::updateEpisodesWithImageUrls,
+            processShowNotes = { showNotesProcessor.process(episodeUuid, it, LoadTranscriptSource.DOWNLOAD_EPISODE) },
         )
-    }
-
-    @VisibleForTesting
-    internal suspend fun updateEpisodesWithImageUrls(showNotesResponse: ShowNotesResponse) {
-        showNotesResponse.podcast?.episodes?.mapNotNull { showNotesEpisode ->
-            showNotesEpisode.image?.let { image ->
-                ImageUrlUpdate(showNotesEpisode.uuid, image)
-            }
-        }?.let { episodeManager.updateImageUrls(it) }
     }
 }

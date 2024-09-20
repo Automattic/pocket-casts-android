@@ -14,6 +14,6 @@ fun LoadingSpinner(
         indicatorColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.9f),
         trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
         strokeWidth = 5.dp,
-        modifier = modifier
+        modifier = modifier,
     )
 }

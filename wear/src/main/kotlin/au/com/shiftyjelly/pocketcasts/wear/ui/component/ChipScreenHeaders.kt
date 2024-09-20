@@ -38,18 +38,18 @@ fun ScreenHeaderChip(
             start = horizontalPadding,
             end = horizontalPadding,
             bottom = verticalPadding,
-        )
+        ),
     )
 }
 
 @Composable
 fun SectionHeaderChip(
     @StringRes text: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Header(
         text = stringResource(text),
-        modifier = modifier.padding(vertical = verticalPadding, horizontal = horizontalPadding)
+        modifier = modifier.padding(vertical = verticalPadding, horizontal = horizontalPadding),
     )
 }
 
@@ -64,7 +64,7 @@ private fun Header(
         color = textColor ?: MaterialTheme.colors.onSecondary,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.button,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     )
 }
 

@@ -37,7 +37,7 @@ enum class NotificationVibrateSetting(
         analyticsString = "new_episodes",
     ) {
         override fun isNotificationVibrateOn(context: Context) = true
-    };
+    }, ;
 
     abstract fun isNotificationVibrateOn(context: Context): Boolean
 

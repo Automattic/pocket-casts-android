@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
 import android.content.res.Configuration
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -46,6 +46,9 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.SectionId
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
+import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
+import au.com.shiftyjelly.pocketcasts.compose.bars.singleAuto
+import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
@@ -60,7 +63,6 @@ import au.com.shiftyjelly.pocketcasts.compose.podcast.PodcastSubscribeImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -70,12 +72,11 @@ fun OnboardingRecommendationsStartPage(
     onSearch: () -> Unit,
     onBackPressed: () -> Unit,
     onComplete: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
-
     val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
     val state by viewModel.state.collectAsState()
 
-    val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
@@ -83,10 +84,9 @@ fun OnboardingRecommendationsStartPage(
     }
 
     LaunchedEffect(Unit) {
-        systemUiController.apply {
-            setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !theme.darkTheme)
-            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
-        }
+        val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f)) { theme.darkTheme }
+        val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
     BackHandler {
         viewModel.onBackPressed()
@@ -108,7 +108,7 @@ fun OnboardingRecommendationsStartPage(
         onComplete = {
             viewModel.onComplete()
             onComplete()
-        }
+        },
     )
 }
 
@@ -122,7 +122,6 @@ private fun Content(
     onComplete: () -> Unit,
 ) {
     Column {
-
         val numToShowDefault = OnboardingRecommendationsStartPageViewModel.NUM_TO_SHOW_DEFAULT
         val numColumns = when (LocalConfiguration.current.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> numToShowDefault
@@ -134,9 +133,8 @@ private fun Content(
             contentPadding = PaddingValues(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
-
             header {
                 Column {
                     Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
@@ -144,31 +142,31 @@ private fun Content(
                         horizontalArrangement = Arrangement.End,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 18.dp)
+                            .padding(bottom = 18.dp),
 
                     ) {
                         TextH30(
                             text = stringResource(LR.string.onboarding_recommendations_import),
                             modifier = Modifier
                                 .clickable { onImportClicked() }
-                                .padding(horizontal = 16.dp, vertical = 9.dp)
+                                .padding(horizontal = 16.dp, vertical = 9.dp),
                         )
                     }
 
                     TextH10(
                         text = stringResource(LR.string.onboarding_recommendations_find_favorite_podcasts),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
 
                     TextP40(
                         text = stringResource(LR.string.onboarding_recommendations_make_pocket_casts_yours),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
 
                     SearchBarButton(
                         text = stringResource(LR.string.search),
                         onClick = onSearch,
-                        modifier = Modifier.padding(bottom = 25.dp)
+                        modifier = Modifier.padding(bottom = 25.dp),
                     )
                 }
             }
@@ -176,7 +174,7 @@ private fun Content(
             state.sections.forEach { section ->
                 section(
                     section = section,
-                    onSubscribeTap = onSubscribeTap
+                    onSubscribeTap = onSubscribeTap,
                 )
             }
 
@@ -201,19 +199,18 @@ private fun Content(
 
 private fun LazyGridScope.section(
     section: Section,
-    onSubscribeTap: (Podcast) -> Unit
+    onSubscribeTap: (Podcast) -> Unit,
 ) {
     if (section.visiblePodcasts.isEmpty()) return
 
     header {
         TextH20(
             text = section.title,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
     }
 
     items(items = section.visiblePodcasts) {
-
         // Simulate minLines = 2 since we can't do that directly
         // This is a bit of a hack based on https://stackoverflow.com/a/66401128/1910286
         // Google is working on adding a minLines capability though: https://issuetracker.google.com/issues/122476634
@@ -239,7 +236,7 @@ private fun LazyGridScope.section(
                 maxLines = 2,
                 modifier = Modifier
                     .heightIn(min = twoLines)
-                    .clearAndSetSemantics {}
+                    .clearAndSetSemantics {},
             )
         }
     }
@@ -249,7 +246,7 @@ private fun LazyGridScope.section(
             text = stringResource(LR.string.onboarding_recommendations_more, section.title),
             includePadding = false,
             onClick = section::onShowMore,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
     }
 }
@@ -259,11 +256,10 @@ private fun LazyGridScope.section(
 private fun Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-
     fun podcast(isSubscribed: Boolean = false) = Podcast(
         uuid = "5168e260-372e-013b-efad-0acc26574db2",
         title = "Why Do We Do That?",
-        isSubscribed = isSubscribed
+        isSubscribed = isSubscribed,
     )
 
     AppThemeWithBackground(themeType) {
@@ -284,7 +280,7 @@ private fun Preview(
                             podcast(),
                         ),
                         onShowMoreFun = {},
-                    )
+                    ),
                 ),
                 showLoadingSpinner = true,
             ),
@@ -292,7 +288,7 @@ private fun Preview(
             onImportClicked = {},
             onSubscribeTap = {},
             onSearch = {},
-            onComplete = {}
+            onComplete = {},
         )
     }
 }

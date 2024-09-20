@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
-import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
@@ -33,17 +32,28 @@ private const val VERSION_CODE_AFTER_SECOND_INSTALL = 2
 @RunWith(MockitoJUnitRunner::class)
 class AppLifecycleObserverTest {
 
-    @Mock @ApplicationContext private lateinit var context: Context
+    @Mock @ApplicationContext
+    private lateinit var context: Context
+
     @Mock private lateinit var settings: Settings
+
     @Mock private lateinit var autoPlayNextEpisodeSetting: UserSetting<Boolean>
+
     @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
-    @Mock private lateinit var packageUtil: PackageUtil
+
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
+
     @Mock private lateinit var preferencesFeatureProvider: PreferencesFeatureProvider
+
     @Mock private lateinit var defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider
+
     @Mock private lateinit var firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
+
     @Mock private lateinit var appLifecycleOwner: LifecycleOwner
+
     @Mock private lateinit var appLifecycle: Lifecycle
+
+    @Mock private lateinit var networkConnectionWatcher: NetworkConnectionWatcherImpl
 
     lateinit var appLifecycleObserver: AppLifecycleObserver
 
@@ -61,8 +71,9 @@ class AppLifecycleObserverTest {
             preferencesFeatureProvider = preferencesFeatureProvider,
             defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,
             firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
-            packageUtil = packageUtil,
+            versionCode = VERSION_CODE_AFTER_SECOND_INSTALL,
             settings = settings,
+            networkConnectionWatcher = networkConnectionWatcher,
             applicationScope = CoroutineScope(Dispatchers.Default),
         )
     }
@@ -79,8 +90,8 @@ class AppLifecycleObserverTest {
         appLifecycleObserver.setup()
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
-        verify(autoPlayNextEpisodeSetting).set(true)
-        verify(useUpNextDarkThemeSetting).set(false)
+        verify(autoPlayNextEpisodeSetting).set(true, updateModifiedAt = false)
+        verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -96,8 +107,8 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
-        verify(useUpNextDarkThemeSetting).set(false)
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -112,8 +123,8 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
-        verify(useUpNextDarkThemeSetting).set(false)
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
 
@@ -122,14 +133,13 @@ class AppLifecycleObserverTest {
     @Test
     fun handlesUpgrade() {
         whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
-        whenever(packageUtil.getVersionCode(context)).thenReturn(VERSION_CODE_AFTER_SECOND_INSTALL)
 
         appLifecycleObserver.setup()
 
         verify(appLifecycleAnalytics).onApplicationUpgrade(VERSION_CODE_AFTER_FIRST_INSTALL)
 
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
-        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any())
-        verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any())
+        verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
     }
 }

@@ -4,9 +4,13 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
+import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
+import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem.Podcast
+import com.squareup.moshi.Moshi
+import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -15,7 +19,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.UUID
 
 private const val SEARCH_TERM_TEST1 = "test1"
 private const val SEARCH_TERM_TEST2 = "test2"
@@ -29,7 +32,9 @@ class SearchHistoryDaoTest {
     @Before
     fun setupDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        testDb = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .addTypeConverters(ModelModule.provideRoomConverters(Moshi.Builder().build()))
+            .build()
         searchHistoryDao = testDb.searchHistoryDao()
     }
 
@@ -88,7 +93,7 @@ class SearchHistoryDaoTest {
             assertEquals("Insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced search term should be on top",
-                result.first().modified > modifiedPrevious
+                result.first().modified > modifiedPrevious,
             )
         }
     }
@@ -104,7 +109,7 @@ class SearchHistoryDaoTest {
             assertEquals(
                 "Last search term inserted should be on top",
                 SEARCH_TERM_TEST2,
-                result.first().term
+                result.first().term,
             )
         }
     }
@@ -121,7 +126,7 @@ class SearchHistoryDaoTest {
             assertEquals("Same podcast search insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced podcast search history item should be on top",
-                result.first().modified > modifiedPrevious
+                result.first().modified > modifiedPrevious,
             )
         }
     }
@@ -139,7 +144,7 @@ class SearchHistoryDaoTest {
             assertEquals(
                 "Last podcast search history inserted should be on top",
                 uuid2,
-                result.first().podcast?.uuid
+                result.first().podcast?.uuid,
             )
         }
     }
@@ -156,7 +161,7 @@ class SearchHistoryDaoTest {
             assertEquals("Same folder search insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced folder search should be on top",
-                result.first().modified > modifiedPrevious
+                result.first().modified > modifiedPrevious,
             )
         }
     }
@@ -174,7 +179,7 @@ class SearchHistoryDaoTest {
             assertEquals(
                 "Last folder search history inserted should be on top",
                 uuid2,
-                result.first().folder?.uuid
+                result.first().folder?.uuid,
             )
         }
     }
@@ -191,7 +196,7 @@ class SearchHistoryDaoTest {
             assertEquals("Same episode insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced episode search should be on top",
-                result.first().modified > modifiedPrevious
+                result.first().modified > modifiedPrevious,
             )
         }
     }
@@ -209,7 +214,7 @@ class SearchHistoryDaoTest {
             assertEquals(
                 "Last episode search history inserted should be on top",
                 uuid2,
-                result.first().episode?.uuid
+                result.first().episode?.uuid,
             )
         }
     }
@@ -220,7 +225,7 @@ class SearchHistoryDaoTest {
         val recentSearch = createTermSearchHistoryItem("recent_search", modified = 1)
         assertTrue(
             "second search occurred after first search",
-            recentSearch.modified > oldSearch.modified
+            recentSearch.modified > oldSearch.modified,
         )
 
         searchHistoryDao.deleteAll()
@@ -229,7 +234,7 @@ class SearchHistoryDaoTest {
         assertEquals(
             "results contain both searches before truncation",
             2,
-            findSearchHistory().size
+            findSearchHistory().size,
         )
 
         val limit = 1
@@ -238,11 +243,11 @@ class SearchHistoryDaoTest {
         assertEquals(
             "truncation reduces number of items to limit",
             limit,
-            results.size
+            results.size,
         )
         assertTrue(
             "truncated results should contain most recent search item (${recentSearch.term}), but instead has (${results.map { it.term }})",
-            results.first().term == recentSearch.term
+            results.first().term == recentSearch.term,
         )
     }
 
@@ -297,7 +302,7 @@ class SearchHistoryDaoTest {
     /* HELPER FUNCTIONS */
     private fun createTermSearchHistoryItem(
         term: String,
-        modified: Long = System.currentTimeMillis()
+        modified: Long = System.currentTimeMillis(),
     ) = SearchHistoryItem(term = term, modified = modified)
 
     private fun createPodcastSearchHistoryItem(uuid: String) =
@@ -306,7 +311,7 @@ class SearchHistoryDaoTest {
                 uuid = uuid,
                 title = "",
                 author = "",
-            )
+            ),
         )
 
     private fun createFolderSearchHistoryItem(uuid: String) =
@@ -320,8 +325,8 @@ class SearchHistoryDaoTest {
                 duration = 0.0,
                 podcastUuid = "",
                 podcastTitle = "",
-                artworkUrl = ""
-            )
+                artworkUrl = "",
+            ),
         )
 
     private suspend fun findSearchHistory(

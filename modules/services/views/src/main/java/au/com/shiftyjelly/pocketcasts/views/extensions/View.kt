@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.extensions
 
 import android.graphics.Rect
-import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -57,12 +56,10 @@ fun View.setRippleBackground(borderless: Boolean = false) {
 }
 
 fun View.setRippleForeground(borderless: Boolean = false) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        val resId = if (borderless) android.R.attr.selectableItemBackgroundBorderless else android.R.attr.selectableItemBackground
-        val outValue = TypedValue()
-        context.theme.resolveAttribute(resId, outValue, true)
-        foreground = ContextCompat.getDrawable(context, outValue.resourceId)
-    }
+    val resId = if (borderless) android.R.attr.selectableItemBackgroundBorderless else android.R.attr.selectableItemBackground
+    val outValue = TypedValue()
+    context.theme.resolveAttribute(resId, outValue, true)
+    foreground = ContextCompat.getDrawable(context, outValue.resourceId)
 }
 
 fun View.expand() {
@@ -73,10 +70,11 @@ fun View.expand() {
     visibility = View.VISIBLE
     val animation = object : Animation() {
         override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-            layoutParams.height = if (interpolatedTime == 1f)
+            layoutParams.height = if (interpolatedTime == 1f) {
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            else
+            } else {
                 (targtetHeight * interpolatedTime).toInt()
+            }
             requestLayout()
         }
 

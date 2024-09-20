@@ -46,7 +46,7 @@ fun AutoResizeText(
     fontFamily: FontFamily? = null,
     letterSpacing: TextUnit = TextUnit.Unspecified,
     textDecoration: TextDecoration? = null,
-    textAlign: TextAlign? = null,
+    textAlign: TextAlign = TextAlign.Unspecified,
     contentAlignment: Alignment? = null,
     lineHeight: TextUnit = TextUnit.Unspecified,
     maxLines: Int = Int.MAX_VALUE,
@@ -76,8 +76,8 @@ fun AutoResizeText(
                     fontFamily = fontFamily,
                     textDecoration = textDecoration,
                     fontStyle = fontStyle,
-                    letterSpacing = letterSpacing
-                )
+                    letterSpacing = letterSpacing,
+                ),
             )
             Paragraph(
                 text = text,
@@ -88,7 +88,7 @@ fun AutoResizeText(
                 spanStyles = listOf(),
                 placeholders = listOf(),
                 maxLines = maxLines,
-                ellipsis = false
+                ellipsis = false,
             )
         }
 
@@ -101,11 +101,12 @@ fun AutoResizeText(
         with(LocalDensity.current) {
             // this loop will attempt to quickly find the correct size font by scaling it by the error
             // it only runs if the max font size isn't specified or the font must be smaller
-            if (maxFontSize.isUnspecified || targetWidth < intrinsics.minIntrinsicWidth.toDp())
+            if (maxFontSize.isUnspecified || targetWidth < intrinsics.minIntrinsicWidth.toDp()) {
                 while ((targetWidth - intrinsics.minIntrinsicWidth.toDp()).toPx().absoluteValue.toDp() > acceptableError / 2f) {
                     shrunkFontSize *= targetWidth.toPx() / intrinsics.minIntrinsicWidth
                     intrinsics = calculateIntrinsics()
                 }
+            }
             // checks if the text fits in the bounds and scales it by 90% until it does
             while (intrinsics.didExceedMaxLines || maxHeight < intrinsics.height.toDp() || maxWidth < intrinsics.minIntrinsicWidth.toDp()) {
                 shrunkFontSize *= 0.9f
@@ -113,8 +114,9 @@ fun AutoResizeText(
             }
         }
 
-        if (maxFontSize.isSpecified && shrunkFontSize > maxFontSize)
+        if (maxFontSize.isSpecified && shrunkFontSize > maxFontSize) {
             shrunkFontSize = maxFontSize
+        }
 
         Text(
             text = text,
@@ -129,7 +131,7 @@ fun AutoResizeText(
             lineHeight = lineHeight,
             onTextLayout = onTextLayout,
             maxLines = maxLines,
-            style = style
+            style = style,
         )
     }
 }
@@ -143,7 +145,7 @@ private fun AutoResizePreview() {
                 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
                 maxFontSize = 22.sp,
                 maxLines = 4,
-                color = Color.White
+                color = Color.White,
             )
         }
     }

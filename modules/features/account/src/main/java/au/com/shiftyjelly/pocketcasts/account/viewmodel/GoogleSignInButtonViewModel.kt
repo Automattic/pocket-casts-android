@@ -6,7 +6,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -25,15 +25,15 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.lang.IllegalArgumentException
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
-import java.lang.IllegalArgumentException
-import javax.inject.Inject
 
 @HiltViewModel
 class GoogleSignInButtonViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
@@ -56,12 +56,14 @@ class GoogleSignInButtonViewModel @Inject constructor(
         onError: suspend () -> Unit,
     ) {
         if (flow != null) {
+            analyticsTracker.track(AnalyticsEvent.SSO_STARTED, mapOf("source" to "google"))
+
             analyticsTracker.track(
                 AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
                 mapOf(
                     OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp.flow(flow),
                     OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp.ButtonTapped.continueWithGoogle,
-                )
+                ),
             )
         } else if (!Util.isAutomotive(context)) {
             throw IllegalArgumentException("OnboardingFlow must be provided for non-automotive devices")
@@ -111,7 +113,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                     signInWithGoogleToken(
                         idToken = idToken,
                         onSuccess = {},
-                        onError = onError
+                        onError = onError,
                     )
                 }
             } catch (ex: Exception) {
@@ -136,7 +138,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                     onSuccess = onSuccess,
                     onError = {
                         onError()
-                    }
+                    },
                 )
             } catch (e: Exception) {
                 if (e is ApiException && e.statusCode == CommonStatusCodes.CANCELED) {
@@ -158,13 +160,13 @@ class GoogleSignInButtonViewModel @Inject constructor(
                 onGoogleSignInResult(
                     result = result,
                     onSuccess = onSuccess,
-                    onError = onError
+                    onError = onError,
                 )
             } catch (e: Exception) {
                 LogBuffer.e(
                     LogBuffer.TAG_CRASH,
                     e,
-                    "Unable to get sign in credentials from legacy Google Sign-In result."
+                    "Unable to get sign in credentials from legacy Google Sign-In result.",
                 )
                 onError()
             }
@@ -174,7 +176,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
     private suspend fun onGoogleSignInResult(
         result: ActivityResult,
         onSuccess: (GoogleSignInState) -> Unit,
-        onError: suspend () -> Unit
+        onError: suspend () -> Unit,
     ) {
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
         val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
@@ -188,7 +190,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
     private suspend fun signInWithGoogleToken(
         idToken: String,
         onSuccess: (GoogleSignInState) -> Unit,
-        onError: suspend () -> Unit
+        onError: suspend () -> Unit,
     ) =
         when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
             is LoginResult.Success -> {

@@ -5,7 +5,9 @@ import android.util.DisplayMetrics
 import android.util.TypedValue
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.math.abs
 import kotlin.math.round
+import kotlin.math.sign
 
 fun Int.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), displayMetrics).toInt()
 fun Int.dpToPx(context: Context) = this.dpToPx(context.resources.displayMetrics)
@@ -18,6 +20,11 @@ fun Int?.isPositive(): Boolean {
     }
     return this != null && this > 0
 }
+
+/**
+ * Ceil division of two integeres without conversion to floating point numbers
+ */
+fun Int.ceilDiv(other: Int): Int = floorDiv(other) + abs(rem(other).sign)
 
 val Int.abbreviated: String
     get() {

@@ -8,16 +8,16 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
-import java.io.File
-import javax.inject.Inject
 
 @HiltViewModel
 class AddFileViewModel @Inject constructor(
     userManager: UserManager,
-    val userEpisodeManager: UserEpisodeManager
+    val userEpisodeManager: UserEpisodeManager,
 ) : ViewModel() {
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()

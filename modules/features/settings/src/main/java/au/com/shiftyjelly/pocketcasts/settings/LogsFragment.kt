@@ -31,33 +31,41 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.LogsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class LogsFragment : BaseFragment() {
+    @Inject lateinit var settings: Settings
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         ComposeView(requireContext()).apply {
             setContent {
                 UiUtil.hideKeyboard(LocalView.current)
                 AppThemeWithBackground(theme.activeTheme) {
+                    val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                     LogsPage(
-                        onBackPressed = ::closeFragment
+                        onBackPressed = ::closeFragment,
+                        bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
                     )
                 }
             }
@@ -71,6 +79,7 @@ class LogsFragment : BaseFragment() {
 @Composable
 private fun LogsPage(
     onBackPressed: () -> Unit,
+    bottomInset: Dp,
 ) {
     val viewModel = hiltViewModel<LogsViewModel>()
     val state by viewModel.state.collectAsState()
@@ -83,7 +92,8 @@ private fun LogsPage(
         onCopyToClipboard = { logs?.let { clipboardManager.setText(AnnotatedString(it)) } },
         onShareLogs = { viewModel.shareLogs(context) },
         includeAppBar = !Util.isAutomotive(context),
-        logs = logs
+        logs = logs,
+        bottomInset = bottomInset,
     )
 }
 
@@ -93,7 +103,8 @@ private fun LogsContent(
     onCopyToClipboard: () -> Unit,
     onShareLogs: () -> Unit,
     logs: String?,
-    includeAppBar: Boolean
+    includeAppBar: Boolean,
+    bottomInset: Dp,
 ) {
     val logScrollState = rememberScrollState(0)
     Column {
@@ -119,8 +130,9 @@ private fun LogsContent(
         Column(
             modifier = Modifier
                 .verticalScroll(logScrollState)
-                .padding(16.dp)
-                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = bottomInset)
+                .fillMaxWidth(),
         ) {
             if (logs == null) {
                 LoadingView()
@@ -145,7 +157,7 @@ private fun AppBarWithShare(
     onScrollToTop: () -> Unit,
     onScrollToBottom: () -> Unit,
     logsAvailable: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ThemedTopAppBar(
         title = stringResource(LR.string.settings_logs),
@@ -157,7 +169,7 @@ private fun AppBarWithShare(
             ) {
                 Icon(
                     imageVector = Icons.Default.VerticalAlignTop,
-                    contentDescription = stringResource(LR.string.go_to_top)
+                    contentDescription = stringResource(LR.string.go_to_top),
                 )
             }
             IconButton(
@@ -166,29 +178,29 @@ private fun AppBarWithShare(
             ) {
                 Icon(
                     imageVector = Icons.Default.VerticalAlignBottom,
-                    contentDescription = stringResource(LR.string.go_to_bottom)
+                    contentDescription = stringResource(LR.string.go_to_bottom),
                 )
             }
             IconButton(
                 onClick = onCopyToClipboard,
-                enabled = logsAvailable
+                enabled = logsAvailable,
             ) {
                 Icon(
                     imageVector = Icons.Default.CopyAll,
-                    contentDescription = stringResource(LR.string.share)
+                    contentDescription = stringResource(LR.string.share),
                 )
             }
             IconButton(
                 onClick = onShareLogs,
-                enabled = logsAvailable
+                enabled = logsAvailable,
             ) {
                 Icon(
                     imageVector = Icons.Default.Share,
-                    contentDescription = stringResource(LR.string.share)
+                    contentDescription = stringResource(LR.string.share),
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -201,10 +213,12 @@ private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::
             onCopyToClipboard = {},
             onShareLogs = {},
             logs = "This is a preview",
-            includeAppBar = true
+            includeAppBar = true,
+            bottomInset = 0.dp,
         )
     }
 }
+
 @Composable
 @Preview
 private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
@@ -214,7 +228,8 @@ private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterPro
             onCopyToClipboard = {},
             onShareLogs = {},
             logs = null,
-            includeAppBar = true
+            includeAppBar = true,
+            bottomInset = 0.dp,
         )
     }
 }

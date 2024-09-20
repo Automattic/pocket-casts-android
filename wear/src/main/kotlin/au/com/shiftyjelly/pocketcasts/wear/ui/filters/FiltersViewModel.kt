@@ -5,14 +5,14 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 
 @HiltViewModel
 class FiltersViewModel @Inject constructor(
-    playlistManager: PlaylistManager
+    playlistManager: PlaylistManager,
 ) : ViewModel() {
 
     sealed class UiState {

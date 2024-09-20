@@ -47,7 +47,7 @@ fun FormField(
             textColor = MaterialTheme.theme.colors.primaryText01,
             placeholderColor = MaterialTheme.theme.colors.primaryText02,
             unfocusedBorderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryField03,
-            errorTrailingIconColor = MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity) // Keep trailing icon the same color in error states
+            errorTrailingIconColor = MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity), // Keep trailing icon the same color in error states
         ),
         enabled = enabled,
         placeholder = { Text(placeholder) },
@@ -63,7 +63,7 @@ fun FormField(
             .onTabMoveFocus()
             .let {
                 if (singleLine) it.onEnter(onImeAction) else it
-            }
+            },
     )
 }
 
@@ -91,7 +91,7 @@ private fun FormFieldPreview() {
         FormField(
             value = "",
             placeholder = "Email",
-            onValueChange = {}
+            onValueChange = {},
         )
     }
 }

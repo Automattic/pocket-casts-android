@@ -9,23 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -41,14 +44,15 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -56,24 +60,35 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class AccountDetailsFragment : BaseFragment() {
+class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
     companion object {
         fun newInstance(): AccountDetailsFragment {
             return AccountDetailsFragment()
         }
     }
 
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
+
     @Inject lateinit var episodeManager: EpisodeManager
+
     @Inject lateinit var folderManager: FolderManager
+
     @Inject lateinit var playlistManager: PlaylistManager
+
     @Inject lateinit var playbackManager: PlaybackManager
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var searchHistoryManager: SearchHistoryManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var upNextQueue: UpNextQueue
+
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
+
     @Inject lateinit var userManager: UserManager
+
     @Inject lateinit var syncManager: SyncManager
 
     private val viewModel: AccountDetailsViewModel by viewModels()
@@ -93,17 +108,28 @@ class AccountDetailsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
-
-        val toolbar = binding.toolbar
-        toolbar?.setTitle(LR.string.profile_pocket_casts_account)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-        toolbar?.setOnLongClickListener {
-            theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity)
-            true
-        }
+        val toolbar = binding.toolbar ?: return
+        setupToolbarAndStatusBar(
+            toolbar = toolbar,
+            title = getString(LR.string.profile_pocket_casts_account),
+            navigationIcon = NavigationIcon.BackArrow,
+        )
 
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
             binding.userView.signedInState = signInState
+            binding.changeAvatarGroup?.isVisible = signInState is SignInState.SignedIn
+
+            if (signInState is SignInState.SignedIn) {
+                binding.btnChangeAvatar?.setOnClickListener {
+                    analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+                    Gravatar.refreshGravatarTimestamp()
+                    context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
+                }
+            }
+
+            if (signInState.isPocketCastsChampion) {
+                binding.userView.setOnUserViewClick(this)
+            }
         }
 
         viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->
@@ -116,24 +142,23 @@ class AccountDetailsFragment : BaseFragment() {
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
             binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
-                !giftExpiring &&
-                FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
+                !giftExpiring
 
             binding.userUpgradeComposeView?.apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     AppTheme(theme.activeTheme) {
                         val showUpgradeBanner = subscription != null && (signInState.isSignedInAsFree || giftExpiring)
-                        binding.dividerView15?.isVisible = showUpgradeBanner &&
-                            FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
+                        binding.dividerView15?.isVisible = showUpgradeBanner
                         if (showUpgradeBanner) {
                             ProfileUpgradeBanner(
                                 onClick = {
+                                    analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
                                     val source = OnboardingUpgradeSource.PROFILE
                                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
                                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
                                 },
-                                modifier = Modifier.padding(top = 16.dp)
+                                modifier = Modifier.padding(top = 16.dp),
                             )
                         }
                     }
@@ -151,6 +176,14 @@ class AccountDetailsFragment : BaseFragment() {
             binding.swtNewsletter?.isChecked = marketingOptIn
             binding.swtNewsletter?.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.updateNewsletter(isChecked)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect { bottomInset ->
+                    binding.mainScrollView.updatePadding(bottom = bottomInset)
+                }
             }
         }
 
@@ -204,6 +237,10 @@ class AccountDetailsFragment : BaseFragment() {
         }
     }
 
+    override fun onPocketCastsChampionClick() {
+        PocketCastsChampionBottomSheetDialog().show(childFragmentManager, "pocket_casts_champion_dialog")
+    }
+
     private fun signOut() {
         if (Util.isAutomotive(requireContext())) {
             signOutAutomotive()
@@ -247,7 +284,6 @@ class AccountDetailsFragment : BaseFragment() {
         when (state) {
             is DeleteAccountState.Success -> {
                 viewModel.clearDeleteAccountState()
-                FirebaseAnalyticsTracker.accountDeleted()
                 performSignOut()
             }
             is DeleteAccountState.Failure -> {
@@ -299,7 +335,7 @@ class AccountDetailsFragment : BaseFragment() {
             folderManager = folderManager,
             searchHistoryManager = searchHistoryManager,
             episodeManager = episodeManager,
-            wasInitiatedByUser = true
+            wasInitiatedByUser = true,
         )
         activity?.finish()
     }

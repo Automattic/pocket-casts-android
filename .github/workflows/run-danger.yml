@@ -1,0 +1,17 @@
+name: ☢️ Trigger Danger On Buildkite
+
+on:
+  pull_request:
+    types: [labeled, unlabeled, milestoned, demilestoned]
+
+jobs:
+  dangermattic:
+    if: ${{ (github.event.pull_request.draft == false) }}
+    uses: Automattic/dangermattic/.github/workflows/reusable-retry-buildkite-step-on-events.yml@v1.1.2
+    with:
+      org-slug: "automattic"
+      pipeline-slug: "pocket-casts-android"
+      retry-step-key: "danger"
+      build-commit-sha: "${{ github.event.pull_request.head.sha }}"
+    secrets:
+      buildkite-api-token: ${{ secrets.TRIGGER_BK_BUILD_TOKEN }}

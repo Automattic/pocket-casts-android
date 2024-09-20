@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 class ChapterProgressBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
 
     var progress: Float = 0.0f
@@ -37,7 +37,7 @@ class ChapterProgressBar @JvmOverloads constructor(
             backgroundPaint.color = when {
                 field.darkTheme -> ThemeColor.playerContrast06(field)
                 field == Theme.ThemeType.LIGHT_CONTRAST -> ThemeColor.primaryUi05(field)
-                else -> ThemeColor.primaryUi02(field)
+                else -> ThemeColor.primaryUi04(field)
             }
             progressPaint.color = when {
                 field == Theme.ThemeType.ROSE -> ThemeColor.primaryIcon02Selected(field).colorIntWithAlpha(25)
@@ -64,15 +64,10 @@ class ChapterProgressBar @JvmOverloads constructor(
         clipPath = Path().apply { addRoundRect(backgroundDrawRect, cornerRadius, cornerRadius, Path.Direction.CW) }
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.clipPath(clipPath)
-        canvas?.drawRect(backgroundDrawRect, backgroundPaint)
-        canvas?.drawRect(progressDrawRect, progressPaint)
-    }
-
-    override fun dispatchDraw(canvas: Canvas?) {
-
-        super.dispatchDraw(canvas)
+        canvas.clipPath(clipPath)
+        canvas.drawRect(backgroundDrawRect, backgroundPaint)
+        canvas.drawRect(progressDrawRect, progressPaint)
     }
 }

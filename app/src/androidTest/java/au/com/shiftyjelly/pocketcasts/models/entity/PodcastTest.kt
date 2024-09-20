@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class PodcastTest {
@@ -12,6 +13,14 @@ class PodcastTest {
         assertEquals("nytimes.com", podcastWithWebsite("https://www.nytimes.com/the-daily").getShortUrl())
         assertEquals("bbc.co.uk", podcastWithWebsite("http://www.bbc.co.uk/programmes/p0bqztzm").getShortUrl())
         assertEquals("", podcastWithWebsite("http://null").getShortUrl())
+    }
+
+    @Test
+    fun ignoreHomeFolderUuid() {
+        val podcast = Podcast()
+        podcast.folderUuid = Folder.homeFolderUuid
+
+        assertNull(podcast.folderUuid)
     }
 
     private fun podcastWithWebsite(website: String): Podcast {

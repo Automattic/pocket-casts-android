@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="transcript_show_seekbar_and_player_controls">true</bool>
+</resources>

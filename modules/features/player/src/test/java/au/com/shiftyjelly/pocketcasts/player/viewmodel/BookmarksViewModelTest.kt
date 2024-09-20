@@ -2,23 +2,27 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.player.view.bookmark.search.BookmarkSearchHandler
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
+import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureWrapper
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
+import java.util.Date
+import java.util.UUID
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,18 +30,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.UUID
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -62,12 +66,6 @@ class BookmarksViewModelTest {
     private lateinit var multiSelectHelper: MultiSelectBookmarksHelper
 
     @Mock
-    private lateinit var episode: BaseEpisode
-
-    @Mock
-    private lateinit var cachedSubscriptionStatus: SubscriptionStatus
-
-    @Mock
     private lateinit var settings: Settings
 
     @Mock
@@ -77,13 +75,15 @@ class BookmarksViewModelTest {
     private lateinit var theme: Theme
 
     @Mock
-    private lateinit var feature: FeatureWrapper
+    private lateinit var bookmarkFeature: BookmarkFeatureControl
 
-    @Mock
-    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private lateinit var bookmarkSearchHandler: BookmarkSearchHandler
 
     private lateinit var bookmarksViewModel: BookmarksViewModel
+
     private val episodeUuid = UUID.randomUUID().toString()
+    private val episode = UserEpisode(episodeUuid, publishedDate = Date())
+    private val cachedSubscriptionStatus = SubscriptionStatus.Free()
 
     @Before
     fun setUp() = runTest {
@@ -91,18 +91,28 @@ class BookmarksViewModelTest {
         whenever(userSetting.flow).thenReturn(MutableStateFlow(cachedSubscriptionStatus))
         whenever(settings.cachedSubscriptionStatus).thenReturn(userSetting)
         whenever(episodeManager.findEpisodeByUuid(episodeUuid)).thenReturn(episode)
-        whenever(feature.isUserEntitled(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
+        whenever(bookmarkFeature.isAvailable(anyOrNull())).thenReturn(true)
         whenever(bookmarkManager.findEpisodeBookmarksFlow(episode, BookmarksSortTypeDefault.TIMESTAMP)).thenReturn(flowOf(emptyList()))
         val playerBookmarksSortType = mock<UserSetting<BookmarksSortTypeDefault>> {
             on { flow } doReturn MutableStateFlow(BookmarksSortTypeDefault.TIMESTAMP)
         }
         whenever(settings.playerBookmarksSortType).thenReturn(playerBookmarksSortType)
+        val profileBookmarksSortType = mock<UserSetting<BookmarksSortTypeForProfile>> {
+            on { flow } doReturn MutableStateFlow(BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST)
+        }
+        whenever(settings.profileBookmarksSortType).thenReturn(profileBookmarksSortType)
+        whenever(episodeManager.findEpisodesByUuids(any())).thenReturn(emptyList())
         whenever(multiSelectHelper.isMultiSelectingLive)
             .thenReturn(MutableLiveData<Boolean>().apply { value = false })
         whenever(multiSelectHelper.selectedListLive)
             .thenReturn(MutableLiveData<List<Bookmark>>().apply { value = emptyList() })
-
+        val artworkConfiguration = mock<UserSetting<ArtworkConfiguration>> {
+            on { flow } doReturn MutableStateFlow(ArtworkConfiguration(false))
+        }
+        whenever(settings.artworkConfiguration).thenReturn(artworkConfiguration)
+        bookmarkSearchHandler = BookmarkSearchHandler(bookmarkManager)
         bookmarksViewModel = BookmarksViewModel(
+            analyticsTracker = AnalyticsTracker.test(),
             bookmarkManager = bookmarkManager,
             episodeManager = episodeManager,
             podcastManager = podcastManager,
@@ -110,33 +120,15 @@ class BookmarksViewModelTest {
             settings = settings,
             playbackManager = playbackManager,
             theme = theme,
-            feature = feature,
+            bookmarkFeature = bookmarkFeature,
             ioDispatcher = UnconfinedTestDispatcher(),
-            analyticsTracker = analyticsTracker,
+            bookmarkSearchHandler = bookmarkSearchHandler,
         )
     }
 
-    /*@Test
-    fun `given no bookmarks, when bookmarks loaded, then Empty state shown`() = runTest {
-        whenever(bookmarkManager.findEpisodeBookmarksFlow(episode)).thenReturn(flowOf(emptyList()))
-
-        bookmarksViewModel.loadBookmarks(episodeUuid)
-
-        assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Empty)
-    }
-
-    @Test
-    fun `given bookmarks present, when bookmarks loaded, then Loaded state shown`() = runTest {
-        whenever(bookmarkManager.findEpisodeBookmarksFlow(episode)).thenReturn(flowOf(listOf(mock())))
-
-        bookmarksViewModel.loadBookmarks(episodeUuid)
-
-        assertTrue(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Loaded)
-    }*/
-
     @Test
     fun `given feature not available, when bookmarks loaded, then Upsell state shown`() = runTest {
-        whenever(feature.isUserEntitled(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(false)
+        whenever(bookmarkFeature.isAvailable(any())).thenReturn(false)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
@@ -145,10 +137,40 @@ class BookmarksViewModelTest {
 
     @Test
     fun `given feature available, when bookmarks loaded, then Upsell state not shown`() = runTest {
-        whenever(feature.isUserEntitled(eq(Feature.BOOKMARKS_ENABLED), anyOrNull())).thenReturn(true)
+        whenever(bookmarkFeature.isAvailable(any())).thenReturn(true)
 
         bookmarksViewModel.loadBookmarks(episodeUuid, SourceView.PLAYER)
 
         assertFalse(bookmarksViewModel.uiState.value is BookmarksViewModel.UiState.Upsell)
+    }
+
+    @Test
+    fun `given non-empty search text, when ui state is loaded, then filtered bookmarks are returned`() = runTest {
+        val searchText = "test"
+        val bookmarks = listOf(Bookmark("uuid1", episodeUuid = "episodeUuid1"), Bookmark("uuid2", episodeUuid = "episodeUuid2"))
+        whenever(bookmarkManager.findBookmarksFlow(any())).thenReturn(flowOf(bookmarks))
+        whenever(bookmarkManager.searchByBookmarkOrEpisodeTitle(any())).thenReturn(listOf("uuid1"))
+
+        bookmarksViewModel.loadBookmarks(null, SourceView.PROFILE)
+        bookmarksViewModel.onSearchTextChanged(searchText)
+
+        val result = (bookmarksViewModel.uiState.value as BookmarksViewModel.UiState.Loaded).bookmarks
+        assertEquals(1, result.size)
+        assertEquals("uuid1", result[0].uuid)
+    }
+
+    @Test
+    fun `given empty search text, when ui state is loaded, then all bookmarks are returned`() = runTest {
+        val searchText = ""
+        val bookmarks = listOf(Bookmark("uuid1", episodeUuid = "episodeUuid1"), Bookmark("uuid2", episodeUuid = "episodeUuid2"))
+        whenever(bookmarkManager.findBookmarksFlow(any())).thenReturn(flowOf(bookmarks))
+
+        bookmarksViewModel.loadBookmarks(null, SourceView.PROFILE)
+        bookmarksViewModel.onSearchTextChanged(searchText)
+
+        val result = (bookmarksViewModel.uiState.value as BookmarksViewModel.UiState.Loaded).bookmarks
+        assertEquals(2, result.size)
+        assertEquals("uuid1", result[0].uuid)
+        assertEquals("uuid2", result[1].uuid)
     }
 }

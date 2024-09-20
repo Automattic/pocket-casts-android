@@ -34,7 +34,7 @@ fun SegmentedProgressIndicator(
             .progressSemantics(progress)
             .fillMaxWidth()
             .height(SegmentHeight)
-            .focusable()
+            .focusable(),
     ) {
         drawSegmentsBackground(backgroundColor, segmentsData)
         drawSegments(progress, color, segmentsData)

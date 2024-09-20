@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Large screens use default layout instead of the landscape one to match iOS design.
+Player controls and seekbar are centered horizontally on this layout, which makes them easier to transition to the Transcript screen.  -->
+<au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:importantForAccessibility="no"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/playerGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:theme="@style/PlayerTheme">
+
+        <ImageView
+            android:id="@+id/artwork"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:importantForAccessibility="no"
+            android:clickable="true"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/chapterArtwork"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:importantForAccessibility="no"
+            android:clickable="true"
+            app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/artworkTopBarrier"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:barrierAllowsGoneWidgets="true"
+            app:barrierDirection="top"
+            app:constraint_referenced_ids="artwork,chapterArtwork" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/artworkEndBarrier"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:barrierAllowsGoneWidgets="true"
+            app:barrierDirection="end"
+            app:constraint_referenced_ids="artwork,chapterArtwork" />
+
+        <ImageView
+            android:id="@+id/chapterUrl"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/player_chapter_url"
+            android:focusable="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_link_back"
+            app:layout_constraintEnd_toEndOf="@+id/artworkEndBarrier"
+            app:layout_constraintTop_toTopOf="@+id/artworkTopBarrier" />
+
+        <ImageView
+            android:id="@+id/chapterUrlFront"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_link"
+            app:layout_constraintBottom_toBottomOf="@+id/chapterUrl"
+            app:layout_constraintEnd_toEndOf="@+id/chapterUrl"
+            app:layout_constraintStart_toStartOf="@+id/chapterUrl"
+            app:layout_constraintTop_toTopOf="@+id/chapterUrl" />
+
+        <au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
+            android:id="@+id/videoView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/episodeTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/episodeTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="4dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.2"
+            android:maxLines="2"
+            android:textColor="#FFFFFFFF"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/subtitleBarrier"
+            app:layout_constraintEnd_toStartOf="@+id/nextChapter"
+            app:layout_constraintStart_toEndOf="@+id/previousChapter"
+            tools:text="@tools:sample/lorem" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/subtitleBarrier"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            app:barrierAllowsGoneWidgets="true"
+            app:barrierDirection="top"
+            app:constraint_referenced_ids="podcastTitle,chapterSummary" />
+
+        <TextView
+            android:id="@+id/podcastTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="?attr/player_contrast_02"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@+id/chapterSummary"
+            app:layout_constraintEnd_toStartOf="@+id/nextChapter"
+            app:layout_constraintStart_toEndOf="@+id/previousChapter"
+            tools:text="Invisibilia" />
+
+        <TextView
+            android:id="@+id/chapterSummary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:textAppearance="?attr/textCaption"
+            app:layout_constraintBottom_toTopOf="@+id/seekBar"
+            app:layout_constraintEnd_toStartOf="@+id/nextChapter"
+            app:layout_constraintStart_toEndOf="@+id/previousChapter"
+            tools:text="@tools:sample/lorem" />
+
+        <ImageButton
+            android:id="@+id/previousChapter"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:contentDescription="@string/player_action_previous_chapter"
+            android:src="@drawable/ic_chapter_skipbackwards"
+            app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/episodeTitle" />
+
+        <ImageButton
+            android:id="@+id/nextChapter"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:contentDescription="@string/player_action_next_chapter"
+            android:src="@drawable/ic_chapter_skipforward"
+            app:layout_constraintBottom_toBottomOf="@+id/episodeTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/episodeTitle" />
+
+        <au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressCircle
+            android:id="@+id/chapterProgressCircle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintBottom_toBottomOf="@+id/nextChapter"
+            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
+            app:layout_constraintStart_toStartOf="@+id/nextChapter"
+            app:layout_constraintTop_toTopOf="@+id/nextChapter" />
+
+        <TextView
+            android:id="@+id/chapterTimeRemaining"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:alpha="0.4"
+            android:textAppearance="@style/H70"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="@+id/nextChapter"
+            app:layout_constraintStart_toStartOf="@+id/nextChapter"
+            app:layout_constraintTop_toBottomOf="@+id/nextChapter"
+            tools:text="9m" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/transcriptPage"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/playerControls"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="@dimen/seekbar_width_percentage" />
+
+        <include
+            layout="@layout/player_controls"
+            android:id="@+id/playerControls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/shelf" />
+
+        <LinearLayout
+            android:id="@+id/shelf"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/player_shelf"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:weightSum="5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageButton
+                android:id="@+id/effects"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:background="?android:attr/actionBarItemBackground"
+                android:contentDescription="@string/player_effects"
+                app:srcCompat="@drawable/ic_effects_off_32"
+                app:tint="?attr/player_contrast_03" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/sleep"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/actionBarItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/player_sleep_timer"
+                android:focusable="true"
+                android:scaleType="centerInside"
+                app:lottie_loop="true"
+                app:lottie_progress="0.5"
+                app:lottie_rawRes="@raw/sleep_button" />
+
+            <ImageButton
+                android:id="@+id/star"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="?android:attr/actionBarItemBackground"
+                android:contentDescription="@string/player_star"
+                app:tint="?attr/player_contrast_03" />
+
+            <ImageButton
+                android:id="@+id/transcript"
+                android:contentDescription="@string/transcript"
+                app:srcCompat="@drawable/ic_transcript_24"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
+                android:id="@+id/share"
+                android:contentDescription="@string/share_podcast"
+                app:srcCompat="@drawable/ic_share_android_32"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
+                android:id="@+id/podcast"
+                android:contentDescription="@string/go_to_podcast"
+                app:srcCompat="@drawable/ic_goto_32"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <FrameLayout
+                android:id="@+id/cast"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1">
+
+                <androidx.mediarouter.app.MediaRouteButton
+                    android:id="@+id/castButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:mediaRouteTypes="user" />
+
+            </FrameLayout>
+
+            <ImageButton
+                android:id="@+id/played"
+                android:contentDescription="@string/mark_as_played"
+                app:srcCompat="@drawable/ic_tick_circle_ol_32"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
+                android:id="@+id/bookmark"
+                android:contentDescription="@string/add_bookmark"
+                app:srcCompat="@drawable/ic_bookmark"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
+                android:id="@+id/archive"
+                android:contentDescription="@string/archive_episode"
+                app:srcCompat="@drawable/ic_archive_32"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
+                android:id="@+id/report"
+                android:contentDescription="@string/report"
+                app:srcCompat="@drawable/ic_flag"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
+                android:id="@+id/playerActions"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="?android:attr/actionBarItemBackground"
+                android:contentDescription="@string/more"
+                android:scaleX="1.2"
+                android:scaleY="1.2"
+                app:srcCompat="@drawable/ic_more"
+                app:tint="?attr/player_contrast_03" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</au.com.shiftyjelly.pocketcasts.views.component.LockableNestedScrollView>

@@ -4,7 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -13,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ExportSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
@@ -21,19 +25,26 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.OpmlExporter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ExportSettingsFragment : PreferenceFragmentCompat() {
 
-    @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var serviceManager: ServiceManager
+
     @Inject lateinit var settings: Settings
+
     @Inject lateinit var podcastManager: PodcastManager
+
     @Inject lateinit var theme: Theme
+
     @Inject lateinit var syncManager: SyncManager
-    @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
+
+    @Inject @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     private val viewModel by viewModels<ExportSettingsViewModel>()
     private var exporter: OpmlExporter? = null
@@ -47,6 +58,14 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
         super.onViewCreated(view, savedInstanceState)
 
         view.findToolbar().setup(title = getString(LR.string.settings_title_import_export), navigationIcon = BackArrow, activity = activity, theme = theme)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.bottomInset.collect {
+                    view.updatePadding(bottom = it)
+                }
+            }
+        }
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -78,7 +97,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
             viewModel.onExportByEmail()
             exporter = OpmlExporter(
                 fragment = this@ExportSettingsFragment,
-                serverManager = serverManager,
+                serviceManager = serviceManager,
                 podcastManager = podcastManager,
                 syncManager = syncManager,
                 context = activity,
@@ -94,7 +113,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
             viewModel.onExportFile()
             exporter = OpmlExporter(
                 fragment = this@ExportSettingsFragment,
-                serverManager = serverManager,
+                serviceManager = serviceManager,
                 podcastManager = podcastManager,
                 syncManager = syncManager,
                 context = activity,
@@ -116,6 +135,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
         startActivityForResult(Intent.createChooser(intent, getString(LR.string.settings_import_choose_file)), IMPORT_PICKER_REQUEST_CODE)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         val activity = activity
         if (activity == null || resultCode != Activity.RESULT_OK || resultData == null) {

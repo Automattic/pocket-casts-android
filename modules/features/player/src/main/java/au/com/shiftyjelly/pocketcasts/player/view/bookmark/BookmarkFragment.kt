@@ -43,7 +43,7 @@ class BookmarkFragment : Fragment() {
                         onTitleChange = { viewModel.changeTitle(it) },
                         onSave = ::saveBookmark,
                         onClose = ::close,
-                        modifier = Modifier.background(uiState.backgroundColor)
+                        modifier = Modifier.background(uiState.backgroundColor),
                     )
                 }
             }
@@ -61,7 +61,7 @@ class BookmarkFragment : Fragment() {
             bookmarkUuid = bookmark.uuid,
             title = bookmark.title,
             tintColor = viewModel.uiState.value.tintColor,
-            isExistingBookmark = isExistingBookmark
+            isExistingBookmark = isExistingBookmark,
         )
         requireActivity().run {
             setResult(Activity.RESULT_OK, intent)

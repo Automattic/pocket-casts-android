@@ -4,14 +4,14 @@ import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import io.reactivex.Single
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
-import javax.inject.Inject
 
 class StatsManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
-    private val settings: Settings
+    private val settings: Settings,
 ) : StatsManager {
 
     companion object {
@@ -83,9 +83,9 @@ class StatsManagerImpl @Inject constructor(
 
     override val mergedTotalTimeSaved: Long
         get() = getCachedValue(StatsBundle.SERVER_KEY_AUTO_SKIPPING) + getCachedValue(StatsBundle.SERVER_KEY_SILENCE_REMOVAL) + getCachedValue(
-            StatsBundle.SERVER_KEY_SKIPPING
+            StatsBundle.SERVER_KEY_SKIPPING,
         ) + getCachedValue(
-            StatsBundle.SERVER_KEY_VARIABLE_SPEED
+            StatsBundle.SERVER_KEY_VARIABLE_SPEED,
         )
 
     override val totalListeningTime: Long
@@ -165,7 +165,7 @@ class StatsManagerImpl @Inject constructor(
             StatsBundle.SERVER_KEY_SKIPPING to getTimeForKey(StatsBundle.SERVER_KEY_SKIPPING),
             StatsBundle.SERVER_KEY_STARTED_AT to getTimeForKey(StatsBundle.SERVER_KEY_STARTED_AT),
             StatsBundle.SERVER_KEY_TOTAL_LISTENED to getTimeForKey(StatsBundle.SERVER_KEY_TOTAL_LISTENED),
-            StatsBundle.SERVER_KEY_VARIABLE_SPEED to getTimeForKey(StatsBundle.SERVER_KEY_VARIABLE_SPEED)
+            StatsBundle.SERVER_KEY_VARIABLE_SPEED to getTimeForKey(StatsBundle.SERVER_KEY_VARIABLE_SPEED),
         )
 
         cachedServerStats = settingsServerStats

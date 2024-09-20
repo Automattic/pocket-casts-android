@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package com.pocketcasts.service.api;
+
+option java_package = "com.pocketcasts.service.api";
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+message BookmarkRequest {
+  string podcast_uuid = 1;
+  string episode_uuid = 2;
+  google.protobuf.Int32Value time = 3;
+  google.protobuf.StringValue title = 4;
+}
+
+message BookmarkResponse {
+  string bookmark_uuid = 1;
+  string podcast_uuid = 2;
+  string episode_uuid = 3;
+  int32 time = 5;
+  string title = 6;
+  google.protobuf.Timestamp createdAt = 7;
+}
+
+message BookmarksResponse {
+  repeated BookmarkResponse bookmarks = 1;
+}
+
+message UserPodcastListRequest {
+  string v = 1;
+  string m = 2;
+}
+
+message UserPodcastListResponse {
+  repeated UserPodcastResponse podcasts = 1;
+  repeated PodcastFolder folders = 2;
+}
+
+message UserPodcastResponse {
+  reserved 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 17; // Not used by mobile client
+
+  string uuid = 1;
+  int32 auto_start_from = 3;
+  int32 auto_skip_last = 13;
+  google.protobuf.StringValue folder_uuid = 14;
+  google.protobuf.Int32Value sort_position = 15;
+  google.protobuf.Timestamp date_added = 16;
+}
+
+message PodcastFolder {
+  string folder_uuid = 1;
+  string name = 2;
+  int32 color = 3;
+  int32 sort_position = 4;
+  int32 podcasts_sort_type = 5;
+  google.protobuf.Timestamp date_added = 6;
+}
+
+message PodcastRatingResponse {
+    string podcast_uuid = 1;
+    google.protobuf.Timestamp modified_at = 3;
+    uint32 podcast_rating = 4;
+}
+
+message PodcastRatingAddRequest {
+    string podcast_uuid = 1;
+    uint32 podcast_rating = 2;
+}
+
+message PodcastRatingShowRequest {
+    string podcast_uuid = 1;
+}
+
+message SupportFeedbackRequest {
+    string message = 1;
+    string email = 2;
+    string subject = 3;
+    string debug = 4;
+    string inbox = 5;
+}

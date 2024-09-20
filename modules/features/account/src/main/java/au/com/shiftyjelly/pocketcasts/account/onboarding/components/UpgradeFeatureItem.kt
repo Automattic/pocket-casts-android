@@ -16,7 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.text.HtmlText
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun UpgradeFeatureItem(
@@ -40,9 +41,11 @@ fun UpgradeFeatureItem(
                 .padding(2.dp),
         )
         Spacer(Modifier.width(16.dp))
-        TextH50(
-            text = stringResource(item.title),
+        HtmlText(
+            html = stringResource(item.title),
             color = color,
+            linkColor = color,
+            textStyleResId = UR.style.H50,
         )
     }
 }

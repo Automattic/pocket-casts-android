@@ -8,7 +8,7 @@ import kotlin.math.abs
 import kotlin.math.sign
 
 class UpNextTouchCallback(
-    private val adapter: ItemTouchHelperAdapter
+    private val adapter: ItemTouchHelperAdapter,
 ) : ItemTouchHelper.Callback() {
 
     interface ItemTouchHelperAdapter {

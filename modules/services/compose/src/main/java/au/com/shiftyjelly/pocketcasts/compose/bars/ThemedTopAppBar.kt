@@ -8,7 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,7 +27,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed class NavigationButton(val image: ImageVector, val contentDescription: Int) {
-    object Back : NavigationButton(image = Icons.Default.ArrowBack, contentDescription = LR.string.back)
+    object Back : NavigationButton(image = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = LR.string.back)
     object Close : NavigationButton(image = Icons.Default.Close, contentDescription = LR.string.close)
 }
 
@@ -55,16 +55,20 @@ fun ThemedTopAppBar(
             if (title != null) {
                 Text(
                     text = title,
-                    color = textColor
+                    color = textColor,
                 )
             }
         },
         actions = actions,
         backgroundColor = backgroundColor,
         elevation = 0.dp,
-        modifier = if (bottomShadow) modifier
-            .zIndex(1f)
-            .shadow(4.dp) else modifier
+        modifier = if (bottomShadow) {
+            modifier
+                .zIndex(1f)
+                .shadow(4.dp)
+        } else {
+            modifier
+        },
     )
 }
 
@@ -77,12 +81,12 @@ fun NavigationIconButton(
 ) {
     IconButton(
         onClick = onNavigationClick,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Icon(
             navigationButton.image,
             stringResource(navigationButton.contentDescription),
-            tint = iconColor
+            tint = iconColor,
         )
     }
 }

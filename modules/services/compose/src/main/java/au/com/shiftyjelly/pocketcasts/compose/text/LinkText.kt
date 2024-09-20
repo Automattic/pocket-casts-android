@@ -17,7 +17,7 @@ fun LinkText(
     text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     TextH40(
         text = text,

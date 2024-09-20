@@ -40,7 +40,8 @@ object PocketCastsNetworkingRules : NetworkingRules {
             }
 
             is RequestType.ImageRequest,
-            RequestType.ApiRequest -> {
+            RequestType.ApiRequest,
+            -> {
                 networks.networks.prefer(NetworkType.Wifi, NetworkType.Cell)
             }
 
@@ -60,7 +61,8 @@ object PocketCastsNetworkingRules : NetworkingRules {
             // Not sure if MediaRequestType.Live will occur for us, but if it does, it seems like it
             // should be treated the same as a MediaRequestType.Stream
             RequestType.MediaRequest.MediaRequestType.Live,
-            RequestType.MediaRequest.MediaRequestType.Stream ->
+            RequestType.MediaRequest.MediaRequestType.Stream,
+            ->
                 // For streaming, assume a low bandwidth and use power efficient BT if available
                 networks.networks.firstOrNull {
                     it.networkInfo.type == NetworkType.BT

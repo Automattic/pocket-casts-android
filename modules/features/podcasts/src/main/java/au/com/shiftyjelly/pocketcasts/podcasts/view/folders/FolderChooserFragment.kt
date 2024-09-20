@@ -12,7 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -24,7 +24,8 @@ import javax.inject.Inject
 class FolderChooserFragment : BaseDialogFragment() {
 
     @Inject lateinit var settings: Settings
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
     private val viewModel: FolderEditViewModel by viewModels()
     private var navHostController: NavHostController? = null
     private var podcastUuid: String? = null
@@ -42,7 +43,7 @@ class FolderChooserFragment : BaseDialogFragment() {
         fun newInstance(podcastUuid: String): FolderChooserFragment {
             return FolderChooserFragment().apply {
                 arguments = bundleOf(
-                    ARG_PODCAST_UUID to podcastUuid
+                    ARG_PODCAST_UUID to podcastUuid,
                 )
             }
         }
@@ -85,14 +86,14 @@ class FolderChooserFragment : BaseDialogFragment() {
                                 onNextClick = { navController.navigate(NavRoutes.name) },
                                 viewModel = viewModel,
                                 settings = settings,
-                                fragmentManager = parentFragmentManager
+                                fragmentManager = parentFragmentManager,
                             )
                         }
                         composable(NavRoutes.name) {
                             FolderEditNamePage(
                                 onBackClick = { navController.popBackStack() },
                                 onNextClick = { navController.navigate(NavRoutes.color) },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                         composable(NavRoutes.color) {
@@ -103,7 +104,7 @@ class FolderChooserFragment : BaseDialogFragment() {
                                         dismiss()
                                     }
                                 },
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                     }

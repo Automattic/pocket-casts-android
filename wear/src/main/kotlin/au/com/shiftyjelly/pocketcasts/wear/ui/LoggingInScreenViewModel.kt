@@ -7,14 +7,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class LoggingInScreenViewModel @Inject constructor(
@@ -40,7 +40,7 @@ class LoggingInScreenViewModel @Inject constructor(
             RefreshState.Refreshing -> State.Refreshing(syncManager.getEmail())
             is RefreshState.Success -> State.RefreshComplete
             null -> State.None
-        }
+        },
     )
     val state = _state.asStateFlow()
 
@@ -67,7 +67,6 @@ class LoggingInScreenViewModel @Inject constructor(
 
     private fun onRefreshStateChange(refreshState: RefreshState) {
         when (refreshState) {
-
             RefreshState.Refreshing -> {
                 val email = state.value.email?.let {
                     syncManager.getEmail()

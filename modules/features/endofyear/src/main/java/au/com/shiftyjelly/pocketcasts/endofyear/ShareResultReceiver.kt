@@ -5,14 +5,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.IntentCompat
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ShareResultReceiver : BroadcastReceiver() {
     @Inject
-    lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject
     lateinit var shareableTextProvider: ShareableTextProvider
