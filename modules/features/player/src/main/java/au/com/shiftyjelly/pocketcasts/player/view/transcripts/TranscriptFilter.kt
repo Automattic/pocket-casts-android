@@ -11,6 +11,8 @@ private val endOfLineChar = "([.!?])\\s+".toRegex()
 private val endOfLineCharEndOfCue = "([.!?])\\z".toRegex()
 private val notEndOfLineCharEndOfCue = "([^.!?$])\\z".toRegex()
 private val nbspRegex = "&nbsp;".toRegex()
+private val apostropheRegex = "&#39;".toRegex()
+private val quoteRegex = "&quot;".toRegex()
 private val breakLineRegex = "<br>|<BR>|<br/>|<BR/>|<BR />|<br />".toRegex()
 private val soundDescriptorRegex = "\\[[^]]*]".toRegex()
 private val htmlSpeakerRegex = "^ *\\w+:\\s*".toRegex()
@@ -53,6 +55,8 @@ class TranscriptRegexFilters(private val filters: List<TranscriptFilter>) : Tran
                 RegexFilters.emptySpacesAtEndOfLinesFilter,
                 RegexFilters.doubleOrMoreSpacesFilter,
                 RegexFilters.tripleOrMoreEmptyLinesFilter,
+                RegexFilters.apostropheRegexFilter,
+                RegexFilters.quotRegexFilter,
             ),
         )
 
@@ -105,6 +109,12 @@ object RegexFilters {
 
     // &nbsp filter
     val nbspFilter = RegexFilter(nbspRegex, " ")
+
+    // apostrophe filter
+    val apostropheRegexFilter = RegexFilter(apostropheRegex, "\'")
+
+    // quot filter
+    val quotRegexFilter = RegexFilter(quoteRegex, "\"")
 
     // <br> filter
     val breakLineFilter = RegexFilter(breakLineRegex, "\n\n")

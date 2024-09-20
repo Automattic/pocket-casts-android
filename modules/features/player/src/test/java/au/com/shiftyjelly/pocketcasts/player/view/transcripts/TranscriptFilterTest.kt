@@ -138,6 +138,24 @@ class TranscriptFilterTest {
     }
 
     @Test
+    fun `filter replaces apostrophe regex with an apostrophe char`() {
+        val input = "Hello, we&#39;re here!"
+        val expected = "Hello, we're here!"
+        val filter = RegexFilters.apostropheRegexFilter
+        val result = filter.filter(input)
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `filter replaces quot regex with a quot char`() {
+        val input = "Hello, &quot;world&quot;!"
+        val expected = "Hello, \"world\"!"
+        val filter = RegexFilters.quotRegexFilter
+        val result = filter.filter(input)
+        assertEquals(expected, result)
+    }
+
+    @Test
     fun `extractFilter extracts speaker from input for vtt format`() {
         val input = "<v Speaker 1> Hello, world!"
         val expected = "Speaker 1"
