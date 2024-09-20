@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import android.content.Context
 import android.os.Build
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.core.spring
@@ -20,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -92,6 +92,7 @@ private fun ReferralCardAnimatedBackgroundView(
                     start = Offset(0.12f * circleSizePx, 0f * circleSizePx),
                     end = Offset(0.89f * circleSizePx, 0.95f * circleSizePx),
                 ),
+                compatImageId = IR.drawable.referrals_blob_top_left,
                 modifier = Modifier
                     .offset(x = -maxWidth / 1.8f, y = -maxHeight / 4f)
                     .offset { animationData.topLeftOffset },
@@ -103,7 +104,7 @@ private fun ReferralCardAnimatedBackgroundView(
                     start = Offset(0.29f * circleSizePx, 0.19f * circleSizePx),
                     end = Offset(0.87f * circleSizePx, 1.18f * circleSizePx),
                 ),
-                rotation = 45f,
+                compatImageId = IR.drawable.referrals_blob_bottom_right,
                 modifier = Modifier
                     .offset(x = maxWidth / 1.7f, y = maxHeight / 3.5f)
                     .offset { animationData.bottomRightOffset },
@@ -116,8 +117,8 @@ private fun ReferralCardAnimatedBackgroundView(
 private fun GradientCircle(
     circleSize: Dp,
     backgroundBrush: Brush,
+    @DrawableRes compatImageId: Int,
     modifier: Modifier = Modifier,
-    rotation: Float = 0f,
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         Box(
@@ -130,12 +131,10 @@ private fun GradientCircle(
         )
     } else {
         Image(
-            painterResource(IR.drawable.blurred_rainbow_circle),
+            painterResource(compatImageId),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = modifier
-                .rotate(rotation)
-                .requiredSize(circleSize * 1.25f),
+            modifier = modifier.requiredSize(circleSize * 1.4f),
         )
     }
 }
