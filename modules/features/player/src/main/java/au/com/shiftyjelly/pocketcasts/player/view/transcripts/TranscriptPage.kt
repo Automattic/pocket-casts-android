@@ -241,8 +241,6 @@ private fun ScrollableTranscriptView(
                     url = state.transcript.url,
                     modifier = Modifier
                         .padding(
-                            start = horizontalContentPadding,
-                            end = horizontalContentPadding,
                             bottom = bottomPadding(),
                         ),
                     forceDark = true,
