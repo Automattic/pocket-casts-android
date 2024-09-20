@@ -135,7 +135,8 @@ fun TranscriptPageWrapper(
         }
 
         LaunchedEffect(transcriptUiState.value) {
-            showSearch = transcriptUiState.value is TranscriptViewModel.UiState.TranscriptLoaded
+            showSearch = transcriptUiState.value is TranscriptViewModel.UiState.TranscriptLoaded &&
+                (transcriptUiState.value as TranscriptViewModel.UiState.TranscriptLoaded).showSearch
             if (!showSearch) expandSearch = false
         }
     }

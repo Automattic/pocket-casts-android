@@ -45,6 +45,7 @@ import androidx.media3.extractor.text.CuesWithTiming
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.WebView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
@@ -235,21 +236,34 @@ private fun ScrollableTranscriptView(
         ),
     ) {
         SelectionContainer {
-            LazyColumn(
-                state = scrollState,
-                modifier = scrollableContentModifier,
-                contentPadding = PaddingValues(
-                    start = horizontalContentPadding,
-                    end = horizontalContentPadding,
-                    top = 64.dp,
-                    bottom = 80.dp,
-                ),
-            ) {
-                items(state.displayInfo.items) { item ->
-                    TranscriptItem(
-                        item = item,
-                        searchState = searchState,
-                    )
+            if (state.showInWebView) {
+                WebView(
+                    url = state.transcript.url,
+                    modifier = Modifier
+                        .padding(
+                            start = horizontalContentPadding,
+                            end = horizontalContentPadding,
+                            bottom = bottomPadding(),
+                        ),
+                    forceDark = true,
+                )
+            } else {
+                LazyColumn(
+                    state = scrollState,
+                    modifier = scrollableContentModifier,
+                    contentPadding = PaddingValues(
+                        start = horizontalContentPadding,
+                        end = horizontalContentPadding,
+                        top = 64.dp,
+                        bottom = 80.dp,
+                    ),
+                ) {
+                    items(state.displayInfo.items) { item ->
+                        TranscriptItem(
+                            item = item,
+                            searchState = searchState,
+                        )
+                    }
                 }
             }
         }

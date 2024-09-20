@@ -1,8 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
+import androidx.media3.common.text.Cue
+import androidx.media3.extractor.text.CuesWithTiming
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptCuesInfo
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.TranscriptError
 import au.com.shiftyjelly.pocketcasts.player.view.transcripts.TranscriptViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -18,6 +21,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -143,6 +147,58 @@ class TranscriptViewModelTest {
         verify(transcriptsManager).loadTranscriptCuesInfo(podcastId, transcript, forceRefresh = false)
     }
 
+    @Test
+    fun `given html transcript with javascript, when transcript load invoked, then transcript is shown in webview`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        initViewModel(content = "<html><script type=\"text/javascript\"></html>")
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            assertTrue((awaitItem() as UiState.TranscriptLoaded).showInWebView)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given html transcript without javascript, when transcript load invoked, then transcript is not shown in webview`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        initViewModel(content = "<html></html>")
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            assertFalse((awaitItem() as UiState.TranscriptLoaded).showInWebView)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given html transcript with javascript, when transcript load invoked, then search is not shown`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        initViewModel(content = "<html><script type=\"text/javascript\"></html>")
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            assertFalse((awaitItem() as UiState.TranscriptLoaded).showSearch)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given html transcript without javascript, when transcript load invoked, then search is shown`() = runTest {
+        whenever(transcriptsManager.observerTranscriptForEpisode(any())).thenReturn(flowOf(transcript.copy(type = "text/html")))
+        initViewModel(content = "<html></html>")
+
+        viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
+
+        viewModel.uiState.test {
+            assertTrue((awaitItem() as UiState.TranscriptLoaded).showSearch)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun initViewModel(
         content: String? = null,
@@ -158,7 +214,12 @@ class TranscriptViewModelTest {
             } else {
                 whenever(response.bytes()).thenReturn(byteArrayOf())
             }
-            whenever(transcriptsManager.loadTranscriptCuesInfo(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(emptyList())
+            val cuesInfo = if (content == null) {
+                emptyList()
+            } else {
+                listOf(TranscriptCuesInfo(CuesWithTiming(listOf(Cue.Builder().setText(content).build()), 0, 0), null))
+            }
+            whenever(transcriptsManager.loadTranscriptCuesInfo(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(cuesInfo)
         }
 
         viewModel = TranscriptViewModel(

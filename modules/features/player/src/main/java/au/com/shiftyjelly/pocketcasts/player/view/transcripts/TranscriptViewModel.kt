@@ -219,6 +219,12 @@ class TranscriptViewModel @Inject constructor(
             val cuesInfo: List<TranscriptCuesInfo>,
         ) : UiState() {
             val isTranscriptEmpty: Boolean = cuesInfo.isEmpty()
+            val showInWebView: Boolean
+                get() = transcript.type == TranscriptFormat.HTML.mimeType &&
+                    cuesInfo.isNotEmpty() && cuesInfo[0].cuesWithTiming.cues.any {
+                        it.text?.contains("<script type=\"text/javascript\">") ?: false
+                    }
+            val showSearch = !showInWebView
         }
 
         data class Error(
