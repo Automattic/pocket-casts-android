@@ -3,9 +3,10 @@ package au.com.shiftyjelly.pocketcasts.analytics.di
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentLogger
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.android.experimentation.ExperimentLogger
 import com.automattic.android.experimentation.VariationsRepository
 import dagger.Module
 import dagger.Provides
@@ -32,15 +33,8 @@ object ExperimentModule {
 
     @Provides
     @Singleton
-    internal fun provideExperimentLogger(): ExperimentLogger {
-        return ExperimentLogger()
-    }
-
-    @Provides
-    @Singleton
     fun provideVariationsRepository(
         @ApplicationContext context: Context,
-        logger: ExperimentLogger,
         @Cached okHttpClient: OkHttpClient,
     ): VariationsRepository {
         val cacheDir = File(context.cacheDir, "experiments_cache").apply {
@@ -50,6 +44,16 @@ object ExperimentModule {
         val experiments = Experiment.getAllExperiments().map { experiment ->
             com.automattic.android.experimentation.Experiment(experiment.identifier)
         }.toSet()
+
+        val logger = object : ExperimentLogger {
+            override fun d(message: String) {
+                LogBuffer.i(ExperimentProvider.TAG, message)
+            }
+
+            override fun e(message: String, throwable: Throwable?) {
+                throwable?.let { LogBuffer.e(ExperimentProvider.TAG, throwable, message) } ?: LogBuffer.e(ExperimentProvider.TAG, message)
+            }
+        }
 
         return VariationsRepository.create(
             platform = ExperimentProvider.PLATFORM,
