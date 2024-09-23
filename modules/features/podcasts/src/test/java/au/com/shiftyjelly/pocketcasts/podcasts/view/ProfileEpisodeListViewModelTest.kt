@@ -24,6 +24,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -169,6 +171,15 @@ class ProfileEpisodeListViewModelTest {
         viewModel.state.test {
             assertEquals(filteredEpisodes, (awaitItem() as State.Loaded).results)
         }
+    }
+
+    @Test
+    fun `playback history records are not filtered on setup when search query is empty`() = runTest {
+        initViewModel()
+
+        viewModel.setup(Mode.History)
+
+        verify(episodeManager, never()).filteredPlaybackHistoryEpisodesFlow("")
     }
 
     @Test
