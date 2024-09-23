@@ -294,5 +294,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:3.0.0"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:6.23.3"
+spotless = "com.diffplug.spotless:6.25.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
