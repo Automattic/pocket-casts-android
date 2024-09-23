@@ -130,13 +130,13 @@ private fun SearchResultsView(
             }
         }
     }
-    val podcasts by remember { mutableStateOf(state.podcasts) }
     val podcastsRowState = rememberLazyListState()
     val episodesRowState = rememberLazyListState()
-    LaunchedEffect(key1 = state.podcasts) {
-        // Only reset the scroll state if we have podcasts and they are different. This prevents resetting the
-        // scroll state when navigating back to the search results after tapping on one of the results.
-        if (state.podcasts.isNotEmpty() && state.podcasts != podcasts) {
+    val initialPodcasts by remember(state.podcasts.isEmpty()) { mutableStateOf(state.podcasts) }
+    // Reset podcast list scroll position when podcast list changes
+    // We use podcast UUIDs as the key to avoid unnecessary resets when only subscription properties change
+    LaunchedEffect(key1 = state.podcasts.map { it.uuid }) {
+        if (state.podcasts.isNotEmpty() && state.podcasts != initialPodcasts) {
             podcastsRowState.scrollToItem(0)
         }
     }
