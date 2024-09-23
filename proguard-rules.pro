@@ -16,9 +16,11 @@
 #   public *;
 #}
 
-# Without this the playback notification doesn't show up on fresh launch
+# Do not optimize PlaybackService class.
+# It causes na issue where the media notification is not displayed in some cases.
 # https://github.com/shiftyjelly/pocketcasts-android/issues/1656
--keep class au.com.shiftyjelly.pocketcasts.core.player.** { *; }
+# https://github.com/shiftyjelly/pocketcasts-android/pulls/2921
+-keep,allowobfuscation,allowshrinking class au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService { *; }
 
 -dontwarn android.test.**
 -dontwarn org.junit.internal.runners.statements.**
