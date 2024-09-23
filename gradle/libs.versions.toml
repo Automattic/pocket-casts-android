@@ -16,12 +16,12 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "11.2.1"
-android-gradle-plugin = "8.5.2"
+aboutlibraries = "11.2.3"
+android-gradle-plugin = "8.6.1"
 billing = "7.0.0"
 coil = "2.7.0"
 compose = "2024.02.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
-dependency-analysis = "2.0.1"
+dependency-analysis = "2.0.2"
 espresso = "3.6.1"
 firebase = "30.5.0"
 fragment = "1.8.2"
@@ -32,18 +32,18 @@ hilt-compiler = "1.2.0"
 horologist = "0.5.26"
 java = "17"
 kotlin = "2.0.20"
-kotlin-coroutines = "1.8.1-Beta"
+kotlin-coroutines = "1.9.0"
 ksp = "2.0.20-1.0.24"
 ktlint = "0.50.0"
-lifecycle = "2.8.5"
-lottie = "6.5.0"
+lifecycle = "2.8.6"
+lottie = "6.5.2"
 media3 = "1.4.1"
 mockito = "5.12.0"
 mockito-kotlin = "5.4.0"
 moshi = "1.15.1"
 navigation = "2.7.7"
 okhttp = "4.12.0"
-protobuf = "4.28.0"
+protobuf = "4.28.2"
 protobuf-plugin = "0.9.4"
 retrofit = "2.11.0"
 room = "2.6.1"
@@ -120,7 +120,7 @@ glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = 
 glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 
 # Google Play Services OSS Licenses - (The following line is still needed as there is no plugin marker available as of yet)
-osslicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.5"
+osslicenses-plugin = "com.google.android.gms:oss-licenses-plugin:0.10.6"
 
 # Horologist
 horologist-audio-ui = { module = "com.google.android.horologist:horologist-audio-ui", version.ref = "horologist" }
@@ -218,7 +218,7 @@ tasker = { module = "com.joaomgcd:taskerpluginlibrary", version.ref = "tasker-pl
 
 # Test
 androidx-test-core = { module = "androidx.test:core", version.ref = "test" }
-androidx-test-junit-ext = "androidx.test.ext:junit:1.1.3"
+androidx-test-junit-ext = "androidx.test.ext:junit:1.2.1"
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "test" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "test" }
 
@@ -245,7 +245,6 @@ work-test = { module = "androidx.work:work-testing", version.ref = "work" }
 androidx-annotation = "androidx.annotation:annotation:1.3.0"
 androidx-appcompat = "androidx.appcompat:appcompat:1.7.0"
 androidx-arch-core = "androidx.arch.core:core-testing:2.2.0"
-androidx-browser = "androidx.browser:browser:1.4.0"
 androidx-car = "androidx.car.app:app:1.4.0"
 androidx-cardview = "androidx.cardview:cardview:1.0.0"
 androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
@@ -256,17 +255,16 @@ androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
 androidx-recyclerview = "androidx.recyclerview:recyclerview:1.3.0"
 androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
-androidx-viewpager = "androidx.viewpager2:viewpager2:1.0.0"
+androidx-viewpager = "androidx.viewpager2:viewpager2:1.1.0"
 barista = "com.adevinta.android:barista:4.3.0"
-browser-helper = "com.google.androidbrowserhelper:androidbrowserhelper:2.3.0"
 capturable = "dev.shreyaspatil:capturable:2.1.0"
-desugar-jdk = "com.android.tools:desugar_jdk_libs:2.0.4"
+desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.2"
 device-names = "com.jaredrummler:android-device-names:2.1.1"
 encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
-engage = "com.google.android.engage:engage-core:1.5.4"
+engage = "com.google.android.engage:engage-core:1.5.5"
 ffmpeg = "com.arthenica:ffmpeg-kit-full:6.0-2"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
-guava = "com.google.guava:guava:33.1.0-android" # Required to fix conflict between versions in exoplayer and workmanager
+guava = "com.google.guava:guava:33.3.0-android" # Required to fix conflict between versions in exoplayer and workmanager
 jsonassert = "org.skyscreamer:jsonassert:1.5.3"
 junit = "junit:junit:4.13.2"
 leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
@@ -278,7 +276,7 @@ play-cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 play-oss-licenses = "com.google.android.gms:play-services-oss-licenses:17.0.0"
 play-review = "com.google.android.play:review-ktx:2.0.1"
 play-wearable = "com.google.android.gms:play-services-wearable:18.0.0"
-reorderable = "sh.calvin.reorderable:reorderable:2.3.2"
+reorderable = "sh.calvin.reorderable:reorderable:2.3.3"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.1.0"
 
@@ -296,5 +294,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 measure-builds = "com.automattic.android.measure-builds:3.0.0"
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:6.23.3"
+spotless = "com.diffplug.spotless:6.25.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

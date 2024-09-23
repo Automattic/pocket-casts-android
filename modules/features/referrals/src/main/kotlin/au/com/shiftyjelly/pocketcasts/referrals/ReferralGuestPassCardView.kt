@@ -29,19 +29,19 @@ object ReferralGuestPassCardDefaults {
     val cardAspectRatio = 200f / 315f
     val cardStrokeColor = Color(0xFF3A3A3A)
     fun cardRadius(source: ReferralGuestPassCardViewSource) = when (source) {
-        ReferralGuestPassCardViewSource.Send -> 13.dp
+        ReferralGuestPassCardViewSource.Claim, ReferralGuestPassCardViewSource.Send -> 13.dp
         ReferralGuestPassCardViewSource.ProfileBanner -> 3.dp
     }
     fun plusIconSize(source: ReferralGuestPassCardViewSource) = when (source) {
-        ReferralGuestPassCardViewSource.Send -> 16.dp
+        ReferralGuestPassCardViewSource.Claim, ReferralGuestPassCardViewSource.Send -> 16.dp
         ReferralGuestPassCardViewSource.ProfileBanner -> 10.dp
     }
     fun plusIconPadding(source: ReferralGuestPassCardViewSource) = when (source) {
-        ReferralGuestPassCardViewSource.Send -> 16.dp
+        ReferralGuestPassCardViewSource.Claim, ReferralGuestPassCardViewSource.Send -> 16.dp
         ReferralGuestPassCardViewSource.ProfileBanner -> 6.dp
     }
     fun cardBorder(source: ReferralGuestPassCardViewSource) = when (source) {
-        ReferralGuestPassCardViewSource.Send -> 1.dp
+        ReferralGuestPassCardViewSource.Claim, ReferralGuestPassCardViewSource.Send -> 1.dp
         ReferralGuestPassCardViewSource.ProfileBanner -> 0.25.dp
     }
 }
@@ -120,6 +120,7 @@ fun ReferralPassCardProfileBannerViewPreview() {
 }
 
 enum class ReferralGuestPassCardViewSource {
+    Claim,
     Send,
     ProfileBanner,
 }

@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_STREAM
+import android.content.Intent.EXTRA_SUBJECT
 import android.content.Intent.EXTRA_TEXT
 import android.content.Intent.EXTRA_TITLE
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -14,12 +15,14 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.META_APP_ID
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.SERVER_SHORT_URL
+import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.Instagram
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.More
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.PocketCasts
@@ -47,6 +50,7 @@ class SharingClient(
     private val displayPodcastCover: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
     private val showCustomCopyFeedback: Boolean = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
     private val hostUrl: String = SERVER_SHORT_URL,
+    private val webBasedHost: String = WEB_BASE_HOST,
     private val metaAppId: String = META_APP_ID,
     private val shareStarter: ShareStarter = object : ShareStarter {
         override fun start(context: Context, intent: Intent) {
@@ -91,6 +95,7 @@ class SharingClient(
                     error = null,
                 )
             }
+
             PocketCasts -> {
                 shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
                 SharingResponse(
@@ -99,15 +104,19 @@ class SharingClient(
                     error = null,
                 )
             }
+
             WhatsApp, Telegram, X, Tumblr, More -> {
-                Intent()
+                val intent = Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("text/plain")
                     .putExtra(EXTRA_TEXT, data.sharingUrl(hostUrl))
                     .putExtra(EXTRA_TITLE, data.sharingTitle())
                     .setPackage(platform.packageId)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-                    .setPodcastCover(data.podcast)
+                data.podcast?.let {
+                    intent.setPodcastCover(it)
+                }
+                intent
                     .toChooserIntent()
                     .share()
                 SharingResponse(
@@ -117,6 +126,25 @@ class SharingClient(
                 )
             }
         }
+
+        is SharingRequest.Data.ReferralLink -> {
+            val shareText = "${context.getString(LR.string.referrals_share_text)}\n\n${data.sharingUrl("https://$webBasedHost")}"
+            val shareSubject = context.getString(LR.string.referrals_share_subject)
+            Intent()
+                .setAction(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(EXTRA_TEXT, shareText)
+                .putExtra(EXTRA_SUBJECT, shareSubject)
+                .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                .toChooserIntent()
+                .share()
+            SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
+        }
+
         is SharingRequest.Data.EpisodeFile -> {
             val file = data.episode.downloadedFilePath?.let(::File)
             if (file?.exists() == true) {
@@ -139,6 +167,7 @@ class SharingClient(
                 )
             }
         }
+
         is SharingRequest.Data.ClipLink -> {
             shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
             SharingResponse(
@@ -147,6 +176,7 @@ class SharingClient(
                 error = null,
             )
         }
+
         is SharingRequest.Data.ClipAudio -> {
             val file = mediaService.clipAudio(data.podcast, data.episode, data.range).getOrThrow()
             Intent()
@@ -162,6 +192,7 @@ class SharingClient(
                 error = null,
             )
         }
+
         is SharingRequest.Data.ClipVideo -> when (platform) {
             Instagram -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
@@ -179,6 +210,7 @@ class SharingClient(
                     error = null,
                 )
             }
+
             WhatsApp, Telegram, X, Tumblr, PocketCasts, More -> {
                 val backgroundImage = requireNotNull(backgroundImage) { "Sharing a video requires a background image" }
                 val cardType = requireNotNull(cardType as VisualCardType) { "Video must be shared with a visual card" }
@@ -240,6 +272,8 @@ data class SharingRequest internal constructor(
     val cardType: CardType?,
     val backgroundImage: File?,
     val source: SourceView,
+    val analyticsEvent: AnalyticsEvent,
+    val analyticsProperties: Map<String, Any>,
 ) {
     companion object {
         fun podcast(
@@ -289,6 +323,16 @@ data class SharingRequest internal constructor(
         ) = Builder(Data.ClipVideo(podcast, episode, range))
             .setCardType(cardType)
             .setBackgroundImage(backgroundImage)
+
+        fun referralLink(
+            referralCode: String,
+        ) = Builder(
+            Data.ReferralLink(
+                referralCode = referralCode,
+            ),
+        )
+            .setAnalyticsEvent(AnalyticsEvent.REFERRAL_LINK_SHARED)
+            .setAnalyticProperties(mapOf("code" to referralCode))
     }
 
     class Builder internal constructor(
@@ -298,6 +342,8 @@ data class SharingRequest internal constructor(
         private var cardType: CardType? = null
         private var source = SourceView.UNKNOWN
         private var backgroundImage: File? = null
+        private var analyticsEvent: AnalyticsEvent = AnalyticsEvent.PODCAST_SHARED
+        private var analyticsProperties: Map<String, Any> = emptyMap()
 
         fun setPlatform(platform: SocialPlatform) = apply {
             this.platform = platform
@@ -315,12 +361,22 @@ data class SharingRequest internal constructor(
             this.backgroundImage = backgroundImage
         }
 
+        fun setAnalyticsEvent(analyticsEvent: AnalyticsEvent) = apply {
+            this.analyticsEvent = analyticsEvent
+        }
+
+        fun setAnalyticProperties(properties: Map<String, Any>) = apply {
+            this.analyticsProperties = properties
+        }
+
         fun build() = SharingRequest(
             data = data,
             platform = platform,
             cardType = cardType,
             backgroundImage = backgroundImage,
             source = source,
+            analyticsEvent = analyticsEvent,
+            analyticsProperties = analyticsProperties,
         )
     }
 
@@ -333,7 +389,7 @@ data class SharingRequest internal constructor(
     }
 
     sealed interface Data {
-        val podcast: PodcastModel
+        val podcast: PodcastModel?
 
         class Podcast internal constructor(
             override val podcast: PodcastModel,
@@ -411,6 +467,16 @@ data class SharingRequest internal constructor(
             val range: Clip.Range,
         ) : Data {
             override fun toString() = "ClipVideo(title=${episode.title}, uuid=${episode.uuid}, start=${range.start.toSecondsWithSingleMilli()}, end=${range.end.toSecondsWithSingleMilli()})"
+        }
+
+        class ReferralLink internal constructor(
+            private val referralCode: String,
+        ) : Data {
+            override val podcast: PodcastModel? = null
+
+            fun sharingUrl(host: String) = "$host/redeem-guest-pass/$referralCode"
+
+            override fun toString() = "ReferralLink(referralCode=$referralCode"
         }
     }
 }

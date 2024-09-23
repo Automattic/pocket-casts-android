@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -41,16 +40,15 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private val plusBackgroundBrush = Brush.horizontalGradient(
-    0f to Color(0xFFFED745),
-    1f to Color(0xFFFEB525),
-)
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -86,24 +84,22 @@ private fun ReferralsClaimGuestPassContent(
             )
             .fillMaxSize(),
     ) {
-        val showFullScreen = windowWidthSizeClass == WindowWidthSizeClass.Compact ||
-            windowHeightSizeClass == WindowHeightSizeClass.Compact
-        val cardCornerRadius = if (showFullScreen) 0.dp else 8.dp
-        val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * .5).dp
-        val cardModifier = if (showFullScreen) {
+        val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
         } else {
             Modifier
-                .width(cardWidth)
+                .width(pageWidth)
                 .wrapContentSize()
         }
 
         Card(
             elevation = 8.dp,
-            shape = RoundedCornerShape(cardCornerRadius),
+            shape = RoundedCornerShape(pageCornerRadius(showFullScreen)),
             backgroundColor = Color.Black,
-            modifier = cardModifier
+            modifier = pageModifier
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
@@ -151,7 +147,7 @@ private fun ReferralsClaimGuestPassContent(
                     textAlign = TextAlign.Center,
                 )
 
-                val guestPassCardWidth = cardWidth * 0.8f
+                val guestPassCardWidth = pageWidth * 0.8f
                 if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -159,7 +155,7 @@ private fun ReferralsClaimGuestPassContent(
                     ReferralGuestPassCardView(
                         modifier = Modifier
                             .size(guestPassCardWidth, guestPassCardHeight),
-                        source = ReferralGuestPassCardViewSource.Send,
+                        source = ReferralGuestPassCardViewSource.Claim,
                     )
                 }
 

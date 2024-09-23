@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = false)
 enum class SubscriptionTier(val label: String) {
     NONE("none"),
     PLUS("plus"),

@@ -616,7 +616,7 @@ class DownloadManagerImpl @Inject constructor(
 
     private fun openDownloadingPageIntent(): PendingIntent {
         val intent = DownloadsDeepLink.toIntent(context)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun updateSource(source: SourceView) {
