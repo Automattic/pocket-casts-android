@@ -14,7 +14,6 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
@@ -27,8 +26,6 @@ class ExperimentProviderTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
-
         accountStatusInfo = mock(AccountStatusInfo::class.java)
         repository = mock(VariationsRepository::class.java)
         experimentProvider = ExperimentProvider(accountStatusInfo, repository)
