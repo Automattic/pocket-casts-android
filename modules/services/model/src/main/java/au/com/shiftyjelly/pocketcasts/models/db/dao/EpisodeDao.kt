@@ -277,6 +277,7 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun observePlaybackHistory(): Flowable<List<PodcastEpisode>>
 
+    @Transaction
     @Query(
         """
         SELECT podcast_episodes.*
