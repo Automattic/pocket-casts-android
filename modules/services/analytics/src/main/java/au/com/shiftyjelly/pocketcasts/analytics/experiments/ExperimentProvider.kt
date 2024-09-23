@@ -8,10 +8,8 @@ import com.automattic.android.experimentation.domain.Variation.Control
 import com.automattic.android.experimentation.domain.Variation.Treatment
 import java.util.UUID
 import javax.inject.Inject
-import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
 
-@Singleton
 class ExperimentProvider @Inject constructor(
     private val accountStatusInfo: AccountStatusInfo,
     private val repository: VariationsRepository,
