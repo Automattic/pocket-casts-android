@@ -5,6 +5,8 @@
         ([#2908](https://github.com/Automattic/pocket-casts-android/pull/2908))
     *   Fix play button local file getting set to pause after episode completion
         ([#1627](https://github.com/Automattic/pocket-casts-android/pull/1627))
+    *   Fix search podcast results scroll back to the start after subscribing
+        ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
 
 7.73
 -----
