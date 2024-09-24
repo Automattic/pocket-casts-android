@@ -40,6 +40,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
@@ -297,6 +298,9 @@ private fun TranscriptWebView(
 ) {
     val webViewState = rememberWebViewState(state.transcript.url)
     val navigator = rememberWebViewNavigator()
+    val lastLoadedUri = webViewState.lastLoadedUrl?.toUri()
+    val transcriptUri = state.transcript.url.toUri()
+    val isRootUrl = "${lastLoadedUri?.host}${lastLoadedUri?.path}" == "${transcriptUri.host}${transcriptUri.path}" // Ignore scheme http or https
     WebView(
         state = webViewState,
         navigator = navigator,
@@ -313,7 +317,7 @@ private fun TranscriptWebView(
             it.setOnKeyListener(
                 View.OnKeyListener { _, keyCode, event ->
                     if (event.action == KeyEvent.ACTION_DOWN) {
-                        if (keyCode == KeyEvent.KEYCODE_BACK && it.canGoBack()) {
+                        if (keyCode == KeyEvent.KEYCODE_BACK && it.canGoBack() && !isRootUrl) {
                             it.goBack()
                             return@OnKeyListener true
                         }
@@ -329,12 +333,8 @@ private fun TranscriptWebView(
     if (webViewState.loadingState is LoadingState.Loading) {
         LoadingView(color = TranscriptColors.textColor())
     }
-    LaunchedEffect(transitionState) {
-        if (transitionState is TransitionState.OpenTranscript &&
-            webViewState.lastLoadedUrl != state.transcript.url
-        ) {
-            navigator.loadUrl(state.transcript.url)
-        }
+    LaunchedEffect(transitionState, webViewState.viewState) {
+        if (!isRootUrl) navigator.navigateBack()
     }
 }
 
