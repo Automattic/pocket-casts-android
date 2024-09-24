@@ -85,7 +85,7 @@ class TranscriptFilterTest {
 
     @Test
     fun `filter removes sound descriptors`() {
-        val input = "Hello, [laughs]"
+        val input = "Hello, \\[laughs\\]"
         val expected = "Hello, "
         val filter = RegexFilters.soundDescriptorFilter
         val result = filter.filter(input)
@@ -138,19 +138,10 @@ class TranscriptFilterTest {
     }
 
     @Test
-    fun `filter replaces apostrophe regex with an apostrophe char`() {
-        val input = "Hello, we&#39;re here!"
-        val expected = "Hello, we're here!"
-        val filter = RegexFilters.apostropheRegexFilter
-        val result = filter.filter(input)
-        assertEquals(expected, result)
-    }
-
-    @Test
-    fun `filter replaces quot regex with a quot char`() {
-        val input = "Hello, &quot;world&quot;!"
-        val expected = "Hello, \"world\"!"
-        val filter = RegexFilters.quotRegexFilter
+    fun `filter replaces input with multiple html entities with correct chars`() {
+        val input = "Hello,&nbsp;world!&#160;This&quot;is&#34;a&apos;test&#39;with&lt;multiple&#60;html&gt;entities&#62;and&#38;more&amp;."
+        val expected = "Hello, world! This\"is\"a'test'with<multiple<html>entities>and&more&."
+        val filter = HTMLEntitiesFilter()
         val result = filter.filter(input)
         assertEquals(expected, result)
     }
