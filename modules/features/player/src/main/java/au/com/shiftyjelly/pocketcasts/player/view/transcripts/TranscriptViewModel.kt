@@ -91,16 +91,27 @@ class TranscriptViewModel @Inject constructor(
                         transcriptFormat = TranscriptFormat.fromType(transcript.type),
                     )
 
-                    if (!pulledToRefresh) {
-                        podcastAndEpisode?.let { track(AnalyticsEvent.TRANSCRIPT_SHOWN, it, mapOf("type" to transcript.type)) }
-                    }
-
-                    UiState.TranscriptLoaded(
+                    val loaded = UiState.TranscriptLoaded(
                         transcript = transcript,
                         podcastAndEpisode = podcastAndEpisode,
                         displayInfo = displayInfo,
                         cuesInfo = cuesInfo,
                     )
+
+                    if (!pulledToRefresh) {
+                        podcastAndEpisode?.let {
+                            track(
+                                event = AnalyticsEvent.TRANSCRIPT_SHOWN,
+                                podcastAndEpisode = it,
+                                analyticsProp = buildMap {
+                                    put("type", transcript.type)
+                                    put("show_in_webview", loaded.showInWebView.toString())
+                                }
+                            )
+                        }
+                    }
+
+                    loaded
                 } catch (e: Exception) {
                     track(AnalyticsEvent.TRANSCRIPT_ERROR, podcastAndEpisode, mapOf("error" to e.message.orEmpty()))
                     when (e) {
@@ -219,6 +230,12 @@ class TranscriptViewModel @Inject constructor(
             val cuesInfo: List<TranscriptCuesInfo>,
         ) : UiState() {
             val isTranscriptEmpty: Boolean = cuesInfo.isEmpty()
+            val showInWebView: Boolean
+                get() = transcript.type == TranscriptFormat.HTML.mimeType &&
+                        cuesInfo.isNotEmpty() && cuesInfo[0].cuesWithTiming.cues.any {
+                    it.text?.contains("<script type=\"text/javascript\">") ?: false
+                }
+            val showSearch = !showInWebView
         }
 
         data class Error(
