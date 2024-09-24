@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.analytics.di
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
+import au.com.shiftyjelly.pocketcasts.analytics.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
@@ -59,7 +60,7 @@ object ExperimentModule {
             platform = ExperimentProvider.PLATFORM,
             experiments = experiments,
             logger = logger,
-            failFast = true,
+            failFast = BuildConfig.DEBUG,
             cacheDir = cacheDir,
             coroutineScope = CoroutineScope(Dispatchers.IO + Job()),
             okhttpClient = okHttpClient,
