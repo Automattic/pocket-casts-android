@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import android.os.Build
+import android.view.KeyEvent
+import android.view.View
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -42,10 +44,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.text.Cue
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.extractor.text.CuesWithTiming
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.components.WebView
 import au.com.shiftyjelly.pocketcasts.compose.extensions.FadeDirection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.gradientBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.verticalScrollBar
@@ -68,6 +71,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.TranscriptFormat
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.google.common.collect.ImmutableList
+import com.kevinnzou.web.LoadingState
+import com.kevinnzou.web.WebView
+import com.kevinnzou.web.rememberWebViewNavigator
+import com.kevinnzou.web.rememberWebViewState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @kotlin.OptIn(ExperimentalMaterialApi::class)
@@ -113,6 +120,7 @@ fun TranscriptPage(
                     searchState = searchState.value,
                     colors = colors,
                     modifier = modifier,
+                    transitionState = transitionState.value,
                 )
 
                 PullRefreshIndicator(
@@ -166,6 +174,7 @@ private fun TranscriptContent(
     searchState: SearchUiState,
     colors: TranscriptColors,
     modifier: Modifier,
+    transitionState: TransitionState?,
 ) {
     Box(
         modifier = modifier
@@ -184,6 +193,7 @@ private fun TranscriptContent(
             ScrollableTranscriptView(
                 state = state,
                 searchState = searchState,
+                transitionState = transitionState,
             )
         }
 
@@ -209,6 +219,7 @@ private fun TranscriptContent(
 private fun ScrollableTranscriptView(
     state: UiState.TranscriptLoaded,
     searchState: SearchUiState,
+    transitionState: TransitionState?,
 ) {
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val displayWidthPercent = if (Util.isTablet(LocalContext.current)) 0.8f else 1f
@@ -237,14 +248,7 @@ private fun ScrollableTranscriptView(
     ) {
         SelectionContainer {
             if (state.showInWebView) {
-                WebView(
-                    url = state.transcript.url,
-                    modifier = Modifier
-                        .padding(
-                            bottom = bottomPadding(),
-                        ),
-                    forceDark = true,
-                )
+                TranscriptWebView(state, transitionState)
             } else {
                 LazyColumn(
                     state = scrollState,
@@ -282,6 +286,54 @@ private fun ScrollableTranscriptView(
                     scrollOffset = -scrollToHighlightedTextOffset,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun TranscriptWebView(
+    state: UiState.TranscriptLoaded,
+    transitionState: TransitionState?,
+) {
+    val webViewState = rememberWebViewState(state.transcript.url)
+    val navigator = rememberWebViewNavigator()
+    WebView(
+        state = webViewState,
+        navigator = navigator,
+        onCreated = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                it.settings.isAlgorithmicDarkeningAllowed = true
+            } else {
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                    @Suppress("DEPRECATION")
+                    WebSettingsCompat.setForceDark(it.settings, WebSettingsCompat.FORCE_DARK_ON)
+                }
+            }
+            it.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            it.setOnKeyListener(
+                View.OnKeyListener { _, keyCode, event ->
+                    if (event.action == KeyEvent.ACTION_DOWN) {
+                        if (keyCode == KeyEvent.KEYCODE_BACK && it.canGoBack()) {
+                            it.goBack()
+                            return@OnKeyListener true
+                        }
+                    }
+                    false
+                },
+            )
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = bottomPadding()),
+    )
+    if (webViewState.loadingState is LoadingState.Loading) {
+        LoadingView(color = TranscriptColors.textColor())
+    }
+    LaunchedEffect(transitionState) {
+        if (transitionState is TransitionState.OpenTranscript &&
+            webViewState.lastLoadedUrl != state.transcript.url
+        ) {
+            navigator.loadUrl(state.transcript.url)
         }
     }
 }
@@ -423,6 +475,7 @@ private fun TranscriptContentPreview(
                 ),
             ),
             searchState = searchState,
+            transitionState = null,
             colors = TranscriptColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
@@ -449,6 +502,7 @@ private fun TranscriptEmptyContentPreview() {
                 ),
             ),
             searchState = SearchUiState(),
+            transitionState = null,
             colors = TranscriptColors(Color.Black),
             modifier = Modifier.fillMaxSize(),
         )
