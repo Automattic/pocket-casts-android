@@ -38,9 +38,7 @@ object ExperimentModule {
         @ApplicationContext context: Context,
         @Cached okHttpClient: OkHttpClient,
     ): VariationsRepository {
-        val directory = File(context.filesDir, "experiments").apply {
-            if (!exists()) mkdirs()
-        }
+        val directory = File(context.filesDir, "experiments")
 
         val experiments = Experiment.getAllExperiments().map { experiment ->
             com.automattic.android.experimentation.Experiment(experiment.identifier)
