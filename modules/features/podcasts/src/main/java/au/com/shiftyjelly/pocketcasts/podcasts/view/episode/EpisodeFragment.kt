@@ -521,6 +521,8 @@ class EpisodeFragment : BaseFragment() {
                     // stopping the white flash on web player load
                     setBackgroundColor(Color.argb(1, 0, 0, 0))
                     isVerticalScrollBarEnabled = false
+                    // stop the web view jumping after loading
+                    isFocusable = false
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                             val url = request.url.toString()

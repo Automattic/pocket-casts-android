@@ -27,6 +27,10 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionRequest
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.bookmarkRequest
@@ -289,6 +293,22 @@ open class SyncServiceManager @Inject constructor(
             .setMessage(message)
             .build()
         return service.sendFeedback(addBearer(token), request)
+    }
+
+    // Referral
+    suspend fun getReferralCode(token: AccessToken): ReferralCodeResponse {
+        return service.getReferralCode(addBearer(token))
+    }
+
+    suspend fun validateReferralCode(token: AccessToken, code: String): ReferralValidationResponse {
+        return service.validateReferralCode(addBearer(token), code)
+    }
+
+    suspend fun redeemReferralCode(token: AccessToken, code: String): ReferralRedemptionResponse {
+        val request = ReferralRedemptionRequest.newBuilder()
+            .setCode(code)
+            .build()
+        return service.redeemReferralCode(addBearer(token), request)
     }
 
     fun signOut() {
