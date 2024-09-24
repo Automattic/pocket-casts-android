@@ -38,7 +38,7 @@ object ExperimentModule {
         @ApplicationContext context: Context,
         @Cached okHttpClient: OkHttpClient,
     ): VariationsRepository {
-        val cacheDir = File(context.cacheDir, "experiments_cache").apply {
+        val directory = File(context.filesDir, "experiments").apply {
             if (!exists()) mkdirs()
         }
 
@@ -61,7 +61,7 @@ object ExperimentModule {
             experiments = experiments,
             logger = logger,
             failFast = BuildConfig.DEBUG,
-            cacheDir = cacheDir,
+            cacheDir = directory,
             coroutineScope = CoroutineScope(Dispatchers.IO + Job()),
             okhttpClient = okHttpClient,
         )
