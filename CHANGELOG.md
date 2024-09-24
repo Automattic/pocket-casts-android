@@ -7,11 +7,14 @@
 *   New Features
     *   Add local search in listening history
         ([#2794](https://github.com/Automattic/pocket-casts-android/pull/2794))
-*   Updated
+*   Updates
     *   Dark theme improvements on the podcast page
         ([#2811](https://github.com/Automattic/pocket-casts-android/pull/2811))
     *   Add a visibility animation to the submit button on the rating screen
         ([#2824](https://github.com/Automattic/pocket-casts-android/pull/2824))
+*   Bug Fixes
+    *   Fix issue when transcript type have an alternative valid mime type 
+        [#2926](https://github.com/Automattic/pocket-casts-ios/issues/2926)
 
 7.72
 -----

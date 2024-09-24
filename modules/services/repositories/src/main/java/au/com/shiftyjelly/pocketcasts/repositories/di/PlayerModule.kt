@@ -21,8 +21,8 @@ object PlayerModule {
         return object : SubtitleParser.Factory {
             override fun supportsFormat(format: Format): Boolean {
                 return when (format.sampleMimeType) {
-                    TranscriptFormat.VTT.mimeType,
-                    TranscriptFormat.SRT.mimeType,
+                    in TranscriptFormat.VTT.possibleMimeTypes(),
+                    in TranscriptFormat.SRT.possibleMimeTypes(),
                     -> true
 
                     else -> false
@@ -31,16 +31,16 @@ object PlayerModule {
 
             override fun getCueReplacementBehavior(format: Format): Int {
                 return when (val mimeType = format.sampleMimeType) {
-                    TranscriptFormat.VTT.mimeType -> WebvttParser.CUE_REPLACEMENT_BEHAVIOR
-                    TranscriptFormat.SRT.mimeType -> SubripParser.CUE_REPLACEMENT_BEHAVIOR
+                    in TranscriptFormat.VTT.possibleMimeTypes() -> WebvttParser.CUE_REPLACEMENT_BEHAVIOR
+                    in TranscriptFormat.SRT.possibleMimeTypes() -> SubripParser.CUE_REPLACEMENT_BEHAVIOR
                     else -> throw IllegalArgumentException("Unsupported MIME type: $mimeType")
                 }
             }
 
             override fun create(format: Format): SubtitleParser {
                 return when (val mimeType = format.sampleMimeType) {
-                    TranscriptFormat.VTT.mimeType -> WebvttParser()
-                    TranscriptFormat.SRT.mimeType -> SubripParser()
+                    in TranscriptFormat.VTT.possibleMimeTypes() -> WebvttParser()
+                    in TranscriptFormat.SRT.possibleMimeTypes() -> SubripParser()
                     else -> throw IllegalArgumentException("Unsupported MIME type: $mimeType")
                 }
             }
