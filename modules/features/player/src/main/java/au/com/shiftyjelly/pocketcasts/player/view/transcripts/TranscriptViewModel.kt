@@ -92,7 +92,7 @@ class TranscriptViewModel @Inject constructor(
                     )
 
                     if (!pulledToRefresh) {
-                        podcastAndEpisode?.let { track(AnalyticsEvent.TRANSCRIPT_SHOWN, it) }
+                        podcastAndEpisode?.let { track(AnalyticsEvent.TRANSCRIPT_SHOWN, it, mapOf("type" to transcript.type)) }
                     }
 
                     UiState.TranscriptLoaded(
