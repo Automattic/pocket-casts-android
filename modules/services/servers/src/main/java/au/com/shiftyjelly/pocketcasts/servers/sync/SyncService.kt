@@ -17,6 +17,10 @@ import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionRequest
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.UserPodcastListRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
@@ -35,6 +39,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface SyncService {
@@ -167,4 +172,17 @@ interface SyncService {
     @Headers("Content-Type: application/octet-stream")
     @POST("/support/feedback")
     suspend fun sendFeedback(@Header("Authorization") authorization: String, @Body request: SupportFeedbackRequest): Response<Void>
+
+    // Referral
+    @Headers("Content-Type: application/octet-stream")
+    @GET("/referrals/code")
+    suspend fun getReferralCode(@Header("Authorization") authorization: String): ReferralCodeResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @GET("/referrals/validate")
+    suspend fun validateReferralCode(@Header("Authorization") authorization: String, @Query("code") code: String): ReferralValidationResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/referrals/redeem")
+    suspend fun redeemReferralCode(@Header("Authorization") authorization: String, @Body request: ReferralRedemptionRequest): ReferralRedemptionResponse
 }

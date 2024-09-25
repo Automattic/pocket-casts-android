@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -55,7 +56,11 @@ class ProfileEpisodeListViewModel @Inject constructor(
         viewModelScope.launch {
             val searchResultsFlow = _searchQueryFlow
                 .flatMapLatest { searchQuery ->
-                    episodeManager.filteredPlaybackHistoryEpisodesFlow(searchQuery)
+                    if (searchQuery.isNotEmpty()) {
+                        episodeManager.filteredPlaybackHistoryEpisodesFlow(searchQuery)
+                    } else {
+                        flowOf(emptyList())
+                    }
                 }
             combine(
                 episodeListFlowable.asFlow(),
