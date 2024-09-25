@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentSleepBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment.Companion.SCROLL_TO_SLEEP_TIMER
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
@@ -34,6 +35,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class SleepFragment : BaseDialogFragment() {
@@ -103,7 +105,13 @@ class SleepFragment : BaseDialogFragment() {
             val fragment = PlaybackSettingsFragment().apply {
                 arguments = bundleOf(SCROLL_TO_SLEEP_TIMER to true)
             }
-            (activity as FragmentHostListener).showModal(fragment)
+            val fragmentHostListener = (activity as? FragmentHostListener)
+            fragmentHostListener?.apply {
+                closePlayer() // Closes player if open
+                openTab(VR.id.navigation_profile)
+                addFragment(SettingsFragment())
+                addFragment(fragment)
+            }
         }
 
         return binding.root
