@@ -1,24 +1,34 @@
 package au.com.shiftyjelly.pocketcasts.repositories.referrals
 
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import com.pocketcasts.service.api.ReferralCodeResponse
-import com.pocketcasts.service.api.ReferralRedemptionResponse
-import com.pocketcasts.service.api.ReferralValidationResponse
+import au.com.shiftyjelly.pocketcasts.utils.NetworkWrapper
+import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import javax.inject.Inject
 
 class ReferralManagerImpl @Inject constructor(
     var syncManager: SyncManager,
+    private val networkWrapper: NetworkWrapper,
 ) : ReferralManager {
 
-    override suspend fun getReferralCode(): ReferralCodeResponse {
-        return syncManager.getReferralCode()
+    override suspend fun getReferralCode() = try {
+        if (!networkWrapper.isConnected()) throw NoNetworkException()
+        ReferralResult.create(syncManager.getReferralCode())
+    } catch (e: Exception) {
+        ReferralResult.create(e)
     }
 
-    override suspend fun validateReferralCode(code: String): ReferralValidationResponse {
-        return syncManager.validateReferralCode(code)
+    override suspend fun validateReferralCode(code: String) = try {
+        if (!networkWrapper.isConnected()) throw NoNetworkException()
+        ReferralResult.create(syncManager.validateReferralCode(code))
+    } catch (e: Exception) {
+        ReferralResult.create(e)
     }
 
-    override suspend fun redeemReferralCode(code: String): ReferralRedemptionResponse {
-        return syncManager.redeemReferralCode(code)
+    override suspend fun redeemReferralCode(code: String) = try {
+        if (!networkWrapper.isConnected()) throw NoNetworkException()
+        ReferralResult.create(syncManager.redeemReferralCode(code))
+    } catch (e: Exception) {
+        ReferralResult.create(e)
     }
 }
