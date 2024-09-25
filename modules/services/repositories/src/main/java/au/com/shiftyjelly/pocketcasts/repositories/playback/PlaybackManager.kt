@@ -2546,6 +2546,10 @@ open class PlaybackManager @Inject constructor(
 
     fun isSleepAfterChapterEnabled(): Boolean = chaptersUntilSleep != 0
 
+    fun restorePlayerVolume() {
+        (player as? SimplePlayer)?.restoreVolume()
+    }
+
     private fun getCurrentChapterUuidForSleepTime(playbackState: PlaybackState): String? {
         val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs.milliseconds)
 
