@@ -16,7 +16,7 @@
             android:id="@+id/sleepSetup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelOneHour,buttonOneHour,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterPlusButton, endOfChapterMinusButton"
+            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelOneHour,buttonOneHour,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterPlusButton, endOfChapterMinusButton, sleepTimeSettings"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
