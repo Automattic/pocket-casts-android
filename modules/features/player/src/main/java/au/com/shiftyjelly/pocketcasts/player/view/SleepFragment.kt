@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -100,9 +101,7 @@ class SleepFragment : BaseDialogFragment() {
             close()
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_SETTINGS_TAPPED)
             val fragment = PlaybackSettingsFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(SCROLL_TO_SLEEP_TIMER, true)
-                }
+                arguments = bundleOf(SCROLL_TO_SLEEP_TIMER to true)
             }
             (activity as FragmentHostListener).showModal(fragment)
         }
