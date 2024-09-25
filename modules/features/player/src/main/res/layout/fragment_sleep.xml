@@ -65,7 +65,6 @@
             android:id="@+id/sleepTimeSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
             android:clickable="true"
             android:contentDescription="@string/player_sleep_timer_settings"
             android:focusable="true"
@@ -75,7 +74,7 @@
             android:src="@drawable/sleep_timer_cog"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/sleepTitle"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/customPlusButton"
             app:layout_constraintTop_toTopOf="@+id/sleepTitle"
             app:tint="?attr/player_contrast_01" />
 
