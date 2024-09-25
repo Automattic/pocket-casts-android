@@ -157,6 +157,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
         downloadStatisticsReporter.setup()
+        experimentProvider.initialize()
     }
 
     private fun setupCrashLogging() {
@@ -267,7 +268,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         novaLauncherBridge.monitorNovaLauncherIntegration()
         CuratedPodcastsSyncWorker.enqueuPeriodicWork(this)
         engageSdkBridge.registerIntegration()
-        experimentProvider.initialize()
 
         settings.useDynamicColorsForWidget.flow
             .onEach { widgetManager.updateWidgetFromSettings(playbackManager) }
