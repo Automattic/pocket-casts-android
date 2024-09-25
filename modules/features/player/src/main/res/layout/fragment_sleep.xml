@@ -73,6 +73,7 @@
             android:minHeight="24dp"
             android:padding="8dp"
             android:src="@drawable/sleep_timer_cog"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/sleepTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/sleepTitle"
