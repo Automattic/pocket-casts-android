@@ -108,7 +108,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 if (variation == Variation.Control) {
                     UpgradeLayout.Original
                 } else {
-                    UpgradeLayout.Reviews
+                    UpgradeLayout.Original
                 }
             }
             else -> UpgradeLayout.Original
