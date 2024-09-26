@@ -7,6 +7,8 @@
         ([#2925](https://github.com/Automattic/pocket-casts-android/pull/2925))
     *   Fix play button local file getting set to pause after episode completion
         ([#1627](https://github.com/Automattic/pocket-casts-android/pull/1627))
+    *   Fix volume that was not returning to the original level after restarting sleep timer by shaking the device
+        ([#2930](https://github.com/Automattic/pocket-casts-android/pull/2930))
 *   New Features
     *   Add sleep timer settings to sleep timer bottom sheet
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
