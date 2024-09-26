@@ -14,6 +14,6 @@ else
   lint_exit_code=0
 fi
 
-upload_sarif_to_github 'app/build/reports/lint-results-debug.sarif' 'Automattic' 'pocket-casts-android'
+upload_sarif_to_github 'app/build/reports/lint-results-debug.sarif'
 
 exit $lint_exit_code
