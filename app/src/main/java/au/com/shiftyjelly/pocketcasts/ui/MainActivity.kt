@@ -1351,8 +1351,7 @@ class MainActivity :
         if (!FeatureFlag.isEnabled(Feature.REFERRALS)) {
             return
         }
-        // TODO decide where to store the referral code
-        Timber.i("Referral code: $code")
+        settings.referralClaimCode.set(code, false)
         val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
         showBottomSheet(fragment)
     }
