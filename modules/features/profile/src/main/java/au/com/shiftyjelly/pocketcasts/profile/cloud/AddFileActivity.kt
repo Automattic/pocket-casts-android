@@ -530,6 +530,8 @@ class AddFileActivity :
                         }
                     }
                 } catch (e: Exception) {
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_UPLOAD_FAILED)
+
                     Timber.e(e, "Could not load file")
 
                     launch(Dispatchers.Main) {

@@ -156,6 +156,7 @@ enum class AnalyticsEvent(val key: String) {
     UPLOADED_FILES_SORT_BY_CHANGED("uploaded_files_sort_by_changed"),
     UPLOADED_FILES_ADD_FILE_TAPPED("uploaded_files_add_file_tapped"),
     UPLOADED_FILES_INVALID_FILE_ERROR("uploaded_files_invalid_file_error"),
+    UPLOADED_FILES_UPLOAD_FAILED("uploaded_files_upload_failed"),
 
     /* User File Details View */
     USER_FILE_DETAIL_SHOWN("user_file_detail_shown"),
