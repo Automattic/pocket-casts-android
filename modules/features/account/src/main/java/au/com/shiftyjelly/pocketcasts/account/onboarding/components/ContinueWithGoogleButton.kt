@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -49,39 +47,11 @@ fun ContinueWithGoogleButton(
         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
     }
 
-    // request legacy Google Sign-In and process the result
-    val googleLegacySignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        viewModel.onGoogleLegacySignInResult(
-            result = result,
+    val onSignInClick = {
+        viewModel.startCredentialManagerSignIn(
+            flow = flow,
             onSuccess = onComplete,
             onError = showError,
-        )
-    }
-
-    // request Google One Tap Sign-In and process the result
-    val googleOneTapSignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        viewModel.onGoogleOneTapSignInResult(
-            result = result,
-            onSuccess = onComplete,
-            onError = {
-                viewModel.startGoogleLegacySignIn(
-                    onSuccess = { request -> googleLegacySignInLauncher.launch(request) },
-                    onError = showError,
-                )
-            },
-        )
-    }
-
-    val onSignInClick = {
-        viewModel.startGoogleOneTapSignIn(
-            flow = flow,
-            onSuccess = { request -> googleOneTapSignInLauncher.launch(request) },
-            onError = {
-                viewModel.startGoogleLegacySignIn(
-                    onSuccess = { request -> googleLegacySignInLauncher.launch(request) },
-                    onError = showError,
-                )
-            },
         )
     }
 

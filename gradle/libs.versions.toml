@@ -21,12 +21,14 @@ android-gradle-plugin = "8.6.1"
 billing = "7.0.0"
 coil = "2.7.0"
 compose = "2024.02.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
+credentials = "1.2.2"
 dependency-analysis = "2.0.2"
 espresso = "3.6.1"
 firebase = "30.5.0"
 fragment = "1.8.2"
 glance = "1.0.0"
 google-services = "4.3.14"
+googleid = "1.1.1"
 hilt = "2.52"
 hilt-compiler = "1.2.0"
 horologist = "0.5.26"
@@ -213,6 +215,11 @@ rx2-relay = "com.jakewharton.rxrelay2:rxrelay:2.1.1"
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
 showkase-processor = { module = "com.airbnb.android:showkase-processor", version.ref = "showkase" }
 
+# Sign in with Google
+credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+
 # Tasker
 tasker = { module = "com.joaomgcd:taskerpluginlibrary", version.ref = "tasker-plugin" }
 
@@ -271,7 +278,7 @@ leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 material = "com.google.android.material:material:1.9.0"
 material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
-play-auth = "com.google.android.gms:play-services-auth:20.4.0"
+play-auth = "com.google.android.gms:play-services-auth:21.2.0"
 play-cast = "com.google.android.gms:play-services-cast-framework:21.4.0"
 play-oss-licenses = "com.google.android.gms:play-services-oss-licenses:17.0.0"
 play-review = "com.google.android.play:review-ktx:2.0.1"

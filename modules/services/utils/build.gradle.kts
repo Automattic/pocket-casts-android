@@ -38,7 +38,9 @@ dependencies {
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.config.ktx)
     implementation(libs.lifecycle.livedata.ktx)
-    implementation(libs.play.auth)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
     implementation(libs.play.cast)
     implementation(libs.rx2.android)
 

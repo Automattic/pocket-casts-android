@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import android.content.Context
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.IntentSenderRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.PasswordCredential
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -16,19 +18,13 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.GetSignInIntentRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 @HiltViewModel
@@ -36,7 +32,6 @@ class GoogleSignInButtonViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     @ApplicationContext private val context: Context,
     private val podcastManager: PodcastManager,
-    private val settings: Settings,
     private val syncManager: SyncManager,
 ) : ViewModel() {
 
@@ -50,9 +45,9 @@ class GoogleSignInButtonViewModel @Inject constructor(
      * Try to sign in with Google One Tap.
      * It's common for the One Tap to fail so then try the legacy Google Sign-In.
      */
-    fun startGoogleOneTapSignIn(
+    fun startCredentialManagerSignIn(
         flow: OnboardingFlow?,
-        onSuccess: (IntentSenderRequest) -> Unit,
+        onSuccess: (GoogleSignInState) -> Unit,
         onError: suspend () -> Unit,
     ) {
         if (flow != null) {
@@ -71,120 +66,78 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val beginSignInRequest = BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
+                val googleIdOption = GetGoogleIdOption.Builder()
+                    // automatic sign-in when single credential matching the request, user has not explicitly signed out, and user hasn't disabled automatic sign-in
+                    .setAutoSelectEnabled(false)
                     // use the Google Cloud credentials OAuth Server Client ID, not the Android Client ID.
                     .setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
                     // don't just show accounts previously used to sign in.
                     .setFilterByAuthorizedAccounts(false)
                     .build()
-                val signInRequest = BeginSignInRequest.builder()
-                    .setGoogleIdTokenRequestOptions(beginSignInRequest)
+                val signInRequest = GetCredentialRequest.Builder()
+                    .addCredentialOption(googleIdOption)
                     .build()
-                val result = Identity.getSignInClient(context).beginSignIn(signInRequest).await()
-                val intentRequest = IntentSenderRequest.Builder(result.pendingIntent).build()
-                onSuccess(intentRequest)
+                val credentialManager = CredentialManager.create(context)
+                val result = credentialManager.getCredential(
+                    request = signInRequest,
+                    context = context,
+                )
+                when (val credential = result.credential) {
+                    // TODO Do we need Passkey
+                    // Passkey credential
+                    // is PublicKeyCredential -> {
+                    //    // Share responseJson such as a GetCredentialResponse on your server to
+                    //    // validate and authenticate
+                    //    responseJson = credential.authenticationResponseJson
+                    // }
+
+                    // Password credential
+                    is PasswordCredential -> {
+                        // Send ID and password to your server to validate and authenticate.
+                        val email = credential.id
+                        val password = credential.password
+
+                        val loginResult = syncManager.loginWithEmailAndPassword(
+                            email = email,
+                            password = password,
+                            signInSource = SignInSource.UserInitiated.Onboarding,
+                        )
+                        when (loginResult) {
+                            is LoginResult.Success -> {
+                                podcastManager.refreshPodcastsAfterSignIn()
+                                onSuccess(GoogleSignInState(isNewAccount = loginResult.result.isNewAccount))
+                            }
+
+                            is LoginResult.Failed -> {
+                                onError()
+                                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to sign in with email and password. ${loginResult.message}")
+                            }
+                        }
+                    }
+
+                    // GoogleIdToken credential
+                    is CustomCredential -> {
+                        if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                            // Use googleIdTokenCredential and extract the ID to validate and authenticate on your server.
+                            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                            signInWithGoogleToken(
+                                idToken = googleIdTokenCredential.idToken,
+                                onSuccess = onSuccess,
+                                onError = onError,
+                            )
+                        }
+                    }
+
+                    else -> {
+                        // Catch any unrecognized credential type here.
+                        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Unexpected type of credential ${credential::class.java}")
+                    }
+                }
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
                 onError()
             }
         }
-    }
-
-    /**
-     * Try to sign in with the legacy Google Sign-In.
-     */
-    fun startGoogleLegacySignIn(
-        onSuccess: (IntentSenderRequest) -> Unit,
-        onError: () -> Unit,
-    ) {
-        viewModelScope.launch {
-            try {
-                Timber.i("Using legacy Google Sign-In")
-                val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(context)
-                val idToken = lastSignedInAccount?.idToken
-                val email = lastSignedInAccount?.email
-                if (idToken == null || email == null) {
-                    val request = GetSignInIntentRequest.builder().setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID).build()
-                    val signInIntent = Identity.getSignInClient(context).getSignInIntent(request).await()
-                    val intentSenderRequest = IntentSenderRequest.Builder(signInIntent.intentSender).build()
-                    onSuccess(intentSenderRequest)
-                } else {
-                    signInWithGoogleToken(
-                        idToken = idToken,
-                        onSuccess = {},
-                        onError = onError,
-                    )
-                }
-            } catch (ex: Exception) {
-                LogBuffer.e(LogBuffer.TAG_CRASH, ex, "Unable to sign in with legacy Google Sign-In")
-                onError()
-            }
-        }
-    }
-
-    /**
-     * Handle the response from the Google One Tap intent to sign in.
-     */
-    fun onGoogleOneTapSignInResult(
-        result: ActivityResult,
-        onSuccess: (GoogleSignInState) -> Unit,
-        onError: suspend () -> Unit,
-    ) {
-        viewModelScope.launch {
-            try {
-                onGoogleSignInResult(
-                    result = result,
-                    onSuccess = onSuccess,
-                    onError = {
-                        onError()
-                    },
-                )
-            } catch (e: Exception) {
-                if (e is ApiException && e.statusCode == CommonStatusCodes.CANCELED) {
-                    // user declined to sign in
-                    return@launch
-                }
-                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to get sign in credentials from Google One Tap result.")
-                onError()
-            }
-        }
-    }
-
-    /**
-     * Handle the response from the legacy Google Sign-In intent.
-     */
-    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: (GoogleSignInState) -> Unit, onError: () -> Unit) {
-        viewModelScope.launch {
-            try {
-                onGoogleSignInResult(
-                    result = result,
-                    onSuccess = onSuccess,
-                    onError = onError,
-                )
-            } catch (e: Exception) {
-                LogBuffer.e(
-                    LogBuffer.TAG_CRASH,
-                    e,
-                    "Unable to get sign in credentials from legacy Google Sign-In result.",
-                )
-                onError()
-            }
-        }
-    }
-
-    private suspend fun onGoogleSignInResult(
-        result: ActivityResult,
-        onSuccess: (GoogleSignInState) -> Unit,
-        onError: suspend () -> Unit,
-    ) {
-        val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
-        val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
-        signInWithGoogleToken(
-            idToken = idToken,
-            onSuccess = onSuccess,
-            onError = onError,
-        )
     }
 
     private suspend fun signInWithGoogleToken(
@@ -195,6 +148,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
         when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
             is LoginResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
+                Timber.i("PHILIP new account? ${authResult.result.isNewAccount}")
                 onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))
             }
             is LoginResult.Failed -> {
