@@ -19,12 +19,11 @@ private val differ = object : DiffUtil.ItemCallback<DiscoverPodcast>() {
     }
 }
 
-class GridListAdapter(private val imageSize: Int, val onPodcastClicked: ((DiscoverPodcast) -> Unit), val onPodcastSubscribe: ((String) -> Unit)) : ListAdapter<DiscoverPodcast, GridListAdapter.PodcastViewHolder>(differ) {
-
-    companion object {
-        const val defaultImageSize = 200
-    }
-
+class GridListAdapter(
+    private val onPodcastClicked: ((DiscoverPodcast) -> Unit),
+    private val onPodcastSubscribe: ((String) -> Unit),
+    private val imageSize: Int = 200,
+) : ListAdapter<DiscoverPodcast, GridListAdapter.PodcastViewHolder>(differ) {
     class PodcastViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val podcastGridRow: PodcastGridRow
             get() = this.itemView as PodcastGridRow
