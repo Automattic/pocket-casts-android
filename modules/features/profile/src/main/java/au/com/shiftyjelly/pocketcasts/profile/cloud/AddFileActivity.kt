@@ -36,6 +36,8 @@ import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -142,6 +144,8 @@ class AddFileActivity :
     @Inject lateinit var playbackManager: PlaybackManager
 
     @Inject lateinit var settings: Settings
+
+    @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     private val viewModel: AddFileViewModel by viewModels()
 
@@ -480,6 +484,10 @@ class AddFileActivity :
         }
 
         if (isUriInvalid(uri)) {
+            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_INVALID_FILE_ERROR)
+
+            Timber.e("Could not upload invalid file")
+
             val message = getString(LR.string.profile_cloud_add_invalid_file)
             handleErrorWhenLoadingFile(errorMessage = message)
         } else {
