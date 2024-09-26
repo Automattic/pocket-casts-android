@@ -38,8 +38,11 @@ steps:
     plugins: [$CI_TOOLKIT]
 
   - label: 'Dependency diff'
+    if: build.pull_request.id != null
     command: .buildkite/commands/dependency-diff.sh
     plugins: [$CI_TOOLKIT]
+    artifact_paths:
+      - "**/build/reports/diff/*"
 
   - label: 'Spotless formatting check'
     command: |
