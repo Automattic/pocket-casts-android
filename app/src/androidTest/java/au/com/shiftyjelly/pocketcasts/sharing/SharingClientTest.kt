@@ -685,7 +685,7 @@ class SharingClientTest {
 
         assertEquals(ACTION_SEND, intent.action)
         assertEquals("text/plain", intent.type)
-        assertEquals("$text\n\nhttps://$WEB_BASE_HOST/redeem-guest-pass/$referralCode", intent.getStringExtra(EXTRA_TEXT))
+        assertEquals("$text\n\nhttps://$WEB_BASE_HOST/redeem/$referralCode", intent.getStringExtra(EXTRA_TEXT))
         assertEquals(subject, intent.getStringExtra(EXTRA_SUBJECT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
     }

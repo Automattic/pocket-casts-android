@@ -1,5 +1,17 @@
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    open-pull-requests-limit: 3
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "[Type] Tech Debt"
+      - "[Area] Dependencies"
+    ignore:
+      # These dependencies cannot be updated beyond v2 for non-Enterpise clients
+      - dependency-name: "gradle-build-action"
+      - dependency-name: "wrapper-validation-action"
   - package-ecosystem: "gradle"
     open-pull-requests-limit: 8
     directory: "/"
@@ -13,6 +25,7 @@ updates:
       - dependency-name: "com.automattic:Automattic-Tracks-Android"
       - dependency-name: "com.automattic:encryptedlogging"
       - dependency-name: "com.automattic.tracks:crashlogging"
+      - dependency-name: "com.automattic.tracks:experimentation"
       - dependency-name: "com.automattic.android.measure-builds"
       # Ignore Compose dependencies as they often need to be updated together
       - dependency-name: "androidx.compose:compose-bom"

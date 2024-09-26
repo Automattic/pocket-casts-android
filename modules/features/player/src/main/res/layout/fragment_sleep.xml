@@ -16,7 +16,7 @@
             android:id="@+id/sleepSetup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelOneHour,buttonOneHour,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterPlusButton, endOfChapterMinusButton"
+            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelOneHour,buttonOneHour,separator3,labelCustom,buttonCustom,customMinusButton,customPlusButton, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeMinusButton, endOfEpisodePlusButton, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterPlusButton, endOfChapterMinusButton, sleepTimeSettings"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
@@ -60,6 +60,23 @@
             android:textColor="?attr/player_contrast_01"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/sleepTimeSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:contentDescription="@string/player_sleep_timer_settings"
+            android:focusable="true"
+            android:minWidth="24dp"
+            android:minHeight="24dp"
+            android:padding="8dp"
+            android:src="@drawable/sleep_timer_cog"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="@+id/sleepTitle"
+            app:layout_constraintEnd_toEndOf="@+id/customPlusButton"
+            app:layout_constraintTop_toTopOf="@+id/sleepTitle"
+            app:tint="?attr/player_contrast_01" />
 
         <TextView
             android:id="@+id/labelMins15"

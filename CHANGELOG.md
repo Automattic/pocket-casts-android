@@ -1,6 +1,15 @@
 7.74
 -----
-
+*   Bug Fixes
+    *   Fix search term persists when navigating to different podcast page
+        ([#2908](https://github.com/Automattic/pocket-casts-android/pull/2908))
+    *   Fix the show notes web view jumping after loading
+        ([#2925](https://github.com/Automattic/pocket-casts-android/pull/2925))
+    *   Fix play button local file getting set to pause after episode completion
+        ([#1627](https://github.com/Automattic/pocket-casts-android/pull/1627))
+*   New Features
+    *   Add sleep timer settings to sleep timer bottom sheet
+        ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
 
 7.73
 -----

@@ -9,9 +9,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class EpisodeSearchHandler @Inject constructor(
     settings: Settings,
     private val cacheServiceManager: PodcastCacheServiceManagerImpl,
