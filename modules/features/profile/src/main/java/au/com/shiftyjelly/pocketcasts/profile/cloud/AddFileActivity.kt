@@ -472,14 +472,15 @@ class AddFileActivity :
             return
         }
 
-        try {
-            binding.layoutLoading.isVisible = true
-            val uri = dataUri ?: return
-            val intentType = intent.type ?: getMimetypeOfContent(uri) ?: uriToFileType(binding.lblFilename.text.toString())
-            if (!(intentType.startsWith("audio/") || intentType.startsWith("video/"))) {
-                return
-            }
-            launch(Dispatchers.IO) {
+        binding.layoutLoading.isVisible = true
+        val uri = dataUri ?: return
+        val intentType = intent.type ?: getMimetypeOfContent(uri) ?: uriToFileType(binding.lblFilename.text.toString())
+        if (!(intentType.startsWith("audio/") || intentType.startsWith("video/"))) {
+            return
+        }
+
+        launch(Dispatchers.IO) {
+            try {
                 val userEpisode = UserEpisode(uuid = uuid, publishedDate = Date(), fileType = intent.type)
 
                 val savePath = DownloadHelper.pathForEpisode(userEpisode, fileStorage) ?: throw Exception("File path empty")
@@ -516,16 +517,24 @@ class AddFileActivity :
                         finish()
                     }
                 }
+            } catch (e: Exception) {
+                launch(Dispatchers.Main) {
+                    handleErrorWhenLoadingFile(e)
+                }
             }
-        } catch (e: Exception) {
-            binding.layoutLoading.isVisible = false
-            Timber.e(e, "Could not load file")
-            AlertDialog.Builder(this)
-                .setTitle(LR.string.error)
-                .setMessage(getString(LR.string.profile_cloud_add_file_error, e.message))
-                .setPositiveButton(LR.string.ok, null)
-                .show()
         }
+    }
+
+    private fun handleErrorWhenLoadingFile(e: Exception) {
+        binding.layoutLoading.isVisible = false
+
+        Timber.e(e, "Could not load file")
+
+        AlertDialog.Builder(this)
+            .setTitle(LR.string.error)
+            .setMessage(getString(LR.string.profile_cloud_add_file_error, e.message))
+            .setPositiveButton(LR.string.ok, null)
+            .show()
     }
 
     private fun uriToFileType(filename: String): String {
