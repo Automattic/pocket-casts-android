@@ -44,7 +44,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
-    private val experimentProvider: ExperimentProvider,
+    private val experiments: ExperimentProvider,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(app) {
 
@@ -103,10 +103,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         val upgradeLayout = when {
             showPatronOnly -> UpgradeLayout.Original
-            FeatureFlag.isEnabled(Feature.PAYWALL_AB_EXPERIMENT) -> UpgradeLayout.Reviews
-            FeatureFlag.isEnabled(Feature.PAYWALL_AA_EXPERIMENT) -> {
-                val variation = experimentProvider.getVariation(Experiment.PaywallAATest)
-                // For the A/A test show the same layout for both variations
+            FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT) -> {
+                val variation = experiments.getVariation(Experiment.PaywallAATest)
                 if (variation == Variation.Control) {
                     UpgradeLayout.Original
                 } else {

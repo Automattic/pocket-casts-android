@@ -1,5 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
-sealed class Experiment(val identifier: String) {
-    data object PaywallAATest : Experiment(identifier = "pocketcasts_paywall_android_aa_test")
+enum class Experiment(val identifier: String) {
+    PaywallAATest("pocketcasts_paywall_android_aa_test"),
+    ;
+
+    companion object {
+        fun getAllExperiments(): Set<Experiment> = entries.toSet()
+    }
 }
