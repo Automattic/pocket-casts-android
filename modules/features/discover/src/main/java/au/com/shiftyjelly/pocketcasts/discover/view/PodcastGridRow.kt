@@ -23,7 +23,7 @@ class PodcastGridRow @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
+    private var imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
     private val lblTitle: TextView
     private val lblSubtitle: TextView
     private val btnSubscribe: ImageButton
@@ -89,6 +89,7 @@ class PodcastGridRow @JvmOverloads constructor(
 
     fun updateImageSize(imageSize: Int) {
         this.imageSize = imageSize
+        this.imageRequestFactory = imageRequestFactory.copy(size = imageSize)
         loadImage()
     }
 
@@ -96,7 +97,7 @@ class PodcastGridRow @JvmOverloads constructor(
         val podcast = podcast
         val imageSize = imageSize
         if (podcast != null && imageSize != null) {
-            imageRequestFactory.copy(size = imageSize).createForPodcast(podcast.uuid).loadInto(imagePodcast)
+            imageRequestFactory.createForPodcast(podcast.uuid).loadInto(imagePodcast)
         }
     }
 
