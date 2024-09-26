@@ -12,6 +12,8 @@
         ([#2811](https://github.com/Automattic/pocket-casts-android/pull/2811))
     *   Add a visibility animation to the submit button on the rating screen
         ([#2824](https://github.com/Automattic/pocket-casts-android/pull/2824))
+    *   Improve performance of rendering artwork
+        ([#2832](https://github.com/Automattic/pocket-casts-android/pull/2832))
 *   Bug Fixes
     *   Fix issue when transcript type have an alternative valid mime type 
         [#2926](https://github.com/Automattic/pocket-casts-ios/issues/2926)
