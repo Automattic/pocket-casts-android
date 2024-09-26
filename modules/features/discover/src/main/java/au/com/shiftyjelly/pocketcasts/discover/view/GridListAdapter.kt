@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 
 private val differ = object : DiffUtil.ItemCallback<DiscoverPodcast>() {
     override fun areItemsTheSame(oldItem: DiscoverPodcast, newItem: DiscoverPodcast): Boolean {
-        return oldItem == newItem
+        return oldItem.uuid == newItem.uuid
     }
 
     override fun areContentsTheSame(oldItem: DiscoverPodcast, newItem: DiscoverPodcast): Boolean {
