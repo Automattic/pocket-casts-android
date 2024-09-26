@@ -432,19 +432,19 @@ class SyncManagerImpl @Inject constructor(
         }
 
     // Referral
-    override suspend fun getReferralCode(): ReferralCodeResponse {
+    override suspend fun getReferralCode(): Response<ReferralCodeResponse> {
         return getCacheTokenOrLogin { token ->
             syncServiceManager.getReferralCode(token)
         }
     }
 
-    override suspend fun validateReferralCode(code: String): ReferralValidationResponse {
+    override suspend fun validateReferralCode(code: String): Response<ReferralValidationResponse> {
         return getCacheTokenOrLogin { token ->
             syncServiceManager.validateReferralCode(token, code)
         }
     }
 
-    override suspend fun redeemReferralCode(code: String): ReferralRedemptionResponse {
+    override suspend fun redeemReferralCode(code: String): Response<ReferralRedemptionResponse> {
         return getCacheTokenOrLogin { token ->
             syncServiceManager.redeemReferralCode(token, code)
         }
