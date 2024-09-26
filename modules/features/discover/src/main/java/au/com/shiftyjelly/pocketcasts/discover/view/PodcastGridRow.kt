@@ -30,6 +30,34 @@ class PodcastGridRow @JvmOverloads constructor(
     private val imagePodcast: ImageView
     private var imageSize: Int? = null
 
+    var onSubscribeClickedListener: ((String) -> Unit)? = null
+        set(value) {
+            field = value
+            val listener = if (value != null) {
+                OnClickListener {
+                    val uuid = podcast?.uuid ?: return@OnClickListener
+                    btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
+                    value(uuid)
+                }
+            } else {
+                null
+            }
+            btnSubscribe.setOnClickListener(listener)
+        }
+
+    var onPodcastClickedListener: ((DiscoverPodcast) -> Unit)? = null
+        set(value) {
+            field = value
+            val listener = if (value != null) {
+                OnClickListener {
+                    podcast?.let(value::invoke)
+                }
+            } else {
+                null
+            }
+            setOnClickListener(listener)
+        }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.item_grid, this, true)
         lblTitle = findViewById(R.id.lblTitle)
@@ -71,23 +99,6 @@ class PodcastGridRow @JvmOverloads constructor(
             imageRequestFactory.copy(size = imageSize).createForPodcast(podcast.uuid).loadInto(imagePodcast)
         }
     }
-
-    var onSubscribeClicked: (() -> Unit)? = null
-        set(value) {
-            field = value
-            btnSubscribe.setOnClickListener {
-                btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
-                onSubscribeClicked?.invoke()
-            }
-        }
-
-    var onPodcastClicked: (() -> Unit)? = null
-        set(value) {
-            field = value
-            this.setOnClickListener {
-                onPodcastClicked?.invoke()
-            }
-        }
 
     fun clear() {
         lblTitle.text = null
