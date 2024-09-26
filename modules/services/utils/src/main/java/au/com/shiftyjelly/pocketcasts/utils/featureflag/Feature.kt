@@ -88,7 +88,7 @@ enum class Feature(
         title = "ExPlat Experiment",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ENGAGE_SDK(
