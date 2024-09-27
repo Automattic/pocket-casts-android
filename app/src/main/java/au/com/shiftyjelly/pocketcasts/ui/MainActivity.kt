@@ -57,8 +57,9 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.OpmlImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PlayFromSearchDeepLink
-import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.PocketCastsWebsiteGetDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.PromoCodeDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShareListDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
@@ -104,6 +105,7 @@ import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
@@ -135,6 +137,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -1286,8 +1290,11 @@ class MainActivity :
                         }
                     }
                 }
-                is PocketCastsWebsiteDeepLink -> {
+                is PocketCastsWebsiteGetDeepLink -> {
                     // Do nothing when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
+                }
+                is ReferralsDeepLink -> {
+                    openReferralClaim(deepLink.code)
                 }
                 is ShowPodcastFromUrlDeepLink -> {
                     openPodcastUrl(deepLink.url)
@@ -1338,6 +1345,16 @@ class MainActivity :
             Timber.e(e)
             crashLogging.sendReport(e)
         }
+    }
+
+    private fun openReferralClaim(code: String) {
+        if (!FeatureFlag.isEnabled(Feature.REFERRALS)) {
+            return
+        }
+        // TODO decide where to store the referral code
+        Timber.i("Referral code: $code")
+        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
+        showBottomSheet(fragment)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

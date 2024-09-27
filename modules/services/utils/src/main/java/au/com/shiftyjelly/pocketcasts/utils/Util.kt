@@ -4,15 +4,14 @@ import android.app.UiModeManager
 import android.content.Context
 import android.content.Context.ACCESSIBILITY_SERVICE
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.ApplicationInfoFlags
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Looper
 import android.text.format.Formatter
 import android.view.accessibility.AccessibilityManager
 import androidx.car.app.connection.CarConnection
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
+import au.com.shiftyjelly.pocketcasts.utils.Util.isAutomotive
 import java.util.Locale
 
 object Util {
@@ -48,12 +47,7 @@ object Util {
         }
 
     private fun appInfoHasBoolean(key: String, context: Context, default: Boolean = false): Boolean {
-        val appInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getApplicationInfo(context.packageName, ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-        }.metaData
+        val appInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
         return appInfo?.getBoolean(key, default) ?: default
     }
 

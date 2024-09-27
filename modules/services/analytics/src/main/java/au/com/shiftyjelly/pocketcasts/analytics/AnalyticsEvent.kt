@@ -328,6 +328,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
     PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
     PLAYER_SLEEP_TIMER_RESTARTED("player_sleep_timer_restarted"),
+    PLAYER_SLEEP_TIMER_SETTINGS_TAPPED("player_sleep_timer_settings_tapped"),
 
     /* Player - Playback effects */
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
@@ -650,4 +651,7 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_SEARCH_SHOWN("transcript_search_shown"),
     TRANSCRIPT_SEARCH_NEXT_RESULT("transcript_search_next_result"),
     TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
+
+    /* Referrals */
+    REFERRAL_LINK_SHARED("referral_link_shared"),
 }

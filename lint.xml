@@ -22,5 +22,7 @@
 
     <!-- This issue causes nondeterministic results when generating baseline files -->
     <issue id="ConvertToWebp" severity="ignore"/>
+    <!-- https://issuetracker.google.com/issues/220326924 -->
+    <issue id="FlowOperatorInvokedInComposition" severity="ignore"/>
 
 </lint>

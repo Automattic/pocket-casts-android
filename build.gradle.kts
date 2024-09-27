@@ -391,6 +391,10 @@ subprojects {
                 implementation(libs.leakcanary)
             }
         }
+        dependencies {
+            val lintChecks by configurations
+            lintChecks(libs.security.lint)
+        }
     }
 }
 

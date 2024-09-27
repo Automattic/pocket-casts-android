@@ -23,10 +23,10 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -35,35 +35,42 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private val plusBackgroundBrush = Brush.horizontalGradient(
-    0f to Color(0xFFFED745),
-    1f to Color(0xFFFEB525),
-)
-
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ReferralsSendGuestPassPage(
+    viewModel: ReferralsSendGuestPassViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
-
+        val state by viewModel.state.collectAsStateWithLifecycle()
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
+            state = state,
+            onRetry = viewModel::onRetry,
             onDismiss = onDismiss,
+            onShare = viewModel::onShareClick,
         )
     }
 }
@@ -72,7 +79,10 @@ fun ReferralsSendGuestPassPage(
 private fun ReferralsSendGuestPassContent(
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
+    state: UiState,
+    onRetry: () -> Unit,
     onDismiss: () -> Unit,
+    onShare: (String) -> Unit,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -85,82 +95,105 @@ private fun ReferralsSendGuestPassContent(
             )
             .fillMaxSize(),
     ) {
-        val showFullScreen = windowWidthSizeClass == WindowWidthSizeClass.Compact ||
-            windowHeightSizeClass == WindowHeightSizeClass.Compact
-        val cardCornerRadius = if (showFullScreen) 0.dp else 8.dp
-        val cardWidth = if (showFullScreen) maxWidth else (maxWidth.value * .5).dp
-        val cardModifier = if (showFullScreen) {
+        val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
         } else {
             Modifier
-                .width(cardWidth)
+                .width(pageWidth)
                 .wrapContentSize()
         }
-
         Card(
             elevation = 8.dp,
-            shape = RoundedCornerShape(cardCornerRadius),
+            shape = RoundedCornerShape(pageCornerRadius(showFullScreen)),
             backgroundColor = Color.Black,
-            modifier = cardModifier
+            modifier = pageModifier
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
                     onClick = {},
                 ),
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-            ) {
-                CloseButton(
-                    modifier = Modifier
-                        .align(Alignment.End),
-                    onClick = onDismiss,
-                )
+            when (state) {
+                UiState.Loading ->
+                    LoadingView(color = Color.White)
 
-                SubscriptionBadge(
-                    fontSize = 16.sp,
-                    padding = 4.dp,
-                    iconRes = IR.drawable.ic_plus,
-                    shortNameRes = LR.string.pocket_casts_plus_short,
-                    iconColor = Color.Black,
-                    backgroundBrush = plusBackgroundBrush,
-                    textColor = Color.Black,
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                TextH10(
-                    text = stringResource(LR.string.referrals_send_guest_pass_title),
-                    textAlign = TextAlign.Center,
-                )
-
-                if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    ReferralsPassCardsStack(
-                        width = cardWidth,
+                is UiState.Loaded ->
+                    SendGuestPassContent(
+                        showFullScreen = showFullScreen,
+                        windowHeightSizeClass = windowHeightSizeClass,
+                        pageWidth = pageWidth,
+                        onDismiss = onDismiss,
+                        onShare = { onShare(state.code) },
                     )
-                }
 
-                if (showFullScreen) {
-                    Spacer(modifier = Modifier.weight(1f))
-                } else {
-                    Spacer(modifier = Modifier.height(32.dp))
-                }
-
-                GradientRowButton(
-                    primaryText = stringResource(LR.string.referrals_share_guest_pass),
-                    textColor = Color.Black,
-                    gradientBackgroundColor = plusBackgroundBrush,
-                    modifier = Modifier.padding(16.dp),
-                    onClick = {},
-                )
+                is UiState.Error ->
+                    ReferralsGuestPassError(state, onRetry, onDismiss)
             }
         }
+    }
+}
+
+@Composable
+private fun SendGuestPassContent(
+    showFullScreen: Boolean,
+    windowHeightSizeClass: WindowHeightSizeClass,
+    pageWidth: Dp,
+    onDismiss: () -> Unit,
+    onShare: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+    ) {
+        CloseButton(
+            modifier = Modifier
+                .align(Alignment.End),
+            onClick = onDismiss,
+        )
+
+        SubscriptionBadge(
+            fontSize = 16.sp,
+            padding = 4.dp,
+            iconRes = IR.drawable.ic_plus,
+            shortNameRes = LR.string.pocket_casts_plus_short,
+            iconColor = Color.Black,
+            backgroundBrush = plusBackgroundBrush,
+            textColor = Color.Black,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        TextH10(
+            text = stringResource(LR.string.referrals_send_guest_pass_title),
+            textAlign = TextAlign.Center,
+        )
+
+        if (windowHeightSizeClass != WindowHeightSizeClass.Compact) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            ReferralsPassCardsStack(
+                width = pageWidth,
+            )
+        }
+
+        if (showFullScreen) {
+            Spacer(modifier = Modifier.weight(1f))
+        } else {
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        GradientRowButton(
+            primaryText = stringResource(LR.string.referrals_share_guest_pass),
+            textColor = Color.Black,
+            gradientBackgroundColor = plusBackgroundBrush,
+            modifier = Modifier.padding(16.dp),
+            onClick = onShare,
+        )
     }
 }
 
@@ -234,7 +267,10 @@ fun ReferralsSendGuestPassContentPreview(
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
+            state = UiState.Loaded(""),
             onDismiss = {},
+            onShare = {},
+            onRetry = {},
         )
     }
 }

@@ -173,7 +173,7 @@ data class ShowFilterDeepLink(
         .putExtra(EXTRA_FILTER_ID, filterId)
 }
 
-data object PocketCastsWebsiteDeepLink : DeepLink
+data object PocketCastsWebsiteGetDeepLink : DeepLink
 
 data class ShowPodcastFromUrlDeepLink(
     val url: String,
@@ -240,6 +240,20 @@ data class SignInDeepLink(
             .authority(shareHost)
             .appendPath("sign-in")
             .let { if (sourceView != null) it.appendQueryParameter(EXTRA_SOURCE_VIEW, sourceView) else it }
+            .build()
+    }
+}
+
+data class ReferralsDeepLink(
+    val code: String,
+) : UriDeepLink {
+    // Use the marketing website as the share host, for example https://pocketcsts.com/redeem/abc
+    override fun toUri(shareHost: String): Uri {
+        return Uri.Builder()
+            .scheme("https")
+            .authority(shareHost)
+            .appendPath("redeem")
+            .appendPath(code)
             .build()
     }
 }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -48,6 +49,14 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
 
     private val viewModel by viewModels<ExportSettingsViewModel>()
     private var exporter: OpmlExporter? = null
+
+    private val importOpmlFilePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val activity = activity ?: return@registerForActivityResult
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data?.data ?: return@registerForActivityResult
+            OpmlImportTask.run(data, activity)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,37 +135,16 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun showOpmlFilePicker() {
         val intent = Intent().apply {
             type = "*/*"
             action = Intent.ACTION_GET_CONTENT
         }
-        startActivityForResult(Intent.createChooser(intent, getString(LR.string.settings_import_choose_file)), IMPORT_PICKER_REQUEST_CODE)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        val activity = activity
-        if (activity == null || resultCode != Activity.RESULT_OK || resultData == null) {
-            return
-        }
-
-        if (requestCode == IMPORT_PICKER_REQUEST_CODE) {
-            val data = resultData.data ?: return
-            OpmlImportTask.run(data, activity)
-        } else if (requestCode == OpmlExporter.EXPORT_PICKER_REQUEST_CODE) {
-            val data = resultData.data ?: return
-            exporter?.exportToUri(data)
-        }
+        importOpmlFilePickerLauncher.launch(Intent.createChooser(intent, getString(LR.string.settings_import_choose_file)))
     }
 
     override fun onPause() {
         super.onPause()
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
-    }
-
-    companion object {
-        private const val IMPORT_PICKER_REQUEST_CODE = 42
     }
 }

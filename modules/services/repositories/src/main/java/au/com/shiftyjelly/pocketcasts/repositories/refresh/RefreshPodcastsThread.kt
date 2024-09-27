@@ -1,14 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.refresh
 
+import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Pair
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -481,7 +483,7 @@ class RefreshPodcastsThread(
             ).toIntent(context).apply {
                 action = action + System.currentTimeMillis() + intentId
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             intentId += 1
 
             val notificationTag = if (isGroupNotification) {
@@ -525,11 +527,8 @@ class RefreshPodcastsThread(
                 builder = builder.addAction(phoneActions[1])
             }
 
-            // Don't include three action on old devices because they don't fit
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                if (phoneActions.size > 2) {
-                    builder = builder.addAction(phoneActions[2])
-                }
+            if (phoneActions.size > 2) {
+                builder = builder.addAction(phoneActions[2])
             }
 
             if (isGroupNotification) {
@@ -565,7 +564,9 @@ class RefreshPodcastsThread(
                 }
             }
 
-            manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
+            }
         }
 
         private fun buildNotificationIntent(intentId: Int, intentName: String, episode: PodcastEpisode, notificationTag: String, context: Context): PendingIntent {
@@ -574,13 +575,13 @@ class RefreshPodcastsThread(
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_ACTION, intentName)
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_EPISODE_UUID, episode.uuid)
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_NOTIFICATION_TAG, notificationTag)
-            return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         private fun getDeletePendingIntent(context: Context): PendingIntent {
             val deleteIntent = Intent(context, NotificationBroadcastReceiver::class.java)
             deleteIntent.action = NotificationBroadcastReceiver.INTENT_ACTION_NOTIFICATION_DELETED
-            return PendingIntent.getBroadcast(context, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            return PendingIntent.getBroadcast(context, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         @Suppress("DEPRECATION")
@@ -608,7 +609,7 @@ class RefreshPodcastsThread(
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+            val pendingIntent = PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             intentIndex += 1
 
             val inboxStyle = NotificationCompat.InboxStyle()
@@ -655,7 +656,9 @@ class RefreshPodcastsThread(
             }
 
             val manager = NotificationManagerCompat.from(context)
-            manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(NotificationBroadcastReceiver.NOTIFICATION_TAG_NEW_EPISODES_PRIMARY, NotificationBroadcastReceiver.NOTIFICATION_ID, summaryNotification)
+            }
         }
 
         private fun getPodcastNotificationWearBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {

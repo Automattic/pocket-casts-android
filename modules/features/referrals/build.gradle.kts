@@ -39,6 +39,7 @@ dependencies {
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.model)
+    implementation(projects.modules.services.sharing)
     implementation(projects.modules.services.utils)
 
     testImplementation(libs.coroutines.test)

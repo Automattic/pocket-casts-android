@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.Intent.ACTION_SEND
 import android.content.Intent.EXTRA_INTENT
 import android.content.Intent.EXTRA_STREAM
+import android.content.Intent.EXTRA_SUBJECT
 import android.content.Intent.EXTRA_TEXT
 import android.content.Intent.EXTRA_TITLE
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -16,6 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
 import java.util.Date
@@ -664,6 +666,28 @@ class SharingClientTest {
         assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
+    }
+
+    @Test
+    fun shareReferralLink() = runTest {
+        val referralCode = "referral-code"
+        val text = context.getString(LR.string.referrals_share_text)
+        val subject = context.getString(LR.string.referrals_share_subject)
+        val request = SharingRequest.referralLink(
+            referralCode = referralCode,
+        ).build()
+
+        val response = client.share(request)
+        assertTrue(response.isSuccsessful)
+        assertNull(response.feedbackMessage)
+
+        val intent = shareStarter.requireChooserIntent
+
+        assertEquals(ACTION_SEND, intent.action)
+        assertEquals("text/plain", intent.type)
+        assertEquals("$text\n\nhttps://$WEB_BASE_HOST/redeem/$referralCode", intent.getStringExtra(EXTRA_TEXT))
+        assertEquals(subject, intent.getStringExtra(EXTRA_SUBJECT))
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     private fun createClient(
