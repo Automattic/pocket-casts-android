@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -53,6 +54,7 @@ class UserManagerImpl @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
+    private val accountManager: AccountManagerStatusInfo,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -115,6 +117,8 @@ class UserManagerImpl @Inject constructor(
                 applicationScope.launch {
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
                 }
+
+                accountManager.signOut()
 
                 settings.marketingOptIn.set(false, updateModifiedAt = false)
                 settings.setEndOfYearShowModal(true)
