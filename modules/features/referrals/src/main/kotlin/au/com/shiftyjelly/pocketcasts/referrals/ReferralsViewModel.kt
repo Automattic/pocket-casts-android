@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -63,5 +65,6 @@ class ReferralsViewModel @Inject constructor(
         val showIcon: Boolean = false,
         val showTooltip: Boolean = false,
         val showProfileBanner: Boolean = false,
+        val referralsOfferInfo: ReferralsOfferInfo = ReferralsOfferInfoMock,
     )
 }

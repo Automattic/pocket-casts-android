@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.referrals
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.EmptyResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.ErrorResult
@@ -63,8 +65,10 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
     }
 
     fun onShareClick(referralCode: String) {
+        if (_state.value !is UiState.Loaded) return
         val request = SharingRequest.referralLink(
             referralCode = referralCode,
+            referralsOfferInfo = (_state.value as UiState.Loaded).referralsOfferInfo,
         ).setSourceView(SourceView.REFERRALS)
             .build()
         viewModelScope.launch {
@@ -74,7 +78,10 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
 
     sealed class UiState {
         data object Loading : UiState()
-        data class Loaded(val code: String) : UiState()
+        data class Loaded(
+            val code: String,
+            val referralsOfferInfo: ReferralsOfferInfo = ReferralsOfferInfoMock,
+        ) : UiState()
         data class Error(val error: ReferralSendGuestPassError) : UiState()
     }
 

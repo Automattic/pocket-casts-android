@@ -2136,19 +2136,26 @@
     <!-- Referrals -->
     <string name="gift">Gift</string>
     <string name="referrals_activate_my_pass">Activate my pass</string>
-    <string name="referrals_claim_guess_pass_banner_card_title_english_only" translatable="false">Claim your 2-Month\nGuest Pass to Plus</string>
-    <string name="referrals_claim_guess_pass_banner_card_title">Claim your 2-Month Guest Pass to Plus</string>
+    <string name="referrals_claim_guess_pass_banner_card_title_english_only" translatable="false">Claim your %1$s\nGuest Pass to Plus</string>
+    <!-- Referrals claim guess pass banner card title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
+    <string name="referrals_claim_guess_pass_banner_card_title">Claim your %1$s Guest Pass to Plus</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Unlock the full listening experience</string>
-    <string name="referrals_claim_guest_pass_description">This offer is for new members only. Membership will automatically renew to a paid annual membership at %s.</string>
-    <string name="referrals_claim_guest_pass_title_english_only" translatable="false">Claim your 2-Month\nGuest Pass</string>
-    <string name="referrals_claim_guest_pass_title">Claim your 2-Month Guest Pass</string>
+    <string name="referrals_claim_guest_pass_description">Membership will automatically renew to a paid annual membership at %s.</string>
+    <string name="referrals_claim_guest_pass_title_english_only" translatable="false">Claim your %1$s\nGuest Pass</string>
+    <!-- Referrals claim guest pass title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
+    <string name="referrals_claim_guest_pass_title">Claim your %1$s Guest Pass</string>
+    <!-- Referrals guest pass card title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
+    <string name="referrals_guest_pass_card_title">%1$s Guest Pass</string>
     <string name="referrals_invalid_offer_description">This guest pass can only be redeemed once and is available for those without an active Plus or Patron subscription. Thanks for listening!</string>
     <string name="referrals_invalid_offer_title">This offer isn\'t available</string>
-    <string name="referrals_send_guest_pass_title">Gift 2 Months of Pocket&#160;Casts&#160;Plus</string>
-    <string name="referrals_send_guest_pass_card_title">2-Month Guest Pass</string>
+    <!-- Referrals send guest pass title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
+    <string name="referrals_send_guest_pass_title">Gift %1$s of Pocket&#160;Casts&#160;Plus</string>
     <string name="referrals_share_guest_pass">Share Guest Pass</string>
-    <string name="referrals_share_subject">2-Month Guest Pass for Pocket&#160;Casts</string>
-    <string name="referrals_share_text">Hey! Use the link below to claim your 2-month guest pass for Pocket&#160;Casts&#160;Plus and enjoy podcasts across all your devices!</string>
-    <string name="referrals_tooltip_message">Gift 2 months of Pocket&#160;Casts&#160;Plus!</string>
+    <!-- Referrals share subject, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
+    <string name="referrals_share_subject">%1$s Guest Pass for Pocket&#160;Casts</string>
+    <!-- Referrals share text, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
+    <string name="referrals_share_text">Hey! Use the link below to claim your %1$s guest pass for Pocket&#160;Casts&#160;Plus and enjoy podcasts across all your devices!</string>
+    <!-- Referrals tooltip message, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
+    <string name="referrals_tooltip_message">Gift %1$s of Pocket&#160;Casts&#160;Plus!</string>
 
 </resources>

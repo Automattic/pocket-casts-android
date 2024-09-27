@@ -122,6 +122,7 @@ private fun ReferralsSendGuestPassContent(
 
                 is UiState.Loaded ->
                     SendGuestPassContent(
+                        state = state,
                         showFullScreen = showFullScreen,
                         windowHeightSizeClass = windowHeightSizeClass,
                         pageWidth = pageWidth,
@@ -138,6 +139,7 @@ private fun ReferralsSendGuestPassContent(
 
 @Composable
 private fun SendGuestPassContent(
+    state: UiState.Loaded,
     showFullScreen: Boolean,
     windowHeightSizeClass: WindowHeightSizeClass,
     pageWidth: Dp,
@@ -169,7 +171,7 @@ private fun SendGuestPassContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         TextH10(
-            text = stringResource(LR.string.referrals_send_guest_pass_title),
+            text = stringResource(LR.string.referrals_send_guest_pass_title, state.referralsOfferInfo.localizedOfferDurationNoun),
             textAlign = TextAlign.Center,
         )
 
@@ -177,6 +179,7 @@ private fun SendGuestPassContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             ReferralsPassCardsStack(
+                state = state,
                 width = pageWidth,
             )
         }
@@ -199,6 +202,7 @@ private fun SendGuestPassContent(
 
 @Composable
 private fun ReferralsPassCardsStack(
+    state: UiState.Loaded,
     cardsCount: Int = 3,
     width: Dp,
 ) {
@@ -217,6 +221,7 @@ private fun ReferralsPassCardsStack(
                     .size(cardWidth, cardHeight)
                     .offset(y = cardOffset),
                 source = ReferralGuestPassCardViewSource.Send,
+                referralsOfferInfo = state.referralsOfferInfo,
             )
         }
     }
