@@ -39,7 +39,7 @@ steps:
 
   - label: 'Dependency diff'
     if: build.pull_request.id != null
-    command: .buildkite/commands/dependency-diff.sh
+    command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
     plugins: [$CI_TOOLKIT]
     artifact_paths:
       - "**/build/reports/diff/*"
