@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.6.0" type="baseline" client="gradle" dependencies="true" name="AGP (8.6.0)" variant="all" version="8.6.0">
+<issues format="6" by="lint 8.6.1" type="baseline" client="gradle" dependencies="true" name="AGP (8.6.1)" variant="all" version="8.6.1">
 
     <issue
         id="MissingSuperCall"
@@ -131,55 +131,6 @@
             file="src/main/java/au/com/shiftyjelly/pocketcasts/views/adapter/FolderItemDiffCallback.kt"
             line="23"
             column="50"/>
-    </issue>
-
-    <issue
-        id="UnsafeOptInUsageError"
-        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
-    </issue>
-
-    <issue
-        id="UnsafeOptInUsageError"
-        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
-    </issue>
-
-    <issue
-        id="UnsafeOptInUsageError"
-        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/NowPlayingViewModel.kt"/>
-    </issue>
-
-    <issue
-        id="UnsafeOptInUsageError"
-        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
-    </issue>
-
-    <issue
-        id="UnsafeOptInUsageError"
-        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
-    </issue>
-
-    <issue
-        id="UnsafeOptInUsageError"
-        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
-    </issue>
-
-    <issue
-        id="UnsafeOptInUsageError"
-        message="This declaration is opt-in and its usage should be marked with `@com.google.android.horologist.annotations.ExperimentalHorologistApi` or `@OptIn(markerClass = com.google.android.horologist.annotations.ExperimentalHorologistApi.class)`">
-        <location
-            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRules.kt"/>
     </issue>
 
     <issue

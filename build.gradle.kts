@@ -413,3 +413,10 @@ fun Project.configureSentry() {
         ignoredBuildTypes = setOf("debug", "debugProd")
     }
 }
+
+tasks.register("aggregatedLintRelease") {
+    group = "verification"
+    description = "Run Lint tasks for application modules"
+
+    dependsOn(":app:lintRelease", ":automotive:lintRelease", ":wear:lintRelease")
+}

@@ -96,13 +96,12 @@ class ProfileEpisodeListViewModel @Inject constructor(
 
     fun onSearchQueryChanged(searchQuery: String) {
         val oldValue = _searchQueryFlow.value
-        val newValue = searchQuery.trim()
-        _searchQueryFlow.value = newValue
+        _searchQueryFlow.value = searchQuery
 
         // Track search events
-        if (oldValue.isEmpty() && newValue.isNotEmpty()) {
+        if (oldValue.isEmpty() && searchQuery.isNotEmpty()) {
             track(AnalyticsEvent.SEARCH_PERFORMED)
-        } else if (oldValue.isNotEmpty() && newValue.isEmpty()) {
+        } else if (oldValue.isNotEmpty() && searchQuery.isEmpty()) {
             track(AnalyticsEvent.SEARCH_CLEARED)
         }
     }

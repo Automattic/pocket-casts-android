@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-11 09:54:03+0000
+Translation-Revision-Date: 2024-09-26 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="referrals_share_text">您好！ 点击下方链接领取 2 个月的 Pocket Casts Plus 访客通行证，即可在所有设备上收听播客！</string>
+    <string name="referrals_share_subject">2 个月的 Pocket Casts 访客通行证</string>
+    <string name="referrals_invalid_offer_title">此优惠不可用</string>
+    <string name="referrals_invalid_offer_description">该访客通行证仅可兑换一次，适用于未激活 Plus 或 Patron 订阅的用户。 感谢收听！</string>
+    <string name="referrals_claim_guest_pass_title">领取您的 2 个月访客通行证</string>
+    <string name="referrals_claim_guest_pass_description">此优惠仅限新会员使用。 会员资格将以 %s 的价格自动续订为年度付费会员资格。</string>
+    <string name="referrals_activate_my_pass">激活我的通行证</string>
+    <string name="referrals_tooltip_message">赠送 2 个月 Pocket Casts Plus 使用权！</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">解锁完整的收听体验</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">领取您的 2 个月 Plus 访客通行证</string>
+    <string name="referrals_share_guest_pass">共享访客通行证</string>
+    <string name="referrals_send_guest_pass_card_title">2 个月的访客通行证</string>
+    <string name="referrals_send_guest_pass_title">赠送 2 个月 Pocket Casts Plus 使用权</string>
+    <string name="move_down">下移</string>
+    <string name="move_up">上移</string>
+    <string name="search_episodes_not_found_summary">我们未搜索到任何相关剧集。 请尝试使用其他关键字。</string>
+    <string name="search_episodes_not_found_title">未找到剧集</string>
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="paywall_layout_reviews_review_six_date">3 月 8 日</string>
     <string name="paywall_layout_reviews_review_six_message">多年来，PC 一直是我的首选。 我也尝试过其他的播客应用程序，但因为它们在简洁性、Ul 和支持方面的不足，我最终总是会回到 PC。 如果您已经厌倦了当前所用的播客应用程序，这将尤其值得一试。</string>
