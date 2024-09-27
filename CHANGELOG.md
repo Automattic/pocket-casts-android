@@ -16,7 +16,9 @@
         ([#2832](https://github.com/Automattic/pocket-casts-android/pull/2832))
 *   Bug Fixes
     *   Fix issue when transcript type have an alternative valid mime type 
-        [#2926](https://github.com/Automattic/pocket-casts-ios/issues/2926)
+        [#2910](https://github.com/Automattic/pocket-casts-android/pull/2910)
+    *   Fix display of html entities in transcripts
+        [#2940](https://github.com/Automattic/pocket-casts-android/issues/2940)
 
 7.72
 -----
