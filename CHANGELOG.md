@@ -29,6 +29,8 @@
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
     *   Add Google Engage SDK integration 
         ([#2847](https://github.com/Automattic/pocket-casts-android/pull/2847))
+    *   Add a progress bar in the browse view on Android Auto
+        ([#2945](https://github.com/Automattic/pocket-casts-android/pull/2945))
 
 7.73
 -----
