@@ -126,7 +126,9 @@ class UserManagerImpl @Inject constructor(
                 analyticsTracker.flush()
                 analyticsTracker.clearAllData()
                 analyticsTracker.refreshMetadata()
-                experimentProvider.clear()
+                applicationScope.launch {
+                    experimentProvider.refreshExperiments()
+                }
             }
         }
         settings.setFullySignedOut(true)
