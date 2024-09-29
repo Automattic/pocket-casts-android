@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-12 17:54:02+0000
+Translation-Revision-Date: 2024-09-19 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="referrals_share_guest_pass">Compartir pase de invitado</string>
+    <string name="referrals_send_guest_pass_card_title">Pase de invitado de 2 meses</string>
+    <string name="referrals_send_guest_pass_title">Regala 2 meses de Pocket Casts Plus</string>
+    <string name="move_down">Bajar</string>
+    <string name="move_up">Subir</string>
+    <string name="search_episodes_not_found_summary">No hemos podido encontrar ningún episodio para esa búsqueda. Prueba con otra palabra clave.</string>
+    <string name="search_episodes_not_found_title">No se ha encontrado ningún episodio</string>
     <string name="transcript_error_not_available">Lo sentimos, pero no hay transcripción disponible para este episodio.</string>
     <string name="paywall_layout_reviews_review_six_date">8 de marzo</string>
     <string name="paywall_layout_reviews_review_six_message">PC ha sido mi opción durante años. He probado otras aplicaciones de podcasts y siempre vuelvo a PC por su sencillez, IU y soporte. Merece la pena echarle un vistazo, sobre todo si te has cansado de tu actual aplicación de podcasts.</string>

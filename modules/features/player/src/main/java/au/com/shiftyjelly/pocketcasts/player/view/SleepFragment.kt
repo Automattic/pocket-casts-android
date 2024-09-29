@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -12,6 +13,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentSleepBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment.Companion.SCROLL_TO_SLEEP_TIMER
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
@@ -30,6 +35,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class SleepFragment : BaseDialogFragment() {
@@ -93,6 +99,20 @@ class SleepFragment : BaseDialogFragment() {
         }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisodeOrChapter.setOnClickListener { cancelTimer() }
+        binding.sleepTimeSettings.setOnClickListener {
+            close()
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_SETTINGS_TAPPED)
+            val fragment = PlaybackSettingsFragment().apply {
+                arguments = bundleOf(SCROLL_TO_SLEEP_TIMER to true)
+            }
+            val fragmentHostListener = (activity as? FragmentHostListener)
+            fragmentHostListener?.apply {
+                closePlayer() // Closes player if open
+                openTab(VR.id.navigation_profile)
+                addFragment(SettingsFragment())
+                addFragment(fragment)
+            }
+        }
 
         return binding.root
     }
