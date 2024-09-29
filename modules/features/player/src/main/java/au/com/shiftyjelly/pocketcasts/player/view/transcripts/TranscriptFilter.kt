@@ -12,7 +12,7 @@ private val endOfLineCharEndOfCue = "([.!?])\\z".toRegex()
 private val notEndOfLineCharEndOfCue = "([^.!?$])\\z".toRegex()
 private val nbspRegex = "&nbsp;".toRegex()
 private val breakLineRegex = "<br>|<BR>|<br/>|<BR/>|<BR />|<br />".toRegex()
-private val soundDescriptorRegex = "\\[[^]]*]".toRegex()
+private val soundDescriptorRegex = "\\\\?\\[[^]]*]".toRegex()
 private val htmlSpeakerRegex = "^ *\\w+:\\s*".toRegex()
 private val htmlSpeakerNewlineRegex = "\\n *\\w+:\\s*".toRegex()
 private val emptySpacesAtEndOfLinesRegex = " *\\n".toRegex()
@@ -53,6 +53,7 @@ class TranscriptRegexFilters(private val filters: List<TranscriptFilter>) : Tran
                 RegexFilters.emptySpacesAtEndOfLinesFilter,
                 RegexFilters.doubleOrMoreSpacesFilter,
                 RegexFilters.tripleOrMoreEmptyLinesFilter,
+                HTMLEntitiesFilter(),
             ),
         )
 
@@ -84,6 +85,31 @@ class RegexFilter(private val regex: Regex, private val replacement: String) : T
         } catch (e: PatternSyntaxException) {
             input
         }
+    }
+}
+
+class HTMLEntitiesFilter : TranscriptFilter {
+    private val htmlEntities = arrayOf(
+        Pair("&nbsp;", " "),
+        Pair("&#160;", " "),
+        Pair("&quot;", "\""),
+        Pair("&#34;", "\""),
+        Pair("&apos;", "'"),
+        Pair("&#39;", "'"),
+        Pair("&lt;", "<"),
+        Pair("&#60;", "<"),
+        Pair("&gt;", ">"),
+        Pair("&#62;", ">"),
+        Pair("&#38;", "&"),
+        Pair("&amp;", "&"), // Do this last so that, e.g. @"&amp;lt;" goes to @"&lt;" not @"<"
+    )
+
+    override fun filter(input: String): String {
+        var result = input
+        for (entity in htmlEntities) {
+            result = result.replace(entity.first, entity.second)
+        }
+        return result
     }
 }
 

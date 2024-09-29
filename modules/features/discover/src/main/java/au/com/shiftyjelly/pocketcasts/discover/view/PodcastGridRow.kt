@@ -23,12 +23,40 @@ class PodcastGridRow @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
+    private var imageRequestFactory = PocketCastsImageRequestFactory(context).themed()
     private val lblTitle: TextView
     private val lblSubtitle: TextView
     private val btnSubscribe: ImageButton
     private val imagePodcast: ImageView
     private var imageSize: Int? = null
+
+    var onSubscribeClickedListener: ((String) -> Unit)? = null
+        set(value) {
+            field = value
+            val listener = if (value != null) {
+                OnClickListener {
+                    val uuid = podcast?.uuid ?: return@OnClickListener
+                    btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
+                    value(uuid)
+                }
+            } else {
+                null
+            }
+            btnSubscribe.setOnClickListener(listener)
+        }
+
+    var onPodcastClickedListener: ((DiscoverPodcast) -> Unit)? = null
+        set(value) {
+            field = value
+            val listener = if (value != null) {
+                OnClickListener {
+                    podcast?.let(value::invoke)
+                }
+            } else {
+                null
+            }
+            setOnClickListener(listener)
+        }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.item_grid, this, true)
@@ -61,6 +89,7 @@ class PodcastGridRow @JvmOverloads constructor(
 
     fun updateImageSize(imageSize: Int) {
         this.imageSize = imageSize
+        this.imageRequestFactory = imageRequestFactory.copy(size = imageSize)
         loadImage()
     }
 
@@ -68,26 +97,9 @@ class PodcastGridRow @JvmOverloads constructor(
         val podcast = podcast
         val imageSize = imageSize
         if (podcast != null && imageSize != null) {
-            imageRequestFactory.copy(size = imageSize).createForPodcast(podcast.uuid).loadInto(imagePodcast)
+            imageRequestFactory.createForPodcast(podcast.uuid).loadInto(imagePodcast)
         }
     }
-
-    var onSubscribeClicked: (() -> Unit)? = null
-        set(value) {
-            field = value
-            btnSubscribe.setOnClickListener {
-                btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
-                onSubscribeClicked?.invoke()
-            }
-        }
-
-    var onPodcastClicked: (() -> Unit)? = null
-        set(value) {
-            field = value
-            this.setOnClickListener {
-                onPodcastClicked?.invoke()
-            }
-        }
 
     fun clear() {
         lblTitle.text = null

@@ -6,7 +6,6 @@ import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.Xml
 import androidx.core.text.HtmlCompat
 import androidx.preference.PreferenceFragmentCompat
@@ -18,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.FileWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,10 +35,6 @@ class OpmlExporter(
     private val applicationScope: CoroutineScope,
 ) {
 
-    companion object {
-        const val EXPORT_PICKER_REQUEST_CODE = 43
-    }
-
     private var serviceTask: Call? = null
     private var progressDialog: ProgressDialog? = null
     private var sendAsEmail: Boolean = false
@@ -55,42 +48,6 @@ class OpmlExporter(
     fun saveFile() {
         sendAsEmail = false
         exportPodcasts()
-    }
-
-    fun exportToUri(uri: Uri) {
-        val opmlFile = opmlFile
-        if (opmlFile == null || !opmlFile.exists()) {
-            return
-        }
-
-        try {
-            context.contentResolver.openFileDescriptor(uri, "w").use { fileDescriptor ->
-                val fileDescriptor = fileDescriptor?.fileDescriptor ?: return@use
-                FileOutputStream(fileDescriptor).use { fileOutputStream ->
-                    FileInputStream(opmlFile).use { fileInputStream ->
-                        val buffer = ByteArray(1024)
-                        var length = fileInputStream.read(buffer)
-
-                        // Transferring data
-                        while (length != -1) {
-                            fileOutputStream.write(buffer, 0, length)
-                            length = fileInputStream.read(buffer)
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "OPML export failed.")
-            UiUtil.hideProgressDialog(progressDialog)
-            UiUtil.displayAlertError(
-                context = context,
-                title = context.getString(LR.string.settings_opml_export_failed_title),
-                message = context.getString(
-                    LR.string.settings_opml_export_failed,
-                ),
-                onComplete = null,
-            )
-        }
     }
 
     private fun exportPodcasts() {
@@ -158,7 +115,7 @@ class OpmlExporter(
             intent.type = "text/html"
 
             val email = syncManager.getEmail()
-            if (email != null && email.isNotBlank()) {
+            if (!email.isNullOrBlank()) {
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
             }
 
@@ -168,7 +125,6 @@ class OpmlExporter(
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)
-                // fragment.startActivityForResult(intent, EXPORT_PICKER_REQUEST_CODE);
             } catch (e: ActivityNotFoundException) {
                 Timber.e(e)
                 UiUtil.displayAlertError(context, context.getString(LR.string.settings_no_email_app_title), context.getString(LR.string.settings_no_email_app), null)

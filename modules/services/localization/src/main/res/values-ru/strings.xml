@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-12 21:54:03+0000
+Translation-Revision-Date: 2024-09-26 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="referrals_share_text">Привет! По ссылке ниже лежит ваш гостевой пропуск в Pocket Casts Plus сроком на 2 месяца. Воспользуйтесь им и слушайте подкасты на любом из ваших устройств!</string>
+    <string name="referrals_share_subject">Гостевой пропуск Pocket Casts на 2 месяца</string>
+    <string name="referrals_invalid_offer_title">Это предложение недействительно</string>
+    <string name="referrals_invalid_offer_description">Этим предложением могут воспользоваться только те, у кого нет подписки Plus или Patron, и только один раз. Благодарим за прослушивание!</string>
+    <string name="referrals_claim_guest_pass_title">Получите бесплатный гостевой пропуск на 2 месяца</string>
+    <string name="referrals_claim_guest_pass_description">Это предложение действительно только для новых участников. По истечении бесплатного периода будет автоматически списан ежегодный членский взнос в размере %s.</string>
+    <string name="referrals_activate_my_pass">Активировать пропуск</string>
+    <string name="referrals_tooltip_message">2 месяца пользования Pocket Casts Plus в подарок!</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Откройте невероятные возможности прослушивания</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Получите бесплатный гостевой пропуск в Plus на 2 месяца</string>
+    <string name="referrals_share_guest_pass">Поделиться гостевым пропуском</string>
+    <string name="referrals_send_guest_pass_card_title">Гостевой пропуск на 2 месяца</string>
+    <string name="referrals_send_guest_pass_title">2 месяца пользования Pocket Casts Plus в подарок</string>
+    <string name="move_down">Перенести вниз</string>
+    <string name="move_up">Перенести вверх</string>
+    <string name="search_episodes_not_found_summary">Не удалось найти выпуск по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
+    <string name="search_episodes_not_found_title">Выпуски не найдены</string>
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="paywall_layout_reviews_review_six_date">8 марта</string>
     <string name="paywall_layout_reviews_review_six_message">PC уже много лет остаётся моим любимым приложением. Я пробовал другие приложения для подкастов, но всегда возвращался к PC: это самый простой вариант с лучшим пользовательским интерфейсом и поддержкой. Безусловно, стоит попробовать, особенно если вам надоело ваше нынешнее приложение для подкастов.</string>

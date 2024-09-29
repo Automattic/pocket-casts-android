@@ -45,6 +45,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -427,6 +430,25 @@ class SyncManagerImpl @Inject constructor(
         getCacheTokenOrLoginRxSingle { token ->
             syncServiceManager.upNextSync(request, token)
         }
+
+    // Referral
+    override suspend fun getReferralCode(): Response<ReferralCodeResponse> {
+        return getCacheTokenOrLogin { token ->
+            syncServiceManager.getReferralCode(token)
+        }
+    }
+
+    override suspend fun validateReferralCode(code: String): Response<ReferralValidationResponse> {
+        return getCacheTokenOrLogin { token ->
+            syncServiceManager.validateReferralCode(token, code)
+        }
+    }
+
+    override suspend fun redeemReferralCode(code: String): Response<ReferralRedemptionResponse> {
+        return getCacheTokenOrLogin { token ->
+            syncServiceManager.redeemReferralCode(token, code)
+        }
+    }
 
 // private methods
 

@@ -80,3 +80,20 @@ message SupportFeedbackRequest {
     string debug = 4;
     string inbox = 5;
 }
+
+message ReferralCodeResponse {
+    string code = 1;
+    string url = 2;
+}
+
+message ReferralValidationResponse {
+    string offer = 1;
+}
+
+message ReferralRedemptionRequest {
+    string code = 1;
+}
+
+message ReferralRedemptionResponse {
+    string code = 1;
+}

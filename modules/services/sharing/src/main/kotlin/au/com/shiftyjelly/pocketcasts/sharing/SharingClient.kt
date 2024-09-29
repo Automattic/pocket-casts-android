@@ -17,6 +17,7 @@ import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toBitmap
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -128,7 +129,7 @@ class SharingClient(
         }
 
         is SharingRequest.Data.ReferralLink -> {
-            val shareText = "${context.getString(LR.string.referrals_share_text)}\n\n${data.sharingUrl("https://$webBasedHost")}"
+            val shareText = "${context.getString(LR.string.referrals_share_text)}\n\n${data.sharingUrl(webBasedHost)}"
             val shareSubject = context.getString(LR.string.referrals_share_subject)
             Intent()
                 .setAction(Intent.ACTION_SEND)
@@ -470,11 +471,11 @@ data class SharingRequest internal constructor(
         }
 
         class ReferralLink internal constructor(
-            private val referralCode: String,
+            val referralCode: String,
         ) : Data {
             override val podcast: PodcastModel? = null
 
-            fun sharingUrl(host: String) = "$host/redeem-guest-pass/$referralCode"
+            fun sharingUrl(host: String) = ReferralsDeepLink(code = referralCode).toUri(host)
 
             override fun toString() = "ReferralLink(referralCode=$referralCode"
         }

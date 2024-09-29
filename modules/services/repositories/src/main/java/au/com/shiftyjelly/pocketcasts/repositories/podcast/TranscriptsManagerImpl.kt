@@ -72,7 +72,7 @@ class TranscriptsManagerImpl @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun findBestTranscript(availableTranscripts: List<Transcript>): Transcript? {
         for (format in supportedFormats) {
-            val transcript = availableTranscripts.firstOrNull { it.type == format.mimeType }
+            val transcript = availableTranscripts.firstOrNull { it.type in format.possibleMimeTypes() }
             if (transcript != null) {
                 return transcript
             }
@@ -161,7 +161,7 @@ class TranscriptsManagerImpl @Inject constructor(
                         ?.transcripts
                         ?.mapNotNull { it.takeIf { it.url != null && it.type != null }?.toTranscript(transcript.episodeUuid) } ?: emptyList()
                     // Try alternative from filtered transcripts
-                    val filteredTranscripts = transcriptsAvailable.filter { it.type !in episodeFailedFormats.map { format -> format.mimeType } }
+                    val filteredTranscripts = transcriptsAvailable.filter { it.type !in episodeFailedFormats.flatMap { format -> format.possibleMimeTypes() } }
                     scope.launch {
                         updateTranscripts(
                             podcastUuid = podcastUuid,
@@ -188,8 +188,13 @@ enum class TranscriptFormat(val mimeType: String) {
     HTML("text/html"),
     ;
 
+    fun possibleMimeTypes() = when (this) {
+        SRT -> listOf(mimeType, "application/x-subrip")
+        else -> listOf(mimeType)
+    }
+
     companion object {
         fun fromType(type: String) =
-            entries.firstOrNull { it.mimeType == type }
+            entries.firstOrNull { it.possibleMimeTypes().contains(type) }
     }
 }

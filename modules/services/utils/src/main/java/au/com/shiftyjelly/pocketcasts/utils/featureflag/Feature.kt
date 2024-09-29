@@ -83,20 +83,12 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    PAYWALL_AA_EXPERIMENT(
-        key = "paywall_aa_experiment",
-        title = "Paywall AA Experiment",
+    EXPLAT_EXPERIMENT(
+        key = "explat_experiment",
+        title = "ExPlat Experiment",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = true,
-    ),
-    PAYWALL_AB_EXPERIMENT(
-        key = "paywall_ab_experiment",
-        title = "Paywall AB Experiment",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ENGAGE_SDK(

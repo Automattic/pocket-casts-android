@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-13 09:54:03+0000
+Translation-Revision-Date: 2024-09-18 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="referrals_share_guest_pass">Gastenpassen delen</string>
+    <string name="referrals_send_guest_pass_card_title">Gastenpas voor 2 maanden</string>
+    <string name="referrals_send_guest_pass_title">Geef 2 maanden Pocket Casts Plus weg</string>
+    <string name="move_down">Omlaag verplaatsen</string>
+    <string name="move_up">Omhoog verplaatsen</string>
+    <string name="search_episodes_not_found_summary">We kunnen geen aflevering vinden voor die zoekopdracht. Probeer een ander trefwoord.</string>
+    <string name="search_episodes_not_found_title">Geen afleveringen gevonden</string>
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
     <string name="paywall_layout_reviews_review_six_date">8 mrt</string>
     <string name="paywall_layout_reviews_review_six_message">PC is al jaren mijn favoriet. Ik heb andere podcastapps geprobeerd, maar kwam altijd weer terug naar PC vanwege de eenvoud, UI en support. Deze app is het zeker waard om even te bekijken, vooral als je je huidige podcastapp zat bent geworden.</string>

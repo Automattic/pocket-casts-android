@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-09 17:54:03+0000
+Translation-Revision-Date: 2024-09-25 19:54:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="referrals_share_text">Ciao! Utilizza il seguente link per ottenere il tuo pass per ospiti da 2 mesi per Pocket Casts Plus e goditi i podcast in tutti i tuoi dispositivi!</string>
+    <string name="referrals_share_subject">Pass per ospiti da 2 mesi per Pocket Casts</string>
+    <string name="referrals_invalid_offer_title">Questa offerta non è disponibile</string>
+    <string name="referrals_invalid_offer_description">Questo pass per ospiti può essere riscattato solo una volta ed è disponibile per chi non ha un abbonamento Plus o Patron attivo. Grazie per l\'ascolto!</string>
+    <string name="referrals_claim_guest_pass_title">Riscatta il tuo pass per ospiti da 2 mesi</string>
+    <string name="referrals_claim_guest_pass_description">Questa offerta è esclusivamente per nuovi membri. L\'iscrizione si rinnoverà automaticamente in un\'iscrizione annuale a pagamento di %s.</string>
+    <string name="referrals_activate_my_pass">Attiva il mio pass</string>
+    <string name="referrals_tooltip_message">Regala 2 mesi di Pocket Casts Plus!</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Sblocca l\'esperienza di ascolto completa</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Riscatta il tuo pass per ospiti da 2 mesi per Plus</string>
+    <string name="referrals_share_guest_pass">Condividi pass per ospiti</string>
+    <string name="referrals_send_guest_pass_card_title">Pass per ospiti da 2 mesi</string>
+    <string name="referrals_send_guest_pass_title">Regala 2 mesi di Pocket Casts Plus</string>
+    <string name="move_down">Vai giù</string>
+    <string name="move_up">Vai su</string>
+    <string name="search_episodes_not_found_summary">Non abbiamo trovato alcun episodio per la ricerca. Prova un\'altra parola chiave.</string>
+    <string name="search_episodes_not_found_title">Nessun episodio trovato</string>
     <string name="transcript_error_not_available">Siamo spiacenti, ma non è disponibile una trascrizione per questo episodio.</string>
     <string name="paywall_layout_reviews_review_six_date">8 mar</string>
     <string name="paywall_layout_reviews_review_six_message">Uso PC da molti anni. Ho provato altre app di podcast, ma ho sempre finito per usare PC per la sua semplicità, la sua interfaccia utente e il suo supporto. Vale la pena di provare questa app di podcast, soprattutto se quella che usate in questo momento non vi soddisfa più.</string>

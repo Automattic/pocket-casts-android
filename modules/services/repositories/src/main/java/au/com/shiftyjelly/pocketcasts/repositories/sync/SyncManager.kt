@@ -28,6 +28,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.ReferralCodeResponse
+import com.pocketcasts.service.api.ReferralRedemptionResponse
+import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -99,4 +102,9 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getBookmarks(): List<Bookmark>
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void>
     suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void>
+
+    // Referral
+    suspend fun getReferralCode(): Response<ReferralCodeResponse>
+    suspend fun validateReferralCode(code: String): Response<ReferralValidationResponse>
+    suspend fun redeemReferralCode(code: String): Response<ReferralRedemptionResponse>
 }

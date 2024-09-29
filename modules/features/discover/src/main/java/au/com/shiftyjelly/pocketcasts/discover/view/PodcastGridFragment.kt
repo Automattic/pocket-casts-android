@@ -121,7 +121,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
 
         recyclerView.addItemDecoration(SpaceItemDecoration())
         val imageSize = UiUtil.getDiscoverGridImageWidthPx(context = recyclerView.context)
-        adapter = GridListAdapter(imageSize, onPodcastClicked, onPodcastSubscribe)
+        adapter = GridListAdapter(onPodcastClicked, onPodcastSubscribe, imageSize)
         recyclerView.adapter = adapter
     }
 

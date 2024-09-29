@@ -3,19 +3,33 @@
 *   Bug Fixes
     *   Fix search term persists when navigating to different podcast page
         ([#2908](https://github.com/Automattic/pocket-casts-android/pull/2908))
+    *   Fix the show notes web view jumping after loading
+        ([#2925](https://github.com/Automattic/pocket-casts-android/pull/2925))
     *   Fix play button local file getting set to pause after episode completion
         ([#1627](https://github.com/Automattic/pocket-casts-android/pull/1627))
+    *   Fix volume that was not returning to the original level after restarting sleep timer by shaking the device
+        ([#2930](https://github.com/Automattic/pocket-casts-android/pull/2930))
+*   New Features
+    *   Add sleep timer settings to sleep timer bottom sheet
+        ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
 
 7.73
 -----
 *   New Features
     *   Add local search in listening history
         ([#2794](https://github.com/Automattic/pocket-casts-android/pull/2794))
-*   Updated
+*   Updates
     *   Dark theme improvements on the podcast page
         ([#2811](https://github.com/Automattic/pocket-casts-android/pull/2811))
     *   Add a visibility animation to the submit button on the rating screen
         ([#2824](https://github.com/Automattic/pocket-casts-android/pull/2824))
+    *   Improve performance of rendering artwork
+        ([#2832](https://github.com/Automattic/pocket-casts-android/pull/2832))
+*   Bug Fixes
+    *   Fix issue when transcript type have an alternative valid mime type 
+        [#2910](https://github.com/Automattic/pocket-casts-android/pull/2910)
+    *   Fix display of html entities in transcripts
+        [#2940](https://github.com/Automattic/pocket-casts-android/issues/2940)
 
 7.72
 -----

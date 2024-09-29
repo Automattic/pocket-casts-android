@@ -40,6 +40,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -177,4 +179,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideTranscriptsManager(transcriptsManagerImpl: TranscriptsManagerImpl): TranscriptsManager
+
+    @Binds
+    abstract fun provideReferralManager(referralManagerImpl: ReferralManagerImpl): ReferralManager
 }

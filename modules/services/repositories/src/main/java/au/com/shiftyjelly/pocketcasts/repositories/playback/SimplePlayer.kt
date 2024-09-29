@@ -172,6 +172,14 @@ class SimplePlayer(
         return player?.volume
     }
 
+    /**
+     * 1.0 represents the maximum/default volume,
+     * while 0.0 represents complete silence
+     */
+    fun restoreVolume() {
+        player?.volume = 1.0f
+    }
+
     override fun setPodcast(podcast: Podcast?) {}
 
     @OptIn(UnstableApi::class)
