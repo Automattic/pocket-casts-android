@@ -365,7 +365,7 @@ platform :android do
       res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
       glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
       locales: SUPPORTED_LOCALES,
-      lint_task: 'lintRelease'
+      lint_task: 'aggregatedLintRelease'
     )
 
     version = release_version_current

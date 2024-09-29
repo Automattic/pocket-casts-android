@@ -123,6 +123,8 @@ class NotesFragment : BaseFragment() {
                 settings.loadsImagesAutomatically = true
                 isScrollbarFadingEnabled = false
                 isVerticalScrollBarEnabled = false
+                // stop the web view jumping after loading
+                isFocusable = false
                 setBackgroundColor(Color.TRANSPARENT)
                 webViewClient = object : WebViewClient() {
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {

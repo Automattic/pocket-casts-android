@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-11 12:09:42+0000
+Translation-Revision-Date: 2024-09-17 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="referrals_share_guest_pass">Dela gästpass</string>
+    <string name="referrals_send_guest_pass_card_title">2 månaders gästpass</string>
+    <string name="referrals_send_guest_pass_title">Ge bort 2 månader med Pocket Casts Plus</string>
     <string name="move_down">Flytta ner</string>
     <string name="move_up">Flytta upp</string>
+    <string name="search_episodes_not_found_summary">Vi kunde inte hitta något avsnitt för denna sökning. Prova med ett annat nyckelord.</string>
     <string name="search_episodes_not_found_title">Inga avsnitt hittades</string>
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="paywall_layout_reviews_review_six_date">8 mar</string>

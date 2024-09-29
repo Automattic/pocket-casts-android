@@ -105,6 +105,17 @@ class TranscriptsManagerImplTest {
     }
 
     @Test
+    fun `findBestTranscript returns first supported transcript for a format with multiple mimetypes`() = runTest {
+        val transcripts = listOf(
+            Transcript("1", "url_1", "application/x-subrip"),
+            Transcript("1", "url_2", "application/srt"),
+        )
+        val result = transcriptsManager.findBestTranscript(transcripts)
+
+        assertEquals(transcripts[0], result)
+    }
+
+    @Test
     fun `findBestTranscript returns null when no transcripts available`() = runTest {
         val transcripts = emptyList<Transcript>()
 
