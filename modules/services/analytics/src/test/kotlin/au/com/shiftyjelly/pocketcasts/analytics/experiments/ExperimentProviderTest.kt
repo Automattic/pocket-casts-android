@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation.Control
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation.Treatment
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.android.experimentation.Experiment
@@ -12,6 +13,8 @@ import com.automattic.android.experimentation.domain.Variation
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,6 +26,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ExperimentProviderTest {
 
     private lateinit var accountStatusInfo: AccountStatusInfo
@@ -32,11 +36,14 @@ class ExperimentProviderTest {
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+
     @Before
     fun setUp() {
         accountStatusInfo = mock(AccountStatusInfo::class.java)
         repository = mock(VariationsRepository::class.java)
-        experimentProvider = ExperimentProvider(accountStatusInfo, repository)
+        experimentProvider = ExperimentProvider(accountStatusInfo, repository, coroutineRule.testDispatcher)
     }
 
     @Test
@@ -62,15 +69,6 @@ class ExperimentProviderTest {
 
         verify(repository).initialize(anyString(), eq(null))
         verify(accountStatusInfo).getUuid()
-    }
-
-    @Test
-    fun `clear should call repository clear`() {
-        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
-
-        experimentProvider.clear()
-
-        verify(repository).clear()
     }
 
     @Test
@@ -122,15 +120,6 @@ class ExperimentProviderTest {
     }
 
     @Test
-    fun `should not clear when feature flag is disabled`() {
-        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
-
-        experimentProvider.clear()
-
-        verify(repository, never()).clear()
-    }
-
-    @Test
     fun `should return null variation when feature flag is disabled`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
 
@@ -140,5 +129,28 @@ class ExperimentProviderTest {
         val variation = experimentProvider.getVariation(experiment)
 
         assertNull(variation)
+    }
+
+    @Test
+    fun `refreshExperiments should refresh experiments`() = runTest {
+        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
+
+        val uuid = "test-uuid"
+        `when`(accountStatusInfo.getUuid()).thenReturn(uuid)
+
+        experimentProvider.refreshExperiments()
+
+        verify(repository).clear()
+        verify(repository).initialize(uuid, null)
+    }
+
+    @Test
+    fun `refreshExperiments should not refresh experiments when feature flag is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
+
+        experimentProvider.refreshExperiments()
+
+        verify(repository, never()).clear()
+        verify(repository, never()).initialize(anyString(), eq(null))
     }
 }
