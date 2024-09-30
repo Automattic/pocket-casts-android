@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.Transitio
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -74,6 +73,8 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.abs
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -82,9 +83,6 @@ private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
-    @Inject
-    lateinit var castManager: CastManager
-
     @Inject
     lateinit var playbackManager: PlaybackManager
 
@@ -136,12 +134,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         )
 
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
-            override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
-                viewModel.seekToMs(progress, seekComplete)
-                playbackManager.trackPlaybackSeek(progress, SourceView.PLAYER)
+            override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
+                val progressMs = progress.inWholeMilliseconds.toInt()
+                viewModel.seekToMs(progressMs, seekComplete)
+                playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
             }
 
-            override fun onSeekPositionChanging(progress: Int) {}
+            override fun onSeekPositionChanging(progress: Duration) {}
 
             override fun onSeekPositionChangeStart() {
             }
@@ -240,8 +239,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
 
             binding.seekBar.setSeekBarState(
-                durationMs = headerViewModel.durationMs,
-                positionMs = headerViewModel.positionMs,
+                duration = headerViewModel.durationMs.milliseconds,
+                position = headerViewModel.positionMs.milliseconds,
+                chapters = headerViewModel.chapters,
+                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
                 tintColor = headerViewModel.iconTintColor,
                 bufferedUpTo = headerViewModel.bufferedUpToMs,
                 isBuffering = headerViewModel.isBuffering,
@@ -345,8 +346,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             binding.nextChapter.isEnabled = !headerViewModel.isLastChapter
             binding.nextChapter.isVisible = headerViewModel.isChaptersPresent
             binding.seekBar.setSeekBarState(
-                durationMs = headerViewModel.durationMs,
-                positionMs = headerViewModel.positionMs,
+                duration = headerViewModel.durationMs.milliseconds,
+                position = headerViewModel.positionMs.milliseconds,
+                chapters = headerViewModel.chapters,
+                playbackSpeed = headerViewModel.playbackEffects.playbackSpeed,
                 tintColor = headerViewModel.iconTintColor,
                 bufferedUpTo = headerViewModel.bufferedUpToMs,
                 isBuffering = headerViewModel.isBuffering,
