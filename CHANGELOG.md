@@ -1,6 +1,8 @@
 7.75
 -----
-
+*   Bug Fixes
+    *   Fix search podcast results scroll back to the start after subscribing
+        ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
 
 7.74
 -----
