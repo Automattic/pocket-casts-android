@@ -1,6 +1,8 @@
 7.75
 -----
-
+*   Bug Fixes
+    *   Fix search podcast results scroll back to the start after subscribing
+        ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
 
 7.74
 -----
@@ -13,8 +15,6 @@
         ([#1627](https://github.com/Automattic/pocket-casts-android/pull/1627))
     *   Fix volume that was not returning to the original level after restarting sleep timer by shaking the device
         ([#2930](https://github.com/Automattic/pocket-casts-android/pull/2930))
-    *   Fix search podcast results scroll back to the start after subscribing
-        ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
 *   New Features
     *   Add sleep timer settings to sleep timer bottom sheet
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
