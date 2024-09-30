@@ -842,6 +842,7 @@
     <string name="profile_cloud_add_file">Add File</string>
     <string name="profile_cloud_edit_file">Edit File</string>
     <string name="profile_cloud_add_file_error">Error adding file: %s</string>
+    <string name="profile_cloud_add_invalid_file">Unable to load the selected file. Please try again or choose a different file.</string>
     <string name="profile_cloud_update_file_error">Sorry, something went wrong trying to update this file. Please try again.</string>
     <string name="profile_confirm">Confirm</string>
     <string name="profile_confirm_new_password">Confirm New Password</string>
