@@ -23,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -59,20 +61,24 @@ private fun ReferralsIconWithTooltip(
         Tooltip(
             show = state.showTooltip,
         ) {
-            TooltipContent()
+            TooltipContent(
+                referralsOfferInfo = state.referralsOfferInfo,
+            )
         }
     }
 }
 
 @Composable
-private fun TooltipContent() {
+private fun TooltipContent(
+    referralsOfferInfo: ReferralsOfferInfo,
+) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .padding(top = 24.dp, bottom = 16.dp),
     ) {
         TextH40(
-            text = stringResource(LR.string.referrals_tooltip_message),
+            text = stringResource(LR.string.referrals_tooltip_message, referralsOfferInfo.localizedOfferDurationNoun.lowercase()),
         )
     }
 }
@@ -112,6 +118,8 @@ fun TooltipContentPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        TooltipContent()
+        TooltipContent(
+            referralsOfferInfo = ReferralsOfferInfoMock,
+        )
     }
 }

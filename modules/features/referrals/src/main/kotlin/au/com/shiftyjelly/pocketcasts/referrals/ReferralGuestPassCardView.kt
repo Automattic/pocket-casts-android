@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -50,8 +52,9 @@ object ReferralGuestPassCardDefaults {
 fun ReferralGuestPassCardView(
     modifier: Modifier = Modifier,
     source: ReferralGuestPassCardViewSource,
+    referralsOfferInfo: ReferralsOfferInfo,
 ) {
-    val cardTitle = stringResource(LR.string.referrals_send_guest_pass_card_title)
+    val cardTitle = stringResource(LR.string.referrals_guest_pass_card_title, referralsOfferInfo.localizedOfferDurationAdjective)
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(ReferralGuestPassCardDefaults.cardRadius(source)))
@@ -106,6 +109,7 @@ fun ReferralPassCardSendViewPreview() {
         modifier = Modifier
             .size(DpSize(315.dp, 200.dp)),
         source = ReferralGuestPassCardViewSource.Send,
+        referralsOfferInfo = ReferralsOfferInfoMock,
     )
 }
 
@@ -116,6 +120,7 @@ fun ReferralPassCardProfileBannerViewPreview() {
         modifier = Modifier
             .size(DpSize(150.dp, 150.dp * ReferralGuestPassCardDefaults.cardAspectRatio)),
         source = ReferralGuestPassCardViewSource.ProfileBanner,
+        referralsOfferInfo = ReferralsOfferInfoMock,
     )
 }
 

@@ -42,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
@@ -54,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ReferralsClaimGuestPassPage(
     onDismiss: () -> Unit,
+    referralsOfferInfo: ReferralsOfferInfo = ReferralsOfferInfoMock,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val context = LocalContext.current
@@ -62,6 +65,7 @@ fun ReferralsClaimGuestPassPage(
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
+            referralsOfferInfo = referralsOfferInfo,
             onDismiss = onDismiss,
         )
     }
@@ -71,6 +75,7 @@ fun ReferralsClaimGuestPassPage(
 private fun ReferralsClaimGuestPassContent(
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
+    referralsOfferInfo: ReferralsOfferInfo,
     onDismiss: () -> Unit,
 ) {
     BoxWithConstraints(
@@ -118,7 +123,7 @@ private fun ReferralsClaimGuestPassContent(
                 } else {
                     LR.string.referrals_claim_guest_pass_title
                 }
-                val price = "$39.99 USD" // TODO - Referrals: Make it dynamic
+                val price = referralsOfferInfo.localizedPriceAfterOffer
 
                 TextButton(
                     modifier = Modifier
@@ -143,7 +148,7 @@ private fun ReferralsClaimGuestPassContent(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 TextH10(
-                    text = stringResource(titleTextResId),
+                    text = stringResource(titleTextResId, referralsOfferInfo.localizedOfferDurationAdjective),
                     textAlign = TextAlign.Center,
                 )
 
@@ -156,6 +161,7 @@ private fun ReferralsClaimGuestPassContent(
                         modifier = Modifier
                             .size(guestPassCardWidth, guestPassCardHeight),
                         source = ReferralGuestPassCardViewSource.Claim,
+                        referralsOfferInfo = referralsOfferInfo,
                     )
                 }
 
@@ -230,6 +236,7 @@ fun ReferralsClaimGuestPassContentPreview(
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
+            referralsOfferInfo = ReferralsOfferInfoMock,
             onDismiss = {},
         )
     }

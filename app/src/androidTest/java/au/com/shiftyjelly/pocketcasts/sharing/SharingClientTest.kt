@@ -17,6 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.WEB_BASE_HOST
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import java.io.File
@@ -671,10 +672,12 @@ class SharingClientTest {
     @Test
     fun shareReferralLink() = runTest {
         val referralCode = "referral-code"
-        val text = context.getString(LR.string.referrals_share_text)
-        val subject = context.getString(LR.string.referrals_share_subject)
+        val referralsOfferInfo = ReferralsOfferInfoMock
+        val text = context.getString(LR.string.referrals_share_text, referralsOfferInfo.localizedOfferDurationAdjective.lowercase())
+        val subject = context.getString(LR.string.referrals_share_subject, referralsOfferInfo.localizedOfferDurationNoun)
         val request = SharingRequest.referralLink(
             referralCode = referralCode,
+            referralsOfferInfo = referralsOfferInfo,
         ).build()
 
         val response = client.share(request)
