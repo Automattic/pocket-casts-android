@@ -6,8 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
-    <string name="referrals_share_text">こんにちは。 以下のリンクを使用して Pocket Casts Plus の2か月間のゲストパスを取得し、お使いの全端末でポッドキャストをお楽しみください !</string>
-    <string name="referrals_share_subject">Pocket Casts の2か月間のゲストパス</string>
     <string name="referrals_invalid_offer_title">このオファーは利用できません</string>
     <string name="referrals_invalid_offer_description">このゲストパスは Plus または Patron のサブスクリプションがアクティブでないユーザーが対象で、1回に限りご利用いただけます。 お聴きいただきありがとうございます !</string>
     <string name="referrals_claim_guest_pass_title">2か月間のゲストパスを取得しましょう</string>

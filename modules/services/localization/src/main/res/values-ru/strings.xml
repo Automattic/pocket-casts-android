@@ -6,8 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
-    <string name="referrals_share_text">Привет! По ссылке ниже лежит ваш гостевой пропуск в Pocket Casts Plus сроком на 2 месяца. Воспользуйтесь им и слушайте подкасты на любом из ваших устройств!</string>
-    <string name="referrals_share_subject">Гостевой пропуск Pocket Casts на 2 месяца</string>
     <string name="referrals_invalid_offer_title">Это предложение недействительно</string>
     <string name="referrals_invalid_offer_description">Этим предложением могут воспользоваться только те, у кого нет подписки Plus или Patron, и только один раз. Благодарим за прослушивание!</string>
     <string name="referrals_claim_guest_pass_title">Получите бесплатный гостевой пропуск на 2 месяца</string>
