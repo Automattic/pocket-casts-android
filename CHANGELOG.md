@@ -9,8 +9,6 @@
         ([#1627](https://github.com/Automattic/pocket-casts-android/pull/1627))
     *   Fix volume that was not returning to the original level after restarting sleep timer by shaking the device
         ([#2930](https://github.com/Automattic/pocket-casts-android/pull/2930))
-    *   Fix crash when uploading file
-        ([#2938](https://github.com/Automattic/pocket-casts-android/pull/2938))
 *   New Features
     *   Add sleep timer settings to sleep timer bottom sheet
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
