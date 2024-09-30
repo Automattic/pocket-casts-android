@@ -12,6 +12,8 @@
 *   New Features
     *   Add sleep timer settings to sleep timer bottom sheet
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
+    *   Add Google Engage SDK integration 
+        ([#2847](https://github.com/Automattic/pocket-casts-android/pull/2847))
 
 7.73
 -----
