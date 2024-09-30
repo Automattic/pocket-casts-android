@@ -42,7 +42,7 @@ class DurationUtilTest {
 
         val text = duration.toHhMmSs()
 
-        assertEquals("01:00:00", text)
+        assertEquals("1:00:00", text)
     }
 
     @Test

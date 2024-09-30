@@ -7,7 +7,7 @@ fun Duration.toHhMmSs() = toComponents { hours, minutes, seconds, _ ->
     if (hours == 0L) {
         String.format(Locale.ROOT, "%02d:%02d", minutes, seconds)
     } else {
-        String.format(Locale.ROOT, "%02d:%02d:%02d", hours, minutes, seconds)
+        String.format(Locale.ROOT, "%d:%02d:%02d", hours, minutes, seconds)
     }
 }
 
