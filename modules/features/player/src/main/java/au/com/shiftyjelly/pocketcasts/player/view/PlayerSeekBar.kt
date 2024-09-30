@@ -138,10 +138,7 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
     private fun remainingTime(): Duration {
-        val skippedChaptersDuration = chapters.getList()
-            .filter { !it.selected && it.endTime > currentTime }
-            .fold(Duration.ZERO) { duration, chapter -> duration + chapter.duration }
-        return (duration - currentTime - skippedChaptersDuration) / playbackSpeed
+        return (duration - currentTime - chapters.skippedChaptersDuration(currentTime)) / playbackSpeed
     }
 
     interface OnUserSeekListener {
