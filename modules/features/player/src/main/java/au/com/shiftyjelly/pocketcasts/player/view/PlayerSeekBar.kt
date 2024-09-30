@@ -131,13 +131,13 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
             val elapsedTime = currentTime.toHhMmSs()
             elapsedTimeText.text = currentTime.toHhMmSs()
             elapsedTimeText.contentDescription = resources.getString(LR.string.player_played_up_to, elapsedTime)
-            val timeRemaining = remainingTime().toHhMmSs()
-            remainingTimeText.text = timeRemaining
-            remainingTimeText.contentDescription = resources.getString(LR.string.player_time_remaining, timeRemaining.removePrefix("-"))
+            val remaingingTime = (-remainingDuration()).toHhMmSs()
+            remainingTimeText.text = remaingingTime
+            remainingTimeText.contentDescription = resources.getString(LR.string.player_time_remaining, remaingingTime.removePrefix("-"))
         }
     }
 
-    private fun remainingTime(): Duration {
+    private fun remainingDuration(): Duration {
         return (duration - currentTime - chapters.skippedChaptersDuration(currentTime)) / playbackSpeed
     }
 
