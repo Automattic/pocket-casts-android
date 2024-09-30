@@ -132,7 +132,7 @@ private fun SearchResultsView(
     }
     val podcastsRowState = rememberLazyListState()
     val episodesRowState = rememberLazyListState()
-    val initialPodcasts by remember(state.podcasts.isEmpty()) { mutableStateOf(state.podcasts) }
+    val initialPodcasts by remember(state.searchTerm) { mutableStateOf(state.podcasts) }
     // Reset podcast list scroll position when podcast list changes
     // We use podcast UUIDs as the key to avoid unnecessary resets when only subscription properties change
     LaunchedEffect(key1 = state.podcasts.map { it.uuid }) {
