@@ -94,9 +94,9 @@ enum class Feature(
     ENGAGE_SDK(
         key = "engage_sdk",
         title = "Integrate Pocket Casts with Engage SDK",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
     REFERRALS(
