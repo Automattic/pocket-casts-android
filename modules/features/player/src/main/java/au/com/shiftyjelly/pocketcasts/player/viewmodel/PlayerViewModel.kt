@@ -179,7 +179,6 @@ class PlayerViewModel @Inject constructor(
         settings.skipForwardInSecs.flow.asObservable(coroutineContext),
         upNextExpandedObservable,
         chaptersExpandedObservable,
-        settings.globalPlaybackEffects.flow.asObservable(coroutineContext),
         settings.artworkConfiguration.flow.asObservable(coroutineContext),
         this::mergeListData,
     )
@@ -341,14 +340,18 @@ class PlayerViewModel @Inject constructor(
             }
     }
 
-    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, artworkConfiguration: ArtworkConfiguration): ListData {
+    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, artworkConfiguration: ArtworkConfiguration): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
         this.episode = episode
         this.podcast = podcast
 
-        val effects = if (podcast?.overrideGlobalEffects == true) podcast.playbackEffects else globalPlaybackEffects
+        val effects = PlaybackEffects().apply {
+            playbackSpeed = playbackState.playbackSpeed
+            trimMode = playbackState.trimMode
+            isVolumeBoosted = playbackState.isVolumeBoosted
+        }
 
         val podcastHeader: PlayerHeader
         if (episode == null) {
