@@ -107,6 +107,7 @@ class PlayerViewModel @Inject constructor(
         val skipBackwardInSecs: Int = 30,
         val isSleepRunning: Boolean = false,
         val isEffectsOn: Boolean = false,
+        val playbackEffects: PlaybackEffects = PlaybackEffects(),
         val isBuffering: Boolean = false,
         val bufferedUpToMs: Int = 0,
         val theme: Theme.ThemeType = Theme.ThemeType.DARK,
@@ -122,7 +123,7 @@ class PlayerViewModel @Inject constructor(
         val isChaptersPresent: Boolean = !chapters.isEmpty
         val chapter: Chapter? = chapters.getChapter(positionMs.milliseconds)
         val chapterProgress: Float = chapter?.calculateProgress(positionMs.milliseconds) ?: 0f
-        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs.milliseconds) ?: ""
+        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs.milliseconds, playbackEffects.playbackSpeed) ?: ""
         val chapterSummary: String = chapters.getChapterSummary(positionMs.milliseconds)
         val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs.milliseconds)
         val isLastChapter: Boolean = chapters.isLastChapter(positionMs.milliseconds)
@@ -372,6 +373,7 @@ class PlayerViewModel @Inject constructor(
                 skipForwardInSecs = skipForwardInSecs,
                 isSleepRunning = playbackState.isSleepTimerRunning,
                 isEffectsOn = !effects.usingDefaultValues,
+                playbackEffects = effects,
                 isBuffering = playbackState.isBuffering,
                 bufferedUpToMs = playbackState.bufferedMs,
                 theme = theme.activeTheme,
