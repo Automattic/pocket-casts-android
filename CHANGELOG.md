@@ -23,6 +23,9 @@
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
     *   Add Google Engage SDK integration 
         ([#2847](https://github.com/Automattic/pocket-casts-android/pull/2847))
+*   Updates
+    *   Display remaining playback time using skipped chapters and playback speed
+        ([#2955](https://github.com/Automattic/pocket-casts-android/pull/2955))
 
 7.73
 -----
