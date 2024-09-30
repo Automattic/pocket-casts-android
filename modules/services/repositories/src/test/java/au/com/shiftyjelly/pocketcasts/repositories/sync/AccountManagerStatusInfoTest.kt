@@ -11,10 +11,7 @@ import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.any
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -64,24 +61,5 @@ class AccountManagerStatusInfoTest {
         val uuid = accountManagerStatusInfo.getUuid()
 
         assertNull(uuid)
-    }
-
-    @Test
-    fun `test signOut removes the account when it exists`() {
-        val account = Account("test@example.com", AccountConstants.ACCOUNT_TYPE)
-        `when`(accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE)).thenReturn(arrayOf(account))
-
-        accountManagerStatusInfo.signOut()
-
-        verify(accountManager).removeAccountExplicitly(account)
-    }
-
-    @Test
-    fun `test signOut does nothing when no account exists`() {
-        `when`(accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE)).thenReturn(emptyArray())
-
-        accountManagerStatusInfo.signOut()
-
-        verify(accountManager, never()).removeAccountExplicitly(any())
     }
 }

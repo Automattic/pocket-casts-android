@@ -113,24 +113,21 @@ class UserManagerImpl @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
             subscriptionManager.clearCachedStatus()
             syncManager.signOut {
-                settings.clearPlusPreferences()
                 applicationScope.launch {
+                    settings.clearPlusPreferences()
+
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
-                }
 
-                accountManager.signOut()
+                    settings.marketingOptIn.set(false, updateModifiedAt = false)
+                    settings.setEndOfYearShowModal(true)
 
-                settings.marketingOptIn.set(false, updateModifiedAt = false)
-                settings.setEndOfYearShowModal(true)
-
-                analyticsTracker.track(
-                    AnalyticsEvent.USER_SIGNED_OUT,
-                    mapOf(KEY_USER_INITIATED to wasInitiatedByUser),
-                )
-                analyticsTracker.flush()
-                analyticsTracker.clearAllData()
-                analyticsTracker.refreshMetadata()
-                applicationScope.launch {
+                    analyticsTracker.track(
+                        AnalyticsEvent.USER_SIGNED_OUT,
+                        mapOf(KEY_USER_INITIATED to wasInitiatedByUser),
+                    )
+                    analyticsTracker.flush()
+                    analyticsTracker.clearAllData()
+                    analyticsTracker.refreshMetadata()
                     experimentProvider.refreshExperiments()
                 }
             }

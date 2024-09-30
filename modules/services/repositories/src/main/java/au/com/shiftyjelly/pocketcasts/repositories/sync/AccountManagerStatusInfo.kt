@@ -15,13 +15,5 @@ class AccountManagerStatusInfo @Inject constructor(
         accountManager.getUserData(account, AccountConstants.UUID)
     }
 
-    override fun signOut() {
-        val account = getAccount()
-
-        if (account != null) {
-            accountManager.removeAccountExplicitly(account)
-        }
-    }
-
     private fun getAccount() = accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE).firstOrNull()
 }
