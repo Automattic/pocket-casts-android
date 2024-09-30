@@ -484,7 +484,7 @@ class AddFileActivity :
         }
 
         if (isUriInvalid(uri)) {
-            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_INVALID_FILE_ERROR)
+            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_INVALID_FILE_ERROR, mapOf("uri" to uri.toString()))
 
             Timber.e("Could not upload invalid file")
 
@@ -530,7 +530,7 @@ class AddFileActivity :
                         }
                     }
                 } catch (e: Exception) {
-                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_UPLOAD_FAILED)
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_UPLOAD_FAILED, mapOf("uri" to uri.toString()))
 
                     Timber.e(e, "Could not load file")
 
