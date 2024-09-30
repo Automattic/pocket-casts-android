@@ -155,6 +155,8 @@ enum class AnalyticsEvent(val key: String) {
     UPLOADED_FILES_MULTI_SELECT_EXITED("uploaded_files_multi_select_exited"),
     UPLOADED_FILES_SORT_BY_CHANGED("uploaded_files_sort_by_changed"),
     UPLOADED_FILES_ADD_FILE_TAPPED("uploaded_files_add_file_tapped"),
+    UPLOADED_FILES_INVALID_FILE_ERROR("uploaded_files_invalid_file_error"),
+    UPLOADED_FILES_UPLOAD_FAILED("uploaded_files_upload_failed"),
 
     /* User File Details View */
     USER_FILE_DETAIL_SHOWN("user_file_detail_shown"),
@@ -328,6 +330,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
     PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
     PLAYER_SLEEP_TIMER_RESTARTED("player_sleep_timer_restarted"),
+    PLAYER_SLEEP_TIMER_SETTINGS_TAPPED("player_sleep_timer_settings_tapped"),
 
     /* Player - Playback effects */
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),

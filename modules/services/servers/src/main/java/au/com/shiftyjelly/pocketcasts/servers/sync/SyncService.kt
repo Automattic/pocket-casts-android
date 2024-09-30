@@ -176,13 +176,13 @@ interface SyncService {
     // Referral
     @Headers("Content-Type: application/octet-stream")
     @GET("/referrals/code")
-    suspend fun getReferralCode(@Header("Authorization") authorization: String): ReferralCodeResponse
+    suspend fun getReferralCode(@Header("Authorization") authorization: String): Response<ReferralCodeResponse>
 
     @Headers("Content-Type: application/octet-stream")
     @GET("/referrals/validate")
-    suspend fun validateReferralCode(@Header("Authorization") authorization: String, @Query("code") code: String): ReferralValidationResponse
+    suspend fun validateReferralCode(@Header("Authorization") authorization: String, @Query("code") code: String): Response<ReferralValidationResponse>
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/referrals/redeem")
-    suspend fun redeemReferralCode(@Header("Authorization") authorization: String, @Body request: ReferralRedemptionRequest): ReferralRedemptionResponse
+    suspend fun redeemReferralCode(@Header("Authorization") authorization: String, @Body request: ReferralRedemptionRequest): Response<ReferralRedemptionResponse>
 }

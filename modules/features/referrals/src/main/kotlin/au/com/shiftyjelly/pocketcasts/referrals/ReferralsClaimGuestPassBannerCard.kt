@@ -95,7 +95,7 @@ private fun ReferralsClaimGuestPassBannerCard(
                         LR.string.referrals_claim_guess_pass_banner_card_title
                     }
                     TextH40(
-                        text = stringResource(textResId),
+                        text = stringResource(textResId, state.referralsOfferInfo.localizedOfferDurationAdjective),
                     )
 
                     Spacer(modifier = modifier.height(8.dp))
@@ -113,6 +113,7 @@ private fun ReferralsClaimGuestPassBannerCard(
                         .width(guestPassCardWidth)
                         .height(guestPassCardWidth * ReferralGuestPassCardDefaults.cardAspectRatio),
                     source = ReferralGuestPassCardViewSource.ProfileBanner,
+                    referralsOfferInfo = state.referralsOfferInfo,
                 )
             }
         }

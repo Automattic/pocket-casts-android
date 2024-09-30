@@ -391,6 +391,10 @@ subprojects {
                 implementation(libs.leakcanary)
             }
         }
+        dependencies {
+            val lintChecks by configurations
+            lintChecks(libs.security.lint)
+        }
     }
 }
 
@@ -408,4 +412,11 @@ fun Project.configureSentry() {
         includeDependenciesReport = false
         ignoredBuildTypes = setOf("debug", "debugProd")
     }
+}
+
+tasks.register("aggregatedLintRelease") {
+    group = "verification"
+    description = "Run Lint tasks for application modules"
+
+    dependsOn(":app:lintRelease", ":automotive:lintRelease", ":wear:lintRelease")
 }

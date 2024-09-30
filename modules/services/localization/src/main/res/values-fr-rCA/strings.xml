@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-12 15:54:03+0000
+Translation-Revision-Date: 2024-09-19 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="referrals_share_guest_pass">Partager le passe invité</string>
+    <string name="referrals_send_guest_pass_card_title">Passe invité 2 mois</string>
+    <string name="referrals_send_guest_pass_title">Offrir 2 mois de Pocket Casts Plus</string>
+    <string name="move_down">Déplacer vers le bas</string>
+    <string name="move_up">Déplacer vers le haut</string>
+    <string name="search_episodes_not_found_summary">Nous n’avons trouvé aucun épisode correspondant à cette recherche. Essayez un autre mot-clé.</string>
+    <string name="search_episodes_not_found_title">Aucun épisode trouvé</string>
     <string name="transcript_error_not_available">Veuillez nous excuser. Aucune transcription n’est disponible pour cet épisode.</string>
     <string name="paywall_layout_reviews_review_six_date">8 mars</string>
     <string name="paywall_layout_reviews_review_six_message">PC est mon application de prédilection depuis des années. J’ai essayé d’autres applications de podcast mais j’ai toujours décidé de revenir à PC pour sa simplicité, son interface utilisateur et son assistance. Cela vaut vraiment le coup d’y jeter un œil, en particulier si votre application de podcast actuelle ne vous satisfait plus.</string>

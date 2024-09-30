@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-10 09:54:03+0000
+Translation-Revision-Date: 2024-09-26 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="referrals_invalid_offer_title">このオファーは利用できません</string>
+    <string name="referrals_invalid_offer_description">このゲストパスは Plus または Patron のサブスクリプションがアクティブでないユーザーが対象で、1回に限りご利用いただけます。 お聴きいただきありがとうございます !</string>
+    <string name="referrals_claim_guest_pass_title">2か月間のゲストパスを取得しましょう</string>
+    <string name="referrals_claim_guest_pass_description">このオファーは新規メンバーのみが対象です。 メンバーシップは%sの有料年間メンバーシップに自動的に更新されます。</string>
+    <string name="referrals_activate_my_pass">パスを有効化</string>
+    <string name="referrals_tooltip_message">Pocket Casts Plus を2か月間プレゼント !</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">リスニング体験をすべてご利用いただけます</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Plus の2か月間のゲストパスを取得しましょう</string>
+    <string name="referrals_share_guest_pass">ゲストパスを共有</string>
+    <string name="referrals_send_guest_pass_card_title">2か月間のゲストパス</string>
+    <string name="referrals_send_guest_pass_title">Pocket Casts Plus を2か月間プレゼント</string>
+    <string name="move_down">下に移動</string>
+    <string name="move_up">上に移動</string>
+    <string name="search_episodes_not_found_summary">その検索に該当するエピソードは見つかりませんでした。 別のキーワードを試してください。</string>
+    <string name="search_episodes_not_found_title">エピソードがありません</string>
     <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
     <string name="paywall_layout_reviews_review_six_date">3月8日</string>
     <string name="paywall_layout_reviews_review_six_message">PC は長年のお気に入りです。 他のポッドキャストアプリも試しましたが、PC はシンプルさ、Ul、サポートが優れているため、いつも PC に戻ってきます。 特に、今使っているポッドキャストアプリに飽きてしまった人は、PC をチェックする価値があります。</string>
