@@ -6,8 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
-    <string name="referrals_share_text">안녕하세요! 아래의 링크를 통해 Pocket Casts Plus 비회원 패스 2개월권을 받아 모든 기기에서 팟캐스트를 즐기세요!</string>
-    <string name="referrals_share_subject">Pocket Casts 비회원 패스 2개월권</string>
     <string name="referrals_invalid_offer_title">이 혜택을 이용하실 수 없습니다.</string>
     <string name="referrals_invalid_offer_description">이 비회원 패스는 한 번만 사용할 수 있으며, Plus 또는 Patron 구독이 활성화되어 있지 않아도 사용 가능합니다. 애청해 주셔서 감사합니다!</string>
     <string name="referrals_claim_guest_pass_title">비회원 패스 2개월권 받기</string>

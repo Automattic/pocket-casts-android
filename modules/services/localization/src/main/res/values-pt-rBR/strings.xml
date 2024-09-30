@@ -6,8 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
-    <string name="referrals_share_text">Olá! Use o link abaixo para resgatar seu passe de convidado de dois meses para o Pocket Casts Plus e curta podcasts em todos os seus dispositivos.</string>
-    <string name="referrals_share_subject">Passe de convidado de dois meses para o Pocket Casts</string>
     <string name="referrals_invalid_offer_title">Esta oferta não está disponível</string>
     <string name="referrals_invalid_offer_description">Esse passe de convidado só pode ser resgatado uma vez e está disponível para aqueles que não tem um plano Plus ou Patron ativo. Agradecemos por ouvir!</string>
     <string name="referrals_claim_guest_pass_title">Resgate seu passe de convidado de dois meses</string>
