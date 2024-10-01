@@ -49,7 +49,11 @@ class ReferralOfferInfoProvider @Inject constructor(
                 emit(
                     ReferralsOfferInfoPlayStore(
                         subscriptionWithOffer = referralSubscriptionWithOffer,
-                        context = context,
+                        localizedOfferDurationAdjective = referralSubscriptionWithOffer?.offerPricingPhase?.periodWithDash(context.resources) ?: "",
+                        localizedOfferDurationNoun = referralSubscriptionWithOffer?.offerPricingPhase?.periodValuePlural(context.resources) ?: "",
+                        localizedPriceAfterOffer = referralSubscriptionWithOffer?.recurringPricingPhase?.let {
+                            "${it.formattedPrice} ${it.priceCurrencyCode}"
+                        } ?: "",
                     ),
                 )
             }.firstOrNull()
