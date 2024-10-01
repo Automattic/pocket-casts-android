@@ -3,6 +3,8 @@
 *   Updates
     *   Add an advanced setting to display artwork in episode listing
         ([#2958](https://github.com/Automattic/pocket-casts-android/pull/2958))
+    *   Display remaining playback time using skipped chapters and playback speed
+        ([#2955](https://github.com/Automattic/pocket-casts-android/pull/2955))
 *   Bug Fixes
     *   Fix search podcast results scroll back to the start after subscribing
         ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
@@ -23,9 +25,6 @@
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
     *   Add Google Engage SDK integration 
         ([#2847](https://github.com/Automattic/pocket-casts-android/pull/2847))
-*   Updates
-    *   Display remaining playback time using skipped chapters and playback speed
-        ([#2955](https://github.com/Automattic/pocket-casts-android/pull/2955))
 
 7.73
 -----
