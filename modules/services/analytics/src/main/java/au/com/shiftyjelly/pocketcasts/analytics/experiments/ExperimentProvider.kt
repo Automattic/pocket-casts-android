@@ -13,7 +13,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
 
 class ExperimentProvider @Inject constructor(
     private val accountStatusInfo: AccountStatusInfo,
@@ -40,7 +39,7 @@ class ExperimentProvider @Inject constructor(
         initialize()
     }
 
-    fun getVariation(experiment: ExperimentModel): Variation? {
+    fun getVariation(experiment: ExperimentType): Variation? {
         if (!FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) return null
 
         return when (val variation = repository.getVariation(Experiment(experiment.identifier))) {
