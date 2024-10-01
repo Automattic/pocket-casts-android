@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.TEST_PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -13,8 +14,12 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 
 object SubscriptionMapper {
-    fun map(productDetails: ProductDetails, isOfferEligible: Boolean): Subscription? {
-        val matchingSubscriptionOfferDetails = if (isOfferEligible) {
+    fun map(
+        productDetails: ProductDetails,
+        isOfferEligible: Boolean,
+        referralProductDetails: ReferralProductDetails?,
+    ): Subscription? {
+        val matchingSubscriptionOfferDetails = if (isOfferEligible || referralProductDetails != null) {
             productDetails
                 .subscriptionOfferDetails
                 ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with offers
@@ -26,11 +31,17 @@ object SubscriptionMapper {
                 ?.filter { it.offerSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without special offers
         } ?: emptyList()
 
-        // TODO handle multiple matching SubscriptionOfferDetails
-        if (matchingSubscriptionOfferDetails.size > 1) {
-            LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, "Multiple matching SubscriptionOfferDetails found. Only using the first.")
+        val relevantSubscriptionOfferDetails = if (FeatureFlag.isEnabled(Feature.REFERRALS) && referralProductDetails != null) {
+            matchingSubscriptionOfferDetails.find { it.offerId == referralProductDetails.offerId }
+        } else {
+            val matchingSubscriptionOfferDetailsWithoutReferralOffer = matchingSubscriptionOfferDetails
+                .filter { !it.offerTags.contains("referral-offer")}
+            // TODO handle multiple matching SubscriptionOfferDetails
+            if (matchingSubscriptionOfferDetailsWithoutReferralOffer.size > 1) {
+                LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, "Multiple matching SubscriptionOfferDetails found. Only using the first.")
+            }
+            matchingSubscriptionOfferDetailsWithoutReferralOffer.firstOrNull()
         }
-        val relevantSubscriptionOfferDetails = matchingSubscriptionOfferDetails.firstOrNull()
 
         return relevantSubscriptionOfferDetails
             ?.recurringSubscriptionPricingPhase
@@ -52,6 +63,17 @@ object SubscriptionMapper {
                             productDetails = productDetails,
                             offerToken = relevantSubscriptionOfferDetails.offerToken,
                         )
+                    } else if (FeatureFlag.isEnabled(Feature.REFERRALS)
+                        && referralProductDetails != null
+                        && hasReferralOffer(productDetails, referralProductDetails)
+                    ) {
+                        Subscription.Trial(
+                            tier = mapProductIdToTier(productDetails.productId),
+                            recurringPricingPhase = recurringPricingPhase,
+                            offerPricingPhase = offerPricingPhase,
+                            productDetails = productDetails,
+                            offerToken = relevantSubscriptionOfferDetails.offerToken,
+                        )
                     } else if (hasTrial(productDetails)) {
                         Subscription.Trial(
                             tier = mapProductIdToTier(productDetails.productId),
@@ -66,11 +88,20 @@ object SubscriptionMapper {
                 }
             }
     }
+    private fun hasReferralOffer(productDetails: ProductDetails, referralProductDetails: ReferralProductDetails): Boolean {
+        val (productId, offerId) = referralProductDetails
+        return productDetails.productId == productId &&
+            productDetails.subscriptionOfferDetails?.any {
+                it.offerId == offerId
+            } ?: false
+    }
+
     private fun hasTrial(productDetails: ProductDetails): Boolean {
         return productDetails.subscriptionOfferDetails?.any {
             it.offerId == Subscription.TRIAL_OFFER_ID
         } ?: false
     }
+
     private fun hasIntro(productDetails: ProductDetails): Boolean {
         return productDetails.subscriptionOfferDetails?.any {
             it.offerId == Subscription.INTRO_OFFER_ID
@@ -146,7 +177,7 @@ object SubscriptionMapper {
         }
 
     fun mapProductIdToTier(productId: String) = when (productId) {
-        in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
+        in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID, TEST_PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
         in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
         else -> SubscriptionTier.UNKNOWN
     }
