@@ -24,23 +24,15 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.images.R
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.ReferralSendGuestPassError
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ReferralsGuestPassError(
-    errorState: UiState.Error,
+    errorMessage: String,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val errorMessage = when (errorState.error) {
-        ReferralSendGuestPassError.Empty,
-        ReferralSendGuestPassError.FailedToLoad,
-        -> stringResource(LR.string.error_generic_message)
-        ReferralSendGuestPassError.NoNetwork -> stringResource(LR.string.error_no_network)
-    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -87,7 +79,7 @@ fun ReferralsGuestPassError(
 fun ReferralsSendGuestPassErrorPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         ReferralsGuestPassError(
-            errorState = UiState.Error(ReferralSendGuestPassError.FailedToLoad),
+            errorMessage = stringResource(LR.string.error_no_network),
             onRetry = {},
             onDismiss = {},
         )
