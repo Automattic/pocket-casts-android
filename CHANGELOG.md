@@ -1,5 +1,8 @@
 7.75
 -----
+*   Updates
+    *   Add an advanced setting to display artwork in episode listing
+        ([#2958](https://github.com/Automattic/pocket-casts-android/pull/2958))
 *   Bug Fixes
     *   Fix search podcast results scroll back to the start after subscribing
         ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
