@@ -57,7 +57,7 @@ class ReferralOfferInfoProviderTest {
     }
 
     @Test
-    fun `referralOfferInfo returns null subscription when subscription does not have referral offer`() = runTest {
+    fun `referralOfferInfo returns null subscription when no subscription product found`() = runTest {
         val productDetailsState = ProductDetailsState.Loaded(emptyList())
         whenever(subscriptionManager.observeProductDetails()).thenReturn(Flowable.just(productDetailsState))
 
@@ -78,7 +78,7 @@ class ReferralOfferInfoProviderTest {
 
     private fun createProductDetailsState(
         productId: String,
-        offerId: String
+        offerId: String,
     ): ProductDetailsState.Loaded {
         val productDetails = mock<ProductDetails>()
         val subscriptionOfferDetails = mock<ProductDetails.SubscriptionOfferDetails>()

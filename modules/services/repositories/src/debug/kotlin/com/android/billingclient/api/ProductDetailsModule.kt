@@ -1,8 +1,6 @@
 package com.android.billingclient.api
 
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsInterceptor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.android.billingclient.api.BillingClient.BillingResponseCode.OK
 import dagger.Module
 import dagger.Provides

@@ -39,7 +39,7 @@ class ReferralOfferInfoProvider @Inject constructor(
 
                 val isReferralOffer: (Subscription.WithOffer) -> Boolean = { subscription ->
                     subscription.productDetails.productId == referralProductDetails.productId &&
-                            subscription.productDetails.subscriptionOfferDetails?.any { it.offerId == referralProductDetails.offerId } == true
+                        subscription.productDetails.subscriptionOfferDetails?.any { it.offerId == referralProductDetails.offerId } == true
                 }
 
                 val referralSubscriptionWithOffer = subscriptionProductDetails

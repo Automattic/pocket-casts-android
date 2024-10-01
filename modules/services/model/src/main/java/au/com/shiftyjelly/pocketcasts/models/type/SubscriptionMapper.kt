@@ -35,7 +35,7 @@ object SubscriptionMapper {
             matchingSubscriptionOfferDetails.find { it.offerId == referralProductDetails.offerId }
         } else {
             val matchingSubscriptionOfferDetailsWithoutReferralOffer = matchingSubscriptionOfferDetails
-                .filter { !it.offerTags.contains("referral-offer")}
+                .filter { !it.offerTags.contains("referral-offer") }
             // TODO handle multiple matching SubscriptionOfferDetails
             if (matchingSubscriptionOfferDetailsWithoutReferralOffer.size > 1) {
                 LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, "Multiple matching SubscriptionOfferDetails found. Only using the first.")
