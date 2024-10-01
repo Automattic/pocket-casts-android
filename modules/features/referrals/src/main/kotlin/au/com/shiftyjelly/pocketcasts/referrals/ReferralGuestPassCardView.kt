@@ -76,7 +76,7 @@ fun ReferralGuestPassCardView(
                 .fillMaxSize(),
         )
 
-        if (source == ReferralGuestPassCardViewSource.Send) {
+        if (source in listOf(ReferralGuestPassCardViewSource.Claim, ReferralGuestPassCardViewSource.Send)) {
             TextH60(
                 text = cardTitle,
                 color = Color.White,

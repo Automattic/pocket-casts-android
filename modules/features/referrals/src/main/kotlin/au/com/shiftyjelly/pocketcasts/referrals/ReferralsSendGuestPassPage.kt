@@ -45,9 +45,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.ReferralSendGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -130,8 +132,15 @@ private fun ReferralsSendGuestPassContent(
                         onShare = { onShare(state.code) },
                     )
 
-                is UiState.Error ->
-                    ReferralsGuestPassError(state, onRetry, onDismiss)
+                is UiState.Error -> {
+                    val errorMessage = when (state.error) {
+                        ReferralSendGuestPassError.Empty,
+                        ReferralSendGuestPassError.FailedToLoad,
+                        -> stringResource(LR.string.error_generic_message)
+                        ReferralSendGuestPassError.NoNetwork -> stringResource(LR.string.error_no_network)
+                    }
+                    ReferralsGuestPassError(errorMessage, onRetry, onDismiss)
+                }
             }
         }
     }
@@ -272,7 +281,7 @@ fun ReferralsSendGuestPassContentPreview(
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
-            state = UiState.Loaded(""),
+            state = UiState.Loaded("", ReferralsOfferInfoMock),
             onDismiss = {},
             onShare = {},
             onRetry = {},
