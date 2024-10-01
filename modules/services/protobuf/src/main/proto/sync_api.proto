@@ -88,6 +88,8 @@ message ReferralCodeResponse {
 
 message ReferralValidationResponse {
     string offer = 1;
+    int32 platform = 2;
+    string details = 3;
 }
 
 message ReferralRedemptionRequest {
