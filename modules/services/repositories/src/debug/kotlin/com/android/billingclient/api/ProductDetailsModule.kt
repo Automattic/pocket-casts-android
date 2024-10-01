@@ -56,7 +56,7 @@ private class MockingProductDetailsInterceptor : ProductDetailsInterceptor {
             |        {
             |          "priceAmountMicros": 0,
             |          "priceCurrencyCode": "USD",
-            |         "formattedPrice": "Free",
+            |          "formattedPrice": "Free",
             |          "billingPeriod": "P2M",
             |          "recurrenceMode": 2,
             |          "billingCycleCount": 1

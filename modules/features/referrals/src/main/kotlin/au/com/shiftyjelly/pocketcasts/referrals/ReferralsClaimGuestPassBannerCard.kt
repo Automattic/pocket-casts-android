@@ -54,7 +54,7 @@ fun ReferralsClaimGuestPassBannerCard(
             val loadedState = state as UiState.Loaded
             loadedState.referralsOfferInfo?.let {
                 ReferralsClaimGuestPassBannerCard(
-                    state = state as UiState.Loaded,
+                    state = loadedState
                     modifier = modifier,
                     onClick = {
                         val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim)
