@@ -33,7 +33,7 @@ class ReferralsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val referralsOfferInfo = referralOfferInfoProvider.referralOfferInfo() as? ReferralsOfferInfoPlayStore?
+            val referralsOfferInfo = referralOfferInfoProvider.referralOfferInfo() as? ReferralsOfferInfoPlayStore
             referralsOfferInfo?.subscriptionWithOffer?.let {
                 combine(
                     userManager.getSignInState().asFlow(),
