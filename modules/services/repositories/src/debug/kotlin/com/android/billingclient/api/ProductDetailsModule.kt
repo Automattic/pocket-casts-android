@@ -46,13 +46,13 @@ private class MockingProductDetailsInterceptor : ProductDetailsInterceptor {
             |   "localizedIn": [
             |    "en-US"
             |  ],
-            |  "skuDetailsToken": "AEuhp4LWRPDnJGhmqmkVkTNpFpXFGvZtBtIT33KsKWhIBQhKnGX1tJ9c6NOcRooeMAW0",
+            |  "skuDetailsToken": "test-yearly-plus-sku-details-token",
             |  "subscriptionOfferDetails": [
             |    {
-            |      "offerIdToken": "AarRn8p4dWN62vQ67aqgHtzD0uaeQ41esr6+rol9mLhh5qulWuO/ChkTprmB7DBH3yjqmbPhJvP09DfZfU0p8asww04FIomfvCU9L3Ho/uOvMgsskI0u",
+            |      "offerIdToken": "test-yearly-plus-offer-id-token",
             |      "basePlanId": "testyearly",
             |      "offerId": "2-months-free",
-            |     "pricingPhases": [
+            |      "pricingPhases": [
             |        {
             |          "priceAmountMicros": 0,
             |          "priceCurrencyCode": "USD",
@@ -62,7 +62,7 @@ private class MockingProductDetailsInterceptor : ProductDetailsInterceptor {
             |          "billingCycleCount": 1
             |        },
             |        {
-            |          "priceAmountMicros": 2150000000,
+            |          "priceAmountMicros": 39990000,
             |          "priceCurrencyCode": "USD",
             |          "formattedPrice": "$39.99",
             |          "billingPeriod": "P1Y",
@@ -74,11 +74,11 @@ private class MockingProductDetailsInterceptor : ProductDetailsInterceptor {
             |      ]
             |    },
             |    {
-            |      "offerIdToken": "AarRn8ratf+yxb+9u+sc8Tm6/yODavGSOfOWHh2FDc0ZG+ltJdIcpiep5TX6bReI/WyGOxtV7t/KMdm92n/m9G0TdA==",
+            |      "offerIdToken": "test-yearly-plus-base-offer-id-token",
             |      "basePlanId": "testyearly",
             |      "pricingPhases": [
             |        {
-            |          "priceAmountMicros": 2150000000,
+            |          "priceAmountMicros": 39990000,
             |          "priceCurrencyCode": "USD",
             |          "formattedPrice": "$39.99",
             |          "billingPeriod": "P1Y",
