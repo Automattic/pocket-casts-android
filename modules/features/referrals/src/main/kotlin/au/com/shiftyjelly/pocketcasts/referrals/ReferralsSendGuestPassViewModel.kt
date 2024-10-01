@@ -36,7 +36,7 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
 
     private fun getReferralCode() {
         viewModelScope.launch {
-            val referralsOfferInfo = referralOfferInfoProvider.referralOfferInfo() as? ReferralsOfferInfoPlayStore?
+            val referralsOfferInfo = referralOfferInfoProvider.referralOfferInfo() as? ReferralsOfferInfoPlayStore
             referralsOfferInfo?.subscriptionWithOffer?.let {
                 val result = referralsManager.getReferralCode()
                 _state.value = when (result) {
