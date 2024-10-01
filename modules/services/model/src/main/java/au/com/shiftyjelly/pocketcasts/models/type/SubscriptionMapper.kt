@@ -63,18 +63,7 @@ object SubscriptionMapper {
                             productDetails = productDetails,
                             offerToken = relevantSubscriptionOfferDetails.offerToken,
                         )
-                    } else if (FeatureFlag.isEnabled(Feature.REFERRALS)
-                        && referralProductDetails != null
-                        && hasReferralOffer(productDetails, referralProductDetails)
-                    ) {
-                        Subscription.Trial(
-                            tier = mapProductIdToTier(productDetails.productId),
-                            recurringPricingPhase = recurringPricingPhase,
-                            offerPricingPhase = offerPricingPhase,
-                            productDetails = productDetails,
-                            offerToken = relevantSubscriptionOfferDetails.offerToken,
-                        )
-                    } else if (hasTrial(productDetails)) {
+                    } else if (hasTrial(productDetails, referralProductDetails)) {
                         Subscription.Trial(
                             tier = mapProductIdToTier(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
@@ -88,17 +77,17 @@ object SubscriptionMapper {
                 }
             }
     }
-    private fun hasReferralOffer(productDetails: ProductDetails, referralProductDetails: ReferralProductDetails): Boolean {
-        val (productId, offerId) = referralProductDetails
-        return productDetails.productId == productId &&
-            productDetails.subscriptionOfferDetails?.any {
-                it.offerId == offerId
-            } ?: false
-    }
 
-    private fun hasTrial(productDetails: ProductDetails): Boolean {
+    private fun hasTrial(productDetails: ProductDetails, referralProductDetails: ReferralProductDetails?): Boolean {
         return productDetails.subscriptionOfferDetails?.any {
-            it.offerId == Subscription.TRIAL_OFFER_ID
+            it.offerId in buildList {
+                add(Subscription.TRIAL_OFFER_ID)
+                referralProductDetails?.let {
+                    if (FeatureFlag.isEnabled(Feature.REFERRALS)) {
+                        add(referralProductDetails.offerId)
+                    }
+                }
+            }
         } ?: false
     }
 
