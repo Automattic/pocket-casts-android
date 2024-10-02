@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.Ref
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.ErrorResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.SuccessResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -24,6 +26,7 @@ import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,6 +43,7 @@ class ReferralsClaimGuestPassViewModelTest {
     private val referralOfferInfo = mock<ReferralsOfferInfoPlayStore>()
     private val referralManager = mock<ReferralManager>()
     private val userManager = mock<UserManager>()
+    private val subscriptionManager = mock<SubscriptionManager>()
     private val settings = mock<Settings>()
     private lateinit var viewModel: ReferralsClaimGuestPassViewModel
     private val referralCode = "referral_code"
@@ -130,11 +134,27 @@ class ReferralsClaimGuestPassViewModelTest {
         }
     }
 
+    @Test
+    fun `given validation success, when activate pass button is clicked, then billing flow is started`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralResult = SuccessResult(mock()),
+        )
+
+        viewModel.navigationEvent.test {
+            viewModel.onActivatePassClick()
+            assertTrue(awaitItem() is NavigationEvent.LaunchBillingFlow)
+        }
+    }
+
     private suspend fun initViewModel(
         offerInfo: ReferralsOfferInfo? = referralOfferInfo,
         signInState: SignInState = SignInState.SignedOut,
         referralResult: ReferralManager.ReferralResult<ReferralValidationResponse> = SuccessResult(mock()),
     ) {
+        whenever(subscriptionManager.observePurchaseEvents()).thenReturn(Flowable.just(PurchaseEvent.Success))
         whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
         whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
         whenever(referralManager.validateReferralCode(referralCode)).thenReturn(referralResult)
@@ -143,6 +163,7 @@ class ReferralsClaimGuestPassViewModelTest {
             referralOfferInfoProvider = referralOfferInfoProvider,
             referralManager = referralManager,
             userManager = userManager,
+            subscriptionManager = subscriptionManager,
             settings = settings,
         )
     }
