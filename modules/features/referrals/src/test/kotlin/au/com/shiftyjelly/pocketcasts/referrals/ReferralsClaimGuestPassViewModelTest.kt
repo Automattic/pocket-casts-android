@@ -124,10 +124,9 @@ class ReferralsClaimGuestPassViewModelTest {
             referralResult = ErrorResult(errorMessage = "", error = NoNetworkException()),
         )
 
-        viewModel.onActivatePassClick()
-
-        viewModel.state.test {
-            assertEquals(UiState.Error(ReferralsClaimGuestPassError.NoNetwork), awaitItem())
+        viewModel.snackBarEvent.test {
+            viewModel.onActivatePassClick()
+            assertEquals(ReferralsClaimGuestPassViewModel.SnackbarEvent.NoNetwork, awaitItem())
         }
     }
 

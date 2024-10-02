@@ -17,6 +17,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
@@ -43,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
@@ -55,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPe
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.NavigationEvent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.ReferralsClaimGuestPassError
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.SnackbarEvent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -76,6 +81,7 @@ fun ReferralsClaimGuestPassPage(
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
         val state by viewModel.state.collectAsStateWithLifecycle()
         val activity = LocalContext.current.getActivity()
+        val snackbarHostState = remember { SnackbarHostState() }
 
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
@@ -84,6 +90,7 @@ fun ReferralsClaimGuestPassPage(
             onDismiss = onDismiss,
             onActivatePassClick = viewModel::onActivatePassClick,
             onRetry = viewModel::retry,
+            snackbarHostState = snackbarHostState,
         )
 
         LaunchedEffect(Unit) {
@@ -101,6 +108,15 @@ fun ReferralsClaimGuestPassPage(
                 }
             }
         }
+
+        LaunchedEffect(Unit) {
+            viewModel.snackBarEvent.collect { snackBarEvent ->
+                val text = when (snackBarEvent) {
+                    SnackbarEvent.NoNetwork -> context.getString(LR.string.error_no_network)
+                }
+                snackbarHostState.showSnackbar(text)
+            }
+        }
     }
 }
 
@@ -112,6 +128,7 @@ private fun ReferralsClaimGuestPassContent(
     onDismiss: () -> Unit,
     onActivatePassClick: () -> Unit,
     onRetry: () -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -167,13 +184,25 @@ private fun ReferralsClaimGuestPassContent(
 
                 is UiState.Error -> {
                     val errorMessage = when (state.error) {
-                        is ReferralsClaimGuestPassError.NoNetwork -> stringResource(LR.string.error_no_network)
                         ReferralsClaimGuestPassError.FailedToLoadOffer -> stringResource(LR.string.error_generic_message)
                     }
                     ReferralsGuestPassError(errorMessage, onRetry, onDismiss)
                 }
             }
         }
+
+        SnackbarHost(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            hostState = snackbarHostState,
+            snackbar = { snackbarData ->
+                Snackbar(
+                    content = { TextH50(snackbarData.message, color = Color.Black) },
+                    backgroundColor = Color.White,
+                )
+            },
+        )
     }
 }
 
@@ -313,6 +342,7 @@ fun ReferralsClaimGuestPassContentPreview(
             onDismiss = {},
             onActivatePassClick = {},
             onRetry = {},
+            snackbarHostState = SnackbarHostState(),
         )
     }
 }

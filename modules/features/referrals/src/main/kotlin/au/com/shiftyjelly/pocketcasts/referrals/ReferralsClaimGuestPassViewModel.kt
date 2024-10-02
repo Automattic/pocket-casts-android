@@ -36,6 +36,9 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private val _navigationEvent: MutableSharedFlow<NavigationEvent> = MutableSharedFlow()
     val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent
 
+    private val _snackBarEvent: MutableSharedFlow<SnackbarEvent> = MutableSharedFlow()
+    val snackBarEvent: SharedFlow<SnackbarEvent> = _snackBarEvent
+
     init {
         loadReferralClaimOffer()
     }
@@ -73,7 +76,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                             is ReferralResult.SuccessResult -> startIAPFlow()
                             is ReferralResult.EmptyResult -> _navigationEvent.emit(NavigationEvent.InValidOffer)
                             is ReferralResult.ErrorResult -> if (result.error is NoNetworkException) {
-                                _state.update { UiState.Error(ReferralsClaimGuestPassError.NoNetwork) }
+                                _snackBarEvent.emit(SnackbarEvent.NoNetwork)
                             } else {
                                 _navigationEvent.emit(NavigationEvent.InValidOffer)
                             }
@@ -96,14 +99,16 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                 _state.value = UiState.Loading
                 loadReferralClaimOffer()
             }
-
-            else -> Unit // This shouldn't happen in the ideal world
         }
     }
 
     sealed class NavigationEvent {
         data object LoginOrSignup : NavigationEvent()
         data object InValidOffer : NavigationEvent()
+    }
+
+    sealed class SnackbarEvent {
+        data object NoNetwork : SnackbarEvent()
     }
 
     sealed class UiState {
@@ -117,7 +122,6 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     }
 
     sealed class ReferralsClaimGuestPassError {
-        data object NoNetwork : ReferralsClaimGuestPassError()
         data object FailedToLoadOffer : ReferralsClaimGuestPassError()
     }
 }
