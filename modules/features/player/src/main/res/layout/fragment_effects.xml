@@ -39,6 +39,46 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/podcastToggleGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/effectsTitle"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAllPodcasts"
+                    style="?attr/materialButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/effect_toggle_button_background"
+                    android:text="All Podcasts"
+                    android:textAllCaps="false"
+                    android:textColor="@color/effect_toggle_text_color"
+                    app:cornerRadius="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnThisPodcast"
+                    style="?attr/materialButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/effect_toggle_button_background"
+                    android:text="This Podcast"
+                    android:textAllCaps="false"
+                    android:textColor="@color/effect_toggle_text_color"
+                    app:cornerRadius="12dp" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
             <ImageView
                 android:id="@+id/iconSpeed"
                 android:layout_width="29dp"
@@ -48,20 +88,20 @@
                 android:src="@drawable/ic_speed"
                 app:tint="?attr/player_contrast_02"
                 app:layout_constraintLeft_toLeftOf="@id/effectsTitle"
-                app:layout_constraintTop_toBottomOf="@id/effectsTitle" />
+                app:layout_constraintTop_toBottomOf="@id/podcastToggleGroup" />
 
             <ImageButton
                 android:id="@+id/btnSpeedUp"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_effects_plus"
-                android:tint="?attr/player_contrast_02"
                 android:contentDescription="@string/player_effects_speed_up"
                 app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/iconSpeed" />
+                app:layout_constraintTop_toTopOf="@id/iconSpeed"
+                app:tint="?attr/player_contrast_02" />
 
             <TextView
                 android:id="@+id/lblSpeed"
@@ -94,11 +134,11 @@
                 android:layout_height="44dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_minus"
-                android:tint="?attr/player_contrast_02"
                 android:contentDescription="@string/player_effects_speed_down"
                 app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
                 app:layout_constraintRight_toLeftOf="@id/lblSpeed"
-                app:layout_constraintTop_toTopOf="@id/iconSpeed" />
+                app:layout_constraintTop_toTopOf="@id/iconSpeed"
+                app:tint="?attr/player_contrast_02" />
 
             <TextView
                 android:id="@+id/speedLabel"

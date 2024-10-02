@@ -100,6 +100,8 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         binding.btnSpeedDown.setOnClickListener(this)
         binding.lblSpeed.setOnClickListener(this)
 
+        binding.podcastToggleGroup.check(binding.btnAllPodcasts.id)
+
         val trimSilence = effects.trimMode != TrimMode.OFF
         binding.switchTrim.setOnCheckedChangeListener(null)
         binding.switchTrim.isChecked = trimSilence
