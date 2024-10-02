@@ -23,6 +23,7 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -52,7 +53,11 @@ import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.NavigationEvent
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.ReferralsClaimGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,14 +73,29 @@ fun ReferralsClaimGuestPassPage(
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
         val state by viewModel.state.collectAsStateWithLifecycle()
+        val activity = LocalContext.current.getActivity()
 
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             state = state,
             onDismiss = onDismiss,
+            onActivatePassClick = viewModel::onActivatePassClick,
             onRetry = viewModel::retry,
         )
+
+        LaunchedEffect(Unit) {
+            viewModel.navigationEvent.collect { navigationEvent ->
+                when (navigationEvent) {
+                    NavigationEvent.InValidOffer -> {
+                        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.InvalidOffer)
+                        (activity as FragmentHostListener).showBottomSheet(fragment)
+                    }
+
+                    NavigationEvent.LoginOrSignup -> Unit // TODO - Referrals: Start Login or Signup flow
+                }
+            }
+        }
     }
 }
 
@@ -85,6 +105,7 @@ private fun ReferralsClaimGuestPassContent(
     windowHeightSizeClass: WindowHeightSizeClass,
     state: UiState,
     onDismiss: () -> Unit,
+    onActivatePassClick: () -> Unit,
     onRetry: () -> Unit,
 ) {
     BoxWithConstraints(
@@ -124,17 +145,26 @@ private fun ReferralsClaimGuestPassContent(
                 is UiState.Loading ->
                     LoadingView(color = Color.White)
 
-                is UiState.Loaded ->
+                is UiState.Loaded -> {
                     ClaimGuestPassContent(
                         pageWidth = pageWidth,
                         windowHeightSizeClass = windowHeightSizeClass,
                         showFullScreen = showFullScreen,
                         referralsOfferInfo = state.referralsOfferInfo,
                         onDismiss = onDismiss,
+                        onActivatePassClick = onActivatePassClick,
                     )
 
-                UiState.Error -> {
-                    val errorMessage = stringResource(LR.string.error_generic_message)
+                    if (state.isValidating) {
+                        LoadingView(color = Color.White)
+                    }
+                }
+
+                is UiState.Error -> {
+                    val errorMessage = when (state.error) {
+                        is ReferralsClaimGuestPassError.NoNetwork -> stringResource(LR.string.error_no_network)
+                        ReferralsClaimGuestPassError.FailedToLoadOffer -> stringResource(LR.string.error_generic_message)
+                    }
                     ReferralsGuestPassError(errorMessage, onRetry, onDismiss)
                 }
             }
@@ -149,6 +179,7 @@ private fun ClaimGuestPassContent(
     showFullScreen: Boolean,
     referralsOfferInfo: ReferralsOfferInfo,
     onDismiss: () -> Unit,
+    onActivatePassClick: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -223,7 +254,7 @@ private fun ClaimGuestPassContent(
             textColor = Color.Black,
             gradientBackgroundColor = plusBackgroundBrush,
             modifier = Modifier.padding(16.dp),
-            onClick = {},
+            onClick = onActivatePassClick,
         )
     }
 }
@@ -275,6 +306,7 @@ fun ReferralsClaimGuestPassContentPreview(
             windowHeightSizeClass = windowHeightSizeClass,
             state = UiState.Loaded(ReferralsOfferInfoMock),
             onDismiss = {},
+            onActivatePassClick = {},
             onRetry = {},
         )
     }
