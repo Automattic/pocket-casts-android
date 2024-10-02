@@ -57,6 +57,8 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.ReferralsClaimGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher.Companion.openOnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -92,7 +94,10 @@ fun ReferralsClaimGuestPassPage(
                         (activity as FragmentHostListener).showBottomSheet(fragment)
                     }
 
-                    NavigationEvent.LoginOrSignup -> Unit // TODO - Referrals: Start Login or Signup flow
+                    NavigationEvent.LoginOrSignup -> openOnboardingFlow(
+                        activity = activity,
+                        onboardingFlow = OnboardingFlow.ReferralLoginOrSignUp,
+                    )
                 }
             }
         }
