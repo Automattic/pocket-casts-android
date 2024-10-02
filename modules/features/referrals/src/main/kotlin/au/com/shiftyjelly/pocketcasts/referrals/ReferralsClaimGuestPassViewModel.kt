@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
