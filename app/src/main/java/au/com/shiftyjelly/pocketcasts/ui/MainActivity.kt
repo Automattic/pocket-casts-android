@@ -1352,8 +1352,13 @@ class MainActivity :
             return
         }
         settings.referralClaimCode.set(code, false)
-        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
-        showBottomSheet(fragment)
+        launch {
+            delay(1000) // To allow loading tabs and prevent race condition in updating activity's status bar color
+            withContext(Dispatchers.Main) {
+                val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
+                showBottomSheet(fragment)
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
