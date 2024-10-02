@@ -2158,6 +2158,7 @@
     <string name="referrals_share_text">Hey! Use the link below to claim your %1$s guest pass for Pocket&#160;Casts&#160;Plus and enjoy podcasts across all your devices!</string>
     <!-- Referrals tooltip message, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_tooltip_message">Gift %1$s of Pocket&#160;Casts&#160;Plus!</string>
-    <string name="referrals_create_subscription_failed">Could not create subscription. Please try again</string>
+    <string name="referrals_create_subscription_failed">Could not create subscription. Please try again later.</string>
+    <string name="referrals_redeem_code_failed">Could not redeem code. Please try again later.</string>
 
 </resources>

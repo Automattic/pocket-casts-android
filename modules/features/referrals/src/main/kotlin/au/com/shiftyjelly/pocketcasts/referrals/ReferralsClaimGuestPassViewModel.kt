@@ -74,10 +74,10 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                 .collect {
                     if (it.isSignedIn) {
                         val loadedState = _state.value as? UiState.Loaded
-                        loadedState?.let { _state.update { loadedState.copy(isValidating = true) } }
+                        updateLoading(true)
                         val referralClaimCode = settings.referralClaimCode.value
                         val result = referralManager.validateReferralCode(referralClaimCode)
-                        loadedState?.let { _state.update { loadedState.copy(isValidating = false) } }
+                        updateLoading(false)
 
                         when (result) {
                             is ReferralResult.SuccessResult -> {
@@ -111,6 +111,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
         when (purchaseEvent) {
             PurchaseEvent.Success -> {
+                redeemReferralCode(settings.referralClaimCode.value)
             }
 
             is PurchaseEvent.Cancelled -> {
@@ -139,6 +140,25 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         )
     }
 
+    private suspend fun redeemReferralCode(code: String) {
+        updateLoading(true)
+        val result = referralManager.redeemReferralCode(code)
+        updateLoading(false)
+        when (result) {
+            is ReferralResult.SuccessResult -> {
+                settings.referralClaimCode.set("", false)
+                _navigationEvent.emit(NavigationEvent.Close)
+            }
+
+            is ReferralResult.EmptyResult -> _snackBarEvent.emit(SnackbarEvent.RedeemFailed)
+            is ReferralResult.ErrorResult -> if (result.error is NoNetworkException) {
+                _snackBarEvent.emit(SnackbarEvent.NoNetwork)
+            } else {
+                _snackBarEvent.emit(SnackbarEvent.RedeemFailed)
+            }
+        }
+    }
+
     fun retry() {
         val errorState = _state.value as? UiState.Error ?: return
         when (errorState.error) {
@@ -149,22 +169,29 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         }
     }
 
+    private fun updateLoading(show: Boolean) {
+        (_state.value as? UiState.Loaded)
+            ?.let { loadedState -> _state.update { loadedState.copy(isLoading = show) } }
+    }
+
     sealed class NavigationEvent {
         data object LoginOrSignup : NavigationEvent()
         data object InValidOffer : NavigationEvent()
         data class LaunchBillingFlow(val subscriptionWithOffer: Subscription.WithOffer) : NavigationEvent()
+        data object Close : NavigationEvent()
     }
 
     sealed class SnackbarEvent {
         data object NoNetwork : SnackbarEvent()
         data object PurchaseFailed : SnackbarEvent()
+        data object RedeemFailed : SnackbarEvent()
     }
 
     sealed class UiState {
         data object Loading : UiState()
         data class Loaded(
             val referralsOfferInfo: ReferralsOfferInfo,
-            val isValidating: Boolean = false,
+            val isLoading: Boolean = false,
         ) : UiState()
 
         data class Error(val error: ReferralsClaimGuestPassError) : UiState()
