@@ -94,6 +94,12 @@ class ReferralsViewModel @Inject constructor(
         }
     }
 
+    fun onBannerShown() {
+        if ((_state.value as? UiState.Loaded)?.showProfileBanner == true) {
+            analyticsTracker.track(AnalyticsEvent.REFERRAL_PASS_BANNER_SHOWN)
+        }
+    }
+
     sealed class UiState {
         data object Loading : UiState()
         data class Loaded(
