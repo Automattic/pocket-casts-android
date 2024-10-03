@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -27,6 +29,7 @@ class ReferralsViewModel @Inject constructor(
     private val userManager: UserManager,
     private val referralOfferInfoProvider: ReferralOfferInfoProvider,
     private val settings: Settings,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -74,6 +77,7 @@ class ReferralsViewModel @Inject constructor(
     fun onIconClick() {
         if (settings.showReferralsTooltip.value) {
             settings.showReferralsTooltip.set(false, updateModifiedAt = false)
+            analyticsTracker.track(AnalyticsEvent.REFERRAL_TOOLTIP_TAPPED)
         }
         (_state.value as? UiState.Loaded)?.let { loadedState ->
             _state.update {
@@ -81,6 +85,12 @@ class ReferralsViewModel @Inject constructor(
                     showTooltip = false,
                 )
             }
+        }
+    }
+
+    fun onTooltipShown() {
+        if ((_state.value as? UiState.Loaded)?.showTooltip == true) {
+            analyticsTracker.track(AnalyticsEvent.REFERRAL_TOOLTIP_SHOWN)
         }
     }
 
