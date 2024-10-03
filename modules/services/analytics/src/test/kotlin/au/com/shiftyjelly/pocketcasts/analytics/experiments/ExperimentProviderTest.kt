@@ -24,7 +24,6 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
-import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment as ExperimentModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExperimentProviderTest {
@@ -75,7 +74,7 @@ class ExperimentProviderTest {
     fun `getVariation should return Control when repository returns Control`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
-        val experiment = ExperimentModel.PaywallAATest
+        val experiment = DummyExperiment.DUMMY_EXPERIMENT
         `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Control)
 
         val variation = experimentProvider.getVariation(experiment)
@@ -87,20 +86,20 @@ class ExperimentProviderTest {
     fun `getVariation should return Treatment when repository returns Treatment`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
-        val experiment = ExperimentModel.PaywallAATest
+        val experiment = DummyExperiment.DUMMY_EXPERIMENT
         `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Treatment(experiment.identifier))
 
         val variation = experimentProvider.getVariation(experiment)
 
         assertTrue(variation is Treatment)
-        assertEquals(ExperimentModel.PaywallAATest.identifier, (variation as Treatment).name)
+        assertEquals(DummyExperiment.DUMMY_EXPERIMENT.identifier, (variation as Treatment).name)
     }
 
     @Test
     fun `getVariation should return null when repository returns null`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
-        val experiment = ExperimentModel.PaywallAATest
+        val experiment = DummyExperiment.DUMMY_EXPERIMENT
         `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(null)
 
         val variation = experimentProvider.getVariation(experiment)
@@ -123,7 +122,7 @@ class ExperimentProviderTest {
     fun `should return null variation when feature flag is disabled`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, false)
 
-        val experiment = ExperimentModel.PaywallAATest
+        val experiment = DummyExperiment.DUMMY_EXPERIMENT
         `when`(repository.getVariation(Experiment(experiment.identifier))).thenReturn(Variation.Control)
 
         val variation = experimentProvider.getVariation(experiment)
@@ -153,4 +152,8 @@ class ExperimentProviderTest {
         verify(repository, never()).clear()
         verify(repository, never()).initialize(anyString(), eq(null))
     }
+}
+
+enum class DummyExperiment(override val identifier: String) : ExperimentType {
+    DUMMY_EXPERIMENT("dummy_experiment"),
 }
