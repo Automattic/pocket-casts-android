@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
@@ -44,6 +45,7 @@ class ReferralsViewModelTest {
     private val settings: Settings = mock()
     private val referralOfferInfoProvider: ReferralOfferInfoProvider = mock()
     private val referralOfferInfo: ReferralsOfferInfoPlayStore = mock()
+    private val analyticsTracker: AnalyticsTracker = mock()
     private lateinit var viewModel: ReferralsViewModel
     private val email = "support@pocketcasts.com"
     private val referralClaimCode = "referral_code"
@@ -235,6 +237,7 @@ class ReferralsViewModelTest {
             userManager = userManager,
             settings = settings,
             referralOfferInfoProvider = referralOfferInfoProvider,
+            analyticsTracker = analyticsTracker,
         )
     }
 }
