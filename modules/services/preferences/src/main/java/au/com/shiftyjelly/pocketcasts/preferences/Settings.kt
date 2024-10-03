@@ -544,4 +544,6 @@ interface Settings {
 
     val playerOrUpNextBottomSheetState: Flow<Int>
     fun updatePlayerOrUpNextBottomSheetState(state: Int)
+
+    val referralClaimCode: UserSetting<String>
 }

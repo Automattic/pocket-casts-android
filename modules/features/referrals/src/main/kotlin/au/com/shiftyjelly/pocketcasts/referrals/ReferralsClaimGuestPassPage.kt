@@ -17,12 +17,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
@@ -52,7 +57,14 @@ import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.NavigationEvent
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.ReferralsClaimGuestPassError
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.SnackbarEvent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher.Companion.openOnboardingFlow
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,14 +80,43 @@ fun ReferralsClaimGuestPassPage(
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
         val state by viewModel.state.collectAsStateWithLifecycle()
+        val activity = LocalContext.current.getActivity()
+        val snackbarHostState = remember { SnackbarHostState() }
 
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             state = state,
             onDismiss = onDismiss,
+            onActivatePassClick = viewModel::onActivatePassClick,
             onRetry = viewModel::retry,
+            snackbarHostState = snackbarHostState,
         )
+
+        LaunchedEffect(Unit) {
+            viewModel.navigationEvent.collect { navigationEvent ->
+                when (navigationEvent) {
+                    NavigationEvent.InValidOffer -> {
+                        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.InvalidOffer)
+                        (activity as FragmentHostListener).showBottomSheet(fragment)
+                    }
+
+                    NavigationEvent.LoginOrSignup -> openOnboardingFlow(
+                        activity = activity,
+                        onboardingFlow = OnboardingFlow.ReferralLoginOrSignUp,
+                    )
+                }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            viewModel.snackBarEvent.collect { snackBarEvent ->
+                val text = when (snackBarEvent) {
+                    SnackbarEvent.NoNetwork -> context.getString(LR.string.error_no_network)
+                }
+                snackbarHostState.showSnackbar(text)
+            }
+        }
     }
 }
 
@@ -85,7 +126,9 @@ private fun ReferralsClaimGuestPassContent(
     windowHeightSizeClass: WindowHeightSizeClass,
     state: UiState,
     onDismiss: () -> Unit,
+    onActivatePassClick: () -> Unit,
     onRetry: () -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -124,21 +167,42 @@ private fun ReferralsClaimGuestPassContent(
                 is UiState.Loading ->
                     LoadingView(color = Color.White)
 
-                is UiState.Loaded ->
+                is UiState.Loaded -> {
                     ClaimGuestPassContent(
                         pageWidth = pageWidth,
                         windowHeightSizeClass = windowHeightSizeClass,
                         showFullScreen = showFullScreen,
                         referralsOfferInfo = state.referralsOfferInfo,
                         onDismiss = onDismiss,
+                        onActivatePassClick = onActivatePassClick,
                     )
 
-                UiState.Error -> {
-                    val errorMessage = stringResource(LR.string.error_generic_message)
+                    if (state.isValidating) {
+                        LoadingView(color = Color.White)
+                    }
+                }
+
+                is UiState.Error -> {
+                    val errorMessage = when (state.error) {
+                        ReferralsClaimGuestPassError.FailedToLoadOffer -> stringResource(LR.string.error_generic_message)
+                    }
                     ReferralsGuestPassError(errorMessage, onRetry, onDismiss)
                 }
             }
         }
+
+        SnackbarHost(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            hostState = snackbarHostState,
+            snackbar = { snackbarData ->
+                Snackbar(
+                    content = { TextH50(snackbarData.message, color = Color.Black) },
+                    backgroundColor = Color.White,
+                )
+            },
+        )
     }
 }
 
@@ -149,6 +213,7 @@ private fun ClaimGuestPassContent(
     showFullScreen: Boolean,
     referralsOfferInfo: ReferralsOfferInfo,
     onDismiss: () -> Unit,
+    onActivatePassClick: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -223,7 +288,7 @@ private fun ClaimGuestPassContent(
             textColor = Color.Black,
             gradientBackgroundColor = plusBackgroundBrush,
             modifier = Modifier.padding(16.dp),
-            onClick = {},
+            onClick = onActivatePassClick,
         )
     }
 }
@@ -275,7 +340,9 @@ fun ReferralsClaimGuestPassContentPreview(
             windowHeightSizeClass = windowHeightSizeClass,
             state = UiState.Loaded(ReferralsOfferInfoMock),
             onDismiss = {},
+            onActivatePassClick = {},
             onRetry = {},
+            snackbarHostState = SnackbarHostState(),
         )
     }
 }

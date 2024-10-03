@@ -46,6 +46,7 @@ class ReferralsViewModelTest {
     private val referralOfferInfo: ReferralsOfferInfoPlayStore = mock()
     private lateinit var viewModel: ReferralsViewModel
     private val email = "support@pocketcasts.com"
+    private val referralClaimCode = "referral_code"
     private val statusAndroidPaidSubscription = SubscriptionStatus.Paid(
         expiry = Date(),
         autoRenew = true,
@@ -176,12 +177,60 @@ class ReferralsViewModelTest {
         }
     }
 
+    @Test
+    fun `profile banner is hidden if referral code is empty`() = runTest {
+        initViewModel(
+            referralCode = "",
+        )
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is hidden if signed in as paid`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
+        )
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is shown if signed in as free and referral code not empty`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedIn(email, SubscriptionStatus.Free()),
+            referralCode = referralClaimCode,
+        )
+
+        viewModel.state.test {
+            assertEquals(true, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is shown if signed out and referral code not empty`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedOut,
+            referralCode = referralClaimCode,
+        )
+
+        viewModel.state.test {
+            assertEquals(true, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
     private suspend fun initViewModel(
         signInState: SignInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
         offerInfo: ReferralsOfferInfo = referralOfferInfo,
+        referralCode: String = referralClaimCode,
     ) {
         whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
+        whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
         viewModel = ReferralsViewModel(
             userManager = userManager,
             settings = settings,

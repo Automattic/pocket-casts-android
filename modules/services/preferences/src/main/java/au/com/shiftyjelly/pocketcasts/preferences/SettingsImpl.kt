@@ -1475,6 +1475,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val referralClaimCode = UserSetting.StringPref(
+        sharedPrefKey = "referralCode",
+        defaultValue = "",
+        sharedPrefs = sharedPreferences,
+    )
+
     private val _playerOrUpNextBottomSheetState = MutableSharedFlow<Int>(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
     override val playerOrUpNextBottomSheetState: Flow<Int>
         get() = _playerOrUpNextBottomSheetState.asSharedFlow().distinctUntilChanged()
