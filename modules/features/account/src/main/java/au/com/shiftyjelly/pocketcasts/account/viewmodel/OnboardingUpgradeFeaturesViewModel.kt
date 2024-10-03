@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.PaywallABTestCustomTreatment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -104,11 +105,24 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         val upgradeLayout = when {
             showPatronOnly -> UpgradeLayout.Original
             FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT) -> {
-                val variation = experiments.getVariation(Experiment.PaywallAATest)
-                if (variation == Variation.Control) {
-                    UpgradeLayout.Original
-                } else {
-                    UpgradeLayout.Original
+                when (val variation = experiments.getVariation(Experiment.PaywallUpgradeABTest)) {
+                    is Variation.Control -> {
+                        UpgradeLayout.Original
+                    }
+                    is Variation.Treatment -> {
+                        when (variation.name) {
+                            PaywallABTestCustomTreatment.FEATURES_TREATMENT.treatmentName -> {
+                                UpgradeLayout.Features
+                            }
+                            PaywallABTestCustomTreatment.REVIEWS_TREATMENT.treatmentName -> {
+                                UpgradeLayout.Reviews
+                            }
+                            else -> {
+                                UpgradeLayout.Original
+                            }
+                        }
+                    }
+                    null -> UpgradeLayout.Original
                 }
             }
             else -> UpgradeLayout.Original
