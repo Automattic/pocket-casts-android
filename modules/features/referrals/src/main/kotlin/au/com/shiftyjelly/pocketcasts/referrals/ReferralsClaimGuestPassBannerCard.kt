@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,8 +64,10 @@ fun ReferralsClaimGuestPassBannerCard(
         }
     }
 
-    activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name)?.let {
-        (activity as FragmentHostListener).showBottomSheet(it)
+    LaunchedEffect(Unit) {
+        activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name)?.let {
+            (activity as FragmentHostListener).showBottomSheet(it)
+        }
     }
 }
 
