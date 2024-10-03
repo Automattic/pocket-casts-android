@@ -105,6 +105,17 @@ fun ReferralsClaimGuestPassPage(
                         activity = activity,
                         onboardingFlow = OnboardingFlow.ReferralLoginOrSignUp,
                     )
+
+                    is NavigationEvent.LaunchBillingFlow -> {
+                        activity?.let {
+                            viewModel.launchBillingFlow(
+                                activity = activity,
+                                subscriptionWithOffer = navigationEvent.subscriptionWithOffer,
+                            )
+                        }
+                    }
+
+                    NavigationEvent.Close -> { onDismiss() }
                 }
             }
         }
@@ -113,6 +124,8 @@ fun ReferralsClaimGuestPassPage(
             viewModel.snackBarEvent.collect { snackBarEvent ->
                 val text = when (snackBarEvent) {
                     SnackbarEvent.NoNetwork -> context.getString(LR.string.error_no_network)
+                    SnackbarEvent.PurchaseFailed -> context.getString(LR.string.referrals_create_subscription_failed)
+                    SnackbarEvent.RedeemFailed -> context.getString(LR.string.referrals_redeem_code_failed)
                 }
                 snackbarHostState.showSnackbar(text)
             }
@@ -177,7 +190,7 @@ private fun ReferralsClaimGuestPassContent(
                         onActivatePassClick = onActivatePassClick,
                     )
 
-                    if (state.isValidating) {
+                    if (state.isLoading) {
                         LoadingView(color = Color.White)
                     }
                 }

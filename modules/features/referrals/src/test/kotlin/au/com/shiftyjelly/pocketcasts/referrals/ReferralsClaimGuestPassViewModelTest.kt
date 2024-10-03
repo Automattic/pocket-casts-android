@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.Ref
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.ErrorResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.SuccessResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
@@ -24,6 +26,7 @@ import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,6 +43,7 @@ class ReferralsClaimGuestPassViewModelTest {
     private val referralOfferInfo = mock<ReferralsOfferInfoPlayStore>()
     private val referralManager = mock<ReferralManager>()
     private val userManager = mock<UserManager>()
+    private val subscriptionManager = mock<SubscriptionManager>()
     private val settings = mock<Settings>()
     private lateinit var viewModel: ReferralsClaimGuestPassViewModel
     private val referralCode = "referral_code"
@@ -82,6 +86,7 @@ class ReferralsClaimGuestPassViewModelTest {
 
     @Test
     fun `given user signed-in, when activate pass button is clicked, then referral code is validated`() = runTest {
+        whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
         initViewModel(
             signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
         )
@@ -95,7 +100,7 @@ class ReferralsClaimGuestPassViewModelTest {
     fun `given validation error, when activate pass button is clicked, then invalid offer is shown`() = runTest {
         initViewModel(
             signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
-            referralResult = ErrorResult(""),
+            referralValidationResult = ErrorResult(""),
         )
 
         viewModel.navigationEvent.test {
@@ -108,7 +113,7 @@ class ReferralsClaimGuestPassViewModelTest {
     fun `given validation empty result, when activate pass button is clicked, then invalid offer is shown`() = runTest {
         initViewModel(
             signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
-            referralResult = EmptyResult(),
+            referralValidationResult = EmptyResult(),
         )
 
         viewModel.navigationEvent.test {
@@ -121,7 +126,7 @@ class ReferralsClaimGuestPassViewModelTest {
     fun `given no network, when activate pass button is clicked, then no network error is shown`() = runTest {
         initViewModel(
             signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
-            referralResult = ErrorResult(errorMessage = "", error = NoNetworkException()),
+            referralValidationResult = ErrorResult(errorMessage = "", error = NoNetworkException()),
         )
 
         viewModel.snackBarEvent.test {
@@ -130,19 +135,103 @@ class ReferralsClaimGuestPassViewModelTest {
         }
     }
 
+    @Test
+    fun `given validation success, when activate pass button is clicked, then billing flow is started`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralValidationResult = SuccessResult(mock()),
+        )
+
+        viewModel.navigationEvent.test {
+            viewModel.onActivatePassClick()
+            assertTrue(awaitItem() is NavigationEvent.LaunchBillingFlow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when purchase is successful, then code is redeemed`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralValidationResult = SuccessResult(mock()),
+            purchaseEvent = PurchaseEvent.Success,
+        )
+        viewModel.onActivatePassClick()
+
+        verify(referralManager).redeemReferralCode(referralCode)
+    }
+
+    @Test
+    fun `when purchase fails, then purchase failed error message is shown`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralValidationResult = SuccessResult(mock()),
+            purchaseEvent = PurchaseEvent.Failure(errorMessage = "", responseCode = 0),
+        )
+
+        viewModel.snackBarEvent.test {
+            viewModel.onActivatePassClick()
+            assertEquals(ReferralsClaimGuestPassViewModel.SnackbarEvent.PurchaseFailed, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when redeem fails, then redeem failed error message is shown`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(ErrorResult(""))
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralValidationResult = SuccessResult(mock()),
+        )
+
+        viewModel.snackBarEvent.test {
+            viewModel.onActivatePassClick()
+            assertEquals(ReferralsClaimGuestPassViewModel.SnackbarEvent.RedeemFailed, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when redeem is successful, then screen closes`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralValidationResult = SuccessResult(mock()),
+        )
+
+        viewModel.navigationEvent.test {
+            viewModel.onActivatePassClick()
+            skipItems(1) // skip billing launch
+            assertEquals(NavigationEvent.Close, awaitItem())
+        }
+    }
+
     private suspend fun initViewModel(
         offerInfo: ReferralsOfferInfo? = referralOfferInfo,
         signInState: SignInState = SignInState.SignedOut,
-        referralResult: ReferralManager.ReferralResult<ReferralValidationResponse> = SuccessResult(mock()),
+        referralValidationResult: ReferralManager.ReferralResult<ReferralValidationResponse> = SuccessResult(mock()),
+        purchaseEvent: PurchaseEvent = PurchaseEvent.Success,
     ) {
+        whenever(subscriptionManager.observePurchaseEvents()).thenReturn(Flowable.just(purchaseEvent))
         whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
         whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
-        whenever(referralManager.validateReferralCode(referralCode)).thenReturn(referralResult)
+        whenever(referralManager.validateReferralCode(referralCode)).thenReturn(referralValidationResult)
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
         viewModel = ReferralsClaimGuestPassViewModel(
             referralOfferInfoProvider = referralOfferInfoProvider,
             referralManager = referralManager,
             userManager = userManager,
+            subscriptionManager = subscriptionManager,
             settings = settings,
         )
     }
