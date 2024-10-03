@@ -26,6 +26,7 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -92,10 +93,7 @@ fun ReferralsClaimGuestPassPage(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             state = state,
-            onDismiss = {
-                viewModel.onNotNowClick()
-                onDismiss()
-            },
+            onDismiss = onDismiss,
             onActivatePassClick = viewModel::onActivatePassClick,
             onRetry = viewModel::retry,
             snackbarHostState = snackbarHostState,
@@ -136,6 +134,14 @@ fun ReferralsClaimGuestPassPage(
                     SnackbarEvent.RedeemFailed -> context.getString(LR.string.referrals_redeem_code_failed)
                 }
                 snackbarHostState.showSnackbar(text)
+            }
+        }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                // Fragment will remain on orientation changes
+                val fragmentRemoved = activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name) == null
+                if (fragmentRemoved) viewModel.onDispose()
             }
         }
     }

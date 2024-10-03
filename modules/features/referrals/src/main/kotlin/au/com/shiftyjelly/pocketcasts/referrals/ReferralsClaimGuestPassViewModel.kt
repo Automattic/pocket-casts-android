@@ -153,6 +153,8 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         when (result) {
             is ReferralResult.SuccessResult -> {
                 settings.referralClaimCode.set("", false)
+                (_state.value as? UiState.Loaded)
+                    ?.let { loadedState -> _state.update { loadedState.copy(flowComplete = true) } }
                 _navigationEvent.emit(NavigationEvent.Close)
             }
 
@@ -184,8 +186,12 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.REFERRAL_CLAIM_SCREEN_SHOWN)
     }
 
-    fun onNotNowClick() {
-        analyticsTracker.track(AnalyticsEvent.REFERRAL_NOT_NOW_TAPPED)
+    fun onDispose() {
+        val loadedState = state.value as? UiState.Loaded
+        // No need to track not now event when page is auto-closed and disposed on flow complete
+        if (loadedState?.flowComplete == false) {
+            analyticsTracker.track(AnalyticsEvent.REFERRAL_NOT_NOW_TAPPED)
+        }
     }
 
     sealed class NavigationEvent {
@@ -206,6 +212,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         data class Loaded(
             val referralsOfferInfo: ReferralsOfferInfo,
             val isLoading: Boolean = false,
+            val flowComplete: Boolean = false,
         ) : UiState()
 
         data class Error(val error: ReferralsClaimGuestPassError) : UiState()
