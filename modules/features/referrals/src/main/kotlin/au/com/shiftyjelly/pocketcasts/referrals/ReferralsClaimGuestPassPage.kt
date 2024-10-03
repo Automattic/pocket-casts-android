@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -83,11 +84,18 @@ fun ReferralsClaimGuestPassPage(
         val activity = LocalContext.current.getActivity()
         val snackbarHostState = remember { SnackbarHostState() }
 
+        CallOnce {
+            viewModel.onShown()
+        }
+
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
             state = state,
-            onDismiss = onDismiss,
+            onDismiss = {
+                viewModel.onNotNowClick()
+                onDismiss()
+            },
             onActivatePassClick = viewModel::onActivatePassClick,
             onRetry = viewModel::retry,
             snackbarHostState = snackbarHostState,

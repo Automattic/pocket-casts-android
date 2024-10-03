@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.referrals
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -35,6 +37,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private val userManager: UserManager,
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -68,6 +71,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     }
 
     fun onActivatePassClick() {
+        analyticsTracker.track(AnalyticsEvent.REFERRAL_ACTIVATE_TAPPED)
         viewModelScope.launch {
             userManager.getSignInState().asFlow()
                 .stateIn(viewModelScope)
@@ -172,6 +176,14 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private fun updateLoading(show: Boolean) {
         (_state.value as? UiState.Loaded)
             ?.let { loadedState -> _state.update { loadedState.copy(isLoading = show) } }
+    }
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.REFERRAL_CLAIM_SCREEN_SHOWN)
+    }
+
+    fun onNotNowClick() {
+        analyticsTracker.track(AnalyticsEvent.REFERRAL_NOT_NOW_TAPPED)
     }
 
     sealed class NavigationEvent {

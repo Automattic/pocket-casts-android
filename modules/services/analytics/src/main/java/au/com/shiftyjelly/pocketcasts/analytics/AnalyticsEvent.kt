@@ -659,4 +659,7 @@ enum class AnalyticsEvent(val key: String) {
     REFERRAL_TOOLTIP_TAPPED("referral_tooltip_tapped"),
     REFERRAL_SHARE_SCREEN_SHOWN("referral_share_screen_shown"),
     REFERRAL_PASS_SHARED("referral_pass_shared"),
+    REFERRAL_CLAIM_SCREEN_SHOWN("referral_claim_screen_shown"),
+    REFERRAL_ACTIVATE_TAPPED("referral_activate_tapped"),
+    REFERRAL_NOT_NOW_TAPPED("referral_not_now_tapped"),
 }
