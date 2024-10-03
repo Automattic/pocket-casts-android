@@ -904,7 +904,9 @@ class MainActivity :
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                    if (bottomSheetTag == UpNextFragment::class.java.name) {
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                    }
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                         removeBottomSheetFragment(it)
                     }
