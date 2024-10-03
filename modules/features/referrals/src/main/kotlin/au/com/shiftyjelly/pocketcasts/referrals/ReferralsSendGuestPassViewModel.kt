@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
@@ -26,6 +28,7 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
     private val referralsManager: ReferralManager,
     private val referralOfferInfoProvider: ReferralOfferInfoProvider,
     private val sharingClient: SharingClient,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val state: StateFlow<UiState> = _state
@@ -89,6 +92,10 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
         viewModelScope.launch {
             sharingClient.share(request)
         }
+    }
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.REFERRAL_SHARE_SCREEN_SHOWN)
     }
 
     sealed class UiState {
