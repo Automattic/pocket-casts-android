@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/effectsConstraint"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primary_ui_01"
+    android:theme="@style/PlayerTheme">
+
+    <ImageView
+        android:id="@+id/iconSpeed"
+        android:layout_width="29dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="30dp"
+        android:padding="2dp"
+        android:src="@drawable/ic_speed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/player_contrast_02" />
+
+    <ImageButton
+        android:id="@+id/btnSpeedUp"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/player_effects_speed_up"
+        android:src="@drawable/ic_effects_plus"
+        app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iconSpeed"
+        app:tint="?attr/player_contrast_02" />
+
+    <TextView
+        android:id="@+id/lblSpeed"
+        style="@style/DarkSubtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_speed_label"
+        android:paddingStart="16dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="4dp"
+        android:textColor="?attr/player_contrast_01"
+        app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+        app:layout_constraintRight_toLeftOf="@id/btnSpeedUp"
+        app:layout_constraintTop_toTopOf="@id/iconSpeed"
+        tools:text="1.0x" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/divider_height"
+        android:background="?attr/player_contrast_05"
+        app:layout_constraintBottom_toTopOf="@id/iconTrim"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iconSpeed" />
+
+    <ImageButton
+        android:id="@+id/btnSpeedDown"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/player_effects_speed_down"
+        android:src="@drawable/ic_minus"
+        app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+        app:layout_constraintRight_toLeftOf="@id/lblSpeed"
+        app:layout_constraintTop_toTopOf="@id/iconSpeed"
+        app:tint="?attr/player_contrast_02" />
+
+    <TextView
+        android:id="@+id/speedLabel"
+        style="@style/DarkSubtitle1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/player_effects_speed"
+        android:textColor="?attr/player_contrast_01"
+        app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+        app:layout_constraintLeft_toRightOf="@id/iconSpeed"
+        app:layout_constraintTop_toTopOf="@id/iconSpeed" />
+
+    <ImageView
+        android:id="@+id/iconTrim"
+        android:layout_width="29dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="32dp"
+        android:importantForAccessibility="no"
+        android:padding="2dp"
+        android:src="@drawable/ic_trim"
+        app:layout_constraintLeft_toLeftOf="@id/iconSpeed"
+        app:layout_constraintTop_toBottomOf="@+id/iconSpeed"
+        app:tint="?attr/player_contrast_02" />
+
+    <Switch
+        android:id="@+id/switchTrim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/player_effects_trim_silence"
+        app:layout_constraintRight_toRightOf="@id/btnSpeedUp"
+        app:layout_constraintTop_toTopOf="@id/iconTrim"
+        app:theme="@style/SwitchStyle" />
+
+    <TextView
+        android:id="@+id/trimSilenceLabel"
+        style="@style/DarkSubtitle1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/player_effects_trim_silence"
+        android:textColor="?attr/player_contrast_01"
+        app:layout_constraintLeft_toLeftOf="@id/speedLabel"
+        app:layout_constraintRight_toLeftOf="@id/switchTrim"
+        app:layout_constraintTop_toTopOf="@id/iconTrim" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/trimToggleGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
+        app:layout_constraintRight_toRightOf="@id/switchTrim"
+        app:layout_constraintTop_toBottomOf="@id/trimSilenceLabel"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/trimLow"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/player_effects_trim_mild"
+            android:textAllCaps="false"
+            app:backgroundTint="@color/trim_mode_background"
+            app:strokeColor="@color/trim_stroke_color" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/trimMedium"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/player_effects_trim_medium"
+            android:textAllCaps="false"
+            android:textColor="?attr/player_contrast_01"
+            app:backgroundTint="@color/trim_mode_background"
+            app:strokeColor="@color/trim_stroke_color" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/trimHigh"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/player_effects_trim_mad_max"
+            android:textAllCaps="false"
+            android:textColor="?attr/player_contrast_01"
+            app:backgroundTint="@color/trim_mode_background"
+            app:strokeColor="@color/trim_stroke_color" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TextView
+        android:id="@+id/detailSilenceLabel"
+        style="@style/DarkSubtitle2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/player_trim_silence_detail"
+        android:textColor="?attr/player_contrast_01"
+        app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
+        app:layout_constraintRight_toLeftOf="@id/switchTrim"
+        app:layout_constraintTop_toBottomOf="@id/trimToggleGroup" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/divider_height"
+        android:background="?attr/player_contrast_05"
+        app:layout_constraintBottom_toTopOf="@id/iconVolume"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detailSilenceLabel" />
+
+    <ImageView
+        android:id="@+id/iconVolume"
+        android:layout_width="29dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="32dp"
+        android:importantForAccessibility="no"
+        android:padding="2dp"
+        android:src="@drawable/ic_volumeboost"
+        app:layout_constraintLeft_toLeftOf="@id/iconSpeed"
+        app:layout_constraintTop_toBottomOf="@id/detailSilenceLabel"
+        app:tint="?attr/player_contrast_02" />
+
+    <Switch
+        android:id="@+id/switchVolume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/player_effects_volume_boost"
+        app:layout_constraintRight_toRightOf="@id/btnSpeedUp"
+        app:layout_constraintTop_toTopOf="@id/iconVolume"
+        app:theme="@style/SwitchStyle" />
+
+    <TextView
+        android:id="@+id/volumeLabel"
+        style="@style/DarkSubtitle1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/player_effects_volume_boost"
+        android:textColor="?attr/player_contrast_01"
+        app:layout_constraintLeft_toLeftOf="@id/speedLabel"
+        app:layout_constraintRight_toLeftOf="@id/switchTrim"
+        app:layout_constraintTop_toTopOf="@id/iconVolume" />
+
+    <TextView
+        android:id="@+id/detailVolumeLabel"
+        style="@style/DarkSubtitle2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/player_effects_voices_sound_louder"
+        android:textColor="?attr/player_contrast_01"
+        app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
+        app:layout_constraintTop_toBottomOf="@id/volumeLabel" />
+</androidx.constraintlayout.widget.ConstraintLayout>
