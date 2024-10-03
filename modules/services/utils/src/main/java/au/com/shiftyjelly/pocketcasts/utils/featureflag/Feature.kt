@@ -19,6 +19,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
+    END_OF_YEAR_2024(
+        key = "end_of_year_2024",
+        title = "End of Year 2024",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = false,
+    ),
     REPORT_VIOLATION(
         key = "report_violation",
         title = "Report Violation",
