@@ -51,7 +51,7 @@ fun ReferralsClaimGuestPassBannerCard(
     val activity = LocalContext.current.getActivity()
 
     CallOnce {
-         viewModel.onBannerShown()
+        viewModel.onBannerShown()
     }
 
     when (state) {
