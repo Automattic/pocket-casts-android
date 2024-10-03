@@ -115,6 +115,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
         when (purchaseEvent) {
             PurchaseEvent.Success -> {
+                analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SUCCESS)
                 redeemReferralCode(settings.referralClaimCode.value)
             }
 
@@ -137,6 +138,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         activity: Activity,
         subscriptionWithOffer: Subscription.WithOffer,
     ) {
+        analyticsTracker.track(AnalyticsEvent.REFERRAL_PURCHASE_SHOWN)
         subscriptionManager.launchBillingFlow(
             activity,
             subscriptionWithOffer.productDetails,
