@@ -98,6 +98,10 @@ class ReferralsSendGuestPassViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.REFERRAL_SHARE_SCREEN_SHOWN)
     }
 
+    fun onDispose() {
+        analyticsTracker.track(AnalyticsEvent.REFERRAL_SHARE_SCREEN_DISMISSED)
+    }
+
     sealed class UiState {
         data object Loading : UiState()
         data class Loaded(
