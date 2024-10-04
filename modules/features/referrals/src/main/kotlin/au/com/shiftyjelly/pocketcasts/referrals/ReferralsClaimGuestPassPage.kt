@@ -26,6 +26,7 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -82,6 +84,10 @@ fun ReferralsClaimGuestPassPage(
         val state by viewModel.state.collectAsStateWithLifecycle()
         val activity = LocalContext.current.getActivity()
         val snackbarHostState = remember { SnackbarHostState() }
+
+        CallOnce {
+            viewModel.onShown()
+        }
 
         ReferralsClaimGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
@@ -128,6 +134,14 @@ fun ReferralsClaimGuestPassPage(
                     SnackbarEvent.RedeemFailed -> context.getString(LR.string.referrals_redeem_code_failed)
                 }
                 snackbarHostState.showSnackbar(text)
+            }
+        }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                // Fragment will remain on orientation changes
+                val fragmentRemoved = activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name) == null
+                if (fragmentRemoved) viewModel.onDispose()
             }
         }
     }

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.LocalColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
@@ -38,6 +39,11 @@ fun ReferralsIconWithTooltip(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val activity = LocalContext.current.getActivity()
+
+    CallOnce {
+        viewModel.onTooltipShown()
+    }
+
     when (state) {
         UiState.Loading -> Unit
         is UiState.Loaded -> {

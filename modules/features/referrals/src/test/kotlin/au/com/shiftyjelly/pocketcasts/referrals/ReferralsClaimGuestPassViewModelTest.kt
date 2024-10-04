@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
@@ -44,6 +45,7 @@ class ReferralsClaimGuestPassViewModelTest {
     private val referralManager = mock<ReferralManager>()
     private val userManager = mock<UserManager>()
     private val subscriptionManager = mock<SubscriptionManager>()
+    private val analyticsTracker = mock<AnalyticsTracker>()
     private val settings = mock<Settings>()
     private lateinit var viewModel: ReferralsClaimGuestPassViewModel
     private val referralCode = "referral_code"
@@ -233,6 +235,7 @@ class ReferralsClaimGuestPassViewModelTest {
             userManager = userManager,
             subscriptionManager = subscriptionManager,
             settings = settings,
+            analyticsTracker = analyticsTracker,
         )
     }
 }

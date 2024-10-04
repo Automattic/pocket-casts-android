@@ -449,7 +449,7 @@ class SharingAnalyticsTest {
         analytics.onShare(request)
         val event = tracker.events.single()
 
-        event.assertType(AnalyticsEvent.REFERRAL_LINK_SHARED)
+        event.assertType(AnalyticsEvent.REFERRAL_PASS_SHARED)
         event.assertProperties(
             mapOf(
                 "code" to referralCode,

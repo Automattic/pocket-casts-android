@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
@@ -41,6 +42,7 @@ class ReferralsSendGuestPassViewModelTest {
     private val sharingClient = mock<SharingClient>()
     private val referralOfferInfoProvider = mock<ReferralOfferInfoProvider>()
     private val referralOfferInfo = mock<ReferralsOfferInfoPlayStore>()
+    private val analyticsTracker = mock<AnalyticsTracker>()
     private lateinit var viewModel: ReferralsSendGuestPassViewModel
 
     private val referralCodeResponse = mock<ReferralCodeResponse>()
@@ -142,7 +144,7 @@ class ReferralsSendGuestPassViewModelTest {
             assertEquals(referralCode, (data as SharingRequest.Data.ReferralLink).referralCode)
             assertEquals(SourceView.REFERRALS, source)
             assertEquals(SocialPlatform.More, platform)
-            assertEquals(AnalyticsEvent.REFERRAL_LINK_SHARED, analyticsEvent)
+            assertEquals(AnalyticsEvent.REFERRAL_PASS_SHARED, analyticsEvent)
             assertEquals(mapOf("code" to referralCode), analyticsProperties)
         }
     }
@@ -155,6 +157,7 @@ class ReferralsSendGuestPassViewModelTest {
             referralsManager = referralManager,
             sharingClient = sharingClient,
             referralOfferInfoProvider = referralOfferInfoProvider,
+            analyticsTracker = analyticsTracker,
         )
     }
 }
