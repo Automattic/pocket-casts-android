@@ -412,15 +412,7 @@ class AutoDownloadSettingsFragment :
 
     private fun setupAutoDownloadLimitOptions() {
         podcastsAutoDownloadLimitPreference?.apply {
-            val options = listOf(
-                AutoDownloadLimitSetting.OFF,
-                AutoDownloadLimitSetting.LATEST_EPISODE,
-                AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
-                AutoDownloadLimitSetting.THREE_LATEST_EPISODE,
-                AutoDownloadLimitSetting.FIVE_LATEST_EPISODE,
-                AutoDownloadLimitSetting.TEN_LATEST_EPISODE,
-                AutoDownloadLimitSetting.ALL_LATEST_EPISODES,
-            )
+            val options = AutoDownloadLimitSetting.entries
             entries = options.map { getString(it.titleRes) }.toTypedArray()
             entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
             value = settings.autoDownloadLimit.value.preferenceInt.toString()
