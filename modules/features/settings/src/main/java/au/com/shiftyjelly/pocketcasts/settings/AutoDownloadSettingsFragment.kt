@@ -67,6 +67,7 @@ class AutoDownloadSettingsFragment :
         const val PREFERENCE_PODCASTS_CATEGORY = "podcasts_category"
         const val PREFERENCE_NEW_EPISODES = "autoDownloadNewEpisodes"
         const val PREFERENCE_CHOOSE_PODCASTS = "autoDownloadPodcastsPreference"
+        const val PREFERENCE_AUTO_DOWNLOAD_PODCAST_LIMIT = "autoDownloadPodcastsLimit"
         const val PREFERENCE_CHOOSE_FILTERS = "autoDownloadPlaylists"
 
         private const val PREFERENCE_CANCEL_ALL = "cancelAll"
@@ -98,6 +99,7 @@ class AutoDownloadSettingsFragment :
     private lateinit var upNextPreference: SwitchPreference
     private var newEpisodesPreference: SwitchPreference? = null
     private var podcastsPreference: Preference? = null
+    private var podcastsAutoDownloadLimitPreference: Preference? = null
     private var filtersPreference: Preference? = null
     private lateinit var autoDownloadOnlyDownloadOnWifi: SwitchPreference
     private lateinit var autoDownloadOnlyWhenCharging: SwitchPreference
@@ -158,6 +160,13 @@ class AutoDownloadSettingsFragment :
             ?.apply {
                 setOnPreferenceClickListener {
                     openPodcastsActivity()
+                    true
+                }
+            }
+        podcastsAutoDownloadLimitPreference = preferenceManager.findPreference<Preference>(PREFERENCE_AUTO_DOWNLOAD_PODCAST_LIMIT)
+            ?.apply {
+                setOnPreferenceClickListener {
+                    // TODO DO
                     true
                 }
             }
@@ -226,11 +235,14 @@ class AutoDownloadSettingsFragment :
 
     private fun updateNewEpisodesSwitch(on: Boolean) {
         val podcastsPreference = podcastsPreference ?: return
+        val podcastsLimitPreference = podcastsAutoDownloadLimitPreference ?: return
         val podcastsCategory = podcastsCategory ?: return
         if (on) {
             podcastsCategory.addPreference(podcastsPreference)
+            podcastsCategory.addPreference(podcastsLimitPreference)
         } else {
             podcastsCategory.removePreference(podcastsPreference)
+            podcastsCategory.removePreference(podcastsLimitPreference)
         }
     }
 

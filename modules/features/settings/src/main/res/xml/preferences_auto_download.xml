@@ -17,12 +17,19 @@
         <SwitchPreference
             android:key="autoDownloadNewEpisodes"
             android:title="@string/settings_auto_download_new_episodes"
+            android:summary="@string/settings_auto_download_new_episodes_description"
             android:persistent="false" />
 
         <Preference
             android:key="autoDownloadPodcastsPreference"
             android:title="@string/settings_choose_podcasts"
             android:summary="@string/settings_podcasts_selected_zero"
+            android:persistent="false" />
+
+        <Preference
+            android:key="autoDownloadPodcastsLimit"
+            android:title="@string/settings_auto_download_limit"
+            android:summary="@string/settings_auto_download_limit_off"
             android:persistent="false" />
 
     </PreferenceCategory>
