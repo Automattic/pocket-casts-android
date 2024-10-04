@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.TEST_PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.mapProductIdToTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -22,8 +21,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -187,16 +184,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductId(PATRON_YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
-            ).apply {
-                if (FeatureFlag.isEnabled(Feature.REFERRALS)) {
-                    add(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(TEST_PLUS_YEARLY_PRODUCT_ID)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build(),
-                    )
-                }
-            }
+            )
 
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(productList)

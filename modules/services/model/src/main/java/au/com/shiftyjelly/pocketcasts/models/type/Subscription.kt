@@ -123,8 +123,7 @@ sealed interface Subscription {
         const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
         const val TRIAL_OFFER_ID = "plus-yearly-trial-30days"
         const val INTRO_OFFER_ID = "plus-yearly-intro-50percent"
-        const val TEST_PLUS_YEARLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.testfreetrialoffer"
-        const val TRIAL_TWO_MONTHS_OFFER_ID = "2-months-free"
+        const val REFERRAL_OFFER_ID = "plus-yearly-referral-two-months-free"
 
         fun fromProductDetails(
             productDetails: ProductDetails,

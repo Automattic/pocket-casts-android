@@ -14,9 +14,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.reactive.asFlow
 
-// TODO - Referrals: Replace Product and offer Ids
-const val REFERRAL_SUBSCRIPTION_PRODUCT_ID = Subscription.TEST_PLUS_YEARLY_PRODUCT_ID
-const val REFERRAL_OFFER_ID = Subscription.TRIAL_TWO_MONTHS_OFFER_ID
+const val REFERRAL_SUBSCRIPTION_PRODUCT_ID = Subscription.PLUS_YEARLY_PRODUCT_ID
+const val REFERRAL_OFFER_ID = Subscription.REFERRAL_OFFER_ID
 
 class ReferralOfferInfoProvider @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
