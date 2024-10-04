@@ -26,10 +26,10 @@
             android:summary="@string/settings_podcasts_selected_zero"
             android:persistent="false" />
 
-        <Preference
+        <ListPreference
             android:key="autoDownloadPodcastsLimit"
+            android:dialogTitle="@string/settings_auto_download_limit_auto_downloads"
             android:title="@string/settings_auto_download_limit"
-            android:summary="@string/settings_auto_download_limit_off"
             android:persistent="false" />
 
     </PreferenceCategory>

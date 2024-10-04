@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
@@ -22,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
@@ -99,7 +101,7 @@ class AutoDownloadSettingsFragment :
     private lateinit var upNextPreference: SwitchPreference
     private var newEpisodesPreference: SwitchPreference? = null
     private var podcastsPreference: Preference? = null
-    private var podcastsAutoDownloadLimitPreference: Preference? = null
+    private var podcastsAutoDownloadLimitPreference: ListPreference? = null
     private var filtersPreference: Preference? = null
     private lateinit var autoDownloadOnlyDownloadOnWifi: SwitchPreference
     private lateinit var autoDownloadOnlyWhenCharging: SwitchPreference
@@ -163,10 +165,16 @@ class AutoDownloadSettingsFragment :
                     true
                 }
             }
-        podcastsAutoDownloadLimitPreference = preferenceManager.findPreference<Preference>(PREFERENCE_AUTO_DOWNLOAD_PODCAST_LIMIT)
+        podcastsAutoDownloadLimitPreference = preferenceManager.findPreference<ListPreference>(PREFERENCE_AUTO_DOWNLOAD_PODCAST_LIMIT)
             ?.apply {
-                setOnPreferenceClickListener {
-                    // TODO DO
+                setOnPreferenceChangeListener { _, newValue ->
+                    val autoDownloadLimitSetting = (newValue as? String)
+                        ?.let { AutoDownloadLimitSetting.fromPreferenceString(it) }
+                        ?: throw IllegalStateException("Invalid value for auto download limit preference: $newValue")
+
+                    settings.autoDownloadLimit.set(autoDownloadLimitSetting, updateModifiedAt = true)
+
+                    changeAutoDownloadLimitSummary()
                     true
                 }
             }
@@ -220,6 +228,7 @@ class AutoDownloadSettingsFragment :
     override fun onResume() {
         super.onResume()
 
+        setupAutoDownloadLimitOptions()
         updateView()
     }
 
@@ -395,5 +404,27 @@ class AutoDownloadSettingsFragment :
     override fun onPause() {
         super.onPause()
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
+    private fun setupAutoDownloadLimitOptions() {
+        podcastsAutoDownloadLimitPreference?.apply {
+            val options = listOf(
+                AutoDownloadLimitSetting.OFF,
+                AutoDownloadLimitSetting.LATEST_EPISODE,
+                AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
+                AutoDownloadLimitSetting.THREE_LATEST_EPISODE,
+                AutoDownloadLimitSetting.FIVE_LATEST_EPISODE,
+                AutoDownloadLimitSetting.TEN_LATEST_EPISODE,
+                AutoDownloadLimitSetting.ALL_LATEST_EPISODES,
+            )
+            entries = options.map { getString(it.titleRes) }.toTypedArray()
+            entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
+            value = settings.autoDownloadLimit.value.preferenceInt.toString()
+        }
+        changeAutoDownloadLimitSummary()
+    }
+
+    private fun changeAutoDownloadLimitSummary() {
+        podcastsAutoDownloadLimitPreference?.summary = getString(settings.autoDownloadLimit.value.titleRes)
     }
 }
