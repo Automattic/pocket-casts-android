@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -48,6 +49,8 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private val _snackBarEvent: MutableSharedFlow<SnackbarEvent> = MutableSharedFlow()
     val snackBarEvent: SharedFlow<SnackbarEvent> = _snackBarEvent
 
+    private var job: Job? = null
+
     init {
         loadReferralClaimOffer()
     }
@@ -72,7 +75,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
     fun onActivatePassClick() {
         analyticsTracker.track(AnalyticsEvent.REFERRAL_ACTIVATE_TAPPED)
-        viewModelScope.launch {
+        job = viewModelScope.launch {
             userManager.getSignInState().asFlow()
                 .stateIn(viewModelScope)
                 .collect {
