@@ -23,8 +23,8 @@ coil = "2.7.0"
 compose = "2024.02.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 dependency-analysis = "2.0.2"
 espresso = "3.6.1"
-firebase = "30.5.0"
-fragment = "1.8.3"
+firebase = "33.3.0"
+fragment = "1.8.2"
 glance = "1.0.0"
 google-services = "4.3.14"
 hilt = "2.52"
@@ -109,8 +109,8 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
-firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
-firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-config = { module = "com.google.firebase:firebase-config" }
 
 # Fragments
 fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragment" }
