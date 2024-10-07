@@ -11,14 +11,6 @@ enum class Feature(
     val hasFirebaseRemoteFlag: Boolean,
     val hasDevToggle: Boolean,
 ) {
-    END_OF_YEAR_ENABLED(
-        key = "end_of_year_enabled",
-        title = "End of Year",
-        defaultValue = false,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = false,
-    ),
     END_OF_YEAR_2024(
         key = "end_of_year_2024",
         title = "End of Year 2024",
