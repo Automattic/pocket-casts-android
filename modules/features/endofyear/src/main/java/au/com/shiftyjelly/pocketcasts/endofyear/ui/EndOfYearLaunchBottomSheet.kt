@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentState
@@ -132,7 +133,7 @@ private fun ImageContent(modifier: Modifier = Modifier) {
                             } else {
                                 padding = density.run {
                                     (result.size.height - result.firstBaseline).toDp() / 1.8f
-                                }
+                                }.coerceAtLeast(0.dp)
                                 isTextSizeComputed = true
                             }
                         }
