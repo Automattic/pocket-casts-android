@@ -7,88 +7,73 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private const val PromptCardSummaryTextAlpha = 0.7f
-private val PromptCardCornerSize = 8.dp
-private val PromptCardImageSize = 150.dp
 
 @Composable
 fun EndOfYearPromptCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .background(color = MaterialTheme.theme.colors.primaryUi02),
+            .background(color = Color.Black, RoundedCornerShape(8.dp))
+            .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
+            .clickable { onClick.invoke() },
     ) {
-        Row(
-            modifier = modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .clip(RoundedCornerShape(PromptCardCornerSize))
-                .background(color = Color.Black)
-                .clickable { onClick.invoke() },
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = modifier.weight(1.1f),
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(
-                modifier = modifier
-                    .weight(1f)
-                    .padding(top = 20.dp, bottom = 20.dp, start = 24.dp, end = 12.dp),
-                verticalArrangement = Arrangement.Center,
-            ) {
-                TextH20(
-                    text = stringResource(LR.string.end_of_year_prompt_card_title),
-                    color = MaterialTheme.theme.colors.contrast01,
-                    modifier = modifier
-                        .padding(bottom = 8.dp),
-                )
-                TextH70(
-                    text = stringResource(LR.string.end_of_year_prompt_card_summary),
-                    color = MaterialTheme.theme.colors.contrast02,
-                    fontWeight = FontWeight.W600,
-                    modifier = modifier.alpha(PromptCardSummaryTextAlpha),
-                )
-            }
+            TextH30(
+                text = stringResource(LR.string.end_of_year_prompt_card_title),
+                color = Color.White,
+            )
+            Spacer(
+                modifier = Modifier.height(8.dp),
+            )
+            TextH70(
+                text = stringResource(LR.string.end_of_year_prompt_card_summary),
+                color = Color.White,
+                fontWeight = FontWeight.W600,
+                fontSize = 11.sp,
+                modifier = modifier.alpha(0.7f),
+            )
+        }
+        Box(
+            contentAlignment = Alignment.CenterEnd,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 16.dp),
+        ) {
             Image(
-                painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_logo_foreground),
+                painter = painterResource(IR.drawable.end_of_year_2024_pb24),
                 contentDescription = null,
-                modifier = modifier
-                    .size(PromptCardImageSize)
-                    .scale(1.5f),
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun EndOfYearPromptCardPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) {
-    AppTheme(themeType) {
-        EndOfYearPromptCard(onClick = {})
-    }
+private fun EndOfYearPromptCardPreview() {
+    EndOfYearPromptCard(onClick = {})
 }

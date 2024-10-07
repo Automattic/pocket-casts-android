@@ -629,7 +629,6 @@ Language: ja_JP
     <string name="no_episodes_in_filter_x">フィルター %1$s にエピソードはありません</string>
     <string name="filter_x_not_found">フィルター %1$s は見つかりません</string>
     <string name="must_provide_filter_name">フィルター名を指定する必要があります</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">後で</string>
     <string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
     <string name="end_of_year_launch_modal_title">ポッドキャストで振り返る1年</string>
     <string name="settings_app_icon_halloween">ハロウィーン</string>

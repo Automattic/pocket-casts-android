@@ -629,7 +629,6 @@ Language: pt_BR
     <string name="no_episodes_in_filter_x">Nenhum episódio no filtro %1$s</string>
     <string name="filter_x_not_found">Filtro %1$s não encontrado</string>
     <string name="must_provide_filter_name">É necessário fornecer um nome de filtro</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Agora não</string>
     <string name="end_of_year_launch_modal_summary">Veja seus principais podcasts, categorias, estatísticas de reprodução e muito mais. Compartilhe com amigos e divulgue seus criadores favoritos!</string>
     <string name="end_of_year_launch_modal_title">Seu ano em podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
