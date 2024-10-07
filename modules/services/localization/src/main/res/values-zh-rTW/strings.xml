@@ -630,7 +630,6 @@ Language: zh_TW
     <string name="filter_x_not_found">找不到篩選條件「%1$s」</string>
     <string name="must_provide_filter_name">必須提供篩選條件名稱</string>
     <string name="end_of_year_launch_modal_secondary_button_title">先不要</string>
-    <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2023 年</string>
     <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。和朋友分享這些資訊，並向你最喜愛的創作者表達敬意！</string>
     <string name="end_of_year_launch_modal_title">你的 Podcast 年度回顧</string>
     <string name="settings_app_icon_halloween">萬聖節</string>

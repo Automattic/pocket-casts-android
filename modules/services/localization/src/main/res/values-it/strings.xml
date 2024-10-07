@@ -630,7 +630,6 @@ Language: it
     <string name="filter_x_not_found">Filtro %1$s non trovato</string>
     <string name="must_provide_filter_name">Devi fornire un nome del filtro</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Non ora</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visualizza il mio 2023</string>
     <string name="end_of_year_launch_modal_summary">Visualizza i tuoi podcast principali, le categorie, le statistiche di ascolto e molto altro ancora. Condividi con gli amici e ringrazia pubblicamente i tuoi creatori preferiti!</string>
     <string name="end_of_year_launch_modal_title">Il tuo anno in podcast</string>
     <string name="settings_app_icon_halloween">Halloween</string>

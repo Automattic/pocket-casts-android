@@ -630,7 +630,6 @@ Language: ko_KR
     <string name="filter_x_not_found">%1$s 필터 찾을 수 없음</string>
     <string name="must_provide_filter_name">필터 이름을 제공해야 함</string>
     <string name="end_of_year_launch_modal_secondary_button_title">나중에</string>
-    <string name="end_of_year_launch_modal_primary_button_title">내 2023년 보기</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="end_of_year_launch_modal_title">회원님의 팟캐스트 원년</string>
     <string name="settings_app_icon_halloween">핼러윈</string>

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.views
+package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,16 +29,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val PromptCardSummaryTextAlpha = 0.7f
 private val PromptCardCornerSize = 8.dp
 private val PromptCardImageSize = 150.dp
-
-private val LightThemeBackgroundColor = R.color.black_26
-private val DarkThemeBackgroundColor = R.color.black_34
 
 @Composable
 fun EndOfYearPromptCard(
@@ -53,11 +49,7 @@ fun EndOfYearPromptCard(
             modifier = modifier
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .clip(RoundedCornerShape(PromptCardCornerSize))
-                .background(
-                    color = colorResource(
-                        if (MaterialTheme.theme.isLight) LightThemeBackgroundColor else DarkThemeBackgroundColor,
-                    ),
-                )
+                .background(color = Color.Black)
                 .clickable { onClick.invoke() },
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -81,7 +73,7 @@ fun EndOfYearPromptCard(
                 )
             }
             Image(
-                painter = painterResource(R.drawable.img_23),
+                painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_logo_foreground),
                 contentDescription = null,
                 modifier = modifier
                     .size(PromptCardImageSize)

@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
@@ -79,6 +79,7 @@ fun BottomSheetContent(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colors.background)
             .padding(ContentPadding),
         contentAlignment = Alignment.TopCenter,
     ) {
@@ -133,7 +134,7 @@ fun Pill(
 private fun SummaryText(content: BottomSheetContentState.Content) {
     TextH50(
         text = content.summaryText,
-        color = MaterialTheme.theme.colors.primaryText02,
+        color = MaterialTheme.theme.colors.primaryText01,
         textAlign = TextAlign.Center,
     )
 }
@@ -182,7 +183,7 @@ private fun DismissButton(
 private fun BottomSheetContentPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    AppThemeWithBackground(themeType) {
+    AppTheme(themeType) {
         BottomSheetContent(
             state = BottomSheetContentState(
                 content = BottomSheetContentState.Content(

@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
@@ -75,7 +76,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
-import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
+import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -706,18 +707,20 @@ class MainActivity :
             ComposeView(viewGroup.context).apply {
                 setContent {
                     val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
-                    EndOfYearLaunchBottomSheet(
-                        parent = viewGroup,
-                        shouldShow = shouldShow,
-                        onClick = {
-                            showStoriesOrAccount(StoriesSource.MODAL.value)
-                        },
-                        onExpanded = {
-                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
-                            settings.setEndOfYearShowModal(false)
-                            viewModel.updateStoriesModalShowState(false)
-                        },
-                    )
+                    AppTheme(theme.activeTheme) {
+                        EndOfYearLaunchBottomSheet(
+                            parent = viewGroup,
+                            shouldShow = shouldShow,
+                            onClick = {
+                                showStoriesOrAccount(StoriesSource.MODAL.value)
+                            },
+                            onExpanded = {
+                                analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
+                                settings.setEndOfYearShowModal(false)
+                                viewModel.updateStoriesModalShowState(false)
+                            },
+                        )
+                    }
                 }
             },
         )

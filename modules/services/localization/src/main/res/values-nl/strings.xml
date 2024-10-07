@@ -622,7 +622,6 @@ Language: nl
     <string name="filter_x_not_found">Filter %1$s niet gevonden</string>
     <string name="must_provide_filter_name">Je moet een filternaam opgeven</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Niet nu</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Mijn 2023 bekijken</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
