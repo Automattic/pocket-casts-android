@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.toCircle
 import com.airbnb.lottie.LottieAnimationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -157,12 +158,13 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
         viewModel.seekStarted()
     }
 
-    override fun onSeekPositionChanging(progress: Int) {
+    override fun onSeekPositionChanging(progress: Duration) {
     }
 
-    override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
-        viewModel.seekToMs(progress)
-        playbackManager.trackPlaybackSeek(progress, SourceView.FULL_SCREEN_VIDEO)
+    override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
+        val progressMs = progress.inWholeMilliseconds.toInt()
+        viewModel.seekToMs(progressMs)
+        playbackManager.trackPlaybackSeek(progressMs, SourceView.FULL_SCREEN_VIDEO)
         seekComplete()
     }
 }

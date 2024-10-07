@@ -42,7 +42,7 @@ class DurationUtilTest {
 
         val text = duration.toHhMmSs()
 
-        assertEquals("01:00:00", text)
+        assertEquals("1:00:00", text)
     }
 
     @Test
@@ -122,5 +122,14 @@ class DurationUtilTest {
         val text = duration.toSecondsWithSingleMilli()
 
         assertEquals("1", text)
+    }
+
+    @Test
+    fun `negative duration`() {
+        val mmSs = -15.minutes - 7.seconds
+        val hhMmSs = -2.hours - 15.minutes - 7.seconds
+
+        assertEquals("-15:07", mmSs.toHhMmSs())
+        assertEquals("-2:15:07", hhMmSs.toHhMmSs())
     }
 }

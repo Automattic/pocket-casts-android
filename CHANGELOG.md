@@ -3,6 +3,8 @@
 *   Updates
     *   Add an advanced setting to display artwork in episode listing
         ([#2958](https://github.com/Automattic/pocket-casts-android/pull/2958))
+    *   Display remaining playback time using skipped chapters and playback speed
+        ([#2955](https://github.com/Automattic/pocket-casts-android/pull/2955))
 *   Bug Fixes
     *   Speed up listening history search
         ([#2979](https://github.com/Automattic/pocket-casts-android/pull/2979))
