@@ -288,6 +288,7 @@ abstract class EpisodeDao {
           AND (UPPER(podcast_episodes.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\'
                OR UPPER(podcasts.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\')
         ORDER BY last_playback_interaction_date DESC
+        LIMIT 100
     """,
     )
     abstract fun filteredPlaybackHistoryFlow(query: String): Flow<List<PodcastEpisode>>
