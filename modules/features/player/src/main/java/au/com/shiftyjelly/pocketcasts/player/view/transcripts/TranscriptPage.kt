@@ -248,7 +248,7 @@ private fun ScrollableTranscriptView(
         ),
     ) {
         SelectionContainer {
-            if (state.showInWebView) {
+            if (state.showAsWebPage) {
                 TranscriptWebView(state, transitionState)
             } else {
                 LazyColumn(
