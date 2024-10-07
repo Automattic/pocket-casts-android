@@ -235,6 +235,8 @@ class TranscriptViewModel @Inject constructor(
                     cuesInfo.isNotEmpty() && cuesInfo[0].cuesWithTiming.cues.any {
                         it.text?.contains("<script type=\"text/javascript\">") ?: false
                     }
+
+            val showSearch = !showAsWebPage
         }
 
         data class Error(

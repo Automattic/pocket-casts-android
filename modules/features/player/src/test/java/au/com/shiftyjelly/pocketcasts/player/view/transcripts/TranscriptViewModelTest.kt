@@ -155,7 +155,7 @@ class TranscriptViewModelTest {
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
         viewModel.uiState.test {
-            assertTrue((awaitItem() as UiState.TranscriptLoaded).showInWebView)
+            assertTrue((awaitItem() as UiState.TranscriptLoaded).showAsWebPage)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -168,7 +168,7 @@ class TranscriptViewModelTest {
         viewModel.parseAndLoadTranscript(isTranscriptViewOpen = true)
 
         viewModel.uiState.test {
-            assertFalse((awaitItem() as UiState.TranscriptLoaded).showInWebView)
+            assertFalse((awaitItem() as UiState.TranscriptLoaded).showAsWebPage)
             cancelAndConsumeRemainingEvents()
         }
     }
