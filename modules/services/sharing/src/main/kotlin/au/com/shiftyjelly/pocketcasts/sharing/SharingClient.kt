@@ -335,7 +335,7 @@ data class SharingRequest internal constructor(
                 referralsOfferInfo = referralsOfferInfo,
             ),
         )
-            .setAnalyticsEvent(AnalyticsEvent.REFERRAL_LINK_SHARED)
+            .setAnalyticsEvent(AnalyticsEvent.REFERRAL_PASS_SHARED)
             .setAnalyticProperties(mapOf("code" to referralCode))
     }
 

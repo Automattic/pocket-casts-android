@@ -72,6 +72,7 @@ private fun Content(
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         OnboardingFlow.InitialOnboarding,
         OnboardingFlow.EngageSdk,
+        OnboardingFlow.ReferralLoginOrSignUp,
         -> OnboardingNavRoute.logInOrSignUp
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
@@ -82,10 +83,14 @@ private fun Content(
     }
 
     val onAccountCreated = {
-        navController.navigate(OnboardingRecommendationsFlow.route) {
-            // clear backstack after account is created
-            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                inclusive = true
+        if (flow is OnboardingFlow.ReferralLoginOrSignUp) {
+            exitOnboarding(OnboardingExitInfo())
+        } else {
+            navController.navigate(OnboardingRecommendationsFlow.route) {
+                // clear backstack after account is created
+                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                    inclusive = true
+                }
             }
         }
     }
@@ -133,6 +138,7 @@ private fun Content(
                         OnboardingFlow.InitialOnboarding,
                         OnboardingFlow.LoggedOut,
                         OnboardingFlow.EngageSdk,
+                        OnboardingFlow.ReferralLoginOrSignUp,
                         -> exitOnboarding(OnboardingExitInfo())
                     }
                 },
@@ -285,7 +291,8 @@ private fun onLoginToExistingAccount(
         OnboardingFlow.LoggedOut,
         OnboardingFlow.EngageSdk,
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
-
+        OnboardingFlow.ReferralLoginOrSignUp,
+        -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = false))
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
         OnboardingFlow.PlusAccountUpgradeNeedsLogin,

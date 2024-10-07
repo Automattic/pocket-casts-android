@@ -30,11 +30,67 @@ private class MockingProductDetailsInterceptor : ProductDetailsInterceptor {
             .build()
         private val products
             get() = listOf(
+                yearlyTestPlusProduct,
                 yearlyPlusProduct,
                 yearlyPatronProduct,
                 monthlyPlusProduct,
                 monthlyPatronProduct,
             )
+        val yearlyTestPlusProduct = ProductDetails(
+            """
+            |{
+            |  "productId": "com.pocketcasts.plus.testfreetrialoffer",
+            |  "type": "subs",
+            |  "title": "Test Subscription (Pocket Casts - Podcast Player)",
+            |   "name": "Test Subscription",
+            |   "localizedIn": [
+            |    "en-US"
+            |  ],
+            |  "skuDetailsToken": "test-yearly-plus-sku-details-token",
+            |  "subscriptionOfferDetails": [
+            |    {
+            |      "offerIdToken": "test-yearly-plus-offer-id-token",
+            |      "basePlanId": "testyearly",
+            |      "offerId": "2-months-free",
+            |      "pricingPhases": [
+            |        {
+            |          "priceAmountMicros": 0,
+            |          "priceCurrencyCode": "USD",
+            |          "formattedPrice": "Free",
+            |          "billingPeriod": "P2M",
+            |          "recurrenceMode": 2,
+            |          "billingCycleCount": 1
+            |        },
+            |        {
+            |          "priceAmountMicros": 39990000,
+            |          "priceCurrencyCode": "USD",
+            |          "formattedPrice": "$39.99",
+            |          "billingPeriod": "P1Y",
+            |          "recurrenceMode": 1
+            |        }
+            |      ],
+            |      "offerTags": [
+            |        "referral-offer"
+            |      ]
+            |    },
+            |    {
+            |      "offerIdToken": "test-yearly-plus-base-offer-id-token",
+            |      "basePlanId": "testyearly",
+            |      "pricingPhases": [
+            |        {
+            |          "priceAmountMicros": 39990000,
+            |          "priceCurrencyCode": "USD",
+            |          "formattedPrice": "$39.99",
+            |          "billingPeriod": "P1Y",
+            |          "recurrenceMode": 1
+            |        }
+            |      ],
+            |      "offerTags": []
+            |    }
+            |  ]
+            |}
+        """.trimMargin("|"),
+        )
         val yearlyPlusProduct = ProductDetails(
             """
             |{

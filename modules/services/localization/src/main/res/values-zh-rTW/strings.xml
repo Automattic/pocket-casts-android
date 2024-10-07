@@ -6,8 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
-    <string name="referrals_share_text">嗨！ 使用下方連結領取你的 2 個月 Pocket Casts Plus 訪客體驗券，在所有裝置上盡情暢聽 Podcast！</string>
-    <string name="referrals_share_subject">2 個月 Pocket Casts 訪客體驗券</string>
     <string name="referrals_invalid_offer_title">此優惠無法使用</string>
     <string name="referrals_invalid_offer_description">此訪客體驗券僅供兌換一次，可供尚未啟用 Plus 或 Patron 訂閱服務的使用者使用。 感謝聆聽！</string>
     <string name="referrals_claim_guest_pass_title">領取你的 2 個月訪客體驗券</string>

@@ -6,8 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
-    <string name="referrals_share_text">Ciao! Utilizza il seguente link per ottenere il tuo pass per ospiti da 2 mesi per Pocket Casts Plus e goditi i podcast in tutti i tuoi dispositivi!</string>
-    <string name="referrals_share_subject">Pass per ospiti da 2 mesi per Pocket Casts</string>
     <string name="referrals_invalid_offer_title">Questa offerta non è disponibile</string>
     <string name="referrals_invalid_offer_description">Questo pass per ospiti può essere riscattato solo una volta ed è disponibile per chi non ha un abbonamento Plus o Patron attivo. Grazie per l\'ascolto!</string>
     <string name="referrals_claim_guest_pass_title">Riscatta il tuo pass per ospiti da 2 mesi</string>

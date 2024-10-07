@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,11 +29,14 @@ import androidx.compose.ui.unit.min
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -46,23 +50,35 @@ fun ReferralsClaimGuestPassBannerCard(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val activity = LocalContext.current.getActivity()
 
-    ReferralsClaimGuestPassBannerCard(
-        state = state,
-        modifier = modifier,
-        onClick = {
-            val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim)
-            (activity as FragmentHostListener).showBottomSheet(fragment)
-        },
-    )
+    CallOnce {
+        viewModel.onBannerShown()
+    }
 
-    activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name)?.let {
-        (activity as FragmentHostListener).showBottomSheet(it)
+    when (state) {
+        UiState.Loading -> Unit
+        is UiState.Loaded -> {
+            val loadedState = state as UiState.Loaded
+            ReferralsClaimGuestPassBannerCard(
+                state = loadedState,
+                modifier = modifier,
+                onClick = {
+                    val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim)
+                    (activity as FragmentHostListener).showBottomSheet(fragment)
+                },
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name)?.let {
+            (activity as FragmentHostListener).showBottomSheet(it)
+        }
     }
 }
 
 @Composable
 private fun ReferralsClaimGuestPassBannerCard(
-    state: ReferralsViewModel.UiState,
+    state: UiState.Loaded,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -95,7 +111,10 @@ private fun ReferralsClaimGuestPassBannerCard(
                         LR.string.referrals_claim_guess_pass_banner_card_title
                     }
                     TextH40(
-                        text = stringResource(textResId, state.referralsOfferInfo.localizedOfferDurationAdjective),
+                        text = stringResource(
+                            textResId,
+                            requireNotNull(state.referralsOfferInfo).localizedOfferDurationAdjective,
+                        ),
                     )
 
                     Spacer(modifier = modifier.height(8.dp))
@@ -113,7 +132,7 @@ private fun ReferralsClaimGuestPassBannerCard(
                         .width(guestPassCardWidth)
                         .height(guestPassCardWidth * ReferralGuestPassCardDefaults.cardAspectRatio),
                     source = ReferralGuestPassCardViewSource.ProfileBanner,
-                    referralsOfferInfo = state.referralsOfferInfo,
+                    referralsOfferInfo = requireNotNull(state.referralsOfferInfo),
                 )
             }
         }
@@ -127,7 +146,10 @@ private fun ReferralsClaimGuestPassBannerCardPreview(
 ) {
     AppTheme(themeType) {
         ReferralsClaimGuestPassBannerCard(
-            state = ReferralsViewModel.UiState(showProfileBanner = true),
+            state = UiState.Loaded(
+                showProfileBanner = true,
+                referralsOfferInfo = ReferralsOfferInfoMock,
+            ),
             onClick = {},
         )
     }

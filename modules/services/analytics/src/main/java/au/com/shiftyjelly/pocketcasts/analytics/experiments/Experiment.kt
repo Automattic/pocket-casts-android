@@ -1,7 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.analytics.experiments
 
-enum class Experiment(val identifier: String) {
-    PaywallAATest("pocketcasts_paywall_android_aa_test"),
+interface ExperimentType {
+    val identifier: String
+}
+
+enum class Experiment(override val identifier: String) : ExperimentType {
+    PaywallUpgradeABTest("pocketcasts_paywall_upgrade_android_ab_test"),
     ;
 
     companion object {

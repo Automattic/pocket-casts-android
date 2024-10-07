@@ -6,8 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
-    <string name="referrals_share_text">您好！ 点击下方链接领取 2 个月的 Pocket Casts Plus 访客通行证，即可在所有设备上收听播客！</string>
-    <string name="referrals_share_subject">2 个月的 Pocket Casts 访客通行证</string>
     <string name="referrals_invalid_offer_title">此优惠不可用</string>
     <string name="referrals_invalid_offer_description">该访客通行证仅可兑换一次，适用于未激活 Plus 或 Patron 订阅的用户。 感谢收听！</string>
     <string name="referrals_claim_guest_pass_title">领取您的 2 个月访客通行证</string>
