@@ -50,6 +50,13 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
     }
 
+    fun onLimitDownloadsChange(newValue: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_TOGGLED,
+            mapOf("value" to newValue),
+        )
+    }
+
     fun stopAllDownloads() {
         downloadManager.stopAllDownloads()
         analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS)

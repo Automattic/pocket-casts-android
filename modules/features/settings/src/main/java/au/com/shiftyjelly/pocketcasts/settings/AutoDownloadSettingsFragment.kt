@@ -178,6 +178,8 @@ class AutoDownloadSettingsFragment :
 
                     settings.autoDownloadLimit.set(autoDownloadLimitSetting, updateModifiedAt = true)
 
+                    viewModel.onLimitDownloadsChange(autoDownloadLimitSetting.analyticsString)
+
                     changeAutoDownloadLimitSummary()
                     true
                 }
