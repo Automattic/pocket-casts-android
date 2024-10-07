@@ -9,14 +9,15 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
+import jakarta.inject.Inject
 import java.time.Period
 import java.time.format.DateTimeParseException
 
-object SubscriptionMapper {
+class SubscriptionMapper @Inject constructor() {
     fun map(
         productDetails: ProductDetails,
-        isOfferEligible: Boolean,
-        referralProductDetails: ReferralProductDetails?,
+        isOfferEligible: Boolean = false,
+        referralProductDetails: ReferralProductDetails? = null,
     ): Subscription? {
         val matchingSubscriptionOfferDetails = if (isOfferEligible || referralProductDetails != null) {
             productDetails
@@ -106,6 +107,7 @@ object SubscriptionMapper {
                     )
                     null
                 }
+
                 1 -> first()
                 else -> {
                     LogBuffer.e(
@@ -164,9 +166,11 @@ object SubscriptionMapper {
             null
         }
 
-    fun mapProductIdToTier(productId: String) = when (productId) {
-        in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
-        in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
-        else -> SubscriptionTier.UNKNOWN
+    companion object {
+        fun mapProductIdToTier(productId: String) = when (productId) {
+            in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
+            in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
+            else -> SubscriptionTier.UNKNOWN
+        }
     }
 }

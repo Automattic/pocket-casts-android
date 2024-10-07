@@ -125,12 +125,6 @@ sealed interface Subscription {
         const val INTRO_OFFER_ID = "plus-yearly-intro-50percent"
         const val REFERRAL_OFFER_ID = "plus-yearly-referral-two-months-free"
 
-        fun fromProductDetails(
-            productDetails: ProductDetails,
-            isOfferEligible: Boolean = false,
-            referralProductDetails: ReferralProductDetails? = null,
-        ): Subscription? =
-            SubscriptionMapper.map(productDetails, isOfferEligible, referralProductDetails)
         fun filterOffers(subscriptions: List<Subscription>): List<Subscription> {
             val offers = subscriptions.count { it is WithOffer }
             val hasIntro = subscriptions.any { it is Intro }
