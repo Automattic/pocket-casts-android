@@ -54,6 +54,7 @@ tasker-plugin = "0.4.10"
 test = "1.6.1"
 tracks = "6.0.2"
 wear-compose = "1.3.1"
+webkit = "1.12.0"
 work = "2.9.1"
 
 [libraries]
@@ -238,6 +239,9 @@ wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation",
 wear-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "wear-compose" }
 wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "wear-compose" }
 
+# Webkit
+androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
+
 # Work Manager
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 work-rx2 = { module = "androidx.work:work-rxjava2", version.ref = "work" }
@@ -260,6 +264,7 @@ androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.3.0"
 androidx-viewpager = "androidx.viewpager2:viewpager2:1.1.0"
 barista = "com.adevinta.android:barista:4.3.0"
 capturable = "dev.shreyaspatil:capturable:2.1.0"
+compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.2"
 device-names = "com.jaredrummler:android-device-names:2.1.1"
 encryptedlogging = "com.automattic:encryptedlogging:0.0.1"
