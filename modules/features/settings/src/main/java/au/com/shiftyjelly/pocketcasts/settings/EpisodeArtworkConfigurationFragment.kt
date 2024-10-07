@@ -129,5 +129,6 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
         ArtworkConfiguration.Element.Starred -> LR.string.profile_navigation_starred
         ArtworkConfiguration.Element.Bookmarks -> LR.string.bookmarks
         ArtworkConfiguration.Element.ListeningHistory -> LR.string.profile_navigation_listening_history
+        ArtworkConfiguration.Element.Podcasts -> LR.string.podcasts
     }
 }

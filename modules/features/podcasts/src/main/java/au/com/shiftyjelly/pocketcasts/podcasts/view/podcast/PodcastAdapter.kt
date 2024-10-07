@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.adapter.TabsViewHold
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -226,14 +227,18 @@ class PodcastAdapter(
             VIEW_TYPE_NO_BOOKMARK -> NoBookmarkViewHolder(ComposeView(parent.context), theme, onHeadsetSettingsClicked)
             else -> EpisodeViewHolder(
                 binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
-                viewMode = EpisodeViewHolder.ViewMode.NoArtwork,
+                viewMode = if (settings.artworkConfiguration.value.useEpisodeArtwork(ArtworkConfiguration.Element.Podcasts)) {
+                    EpisodeViewHolder.ViewMode.Artwork
+                } else {
+                    EpisodeViewHolder.ViewMode.NoArtwork
+                },
                 downloadProgressUpdates = downloadManager.progressUpdateRelay,
                 playbackStateUpdates = playbackManager.playbackStateRelay,
                 upNextChangesObservable = upNextQueue.changesObservable,
                 imageRequestFactory = imageRequestFactory.smallSize(),
                 settings = settings,
                 swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                artworkContext = null,
+                artworkContext = ArtworkConfiguration.Element.Podcasts,
             )
         }
     }

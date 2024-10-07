@@ -155,6 +155,8 @@ enum class AnalyticsEvent(val key: String) {
     UPLOADED_FILES_MULTI_SELECT_EXITED("uploaded_files_multi_select_exited"),
     UPLOADED_FILES_SORT_BY_CHANGED("uploaded_files_sort_by_changed"),
     UPLOADED_FILES_ADD_FILE_TAPPED("uploaded_files_add_file_tapped"),
+    UPLOADED_FILES_INVALID_FILE_ERROR("uploaded_files_invalid_file_error"),
+    UPLOADED_FILES_UPLOAD_FAILED("uploaded_files_upload_failed"),
 
     /* User File Details View */
     USER_FILE_DETAIL_SHOWN("user_file_detail_shown"),
@@ -328,6 +330,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
     PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
     PLAYER_SLEEP_TIMER_RESTARTED("player_sleep_timer_restarted"),
+    PLAYER_SLEEP_TIMER_SETTINGS_TAPPED("player_sleep_timer_settings_tapped"),
 
     /* Player - Playback effects */
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
@@ -652,5 +655,15 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
 
     /* Referrals */
-    REFERRAL_LINK_SHARED("referral_link_shared"),
+    REFERRAL_TOOLTIP_SHOWN("referral_tooltip_shown"),
+    REFERRAL_TOOLTIP_TAPPED("referral_tooltip_tapped"),
+    REFERRAL_SHARE_SCREEN_SHOWN("referral_share_screen_shown"),
+    REFERRAL_SHARE_SCREEN_DISMISSED("referral_share_screen_dismissed"),
+    REFERRAL_PASS_SHARED("referral_pass_shared"),
+    REFERRAL_CLAIM_SCREEN_SHOWN("referral_claim_screen_shown"),
+    REFERRAL_ACTIVATE_TAPPED("referral_activate_tapped"),
+    REFERRAL_NOT_NOW_TAPPED("referral_not_now_tapped"),
+    REFERRAL_PASS_BANNER_SHOWN("referral_pass_banner_shown"),
+    REFERRAL_PURCHASE_SHOWN("referral_purchase_shown"),
+    REFERRAL_PURCHASE_SUCCESS("referral_purchase_success"),
 }

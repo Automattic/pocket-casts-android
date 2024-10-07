@@ -6,6 +6,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
@@ -51,6 +53,8 @@ class UserManagerImpl @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashLogging: CrashLogging,
+    private val experimentProvider: ExperimentProvider,
+    private val accountManager: AccountManagerStatusInfo,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -109,21 +113,23 @@ class UserManagerImpl @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
             subscriptionManager.clearCachedStatus()
             syncManager.signOut {
-                settings.clearPlusPreferences()
                 applicationScope.launch {
+                    settings.clearPlusPreferences()
+
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
+
+                    settings.marketingOptIn.set(false, updateModifiedAt = false)
+                    settings.setEndOfYearShowModal(true)
+
+                    analyticsTracker.track(
+                        AnalyticsEvent.USER_SIGNED_OUT,
+                        mapOf(KEY_USER_INITIATED to wasInitiatedByUser),
+                    )
+                    analyticsTracker.flush()
+                    analyticsTracker.clearAllData()
+                    analyticsTracker.refreshMetadata()
+                    experimentProvider.refreshExperiments()
                 }
-
-                settings.marketingOptIn.set(false, updateModifiedAt = false)
-                settings.setEndOfYearShowModal(true)
-
-                analyticsTracker.track(
-                    AnalyticsEvent.USER_SIGNED_OUT,
-                    mapOf(KEY_USER_INITIATED to wasInitiatedByUser),
-                )
-                analyticsTracker.flush()
-                analyticsTracker.clearAllData()
-                analyticsTracker.refreshMetadata()
             }
         }
         settings.setFullySignedOut(true)

@@ -66,6 +66,7 @@ class SleepTimerRestartWhenShakingDevice @Inject constructor(
         if (settings.shakeToResetSleepTimer.value) {
             val time = sleepTimer.restartTimerIfIsRunning onSuccess@{
                 playbackManager.updateSleepTimerStatus(sleepTimeRunning = true)
+                playbackManager.restorePlayerVolume()
 
                 if (context.isAppForeground()) {
                     Toast.makeText(

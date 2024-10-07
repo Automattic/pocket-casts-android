@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-10 09:54:03+0000
+Translation-Revision-Date: 2024-09-26 13:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="referrals_invalid_offer_title">此優惠無法使用</string>
+    <string name="referrals_invalid_offer_description">此訪客體驗券僅供兌換一次，可供尚未啟用 Plus 或 Patron 訂閱服務的使用者使用。 感謝聆聽！</string>
+    <string name="referrals_claim_guest_pass_title">領取你的 2 個月訪客體驗券</string>
+    <string name="referrals_claim_guest_pass_description">此優惠僅供新會員使用。 會員資格會以 %s的價格自動續訂為付費年度會員。</string>
+    <string name="referrals_activate_my_pass">啟用我的體驗券</string>
+    <string name="referrals_tooltip_message">贈送 2 個月 Pocket Casts Plus 體驗！</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">解鎖完整聆聽體驗</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">領取你的 2 個月 Plus 訪客體驗券</string>
+    <string name="referrals_share_guest_pass">分享訪客體驗券</string>
+    <string name="referrals_send_guest_pass_card_title">2 個月訪客體驗券</string>
+    <string name="referrals_send_guest_pass_title">贈送 2 個月 Pocket Casts Plus 體驗</string>
+    <string name="move_down">下移</string>
+    <string name="move_up">上移</string>
+    <string name="search_episodes_not_found_summary">找不到符合搜尋內容的單集。 請嘗試其他關鍵字。</string>
+    <string name="search_episodes_not_found_title">找不到任何單集</string>
     <string name="transcript_error_not_available">不好意思，此單集不提供逐字稿。</string>
     <string name="paywall_layout_reviews_review_six_date">3 月 8 日</string>
     <string name="paywall_layout_reviews_review_six_message">這幾年來電腦一直是我的必備工具。 我嘗試過其他 Podcast 應用程式，但總是會回頭使用電腦，因為電腦用起來較簡單，加上其 UI 設計及支援服務。 絕對值得一試，要是你對目前的 Podcast 應用程式感到厭倦，那尤其更該試試。</string>

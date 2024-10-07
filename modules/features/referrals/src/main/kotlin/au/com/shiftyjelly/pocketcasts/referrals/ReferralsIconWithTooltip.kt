@@ -17,13 +17,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.LocalColors
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -35,19 +39,29 @@ fun ReferralsIconWithTooltip(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val activity = LocalContext.current.getActivity()
-    ReferralsIconWithTooltip(
-        state = state,
-        onIconClick = {
-            viewModel.onIconClick()
-            val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send)
-            (activity as FragmentHostListener).showBottomSheet(fragment)
-        },
-    )
+
+    CallOnce {
+        viewModel.onTooltipShown()
+    }
+
+    when (state) {
+        UiState.Loading -> Unit
+        is UiState.Loaded -> {
+            ReferralsIconWithTooltip(
+                state = state as UiState.Loaded,
+                onIconClick = {
+                    viewModel.onIconClick()
+                    val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send)
+                    (activity as FragmentHostListener).showBottomSheet(fragment)
+                },
+            )
+        }
+    }
 }
 
 @Composable
 private fun ReferralsIconWithTooltip(
-    state: ReferralsViewModel.UiState,
+    state: UiState.Loaded,
     onIconClick: () -> Unit,
 ) {
     if (state.showIcon) {
@@ -59,20 +73,26 @@ private fun ReferralsIconWithTooltip(
         Tooltip(
             show = state.showTooltip,
         ) {
-            TooltipContent()
+            state.referralsOfferInfo?.let {
+                TooltipContent(
+                    referralsOfferInfo = it,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun TooltipContent() {
+private fun TooltipContent(
+    referralsOfferInfo: ReferralsOfferInfo,
+) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .padding(top = 24.dp, bottom = 16.dp),
     ) {
         TextH40(
-            text = stringResource(LR.string.referrals_tooltip_message),
+            text = stringResource(LR.string.referrals_tooltip_message, referralsOfferInfo.localizedOfferDurationNoun.lowercase()),
         )
     }
 }
@@ -112,6 +132,8 @@ fun TooltipContentPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        TooltipContent()
+        TooltipContent(
+            referralsOfferInfo = ReferralsOfferInfoMock,
+        )
     }
 }

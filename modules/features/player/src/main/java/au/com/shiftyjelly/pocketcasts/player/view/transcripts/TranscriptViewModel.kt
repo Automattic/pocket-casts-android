@@ -105,7 +105,7 @@ class TranscriptViewModel @Inject constructor(
                                 podcastAndEpisode = it,
                                 analyticsProp = buildMap {
                                     put("type", transcript.type)
-                                    put("show_in_webview", loaded.showInWebView.toString())
+                                    put("show_as_webpage", loaded.showAsWebPage.toString())
                                 },
                             )
                         }
@@ -230,12 +230,11 @@ class TranscriptViewModel @Inject constructor(
             val cuesInfo: List<TranscriptCuesInfo>,
         ) : UiState() {
             val isTranscriptEmpty: Boolean = cuesInfo.isEmpty()
-            val showInWebView: Boolean
+            val showAsWebPage: Boolean
                 get() = transcript.type == TranscriptFormat.HTML.mimeType &&
                     cuesInfo.isNotEmpty() && cuesInfo[0].cuesWithTiming.cues.any {
                         it.text?.contains("<script type=\"text/javascript\">") ?: false
                     }
-            val showSearch = !showInWebView
         }
 
         data class Error(

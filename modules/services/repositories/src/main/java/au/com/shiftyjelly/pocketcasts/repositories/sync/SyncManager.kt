@@ -104,7 +104,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void>
 
     // Referral
-    suspend fun getReferralCode(): ReferralCodeResponse
-    suspend fun validateReferralCode(code: String): ReferralValidationResponse
-    suspend fun redeemReferralCode(code: String): ReferralRedemptionResponse
+    suspend fun getReferralCode(): Response<ReferralCodeResponse>
+    suspend fun validateReferralCode(code: String): Response<ReferralValidationResponse>
+    suspend fun redeemReferralCode(code: String): Response<ReferralRedemptionResponse>
 }

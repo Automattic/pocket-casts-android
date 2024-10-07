@@ -30,7 +30,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coroutines.core)
-    implementation(libs.firebase.config.ktx)
+    implementation(libs.firebase.config)
     implementation(libs.play.cast)
     implementation(libs.timber)
 

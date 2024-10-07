@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-11 15:54:03+0000
+Translation-Revision-Date: 2024-09-25 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="referrals_invalid_offer_title">Dieses Angebot ist nicht verfügbar</string>
+    <string name="referrals_invalid_offer_description">Dieser Gastpass kann nur einmal eingelöst werden und steht nur Personen ohne aktives Plus- oder Patron-Abonnement zur Verfügung. Danke fürs Zuhören!</string>
+    <string name="referrals_claim_guest_pass_title">Sichere dir deinen 2-monatigen Gastpass</string>
+    <string name="referrals_claim_guest_pass_description">Dieses Angebot gilt nur für neue Mitglieder. Die Mitgliedschaft wird automatisch zu einer kostenpflichtigen jährlichen Mitgliedschaft in Höhe von %s verlängert.</string>
+    <string name="referrals_activate_my_pass">Meinen Pass aktivieren</string>
+    <string name="referrals_tooltip_message">Verschenke 2 Monate Pocket Casts Plus!</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Profitiere vom vollständigen Audioerlebnis</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Sichere dir deinen 2-monatigen Gastpass für Plus</string>
+    <string name="referrals_share_guest_pass">Gastpass teilen</string>
+    <string name="referrals_send_guest_pass_card_title">Gastpass für 2 Monate</string>
+    <string name="referrals_send_guest_pass_title">Verschenke 2 Monate Pocket Casts Plus</string>
+    <string name="move_down">Nach unten verschieben</string>
+    <string name="move_up">Nach oben verschieben</string>
+    <string name="search_episodes_not_found_summary">Wir konnten keine Folge für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
+    <string name="search_episodes_not_found_title">Keine Folgen gefunden</string>
     <string name="transcript_error_not_available">Für diese Folge ist kein Transkript verfügbar.</string>
     <string name="paywall_layout_reviews_review_six_date">8. März</string>
     <string name="paywall_layout_reviews_review_six_message">Ich nutze seit Jahren Pocket Casts. Zwar habe ich andere Podcast-Apps ausprobiert, aber ich kehre immer wieder zu Pocket Casts zurück. Die App ist unkompliziert, die Benutzeroberfläche ansprechend und der Support hervorragend. Man sollte sich die App auf jeden Fall angesehen haben, besonders, wenn man mit der derzeitigen Podcast-App nicht zufrieden ist.</string>

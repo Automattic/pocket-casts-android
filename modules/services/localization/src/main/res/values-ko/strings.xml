@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-12 09:54:03+0000
+Translation-Revision-Date: 2024-09-26 09:54:07+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="referrals_invalid_offer_title">이 혜택을 이용하실 수 없습니다.</string>
+    <string name="referrals_invalid_offer_description">이 비회원 패스는 한 번만 사용할 수 있으며, Plus 또는 Patron 구독이 활성화되어 있지 않아도 사용 가능합니다. 애청해 주셔서 감사합니다!</string>
+    <string name="referrals_claim_guest_pass_title">비회원 패스 2개월권 받기</string>
+    <string name="referrals_claim_guest_pass_description">이 혜택은 신규 회원에게만 제공됩니다. 멤버십은 %s의 유료 연간 멤버십으로 자동 갱신됩니다.</string>
+    <string name="referrals_activate_my_pass">내 패스 활성화</string>
+    <string name="referrals_tooltip_message">Pocket Casts Plus 2개월권을 선물하세요!</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">모든 기능을 갖춘 청취 환경 이용하기</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Plus 혜택이 제공되는 비회원 패스 2개월권 받기</string>
+    <string name="referrals_share_guest_pass">비회원 패스 공유</string>
+    <string name="referrals_send_guest_pass_card_title">2개월 비회원 패스</string>
+    <string name="referrals_send_guest_pass_title">Pocket Casts Plus 2개월권 선물하기</string>
+    <string name="move_down">아래로 이동</string>
+    <string name="move_up">위로 이동</string>
+    <string name="search_episodes_not_found_summary">해당 검색에 대한 에피소드를 찾을 수 없습니다. 다른 키워드를 사용해 보세요.</string>
+    <string name="search_episodes_not_found_title">에피소드를 찾을 수 없음</string>
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에 대본을 사용할 수 없습니다.</string>
     <string name="paywall_layout_reviews_review_six_date">3월 8일</string>
     <string name="paywall_layout_reviews_review_six_message">PC는 저의 오랜 동반자입니다. 다른 팟캐스트 앱을 사용하다가 언제나 단순성, Ul 및 지원 때문에 PC로 되돌아왔습니다. 특히 현재 팟캐스트 앱에 지쳤다면 분명히 확인해 볼 만한 가치가 있습니다.</string>

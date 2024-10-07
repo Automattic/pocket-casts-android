@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
@@ -440,14 +441,15 @@ class SharingAnalyticsTest {
     @Test
     fun `log referral link sharing`() {
         val referralCode = "TEST_CODE"
-        val request = SharingRequest.referralLink(referralCode)
+        val referralsOfferInfo = ReferralsOfferInfoMock
+        val request = SharingRequest.referralLink(referralCode, referralsOfferInfo)
             .setSourceView(SourceView.REFERRALS)
             .build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
 
-        event.assertType(AnalyticsEvent.REFERRAL_LINK_SHARED)
+        event.assertType(AnalyticsEvent.REFERRAL_PASS_SHARED)
         event.assertProperties(
             mapOf(
                 "code" to referralCode,

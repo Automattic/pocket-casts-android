@@ -20,6 +20,7 @@ data class ArtworkConfiguration(
         Starred("starred"),
         Bookmarks("bookmarks"),
         ListeningHistory("listening_history"),
+        Podcasts("podcasts"),
         ;
 
         companion object {

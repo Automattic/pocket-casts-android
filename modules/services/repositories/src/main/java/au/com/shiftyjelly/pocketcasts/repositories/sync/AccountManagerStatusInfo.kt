@@ -8,11 +8,12 @@ import javax.inject.Inject
 class AccountManagerStatusInfo @Inject constructor(
     private val accountManager: AccountManager,
 ) : AccountStatusInfo {
-    fun getAccount() = accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE).firstOrNull()
 
     override fun isLoggedIn() = getAccount() != null
 
     override fun getUuid() = getAccount()?.let { account ->
         accountManager.getUserData(account, AccountConstants.UUID)
     }
+
+    private fun getAccount() = accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE).firstOrNull()
 }

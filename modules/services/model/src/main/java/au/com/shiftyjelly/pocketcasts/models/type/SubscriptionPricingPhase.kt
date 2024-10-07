@@ -11,6 +11,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
     val chronoUnit: ChronoUnit
@@ -42,6 +43,8 @@ sealed interface OfferSubscriptionPricingPhase : SubscriptionPricingPhase {
 }
 
 sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
+    val priceCurrencyCode: String
+        get() = pricingPhase.priceCurrencyCode
     val formattedPrice: String
         get() = pricingPhase.formattedPrice
     val perPeriod: Int
@@ -68,6 +71,8 @@ sealed interface SubscriptionPricingPhase {
         res.getStringPlural(periodValue, periodResSingular, periodResPlural)
     fun periodValueSingular(res: Resources): String =
         "$periodValue ${res.getString(periodResSingular)}"
+    fun periodWithDash(res: Resources): String =
+        "$periodValue-${res.getString(periodResSingular).replaceFirstChar { it.titlecase(Locale.getDefault()) }}"
     fun slashPeriod(res: Resources): String =
         "/ ${res.getString(periodResSingular)}"
     fun phaseType(): Type = pricingPhase.subscriptionPricingPhaseType

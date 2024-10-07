@@ -296,15 +296,15 @@ open class SyncServiceManager @Inject constructor(
     }
 
     // Referral
-    suspend fun getReferralCode(token: AccessToken): ReferralCodeResponse {
+    suspend fun getReferralCode(token: AccessToken): Response<ReferralCodeResponse> {
         return service.getReferralCode(addBearer(token))
     }
 
-    suspend fun validateReferralCode(token: AccessToken, code: String): ReferralValidationResponse {
+    suspend fun validateReferralCode(token: AccessToken, code: String): Response<ReferralValidationResponse> {
         return service.validateReferralCode(addBearer(token), code)
     }
 
-    suspend fun redeemReferralCode(token: AccessToken, code: String): ReferralRedemptionResponse {
+    suspend fun redeemReferralCode(token: AccessToken, code: String): Response<ReferralRedemptionResponse> {
         val request = ReferralRedemptionRequest.newBuilder()
             .setCode(code)
             .build()
