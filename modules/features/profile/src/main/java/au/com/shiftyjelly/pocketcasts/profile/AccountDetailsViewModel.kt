@@ -42,6 +42,7 @@ class AccountDetailsViewModel
     private val syncManager: SyncManager,
     private val analyticsTracker: AnalyticsTracker,
     private val crashLogging: CrashLogging,
+    private val subscriptionMapper: SubscriptionMapper,
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -51,7 +52,7 @@ class AccountDetailsViewModel
         if (state is ProductDetailsState.Loaded) {
             val subscriptions = state.productDetails
                 .mapNotNull {
-                    Subscription.fromProductDetails(
+                    subscriptionMapper.map(
                         productDetails = it,
                         isOfferEligible = subscriptionManager.isOfferEligible(
                             SubscriptionMapper.mapProductIdToTier(it.productId),

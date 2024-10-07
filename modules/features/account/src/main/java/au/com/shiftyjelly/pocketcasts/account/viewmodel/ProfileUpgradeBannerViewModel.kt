@@ -28,6 +28,7 @@ import kotlinx.coroutines.reactive.asFlow
 class ProfileUpgradeBannerViewModel @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
+    private val subscriptionMapper: SubscriptionMapper,
     app: Application,
 ) : AndroidViewModel(app) {
 
@@ -53,7 +54,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                     val subscriptions = (productDetailsState as? ProductDetailsState.Loaded)
                         ?.productDetails
                         ?.mapNotNull { details ->
-                            Subscription.fromProductDetails(
+                            subscriptionMapper.map(
                                 productDetails = details,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
                                     SubscriptionMapper.mapProductIdToTier(details.productId),

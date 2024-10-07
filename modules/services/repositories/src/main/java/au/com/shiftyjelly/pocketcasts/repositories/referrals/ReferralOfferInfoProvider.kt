@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.ReferralProductDetails
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -19,6 +20,7 @@ const val REFERRAL_OFFER_ID = Subscription.REFERRAL_OFFER_ID
 
 class ReferralOfferInfoProvider @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
+    private val subscriptionMapper: SubscriptionMapper,
     @ApplicationContext private val context: Context,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,7 +32,7 @@ class ReferralOfferInfoProvider @Inject constructor(
             .asFlow()
             .transformLatest<ProductDetailsState, ReferralsOfferInfoPlayStore> { productDetailsState ->
                 val subscriptionProductDetails = (productDetailsState as? ProductDetailsState.Loaded)?.productDetails?.mapNotNull { productDetails ->
-                    Subscription.fromProductDetails(
+                    subscriptionMapper.map(
                         productDetails = productDetails,
                         referralProductDetails = referralProductDetails,
                     )
