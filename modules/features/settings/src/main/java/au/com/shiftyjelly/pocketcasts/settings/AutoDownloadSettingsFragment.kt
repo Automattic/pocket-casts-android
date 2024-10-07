@@ -348,6 +348,9 @@ class AutoDownloadSettingsFragment :
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
+        if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+            newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
+        }
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {

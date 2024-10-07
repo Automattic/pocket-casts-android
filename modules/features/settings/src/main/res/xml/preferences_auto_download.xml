@@ -17,7 +17,6 @@
         <SwitchPreference
             android:key="autoDownloadNewEpisodes"
             android:title="@string/settings_auto_download_new_episodes"
-            android:summary="@string/settings_auto_download_new_episodes_description"
             android:persistent="false" />
 
         <Preference
