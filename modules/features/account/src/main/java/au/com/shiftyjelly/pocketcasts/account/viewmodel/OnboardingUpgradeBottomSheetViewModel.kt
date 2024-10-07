@@ -63,7 +63,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                     val subscriptions = when (productDetails) {
                         is ProductDetailsState.Error -> null
                         is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                            subscriptionMapper.map(
+                            subscriptionMapper.mapFromProductDetails(
                                 productDetails = productDetailsState,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
                                     SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),

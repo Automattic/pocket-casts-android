@@ -52,7 +52,7 @@ class AccountDetailsViewModel
         if (state is ProductDetailsState.Loaded) {
             val subscriptions = state.productDetails
                 .mapNotNull {
-                    subscriptionMapper.map(
+                    subscriptionMapper.mapFromProductDetails(
                         productDetails = it,
                         isOfferEligible = subscriptionManager.isOfferEligible(
                             SubscriptionMapper.mapProductIdToTier(it.productId),

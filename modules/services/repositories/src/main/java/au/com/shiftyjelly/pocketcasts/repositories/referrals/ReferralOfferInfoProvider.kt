@@ -32,7 +32,7 @@ class ReferralOfferInfoProvider @Inject constructor(
             .asFlow()
             .transformLatest<ProductDetailsState, ReferralsOfferInfoPlayStore> { productDetailsState ->
                 val subscriptionProductDetails = (productDetailsState as? ProductDetailsState.Loaded)?.productDetails?.mapNotNull { productDetails ->
-                    subscriptionMapper.map(
+                    subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetails,
                         referralProductDetails = referralProductDetails,
                     )

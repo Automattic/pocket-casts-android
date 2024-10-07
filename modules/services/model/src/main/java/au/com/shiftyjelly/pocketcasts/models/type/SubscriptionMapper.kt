@@ -14,7 +14,7 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 
 class SubscriptionMapper @Inject constructor() {
-    fun map(
+    fun mapFromProductDetails(
         productDetails: ProductDetails,
         isOfferEligible: Boolean = false,
         referralProductDetails: ReferralProductDetails? = null,

@@ -54,7 +54,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                     val subscriptions = (productDetailsState as? ProductDetailsState.Loaded)
                         ?.productDetails
                         ?.mapNotNull { details ->
-                            subscriptionMapper.map(
+                            subscriptionMapper.mapFromProductDetails(
                                 productDetails = details,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
                                     SubscriptionMapper.mapProductIdToTier(details.productId),
