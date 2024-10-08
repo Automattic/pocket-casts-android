@@ -48,11 +48,11 @@ enum class AutoDownloadLimitSetting(
     companion object {
 
         fun fromPreferenceString(stringValue: String): AutoDownloadLimitSetting {
-            try {
+            return try {
                 val intValue = stringValue.toInt()
-                return entries.first { it.preferenceInt == intValue }
+                entries.firstOrNull { it.preferenceInt == intValue } ?: OFF
             } catch (e: Exception) {
-                throw IllegalStateException("Unknown auto download setting: $stringValue")
+                OFF
             }
         }
     }
