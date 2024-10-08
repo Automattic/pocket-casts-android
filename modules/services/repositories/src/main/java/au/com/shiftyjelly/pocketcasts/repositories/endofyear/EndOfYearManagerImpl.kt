@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -48,7 +47,6 @@ class EndOfYearManagerImpl @Inject constructor(
 
     companion object {
         private const val YEAR = 2023
-        private const val EPISODE_MINIMUM_PLAYED_TIME_IN_MIN = 5L
     }
 
     private fun yearStart(year: Int) = epochAtStartOfYear(year)
@@ -66,9 +64,7 @@ class EndOfYearManagerImpl @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    override suspend fun isEligibleForStories(): Boolean =
-        hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN)) &&
-            FeatureFlag.isEnabled(Feature.END_OF_YEAR_ENABLED)
+    override suspend fun isEligibleForStories(): Boolean = FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024)
 
     override suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit) {
         if (!syncManager.isLoggedIn()) {

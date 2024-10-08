@@ -629,8 +629,6 @@ Language: ru
     <string name="no_episodes_in_filter_x">Нет выпусков в фильтре %1$s</string>
     <string name="filter_x_not_found">Фильтр %1$s не найден</string>
     <string name="must_provide_filter_name">Укажите имя фильтра</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Не сейчас</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Моя статистика за 2023 г.</string>
     <string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
     <string name="end_of_year_launch_modal_title">Ваш год в подкастах</string>
     <string name="settings_app_icon_halloween">Хэллоуин</string>

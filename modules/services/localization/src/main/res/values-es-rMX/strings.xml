@@ -621,8 +621,6 @@ Language: es
     <string name="no_episodes_in_filter_x">No hay episodios en el filtro %1$s</string>
     <string name="filter_x_not_found">No se ha encontrado el filtro %1$s</string>
     <string name="must_provide_filter_name">Introduce un nombre de filtro</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Ahora no</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Ver Mi 2023</string>
     <string name="end_of_year_launch_modal_summary">Consulta cuáles han sido los podcasts y las categorías que más has escuchado, las estadísticas de escucha y mucho más. Compártelo con tus amigos y haz que todo el mundo sepa cuáles son tus creadores favoritos.</string>
     <string name="end_of_year_launch_modal_title">Tu año en podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>

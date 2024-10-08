@@ -331,7 +331,6 @@ Language: ar
     <string name="settings_app_icon_halloween">عيد الهالوين</string>
     <string name="end_of_year_launch_modal_title">أحداث العام الخاصة بي في حلقات البودكاست</string>
     <string name="end_of_year_launch_modal_summary">اطلع على أهم حلقات البودكاست والتصنيفات وإحصاءات الاستماع الخاصة بك والمزيد. شارك مع الأصدقاء وعبّر عن المبدعين الذين تفضّلهم!</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">ليس الآن</string>
     <string name="settings_show_played">عرض الحلقات التي تم تشغيلها</string>
     <string name="settings_show_played_summary">ستظل الحلقات التي أنهيت تشغيلها معروضة</string>
     <string name="profile_privacy_policy_read">قراءة سياسة الخصوصية</string>

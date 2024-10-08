@@ -321,12 +321,14 @@ fun TextH70(
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight = FontWeight.W500,
     maxLines: Int = Int.MAX_VALUE,
+    fontSize: TextUnit? = null,
     disableScale: Boolean = false,
 ) {
+    val fontSizeUpdated = fontSize ?: 12.sp
     Text(
         text = text,
         color = color,
-        fontSize = if (disableScale) 12.nonScaledSp else 12.sp,
+        fontSize = if (disableScale) fontSizeUpdated.value.nonScaledSp else fontSizeUpdated,
         fontFamily = fontFamily,
         fontWeight = fontWeight,
         lineHeight = if (disableScale) 14.nonScaledSp else 14.sp,

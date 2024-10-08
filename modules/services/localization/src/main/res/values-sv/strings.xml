@@ -621,8 +621,6 @@ Language: sv_SE
     <string name="no_episodes_in_filter_x">Inga avsnitt i filtret %1$s</string>
     <string name="filter_x_not_found">Filtret %1$s hittades inte</string>
     <string name="must_provide_filter_name">Filternamn måste anges</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Inte nu</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visa mitt 2023</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
     <string name="end_of_year_launch_modal_title">Ditt podcastår</string>
     <string name="settings_app_icon_halloween">Halloween</string>

@@ -629,8 +629,6 @@ Language: de
     <string name="no_episodes_in_filter_x">Keine Folgen in Filter %1$s</string>
     <string name="filter_x_not_found">Filter %1$s nicht gefunden</string>
     <string name="must_provide_filter_name">Filtername erforderlich</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Nicht jetzt</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Mein 2023 anzeigen</string>
     <string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
     <string name="end_of_year_launch_modal_title">Dein Jahr in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>

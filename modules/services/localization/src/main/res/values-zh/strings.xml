@@ -629,8 +629,6 @@ Language: zh_CN
     <string name="no_episodes_in_filter_x">过滤器 %1$s 中无剧集</string>
     <string name="filter_x_not_found">未找到过滤器 %1$s</string>
     <string name="must_provide_filter_name">必须提供过滤器名称</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">不用了</string>
-    <string name="end_of_year_launch_modal_primary_button_title">查看我的 2023</string>
     <string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
     <string name="end_of_year_launch_modal_title">您的年度播客盘点</string>
     <string name="settings_app_icon_halloween">万圣节</string>

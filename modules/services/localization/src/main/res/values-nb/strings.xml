@@ -327,7 +327,6 @@ Language: nb_NO
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_title">Året ditt i podcaster</string>
     <string name="end_of_year_launch_modal_summary">Se favorittpodcaster, kategorier, lyttestatistikk og mer. Del med venner og fremhev favorittskaperne!</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Ikke nå</string>
     <string name="settings_show_played">Vis avspilte episoder</string>
     <string name="settings_show_played_summary">Episoder som du har spilt av, vises fremdeles</string>
     <string name="profile_privacy_policy_read">Les personvernreglene</string>
