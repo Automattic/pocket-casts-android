@@ -13,17 +13,25 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyBoolean
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class ReferralOfferInfoProviderTest {
     private lateinit var referralOfferInfoProvider: ReferralOfferInfoProvider
+    private val subscriptionMapper: SubscriptionMapper = mock()
     private val context: Context = mock()
     private val subscriptionManager: SubscriptionManager = mock()
 
     @Before
     fun setUp() {
-        referralOfferInfoProvider = ReferralOfferInfoProvider(subscriptionManager, context)
+        referralOfferInfoProvider = ReferralOfferInfoProvider(
+            subscriptionManager = subscriptionManager,
+            subscriptionMapper = subscriptionMapper,
+            context = context,
+        )
     }
 
     @Test
@@ -87,7 +95,7 @@ class ReferralOfferInfoProviderTest {
         whenever(productDetails.subscriptionOfferDetails).thenReturn(listOf(subscriptionOfferDetails))
         whenever(subscription.productDetails).thenReturn(productDetails)
         whenever(subscriptionOfferDetails.offerId).thenReturn(offerId)
-        SubscriptionMapper.setSubscription(subscription)
+        whenever(subscriptionMapper.mapFromProductDetails(eq(productDetails), anyBoolean(), any())).thenReturn(subscription)
 
         return ProductDetailsState.Loaded(listOf(productDetails))
     }

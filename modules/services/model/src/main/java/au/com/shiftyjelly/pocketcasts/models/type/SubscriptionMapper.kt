@@ -1,22 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
+import jakarta.inject.Inject
 import java.time.Period
 import java.time.format.DateTimeParseException
 
-object SubscriptionMapper {
-    fun map(
+class SubscriptionMapper @Inject constructor() {
+    fun mapFromProductDetails(
         productDetails: ProductDetails,
-        isOfferEligible: Boolean,
-        referralProductDetails: ReferralProductDetails?,
+        isOfferEligible: Boolean = false,
+        referralProductDetails: ReferralProductDetails? = null,
     ): Subscription? {
         val matchingSubscriptionOfferDetails = if (isOfferEligible || referralProductDetails != null) {
             productDetails
@@ -48,7 +45,7 @@ object SubscriptionMapper {
                 val offerPricingPhase = relevantSubscriptionOfferDetails.offerSubscriptionPricingPhase
                 if (offerPricingPhase == null) {
                     Subscription.Simple(
-                        tier = mapProductIdToTier(productDetails.productId),
+                        tier = SubscriptionTier.fromProductId(productDetails.productId),
                         recurringPricingPhase = recurringPricingPhase,
                         productDetails = productDetails,
                         offerToken = relevantSubscriptionOfferDetails.offerToken,
@@ -56,7 +53,7 @@ object SubscriptionMapper {
                 } else {
                     if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED) && hasIntro(productDetails)) {
                         Subscription.Intro(
-                            tier = mapProductIdToTier(productDetails.productId),
+                            tier = SubscriptionTier.fromProductId(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
                             offerPricingPhase = offerPricingPhase,
                             productDetails = productDetails,
@@ -64,7 +61,7 @@ object SubscriptionMapper {
                         )
                     } else if (hasTrial(productDetails, referralProductDetails)) {
                         Subscription.Trial(
-                            tier = mapProductIdToTier(productDetails.productId),
+                            tier = SubscriptionTier.fromProductId(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
                             offerPricingPhase = offerPricingPhase,
                             productDetails = productDetails,
@@ -106,6 +103,7 @@ object SubscriptionMapper {
                     )
                     null
                 }
+
                 1 -> first()
                 else -> {
                     LogBuffer.e(
@@ -163,10 +161,4 @@ object SubscriptionMapper {
             )
             null
         }
-
-    fun mapProductIdToTier(productId: String) = when (productId) {
-        in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
-        in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
-        else -> SubscriptionTier.UNKNOWN
-    }
 }
