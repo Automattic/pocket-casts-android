@@ -57,7 +57,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                             subscriptionMapper.mapFromProductDetails(
                                 productDetails = details,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
-                                    SubscriptionMapper.mapProductIdToTier(details.productId),
+                                    Subscription.SubscriptionTier.fromProductId(details.productId),
                                 ),
                             )
                         } ?: emptyList()
@@ -96,8 +96,8 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                                 )
                             }
 
-                        val currentTier = SubscriptionMapper
-                            .mapProductIdToTier(defaultSubscription.productDetails.productId)
+                        val currentTier = Subscription.SubscriptionTier
+                            .fromProductId(defaultSubscription.productDetails.productId)
 
                         _state.value = State.Loaded(
                             featureCardsState = FeatureCardsState(

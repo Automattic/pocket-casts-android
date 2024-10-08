@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MO
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.Companion.mapProductIdToTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -275,7 +274,7 @@ class SubscriptionManagerImpl @Inject constructor(
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
                     purchase.products.map {
-                        mapProductIdToTier(it.toString())
+                        Subscription.SubscriptionTier.fromProductId(it.toString())
                     }.distinct().forEach {
                         updateOfferEligible(it, false)
                     }
@@ -325,7 +324,7 @@ class SubscriptionManagerImpl @Inject constructor(
         val result = billingClient.queryPurchaseHistory(queryPurchaseHistoryParams)
         result.purchaseHistoryRecordList?.forEach {
             it.products.map { productId ->
-                mapProductIdToTier(productId)
+                Subscription.SubscriptionTier.fromProductId(productId)
             }.distinct().forEach { tier ->
                 updateOfferEligible(tier, false)
             }
@@ -430,7 +429,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetailsState,
                         isOfferEligible = isOfferEligible(
-                            mapProductIdToTier(productDetailsState.productId),
+                            Subscription.SubscriptionTier.fromProductId(productDetailsState.productId),
                         ),
                     )
                 }

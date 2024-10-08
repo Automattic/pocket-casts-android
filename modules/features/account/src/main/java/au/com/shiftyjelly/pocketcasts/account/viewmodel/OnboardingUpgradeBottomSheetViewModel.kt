@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.OfferSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
@@ -66,7 +67,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                             subscriptionMapper.mapFromProductDetails(
                                 productDetails = productDetailsState,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
-                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
+                                    SubscriptionTier.fromProductId(productDetailsState.productId),
                                 ),
                             )
                         }

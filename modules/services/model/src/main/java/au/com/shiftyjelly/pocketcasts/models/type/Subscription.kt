@@ -94,13 +94,20 @@ sealed interface Subscription {
         }
     }
 
-    enum class SubscriptionTier {
-        PLUS,
-        PATRON,
-        UNKNOWN,
+    enum class SubscriptionTier(val supportedProductIds: List<String>) {
+        PLUS(listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID)),
+        PATRON(listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID)),
+        UNKNOWN(emptyList()),
         ;
 
         companion object {
+            private val productIdToTierMap: Map<String, SubscriptionTier> = entries.flatMap { entry ->
+                entry.supportedProductIds.map { productId -> productId to entry }
+            }.toMap()
+
+            fun fromProductId(productId: String): SubscriptionTier =
+                productIdToTierMap[productId] ?: UNKNOWN
+
             fun fromUserTier(userTier: UserTier) = when (userTier) {
                 UserTier.Free -> UNKNOWN
                 UserTier.Plus -> PLUS

@@ -1,9 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -49,7 +45,7 @@ class SubscriptionMapper @Inject constructor() {
                 val offerPricingPhase = relevantSubscriptionOfferDetails.offerSubscriptionPricingPhase
                 if (offerPricingPhase == null) {
                     Subscription.Simple(
-                        tier = mapProductIdToTier(productDetails.productId),
+                        tier = SubscriptionTier.fromProductId(productDetails.productId),
                         recurringPricingPhase = recurringPricingPhase,
                         productDetails = productDetails,
                         offerToken = relevantSubscriptionOfferDetails.offerToken,
@@ -57,7 +53,7 @@ class SubscriptionMapper @Inject constructor() {
                 } else {
                     if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED) && hasIntro(productDetails)) {
                         Subscription.Intro(
-                            tier = mapProductIdToTier(productDetails.productId),
+                            tier = SubscriptionTier.fromProductId(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
                             offerPricingPhase = offerPricingPhase,
                             productDetails = productDetails,
@@ -65,7 +61,7 @@ class SubscriptionMapper @Inject constructor() {
                         )
                     } else if (hasTrial(productDetails, referralProductDetails)) {
                         Subscription.Trial(
-                            tier = mapProductIdToTier(productDetails.productId),
+                            tier = SubscriptionTier.fromProductId(productDetails.productId),
                             recurringPricingPhase = recurringPricingPhase,
                             offerPricingPhase = offerPricingPhase,
                             productDetails = productDetails,
@@ -165,12 +161,4 @@ class SubscriptionMapper @Inject constructor() {
             )
             null
         }
-
-    companion object {
-        fun mapProductIdToTier(productId: String) = when (productId) {
-            in listOf(PLUS_MONTHLY_PRODUCT_ID, PLUS_YEARLY_PRODUCT_ID) -> SubscriptionTier.PLUS
-            in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) -> SubscriptionTier.PATRON
-            else -> SubscriptionTier.UNKNOWN
-        }
-    }
 }

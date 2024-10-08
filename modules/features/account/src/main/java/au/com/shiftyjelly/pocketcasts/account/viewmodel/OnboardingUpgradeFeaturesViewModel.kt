@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.PaywallABTestCustomTreatment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -69,7 +70,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                             subscriptionMapper.mapFromProductDetails(
                                 productDetails = productDetailsState,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
-                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
+                                    SubscriptionTier.fromProductId(productDetailsState.productId),
                                 ),
                             )
                         }
@@ -131,7 +132,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         selectedSubscription?.let {
             val currentSubscriptionFrequency = selectedSubscription.recurringPricingPhase.toSubscriptionFrequency()
-            val currentTier = SubscriptionMapper.mapProductIdToTier(selectedSubscription.productDetails.productId)
+            val currentTier = SubscriptionTier.fromProductId(selectedSubscription.productDetails.productId)
             val currentFeatureCard = currentTier.toUpgradeFeatureCard()
             _state.update {
                 OnboardingUpgradeFeaturesState.Loaded(

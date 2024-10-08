@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
@@ -55,7 +56,7 @@ class AccountDetailsViewModel
                     subscriptionMapper.mapFromProductDetails(
                         productDetails = it,
                         isOfferEligible = subscriptionManager.isOfferEligible(
-                            SubscriptionMapper.mapProductIdToTier(it.productId),
+                            SubscriptionTier.fromProductId(it.productId),
                         ),
                     )
                 }
