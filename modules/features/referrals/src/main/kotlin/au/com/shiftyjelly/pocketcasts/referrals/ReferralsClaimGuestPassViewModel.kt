@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.utils.exception.NoNetworkException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -48,6 +49,8 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
     private val _snackBarEvent: MutableSharedFlow<SnackbarEvent> = MutableSharedFlow()
     val snackBarEvent: SharedFlow<SnackbarEvent> = _snackBarEvent
 
+    private var job: Job? = null
+
     init {
         loadReferralClaimOffer()
     }
@@ -72,7 +75,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
 
     fun onActivatePassClick() {
         analyticsTracker.track(AnalyticsEvent.REFERRAL_ACTIVATE_TAPPED)
-        viewModelScope.launch {
+        job = viewModelScope.launch {
             userManager.getSignInState().asFlow()
                 .stateIn(viewModelScope)
                 .collect {
@@ -89,11 +92,17 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                                 offerInfo?.subscriptionWithOffer?.let { subscriptionWithOffer -> triggerBillingFlowAndObservePurchaseEvents(subscriptionWithOffer) }
                             }
 
-                            is ReferralResult.EmptyResult -> _navigationEvent.emit(NavigationEvent.InValidOffer)
-                            is ReferralResult.ErrorResult -> if (result.error is NoNetworkException) {
-                                _snackBarEvent.emit(SnackbarEvent.NoNetwork)
-                            } else {
+                            is ReferralResult.EmptyResult -> {
+                                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Empty validation result for redeem code: ${settings.referralClaimCode.value}")
                                 _navigationEvent.emit(NavigationEvent.InValidOffer)
+                            }
+                            is ReferralResult.ErrorResult -> {
+                                if (result.error is NoNetworkException) {
+                                    _snackBarEvent.emit(SnackbarEvent.NoNetwork)
+                                } else {
+                                    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Validation failed for redeem code: ${settings.referralClaimCode.value} ${result.error}")
+                                    _navigationEvent.emit(NavigationEvent.InValidOffer)
+                                }
                             }
                         }
                     } else {
@@ -158,11 +167,17 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                 _navigationEvent.emit(NavigationEvent.Close)
             }
 
-            is ReferralResult.EmptyResult -> _snackBarEvent.emit(SnackbarEvent.RedeemFailed)
-            is ReferralResult.ErrorResult -> if (result.error is NoNetworkException) {
-                _snackBarEvent.emit(SnackbarEvent.NoNetwork)
-            } else {
+            is ReferralResult.EmptyResult -> {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Empty redemption result for redeem code: ${settings.referralClaimCode.value}")
                 _snackBarEvent.emit(SnackbarEvent.RedeemFailed)
+            }
+            is ReferralResult.ErrorResult -> {
+                if (result.error is NoNetworkException) {
+                    _snackBarEvent.emit(SnackbarEvent.NoNetwork)
+                } else {
+                    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Redeem failed for redeem code: ${settings.referralClaimCode.value} ${result.error}")
+                    _snackBarEvent.emit(SnackbarEvent.RedeemFailed)
+                }
             }
         }
     }
