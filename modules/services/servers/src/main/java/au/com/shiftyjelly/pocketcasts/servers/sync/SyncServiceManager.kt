@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
+import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
@@ -275,6 +276,10 @@ open class SyncServiceManager @Inject constructor(
             .setPodcastUuid(podcastUuid)
             .build()
         return service.getPodcastRating(addBearer(token), request)
+    }
+
+    suspend fun getPodcastRatings(token: AccessToken): PodcastRatingsResponse? {
+        return service.getPodcastRatings(addBearer(token)).body()
     }
 
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void> {
