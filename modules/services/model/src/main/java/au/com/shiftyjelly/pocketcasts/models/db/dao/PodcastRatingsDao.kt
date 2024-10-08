@@ -31,9 +31,9 @@ abstract class PodcastRatingsDao {
     open suspend fun updateUserRatings(ratings: List<UserPodcastRating>) {
         val localRatings = getAllUserRatings().associate { it.podcastUuid to it.modifiedAt }
         val filteredRatings = ratings.filter { rating ->
-                val modifiedAt = localRatings[rating.podcastUuid] ?: return@filter true
-                rating.modifiedAt >= modifiedAt
-            }
+            val modifiedAt = localRatings[rating.podcastUuid] ?: return@filter true
+            rating.modifiedAt >= modifiedAt
+        }
         insertOrReplaceUserRatings(filteredRatings)
     }
 }
