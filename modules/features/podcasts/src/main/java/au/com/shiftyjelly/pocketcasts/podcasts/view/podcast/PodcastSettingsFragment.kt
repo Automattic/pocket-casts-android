@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -31,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -64,6 +67,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
     private var preferenceFeedIssueDetected: Preference? = null
     private var preferenceNotifications: SwitchPreference? = null
     private var preferenceAutoDownload: SwitchPreference? = null
+    private var autoDownloadPodcastsLimit: ListPreference? = null
     private var preferenceAddToUpNext: SwitchPreference? = null
     private var preferenceAddToUpNextOrder: ListPreference? = null
     private var preferenceAddToUpNextGlobal: Preference? = null
@@ -104,6 +108,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         preferenceFeedIssueDetected = preferenceManager.findPreference("feedIssueDetected")
         preferenceNotifications = preferenceManager.findPreference("notifications")
         preferenceAutoDownload = preferenceManager.findPreference("autoDownload")
+        autoDownloadPodcastsLimit = preferenceManager.findPreference("autoDownloadPodcastsLimit")
         preferenceAddToUpNext = preferenceManager.findPreference("addToUpNext")
         preferenceAddToUpNextOrder = preferenceManager.findPreference("addToUpNextOrder")
         preferenceAddToUpNextGlobal = preferenceManager.findPreference("addToUpNextGlobal")
@@ -131,7 +136,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         view.isClickable = true
 
-        toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        toolbar = view.findViewById(R.id.toolbar)
 
         preferenceAddToUpNextOrder?.isVisible = false
 
@@ -159,6 +164,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             preferenceNotifications?.isChecked = podcast.isShowNotifications
 
             preferenceAutoDownload?.isChecked = podcast.isAutoDownloadNewEpisodes
+            autoDownloadPodcastsLimit?.isVisible = FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD) && podcast.isAutoDownloadNewEpisodes
 
             preferenceAddToUpNext?.isChecked = !podcast.isAutoAddToUpNextOff
             preferenceAddToUpNextOrder?.isVisible = !podcast.isAutoAddToUpNextOff
@@ -212,6 +218,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         setupFilters()
         setupUnsubscribe()
         setupFeedIssueDetected()
+        setupAutoDownloadLimitOptions()
     }
 
     private fun setupFeedIssueDetected() {
@@ -488,6 +495,20 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             preferenceFilters?.summary = getString(LR.string.podcast_included_in_filters, filterTitles.joinToString())
         }
         preferenceFilters?.isVisible = availableFilters.isNotEmpty()
+    }
+
+    private fun setupAutoDownloadLimitOptions() {
+        autoDownloadPodcastsLimit?.apply {
+            val options = AutoDownloadLimitSetting.entries
+            entries = options.map { getString(it.titleRes) }.toTypedArray()
+            entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
+            value = settings.autoDownloadLimit.value.preferenceInt.toString()
+        }
+        changeAutoDownloadLimitSummary()
+    }
+
+    private fun changeAutoDownloadLimitSummary() {
+        autoDownloadPodcastsLimit?.summary = getString(settings.autoDownloadLimit.value.titleRes)
     }
 
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
