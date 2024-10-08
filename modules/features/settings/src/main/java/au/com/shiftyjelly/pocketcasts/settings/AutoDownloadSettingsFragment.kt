@@ -174,11 +174,9 @@ class AutoDownloadSettingsFragment :
                 setOnPreferenceChangeListener { _, newValue ->
                     val autoDownloadLimitSetting = (newValue as? String)
                         ?.let { AutoDownloadLimitSetting.fromPreferenceString(it) }
-                        ?: throw IllegalStateException("Invalid value for auto download limit preference: $newValue")
+                        ?: AutoDownloadLimitSetting.TWO_LATEST_EPISODE
 
-                    settings.autoDownloadLimit.set(autoDownloadLimitSetting, updateModifiedAt = true)
-
-                    viewModel.onLimitDownloadsChange(autoDownloadLimitSetting.analyticsString)
+                    viewModel.onLimitDownloadsChange(autoDownloadLimitSetting)
 
                     changeAutoDownloadLimitSummary()
                     true

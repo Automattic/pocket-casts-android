@@ -50,9 +50,9 @@ enum class AutoDownloadLimitSetting(
         fun fromPreferenceString(stringValue: String): AutoDownloadLimitSetting {
             return try {
                 val intValue = stringValue.toInt()
-                entries.firstOrNull { it.preferenceInt == intValue } ?: OFF
+                entries.firstOrNull { it.preferenceInt == intValue } ?: TWO_LATEST_EPISODE
             } catch (e: Exception) {
-                OFF
+                TWO_LATEST_EPISODE
             }
         }
     }
