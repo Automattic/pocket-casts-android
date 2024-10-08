@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel.State.Loaded.Stars
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -15,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -151,7 +153,7 @@ class GiveRatingViewModel @Inject constructor(
             mapOf("uuid" to (state.value as State.Loaded).podcastUuid, "stars" to starsToRating(stars)),
         )
 
-        val result = ratingManager.submitPodcastRating(podcastUuid, starsToRating(stars))
+        val result = ratingManager.submitPodcastRating(UserPodcastRating(podcastUuid, starsToRating(stars), Date()))
 
         if (result is PodcastRatingResult.Success) {
             LogBuffer.i(TAG, "Submitted a rating of ${result.rating} for $podcastUuid")

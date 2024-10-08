@@ -60,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import java.io.File
@@ -84,8 +85,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         DbChapter::class,
         CuratedPodcast::class,
         Transcript::class,
+        UserPodcastRating::class,
     ],
-    version = 101,
+    version = 102,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -847,6 +849,18 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE podcasts ADD COLUMN auto_download_limit INTEGER")
         }
 
+        val MIGRATION_101_102 = addMigration(101, 102) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE user_podcast_ratings(
+                        podcast_uuid TEXT NOT NULL PRIMARY KEY,
+                        rating INTEGER NOT NULL,
+                        modified_at INTEGER NOT NULL
+                    )
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1238,6 +1252,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_98_99,
                 MIGRATION_99_100,
                 MIGRATION_100_101,
+                MIGRATION_101_102,
             )
         }
 
