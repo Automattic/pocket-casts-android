@@ -477,6 +477,11 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
                 ?.let { AutoDownloadLimitSetting.fromPreferenceString(it) }
                 ?: AutoDownloadLimitSetting.TWO_LATEST_EPISODE
 
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_LIMIT_TOGGLED,
+                mapOf("value" to autoDownloadLimitSetting.analyticsString),
+            )
+
             viewModel.setAutoDownloadLimit(autoDownloadLimitSetting)
 
             true
