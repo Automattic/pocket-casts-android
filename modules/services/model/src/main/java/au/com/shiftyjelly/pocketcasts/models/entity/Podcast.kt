@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.Bundle
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import java.io.Serializable
@@ -59,6 +60,7 @@ data class Podcast(
     @ColumnInfo(name = "show_notifications") var isShowNotifications: Boolean = false,
     @ColumnInfo(name = "show_notifications_modified") var showNotificationsModified: Date? = null,
     @ColumnInfo(name = "auto_download_status") var autoDownloadStatus: Int = 0,
+    @ColumnInfo(name = "auto_download_limit") var autoDownloadLimit: AutoDownloadLimitSetting = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
     @ColumnInfo(name = "auto_add_to_up_next") var autoAddToUpNext: AutoAddUpNext = AutoAddUpNext.OFF,
     @ColumnInfo(name = "auto_add_to_up_next_modified") var autoAddToUpNextModified: Date? = null,
     @ColumnInfo(name = "most_popular_color") var backgroundColor: Int = 0,

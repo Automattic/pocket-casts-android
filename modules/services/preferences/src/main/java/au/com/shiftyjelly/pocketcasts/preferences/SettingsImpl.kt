@@ -391,7 +391,7 @@ class SettingsImpl @Inject constructor(
         defaultValue = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
         sharedPrefs = sharedPreferences,
         fromString = { AutoDownloadLimitSetting.fromPreferenceString(it) },
-        toString = { it.preferenceInt.toString() },
+        toString = { it.id.toString() },
     )
 
     override fun setLastModified(lastModified: String?) {

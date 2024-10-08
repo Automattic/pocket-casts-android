@@ -501,8 +501,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         autoDownloadPodcastsLimit?.apply {
             val options = AutoDownloadLimitSetting.entries
             entries = options.map { getString(it.titleRes) }.toTypedArray()
-            entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
-            value = settings.autoDownloadLimit.value.preferenceInt.toString()
+            entryValues = options.map { it.id.toString() }.toTypedArray()
+            value = settings.autoDownloadLimit.value.id.toString()
         }
         changeAutoDownloadLimitSummary()
     }

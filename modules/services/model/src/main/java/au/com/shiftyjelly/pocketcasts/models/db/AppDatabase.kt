@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConve
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoDownloadLimitConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
@@ -84,7 +85,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         CuratedPodcast::class,
         Transcript::class,
     ],
-    version = 100,
+    version = 101,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -111,6 +112,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     PodcastGroupingTypeConverter::class,
     ChapterIndicesConverter::class,
     InstantConverter::class,
+    PodcastAutoDownloadLimitConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -841,6 +843,10 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_100_101 = addMigration(100, 101) { database ->
+            database.execSQL("ALTER TABLE episode ADD COLUMN auto_download_limit INTEGER DEFAULT 2")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1231,6 +1237,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_97_98,
                 MIGRATION_98_99,
                 MIGRATION_99_100,
+                MIGRATION_100_101,
             )
         }
 
