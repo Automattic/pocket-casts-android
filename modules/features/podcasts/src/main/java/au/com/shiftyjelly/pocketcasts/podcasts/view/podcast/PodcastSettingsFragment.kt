@@ -56,13 +56,17 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.Listener, HasBackstack {
-    @Inject lateinit var theme: Theme
+    @Inject
+    lateinit var theme: Theme
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject
+    lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
     private var preferenceFeedIssueDetected: Preference? = null
     private var preferenceNotifications: SwitchPreference? = null
@@ -182,6 +186,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
             preferenceUnsubscribe?.isVisible = podcast.isSubscribed
 
+            updateAutoDownloadLimit(podcast)
+
             hideLoading()
         }
 
@@ -218,7 +224,6 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         setupFilters()
         setupUnsubscribe()
         setupFeedIssueDetected()
-        setupAutoDownloadLimitOptions()
     }
 
     private fun setupFeedIssueDetected() {
@@ -467,6 +472,16 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             true
         }
 
+        autoDownloadPodcastsLimit?.setOnPreferenceChangeListener { _, newValue ->
+            val autoDownloadLimitSetting = (newValue as? String)
+                ?.let { AutoDownloadLimitSetting.fromPreferenceString(it) }
+                ?: AutoDownloadLimitSetting.TWO_LATEST_EPISODE
+
+            viewModel.setAutoDownloadLimit(autoDownloadLimitSetting)
+
+            true
+        }
+
         preferenceAddToUpNextGlobal?.run {
             setOnPreferenceClickListener {
                 val fragment = AutoAddSettingsFragment()
@@ -497,18 +512,14 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         preferenceFilters?.isVisible = availableFilters.isNotEmpty()
     }
 
-    private fun setupAutoDownloadLimitOptions() {
-        autoDownloadPodcastsLimit?.apply {
-            val options = AutoDownloadLimitSetting.entries
-            entries = options.map { getString(it.titleRes) }.toTypedArray()
-            entryValues = options.map { it.id.toString() }.toTypedArray()
-            value = settings.autoDownloadLimit.value.id.toString()
+    private fun updateAutoDownloadLimit(podcast: Podcast) {
+        val options = AutoDownloadLimitSetting.entries
+        autoDownloadPodcastsLimit?.let { autoDownloadLimit ->
+            autoDownloadLimit.entries = options.map { getString(it.titleRes) }.toTypedArray()
+            autoDownloadLimit.entryValues = options.map { it.id.toString() }.toTypedArray()
+            autoDownloadLimit.value = podcast.autoDownloadLimit.id.toString()
+            autoDownloadLimit.summary = getString(podcast.autoDownloadLimit.titleRes)
         }
-        changeAutoDownloadLimitSummary()
-    }
-
-    private fun changeAutoDownloadLimitSummary() {
-        autoDownloadPodcastsLimit?.summary = getString(settings.autoDownloadLimit.value.titleRes)
     }
 
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
