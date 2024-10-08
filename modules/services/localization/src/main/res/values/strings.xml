@@ -1145,6 +1145,16 @@
     <string name="settings_auto_download_filters_episodes">All filter episodes</string>
     <string name="settings_auto_download_new_episodes">New episodes</string>
     <string name="settings_auto_download_podcasts">Auto download podcasts</string>
+    <string name="settings_auto_download_new_episodes_description">Download new episodes as they’re released, and manage your storage by setting a limit on how many episodes are saved.</string>
+    <string name="settings_auto_download_limit">Limit downloads</string>
+    <string name="settings_auto_download_limit_off">Off</string>
+    <string name="settings_auto_download_limit_latest_episode">Latest Episode</string>
+    <string name="settings_auto_download_limit_two_latest_episode">2 Latest Episodes</string>
+    <string name="settings_auto_download_limit_three_latest_episode">3 Latest Episodes</string>
+    <string name="settings_auto_download_limit_five_latest_episode">5 Latest Episodes</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">10 Latest Episodes</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">All Latest Episode</string>
+    <string name="settings_auto_download_limit_auto_downloads">Limit auto downloads</string>
     <string name="settings_auto_download_unmetered">Only on unmetered WiFi</string>
     <string name="settings_auto_download_unmetered_summary">Turning this off will allow downloads on cellular as well as other metered networks. Check your network settings for more info.</string>
     <string name="settings_auto_download_up_next">Episodes added to Up Next</string>

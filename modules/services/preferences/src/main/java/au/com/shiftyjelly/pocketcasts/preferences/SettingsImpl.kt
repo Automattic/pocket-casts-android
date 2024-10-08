@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -382,6 +383,14 @@ class SettingsImpl @Inject constructor(
         },
         sharedPrefs = sharedPreferences,
         fromString = { PlayOverNotificationSetting.fromPreferenceString(it) },
+        toString = { it.preferenceInt.toString() },
+    )
+
+    override val autoDownloadLimit = UserSetting.PrefFromString(
+        sharedPrefKey = "autoDownloadLimit",
+        defaultValue = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
+        sharedPrefs = sharedPreferences,
+        fromString = { AutoDownloadLimitSetting.fromPreferenceString(it) },
         toString = { it.preferenceInt.toString() },
     )
 

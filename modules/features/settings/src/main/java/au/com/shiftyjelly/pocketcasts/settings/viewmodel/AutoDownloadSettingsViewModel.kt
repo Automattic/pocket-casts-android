@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,6 +48,15 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED,
             mapOf("enabled" to newValue),
+        )
+    }
+
+    fun onLimitDownloadsChange(autoDownloadLimitSetting: AutoDownloadLimitSetting) {
+        settings.autoDownloadLimit.set(autoDownloadLimitSetting, updateModifiedAt = true)
+
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_TOGGLED,
+            mapOf("value" to autoDownloadLimitSetting.analyticsString),
         )
     }
 
