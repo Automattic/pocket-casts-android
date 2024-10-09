@@ -56,6 +56,6 @@ enum class AutoDownloadLimitSetting(
             }
         }
 
-        fun fromInt(id: Int) = (AutoDownloadLimitSetting.entries.firstOrNull { it.id == id } ?: TWO_LATEST_EPISODE)
+        fun fromInt(id: Int) = (AutoDownloadLimitSetting.entries.firstOrNull { it.id == id })
     }
 }

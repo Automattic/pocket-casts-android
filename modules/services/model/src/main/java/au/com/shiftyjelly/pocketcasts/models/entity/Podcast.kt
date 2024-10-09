@@ -60,7 +60,7 @@ data class Podcast(
     @ColumnInfo(name = "show_notifications") var isShowNotifications: Boolean = false,
     @ColumnInfo(name = "show_notifications_modified") var showNotificationsModified: Date? = null,
     @ColumnInfo(name = "auto_download_status") var autoDownloadStatus: Int = 0,
-    @ColumnInfo(name = "auto_download_limit") var autoDownloadLimit: AutoDownloadLimitSetting = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
+    @ColumnInfo(name = "auto_download_limit") var autoDownloadLimit: AutoDownloadLimitSetting = AutoDownloadLimitSetting.OFF,
     @ColumnInfo(name = "auto_add_to_up_next") var autoAddToUpNext: AutoAddUpNext = AutoAddUpNext.OFF,
     @ColumnInfo(name = "auto_add_to_up_next_modified") var autoAddToUpNextModified: Date? = null,
     @ColumnInfo(name = "most_popular_color") var backgroundColor: Int = 0,

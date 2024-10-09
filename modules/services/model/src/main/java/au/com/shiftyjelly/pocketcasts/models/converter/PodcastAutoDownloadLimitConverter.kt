@@ -6,12 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 class PodcastAutoDownloadLimitConverter {
 
     @TypeConverter
-    fun toInt(autoDownloadLimitSetting: AutoDownloadLimitSetting): Int {
-        return autoDownloadLimitSetting.id
-    }
+    fun toInt(autoDownloadLimitSetting: AutoDownloadLimitSetting): Int = autoDownloadLimitSetting.id
 
     @TypeConverter
-    fun toAutoDownloadLimitSetting(id: Int): AutoDownloadLimitSetting {
-        return AutoDownloadLimitSetting.fromInt(id)
-    }
+    fun toAutoDownloadLimitSetting(id: Int): AutoDownloadLimitSetting? = AutoDownloadLimitSetting.fromInt(id)
 }
