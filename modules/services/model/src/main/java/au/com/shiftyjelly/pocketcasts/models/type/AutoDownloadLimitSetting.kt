@@ -47,12 +47,12 @@ enum class AutoDownloadLimitSetting(
 
     companion object {
 
-        fun fromPreferenceString(stringValue: String): AutoDownloadLimitSetting {
+        fun fromPreferenceString(stringValue: String): AutoDownloadLimitSetting? {
             return try {
                 val intValue = stringValue.toInt()
-                entries.firstOrNull { it.id == intValue } ?: TWO_LATEST_EPISODE
+                entries.firstOrNull { it.id == intValue }
             } catch (e: Exception) {
-                TWO_LATEST_EPISODE
+                null
             }
         }
 

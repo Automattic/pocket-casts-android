@@ -386,11 +386,11 @@ class SettingsImpl @Inject constructor(
         toString = { it.preferenceInt.toString() },
     )
 
-    override val autoDownloadLimit = UserSetting.PrefFromString(
+    override val autoDownloadLimit: UserSetting<AutoDownloadLimitSetting> = UserSetting.PrefFromString(
         sharedPrefKey = "autoDownloadLimit",
-        defaultValue = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
+        defaultValue = AutoDownloadLimitSetting.OFF,
         sharedPrefs = sharedPreferences,
-        fromString = { AutoDownloadLimitSetting.fromPreferenceString(it) },
+        fromString = { AutoDownloadLimitSetting.fromPreferenceString(it) ?: AutoDownloadLimitSetting.OFF },
         toString = { it.id.toString() },
     )
 
