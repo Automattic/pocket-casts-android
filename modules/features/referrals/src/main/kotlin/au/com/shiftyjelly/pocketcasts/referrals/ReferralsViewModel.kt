@@ -100,12 +100,25 @@ class ReferralsViewModel @Inject constructor(
         }
     }
 
+    fun onHideBannerClick() {
+        (_state.value as? UiState.Loaded)?.let { loadedState ->
+            settings.referralClaimCode.set("", updateModifiedAt = false)
+            _state.update {
+                loadedState.copy(
+                    showProfileBanner = false,
+                    showHideBannerPopup = false,
+                )
+            }
+        }
+    }
+
     sealed class UiState {
         data object Loading : UiState()
         data class Loaded(
             val showIcon: Boolean = false,
             val showTooltip: Boolean = false,
             val showProfileBanner: Boolean = false,
+            val showHideBannerPopup: Boolean = false,
             val referralsOfferInfo: ReferralsOfferInfo? = null,
         ) : UiState()
     }

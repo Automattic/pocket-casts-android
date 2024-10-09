@@ -2146,6 +2146,8 @@
     <!-- Referrals -->
     <string name="gift">Gift</string>
     <string name="referrals_activate_my_pass">Activate my pass</string>
+    <string name="referrals_banner_long_press_label">Hide referral claim pass banner.</string>
+    <string name="referrals_banner_hide_label">Hide this banner</string>
     <string name="referrals_claim_guess_pass_banner_card_title_english_only" translatable="false">Claim your %1$s\nGuest Pass to Plus</string>
     <!-- Referrals claim guess pass banner card title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_claim_guess_pass_banner_card_title">Claim your %1$s Guest Pass to Plus</string>
