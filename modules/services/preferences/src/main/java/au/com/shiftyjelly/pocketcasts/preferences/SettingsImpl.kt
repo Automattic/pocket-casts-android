@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -26,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
-import au.com.shiftyjelly.pocketcasts.preferences.model.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeDefault
@@ -386,12 +386,12 @@ class SettingsImpl @Inject constructor(
         toString = { it.preferenceInt.toString() },
     )
 
-    override val autoDownloadLimit = UserSetting.PrefFromString(
+    override val autoDownloadLimit: UserSetting<AutoDownloadLimitSetting> = UserSetting.PrefFromString(
         sharedPrefKey = "autoDownloadLimit",
         defaultValue = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
         sharedPrefs = sharedPreferences,
-        fromString = { AutoDownloadLimitSetting.fromPreferenceString(it) },
-        toString = { it.preferenceInt.toString() },
+        fromString = { AutoDownloadLimitSetting.fromPreferenceString(it) ?: AutoDownloadLimitSetting.TWO_LATEST_EPISODE },
+        toString = { it.id.toString() },
     )
 
     override fun setLastModified(lastModified: String?) {
