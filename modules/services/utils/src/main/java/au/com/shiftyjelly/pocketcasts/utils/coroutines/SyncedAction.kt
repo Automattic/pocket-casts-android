@@ -6,19 +6,20 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 
-class SyncedAction<InputT, OutputT : Any>(
+class SyncedAction<InputT, OutputT>(
     private val action: suspend (InputT) -> OutputT,
 ) {
     @Volatile
-    private var value: OutputT? = null
+    private var value: Any? = UNSYNCED_TOKEN
 
     @Volatile
     private var syncJob: Deferred<OutputT>? = null
 
     fun run(input: InputT, scope: CoroutineScope): Deferred<OutputT> {
         val cachedValue = value
-        if (cachedValue != null) {
-            return CompletableDeferred(cachedValue)
+        if (cachedValue !== UNSYNCED_TOKEN) {
+            @Suppress("UNCHECKED_CAST")
+            return CompletableDeferred(cachedValue as OutputT)
         }
 
         return syncJob ?: synchronized(this) {
@@ -35,8 +36,12 @@ class SyncedAction<InputT, OutputT : Any>(
 
     suspend fun reset() {
         syncJob?.cancelAndJoin()
-        value = null
+        value = UNSYNCED_TOKEN
+    }
+
+    private companion object {
+        val UNSYNCED_TOKEN = Any()
     }
 }
 
-fun <T : Any> SyncedAction<Unit, T>.run(scope: CoroutineScope) = run(input = Unit, scope)
+fun <T> SyncedAction<Unit, T>.run(scope: CoroutineScope) = run(input = Unit, scope)
