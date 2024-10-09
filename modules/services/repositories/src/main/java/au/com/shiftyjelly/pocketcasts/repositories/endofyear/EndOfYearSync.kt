@@ -115,5 +115,5 @@ class EndOfYearSync @Inject constructor(
 
     private fun yearEnd(year: Int) = epochAtStartOfYear(year + 1)
 
-    private fun epochAtStartOfYear(year: Int) = LocalDate.of(year, 1, 1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    private fun epochAtStartOfYear(year: Int) = LocalDate.of(year, 1, 1).atStartOfDay().atZone(clock.zone).toInstant().toEpochMilli()
 }
