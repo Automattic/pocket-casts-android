@@ -103,6 +103,7 @@ class ReferralsViewModel @Inject constructor(
     fun onHideBannerClick() {
         (_state.value as? UiState.Loaded)?.let { loadedState ->
             settings.referralClaimCode.set("", updateModifiedAt = false)
+            analyticsTracker.track(AnalyticsEvent.REFERRAL_PASS_BANNER_HIDE_TAPPED)
             _state.update {
                 loadedState.copy(
                     showProfileBanner = false,
