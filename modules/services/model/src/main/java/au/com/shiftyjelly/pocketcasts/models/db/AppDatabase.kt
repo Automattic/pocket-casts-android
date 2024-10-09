@@ -844,7 +844,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_100_101 = addMigration(100, 101) { database ->
-            database.execSQL("ALTER TABLE episode ADD COLUMN auto_download_limit INTEGER DEFAULT 2")
+            database.execSQL("ALTER TABLE podcasts ADD COLUMN auto_download_limit INTEGER")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {

@@ -519,11 +519,13 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
 
     private fun updateAutoDownloadLimit(podcast: Podcast) {
         val options = AutoDownloadLimitSetting.entries
+        val podcastAutoDownloadLimit = podcast.autoDownloadLimit ?: AutoDownloadLimitSetting.TWO_LATEST_EPISODE
+
         autoDownloadPodcastsLimit?.let { autoDownloadLimit ->
             autoDownloadLimit.entries = options.map { getString(it.titleRes) }.toTypedArray()
             autoDownloadLimit.entryValues = options.map { it.id.toString() }.toTypedArray()
-            autoDownloadLimit.value = podcast.autoDownloadLimit.id.toString()
-            autoDownloadLimit.summary = getString(podcast.autoDownloadLimit.titleRes)
+            autoDownloadLimit.value = podcastAutoDownloadLimit.id.toString()
+            autoDownloadLimit.summary = getString(podcastAutoDownloadLimit.titleRes)
         }
     }
 
