@@ -72,6 +72,7 @@ class ExoPlayerDataSourceFactory @Inject constructor(
     fun createMediaSource(
         episodeLocation: EpisodeLocation,
         clipRange: ClosedRange<Long>? = null,
+        onCachingComplete: (String) -> Unit = {},
     ): MediaSource? {
         val episodeUri = episodeLocation.uri ?: return null
         val mediaItem = MediaItem.Builder()
@@ -95,7 +96,12 @@ class ExoPlayerDataSourceFactory @Inject constructor(
             .setCacheWriteDataSinkFactory(null)
             .takeIf { episodeLocation.episode.shouldUseCache() }
         if (cacheFactory != null) {
-            CacheWorker.startCachingEntireEpisode(context, episodeUri.toString(), episodeLocation.episode.uuid)
+            CacheWorker.startCachingEntireEpisode(
+                context = context,
+                url = episodeUri,
+                episodeUuid = episodeLocation.episode.uuid,
+                onCachingComplete = onCachingComplete,
+            )
         }
 
         val dataFactory = cacheFactory ?: defaultFactory

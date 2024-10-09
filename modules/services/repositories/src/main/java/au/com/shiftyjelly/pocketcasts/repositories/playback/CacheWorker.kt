@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.hilt.work.HiltWorker
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.cache.CacheWriter
@@ -11,12 +13,15 @@ import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @OptIn(UnstableApi::class)
@@ -50,13 +55,15 @@ class CacheWorker @AssistedInject constructor(
             )
             cacheWriter?.cache()
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Caching complete for episode id: $episodeUuid worker id: '$id'")
+
+            val outputData = Data.Builder().putString(EPISODE_UUID_KEY, episodeUuid).build()
+            return Result.success(outputData)
         } catch (exception: Exception) {
             val errorMessage = "Failed to cache episode '$episodeUuid' for url '$downloadUrl' worker id: '$id'"
             Timber.tag(TAG).e(exception, errorMessage)
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, errorMessage)
             return Result.failure()
         }
-        return Result.success()
     }
 
     override fun onStopped() {
@@ -76,8 +83,9 @@ class CacheWorker @AssistedInject constructor(
 
         fun startCachingEntireEpisode(
             context: Context,
-            url: String?,
-            episodeUuid: String?,
+            url: String,
+            episodeUuid: String,
+            onCachingComplete: (String) -> Unit,
         ) {
             val inputData = Data.Builder()
                 .putString(URL_KEY, url)
@@ -95,8 +103,28 @@ class CacheWorker @AssistedInject constructor(
                 .setConstraints(constraints)
                 .setInputData(inputData).build()
 
+            observeWorkerInfo(context, cacheWorkRequest, episodeUuid, onCachingComplete)
+
             // Enqueue new caching work
             WorkManager.getInstance(context).enqueue(cacheWorkRequest)
+        }
+
+        private fun observeWorkerInfo(
+            context: Context,
+            cacheWorkRequest: OneTimeWorkRequest,
+            episodeUuid: String,
+            onCachingComplete: (String) -> Unit,
+        ) {
+            ProcessLifecycleOwner.get().lifecycleScope.launch {
+                WorkManager.getInstance(context)
+                    .getWorkInfoByIdFlow(cacheWorkRequest.id).collectLatest { workInfo ->
+                        if (workInfo?.state == WorkInfo.State.SUCCEEDED &&
+                            workInfo.outputData.getString(EPISODE_UUID_KEY) == episodeUuid
+                        ) {
+                            onCachingComplete(episodeUuid)
+                        }
+                    }
+            }
         }
     }
 }
