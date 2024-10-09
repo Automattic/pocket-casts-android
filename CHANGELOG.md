@@ -12,6 +12,9 @@
         ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
     *   Display web-page based HTML transcripts in web view
         ([#2910](https://github.com/Automattic/pocket-casts-android/pull/2910))
+*   New Features
+    *   Add a progress bar in the browse view on Android Auto
+        ([#2945](https://github.com/Automattic/pocket-casts-android/pull/2945))
 
 7.74
 -----
@@ -29,8 +32,6 @@
         ([#2829](https://github.com/Automattic/pocket-casts-android/pull/2829))
     *   Add Google Engage SDK integration 
         ([#2847](https://github.com/Automattic/pocket-casts-android/pull/2847))
-    *   Add a progress bar in the browse view on Android Auto
-        ([#2945](https://github.com/Automattic/pocket-casts-android/pull/2945))
 
 7.73
 -----
