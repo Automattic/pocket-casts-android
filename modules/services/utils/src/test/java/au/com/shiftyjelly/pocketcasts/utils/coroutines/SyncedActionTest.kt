@@ -79,4 +79,20 @@ class SyncedActionTest {
 
         job.cancelAndJoin()
     }
+
+    @Test
+    fun `allow to run again after reset`() = runTest {
+        val emitter = MutableSharedFlow<Int>()
+        val action = SyncedAction<Unit, Int> { emitter.first() }
+
+        action.run(scope = this)
+        yield()
+        action.reset()
+
+        val job = action.run(scope = this)
+        yield()
+        emitter.emit(10)
+
+        assertEquals(10, job.await())
+    }
 }
