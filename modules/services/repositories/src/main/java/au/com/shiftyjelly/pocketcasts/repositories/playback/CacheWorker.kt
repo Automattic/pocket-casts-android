@@ -121,6 +121,16 @@ class CacheWorker @AssistedInject constructor(
                         if (workInfo?.state == WorkInfo.State.SUCCEEDED &&
                             workInfo.outputData.getString(EPISODE_UUID_KEY) == episodeUuid
                         ) {
+                            /* For fully cached media, ExoPlayer's buffer position might not reach the end,
+                            even when the entire media is cached. This is due to ExoPlayer's LoadControl
+                            mechanism, which might not request the entire media to be buffered even when it's
+                            fully cached.
+
+                            This callback is triggered when the media is fully cached and is used to
+                            manually update the buffer position to the end of the media, ensuring more accurate
+                            buffer status tracking.
+
+                            See https://rb.gy/333bzt for more details. */
                             onCachingComplete(episodeUuid)
                         }
                     }
