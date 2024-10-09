@@ -93,6 +93,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                             }
 
                             is ReferralResult.EmptyResult -> {
+                                settings.referralClaimCode.set("", false)
                                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Empty validation result for redeem code: ${settings.referralClaimCode.value}")
                                 _navigationEvent.emit(NavigationEvent.InValidOffer)
                             }
@@ -100,6 +101,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                                 if (result.error is NoNetworkException) {
                                     _snackBarEvent.emit(SnackbarEvent.NoNetwork)
                                 } else {
+                                    settings.referralClaimCode.set("", false)
                                     LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Validation failed for redeem code: ${settings.referralClaimCode.value} ${result.error}")
                                     _navigationEvent.emit(NavigationEvent.InValidOffer)
                                 }
