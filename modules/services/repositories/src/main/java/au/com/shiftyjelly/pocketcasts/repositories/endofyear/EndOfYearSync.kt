@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
-import au.com.shiftyjelly.pocketcasts.utils.coroutines.SyncedAction
+import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.run
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -31,9 +31,9 @@ class EndOfYearSync @Inject constructor(
     private val settings: Settings,
     private val clock: Clock,
 ) {
-    private val ratingsSync = SyncedAction<Unit, Unit> { syncRatings() }
-    private val thisYearSync = SyncedAction<Int, Unit> { syncHistoryForYear(it) }
-    private val lastYearSync = SyncedAction<Int, Unit> { syncHistoryForYear(it) }
+    private val ratingsSync = CachedAction<Unit, Unit> { syncRatings() }
+    private val thisYearSync = CachedAction<Int, Unit> { syncHistoryForYear(it) }
+    private val lastYearSync = CachedAction<Int, Unit> { syncHistoryForYear(it) }
 
     suspend fun sync(year: Int = EndOfYearManager.YEAR_TO_SYNC): Boolean {
         return if (FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024) && syncManager.isLoggedIn()) {
