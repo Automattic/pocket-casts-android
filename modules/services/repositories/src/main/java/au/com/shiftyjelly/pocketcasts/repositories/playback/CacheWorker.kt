@@ -130,7 +130,7 @@ class CacheWorker @AssistedInject constructor(
                             manually update the buffer position to the end of the media, ensuring more accurate
                             buffer status tracking.
 
-                            See https://rb.gy/333bzt for more details. */
+                            See https://github.com/google/ExoPlayer/issues/9172#issuecomment-877250396 for more details. */
                             onCachingComplete(episodeUuid)
                         }
                     }
