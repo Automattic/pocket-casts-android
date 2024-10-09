@@ -6,7 +6,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 
-class SyncedAction<InputT, OutputT>(
+class CachedAction<InputT, OutputT>(
     private val action: suspend (InputT) -> OutputT,
 ) {
     @Volatile
@@ -44,4 +44,4 @@ class SyncedAction<InputT, OutputT>(
     }
 }
 
-fun <T> SyncedAction<Unit, T>.run(scope: CoroutineScope) = run(input = Unit, scope)
+fun <T> CachedAction<Unit, T>.run(scope: CoroutineScope) = run(input = Unit, scope)

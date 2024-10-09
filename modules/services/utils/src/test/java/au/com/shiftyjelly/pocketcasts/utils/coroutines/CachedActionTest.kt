@@ -11,11 +11,11 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class SyncedActionTest {
+class CachedActionTest {
     @Test
     fun `complete job when action is done`() = runTest {
         val emitter = MutableSharedFlow<Unit>()
-        val action = SyncedAction<Unit, Unit> { emitter.first() }
+        val action = CachedAction<Unit, Unit> { emitter.first() }
 
         val job = action.run(scope = this)
         assertTrue(job.isActive)
@@ -27,7 +27,7 @@ class SyncedActionTest {
 
     @Test
     fun `run a single job`() = runTest {
-        val action = SyncedAction<Unit, Unit> { awaitCancellation() }
+        val action = CachedAction<Unit, Unit> { awaitCancellation() }
 
         val job1 = action.run(scope = this)
         val job2 = action.run(scope = this)
@@ -40,7 +40,7 @@ class SyncedActionTest {
     @Test
     fun `memoize result`() = runTest {
         val emitter = MutableSharedFlow<Int>()
-        val action = SyncedAction<Unit, Int> { emitter.first() }
+        val action = CachedAction<Unit, Int> { emitter.first() }
 
         action.run(scope = this)
         yield()
@@ -53,7 +53,7 @@ class SyncedActionTest {
 
     @Test
     fun `cancel the job when reset`() = runTest {
-        val action = SyncedAction<Unit, Unit> { awaitCancellation() }
+        val action = CachedAction<Unit, Unit> { awaitCancellation() }
 
         val job = action.run(scope = this)
         yield()
@@ -66,7 +66,7 @@ class SyncedActionTest {
     @Test
     fun `clear the result when reset`() = runTest {
         val emitter = MutableSharedFlow<Int>()
-        val action = SyncedAction<Unit, Int> { emitter.first() }
+        val action = CachedAction<Unit, Int> { emitter.first() }
 
         action.run(scope = this)
         yield()
@@ -83,7 +83,7 @@ class SyncedActionTest {
     @Test
     fun `allow to run again after reset`() = runTest {
         val emitter = MutableSharedFlow<Int>()
-        val action = SyncedAction<Unit, Int> { emitter.first() }
+        val action = CachedAction<Unit, Int> { emitter.first() }
 
         action.run(scope = this)
         yield()
