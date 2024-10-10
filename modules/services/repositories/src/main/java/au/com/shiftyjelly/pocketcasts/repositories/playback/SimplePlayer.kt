@@ -253,7 +253,9 @@ class SimplePlayer(
             onError(PlayerEvent.PlayerError("No episode location found"))
             return
         }
-        val source = dataSourceFactory.createMediaSource(episodeLocation)
+        val source = dataSourceFactory.createMediaSource(episodeLocation) {
+            onPlayerEvent(this, PlayerEvent.CachingComplete(it))
+        }
         if (source == null) {
             onError(PlayerEvent.PlayerError("Episode has no source"))
             return

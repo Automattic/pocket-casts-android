@@ -190,7 +190,7 @@ open class PlaybackManager @Inject constructor(
 
     private var updateCount = 0
     private var resettingPlayer = false
-    private var lastBufferedUpTo: Int = 0
+    private var episodeLastBufferStatus: EpisodeBufferStatus? = null
     private var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
     private var updateTimerDisposable: Disposable? = null
@@ -1578,6 +1578,15 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    private suspend fun onCachingComplete(episodeUuid: String) {
+        val episode = getCurrentEpisode()
+        episode?.takeIf { it.uuid == episodeUuid }
+            ?.let {
+                updateBufferPosition(EpisodeBufferStatus(episodeUuid, episode.durationMs))
+                bufferUpdateTimerDisposable?.dispose()
+            }
+    }
+
     @Volatile
     private var observeChaptersJob: Job? = null
 
@@ -2196,6 +2205,7 @@ open class PlaybackManager @Inject constructor(
                 is PlayerEvent.PlayerError -> onPlayerError(event)
                 is PlayerEvent.RemoteMetadataNotMatched -> onRemoteMetaDataNotMatched(event.remoteEpisodeUuid)
                 is PlayerEvent.EpisodeChanged -> onEpisodeChanged(event.episodeUuid)
+                is PlayerEvent.CachingComplete -> onCachingComplete(event.episodeUuid)
             }
         }
     }
@@ -2275,22 +2285,24 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun updateBufferPosition() {
+    private suspend fun updateBufferPosition(
+        episodeBufferStatus: EpisodeBufferStatus? = null,
+    ) {
         val episode = getCurrentEpisode()
         val player = player
         if (episode == null || player == null || !player.isStreaming) {
             return
         }
-        val bufferedUpToMs = getBufferedUpToMs()
-        if (bufferedUpToMs == lastBufferedUpTo) {
+        val episodeNewBufferStatus = episodeBufferStatus ?: EpisodeBufferStatus(episode.uuid, getBufferedUpToMs())
+        if (episodeLastBufferStatus == episodeNewBufferStatus) {
             return
         }
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
-                playbackStateRelay.accept(playbackState.copy(bufferedMs = bufferedUpToMs, lastChangeFrom = LastChangeFrom.OnUpdateBufferPosition.value))
+                playbackStateRelay.accept(playbackState.copy(bufferedMs = episodeNewBufferStatus.bufferedUpToMs, lastChangeFrom = LastChangeFrom.OnUpdateBufferPosition.value))
             }
         }
-        lastBufferedUpTo = bufferedUpToMs
+        episodeLastBufferStatus = episodeNewBufferStatus
     }
 
     private fun setupUpdateTimer() {
@@ -2379,7 +2391,10 @@ open class PlaybackManager @Inject constructor(
         if (player == null || !player.isStreaming || player.isRemote || episode.isDownloading) {
             return
         }
-        lastBufferedUpTo = -1
+        val isEpisodeFullyBuffered = episodeLastBufferStatus == EpisodeBufferStatus(episode.uuid, episode.durationMs)
+        if (isEpisodeFullyBuffered) return
+
+        episodeLastBufferStatus = null
         bufferUpdateTimerDisposable?.dispose()
         bufferUpdateTimerDisposable = Observable.interval(UPDATE_TIMER_POLL_TIME, UPDATE_TIMER_POLL_TIME, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMapCompletable {
@@ -2576,6 +2591,8 @@ open class PlaybackManager @Inject constructor(
         AUDIO("audio"),
         VIDEO("video"),
     }
+
+    data class EpisodeBufferStatus(val episodeUuid: String, val bufferedUpToMs: Int)
 
     enum class LastChangeFrom(val value: String) {
         OnInit("Init"),
