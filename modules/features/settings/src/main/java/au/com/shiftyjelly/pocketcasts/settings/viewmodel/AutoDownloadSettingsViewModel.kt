@@ -51,12 +51,16 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
     }
 
-    fun onLimitDownloadsChange(autoDownloadLimitSetting: AutoDownloadLimitSetting) {
-        settings.autoDownloadLimit.set(autoDownloadLimitSetting, updateModifiedAt = true)
+    fun setLimitDownloads(value: AutoDownloadLimitSetting) {
+        settings.autoDownloadLimit.set(value, updateModifiedAt = true)
+    }
+
+    fun onLimitDownloadsChange(value: AutoDownloadLimitSetting) {
+        setLimitDownloads(value)
 
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_TOGGLED,
-            mapOf("value" to autoDownloadLimitSetting.analyticsString),
+            mapOf("value" to value.analyticsString),
         )
     }
 
