@@ -211,7 +211,7 @@ private fun ReferralsClaimGuestPassContent(
 
                 is UiState.Error -> {
                     val errorMessage = when (state.error) {
-                        ReferralsClaimGuestPassError.FailedToLoadOffer -> stringResource(LR.string.error_generic_message)
+                        ReferralsClaimGuestPassError.FailedToLoadOffer -> stringResource(LR.string.referrals_failed_to_load_offer)
                     }
                     ReferralsGuestPassError(errorMessage, onRetry, onDismiss)
                 }

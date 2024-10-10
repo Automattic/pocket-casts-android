@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -51,7 +52,7 @@ fun ReferralsGuestPassError(
             tint = Color.White.copy(alpha = 0.5f),
         )
         Spacer(modifier = Modifier.height(16.dp))
-        TextP40(
+        TextH40(
             text = errorMessage,
             textAlign = TextAlign.Center,
         )
@@ -60,7 +61,7 @@ fun ReferralsGuestPassError(
             onClick = onRetry,
             shape = RoundedCornerShape(40.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.White.copy(alpha = 0.5f),
+                backgroundColor = Color.White.copy(alpha = 0.2f),
             ),
         ) {
             TextP40(
