@@ -225,6 +225,20 @@ class ReferralsViewModelTest {
         }
     }
 
+    @Test
+    fun `profile banner is hidden on hide banner click`() = runTest {
+        initViewModel(
+            signInState = SignInState.SignedOut,
+            referralCode = referralClaimCode,
+        )
+
+        viewModel.onHideBannerClick()
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
     private suspend fun initViewModel(
         signInState: SignInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
         offerInfo: ReferralsOfferInfo = referralOfferInfo,

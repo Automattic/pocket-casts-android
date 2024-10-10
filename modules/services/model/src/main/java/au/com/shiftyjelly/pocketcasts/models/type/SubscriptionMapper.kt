@@ -18,6 +18,7 @@ class SubscriptionMapper @Inject constructor() {
         val matchingSubscriptionOfferDetails = if (isOfferEligible || referralProductDetails != null) {
             productDetails
                 .subscriptionOfferDetails
+                ?.filter { referralProductDetails == null && !it.offerTags.contains(REFERRAL_OFFER_TAG) } // get SubscriptionOfferDetails with offers
                 ?.filter { it.offerSubscriptionPricingPhase != null } // get SubscriptionOfferDetails with offers
                 ?.ifEmpty { productDetails.subscriptionOfferDetails } // if no special offers, return all offers available
                 ?: productDetails.subscriptionOfferDetails // if null, return all offers
@@ -31,7 +32,7 @@ class SubscriptionMapper @Inject constructor() {
             matchingSubscriptionOfferDetails.find { it.offerId == referralProductDetails.offerId }
         } else {
             val matchingSubscriptionOfferDetailsWithoutReferralOffer = matchingSubscriptionOfferDetails
-                .filter { !it.offerTags.contains("referral-offer") }
+                .filter { !it.offerTags.contains(REFERRAL_OFFER_TAG) }
             // TODO handle multiple matching SubscriptionOfferDetails
             if (matchingSubscriptionOfferDetailsWithoutReferralOffer.size > 1) {
                 LogBuffer.w(LogBuffer.TAG_SUBSCRIPTIONS, "Multiple matching SubscriptionOfferDetails found. Only using the first.")
@@ -161,4 +162,8 @@ class SubscriptionMapper @Inject constructor() {
             )
             null
         }
+
+    companion object {
+        private const val REFERRAL_OFFER_TAG = "referral-offer"
+    }
 }
