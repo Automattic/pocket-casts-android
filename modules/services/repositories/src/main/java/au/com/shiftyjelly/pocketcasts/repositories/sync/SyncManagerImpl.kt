@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
@@ -388,6 +389,11 @@ class SyncManagerImpl @Inject constructor(
             syncServiceManager.getPodcastRating(podcastUuid, token)
         }
 
+    override suspend fun getPodcastRatings(): PodcastRatingsResponse? =
+        getCacheTokenOrLogin { token ->
+            syncServiceManager.getPodcastRatings(token)
+        }
+
     // Other
 
     override suspend fun exchangeSonos(): ExchangeSonosResponse =
@@ -549,7 +555,7 @@ class SyncManagerImpl @Inject constructor(
             AccountConstants.SignInType.Tokens -> syncServiceManager.loginToken(refreshToken = refreshToken)
         }
 
-    private suspend fun <T : Any> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
+    private suspend fun <T> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
         if (isLoggedIn()) {
             return try {
                 val token = syncAccountManager.getAccessToken() ?: refreshTokenSuspend()

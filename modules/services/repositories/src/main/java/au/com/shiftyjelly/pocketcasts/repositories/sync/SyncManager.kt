@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.PodcastRatingResponse
+import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
@@ -93,6 +94,7 @@ interface SyncManager : NamedSettingsCaller {
     // Rating
     suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse
     suspend fun getPodcastRating(podcastUuid: String): PodcastRatingResponse
+    suspend fun getPodcastRatings(): PodcastRatingsResponse?
 
     // Other
     suspend fun exchangeSonos(): ExchangeSonosResponse
