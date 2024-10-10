@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -29,6 +30,9 @@ class OnboardingActivityViewModelTest {
 
     @Mock
     private lateinit var userManager: UserManager
+
+    @Mock
+    private lateinit var settings: Settings
 
     private lateinit var viewModel: OnboardingActivityViewModel
 
@@ -73,6 +77,16 @@ class OnboardingActivityViewModelTest {
         }
     }
 
+    @Test
+    fun `given showWelcomeInReferralFlow is true, when exit onboarding, then finish with DoneShowWelcomeInReferralFlow`() = runTest {
+        initViewModel(freeSubscriptionStatus)
+
+        viewModel.finishState.test {
+            viewModel.onExitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
+            assert(awaitItem() == OnboardingFinish.DoneShowWelcomeInReferralFlow)
+        }
+    }
+
     private fun initViewModel(subscriptionStatus: SubscriptionStatus) {
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(
@@ -81,6 +95,7 @@ class OnboardingActivityViewModelTest {
         )
         viewModel = OnboardingActivityViewModel(
             userManager = userManager,
+            settings = settings,
         )
     }
 }

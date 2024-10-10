@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ import kotlinx.coroutines.reactive.asFlow
 @HiltViewModel
 class OnboardingActivityViewModel @Inject constructor(
     private val userManager: UserManager,
+    private val settings: Settings,
 ) : ViewModel() {
 
     private var showPlusPromotionForFreeUserFlow = MutableStateFlow(false)
@@ -50,10 +52,13 @@ class OnboardingActivityViewModel @Inject constructor(
     }
 
     fun onExitOnboarding(exitInfo: OnboardingExitInfo) {
-        if (exitInfo.showPlusPromotionForFreeUser) {
-            showPlusPromotionForFreeUserFlow.value = true
-        } else {
-            viewModelScope.launch {
+        when {
+            exitInfo.showPlusPromotionForFreeUser -> showPlusPromotionForFreeUserFlow.value = true
+            exitInfo.showWelcomeInReferralFlow -> viewModelScope.launch {
+                settings.showReferralWelcome.set(true, updateModifiedAt = false)
+            }
+
+            else -> viewModelScope.launch {
                 _finishState.emit(OnboardingFinish.Done)
             }
         }
