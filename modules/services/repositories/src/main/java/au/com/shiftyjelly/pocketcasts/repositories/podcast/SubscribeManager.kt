@@ -4,7 +4,9 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.Companion.AUTO_DOWNLOAD_NEW_EPISODES
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -149,6 +151,10 @@ class SubscribeManager @Inject constructor(
                 podcast.isSubscribed = subscribed
                 podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
+                if (subscribed) {
+                    podcast.autoDownloadStatus = AUTO_DOWNLOAD_NEW_EPISODES
+                    podcast.autoDownloadLimit = AutoDownloadLimitSetting.TWO_LATEST_EPISODE
+                }
             }
         // add the podcast
         val insertPodcastObservable = podcastObservable.flatMap { podcast ->
