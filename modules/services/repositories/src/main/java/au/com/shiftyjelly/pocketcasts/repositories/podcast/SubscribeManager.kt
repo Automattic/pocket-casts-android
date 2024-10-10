@@ -107,7 +107,7 @@ class SubscribeManager @Inject constructor(
 
                 if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
                     podcastDao.findByUuid(podcastUuid)?.let { podcast ->
-                        val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast)
+                        val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
                         val autoDownloadLimit = podcast.autoDownloadLimit ?: settings.autoDownloadLimit.value
 
                         episodes.take(AutoDownloadLimitSetting.getNumberOfEpisodes(autoDownloadLimit)).forEach { episode ->
