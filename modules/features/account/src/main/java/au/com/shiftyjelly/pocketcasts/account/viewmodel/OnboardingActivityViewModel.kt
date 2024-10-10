@@ -50,10 +50,13 @@ class OnboardingActivityViewModel @Inject constructor(
     }
 
     fun onExitOnboarding(exitInfo: OnboardingExitInfo) {
-        if (exitInfo.showPlusPromotionForFreeUser) {
-            showPlusPromotionForFreeUserFlow.value = true
-        } else {
-            viewModelScope.launch {
+        when {
+            exitInfo.showPlusPromotionForFreeUser -> showPlusPromotionForFreeUserFlow.value = true
+            exitInfo.showWelcomeInReferralFlow -> viewModelScope.launch {
+                _finishState.emit(OnboardingFinish.DoneShowWelcomeInReferralFlow)
+            }
+
+            else -> viewModelScope.launch {
                 _finishState.emit(OnboardingFinish.Done)
             }
         }

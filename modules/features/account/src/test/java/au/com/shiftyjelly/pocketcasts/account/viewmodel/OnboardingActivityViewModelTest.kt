@@ -73,6 +73,16 @@ class OnboardingActivityViewModelTest {
         }
     }
 
+    @Test
+    fun `given showWelcomeInReferralFlow is true, when exit onboarding, then finish with DoneShowWelcomeInReferralFlow`() = runTest {
+        initViewModel(freeSubscriptionStatus)
+
+        viewModel.finishState.test {
+            viewModel.onExitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
+            assert(awaitItem() == OnboardingFinish.DoneShowWelcomeInReferralFlow)
+        }
+    }
+
     private fun initViewModel(subscriptionStatus: SubscriptionStatus) {
         whenever(userManager.getSignInState()).thenReturn(
             Flowable.just(

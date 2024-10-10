@@ -215,6 +215,44 @@ class ReferralsClaimGuestPassViewModelTest {
             viewModel.onActivatePassClick()
             skipItems(1) // skip billing launch
             assertEquals(NavigationEvent.Close, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `given show welcome screen setting true, when redeem is successful, then welcome screen shown`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralValidationResult = SuccessResult(mock()),
+            showWelcomeSetting = UserSetting.Mock(true, mock()),
+        )
+
+        viewModel.navigationEvent.test {
+            viewModel.onActivatePassClick()
+            skipItems(2) // skip billing launch, close screen
+            assertEquals(NavigationEvent.Welcome, awaitItem())
+        }
+    }
+
+    @Test
+    fun `given show welcome screen setting false, when redeem is successful, then welcome screen not shown`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
+        whenever(referralManager.redeemReferralCode(referralCode)).thenReturn(SuccessResult(mock()))
+        initViewModel(
+            offerInfo = referralOfferInfo,
+            signInState = SignInState.SignedIn("email", SubscriptionStatus.Free()),
+            referralValidationResult = SuccessResult(mock()),
+            showWelcomeSetting = UserSetting.Mock(false, mock()),
+        )
+
+        viewModel.navigationEvent.test {
+            viewModel.onActivatePassClick()
+            assertTrue(awaitItem() is NavigationEvent.LaunchBillingFlow)
+            assertEquals(NavigationEvent.Close, awaitItem())
+            ensureAllEventsConsumed()
         }
     }
 
@@ -223,10 +261,12 @@ class ReferralsClaimGuestPassViewModelTest {
         signInState: SignInState = SignInState.SignedOut,
         referralValidationResult: ReferralManager.ReferralResult<ReferralValidationResponse> = SuccessResult(mock()),
         purchaseEvent: PurchaseEvent = PurchaseEvent.Success,
+        showWelcomeSetting: UserSetting<Boolean> = UserSetting.Mock(false, mock()),
     ) {
         whenever(subscriptionManager.observePurchaseEvents()).thenReturn(Flowable.just(purchaseEvent))
         whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
         whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))
+        whenever(settings.showReferralWelcome).thenReturn(showWelcomeSetting)
         whenever(referralManager.validateReferralCode(referralCode)).thenReturn(referralValidationResult)
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
         viewModel = ReferralsClaimGuestPassViewModel(

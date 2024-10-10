@@ -549,4 +549,5 @@ interface Settings {
     fun updatePlayerOrUpNextBottomSheetState(state: Int)
 
     val referralClaimCode: UserSetting<String>
+    val showReferralWelcome: UserSetting<Boolean>
 }
