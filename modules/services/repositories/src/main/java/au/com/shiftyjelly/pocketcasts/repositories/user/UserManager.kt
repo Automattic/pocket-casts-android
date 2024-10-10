@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -55,6 +56,7 @@ class UserManagerImpl @Inject constructor(
     private val crashLogging: CrashLogging,
     private val experimentProvider: ExperimentProvider,
     private val accountManager: AccountManagerStatusInfo,
+    private val endOfYearSync: EndOfYearSync,
 ) : UserManager, CoroutineScope {
 
     companion object {
@@ -119,7 +121,6 @@ class UserManagerImpl @Inject constructor(
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
 
                     settings.marketingOptIn.set(false, updateModifiedAt = false)
-                    settings.setEndOfYearShowModal(true)
 
                     analyticsTracker.track(
                         AnalyticsEvent.USER_SIGNED_OUT,
@@ -128,7 +129,11 @@ class UserManagerImpl @Inject constructor(
                     analyticsTracker.flush()
                     analyticsTracker.clearAllData()
                     analyticsTracker.refreshMetadata()
+
                     experimentProvider.refreshExperiments()
+
+                    settings.setEndOfYearShowModal(true)
+                    endOfYearSync.reset()
                 }
             }
         }
