@@ -178,7 +178,7 @@ class AutoDownloadSettingsFragment :
 
                     viewModel.onLimitDownloadsChange(autoDownloadLimitSetting)
 
-                    changeAutoDownloadLimitSummary()
+                    updateLimitDownloadsSummary()
                     true
                 }
             }
@@ -256,6 +256,10 @@ class AutoDownloadSettingsFragment :
         } else {
             podcastsCategory.removePreference(podcastsPreference)
             podcastsCategory.removePreference(podcastsLimitPreference)
+
+            // Reset Limit Downloads to default value after disabling auto download toggle
+            viewModel.setLimitDownloads(AutoDownloadLimitSetting.TWO_LATEST_EPISODE)
+            updateLimitDownloadsSummary()
         }
     }
 
@@ -420,10 +424,10 @@ class AutoDownloadSettingsFragment :
             entryValues = options.map { it.id.toString() }.toTypedArray()
             value = settings.autoDownloadLimit.value.id.toString()
         }
-        changeAutoDownloadLimitSummary()
+        updateLimitDownloadsSummary()
     }
 
-    private fun changeAutoDownloadLimitSummary() {
+    private fun updateLimitDownloadsSummary() {
         podcastsAutoDownloadLimitPreference?.summary = getString(settings.autoDownloadLimit.value.titleRes)
     }
 }
