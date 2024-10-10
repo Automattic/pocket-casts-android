@@ -21,7 +21,6 @@ import kotlinx.coroutines.reactive.asFlow
 @HiltViewModel
 class OnboardingActivityViewModel @Inject constructor(
     private val userManager: UserManager,
-    private val settings: Settings,
 ) : ViewModel() {
 
     private var showPlusPromotionForFreeUserFlow = MutableStateFlow(false)
@@ -55,7 +54,7 @@ class OnboardingActivityViewModel @Inject constructor(
         when {
             exitInfo.showPlusPromotionForFreeUser -> showPlusPromotionForFreeUserFlow.value = true
             exitInfo.showWelcomeInReferralFlow -> viewModelScope.launch {
-                settings.showReferralWelcome.set(true, updateModifiedAt = false)
+                _finishState.emit(OnboardingFinish.DoneShowWelcomeInReferralFlow)
             }
 
             else -> viewModelScope.launch {
