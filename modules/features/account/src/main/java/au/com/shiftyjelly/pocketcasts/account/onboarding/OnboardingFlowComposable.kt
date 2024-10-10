@@ -87,7 +87,7 @@ private fun Content(
 
     val onAccountCreated = {
         if (flow is OnboardingFlow.ReferralLoginOrSignUp) {
-            exitOnboarding(OnboardingExitInfo())
+            exitOnboarding(OnboardingExitInfo(showWelcomeInReferralFlow = true))
         } else {
             navController.navigate(OnboardingRecommendationsFlow.route) {
                 // clear backstack after account is created
