@@ -80,6 +80,9 @@ private fun Content(
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PlusFlow,
         -> OnboardingNavRoute.PlusUpgrade.route
+
+        is OnboardingFlow.Welcome,
+        -> OnboardingNavRoute.welcome
     }
 
     val onAccountCreated = {
@@ -124,6 +127,7 @@ private fun Content(
                         // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
                         is OnboardingFlow.PlusAccountUpgrade,
                         is OnboardingFlow.PatronAccountUpgrade,
+                        is OnboardingFlow.Welcome,
                         -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
 
                         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
@@ -293,6 +297,7 @@ private fun onLoginToExistingAccount(
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = true))
         OnboardingFlow.ReferralLoginOrSignUp,
         -> exitOnboarding(OnboardingExitInfo(showPlusPromotionForFreeUser = false))
+        OnboardingFlow.Welcome -> Unit // this should never happens, login is not initiated from welcome screen
         is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PatronAccountUpgrade,
         OnboardingFlow.PlusAccountUpgradeNeedsLogin,

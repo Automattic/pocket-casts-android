@@ -27,4 +27,6 @@ sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
     sealed interface PlusFlow {
         val source: OnboardingUpgradeSource
     }
+
+    @Parcelize data object Welcome : OnboardingFlow("welcome")
 }
