@@ -104,7 +104,7 @@ enum class Feature(
         title = "Referrals",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     EXO_OKHTTP(

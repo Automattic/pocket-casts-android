@@ -167,6 +167,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                 (_state.value as? UiState.Loaded)
                     ?.let { loadedState -> _state.update { loadedState.copy(flowComplete = true) } }
                 _navigationEvent.emit(NavigationEvent.Close)
+                job?.cancel()
             }
 
             is ReferralResult.EmptyResult -> {
