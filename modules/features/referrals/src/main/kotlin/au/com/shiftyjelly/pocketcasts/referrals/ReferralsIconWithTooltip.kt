@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -54,6 +55,7 @@ fun ReferralsIconWithTooltip(
                     val fragment = ReferralsGuestPassFragment.newInstance(ReferralsPageType.Send)
                     (activity as FragmentHostListener).showBottomSheet(fragment)
                 },
+                onTooltipClick = viewModel::onTooltipClick,
             )
         }
     }
@@ -63,6 +65,7 @@ fun ReferralsIconWithTooltip(
 private fun ReferralsIconWithTooltip(
     state: UiState.Loaded,
     onIconClick: () -> Unit,
+    onTooltipClick: () -> Unit,
 ) {
     if (state.showIcon) {
         Icon(
@@ -76,6 +79,7 @@ private fun ReferralsIconWithTooltip(
             state.referralsOfferInfo?.let {
                 TooltipContent(
                     referralsOfferInfo = it,
+                    onClick = onTooltipClick,
                 )
             }
         }
@@ -85,11 +89,15 @@ private fun ReferralsIconWithTooltip(
 @Composable
 private fun TooltipContent(
     referralsOfferInfo: ReferralsOfferInfo,
+    onClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .padding(top = 24.dp, bottom = 16.dp),
+            .padding(top = 24.dp, bottom = 16.dp)
+            .clickable {
+                onClick()
+            },
     ) {
         TextH40(
             text = stringResource(LR.string.referrals_tooltip_message, referralsOfferInfo.localizedOfferDurationNoun.lowercase()),
@@ -134,6 +142,7 @@ fun TooltipContentPreview(
     AppThemeWithBackground(themeType) {
         TooltipContent(
             referralsOfferInfo = ReferralsOfferInfoMock,
+            onClick = {},
         )
     }
 }

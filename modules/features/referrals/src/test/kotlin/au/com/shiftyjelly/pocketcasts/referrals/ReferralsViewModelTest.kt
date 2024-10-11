@@ -65,7 +65,6 @@ class ReferralsViewModelTest {
     fun setUp() {
         FeatureFlag.setEnabled(Feature.REFERRALS, true)
         whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
-        whenever(settings.showReferralsTooltip).thenReturn(UserSetting.Mock(true, mock()))
         whenever(settings.playerOrUpNextBottomSheetState).thenReturn(flowOf(BottomSheetBehavior.STATE_COLLAPSED))
     }
 
@@ -169,10 +168,20 @@ class ReferralsViewModelTest {
 
     @Test
     fun `tooltip is hidden on icon click`() = runTest {
-        whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(null)
         initViewModel()
 
         viewModel.onIconClick()
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
+        }
+    }
+
+    @Test
+    fun `tooltip is hidden on tooltip click`() = runTest {
+        initViewModel()
+
+        viewModel.onTooltipClick()
 
         viewModel.state.test {
             assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
@@ -243,7 +252,9 @@ class ReferralsViewModelTest {
         signInState: SignInState = SignInState.SignedIn(email, statusAndroidPaidSubscription),
         offerInfo: ReferralsOfferInfo = referralOfferInfo,
         referralCode: String = referralClaimCode,
+        showReferralsTooltipUserSetting: UserSetting<Boolean> = UserSetting.Mock(true, mock()),
     ) {
+        whenever(settings.showReferralsTooltip).thenReturn(showReferralsTooltipUserSetting)
         whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
         whenever(userManager.getSignInState()).thenReturn(Flowable.just(signInState))
         whenever(settings.referralClaimCode).thenReturn(UserSetting.Mock(referralCode, mock()))

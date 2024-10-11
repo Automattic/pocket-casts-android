@@ -75,16 +75,20 @@ class ReferralsViewModel @Inject constructor(
     }
 
     fun onIconClick() {
+        hideTooltip()
+    }
+
+    fun onTooltipClick() {
+        hideTooltip()
+        analyticsTracker.track(AnalyticsEvent.REFERRAL_TOOLTIP_TAPPED)
+    }
+
+    private fun hideTooltip() {
         if (settings.showReferralsTooltip.value) {
             settings.showReferralsTooltip.set(false, updateModifiedAt = false)
-            analyticsTracker.track(AnalyticsEvent.REFERRAL_TOOLTIP_TAPPED)
         }
         (_state.value as? UiState.Loaded)?.let { loadedState ->
-            _state.update {
-                loadedState.copy(
-                    showTooltip = false,
-                )
-            }
+            _state.update { loadedState.copy(showTooltip = false) }
         }
     }
 
