@@ -108,6 +108,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                             }
                         }
                     } else {
+                        settings.showReferralWelcome.set(false, updateModifiedAt = false)
                         _navigationEvent.emit(NavigationEvent.LoginOrSignup)
                     }
                 }
@@ -167,6 +168,10 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
                 (_state.value as? UiState.Loaded)
                     ?.let { loadedState -> _state.update { loadedState.copy(flowComplete = true) } }
                 _navigationEvent.emit(NavigationEvent.Close)
+                if (settings.showReferralWelcome.value) {
+                    settings.showReferralWelcome.set(false, updateModifiedAt = false)
+                    _navigationEvent.emit(NavigationEvent.Welcome)
+                }
                 job?.cancel()
             }
 
@@ -217,6 +222,7 @@ class ReferralsClaimGuestPassViewModel @Inject constructor(
         data object InValidOffer : NavigationEvent()
         data class LaunchBillingFlow(val subscriptionWithOffer: Subscription.WithOffer) : NavigationEvent()
         data object Close : NavigationEvent()
+        data object Welcome : NavigationEvent()
     }
 
     sealed class SnackbarEvent {
