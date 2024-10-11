@@ -1,26 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
-import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
-import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
-import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import java.time.Year
 
 interface EndOfYearManager {
-    suspend fun isEligibleForStories(): Boolean
-    suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit)
-    suspend fun loadStories(): List<Story>
-    suspend fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Boolean
-    suspend fun getTotalListeningTimeInSecsForYear(year: Int): Long?
-    suspend fun findListenedCategoriesForYear(year: Int): List<ListenedCategory>
-    suspend fun findListenedNumbersForYear(year: Int): ListenedNumbers
-    suspend fun findTopPodcastsForYear(year: Int, limit: Int): List<TopPodcast>
-    suspend fun findLongestPlayedEpisodeForYear(year: Int): LongestEpisode?
-    suspend fun getYearOverYearListeningTime(thisYear: Int): YearOverYearListeningTime?
-    suspend fun countEpisodesStartedAndCompleted(year: Int): EpisodesStartedAndCompleted
+    suspend fun isEligibleForEndOfYear(year: Year = YEAR_TO_SYNC): Boolean
+    suspend fun getStats(year: Year = YEAR_TO_SYNC): EndOfYearStats
+    suspend fun getPlayedEpisodeCount(year: Year = YEAR_TO_SYNC): Int
 
     companion object {
         val YEAR_TO_SYNC = Year.of(2024)

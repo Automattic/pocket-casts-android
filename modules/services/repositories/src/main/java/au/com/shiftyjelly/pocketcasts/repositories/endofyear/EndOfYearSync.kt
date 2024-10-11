@@ -2,14 +2,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.run
-import au.com.shiftyjelly.pocketcasts.utils.extensions.toEpochMillis
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
@@ -27,7 +25,7 @@ class EndOfYearSync @Inject constructor(
     private val syncManager: SyncManager,
     private val historyManager: HistoryManager,
     private val ratingsManager: RatingsManager,
-    private val episodeManager: EpisodeManager,
+    private val endOfYearManager: EndOfYearManager,
     private val settings: Settings,
     private val clock: Clock,
 ) {
@@ -98,7 +96,7 @@ class EndOfYearSync @Inject constructor(
         if (serverCount == null) {
             throw RuntimeException("Failed to get history episode count for year $year")
         }
-        val localCount = countEpisodeInteractionsInYear(year)
+        val localCount = endOfYearManager.getPlayedEpisodeCount(year)
 
         if (serverCount > localCount) {
             val history = syncManager.historyYear(year = year.value, count = false).history
@@ -107,9 +105,5 @@ class EndOfYearSync @Inject constructor(
             }
             historyManager.processServerResponse(response = history, updateServerModified = false)
         }
-    }
-
-    private suspend fun countEpisodeInteractionsInYear(year: Year): Int {
-        return episodeManager.countEpisodesInListeningHistory(year.toEpochMillis(clock.zone), year.plusYears(1).toEpochMillis(clock.zone))
     }
 }

@@ -1,11 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.db.helper.EpisodesStartedAndCompleted
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
-import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
-import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -132,21 +127,7 @@ interface EpisodeManager {
     suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, removeFromUpNext: Boolean = true)
     suspend fun findStaleDownloads(): List<PodcastEpisode>
-    suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
-    suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
-    suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
-    suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
-    suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
-    suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): PodcastEpisode?
-    suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
     suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double
-    suspend fun yearOverYearListeningTime(
-        fromEpochMsPreviousYear: Long,
-        toEpochMsPreviousYear: Long,
-        fromEpochMsCurrentYear: Long,
-        toEpochMsCurrentYear: Long,
-    ): YearOverYearListeningTime
-    suspend fun countEpisodesStartedAndCompleted(fromEpochMs: Long, toEpochMs: Long): EpisodesStartedAndCompleted
 
     suspend fun updateDownloadUrl(episode: PodcastEpisode): String?
 
