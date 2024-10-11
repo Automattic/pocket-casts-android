@@ -36,8 +36,9 @@ class EndOfYearSync @Inject constructor(
     private val timestampSetting = settings.lastEoySyncTimestamp
 
     suspend fun sync(year: Int = EndOfYearManager.YEAR_TO_SYNC): Boolean {
-        return if (shouldSync()) {
-            supervisorScope {
+        return when {
+            isDataSynced() -> true
+            canSyncData() -> supervisorScope {
                 val jobs = listOf(
                     thisYearSync.run(year, scope = this),
                     lastYearSync.run(year - 1, scope = this),
@@ -48,8 +49,7 @@ class EndOfYearSync @Inject constructor(
                     .onSuccess { timestampSetting.set(clock.instant(), updateModifiedAt = false) }
                     .getOrElse { error -> if (error !is CancellationException) false else throw error }
             }
-        } else {
-            false
+            else -> false
         }
     }
 
@@ -60,9 +60,12 @@ class EndOfYearSync @Inject constructor(
         timestampSetting.set(Instant.EPOCH, updateModifiedAt = false)
     }
 
-    private fun shouldSync(): Boolean {
-        val isDataStale = Duration.between(timestampSetting.value, clock.instant()) > Duration.ofHours(6)
-        return FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024) && syncManager.isLoggedIn() && isDataStale
+    private fun isDataSynced(): Boolean {
+        return Duration.between(timestampSetting.value, clock.instant()) > Duration.ofHours(6)
+    }
+
+    private fun canSyncData(): Boolean {
+        return FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024) && syncManager.isLoggedIn()
     }
 
     private suspend fun syncRatings() {
