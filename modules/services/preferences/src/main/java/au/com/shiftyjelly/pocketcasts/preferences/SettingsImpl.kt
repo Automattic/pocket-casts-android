@@ -52,6 +52,7 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.nio.charset.Charset
+import java.time.Instant
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -1503,4 +1504,12 @@ class SettingsImpl @Inject constructor(
     override fun updatePlayerOrUpNextBottomSheetState(state: Int) {
         _playerOrUpNextBottomSheetState.tryEmit(state)
     }
+
+    override val lastEoySyncTimestamp = UserSetting.PrefFromString<Instant>(
+        sharedPrefKey = "eoy_sync_timestamp",
+        defaultValue = Instant.EPOCH,
+        sharedPrefs = sharedPreferences,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrDefault(Instant.EPOCH) },
+        toString = { value -> value.toString() },
+    )
 }

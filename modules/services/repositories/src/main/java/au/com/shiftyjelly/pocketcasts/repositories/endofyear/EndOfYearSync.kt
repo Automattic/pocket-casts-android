@@ -33,9 +33,10 @@ class EndOfYearSync @Inject constructor(
     private val ratingsSync = CachedAction<Unit, Unit> { syncRatings() }
     private val thisYearSync = CachedAction<Int, Unit> { syncHistoryForYear(it) }
     private val lastYearSync = CachedAction<Int, Unit> { syncHistoryForYear(it) }
+    private val timestampSetting = settings.lastEoySyncTimestamp
 
     suspend fun sync(year: Int = EndOfYearManager.YEAR_TO_SYNC): Boolean {
-        return if (FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024) && syncManager.isLoggedIn()) {
+        return if (shouldSync()) {
             supervisorScope {
                 val jobs = listOf(
                     thisYearSync.run(year, scope = this),
@@ -44,6 +45,7 @@ class EndOfYearSync @Inject constructor(
                 )
                 runCatching { jobs.awaitAll() }
                     .map { true }
+                    .onSuccess { timestampSetting.set(clock.instant(), updateModifiedAt = false) }
                     .getOrElse { error -> if (error !is CancellationException) false else throw error }
             }
         } else {
@@ -55,13 +57,19 @@ class EndOfYearSync @Inject constructor(
         ratingsSync.reset()
         thisYearSync.reset()
         lastYearSync.reset()
+        timestampSetting.set(Instant.EPOCH, updateModifiedAt = false)
+    }
+
+    private fun shouldSync(): Boolean {
+        val isDataStale = Duration.between(timestampSetting.value, clock.instant()) > Duration.ofHours(6)
+        return FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024) && syncManager.isLoggedIn() && isDataStale
     }
 
     private suspend fun syncRatings() {
         val lastSyncTimeString = settings.getLastModified()
         val lastSyncTime = runCatching { Instant.parse(lastSyncTimeString) }.getOrDefault(Instant.EPOCH)
         // Check if we synced account in the last day and assume that ratings are accurate if that's the case
-        if (Duration.between(lastSyncTime, clock.instant()).toDays() < 1) {
+        if (Duration.between(lastSyncTime, clock.instant()) < Duration.ofDays(1)) {
             return
         }
 
