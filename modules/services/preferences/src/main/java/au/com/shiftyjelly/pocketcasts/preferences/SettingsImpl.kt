@@ -387,7 +387,7 @@ class SettingsImpl @Inject constructor(
         toString = { it.preferenceInt.toString() },
     )
 
-    override val autoDownloadLimit: UserSetting<AutoDownloadLimitSetting> = UserSetting.PrefFromString(
+    override val autoDownloadLimit = UserSetting.PrefFromString(
         sharedPrefKey = "autoDownloadLimit",
         defaultValue = AutoDownloadLimitSetting.TWO_LATEST_EPISODE,
         sharedPrefs = sharedPreferences,

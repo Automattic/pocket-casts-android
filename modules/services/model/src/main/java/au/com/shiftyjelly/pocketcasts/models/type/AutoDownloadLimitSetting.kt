@@ -8,11 +8,6 @@ enum class AutoDownloadLimitSetting(
     @StringRes val titleRes: Int,
     val analyticsString: String,
 ) {
-    OFF(
-        id = 0,
-        titleRes = LR.string.settings_auto_download_limit_off,
-        analyticsString = "off",
-    ),
     LATEST_EPISODE(
         id = 1,
         titleRes = LR.string.settings_auto_download_limit_latest_episode,
@@ -57,5 +52,14 @@ enum class AutoDownloadLimitSetting(
         }
 
         fun fromInt(id: Int) = (AutoDownloadLimitSetting.entries.firstOrNull { it.id == id })
+
+        fun getNumberOfEpisodes(setting: AutoDownloadLimitSetting): Int = when (setting) {
+            LATEST_EPISODE -> 1
+            TWO_LATEST_EPISODE -> 2
+            THREE_LATEST_EPISODE -> 3
+            FIVE_LATEST_EPISODE -> 5
+            TEN_LATEST_EPISODE -> 10
+            ALL_LATEST_EPISODES -> 1 // todo - confirm what does all latest episodes mean
+        }
     }
 }

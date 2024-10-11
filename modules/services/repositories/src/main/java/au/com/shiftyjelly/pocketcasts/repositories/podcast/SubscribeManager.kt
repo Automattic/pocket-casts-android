@@ -1,14 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.Companion.AUTO_DOWNLOAD_NEW_EPISODES
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
@@ -16,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.executeBlocking
 import coil.imageLoader
@@ -40,6 +47,8 @@ class SubscribeManager @Inject constructor(
     val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val staticServiceManager: StaticServiceManager,
     private val syncManager: SyncManager,
+    private val episodeManager: EpisodeManager,
+    private val downloadManager: DownloadManager,
     @ApplicationContext val context: Context,
     val settings: Settings,
 ) {
@@ -95,6 +104,27 @@ class SubscribeManager @Inject constructor(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Added podcast $podcastUuid to database")
                 // update the notification time as any podcasts added after this date will be ignored
                 settings.setNotificationLastSeenToNow()
+
+                if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+                    podcastDao.findByUuid(podcastUuid)?.let { podcast ->
+                        val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
+                        val autoDownloadLimit = podcast.autoDownloadLimit ?: settings.autoDownloadLimit.value
+
+                        episodes.take(AutoDownloadLimitSetting.getNumberOfEpisodes(autoDownloadLimit)).forEach { episode ->
+                            if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
+                                return@forEach
+                            }
+
+                            DownloadHelper.addAutoDownloadedEpisodeToQueue(
+                                episode,
+                                "Auto Download after subscribing to $podcastUuid",
+                                downloadManager,
+                                episodeManager,
+                                source = SourceView.DOWNLOADS,
+                            )
+                        }
+                    }
+                }
             }
     }
 
@@ -149,6 +179,10 @@ class SubscribeManager @Inject constructor(
                 podcast.isSubscribed = subscribed
                 podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
+                if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+                    podcast.autoDownloadStatus = AUTO_DOWNLOAD_NEW_EPISODES
+                    podcast.autoDownloadLimit = settings.autoDownloadLimit.value
+                }
             }
         // add the podcast
         val insertPodcastObservable = podcastObservable.flatMap { podcast ->
