@@ -89,11 +89,6 @@ class EndOfYearSync @Inject constructor(
     }
 
     private suspend fun syncHistoryForYear(year: Int) {
-        // check for an episode interacted with before this year and assume they have the full listening history if they exist
-        if (anyEpisodeInteractionBeforeYear(year)) {
-            return
-        }
-
         // only download the count to check if we are missing history episodes
         val serverCount = syncManager.historyYear(year = year, count = true).count
         if (serverCount == null) {
@@ -108,10 +103,6 @@ class EndOfYearSync @Inject constructor(
             }
             historyManager.processServerResponse(response = history, updateServerModified = false)
         }
-    }
-
-    private suspend fun anyEpisodeInteractionBeforeYear(year: Int): Boolean {
-        return episodeManager.findEpisodeInteractedBefore(yearStart(year)) != null
     }
 
     private suspend fun countEpisodeInteractionsInYear(year: Int): Int {
