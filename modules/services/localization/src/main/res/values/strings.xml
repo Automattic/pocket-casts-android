@@ -2158,6 +2158,7 @@
     <string name="referrals_claim_guest_pass_title">Claim your %1$s Guest Pass</string>
     <!-- Referrals guest pass card title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_guest_pass_card_title">%1$s Guest Pass</string>
+    <string name="referrals_failed_to_load_offer">Sorry, but something went wrong fetching your referral link.</string>
     <string name="referrals_invalid_offer_description">This guest pass can only be redeemed once and is available for those without an active Plus or Patron subscription. Thanks for listening!</string>
     <string name="referrals_invalid_offer_title">This offer isn\'t available</string>
     <!-- Referrals send guest pass title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
