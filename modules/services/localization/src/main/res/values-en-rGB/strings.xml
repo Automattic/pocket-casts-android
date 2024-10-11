@@ -301,7 +301,6 @@ Language: en_GB
     <string name="end_of_year_story_listened_to_categories_subtitle">Let’s take a look at some of your favourites…</string>
     <string name="end_of_year_story_listened_to_categories">You listened to %1$d different categories this year</string>
     <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>
-    <string name="end_of_year_launch_modal_image_title">Year in Podcasts</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
     <string name="playback_speed">Playback speed</string>
     <string name="trim_silence_mode_not_valid">Trim Silence Mode %1$s not valid</string>
@@ -338,7 +337,6 @@ Language: en_GB
     <string name="must_provide_command_name">Must provide command name</string>
     <string name="no_episodes_in_filter_x">No episodes in Filter %1$s</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favourite creators!</string>
-    <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
     <string name="settings_show_played">Show played episodes</string>

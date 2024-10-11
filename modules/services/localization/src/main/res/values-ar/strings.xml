@@ -289,7 +289,6 @@ Language: ar
     <string name="end_of_year_story_top_categories">أهم تصنيفاتك</string>
     <string name="end_of_year_story_top_categories_share_text">الأكثر استماعًا إلى تصنيفات الحلقات الصوتية</string>
     <string name="end_of_year_create_account_to_see">احفظ حلقاتك الصوتية في السحابة واحصل على تقييم نهاية العام وقم بمزامنة تقدُّمك مع الأجهزة الأخرى.</string>
-    <string name="end_of_year_launch_modal_image_title">أحداث العام في حلقات البودكاست</string>
     <string name="end_of_year_story_intro_title">لنحتفل بأحداث العام الخاصة بك من خلال الاستماع!</string>
     <string name="end_of_year_story_listened_to_categories">لقد استمعتَ إلى ⁦%1$d⁩ من التصنيفات المختلفة في هذا العام</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">لنلقِ نظرة إلى بعض مفضلاتك…</string>
@@ -329,7 +328,6 @@ Language: ar
     <string name="chapter_to_skip_to">الفصل المطلوب تخطيه</string>
     <string name="chapter_to_skip_to_not_valid">الفصل المطلوب تخطيه إلى ⁦%1$s⁩ غير صالح</string>
     <string name="settings_app_icon_halloween">عيد الهالوين</string>
-    <string name="end_of_year_launch_modal_title">أحداث العام الخاصة بي في حلقات البودكاست</string>
     <string name="end_of_year_launch_modal_summary">اطلع على أهم حلقات البودكاست والتصنيفات وإحصاءات الاستماع الخاصة بك والمزيد. شارك مع الأصدقاء وعبّر عن المبدعين الذين تفضّلهم!</string>
     <string name="settings_show_played">عرض الحلقات التي تم تشغيلها</string>
     <string name="settings_show_played_summary">ستظل الحلقات التي أنهيت تشغيلها معروضة</string>

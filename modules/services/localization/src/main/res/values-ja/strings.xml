@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-26 09:54:03+0000
+Translation-Revision-Date: 2024-10-08 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">コードを利用できませんでした。 後でもう一度お試しください。</string>
+    <string name="referrals_create_subscription_failed">サブスクリプションを作成できませんでした。 後でもう一度お試しください。</string>
+    <string name="referrals_guest_pass_card_title">%1$sのゲストパス</string>
+    <string name="referrals_claim_guest_pass_description">メンバーシップは%sの有料年間メンバーシップに自動的に更新されます。</string>
+    <string name="profile_cloud_add_invalid_file">選択したファイルを読み込めません。 もう一度試すか、別のファイルを選択してください。</string>
+    <string name="error_generic_message">問題が発生しました。 後でもう一度お試しください。</string>
+    <string name="player_sleep_timer_settings">スリープタイマー設定</string>
+    <string name="referrals_share_text">こんにちは。 以下のリンクを使用して Pocket Casts Plus の%1$sのゲストパスを取得し、お使いの全端末でポッドキャストをお楽しみください !</string>
+    <string name="referrals_share_subject">Pocket Casts の%1$sのゲストパス</string>
     <string name="referrals_invalid_offer_title">このオファーは利用できません</string>
     <string name="referrals_invalid_offer_description">このゲストパスは Plus または Patron のサブスクリプションがアクティブでないユーザーが対象で、1回に限りご利用いただけます。 お聴きいただきありがとうございます !</string>
-    <string name="referrals_claim_guest_pass_title">2か月間のゲストパスを取得しましょう</string>
-    <string name="referrals_claim_guest_pass_description">このオファーは新規メンバーのみが対象です。 メンバーシップは%sの有料年間メンバーシップに自動的に更新されます。</string>
+    <string name="referrals_claim_guest_pass_title">%1$sのゲストパスを取得しましょう</string>
     <string name="referrals_activate_my_pass">パスを有効化</string>
-    <string name="referrals_tooltip_message">Pocket Casts Plus を2か月間プレゼント !</string>
+    <string name="referrals_tooltip_message">Pocket Casts Plus を%1$sプレゼント !</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">リスニング体験をすべてご利用いただけます</string>
-    <string name="referrals_claim_guess_pass_banner_card_title">Plus の2か月間のゲストパスを取得しましょう</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Plus の%1$sのゲストパスを取得しましょう</string>
     <string name="referrals_share_guest_pass">ゲストパスを共有</string>
-    <string name="referrals_send_guest_pass_card_title">2か月間のゲストパス</string>
-    <string name="referrals_send_guest_pass_title">Pocket Casts Plus を2か月間プレゼント</string>
+    <string name="referrals_send_guest_pass_title">Pocket Casts Plus を%1$sプレゼント</string>
     <string name="move_down">下に移動</string>
     <string name="move_up">上に移動</string>
     <string name="search_episodes_not_found_summary">その検索に該当するエピソードは見つかりませんでした。 別のキーワードを試してください。</string>
@@ -593,7 +600,6 @@ Language: ja_JP
     <string name="end_of_year_story_listened_to_categories">今年、%1$d個のカテゴリーを聴きました</string>
     <string name="end_of_year_story_listened_to_share_text">今年ポッドキャストを聴いた時間は%1$s時間でした</string>
     <string name="end_of_year_story_intro_title">今年聴いたポッドキャストを振り返ってみましょう。</string>
-    <string name="end_of_year_launch_modal_image_title">ポッドキャストで振り返る1年</string>
     <string name="settings_media_notification_controls">メディア通知コントロール</string>
     <string name="playback_speed">再生速度</string>
     <string name="volume_boost_enabled_not_valid">「ボリュームブーストを有効化」の値は \'true\' または \'false\' である必要があります、 %1$s でした</string>
@@ -630,7 +636,6 @@ Language: ja_JP
     <string name="filter_x_not_found">フィルター %1$s は見つかりません</string>
     <string name="must_provide_filter_name">フィルター名を指定する必要があります</string>
     <string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
-    <string name="end_of_year_launch_modal_title">ポッドキャストで振り返る1年</string>
     <string name="settings_app_icon_halloween">ハロウィーン</string>
     <string name="settings_show_played_summary">プレイを終了したエピソードは、引き続き表示されます。</string>
     <string name="settings_show_played">「再生されたエピソードを表示」</string>

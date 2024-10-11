@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-25 12:54:03+0000
+Translation-Revision-Date: 2024-10-09 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">Code konnte nicht eingelöst werden. Bitte versuche es später erneut.</string>
+    <string name="referrals_create_subscription_failed">Abonnement konnte nicht erstellt werden. Bitte versuche es später erneut.</string>
+    <string name="referrals_guest_pass_card_title">%1$s-Gastpass</string>
+    <string name="referrals_claim_guest_pass_description">Die Mitgliedschaft wird automatisch zu einer kostenpflichtigen jährlichen Mitgliedschaft in Höhe von %s verlängert.</string>
+    <string name="profile_cloud_add_invalid_file">Die ausgewählte Datei kann nicht geladen werden. Bitte versuche es erneut oder wähle eine andere Datei aus.</string>
+    <string name="error_generic_message">Etwas ist schiefgegangen. Bitte versuche es später erneut.</string>
+    <string name="player_sleep_timer_settings">Einstellungen für Schlummerfunktion</string>
+    <string name="referrals_share_text">Hallo! Über den unten stehenden Link kannst du deinen %1$s-Gastpass für Pocket Casts Plus anfordern und dir auf all deinen Geräten Podcasts anhören!</string>
+    <string name="referrals_share_subject">%1$s-Gastpass für Pocket Casts</string>
     <string name="referrals_invalid_offer_title">Dieses Angebot ist nicht verfügbar</string>
     <string name="referrals_invalid_offer_description">Dieser Gastpass kann nur einmal eingelöst werden und steht nur Personen ohne aktives Plus- oder Patron-Abonnement zur Verfügung. Danke fürs Zuhören!</string>
-    <string name="referrals_claim_guest_pass_title">Sichere dir deinen 2-monatigen Gastpass</string>
-    <string name="referrals_claim_guest_pass_description">Dieses Angebot gilt nur für neue Mitglieder. Die Mitgliedschaft wird automatisch zu einer kostenpflichtigen jährlichen Mitgliedschaft in Höhe von %s verlängert.</string>
+    <string name="referrals_claim_guest_pass_title">Sichere dir deinen %1$s-Gastpass</string>
     <string name="referrals_activate_my_pass">Meinen Pass aktivieren</string>
-    <string name="referrals_tooltip_message">Verschenke 2 Monate Pocket Casts Plus!</string>
+    <string name="referrals_tooltip_message">Verschenke %1$s-Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Profitiere vom vollständigen Audioerlebnis</string>
-    <string name="referrals_claim_guess_pass_banner_card_title">Sichere dir deinen 2-monatigen Gastpass für Plus</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Sichere dir deinen %1$s-Gastpass für Plus</string>
     <string name="referrals_share_guest_pass">Gastpass teilen</string>
-    <string name="referrals_send_guest_pass_card_title">Gastpass für 2 Monate</string>
-    <string name="referrals_send_guest_pass_title">Verschenke 2 Monate Pocket Casts Plus</string>
+    <string name="referrals_send_guest_pass_title">Verschenke %1$s-Pocket Casts Plus</string>
     <string name="move_down">Nach unten verschieben</string>
     <string name="move_up">Nach oben verschieben</string>
     <string name="search_episodes_not_found_summary">Wir konnten keine Folge für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
@@ -593,7 +600,6 @@ Language: de
     <string name="end_of_year_story_listened_to_categories">Du hast dir in diesem Jahr %1$d unterschiedliche Kategorien angehört</string>
     <string name="end_of_year_story_listened_to_share_text">Ich habe in diesem Jahr %1$s mit dem Anhören von Podcasts verbracht</string>
     <string name="end_of_year_story_intro_title">Feiern wir dein Audio-Jahr!</string>
-    <string name="end_of_year_launch_modal_image_title">Das Jahr in Podcasts</string>
     <string name="settings_media_notification_controls">Benachrichtigungskontrollen für Medien</string>
     <string name="playback_speed">Wiedergabegeschwindigkeit</string>
     <string name="volume_boost_enabled_not_valid">Der Wert für „Lautstärke-Booster aktiviert“ muss „wahr“ oder „falsch“ sein, war jedoch  %1$s</string>
@@ -630,7 +636,6 @@ Language: de
     <string name="filter_x_not_found">Filter %1$s nicht gefunden</string>
     <string name="must_provide_filter_name">Filtername erforderlich</string>
     <string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
-    <string name="end_of_year_launch_modal_title">Dein Jahr in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Folgen, die du bereits abgespielt hast, werden weiterhin angezeigt</string>
     <string name="settings_show_played">Abgespielte Folgen anzeigen</string>

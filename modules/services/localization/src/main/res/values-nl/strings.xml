@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-18 11:54:03+0000
+Translation-Revision-Date: 2024-10-10 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">De code kon niet ingewisseld worden. Probeer het later opnieuw.</string>
+    <string name="referrals_create_subscription_failed">Kan geen abonnement aanmaken. Probeer het later opnieuw.</string>
+    <string name="referrals_guest_pass_card_title">%1$s gastenpas</string>
+    <string name="referrals_claim_guest_pass_description">Lidmaatschap wordt automatisch verlengd met een betaald jaarlidmaatschap van %s.</string>
+    <string name="profile_cloud_add_invalid_file">Het geselecteerde bestand kon niet geladen worden. Probeer het later opnieuw of kies een ander bestand.</string>
+    <string name="error_generic_message">Er is iets fout gegaan. Probeer het later opnieuw.</string>
+    <string name="player_sleep_timer_settings">Instellingen slaaptimer</string>
+    <string name="referrals_share_text">Hallo! Gebruik de onderstaande link om je gastenpas van %1$s voor Pocket Casts Plus te claimen en op al je devices naar podcasts te luisteren!</string>
+    <string name="referrals_share_subject">Gastenpas van %1$s voor Pocket Casts</string>
+    <string name="referrals_invalid_offer_title">Deze aanbieding is niet geldig</string>
+    <string name="referrals_invalid_offer_description">Deze gastenpas kan eenmalig worden ingewisseld en is beschikbaar voor iedereen zonder een actief Plus- of Patron-abonnement. Bedankt voor het luisteren!</string>
+    <string name="referrals_claim_guest_pass_title">Claim je gastenpas van %1$s voor Plus</string>
+    <string name="referrals_activate_my_pass">Activeer mijn pas</string>
+    <string name="referrals_tooltip_message">Geef %1$s Pocket Casts Plus weg!</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Ontgrendel de volledige luisterervaring</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Claim je gastenpas van %1$svoor Plus</string>
     <string name="referrals_share_guest_pass">Gastenpassen delen</string>
-    <string name="referrals_send_guest_pass_card_title">Gastenpas voor 2 maanden</string>
-    <string name="referrals_send_guest_pass_title">Geef 2 maanden Pocket Casts Plus weg</string>
+    <string name="referrals_send_guest_pass_title">Geef %1$s Pocket Casts Plus weg</string>
     <string name="move_down">Omlaag verplaatsen</string>
     <string name="move_up">Omhoog verplaatsen</string>
     <string name="search_episodes_not_found_summary">We kunnen geen aflevering vinden voor die zoekopdracht. Probeer een ander trefwoord.</string>
@@ -585,7 +600,6 @@ Language: nl
     <string name="end_of_year_story_listened_to_categories">Je hebt dit jaar naar %1$d verschillende categorieën geluisterd</string>
     <string name="end_of_year_story_listened_to_share_text">Dit jaar heb je %1$s naar podcasts geluisterd</string>
     <string name="end_of_year_story_intro_title">Laten we je luisterjaar vieren!</string>
-    <string name="end_of_year_launch_modal_image_title">Jaar in podcasts</string>
     <string name="settings_media_notification_controls">Meldingen mediabedieningen</string>
     <string name="playback_speed">Afspeelsnelheid</string>
     <string name="volume_boost_enabled_not_valid">Waarde volumeboost ingeschakeld moet \'true\' (waar) of \'false\' (onwaar) zijn, maar was  %1$s</string>
@@ -622,7 +636,6 @@ Language: nl
     <string name="filter_x_not_found">Filter %1$s niet gevonden</string>
     <string name="must_provide_filter_name">Je moet een filternaam opgeven</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
-    <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Afleveringen die helemaal zijn afgespeeld, worden nog steeds weergegeven</string>
     <string name="settings_show_played">Afgespeelde afleveringen weergeven</string>

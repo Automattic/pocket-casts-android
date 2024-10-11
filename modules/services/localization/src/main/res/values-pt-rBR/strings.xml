@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-26 18:54:03+0000
+Translation-Revision-Date: 2024-10-07 15:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">Não foi possível resgatar o código. Tente novamente mais tarde.</string>
+    <string name="referrals_create_subscription_failed">Não foi possível criar uma assinatura. Tente novamente mais tarde.</string>
+    <string name="referrals_guest_pass_card_title">Passe de convidado %1$s</string>
+    <string name="referrals_claim_guest_pass_description">A associação será renovada automaticamente para um plano anual por %s.</string>
+    <string name="profile_cloud_add_invalid_file">Não foi possível carregar o arquivo selecionado. Tente novamente ou escolha outro arquivo.</string>
+    <string name="error_generic_message">Ocorreu um erro. Tente novamente mais tarde.</string>
+    <string name="player_sleep_timer_settings">Configurações do temporizador</string>
+    <string name="referrals_share_text">Olá! Use o link abaixo para resgatar seu passe de convidado %1$s para o Pocket Casts Plus e curta podcasts em todos os seus dispositivos.</string>
+    <string name="referrals_share_subject">Passe de convidado %1$s para o Pocket Casts</string>
     <string name="referrals_invalid_offer_title">Esta oferta não está disponível</string>
     <string name="referrals_invalid_offer_description">Esse passe de convidado só pode ser resgatado uma vez e está disponível para aqueles que não tem um plano Plus ou Patron ativo. Agradecemos por ouvir!</string>
-    <string name="referrals_claim_guest_pass_title">Resgate seu passe de convidado de dois meses</string>
-    <string name="referrals_claim_guest_pass_description">Esta oferta é apenas para novos membros. A associação será renovada automaticamente para um plano anual por %s.</string>
+    <string name="referrals_claim_guest_pass_title">Resgate seu passe de convidado %1$s</string>
     <string name="referrals_activate_my_pass">Ativar meu passe</string>
-    <string name="referrals_tooltip_message">Dê de presente dois meses de Pocket Casts Plus!</string>
+    <string name="referrals_tooltip_message">Dê de presente %1$s de Pocket Casts Plus!</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Tenha uma experiência sonora completa</string>
-    <string name="referrals_claim_guess_pass_banner_card_title">Resgate seu passe de convidado de dois meses para o Plus</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Resgate seu passe de convidado %1$s para o Plus</string>
     <string name="referrals_share_guest_pass">Compartilhar passe de convidado</string>
-    <string name="referrals_send_guest_pass_card_title">Passe de convidado de dois meses</string>
-    <string name="referrals_send_guest_pass_title">Dê de presente dois meses de Pocket Casts Plus</string>
+    <string name="referrals_send_guest_pass_title">Dê de presente %1$s de Pocket Casts Plus</string>
     <string name="move_down">Mover para baixo</string>
     <string name="move_up">Mover para cima</string>
     <string name="search_episodes_not_found_summary">Não encontramos nenhum episódio para essa pesquisa. Tente outra palavra-chave.</string>
@@ -593,7 +600,6 @@ Language: pt_BR
     <string name="end_of_year_story_listened_to_categories">Você ouviu %1$d categorias diferentes neste ano</string>
     <string name="end_of_year_story_listened_to_share_text">Eu passei %1$s ouvindo podcasts neste ano</string>
     <string name="end_of_year_story_intro_title">Vamos celebrar seu ano em podcasts!</string>
-    <string name="end_of_year_launch_modal_image_title">Ano em podcasts</string>
     <string name="settings_media_notification_controls">Controles de notificação de mídia</string>
     <string name="playback_speed">Velocidade de reprodução</string>
     <string name="volume_boost_enabled_not_valid">O valor de \"Otimização de volume ativada\" deve ser \"true\" ou \"false\". Era  %1$s</string>
@@ -630,7 +636,6 @@ Language: pt_BR
     <string name="filter_x_not_found">Filtro %1$s não encontrado</string>
     <string name="must_provide_filter_name">É necessário fornecer um nome de filtro</string>
     <string name="end_of_year_launch_modal_summary">Veja seus principais podcasts, categorias, estatísticas de reprodução e muito mais. Compartilhe com amigos e divulgue seus criadores favoritos!</string>
-    <string name="end_of_year_launch_modal_title">Seu ano em podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Os episódios que você já terminou de reproduzir continuarão sendo exibidos</string>
     <string name="settings_show_played">Mostrar episódios reproduzidos</string>

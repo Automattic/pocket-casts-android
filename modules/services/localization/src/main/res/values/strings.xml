@@ -1918,7 +1918,7 @@
     <string name="transcript_empty">Transcript is empty.</string>
     <string name="transcript_close">Close transcript</string>
     <string name="transcript_search">Search transcript</string>
-    <string name="transcript_error_not_available">Sorry, but a transcript is not available for this episode.</string>
+    <string name="transcript_error_not_available">Sorry, but this episode has no transcript available.</string>
 
     <!--    Tasker Plugin-->
 
@@ -2065,23 +2065,6 @@
     <string name="pocket_casts_champion_dialog_description">Thanks for being with us since the beginning! If you enjoy using our app, we’d love to hear your feedback.</string>
     <string name="rate_pocket_casts">Rate Pocket Casts</string>
     <string name="pocket_casts_logo">Pocket Casts logo</string>
-
-    <!-- Kids Profile -->
-    <string name="kids_profile">Kids Profile</string>
-    <string name="kids_profile_banner">Kids Profile Banner</string>
-    <string name="soon_label">Soon</string>
-    <string name="kids_profile_banner_description">A new profile with only content for kids to keep your subscriptions tidy.</string>
-    <string name="request_early_access">Request Early Access</string>
-    <string name="kids_profile_face_image">Kids Profile Face Image</string>
-    <string name="thank_you_for_your_interest">Thank you for your interest</string>
-    <string name="kids_bottom_sheet_description">You’ll get a notification via the app when the new Kids profile is ready! Want to let us know what you’d like to see?</string>
-    <string name="send_feedback">Send feedback</string>
-    <string name="no_thank_you">No, thank you</string>
-    <string name="send_feedback_title">What would you like to see in a Kids profile for Pocket Casts?</string>
-    <string name="feedback_form_placeholder">I would like to filter episodes by</string>
-    <string name="swipe_affordance_icon">Swipe Affordance Icon</string>
-    <string name="thank_you_for_your_feedback">Thank you for your feedback!</string>
-    <string name="something_went_wrong_when_sending_feedback">Something went wrong. Please try submitting your feedback again.</string>
 
     <!-- Paywall -->
     <string name="paywall_save_50_off">Save 50% off your first year.</string>
