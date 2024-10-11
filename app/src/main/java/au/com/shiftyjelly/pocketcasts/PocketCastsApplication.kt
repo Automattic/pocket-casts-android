@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.nova.NovaLauncherBridge
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
@@ -124,6 +125,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var engageSdkBridge: EngageSdkBridge
 
     @Inject lateinit var experimentProvider: ExperimentProvider
+
+    @Inject lateinit var endOfYearSync: EndOfYearSync
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -276,6 +279,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             .onEach { widgetManager.updateWidgetEpisodeArtwork(playbackManager) }
             .launchIn(applicationScope)
         keepPlayerWidgetsUpdated()
+
+        applicationScope.launch { endOfYearSync.sync() }
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
     }

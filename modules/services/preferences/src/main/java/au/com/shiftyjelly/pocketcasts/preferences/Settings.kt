@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -550,4 +551,6 @@ interface Settings {
 
     val referralClaimCode: UserSetting<String>
     val showReferralWelcome: UserSetting<Boolean>
+
+    val lastEoySyncTimestamp: UserSetting<Instant>
 }
