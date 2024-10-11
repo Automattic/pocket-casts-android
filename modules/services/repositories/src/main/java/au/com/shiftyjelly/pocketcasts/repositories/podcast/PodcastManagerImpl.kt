@@ -142,12 +142,12 @@ class PodcastManagerImpl @Inject constructor(
      */
     override fun findOrDownloadPodcastRx(podcastUuid: String): Single<Podcast> {
         return findPodcastByUuidRx(podcastUuid)
-            .switchIfEmpty(subscribeManager.addPodcast(podcastUuid, sync = false, subscribed = false).toMaybe())
+            .switchIfEmpty(subscribeManager.addPodcast(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).toMaybe())
             .toSingle()
     }
 
     override fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast> {
-        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed)
+        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = false)
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {

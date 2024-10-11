@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import android.annotation.SuppressLint
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
@@ -63,12 +64,17 @@ class SubscribeManager @Inject constructor(
 
     data class PodcastSubscribe(val podcastUuid: String, val sync: Boolean)
 
+    @SuppressLint("CheckResult")
     private fun setupSubscribeRelay(): PublishRelay<PodcastSubscribe> {
         val source = PublishRelay.create<PodcastSubscribe>()
         source
             .observeOn(Schedulers.io())
             .doOnNext { info -> Timber.i("Adding podcast to addPodcast queue ${info.podcastUuid}") }
-            .flatMap({ info -> addPodcast(info.podcastUuid, sync = info.sync, subscribed = true).toObservable() }, true, 5)
+            .flatMap({ info ->
+                // shouldAutoDownload = true because the user manually subscribed to the podcast,
+                // so we want to automatically download episodes at this moment.
+                addPodcast(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = true).toObservable()
+            }, true, 5)
             .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast") }
             .subscribeBy(
                 onNext = { podcast ->
@@ -94,8 +100,8 @@ class SubscribeManager @Inject constructor(
     /**
      * Subscribe to a podcast and wait.
      */
-    fun addPodcast(podcastUuid: String, sync: Boolean = false, subscribed: Boolean = false): Single<Podcast> {
-        return subscribeToExistingOrServerPodcast(podcastUuid, sync, subscribed)
+    fun addPodcast(podcastUuid: String, sync: Boolean = false, subscribed: Boolean = false, shouldAutoDownload: Boolean): Single<Podcast> {
+        return subscribeToExistingOrServerPodcast(podcastUuid, sync, subscribed, shouldAutoDownload)
             .flatMap {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Adding podcast $podcastUuid to database")
                 cacheArtwork(it).toSingleDefault(it)
@@ -105,10 +111,10 @@ class SubscribeManager @Inject constructor(
                 // update the notification time as any podcasts added after this date will be ignored
                 settings.setNotificationLastSeenToNow()
 
-                if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+                if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD) && shouldAutoDownload) {
                     podcastDao.findByUuid(podcastUuid)?.let { podcast ->
                         val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
-                        val autoDownloadLimit = podcast.autoDownloadLimit ?: settings.autoDownloadLimit.value
+                        val autoDownloadLimit = podcast.autoDownloadLimit ?: return@doOnSuccess
 
                         episodes.take(AutoDownloadLimitSetting.getNumberOfEpisodes(autoDownloadLimit)).forEach { episode ->
                             if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
@@ -146,7 +152,7 @@ class SubscribeManager @Inject constructor(
         return uuidsInQueue
     }
 
-    private fun subscribeToExistingOrServerPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast> {
+    private fun subscribeToExistingOrServerPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
         // check if the podcast exists already
         val subscribedObservable = podcastDao.isSubscribedToPodcastRx(podcastUuid)
         return subscribedObservable.flatMap { isSubscribed ->
@@ -154,7 +160,7 @@ class SubscribeManager @Inject constructor(
             if (isSubscribed) {
                 subscribeToExistingPodcast(podcastUuid, sync)
             } else {
-                subscribeToServerPodcast(podcastUuid, sync, subscribed)
+                subscribeToServerPodcast(podcastUuid, sync, subscribed, shouldAutoDownload)
             }
         }
     }
@@ -170,7 +176,7 @@ class SubscribeManager @Inject constructor(
         return updateObservable.andThen(findObservable.toSingle())
     }
 
-    private fun subscribeToServerPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast> {
+    private fun subscribeToServerPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
         // download the podcast
         val podcastObservable = downloadPodcast(podcastUuid)
             .doOnSuccess { podcast ->
@@ -179,7 +185,7 @@ class SubscribeManager @Inject constructor(
                 podcast.isSubscribed = subscribed
                 podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
-                if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+                if (subscribed && shouldAutoDownload && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
                     podcast.autoDownloadStatus = AUTO_DOWNLOAD_NEW_EPISODES
                     podcast.autoDownloadLimit = settings.autoDownloadLimit.value
                 }
