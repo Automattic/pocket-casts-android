@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.YearOverYearListeningTime
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import java.time.Year
 
 interface EndOfYearManager {
     suspend fun isEligibleForStories(): Boolean
@@ -22,6 +23,6 @@ interface EndOfYearManager {
     suspend fun countEpisodesStartedAndCompleted(year: Int): EpisodesStartedAndCompleted
 
     companion object {
-        val YEAR_TO_SYNC = 2024
+        val YEAR_TO_SYNC = Year.of(2024)
     }
 }

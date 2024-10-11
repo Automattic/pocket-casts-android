@@ -9,12 +9,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.run
+import au.com.shiftyjelly.pocketcasts.utils.extensions.toEpochMillis
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDate
+import java.time.Year
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
@@ -31,17 +32,17 @@ class EndOfYearSync @Inject constructor(
     private val clock: Clock,
 ) {
     private val ratingsSync = CachedAction<Unit, Unit> { syncRatings() }
-    private val thisYearSync = CachedAction<Int, Unit> { syncHistoryForYear(it) }
-    private val lastYearSync = CachedAction<Int, Unit> { syncHistoryForYear(it) }
+    private val thisYearSync = CachedAction<Year, Unit> { syncHistoryForYear(it) }
+    private val lastYearSync = CachedAction<Year, Unit> { syncHistoryForYear(it) }
     private val timestampSetting = settings.lastEoySyncTimestamp
 
-    suspend fun sync(year: Int = EndOfYearManager.YEAR_TO_SYNC): Boolean {
+    suspend fun sync(year: Year = EndOfYearManager.YEAR_TO_SYNC): Boolean {
         return when {
             isDataSynced() -> true
             canSyncData() -> supervisorScope {
                 val jobs = listOf(
                     thisYearSync.run(year, scope = this),
-                    lastYearSync.run(year - 1, scope = this),
+                    lastYearSync.run(year.minusYears(1), scope = this),
                     ratingsSync.run(scope = this),
                 )
                 runCatching { jobs.awaitAll() }
@@ -61,7 +62,7 @@ class EndOfYearSync @Inject constructor(
     }
 
     private fun isDataSynced(): Boolean {
-        return Duration.between(timestampSetting.value, clock.instant()) > Duration.ofHours(6)
+        return Duration.between(timestampSetting.value, clock.instant()) < Duration.ofHours(6)
     }
 
     private fun canSyncData(): Boolean {
@@ -91,16 +92,16 @@ class EndOfYearSync @Inject constructor(
         ratingsManager.updateUserRatings(userRatings)
     }
 
-    private suspend fun syncHistoryForYear(year: Int) {
+    private suspend fun syncHistoryForYear(year: Year) {
         // only download the count to check if we are missing history episodes
-        val serverCount = syncManager.historyYear(year = year, count = true).count
+        val serverCount = syncManager.historyYear(year = year.value, count = true).count
         if (serverCount == null) {
             throw RuntimeException("Failed to get history episode count for year $year")
         }
         val localCount = countEpisodeInteractionsInYear(year)
 
         if (serverCount > localCount) {
-            val history = syncManager.historyYear(year = year, count = false).history
+            val history = syncManager.historyYear(year = year.value, count = false).history
             if (history == null) {
                 throw RuntimeException("Failed to get history for year $year")
             }
@@ -108,13 +109,7 @@ class EndOfYearSync @Inject constructor(
         }
     }
 
-    private suspend fun countEpisodeInteractionsInYear(year: Int): Int {
-        return episodeManager.countEpisodesInListeningHistory(yearStart(year), yearEnd(year))
+    private suspend fun countEpisodeInteractionsInYear(year: Year): Int {
+        return episodeManager.countEpisodesInListeningHistory(year.toEpochMillis(clock.zone), year.plusYears(1).toEpochMillis(clock.zone))
     }
-
-    private fun yearStart(year: Int) = epochAtStartOfYear(year)
-
-    private fun yearEnd(year: Int) = epochAtStartOfYear(year + 1)
-
-    private fun epochAtStartOfYear(year: Int) = LocalDate.of(year, 1, 1).atStartOfDay().atZone(clock.zone).toInstant().toEpochMilli()
 }
