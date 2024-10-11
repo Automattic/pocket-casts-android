@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-26 09:54:03+0000
+Translation-Revision-Date: 2024-10-09 15:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">Не удалось использовать код. Повторите попытку позже.</string>
+    <string name="referrals_create_subscription_failed">Не удалось создать подписку. Повторите попытку позже.</string>
+    <string name="referrals_guest_pass_card_title">Гостевой пропуск %1$s</string>
+    <string name="referrals_claim_guest_pass_description">По истечении бесплатного периода будет автоматически списан ежегодный членский взнос в размере %s.</string>
+    <string name="profile_cloud_add_invalid_file">Не удалось загрузить выбранный файл. Повторите попытку позже или выберите другой файл.</string>
+    <string name="error_generic_message">Что-то пошло не так. Повторите попытку позже.</string>
+    <string name="player_sleep_timer_settings">Настройки таймера сна</string>
+    <string name="referrals_share_text">Привет! По ссылке ниже лежит ваш гостевой пропуск в Pocket Casts Plus сроком на %1$s. Воспользуйтесь им и слушайте подкасты на любом из ваших устройств!</string>
+    <string name="referrals_share_subject">Гостевой пропуск Pocket Casts на %1$s</string>
     <string name="referrals_invalid_offer_title">Это предложение недействительно</string>
     <string name="referrals_invalid_offer_description">Этим предложением могут воспользоваться только те, у кого нет подписки Plus или Patron, и только один раз. Благодарим за прослушивание!</string>
-    <string name="referrals_claim_guest_pass_title">Получите бесплатный гостевой пропуск на 2 месяца</string>
-    <string name="referrals_claim_guest_pass_description">Это предложение действительно только для новых участников. По истечении бесплатного периода будет автоматически списан ежегодный членский взнос в размере %s.</string>
+    <string name="referrals_claim_guest_pass_title">Получите бесплатный гостевой пропуск на %1$s</string>
     <string name="referrals_activate_my_pass">Активировать пропуск</string>
-    <string name="referrals_tooltip_message">2 месяца пользования Pocket Casts Plus в подарок!</string>
+    <string name="referrals_tooltip_message">%1$s пользования Pocket Casts Plus в подарок!</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">Откройте невероятные возможности прослушивания</string>
-    <string name="referrals_claim_guess_pass_banner_card_title">Получите бесплатный гостевой пропуск в Plus на 2 месяца</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Получите бесплатный гостевой пропуск в Plus на %1$s</string>
     <string name="referrals_share_guest_pass">Поделиться гостевым пропуском</string>
-    <string name="referrals_send_guest_pass_card_title">Гостевой пропуск на 2 месяца</string>
-    <string name="referrals_send_guest_pass_title">2 месяца пользования Pocket Casts Plus в подарок</string>
+    <string name="referrals_send_guest_pass_title">%1$s пользования Pocket Casts Plus в подарок</string>
     <string name="move_down">Перенести вниз</string>
     <string name="move_up">Перенести вверх</string>
     <string name="search_episodes_not_found_summary">Не удалось найти выпуск по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
@@ -593,7 +600,6 @@ Language: ru
     <string name="end_of_year_story_listened_to_categories">В этом году вы выбрали %1$d рубрик (-и)</string>
     <string name="end_of_year_story_listened_to_share_text">В этом году я провел(а) %1$s, слушая подкасты</string>
     <string name="end_of_year_story_intro_title">Давайте отметим ваш год прослушивания!</string>
-    <string name="end_of_year_launch_modal_image_title">Год в подкастах</string>
     <string name="settings_media_notification_controls">Элементы управления уведомлениями о медиафайлах</string>
     <string name="playback_speed">Скорость воспроизведения</string>
     <string name="volume_boost_enabled_not_valid">Для параметра \"Усилитель звука включён\" требуется значение true или false; было задано  %1$s</string>
@@ -629,10 +635,7 @@ Language: ru
     <string name="no_episodes_in_filter_x">Нет выпусков в фильтре %1$s</string>
     <string name="filter_x_not_found">Фильтр %1$s не найден</string>
     <string name="must_provide_filter_name">Укажите имя фильтра</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Не сейчас</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Моя статистика за 2023 г.</string>
     <string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
-    <string name="end_of_year_launch_modal_title">Ваш год в подкастах</string>
     <string name="settings_app_icon_halloween">Хэллоуин</string>
     <string name="settings_show_played_summary">Выпуски, которые вы уже прослушали, будут по-прежнему отображаться</string>
     <string name="settings_show_played">Показывать прослушанные выпуски</string>

@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-26 13:54:04+0000
+Translation-Revision-Date: 2024-10-09 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">無法兌換代碼。 請稍後再試。</string>
+    <string name="referrals_create_subscription_failed">無法建立訂閱。 請稍後再試。</string>
+    <string name="referrals_guest_pass_card_title">%1$s 訪客體驗券</string>
+    <string name="referrals_claim_guest_pass_description">會員資格會以 %s的價格自動續訂為付費年度會員。</string>
+    <string name="profile_cloud_add_invalid_file">無法載入選取的檔案。 請稍後再試，或選擇其他檔案。</string>
+    <string name="error_generic_message">發生錯誤。 請稍後再試。</string>
+    <string name="player_sleep_timer_settings">睡眠計時器設定</string>
+    <string name="referrals_share_text">嗨！ 使用下方連結領取你的 %1$s Pocket Casts Plus 訪客體驗券，在所有裝置上盡情暢聽 Podcast！</string>
+    <string name="referrals_share_subject">%1$s Pocket Casts 訪客體驗券</string>
     <string name="referrals_invalid_offer_title">此優惠無法使用</string>
     <string name="referrals_invalid_offer_description">此訪客體驗券僅供兌換一次，可供尚未啟用 Plus 或 Patron 訂閱服務的使用者使用。 感謝聆聽！</string>
-    <string name="referrals_claim_guest_pass_title">領取你的 2 個月訪客體驗券</string>
-    <string name="referrals_claim_guest_pass_description">此優惠僅供新會員使用。 會員資格會以 %s的價格自動續訂為付費年度會員。</string>
+    <string name="referrals_claim_guest_pass_title">領取你的 %1$s 訪客體驗券</string>
     <string name="referrals_activate_my_pass">啟用我的體驗券</string>
-    <string name="referrals_tooltip_message">贈送 2 個月 Pocket Casts Plus 體驗！</string>
+    <string name="referrals_tooltip_message">贈送 %1$s Pocket Casts Plus 體驗！</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">解鎖完整聆聽體驗</string>
-    <string name="referrals_claim_guess_pass_banner_card_title">領取你的 2 個月 Plus 訪客體驗券</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">領取你的 %1$s Plus 訪客體驗券</string>
     <string name="referrals_share_guest_pass">分享訪客體驗券</string>
-    <string name="referrals_send_guest_pass_card_title">2 個月訪客體驗券</string>
-    <string name="referrals_send_guest_pass_title">贈送 2 個月 Pocket Casts Plus 體驗</string>
+    <string name="referrals_send_guest_pass_title">贈送 %1$s Pocket Casts Plus 體驗</string>
     <string name="move_down">下移</string>
     <string name="move_up">上移</string>
     <string name="search_episodes_not_found_summary">找不到符合搜尋內容的單集。 請嘗試其他關鍵字。</string>
@@ -593,7 +600,6 @@ Language: zh_TW
     <string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
     <string name="end_of_year_story_listened_to_share_text">你今年花了 %1$s收聽 Podcast</string>
     <string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年！</string>
-    <string name="end_of_year_launch_modal_image_title">Podcast 年度回顧</string>
     <string name="settings_media_notification_controls">媒體通知控制項</string>
     <string name="playback_speed">播放速度</string>
     <string name="volume_boost_enabled_not_valid">「已啟用音量增強」的值必須為「true」或「false」，先前為  %1$s</string>
@@ -629,10 +635,7 @@ Language: zh_TW
     <string name="no_episodes_in_filter_x">找不到符合篩選條件「%1$s」的單集</string>
     <string name="filter_x_not_found">找不到篩選條件「%1$s」</string>
     <string name="must_provide_filter_name">必須提供篩選條件名稱</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">先不要</string>
-    <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2023 年</string>
     <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。和朋友分享這些資訊，並向你最喜愛的創作者表達敬意！</string>
-    <string name="end_of_year_launch_modal_title">你的 Podcast 年度回顧</string>
     <string name="settings_app_icon_halloween">萬聖節</string>
     <string name="settings_show_played_summary">你已播放完畢的節目仍會顯示</string>
     <string name="settings_show_played">顯示已播放的節目</string>

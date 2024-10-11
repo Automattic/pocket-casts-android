@@ -285,7 +285,6 @@ Language: nb_NO
     <string name="end_of_year_story_top_categories">Favorittkategoriene dine</string>
     <string name="end_of_year_story_top_categories_share_text">Podcastkategoriene jeg lyttet mest til</string>
     <string name="end_of_year_create_account_to_see">Lagre podcastene dine i skyen, få en gjennomgang ved årsslutt, og synkroniser fremdriften med andre enheter.</string>
-    <string name="end_of_year_launch_modal_image_title">Året i podcaster</string>
     <string name="end_of_year_story_intro_title">La oss feire et år med lytting!</string>
     <string name="end_of_year_story_listened_to_categories">Du lyttet til %1$d forskjellige kategorier dette året</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">La oss ta en kikk på noen av favorittene…</string>
@@ -325,9 +324,7 @@ Language: nb_NO
     <string name="chapter_to_skip_to">Kapittel å gå til</string>
     <string name="chapter_to_skip_to_not_valid">Kapittelet å gå til %1$s er ikke gyldig</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_title">Året ditt i podcaster</string>
     <string name="end_of_year_launch_modal_summary">Se favorittpodcaster, kategorier, lyttestatistikk og mer. Del med venner og fremhev favorittskaperne!</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Ikke nå</string>
     <string name="settings_show_played">Vis avspilte episoder</string>
     <string name="settings_show_played_summary">Episoder som du har spilt av, vises fremdeles</string>
     <string name="profile_privacy_policy_read">Les personvernreglene</string>

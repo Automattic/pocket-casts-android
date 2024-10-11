@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-17 13:54:03+0000
+Translation-Revision-Date: 2024-10-09 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">Det gick inte att lösa in koden. Försök igen senare.</string>
+    <string name="referrals_create_subscription_failed">Det gick inte att skapa en prenumeration. Försök igen senare.</string>
+    <string name="referrals_guest_pass_card_title">Gästpass för %1$s</string>
+    <string name="referrals_claim_guest_pass_description">Medlemskapet förnyas automatiskt som ett årligt betalmedlemskap för %s.</string>
+    <string name="profile_cloud_add_invalid_file">Det gick inte att läsa in den valda filen. Försök igen eller välj en annan fil.</string>
+    <string name="error_generic_message">Något gick fel. Försök igen senare.</string>
+    <string name="player_sleep_timer_settings">Inställningar för sovtimer</string>
+    <string name="referrals_share_text">Hej! Använd länken nedan för att göra anspråk på ditt %1$s gästpass för Pocket Casts Plus och ta del av podcasts på alla dina enheter.</string>
+    <string name="referrals_share_subject">%1$s gästpass för Pocket Casts</string>
+    <string name="referrals_invalid_offer_title">Detta erbjudande är inte tillgängligt</string>
+    <string name="referrals_invalid_offer_description">Detta gästpass kan endast lösas in en gång och är tillgängligt för användare utan en aktiv Plus- eller Patron-prenumeration. Tack för att du lyssnar.</string>
+    <string name="referrals_claim_guest_pass_title">Gör anspråk på ditt gästpass för %1$s</string>
+    <string name="referrals_activate_my_pass">Aktivera mitt pass</string>
+    <string name="referrals_tooltip_message">Ge bort %1$s med Pocket Casts Plus.</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Lås upp den fullständiga lyssningsupplevelsen</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Gör anspråk på ditt %1$s gästpass för Plus</string>
     <string name="referrals_share_guest_pass">Dela gästpass</string>
-    <string name="referrals_send_guest_pass_card_title">2 månaders gästpass</string>
-    <string name="referrals_send_guest_pass_title">Ge bort 2 månader med Pocket Casts Plus</string>
+    <string name="referrals_send_guest_pass_title">Ge bort %1$s med Pocket Casts Plus</string>
     <string name="move_down">Flytta ner</string>
     <string name="move_up">Flytta upp</string>
     <string name="search_episodes_not_found_summary">Vi kunde inte hitta något avsnitt för denna sökning. Prova med ett annat nyckelord.</string>
@@ -585,7 +600,6 @@ Language: sv_SE
     <string name="end_of_year_story_listened_to_categories">Du lyssnade på %1$d olika kategorier i år</string>
     <string name="end_of_year_story_listened_to_share_text">Jag lyssnade på podcasts %1$s i år</string>
     <string name="end_of_year_story_intro_title">Låt oss fira ditt lyssningsår.</string>
-    <string name="end_of_year_launch_modal_image_title">Podcastår</string>
     <string name="settings_media_notification_controls">Mediaaviseringskontroller</string>
     <string name="playback_speed">Uppspelningshastighet</string>
     <string name="volume_boost_enabled_not_valid">Volymökning aktiverad-värdet måste vara \"true\" eller \"false\", men var  %1$s</string>
@@ -621,10 +635,7 @@ Language: sv_SE
     <string name="no_episodes_in_filter_x">Inga avsnitt i filtret %1$s</string>
     <string name="filter_x_not_found">Filtret %1$s hittades inte</string>
     <string name="must_provide_filter_name">Filternamn måste anges</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Inte nu</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visa mitt 2023</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
-    <string name="end_of_year_launch_modal_title">Ditt podcastår</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Avsnitt som du har spelat klart kommer fortfarande att visas</string>
     <string name="settings_show_played">Visa spelade avsnitt</string>

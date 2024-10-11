@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-19 15:54:03+0000
+Translation-Revision-Date: 2024-10-09 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">No se ha podido canjear el código. Inténtalo de nuevo más tarde.</string>
+    <string name="referrals_create_subscription_failed">No se ha podido crear la suscripción. Inténtalo de nuevo más tarde.</string>
+    <string name="referrals_guest_pass_card_title">Pase de invitado de %1$s</string>
+    <string name="referrals_claim_guest_pass_description">La suscripción se renovará automáticamente a una suscripción anual de pago en %s.</string>
+    <string name="profile_cloud_add_invalid_file">No se ha podido cargar el archivo seleccionado. Inténtalo de nuevo o elige un archivo diferente.</string>
+    <string name="error_generic_message">Se ha producido un error. Inténtalo de nuevo más tarde.</string>
+    <string name="player_sleep_timer_settings">Ajustes del temporizador</string>
+    <string name="referrals_share_text">¡Hola! Utiliza el siguiente enlace para solicitar tu pase de invitado de %1$s para Pocket Casts Plus y disfrutar de podcasts en todos tus dispositivos.</string>
+    <string name="referrals_share_subject">Pase de invitado de %1$s para Pocket Casts</string>
+    <string name="referrals_invalid_offer_title">Esta oferta no está disponible</string>
+    <string name="referrals_invalid_offer_description">Este pase de invitado solo puede canjearse una vez y está disponible para quienes no tengan una suscripción Plus o Patron activa. Gracias por escucharnos.</string>
+    <string name="referrals_claim_guest_pass_title">Solicita tu pase de invitado de %1$s</string>
+    <string name="referrals_activate_my_pass">Activar mi pase</string>
+    <string name="referrals_tooltip_message">Regala %1$s de Pocket Casts Plus.</string>
+    <string name="referrals_claim_guess_pass_banner_card_subtitle">Desbloquea la experiencia auditiva completa</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">Solicita tu pase de invitado de %1$s a Plus</string>
     <string name="referrals_share_guest_pass">Compartir pase de invitado</string>
-    <string name="referrals_send_guest_pass_card_title">Pase de invitado de 2 meses</string>
-    <string name="referrals_send_guest_pass_title">Regala 2 meses de Pocket Casts Plus</string>
+    <string name="referrals_send_guest_pass_title">Regala %1$s de Pocket Casts Plus</string>
     <string name="move_down">Bajar</string>
     <string name="move_up">Subir</string>
     <string name="search_episodes_not_found_summary">No hemos podido encontrar ningún episodio para esa búsqueda. Prueba con otra palabra clave.</string>
@@ -585,7 +600,6 @@ Language: es
     <string name="end_of_year_story_listened_to_categories">Escuchaste %1$d categorías diferentes este año.</string>
     <string name="end_of_year_story_listened_to_share_text">Este año he pasado %1$s escuchando pódcasts</string>
     <string name="end_of_year_story_intro_title">¡Celebremos el año que llevas escuchando pódcast!</string>
-    <string name="end_of_year_launch_modal_image_title">Año en pódcast</string>
     <string name="settings_media_notification_controls">Controles de notificación de medios</string>
     <string name="playback_speed">Velocidad de reproducción</string>
     <string name="volume_boost_enabled_not_valid">El valor Subir volumen activado debe ser \"true\" o \"false\", y era  %1$s.</string>
@@ -621,10 +635,7 @@ Language: es
     <string name="no_episodes_in_filter_x">No hay episodios en el filtro %1$s</string>
     <string name="filter_x_not_found">No se ha encontrado el filtro %1$s</string>
     <string name="must_provide_filter_name">Introduce un nombre de filtro</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Ahora no</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Ver Mi 2023</string>
     <string name="end_of_year_launch_modal_summary">Consulta cuáles han sido los podcasts y las categorías que más has escuchado, las estadísticas de escucha y mucho más. Compártelo con tus amigos y haz que todo el mundo sepa cuáles son tus creadores favoritos.</string>
-    <string name="end_of_year_launch_modal_title">Tu año en podcasts</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Se seguirán mostrando los episodios que hayas terminado de reproducir.</string>
     <string name="settings_show_played">Mostrar episodios reproducidos</string>

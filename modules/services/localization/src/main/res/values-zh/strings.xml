@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-09-26 11:54:03+0000
+Translation-Revision-Date: 2024-10-09 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="referrals_redeem_code_failed">无法兑换代码。 请稍后重试。</string>
+    <string name="referrals_create_subscription_failed">无法创建订阅。 请稍后重试。</string>
+    <string name="referrals_guest_pass_card_title">%1$s 访客通行证</string>
+    <string name="referrals_claim_guest_pass_description">会员资格将以 %s 的价格自动续订为年度付费会员资格。</string>
+    <string name="profile_cloud_add_invalid_file">无法加载所选文件。 请重试或选择其他文件。</string>
+    <string name="error_generic_message">出错了。 请稍后重试。</string>
+    <string name="player_sleep_timer_settings">睡眠计时器设置</string>
+    <string name="referrals_share_text">您好！ 点击下方链接领取 %1$s 的 Pocket Casts Plus 访客通行证，即可在所有设备上收听播客！</string>
+    <string name="referrals_share_subject">%1$s 的 Pocket Casts 访客通行证</string>
     <string name="referrals_invalid_offer_title">此优惠不可用</string>
     <string name="referrals_invalid_offer_description">该访客通行证仅可兑换一次，适用于未激活 Plus 或 Patron 订阅的用户。 感谢收听！</string>
-    <string name="referrals_claim_guest_pass_title">领取您的 2 个月访客通行证</string>
-    <string name="referrals_claim_guest_pass_description">此优惠仅限新会员使用。 会员资格将以 %s 的价格自动续订为年度付费会员资格。</string>
+    <string name="referrals_claim_guest_pass_title">领取您的 %1$s 访客通行证</string>
     <string name="referrals_activate_my_pass">激活我的通行证</string>
-    <string name="referrals_tooltip_message">赠送 2 个月 Pocket Casts Plus 使用权！</string>
+    <string name="referrals_tooltip_message">赠送 %1$s Pocket Casts Plus 使用权！</string>
     <string name="referrals_claim_guess_pass_banner_card_subtitle">解锁完整的收听体验</string>
-    <string name="referrals_claim_guess_pass_banner_card_title">领取您的 2 个月 Plus 访客通行证</string>
+    <string name="referrals_claim_guess_pass_banner_card_title">领取您的 %1$s Plus 访客通行证</string>
     <string name="referrals_share_guest_pass">共享访客通行证</string>
-    <string name="referrals_send_guest_pass_card_title">2 个月的访客通行证</string>
-    <string name="referrals_send_guest_pass_title">赠送 2 个月 Pocket Casts Plus 使用权</string>
+    <string name="referrals_send_guest_pass_title">赠送 %1$s Pocket Casts Plus 使用权</string>
     <string name="move_down">下移</string>
     <string name="move_up">上移</string>
     <string name="search_episodes_not_found_summary">我们未搜索到任何相关剧集。 请尝试使用其他关键字。</string>
@@ -593,7 +600,6 @@ Language: zh_CN
     <string name="end_of_year_story_listened_to_categories">您今年收听了 %1$d 种不同的分类</string>
     <string name="end_of_year_story_listened_to_share_text">我今年收听播客的时间为 %1$s</string>
     <string name="end_of_year_story_intro_title">我们来庆祝您的聆听之年！</string>
-    <string name="end_of_year_launch_modal_image_title">年度播客盘点</string>
     <string name="settings_media_notification_controls">媒体通知控件</string>
     <string name="playback_speed">播放速度</string>
     <string name="volume_boost_enabled_not_valid">“已启用音量增强”值必须为“true”或“false”，为  %1$s</string>
@@ -629,10 +635,7 @@ Language: zh_CN
     <string name="no_episodes_in_filter_x">过滤器 %1$s 中无剧集</string>
     <string name="filter_x_not_found">未找到过滤器 %1$s</string>
     <string name="must_provide_filter_name">必须提供过滤器名称</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">不用了</string>
-    <string name="end_of_year_launch_modal_primary_button_title">查看我的 2023</string>
     <string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
-    <string name="end_of_year_launch_modal_title">您的年度播客盘点</string>
     <string name="settings_app_icon_halloween">万圣节</string>
     <string name="settings_show_played_summary">您已播放完的剧集仍会显示</string>
     <string name="settings_show_played">显示已播放的剧集</string>
