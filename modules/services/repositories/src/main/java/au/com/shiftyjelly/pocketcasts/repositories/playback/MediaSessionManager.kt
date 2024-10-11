@@ -16,6 +16,7 @@ import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.core.content.IntentCompat
 import androidx.core.os.bundleOf
+import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -249,7 +250,12 @@ class MediaSessionManager(
         val stateBuilder = PlaybackStateCompat.Builder()
             .setState(state, playbackState.positionMs.toLong(), currentSpeed.toFloat(), SystemClock.elapsedRealtime())
             .setActions(getSupportedActions(playbackState))
-            .setExtras(bundleOf(EXTRA_TRANSIENT to playbackState.transientLoss))
+            .setExtras(
+                bundleOf(
+                    PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID to currentEpisode.uuid,
+                    EXTRA_TRANSIENT to playbackState.transientLoss,
+                ),
+            )
 
         // Do not add custom actions on Wear OS because there is a bug in Wear 3.5 that causes
         // this to make the Wear OS media notification stop working. This bug was fixed

@@ -2,13 +2,18 @@ package au.com.shiftyjelly.pocketcasts.referrals
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoPlayStore
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.ReferralSendGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.EmptyResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.ErrorResult
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager.ReferralResult.SuccessResult
+import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralOfferInfoProvider
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingClient
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
@@ -35,6 +40,9 @@ class ReferralsSendGuestPassViewModelTest {
 
     private val referralManager = mock<ReferralManager>()
     private val sharingClient = mock<SharingClient>()
+    private val referralOfferInfoProvider = mock<ReferralOfferInfoProvider>()
+    private val referralOfferInfo = mock<ReferralsOfferInfoPlayStore>()
+    private val analyticsTracker = mock<AnalyticsTracker>()
     private lateinit var viewModel: ReferralsSendGuestPassViewModel
 
     private val referralCodeResponse = mock<ReferralCodeResponse>()
@@ -43,18 +51,39 @@ class ReferralsSendGuestPassViewModelTest {
 
     @Before
     fun setUp() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
         whenever(referralCodeResponse.code).thenReturn(referralCode)
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
+    }
+
+    @Test
+    fun `given referral subscription offer not found, when vm init, then error state shown`() = runTest {
+        whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(null)
+        initViewModel(offerInfo = referralOfferInfo)
+
+        viewModel.state.test {
+            assertTrue(awaitItem() == UiState.Error(ReferralSendGuestPassError.FailedToLoad))
+        }
+    }
+
+    @Test
+    fun `given referral subscription offer found, when vm init, then loaded state shown`() = runTest {
+        whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
+        initViewModel(offerInfo = referralOfferInfo)
+
+        viewModel.state.test {
+            assertEquals(referralOfferInfo, (awaitItem() as UiState.Loaded).referralsOfferInfo)
+        }
     }
 
     @Test
     fun `given referral code success, when getting referral code, then state is loaded`() = runTest {
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
 
-        viewModel = ReferralsSendGuestPassViewModel(referralManager, sharingClient)
+        initViewModel(offerInfo = referralOfferInfo)
 
         viewModel.state.test {
-            assertEquals(UiState.Loaded(referralCode), awaitItem())
+            assertEquals(UiState.Loaded(referralCode, referralOfferInfo), awaitItem())
         }
     }
 
@@ -62,7 +91,7 @@ class ReferralsSendGuestPassViewModelTest {
     fun `given empty result, when getting referral code, then state is empty error`() = runTest {
         whenever(referralManager.getReferralCode()).thenReturn(EmptyResult())
 
-        viewModel = ReferralsSendGuestPassViewModel(referralManager, sharingClient)
+        initViewModel()
 
         viewModel.state.test {
             assertTrue(awaitItem() == UiState.Error(ReferralSendGuestPassError.Empty))
@@ -73,7 +102,7 @@ class ReferralsSendGuestPassViewModelTest {
     fun `given network error, when getting referral code, then state is network error`() = runTest {
         whenever(referralManager.getReferralCode()).thenReturn(ErrorResult(errorMessage = "", error = NoNetworkException()))
 
-        viewModel = ReferralsSendGuestPassViewModel(referralManager, sharingClient)
+        initViewModel()
 
         viewModel.state.test {
             assertTrue(awaitItem() == UiState.Error(ReferralSendGuestPassError.NoNetwork))
@@ -84,7 +113,7 @@ class ReferralsSendGuestPassViewModelTest {
     fun `given unknown error, when getting referral code, then state is failed to load`() = runTest {
         whenever(referralManager.getReferralCode()).thenReturn(ErrorResult(""))
 
-        viewModel = ReferralsSendGuestPassViewModel(referralManager, sharingClient)
+        initViewModel()
 
         viewModel.state.test {
             assertTrue(awaitItem() == UiState.Error(ReferralSendGuestPassError.FailedToLoad))
@@ -93,7 +122,7 @@ class ReferralsSendGuestPassViewModelTest {
 
     @Test
     fun `when retry clicked, then referral code is fetched again`() = runTest {
-        viewModel = ReferralsSendGuestPassViewModel(referralManager, sharingClient)
+        initViewModel()
 
         viewModel.onRetry()
 
@@ -105,7 +134,7 @@ class ReferralsSendGuestPassViewModelTest {
         val requestCaptor = argumentCaptor<SharingRequest>()
         whenever(referralManager.getReferralCode()).thenReturn(referralCodeSuccessResult)
 
-        viewModel = ReferralsSendGuestPassViewModel(referralManager, sharingClient)
+        initViewModel()
         viewModel.onShareClick(referralCode)
 
         verify(referralManager).getReferralCode()
@@ -115,8 +144,20 @@ class ReferralsSendGuestPassViewModelTest {
             assertEquals(referralCode, (data as SharingRequest.Data.ReferralLink).referralCode)
             assertEquals(SourceView.REFERRALS, source)
             assertEquals(SocialPlatform.More, platform)
-            assertEquals(AnalyticsEvent.REFERRAL_LINK_SHARED, analyticsEvent)
+            assertEquals(AnalyticsEvent.REFERRAL_PASS_SHARED, analyticsEvent)
             assertEquals(mapOf("code" to referralCode), analyticsProperties)
         }
+    }
+
+    private suspend fun initViewModel(
+        offerInfo: ReferralsOfferInfo? = referralOfferInfo,
+    ) {
+        whenever(referralOfferInfoProvider.referralOfferInfo()).thenReturn(offerInfo)
+        viewModel = ReferralsSendGuestPassViewModel(
+            referralsManager = referralManager,
+            sharingClient = sharingClient,
+            referralOfferInfoProvider = referralOfferInfoProvider,
+            analyticsTracker = analyticsTracker,
+        )
     }
 }

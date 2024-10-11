@@ -190,7 +190,7 @@
 
     <issue
         id="PrivateResource"
-        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.9.0"
+        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.11.0"
         errorLine1="        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt()"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -201,7 +201,7 @@
 
     <issue
         id="PrivateResource"
-        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.9.0"
+        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.11.0"
         errorLine1="        val padding = resources.getDimension(MR.dimen.design_bottom_navigation_height).toInt() + miniPlayerHeight"
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -212,7 +212,7 @@
 
     <issue
         id="PrivateResource"
-        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.9.0"
+        message="The resource `@dimen/design_bottom_navigation_height` is marked as private in com.google.android.material:material:1.11.0"
         errorLine1="            android:paddingBottom=&quot;@dimen/design_bottom_navigation_height&quot;"
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -7383,17 +7383,6 @@
 
     <issue
         id="UnusedIds"
-        message="The resource `R.id.recycler_view` appears to be unused"
-        errorLine1="    android:id=&quot;@+id/recycler_view&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../modules/services/views/src/main/res/layout/fragment_recyclerview.xml"
-            line="3"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="UnusedIds"
         message="The resource `R.id.sharePodcast` appears to be unused"
         errorLine1="            android:id=&quot;@+id/sharePodcast&quot;"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -7654,17 +7643,6 @@
             file="../modules/features/cartheme/src/main/res/layout/preference_widget_seekbar_material_car.xml"
             line="84"
             column="17"/>
-    </issue>
-
-    <issue
-        id="UnusedIds"
-        message="The resource `R.id.carousel` appears to be unused"
-        errorLine1="    android:id=&quot;@+id/carousel&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../modules/features/discover/src/main/res/layout/row_carousel_list.xml"
-            line="3"
-            column="5"/>
     </issue>
 
     <issue

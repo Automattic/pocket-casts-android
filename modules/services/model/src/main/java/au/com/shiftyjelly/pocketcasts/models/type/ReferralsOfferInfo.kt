@@ -6,6 +6,13 @@ interface ReferralsOfferInfo {
     val localizedPriceAfterOffer: String
 }
 
+data class ReferralsOfferInfoPlayStore(
+    val subscriptionWithOffer: Subscription.WithOffer? = null,
+    override val localizedOfferDurationNoun: String,
+    override val localizedOfferDurationAdjective: String,
+    override val localizedPriceAfterOffer: String,
+) : ReferralsOfferInfo
+
 data object ReferralsOfferInfoMock : ReferralsOfferInfo {
     override val localizedOfferDurationNoun = "2 Months"
     override val localizedOfferDurationAdjective = "2-Month"

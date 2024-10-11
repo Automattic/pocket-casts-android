@@ -81,6 +81,22 @@ data class Chapters(
         return getChapterIndex(time) == items.size - 1
     }
 
+    fun skippedChaptersDuration(time: Duration): Duration {
+        return if (FeatureFlag.isEnabled(Feature.DESELECT_CHAPTERS)) {
+            items
+                .filter { !it.selected && it.endTime > time }
+                .fold(Duration.ZERO) { duration, chapter ->
+                    duration + if (time in chapter) {
+                        chapter.endTime - time
+                    } else {
+                        chapter.duration
+                    }
+                }
+        } else {
+            Duration.ZERO
+        }
+    }
+
     fun toDbChapters(
         episodeId: String,
         isEmbedded: Boolean,

@@ -15,8 +15,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.PaywallABTestCustomTreatment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -45,6 +47,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
     private val experiments: ExperimentProvider,
+    private val subscriptionMapper: SubscriptionMapper,
     savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(app) {
 
@@ -64,10 +67,10 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     val subscriptions = when (productDetails) {
                         is ProductDetailsState.Error -> emptyList()
                         is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                            Subscription.fromProductDetails(
+                            subscriptionMapper.mapFromProductDetails(
                                 productDetails = productDetailsState,
                                 isOfferEligible = subscriptionManager.isOfferEligible(
-                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId),
+                                    SubscriptionTier.fromProductId(productDetailsState.productId),
                                 ),
                             )
                         }
@@ -104,11 +107,24 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         val upgradeLayout = when {
             showPatronOnly -> UpgradeLayout.Original
             FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT) -> {
-                val variation = experiments.getVariation(Experiment.PaywallAATest)
-                if (variation == Variation.Control) {
-                    UpgradeLayout.Original
-                } else {
-                    UpgradeLayout.Original
+                when (val variation = experiments.getVariation(Experiment.PaywallUpgradeABTest)) {
+                    is Variation.Control -> {
+                        UpgradeLayout.Original
+                    }
+                    is Variation.Treatment -> {
+                        when (variation.name) {
+                            PaywallABTestCustomTreatment.FEATURES_TREATMENT.treatmentName -> {
+                                UpgradeLayout.Features
+                            }
+                            PaywallABTestCustomTreatment.REVIEWS_TREATMENT.treatmentName -> {
+                                UpgradeLayout.Reviews
+                            }
+                            else -> {
+                                UpgradeLayout.Original
+                            }
+                        }
+                    }
+                    null -> UpgradeLayout.Original
                 }
             }
             else -> UpgradeLayout.Original
@@ -116,7 +132,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
         selectedSubscription?.let {
             val currentSubscriptionFrequency = selectedSubscription.recurringPricingPhase.toSubscriptionFrequency()
-            val currentTier = SubscriptionMapper.mapProductIdToTier(selectedSubscription.productDetails.productId)
+            val currentTier = SubscriptionTier.fromProductId(selectedSubscription.productDetails.productId)
             val currentFeatureCard = currentTier.toUpgradeFeatureCard()
             _state.update {
                 OnboardingUpgradeFeaturesState.Loaded(

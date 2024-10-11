@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.mapProductIdToTier
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -63,6 +63,7 @@ class SubscriptionManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val productDetailsInterceptor: ProductDetailsInterceptor,
     private val settings: Settings,
+    private val subscriptionMapper: SubscriptionMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : SubscriptionManager,
     PurchasesUpdatedListener,
@@ -176,20 +177,15 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductId(PLUS_YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
-            ).apply {
-                add(
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(PATRON_MONTHLY_PRODUCT_ID)
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build(),
-                )
-                add(
-                    QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(PATRON_YEARLY_PRODUCT_ID)
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build(),
-                )
-            }
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(PATRON_MONTHLY_PRODUCT_ID)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(PATRON_YEARLY_PRODUCT_ID)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+            )
 
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(productList)
@@ -278,7 +274,7 @@ class SubscriptionManagerImpl @Inject constructor(
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
                     purchase.products.map {
-                        mapProductIdToTier(it.toString())
+                        Subscription.SubscriptionTier.fromProductId(it.toString())
                     }.distinct().forEach {
                         updateOfferEligible(it, false)
                     }
@@ -328,7 +324,7 @@ class SubscriptionManagerImpl @Inject constructor(
         val result = billingClient.queryPurchaseHistory(queryPurchaseHistoryParams)
         result.purchaseHistoryRecordList?.forEach {
             it.products.map { productId ->
-                mapProductIdToTier(productId)
+                Subscription.SubscriptionTier.fromProductId(productId)
             }.distinct().forEach { tier ->
                 updateOfferEligible(tier, false)
             }
@@ -430,10 +426,10 @@ class SubscriptionManagerImpl @Inject constructor(
             val subscriptions = when (productDetails) {
                 is ProductDetailsState.Error -> null
                 is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
-                    Subscription.fromProductDetails(
+                    subscriptionMapper.mapFromProductDetails(
                         productDetails = productDetailsState,
                         isOfferEligible = isOfferEligible(
-                            mapProductIdToTier(productDetailsState.productId),
+                            Subscription.SubscriptionTier.fromProductId(productDetailsState.productId),
                         ),
                     )
                 }

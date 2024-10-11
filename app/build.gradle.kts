@@ -71,7 +71,7 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
     implementation(libs.encryptedlogging)
-    implementation(libs.firebase.config.ktx)
+    implementation(libs.firebase.config)
     implementation(libs.fragment.ktx)
     implementation(libs.guava)
     implementation(libs.hilt.work)

@@ -220,6 +220,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED("podcast_settings_feed_error_fix_succeeded"),
     PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED("podcast_settings_feed_error_fix_failed"),
     PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED("podcast_settings_auto_download_toggled"),
+    PODCAST_SETTINGS_AUTO_DOWNLOAD_LIMIT_TOGGLED("podcast_settings_auto_download_limit_toggled"),
     PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED("podcast_settings_notifications_toggled"),
     PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED("podcast_settings_auto_add_up_next_toggled"),
     PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED("podcast_settings_auto_add_up_next_position_option_changed"),
@@ -474,6 +475,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_SHOWN("settings_auto_download_shown"),
     SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED("settings_auto_download_up_next_toggled"),
     SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED("settings_auto_download_new_episodes_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_TOGGLED("settings_auto_download_limit_downloads_toggled"),
     SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED("settings_auto_download_podcasts_changed"),
     SETTINGS_AUTO_DOWNLOAD_FILTERS_CHANGED("settings_auto_download_filters_changed"),
     SETTINGS_AUTO_DOWNLOAD_ONLY_ON_WIFI_TOGGLED("settings_auto_download_only_on_wifi_toggled"),
@@ -645,5 +647,16 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_SEARCH_PREVIOUS_RESULT("transcript_search_previous_result"),
 
     /* Referrals */
-    REFERRAL_LINK_SHARED("referral_link_shared"),
+    REFERRAL_TOOLTIP_SHOWN("referral_tooltip_shown"),
+    REFERRAL_TOOLTIP_TAPPED("referral_tooltip_tapped"),
+    REFERRAL_SHARE_SCREEN_SHOWN("referral_share_screen_shown"),
+    REFERRAL_SHARE_SCREEN_DISMISSED("referral_share_screen_dismissed"),
+    REFERRAL_PASS_SHARED("referral_pass_shared"),
+    REFERRAL_CLAIM_SCREEN_SHOWN("referral_claim_screen_shown"),
+    REFERRAL_ACTIVATE_TAPPED("referral_activate_tapped"),
+    REFERRAL_NOT_NOW_TAPPED("referral_not_now_tapped"),
+    REFERRAL_PASS_BANNER_SHOWN("referral_pass_banner_shown"),
+    REFERRAL_PASS_BANNER_HIDE_TAPPED("referral_pass_banner_hide_tapped"),
+    REFERRAL_PURCHASE_SHOWN("referral_purchase_shown"),
+    REFERRAL_PURCHASE_SUCCESS("referral_purchase_success"),
 }

@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.player.binding
 
 import android.view.View
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.lottie.LottieAnimationView
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import okhttp3.HttpUrl
 
 fun View.showIfPresent(url: HttpUrl?) {
@@ -15,14 +18,27 @@ fun PlayerSeekBar.setPlaybackState(playbackState: PlaybackState?) {
     if (playbackState == null) {
         return
     }
-    setDurationMs(playbackState.durationMs)
-    setCurrentTimeMs(playbackState.positionMs)
+    setDuration(playbackState.durationMs.milliseconds)
+    setPlaybackSpeed(playbackState.playbackSpeed)
+    setCurrentTime(playbackState.positionMs.milliseconds)
+    setChapters(playbackState.chapters)
     setTintColor(playbackState.podcast?.tintColorForDarkBg, Theme.ThemeType.DARK)
 }
 
-fun PlayerSeekBar.setSeekBarState(durationMs: Int, positionMs: Int, tintColor: Int, bufferedUpTo: Int, isBuffering: Boolean, theme: Theme.ThemeType) {
-    setDurationMs(durationMs)
-    setCurrentTimeMs(positionMs)
+fun PlayerSeekBar.setSeekBarState(
+    duration: Duration,
+    position: Duration,
+    chapters: Chapters,
+    playbackSpeed: Double,
+    tintColor: Int,
+    bufferedUpTo: Int,
+    isBuffering: Boolean,
+    theme: Theme.ThemeType,
+) {
+    setDuration(duration)
+    setPlaybackSpeed(playbackSpeed)
+    setCurrentTime(position)
+    setChapters(chapters)
     setTintColor(tintColor, theme)
     this.isBuffering = isBuffering
     bufferedUpToInSecs = bufferedUpTo / 1000

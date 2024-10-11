@@ -20,4 +20,8 @@ interface EndOfYearManager {
     suspend fun findLongestPlayedEpisodeForYear(year: Int): LongestEpisode?
     suspend fun getYearOverYearListeningTime(thisYear: Int): YearOverYearListeningTime?
     suspend fun countEpisodesStartedAndCompleted(year: Int): EpisodesStartedAndCompleted
+
+    companion object {
+        val YEAR_TO_SYNC = 2024
+    }
 }

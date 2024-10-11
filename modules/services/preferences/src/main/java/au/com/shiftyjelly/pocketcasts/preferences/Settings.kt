@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -29,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import io.reactivex.Observable
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -306,6 +308,8 @@ interface Settings {
 
     val playOverNotification: UserSetting<PlayOverNotificationSetting>
 
+    val autoDownloadLimit: UserSetting<AutoDownloadLimitSetting>
+
     fun setLastModified(lastModified: String?)
     fun getLastModified(): String?
 
@@ -542,4 +546,9 @@ interface Settings {
 
     val playerOrUpNextBottomSheetState: Flow<Int>
     fun updatePlayerOrUpNextBottomSheetState(state: Int)
+
+    val referralClaimCode: UserSetting<String>
+    val showReferralWelcome: UserSetting<Boolean>
+
+    val lastEoySyncTimestamp: UserSetting<Instant>
 }

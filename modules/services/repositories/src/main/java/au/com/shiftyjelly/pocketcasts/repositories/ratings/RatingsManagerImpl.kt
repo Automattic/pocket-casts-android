@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.ratings
 
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -50,9 +51,10 @@ class RatingsManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun submitPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResult = try {
-        syncManager.addPodcastRating(podcastUuid, rate)
-        PodcastRatingResult.Success(rate.toDouble())
+    override suspend fun submitPodcastRating(rating: UserPodcastRating): PodcastRatingResult = try {
+        syncManager.addPodcastRating(rating.podcastUuid, rating.rating)
+        podcastRatingsDao.insertOrReplaceUserRatings(listOf(rating))
+        PodcastRatingResult.Success(rating.rating.toDouble())
     } catch (e: Exception) {
         PodcastRatingResult.Error(e)
     }
@@ -68,6 +70,10 @@ class RatingsManagerImpl @Inject constructor(
         }
     } catch (e: Exception) {
         PodcastRatingResult.Error(e)
+    }
+
+    override suspend fun updateUserRatings(ratings: List<UserPodcastRating>) {
+        podcastRatingsDao.updateUserRatings(ratings)
     }
 
     companion object {

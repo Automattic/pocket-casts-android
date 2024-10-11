@@ -51,6 +51,31 @@ private class MockingProductDetailsInterceptor : ProductDetailsInterceptor {
             |    {
             |      "offerIdToken": "yearly-plus-offer-id-token",
             |      "basePlanId": "p1y",
+            |      "offerId": "plus-yearly-referral-two-months-free",
+            |      "pricingPhases": [
+            |        {
+            |          "priceAmountMicros": 0,
+            |          "priceCurrencyCode": "USD",
+            |          "formattedPrice": "Free",
+            |          "billingPeriod": "P2M",
+            |          "recurrenceMode": 2,
+            |          "billingCycleCount": 1
+            |        },
+            |        {
+            |          "priceAmountMicros": 420690000,
+            |          "priceCurrencyCode": "USD",
+            |          "formattedPrice": "$ 420.69",
+            |          "billingPeriod": "P1Y",
+            |          "recurrenceMode": 1
+            |        }
+            |      ],
+            |      "offerTags": [
+            |        "referral-offer"
+            |      ]
+            |    },
+            |    {
+            |      "offerIdToken": "yearly-plus-offer-id-token",
+            |      "basePlanId": "p1y",
             |      "pricingPhases": [
             |        {
             |          "priceAmountMicros": 420690000,

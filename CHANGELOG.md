@@ -1,6 +1,22 @@
 7.75
 -----
-
+*   Updates
+    *   Add an advanced setting to display artwork in episode listing
+        ([#2958](https://github.com/Automattic/pocket-casts-android/pull/2958))
+    *   Display remaining playback time using skipped chapters and playback speed
+        ([#2955](https://github.com/Automattic/pocket-casts-android/pull/2955))
+    *   Display buffer position more accurately for cached episode 
+        ([#2987](https://github.com/Automattic/pocket-casts-android/pull/2987))
+*   Bug Fixes
+    *   Speed up listening history search
+        ([#2979](https://github.com/Automattic/pocket-casts-android/pull/2979))
+    *   Fix search podcast results scroll back to the start after subscribing
+        ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
+    *   Display web-page based HTML transcripts in web view
+        ([#2910](https://github.com/Automattic/pocket-casts-android/pull/2910))
+*   New Features
+    *   Add a progress bar in the browse view on Android Auto
+        ([#2945](https://github.com/Automattic/pocket-casts-android/pull/2945))
 
 7.74
 -----

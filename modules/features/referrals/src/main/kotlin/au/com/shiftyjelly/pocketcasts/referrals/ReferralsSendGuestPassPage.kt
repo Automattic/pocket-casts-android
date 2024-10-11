@@ -23,6 +23,7 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.GradientRowButton
@@ -45,9 +47,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.ReferralSendGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -64,6 +68,12 @@ fun ReferralsSendGuestPassPage(
         val context = LocalContext.current
         val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
         val state by viewModel.state.collectAsStateWithLifecycle()
+        val activity = LocalContext.current.getActivity()
+
+        CallOnce {
+            viewModel.onShown()
+        }
+
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowSize.widthSizeClass,
             windowHeightSizeClass = windowSize.heightSizeClass,
@@ -72,6 +82,14 @@ fun ReferralsSendGuestPassPage(
             onDismiss = onDismiss,
             onShare = viewModel::onShareClick,
         )
+
+        DisposableEffect(Unit) {
+            onDispose {
+                // Fragment will remain on orientation changes
+                val fragmentRemoved = activity?.supportFragmentManager?.findFragmentByTag(ReferralsGuestPassFragment::class.java.name) == null
+                if (fragmentRemoved) viewModel.onDispose()
+            }
+        }
     }
 }
 
@@ -130,8 +148,15 @@ private fun ReferralsSendGuestPassContent(
                         onShare = { onShare(state.code) },
                     )
 
-                is UiState.Error ->
-                    ReferralsGuestPassError(state, onRetry, onDismiss)
+                is UiState.Error -> {
+                    val errorMessage = when (state.error) {
+                        ReferralSendGuestPassError.Empty,
+                        ReferralSendGuestPassError.FailedToLoad,
+                        -> stringResource(LR.string.error_generic_message)
+                        ReferralSendGuestPassError.NoNetwork -> stringResource(LR.string.error_no_network)
+                    }
+                    ReferralsGuestPassError(errorMessage, onRetry, onDismiss)
+                }
             }
         }
     }
@@ -272,7 +297,7 @@ fun ReferralsSendGuestPassContentPreview(
         ReferralsSendGuestPassContent(
             windowWidthSizeClass = windowWidthSizeClass,
             windowHeightSizeClass = windowHeightSizeClass,
-            state = UiState.Loaded(""),
+            state = UiState.Loaded("", ReferralsOfferInfoMock),
             onDismiss = {},
             onShare = {},
             onRetry = {},

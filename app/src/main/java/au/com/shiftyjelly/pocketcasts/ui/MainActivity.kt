@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
@@ -75,7 +76,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
-import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
+import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -279,6 +280,9 @@ class MainActivity :
             OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
+            }
+            OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
+                settings.showReferralWelcome.set(true, updateModifiedAt = false)
             }
             null -> {
                 Timber.e("Unexpected null result from onboarding activity")
@@ -706,18 +710,20 @@ class MainActivity :
             ComposeView(viewGroup.context).apply {
                 setContent {
                     val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
-                    EndOfYearLaunchBottomSheet(
-                        parent = viewGroup,
-                        shouldShow = shouldShow,
-                        onClick = {
-                            showStoriesOrAccount(StoriesSource.MODAL.value)
-                        },
-                        onExpanded = {
-                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
-                            settings.setEndOfYearShowModal(false)
-                            viewModel.updateStoriesModalShowState(false)
-                        },
-                    )
+                    AppTheme(theme.activeTheme) {
+                        EndOfYearLaunchBottomSheet(
+                            parent = viewGroup,
+                            shouldShow = shouldShow,
+                            onClick = {
+                                showStoriesOrAccount(StoriesSource.MODAL.value)
+                            },
+                            onExpanded = {
+                                analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
+                                settings.setEndOfYearShowModal(false)
+                                viewModel.updateStoriesModalShowState(false)
+                            },
+                        )
+                    }
                 }
             },
         )
@@ -904,7 +910,9 @@ class MainActivity :
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 settings.updatePlayerOrUpNextBottomSheetState(newState)
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                    if (bottomSheetTag == UpNextFragment::class.java.name) {
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
+                    }
                     supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                         removeBottomSheetFragment(it)
                     }
@@ -1351,10 +1359,14 @@ class MainActivity :
         if (!FeatureFlag.isEnabled(Feature.REFERRALS)) {
             return
         }
-        // TODO decide where to store the referral code
-        Timber.i("Referral code: $code")
-        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
-        showBottomSheet(fragment)
+        settings.referralClaimCode.set(code, false)
+        launch {
+            delay(1000) // To allow loading tabs and prevent race condition in updating activity's status bar color
+            withContext(Dispatchers.Main) {
+                val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
+                showBottomSheet(fragment)
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

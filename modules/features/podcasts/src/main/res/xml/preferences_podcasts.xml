@@ -24,6 +24,12 @@
         android:title="@string/podcast_settings_auto_download"
         android:summary="@string/podcast_settings_auto_download_summary" />
 
+    <ListPreference
+        android:key="autoDownloadPodcastsLimit"
+        android:dialogTitle="@string/settings_auto_download_limit_auto_downloads"
+        android:title="@string/settings_auto_download_limit"
+        android:persistent="false" />
+
     <SwitchPreference
         android:key="addToUpNext"
         android:defaultValue="false"

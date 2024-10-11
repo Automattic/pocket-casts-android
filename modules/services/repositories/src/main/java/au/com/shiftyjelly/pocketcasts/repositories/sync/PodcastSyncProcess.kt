@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -27,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -79,6 +81,7 @@ class PodcastSyncProcess(
     var subscriptionManager: SubscriptionManager,
     var folderManager: FolderManager,
     var syncManager: SyncManager,
+    var ratingsManager: RatingsManager,
     val crashLogging: CrashLogging,
     val analyticsTracker: AnalyticsTracker,
 ) : CoroutineScope {
@@ -123,6 +126,7 @@ class PodcastSyncProcess(
                     syncPlayHistory()
                 },
             )
+            .andThen(syncRatings())
         return syncUpNextObservable
             .doOnError { throwable ->
                 crashLogging.sendReport(throwable, message = "Sync failed")
@@ -319,6 +323,21 @@ class PodcastSyncProcess(
                     Completable.complete()
                 }
             }
+    }
+
+    private fun syncRatings(): Completable {
+        return rxCompletable {
+            syncManager.getPodcastRatings()?.podcastRatingsList
+                ?.mapNotNull { rating ->
+                    val modifiedAt = rating.modifiedAt.toDate() ?: return@mapNotNull null
+                    UserPodcastRating(
+                        podcastUuid = rating.podcastUuid,
+                        rating = rating.podcastRating,
+                        modifiedAt = modifiedAt,
+                    )
+                }
+                ?.let { ratingsManager.updateUserRatings(it) }
+        }
     }
 
     private fun uploadChanges(): Pair<String, List<PodcastEpisode>> {

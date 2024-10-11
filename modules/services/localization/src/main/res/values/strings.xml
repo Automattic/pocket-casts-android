@@ -1145,6 +1145,16 @@
     <string name="settings_auto_download_filters_episodes">All filter episodes</string>
     <string name="settings_auto_download_new_episodes">New episodes</string>
     <string name="settings_auto_download_podcasts">Auto download podcasts</string>
+    <string name="settings_auto_download_new_episodes_description">Download new episodes as they’re released, and manage your storage by setting a limit on how many episodes are saved.</string>
+    <string name="settings_auto_download_limit">Limit downloads</string>
+    <string name="settings_auto_download_limit_off">Off</string>
+    <string name="settings_auto_download_limit_latest_episode">Latest Episode</string>
+    <string name="settings_auto_download_limit_two_latest_episode">2 Latest Episodes</string>
+    <string name="settings_auto_download_limit_three_latest_episode">3 Latest Episodes</string>
+    <string name="settings_auto_download_limit_five_latest_episode">5 Latest Episodes</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">10 Latest Episodes</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">All Latest Episode</string>
+    <string name="settings_auto_download_limit_auto_downloads">Limit auto downloads</string>
     <string name="settings_auto_download_unmetered">Only on unmetered WiFi</string>
     <string name="settings_auto_download_unmetered_summary">Turning this off will allow downloads on cellular as well as other metered networks. Check your network settings for more info.</string>
     <string name="settings_auto_download_up_next">Episodes added to Up Next</string>
@@ -1679,13 +1689,12 @@
 
     <!-- End of Year -->
 
-    <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
-    <string name="end_of_year_launch_modal_image_title">Year in Podcasts</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
-    <string name="end_of_year_launch_modal_primary_button_title">View My 2023</string>
-    <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
-    <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
-    <string name="end_of_year_prompt_card_summary">See your listening stats, top podcasts, and more.</string>
+    <!-- Playback 2024 is a proper noun and shouldn't be translated -->
+    <string name="end_of_year_launch_modal_primary_button_title">View My Playback&#160;2024</string>
+    <!-- Playback 2024 is a proper noun and shouldn't be translated -->
+    <string name="end_of_year_prompt_card_title">Playback 2024\nis here!</string>
+    <string name="end_of_year_prompt_card_summary">See your listening&#160;stats, top&#160;podcasts, and&#160;more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_replay">Play again</string>
     <string name="end_of_year_listening_time_title">This was your total time listening to podcasts</string>
@@ -2120,6 +2129,8 @@
     <!-- Referrals -->
     <string name="gift">Gift</string>
     <string name="referrals_activate_my_pass">Activate my pass</string>
+    <string name="referrals_banner_long_press_label">Hide referral claim pass banner.</string>
+    <string name="referrals_banner_hide_label">Hide this banner</string>
     <string name="referrals_claim_guess_pass_banner_card_title_english_only" translatable="false">Claim your %1$s\nGuest Pass to Plus</string>
     <!-- Referrals claim guess pass banner card title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_claim_guess_pass_banner_card_title">Claim your %1$s Guest Pass to Plus</string>
@@ -2130,6 +2141,7 @@
     <string name="referrals_claim_guest_pass_title">Claim your %1$s Guest Pass</string>
     <!-- Referrals guest pass card title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_guest_pass_card_title">%1$s Guest Pass</string>
+    <string name="referrals_failed_to_load_offer">Sorry, but something went wrong fetching your referral link.</string>
     <string name="referrals_invalid_offer_description">This guest pass can only be redeemed once and is available for those without an active Plus or Patron subscription. Thanks for listening!</string>
     <string name="referrals_invalid_offer_title">This offer isn\'t available</string>
     <!-- Referrals send guest pass title, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
@@ -2141,5 +2153,7 @@
     <string name="referrals_share_text">Hey! Use the link below to claim your %1$s guest pass for Pocket&#160;Casts&#160;Plus and enjoy podcasts across all your devices!</string>
     <!-- Referrals tooltip message, `%1$s' is a placeholder for the offer duration on the Plus subscription -->
     <string name="referrals_tooltip_message">Gift %1$s of Pocket&#160;Casts&#160;Plus!</string>
+    <string name="referrals_create_subscription_failed">Could not create subscription. Please try again later.</string>
+    <string name="referrals_redeem_code_failed">Could not redeem code. Please try again later.</string>
 
 </resources>

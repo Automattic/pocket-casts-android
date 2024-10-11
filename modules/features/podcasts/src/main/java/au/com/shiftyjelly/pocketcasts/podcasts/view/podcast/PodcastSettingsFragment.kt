@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
@@ -31,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -53,17 +56,22 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.Listener, HasBackstack {
-    @Inject lateinit var theme: Theme
+    @Inject
+    lateinit var theme: Theme
 
-    @Inject lateinit var podcastManager: PodcastManager
+    @Inject
+    lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
     private var preferenceFeedIssueDetected: Preference? = null
     private var preferenceNotifications: SwitchPreference? = null
     private var preferenceAutoDownload: SwitchPreference? = null
+    private var autoDownloadPodcastsLimit: ListPreference? = null
     private var preferenceAddToUpNext: SwitchPreference? = null
     private var preferenceAddToUpNextOrder: ListPreference? = null
     private var preferenceAddToUpNextGlobal: Preference? = null
@@ -104,6 +112,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         preferenceFeedIssueDetected = preferenceManager.findPreference("feedIssueDetected")
         preferenceNotifications = preferenceManager.findPreference("notifications")
         preferenceAutoDownload = preferenceManager.findPreference("autoDownload")
+        autoDownloadPodcastsLimit = preferenceManager.findPreference("autoDownloadPodcastsLimit")
         preferenceAddToUpNext = preferenceManager.findPreference("addToUpNext")
         preferenceAddToUpNextOrder = preferenceManager.findPreference("addToUpNextOrder")
         preferenceAddToUpNextGlobal = preferenceManager.findPreference("addToUpNextGlobal")
@@ -131,7 +140,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
         view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         view.isClickable = true
 
-        toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        toolbar = view.findViewById(R.id.toolbar)
 
         preferenceAddToUpNextOrder?.isVisible = false
 
@@ -159,6 +168,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             preferenceNotifications?.isChecked = podcast.isShowNotifications
 
             preferenceAutoDownload?.isChecked = podcast.isAutoDownloadNewEpisodes
+            autoDownloadPodcastsLimit?.isVisible = FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD) && podcast.isAutoDownloadNewEpisodes
 
             preferenceAddToUpNext?.isChecked = !podcast.isAutoAddToUpNextOff
             preferenceAddToUpNextOrder?.isVisible = !podcast.isAutoAddToUpNextOff
@@ -175,6 +185,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             preferenceFilters?.icon = context.getTintedDrawable(IR.drawable.ic_filters, colors.iconColor)
 
             preferenceUnsubscribe?.isVisible = podcast.isSubscribed
+
+            updateAutoDownloadLimit(podcast)
 
             hideLoading()
         }
@@ -460,6 +472,21 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             true
         }
 
+        autoDownloadPodcastsLimit?.setOnPreferenceChangeListener { _, newValue ->
+            val autoDownloadLimitSetting = (newValue as? String)
+                ?.let { AutoDownloadLimitSetting.fromPreferenceString(it) }
+
+            autoDownloadLimitSetting?.let {
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_LIMIT_TOGGLED,
+                    mapOf("value" to it.analyticsString),
+                )
+
+                viewModel.setAutoDownloadLimit(it)
+            }
+            true
+        }
+
         preferenceAddToUpNextGlobal?.run {
             setOnPreferenceClickListener {
                 val fragment = AutoAddSettingsFragment()
@@ -488,6 +515,18 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
             preferenceFilters?.summary = getString(LR.string.podcast_included_in_filters, filterTitles.joinToString())
         }
         preferenceFilters?.isVisible = availableFilters.isNotEmpty()
+    }
+
+    private fun updateAutoDownloadLimit(podcast: Podcast) {
+        val options = AutoDownloadLimitSetting.entries
+        val podcastAutoDownloadLimit = podcast.autoDownloadLimit ?: AutoDownloadLimitSetting.TWO_LATEST_EPISODE
+
+        autoDownloadPodcastsLimit?.let { autoDownloadLimit ->
+            autoDownloadLimit.entries = options.map { getString(it.titleRes) }.toTypedArray()
+            autoDownloadLimit.entryValues = options.map { it.id.toString() }.toTypedArray()
+            autoDownloadLimit.value = podcastAutoDownloadLimit.id.toString()
+            autoDownloadLimit.summary = getString(podcastAutoDownloadLimit.titleRes)
+        }
     }
 
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
