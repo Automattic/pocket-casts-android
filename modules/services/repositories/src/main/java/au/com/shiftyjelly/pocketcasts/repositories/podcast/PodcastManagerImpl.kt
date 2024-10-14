@@ -121,8 +121,8 @@ class PodcastManagerImpl @Inject constructor(
     /**
      * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
      */
-    override fun subscribeToPodcast(podcastUuid: String, sync: Boolean) {
-        subscribeManager.subscribeOnQueue(podcastUuid, sync)
+    override fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean) {
+        subscribeManager.subscribeOnQueue(podcastUuid, sync, shouldAutoDownload)
     }
 
     override suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean): Podcast =
@@ -132,8 +132,8 @@ class PodcastManagerImpl @Inject constructor(
      * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
      * Do this now rather than adding it to a queue.
      */
-    override fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean): Single<Podcast> {
-        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true)
+    override fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
+        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload)
     }
 
     /**
@@ -145,8 +145,8 @@ class PodcastManagerImpl @Inject constructor(
             .toSingle()
     }
 
-    override fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast> {
-        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = false)
+    override fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
+        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload)
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {
