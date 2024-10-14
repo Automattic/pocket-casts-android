@@ -20,21 +20,26 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 
+interface EndOfYearSync {
+    suspend fun sync(year: Year = EndOfYearManager.YEAR_TO_SYNC): Boolean
+    suspend fun reset()
+}
+
 @Singleton
-class EndOfYearSync @Inject constructor(
+class EndOfYearSyncImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val historyManager: HistoryManager,
     private val ratingsManager: RatingsManager,
     private val endOfYearManager: EndOfYearManager,
     private val settings: Settings,
     private val clock: Clock,
-) {
+) : EndOfYearSync {
     private val ratingsSync = CachedAction<Unit, Unit> { syncRatings() }
     private val thisYearSync = CachedAction<Year, Unit> { syncHistoryForYear(it) }
     private val lastYearSync = CachedAction<Year, Unit> { syncHistoryForYear(it) }
     private val timestampSetting = settings.lastEoySyncTimestamp
 
-    suspend fun sync(year: Year = EndOfYearManager.YEAR_TO_SYNC): Boolean {
+    override suspend fun sync(year: Year): Boolean {
         return when {
             isDataSynced() -> true
             canSyncData() -> supervisorScope {
@@ -52,7 +57,7 @@ class EndOfYearSync @Inject constructor(
         }
     }
 
-    suspend fun reset() {
+    override suspend fun reset() {
         ratingsSync.reset()
         thisYearSync.reset()
         lastYearSync.reset()
