@@ -195,7 +195,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="958"
+            line="966"
             column="55"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="965"
+            line="973"
             column="55"/>
     </issue>
 
@@ -1102,17 +1102,6 @@
             file="../modules/features/cartheme/src/main/res/drawable/car_unbounded_ripple_background.xml"
             line="17"
             column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.color.modal_image_content_background_color` appears to be unused"
-        errorLine1="    &lt;color name=&quot;modal_image_content_background_color&quot;>#FF6262&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../modules/features/endofyear/src/main/res/values/colors.xml"
-            line="3"
-            column="12"/>
     </issue>
 
     <issue
@@ -3950,17 +3939,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.heart` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/heart.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.drawable.highlight_circle` appears to be unused"
         errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -4628,17 +4606,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.logo_white` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/logo_white.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.menu.menu_about` appears to be unused"
         errorLine1="&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -5014,17 +4981,6 @@
         <location
             file="../modules/features/discover/src/main/res/drawable/primary_ui_3_8_round.xml"
             line="2"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.rectangle` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/rectangle.xml"
-            line="1"
             column="1"/>
     </issue>
 
