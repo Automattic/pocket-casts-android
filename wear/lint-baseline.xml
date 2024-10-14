@@ -1007,17 +1007,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.color.modal_image_content_background_color` appears to be unused"
-        errorLine1="    &lt;color name=&quot;modal_image_content_background_color&quot;>#FF6262&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../modules/features/endofyear/src/main/res/values/colors.xml"
-            line="3"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.color.pocketcastsreddark` appears to be unused"
         errorLine1="    &lt;color name=&quot;pocketcastsreddark&quot;>#C62828&lt;/color>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -3818,17 +3807,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.heart` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/heart.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.drawable.ic_action_share` appears to be unused">
         <location
             file="../modules/services/images/src/main/res/drawable-hdpi/ic_action_share.png"/>
@@ -4533,17 +4511,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.logo_white` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/logo_white.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.menu.menu_about` appears to be unused"
         errorLine1="&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -4913,17 +4880,6 @@
             file="../modules/features/settings/src/main/res/values/preferences_default_row_action.xml"
             line="30"
             column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.rectangle` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="../modules/features/endofyear/src/main/res/drawable/rectangle.xml"
-            line="1"
-            column="1"/>
     </issue>
 
     <issue
