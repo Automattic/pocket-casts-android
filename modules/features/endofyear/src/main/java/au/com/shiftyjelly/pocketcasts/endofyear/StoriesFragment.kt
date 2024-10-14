@@ -11,11 +11,14 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.StoriesPage
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import android.R as AndroidR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -25,6 +28,14 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         get() = StatusBarColor.Custom(Color.BLACK, true)
     private val source: StoriesSource
         get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), ARG_SOURCE, StoriesSource::class.java))
+
+    private val viewModel by viewModels<EndOfYearViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<EndOfYearViewModel.Factory> { factory ->
+                factory.create(EndOfYearManager.YEAR_TO_SYNC)
+            }
+        },
+    )
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
