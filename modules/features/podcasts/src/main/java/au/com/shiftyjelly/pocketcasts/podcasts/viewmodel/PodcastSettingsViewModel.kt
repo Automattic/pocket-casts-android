@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -90,13 +89,6 @@ class PodcastSettingsViewModel @Inject constructor(
         launch {
             val autoDownloadStatus = if (download) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
             podcastManager.updateAutoDownloadStatus(podcast, autoDownloadStatus)
-        }
-    }
-
-    fun setAutoDownloadLimit(autoDownloadLimitSetting: AutoDownloadLimitSetting) {
-        val podcast = this.podcast.value ?: return
-        launch {
-            podcastManager.updateAutoDownloadLimit(podcast, autoDownloadLimitSetting)
         }
     }
 

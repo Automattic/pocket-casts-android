@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
-import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -351,9 +350,6 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract fun updateAutoDownloadStatus(autoDownloadStatus: Int, uuid: String)
-
-    @Query("UPDATE podcasts SET auto_download_limit = :autoDownloadLimit WHERE uuid = :uuid")
-    abstract fun updateAutoDownloadLimit(autoDownloadLimit: AutoDownloadLimitSetting, uuid: String)
 
     @Query("SELECT * FROM podcasts WHERE sync_status = " + Podcast.SYNC_STATUS_NOT_SYNCED + " AND uuid IS NOT NULL")
     abstract fun findNotSynced(): List<Podcast>
