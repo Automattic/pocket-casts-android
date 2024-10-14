@@ -33,11 +33,6 @@ enum class AutoDownloadLimitSetting(
         titleRes = LR.string.settings_auto_download_limit_ten_latest_episode,
         analyticsString = "ten_latest_episode",
     ),
-    ALL_LATEST_EPISODES(
-        id = 6,
-        titleRes = LR.string.settings_auto_download_limit_all_latest_episodes,
-        analyticsString = "all_latest_episodes",
-    ),
     ;
 
     companion object {
@@ -59,7 +54,6 @@ enum class AutoDownloadLimitSetting(
             THREE_LATEST_EPISODE -> 3
             FIVE_LATEST_EPISODE -> 5
             TEN_LATEST_EPISODE -> 10
-            ALL_LATEST_EPISODES -> 1 // todo - confirm what does all latest episodes mean
         }
     }
 }
