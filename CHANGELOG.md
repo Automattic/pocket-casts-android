@@ -12,6 +12,8 @@
         ([#2979](https://github.com/Automattic/pocket-casts-android/pull/2979))
     *   Fix search podcast results scroll back to the start after subscribing
         ([#2923](https://github.com/Automattic/pocket-casts-android/pull/2923))
+    *   Fix episodes stuck on the downloads page
+        ([#3006](https://github.com/Automattic/pocket-casts-android/pull/3006))
     *   Display web-page based HTML transcripts in web view
         ([#2910](https://github.com/Automattic/pocket-casts-android/pull/2910))
 *   New Features
