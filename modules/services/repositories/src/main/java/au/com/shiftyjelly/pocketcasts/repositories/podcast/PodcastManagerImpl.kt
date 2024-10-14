@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -820,9 +819,6 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun refreshPodcastFeed(podcastUuid: String): Boolean {
         return refreshServiceManager.refreshPodcastFeed(podcastUuid).isSuccessful
     }
-
-    override suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast> =
-        podcastDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 
     override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)
