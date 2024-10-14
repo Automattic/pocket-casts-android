@@ -237,17 +237,16 @@ class DownloadManagerImpl @Inject constructor(
     private suspend fun cleanUpStaleDownloads(workManager: WorkManager) = withContext(downloadsCoroutineContext) {
         val staleDownloads = episodeManager.findStaleDownloads()
 
+        Timber.i("Cleaning up ${staleDownloads.size} stale downloads.")
+
         for (episode in staleDownloads) {
             val taskId = episode.downloadTaskId ?: continue
             val uuid = UUID.fromString(taskId)
 
             try {
                 val state = workManager.getWorkInfoById(uuid).get()
-                val wasCancelled = state.outputData.getBoolean(
-                    DownloadEpisodeTask.OUTPUT_CANCELLED,
-                    false,
-                )
-                if (state == null || wasCancelled) {
+                val missingOrCancelled = state == null || state.outputData.getBoolean(DownloadEpisodeTask.OUTPUT_CANCELLED, false)
+                if (missingOrCancelled) {
                     episodeManager.updateDownloadTaskId(episode, null)
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up old workmanager task for ${episode.uuid}.")
                 } else {
@@ -255,7 +254,7 @@ class DownloadManagerImpl @Inject constructor(
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Workmanager knows about ${episode.uuid} but it is marked as not downloaded.")
                 }
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not clean up stale download ${episode.uuid}.", e)
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not clean up stale download ${episode.uuid}.")
             }
         }
     }
