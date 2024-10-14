@@ -108,6 +108,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
 }
 
+@Immutable
 internal sealed interface UiState {
     data object Syncing : UiState
 
@@ -119,6 +120,7 @@ internal sealed interface UiState {
     ) : UiState
 }
 
+@Immutable
 internal sealed interface Story {
     data object Cover : Story
 

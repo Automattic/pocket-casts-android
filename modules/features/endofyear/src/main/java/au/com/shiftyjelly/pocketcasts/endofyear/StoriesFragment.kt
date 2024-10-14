@@ -8,6 +8,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
@@ -59,7 +62,11 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
-            StoriesPage()
+            LaunchedEffect(Unit) {
+                viewModel.syncData()
+            }
+            val state by viewModel.uiState.collectAsState()
+            StoriesPage(state)
         }
     }
 
