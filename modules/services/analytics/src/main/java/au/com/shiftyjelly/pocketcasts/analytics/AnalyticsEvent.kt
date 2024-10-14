@@ -220,7 +220,6 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED("podcast_settings_feed_error_fix_succeeded"),
     PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED("podcast_settings_feed_error_fix_failed"),
     PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED("podcast_settings_auto_download_toggled"),
-    PODCAST_SETTINGS_AUTO_DOWNLOAD_LIMIT_TOGGLED("podcast_settings_auto_download_limit_toggled"),
     PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED("podcast_settings_notifications_toggled"),
     PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED("podcast_settings_auto_add_up_next_toggled"),
     PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED("podcast_settings_auto_add_up_next_position_option_changed"),
