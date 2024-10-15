@@ -153,8 +153,63 @@ class EndOfYearViewModelTest {
             assertEquals(stats.playedPodcastCount, story.showCount)
             assertEquals(stats.playedEpisodeCount, story.epsiodeCount)
             // We select 8 random episodes to display in the UI
-            assertEquals(8, story.showIds.distinct().size)
-            assertTrue(stats.playedPodcastIds.containsAll(story.showIds))
+            assertEquals(4, story.topShowIds.distinct().size)
+            assertEquals(4, story.bottomShowIds.distinct().size)
+            assertEquals(emptySet<String>(), story.topShowIds.intersect(story.bottomShowIds))
+            assertTrue(stats.playedPodcastIds.containsAll(story.topShowIds))
+        }
+    }
+
+    @Test
+    fun `number of shows for a single show`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats.copy(playedPodcastIds = listOf("id")))
+
+        viewModel.syncData()
+        viewModel.uiState.test {
+            val story = awaitStory<NumberOfShows>()
+
+            assertEquals(List(4) { "id" }, story.topShowIds)
+            assertEquals(List(4) { "id" }, story.bottomShowIds)
+        }
+    }
+
+    @Test
+    fun `number of shows for three shows`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats.copy(playedPodcastIds = List(3) { "id-$it" }))
+
+        viewModel.syncData()
+        viewModel.uiState.test {
+            val story = awaitStory<NumberOfShows>()
+
+            assertEquals(4, story.topShowIds.size)
+            assertEquals(4, story.bottomShowIds.size)
+
+            // Verify list rotation
+            assertEquals(story.topShowIds[0], story.topShowIds[3])
+            assertEquals(story.topShowIds[1], story.bottomShowIds[0])
+            assertEquals(story.topShowIds[2], story.bottomShowIds[1])
+            assertEquals(story.topShowIds[3], story.bottomShowIds[2])
+            assertEquals(story.bottomShowIds[0], story.bottomShowIds[3])
+        }
+    }
+
+    @Test
+    fun `number of shows for six shows`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats.copy(playedPodcastIds = List(6) { "id-$it" }))
+
+        viewModel.syncData()
+        viewModel.uiState.test {
+            val story = awaitStory<NumberOfShows>()
+
+            assertEquals(4, story.topShowIds.size)
+            assertEquals(4, story.bottomShowIds.size)
+
+            // Verify list rotation
+            assertEquals(story.topShowIds[0], story.bottomShowIds[2])
+            assertEquals(story.topShowIds[1], story.bottomShowIds[3])
         }
     }
 
@@ -165,9 +220,9 @@ class EndOfYearViewModelTest {
 
         viewModel.syncData()
         viewModel.uiState.test {
-            val story = awaitStory<NumberOfShows>()
+            val stories = awaitStories()
 
-            assertEquals(0, story.showIds.size)
+            assertDoesNotHaveStory<NumberOfShows>(stories)
         }
     }
 
