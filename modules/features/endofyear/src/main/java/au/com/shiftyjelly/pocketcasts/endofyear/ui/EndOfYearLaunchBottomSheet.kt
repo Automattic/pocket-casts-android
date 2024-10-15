@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -142,19 +139,4 @@ private fun ImageContent(modifier: Modifier = Modifier) {
             )
         }
     }
-}
-
-@Composable
-private fun PlaybackText(
-    color: Color,
-    fontSize: TextUnit,
-    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
-) {
-    Text(
-        text = "PLAYBACK",
-        color = color,
-        fontSize = fontSize,
-        fontFamily = humaneFontFamily,
-        onTextLayout = onTextLayout,
-    )
 }
