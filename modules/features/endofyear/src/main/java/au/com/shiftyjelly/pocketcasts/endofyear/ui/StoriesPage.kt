@@ -338,7 +338,7 @@ private fun NumberOfShowsStory(
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
             RowOutlinedButton(
-                "Share this story",
+                text = stringResource(LR.string.end_of_year_share_story),
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = Color.Transparent,
                     contentColor = Color.Black,
