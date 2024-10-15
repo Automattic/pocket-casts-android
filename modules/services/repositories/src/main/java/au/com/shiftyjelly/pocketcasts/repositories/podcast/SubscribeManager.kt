@@ -114,7 +114,7 @@ class SubscribeManager @Inject constructor(
                 if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD) && shouldAutoDownload) {
                     podcastDao.findByUuid(podcastUuid)?.let { podcast ->
                         val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
-                        val autoDownloadLimit = podcast.autoDownloadLimit ?: return@doOnSuccess
+                        val autoDownloadLimit = settings.autoDownloadLimit.value
 
                         episodes.take(AutoDownloadLimitSetting.getNumberOfEpisodes(autoDownloadLimit)).forEach { episode ->
                             if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
@@ -187,7 +187,6 @@ class SubscribeManager @Inject constructor(
                 podcast.showArchived = settings.showArchivedDefault.value
                 if (subscribed && shouldAutoDownload && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
                     podcast.autoDownloadStatus = AUTO_DOWNLOAD_NEW_EPISODES
-                    podcast.autoDownloadLimit = settings.autoDownloadLimit.value
                 }
             }
         // add the podcast
