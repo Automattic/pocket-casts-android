@@ -401,7 +401,7 @@ private fun TopShowStory(
         val coverSize = shapeSize * sqrt(2f)
         val coverOffset = sizes.closeButtonBottomEdge
         PodcastImage(
-            uuid = "221f43c0-355c-013b-efa5-0acc26574db2",
+            uuid = story.show.uuid,
             elevation = 0.dp,
             roundCorners = false,
             modifier = Modifier
