@@ -66,7 +66,10 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 viewModel.syncData()
             }
             val state by viewModel.uiState.collectAsState()
-            StoriesPage(state)
+            StoriesPage(
+                state = state,
+                onClose = ::dismiss,
+            )
         }
     }
 

@@ -4,11 +4,12 @@ import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,10 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -45,16 +50,18 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlin.math.roundToLong
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun StoriesPage(
     state: UiState,
+    onClose: () -> Unit,
 ) {
     val size = getSizeLimit(LocalContext.current)?.let(Modifier::size) ?: Modifier.fillMaxSize()
     BoxWithConstraints(
@@ -74,10 +81,32 @@ internal fun StoriesPage(
         } else if (state is UiState.Synced) {
             Stories(
                 stories = state.stories,
-                coverFontSize = coverFontSize,
-                coverTextHeight = coverTextHeight,
+                sizes = EndOfYearSizes(
+                    width = this@BoxWithConstraints.maxWidth,
+                    height = this@BoxWithConstraints.maxHeight,
+                    closeButtonBottomEdge = 36.dp,
+                    coverFontSize = coverFontSize,
+                    coverTextHeight = coverTextHeight,
+                ),
             )
         }
+
+        Image(
+            painter = painterResource(IR.drawable.ic_close),
+            contentDescription = stringResource(LR.string.close),
+            colorFilter = ColorFilter.tint(Color.Black),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 12.dp, end = 18.dp)
+                .size(24.dp)
+                .clickable(
+                    interactionSource = remember(::MutableInteractionSource),
+                    indication = rememberRipple(color = Color.Black, bounded = false),
+                    onClickLabel = stringResource(LR.string.close),
+                    role = Role.Button,
+                    onClick = onClose,
+                ),
+        )
 
         // Use an invisible 'PLAYBACK' text to compute an appropriate font size.
         // The font should occupy the whole viewport's width with some padding.
@@ -107,14 +136,13 @@ internal fun StoriesPage(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun BoxWithConstraintsScope.Stories(
+private fun Stories(
     stories: List<Story>,
-    coverFontSize: TextUnit,
-    coverTextHeight: Dp,
+    sizes: EndOfYearSizes,
 ) {
     val pagerState = rememberPagerState(pageCount = { stories.size })
     val coroutineScope = rememberCoroutineScope()
-    val widthPx = LocalDensity.current.run { maxWidth.toPx() }
+    val widthPx = LocalDensity.current.run { sizes.width.toPx() }
 
     HorizontalPager(
         state = pagerState,
@@ -135,7 +163,7 @@ private fun BoxWithConstraintsScope.Stories(
         },
     ) { index ->
         when (val story = stories[index]) {
-            is Story.Cover -> CoverStory(story, coverFontSize, coverTextHeight)
+            is Story.Cover -> CoverStory(story, sizes)
             is Story.NumberOfShows -> StoryPlaceholder(story)
             is Story.TopShow -> StoryPlaceholder(story)
             is Story.TopShows -> StoryPlaceholder(story)
@@ -165,8 +193,7 @@ private fun StoryPlaceholder(story: Story) {
 @Composable
 private fun CoverStory(
     story: Story.Cover,
-    fontSize: TextUnit,
-    textHeight: Dp,
+    sizes: EndOfYearSizes,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -190,13 +217,13 @@ private fun CoverStory(
             items(Int.MAX_VALUE) {
                 PlaybackText(
                     color = Color(0xFFEEB1F4),
-                    fontSize = fontSize,
-                    modifier = Modifier.sizeIn(maxHeight = textHeight),
+                    fontSize = sizes.coverFontSize,
+                    modifier = Modifier.sizeIn(maxHeight = sizes.coverTextHeight),
                 )
             }
         }
         Image(
-            painter = painterResource(R.drawable.end_of_year_2024_sticker_2),
+            painter = painterResource(IR.drawable.end_of_year_2024_sticker_2),
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -204,7 +231,7 @@ private fun CoverStory(
                 .size(width = 172.dp, height = 163.dp),
         )
         Image(
-            painter = painterResource(R.drawable.end_of_year_2024_sticker_1),
+            painter = painterResource(IR.drawable.end_of_year_2024_sticker_1),
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -213,6 +240,14 @@ private fun CoverStory(
         )
     }
 }
+
+private data class EndOfYearSizes(
+    val width: Dp = Dp.Unspecified,
+    val height: Dp = Dp.Unspecified,
+    val coverFontSize: TextUnit = TextUnit.Unspecified,
+    val coverTextHeight: Dp = Dp.Unspecified,
+    val closeButtonBottomEdge: Dp = Dp.Unspecified,
+)
 
 private val Story.backgroundColor get() = when (this) {
     is Story.Cover -> Color(0xFFEE661C)
@@ -271,7 +306,9 @@ private fun ErrorMessage() {
 fun CoverStoryPreview() {
     CoverStory(
         story = Story.Cover,
-        fontSize = 260.sp,
-        textHeight = 210.dp,
+        sizes = EndOfYearSizes(
+            coverFontSize = 260.sp,
+            coverTextHeight = 210.dp,
+        ),
     )
 }
