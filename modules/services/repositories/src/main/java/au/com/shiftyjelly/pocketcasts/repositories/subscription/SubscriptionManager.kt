@@ -5,6 +5,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
@@ -21,6 +22,7 @@ interface SubscriptionManager {
     fun observeProductDetails(): Flowable<ProductDetailsState>
     fun observePurchaseEvents(): Flowable<PurchaseEvent>
     fun observeSubscriptionStatus(): Flowable<Optional<SubscriptionStatus>>
+    fun subscriptionTier(): Flow<SubscriptionTier>
     fun getSubscriptionStatus(allowCache: Boolean = true): Single<SubscriptionStatus>
     fun connectToGooglePlay(context: Context)
     fun loadProducts()

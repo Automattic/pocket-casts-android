@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSyncImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -182,4 +184,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideReferralManager(referralManagerImpl: ReferralManagerImpl): ReferralManager
+
+    @Binds
+    abstract fun provideEndOfYearSync(endOfYearSyncImpl: EndOfYearSyncImpl): EndOfYearSync
 }
