@@ -400,20 +400,15 @@ private fun TopShowStory(
         val shapeSize = sizes.width * 1.12f
         val coverSize = shapeSize * sqrt(2f)
         val coverOffset = sizes.closeButtonBottomEdge
-        Box(
+        PodcastImage(
+            uuid = "221f43c0-355c-013b-efa5-0acc26574db2",
+            elevation = 0.dp,
+            roundCorners = false,
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-        ) {
-            PodcastImage(
-                uuid = "221f43c0-355c-013b-efa5-0acc26574db2",
-                elevation = 0.dp,
-                roundCorners = false,
-                modifier = Modifier
-                    .requiredSize(coverSize)
-                    .offset(y = coverOffset),
-            )
-        }
+                .requiredSize(coverSize)
+                .offset(y = coverOffset),
+        )
+
         val transition = rememberInfiniteTransition(label = "transition")
         val rotation = transition.animateFloat(
             initialValue = 0f,
@@ -421,7 +416,6 @@ private fun TopShowStory(
             animationSpec = infiniteRepeatable(tween(40_000, easing = LinearEasing)),
             label = "rotation",
         )
-
         val shapeSizePx = LocalDensity.current.run { shapeSize.toPx() }
         val shapeOffsetPx = LocalDensity.current.run { (coverOffset * 0.6f + (coverSize - shapeSize) / 2).toPx() }
         Box(
