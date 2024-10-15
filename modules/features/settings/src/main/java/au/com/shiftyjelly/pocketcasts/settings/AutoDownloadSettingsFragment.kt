@@ -156,8 +156,8 @@ class AutoDownloadSettingsFragment :
             ?.apply {
                 setOnPreferenceChangeListener { _, newValue ->
                     if (newValue is Boolean) {
-                        onChangeNewEpisodes(newValue)
                         viewModel.onNewEpisodesChange(newValue)
+                        onChangeNewEpisodes(newValue)
                     }
                     true
                 }
@@ -238,9 +238,6 @@ class AutoDownloadSettingsFragment :
 
     private fun onChangeNewEpisodes(on: Boolean) {
         lifecycleScope.launch {
-            if (!on) {
-                async(Dispatchers.Default) { podcastManager.updateAllAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_OFF) }.await()
-            }
             updateNewEpisodesSwitch(on)
             updatePodcastsSummary()
         }
@@ -256,10 +253,6 @@ class AutoDownloadSettingsFragment :
         } else {
             podcastsCategory.removePreference(podcastsPreference)
             podcastsCategory.removePreference(podcastsLimitPreference)
-
-            // Reset Limit Downloads to default value after disabling auto download toggle
-            viewModel.setLimitDownloads(AutoDownloadLimitSetting.TWO_LATEST_EPISODE)
-            updateLimitDownloadsSummary()
         }
     }
 
