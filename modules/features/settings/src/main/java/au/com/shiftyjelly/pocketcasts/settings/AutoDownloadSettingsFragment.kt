@@ -345,9 +345,9 @@ class AutoDownloadSettingsFragment :
     private fun updateView() {
         updatePodcastsSummary()
         updateFiltersSelectedSummary()
-        updateNewEpisodesSwitch()
 
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
+        newEpisodesPreference?.isChecked = viewModel.getAutoDownloadNewEpisodes()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
@@ -381,19 +381,6 @@ class AutoDownloadSettingsFragment :
                         else -> resources.getString(LR.string.settings_podcasts_selected_x, autoDownloadingCount)
                     }
                     podcastsPreference?.summary = summary
-                },
-            )
-    }
-
-    @SuppressLint("CheckResult")
-    private fun updateNewEpisodesSwitch() {
-        countPodcastsAutoDownloading()
-            .map { it > 0 }
-            .subscribeBy(
-                onError = { Timber.e(it) },
-                onSuccess = { on ->
-                    updateNewEpisodesSwitch(on)
-                    newEpisodesPreference?.isChecked = on
                 },
             )
     }
