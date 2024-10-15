@@ -38,8 +38,8 @@ fun <T> ScrollingRow(
     val state = remember {
         LazyListState(
             firstVisibleItemIndex = when (scrollDirection) {
-                ScrollDirection.Left -> Int.MAX_VALUE - 1
-                ScrollDirection.Right -> 0
+                ScrollDirection.Left -> 0
+                ScrollDirection.Right -> Int.MAX_VALUE - 1
             },
         )
     }
@@ -47,8 +47,8 @@ fun <T> ScrollingRow(
     LaunchedEffect(Unit) {
         while (isActive) {
             val scrollValue = when (scrollDirection) {
-                ScrollDirection.Left -> -scrollByPixels
-                ScrollDirection.Right -> scrollByPixels
+                ScrollDirection.Left -> scrollByPixels
+                ScrollDirection.Right -> -scrollByPixels
             }
             state.scrollBy(scrollValue)
             delay(scrollDelay(density))

@@ -285,7 +285,7 @@ private fun NumberOfShowsStory(
         ) {
             PodcastCoverCarousel(
                 podcastIds = story.topShowIds,
-                scrollDirection = ScrollDirection.Right,
+                scrollDirection = ScrollDirection.Left,
                 coverSize = coverSize,
                 spacingSize = spacingSize,
             )
@@ -294,7 +294,7 @@ private fun NumberOfShowsStory(
             )
             PodcastCoverCarousel(
                 podcastIds = story.bottomShowIds,
-                scrollDirection = ScrollDirection.Left,
+                scrollDirection = ScrollDirection.Right,
                 coverSize = coverSize,
                 spacingSize = spacingSize,
             )
