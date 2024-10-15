@@ -114,11 +114,14 @@ class SubscribeManager @Inject constructor(
                 if (canDownloadEpisodesAfterSubscription(subscribed, shouldAutoDownload)) {
                     podcastDao.findByUuid(podcastUuid)?.let { podcast ->
                         val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
+                        val numberOfEpisodes = AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)
 
-                        episodes.take(AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)).forEach { episode ->
+                        episodes.take(numberOfEpisodes).forEach { episode ->
                             if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
                                 return@forEach
                             }
+
+                            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto Downloading $numberOfEpisodes episodes after subscribing to $podcastUuid")
 
                             DownloadHelper.addAutoDownloadedEpisodeToQueue(
                                 episode,
@@ -185,6 +188,7 @@ class SubscribeManager @Inject constructor(
                 podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
                 if (canDownloadEpisodesAfterSubscription(subscribed, shouldAutoDownload)) {
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Update auto download status for $podcastUuid")
                     podcast.autoDownloadStatus = AUTO_DOWNLOAD_NEW_EPISODES
                 }
             }
