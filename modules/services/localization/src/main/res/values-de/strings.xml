@@ -280,7 +280,6 @@ Language: de
     <string name="discover_category_health_abbreviation">Gesundheit</string>
     <string name="eoy_story_top_podcasts_subtitle">Das sind deine Top 5 am häufigsten angehörten Shows im Jahr 2023</string>
     <string name="eoy_story_top_podcasts_title">Und auch diese Shows haben dir gefallen!</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s war deine am häufigsten angehörte Show im Jahr 2023</string>
     <string name="end_of_year_share_story">Diese Story teilen</string>
     <string name="podcast_log_in_to_rate">Bitte melde dich an, um eine Bewertung abzugeben</string>
     <string name="podcast_submit_rating_no_internet">Keine Internetverbindung gefunden. Bitte stelle eine Internetverbindung her, um eine Bewertung abzugeben.</string>

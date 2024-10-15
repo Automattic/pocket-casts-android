@@ -280,7 +280,6 @@ Language: es
     <string name="discover_category_health_abbreviation">Salud</string>
     <string name="eoy_story_top_podcasts_subtitle">Este es tu top 5 de lo más escuchado en 2023</string>
     <string name="eoy_story_top_podcasts_title">Y también escuchaste mucho estos programas.</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s fue tu programa más escuchado en 2023</string>
     <string name="end_of_year_share_story">Compartir esta historia</string>
     <string name="podcast_log_in_to_rate">Debes acceder para dejar una valoración</string>
     <string name="podcast_submit_rating_no_internet">No se ha encontrado ninguna conexión a Internet. Conéctate a Internet para enviar una valoración.</string>

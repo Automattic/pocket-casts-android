@@ -280,7 +280,6 @@ Language: ja_JP
     <string name="discover_category_health_abbreviation">健康</string>
     <string name="eoy_story_top_podcasts_subtitle">2023年に最も視聴されたトップ5です</string>
     <string name="eoy_story_top_podcasts_title">そしてこれらのショーも大変気に入っていただけました !</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s が2023年で最も視聴されたショーでした</string>
     <string name="end_of_year_share_story">このストーリーを共有</string>
     <string name="podcast_log_in_to_rate">評価を残すにはログインする必要があります</string>
     <string name="podcast_submit_rating_no_internet">インターネット接続が見つかりません。 評価を送信するにはインターネットに接続してください。</string>

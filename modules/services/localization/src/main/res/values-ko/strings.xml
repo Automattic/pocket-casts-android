@@ -280,7 +280,6 @@ Language: ko_KR
     <string name="discover_category_health_abbreviation">건강</string>
     <string name="eoy_story_top_podcasts_subtitle">2023년 가장 많이 청취한 프로그램 5개</string>
     <string name="eoy_story_top_podcasts_title">이런 프로그램도 많이 청취하셨습니다!</string>
-    <string name="end_of_year_story_top_podcast_title">2023년 가장 많이 청취한 프로그램은 %1$s였습니다.</string>
     <string name="end_of_year_share_story">이 스토리 공유</string>
     <string name="podcast_log_in_to_rate">평가를 남기려면 로그인 필요</string>
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>

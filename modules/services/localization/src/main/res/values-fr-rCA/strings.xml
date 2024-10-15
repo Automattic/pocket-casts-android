@@ -280,7 +280,6 @@ Language: fr
     <string name="discover_category_health_abbreviation">Santé</string>
     <string name="eoy_story_top_podcasts_subtitle">Voici les 5 émissions que vous avez le plus écoutées en 2023\"</string>
     <string name="eoy_story_top_podcasts_title">Vous avez aussi adoré ces émissions !</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s est l’émission que vous avez le plus écoutée en 2023</string>
     <string name="end_of_year_share_story">Partager cette story</string>
     <string name="podcast_log_in_to_rate">Vous devez vous connecter pour laisser une note</string>
     <string name="podcast_submit_rating_no_internet">Aucune connexion Internet détectée. Veuillez vous connecter à Internet pour envoyer une note.</string>

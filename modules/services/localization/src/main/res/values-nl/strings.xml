@@ -280,7 +280,6 @@ Language: nl
     <string name="discover_category_health_abbreviation">Gezondheid</string>
     <string name="eoy_story_top_podcasts_subtitle">Dit is je top 5 meest geluisterd in 2023*</string>
     <string name="eoy_story_top_podcasts_title">En deze shows vond je ook geweldig!</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s was jouw meest beluisterde show in 2023</string>
     <string name="end_of_year_share_story">Deel dit verhaal</string>
     <string name="podcast_log_in_to_rate">Je moet inloggen om een beoordeling achter te laten</string>
     <string name="podcast_submit_rating_no_internet">Geen internetverbinding gevonden. Maak verbinding met het internet om een beoordeling in te dienen.</string>
