@@ -59,15 +59,15 @@ interface PodcastManager {
     fun observeEpisodeCountByPodcatUuid(uuid: String): Flow<Int>
 
     /** Add methods  */
-    fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
+    fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean = true)
 
     suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean = false): Podcast
-    fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean = false): Single<Podcast>
+    fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Single<Podcast>
     fun findOrDownloadPodcastRx(podcastUuid: String): Single<Podcast>
     fun isSubscribingToPodcasts(): Boolean
     fun getSubscribedPodcastUuids(): Single<List<String>>
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
-    fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast>
+    fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast>
 
     fun addFolderPodcast(podcast: Podcast)
 

@@ -334,7 +334,7 @@ class OpmlImportTask @AssistedInject constructor(
 private fun Flow<ImportOpmlResponse>.subscribeToPodcasts(podcastManager: PodcastManager): Flow<ImportOpmlResponse> {
     return onEach {
         // add podcast uuid to subscribe queue
-        it.uuids.forEach { uuid -> podcastManager.subscribeToPodcast(uuid, true) }
+        it.uuids.forEach { uuid -> podcastManager.subscribeToPodcast(uuid, sync = true, shouldAutoDownload = false) }
     }
 }
 

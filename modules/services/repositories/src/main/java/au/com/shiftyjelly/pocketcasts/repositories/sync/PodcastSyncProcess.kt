@@ -262,7 +262,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(podcastResponse: UserPodcastResponse?): Maybe<Podcast> {
         val podcastUuid = podcastResponse?.uuid ?: return Maybe.empty()
-        return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false)
+        return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false, shouldAutoDownload = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
             .toMaybe()
             .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast %s", podcastUuid) }
@@ -788,7 +788,7 @@ class PodcastSyncProcess(
         val isSubscribed = podcastSync.subscribed
         val podcastUuid = podcastSync.uuid
         if (podcastSync.subscribed && isSubscribed && podcastUuid != null) {
-            return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false)
+            return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false, shouldAutoDownload = false)
                 .doOnSuccess { podcast ->
                     applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
                     podcastManager.updatePodcast(podcast)

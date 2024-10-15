@@ -52,7 +52,7 @@ class HistoryManager @Inject constructor(
             .observeOn(Schedulers.io())
             .flatMap(
                 { podcastUuid ->
-                    podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false)
+                    podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
                         .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
                         .onErrorReturn { Podcast(uuid = podcastUuid) }
                         .toObservable()

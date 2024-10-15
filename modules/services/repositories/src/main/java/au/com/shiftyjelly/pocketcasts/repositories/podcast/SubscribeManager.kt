@@ -62,7 +62,7 @@ class SubscribeManager @Inject constructor(
     private val episodeDao = appDatabase.episodeDao()
     private val imageRequestFactory = PocketCastsImageRequestFactory(context, isDarkTheme = true)
 
-    data class PodcastSubscribe(val podcastUuid: String, val sync: Boolean)
+    data class PodcastSubscribe(val podcastUuid: String, val sync: Boolean, val shouldAutoDownload: Boolean)
 
     @SuppressLint("CheckResult")
     private fun setupSubscribeRelay(): PublishRelay<PodcastSubscribe> {
@@ -73,7 +73,7 @@ class SubscribeManager @Inject constructor(
             .flatMap({ info ->
                 // shouldAutoDownload = true because the user manually subscribed to the podcast,
                 // so we want to automatically download episodes at this moment.
-                addPodcast(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = true).toObservable()
+                addPodcast(info.podcastUuid, sync = info.sync, subscribed = true, shouldAutoDownload = info.shouldAutoDownload).toObservable()
             }, true, 5)
             .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Could not subscribe to podcast") }
             .subscribeBy(
@@ -89,12 +89,12 @@ class SubscribeManager @Inject constructor(
     /**
      * Subscribe to a podcast on a background queue.
      */
-    fun subscribeOnQueue(podcastUuid: String, sync: Boolean = false) {
+    fun subscribeOnQueue(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean) {
         if (uuidsInQueue.contains(podcastUuid)) {
             return
         }
         uuidsInQueue.add(podcastUuid)
-        subscribeRelay.accept(PodcastSubscribe(podcastUuid, sync))
+        subscribeRelay.accept(PodcastSubscribe(podcastUuid, sync, shouldAutoDownload))
     }
 
     /**
