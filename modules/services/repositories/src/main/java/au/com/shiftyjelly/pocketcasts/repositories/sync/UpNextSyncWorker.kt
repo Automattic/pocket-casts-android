@@ -11,7 +11,6 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
@@ -33,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.Completable
-import io.reactivex.Observable
 import java.util.Locale
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
@@ -195,7 +193,6 @@ class UpNextSyncWorker @AssistedInject constructor(
         } ?: emptyList()
 
         // import the server Up Next into the database
-        // TODO: Convert to suspend function
         upNextQueue.importServerChanges(episodes, playbackManager, downloadManager)
         // check the current episode it correct
         playbackManager.loadQueue()
