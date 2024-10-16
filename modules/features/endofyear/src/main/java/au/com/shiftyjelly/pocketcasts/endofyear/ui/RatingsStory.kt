@@ -1,5 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateIntOffset
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +24,14 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -35,6 +45,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
@@ -48,6 +60,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import kotlin.math.roundToLong
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -55,10 +68,17 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
+) = RatingsStory(story, measurements, showBars = false)
+
+@Composable
+private fun RatingsStory(
+    story: Story.Ratings,
+    measurements: EndOfYearMeasurements,
+    showBars: Boolean,
 ) {
     val maxRatingCount = story.stats.max().second
     if (maxRatingCount != 0) {
-        PresentRatings(story, measurements)
+        PresentRatings(story, measurements, showBars)
     } else {
         AbsentRatings(story, measurements)
     }
@@ -68,6 +88,7 @@ internal fun RatingsStory(
 private fun PresentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
+    showBars: Boolean,
 ) {
     Column(
         modifier = Modifier
@@ -82,12 +103,17 @@ private fun PresentRatings(
                 .weight(1f)
                 .padding(horizontal = 24.dp),
         ) {
-            RatingBars(story.stats)
+            RatingBars(
+                stats = story.stats,
+                showBars = showBars,
+            )
         }
-        Spacer(
-            modifier = Modifier.height(32.dp),
-        )
-        Column {
+        Column(
+            modifier = Modifier.background(story.backgroundColor),
+        ) {
+            Spacer(
+                modifier = Modifier.height(32.dp),
+            )
             TextH10(
                 text = stringResource(LR.string.eoy_story_ratings_title_1),
                 disableScale = true,
@@ -119,6 +145,7 @@ private val SectionHeight = BarHeight + SpaceHeight
 @Composable
 private fun BoxWithConstraintsScope.RatingBars(
     stats: RatingStats,
+    showBars: Boolean,
 ) {
     // Measure text height to account for available space for rating lines
     val textMeasurer = rememberTextMeasurer()
@@ -133,7 +160,13 @@ private fun BoxWithConstraintsScope.RatingBars(
             ),
         ).size.height.dp + 8.dp // Plus padding
     }
-    val maxLineCount = ((maxHeight - ratingTextHeight) / SectionHeight)
+    val maxLineCount = (maxHeight - ratingTextHeight) / SectionHeight
+
+    var show by remember { mutableStateOf(showBars) }
+    LaunchedEffect(Unit) {
+        delay(350)
+        show = true
+    }
 
     Row(
         verticalAlignment = Alignment.Bottom,
@@ -143,7 +176,9 @@ private fun BoxWithConstraintsScope.RatingBars(
         Rating.entries.forEach { rating ->
             RatingBar(
                 rating = rating.numericalValue,
-                lineCount = (maxLineCount * stats.relativeToMax(rating)).toInt(),
+                lineCount = (maxLineCount * stats.relativeToMax(rating)).toInt().coerceAtLeast(1),
+                textHeight = ratingTextHeight,
+                show = show,
             )
         }
     }
@@ -153,7 +188,65 @@ private fun BoxWithConstraintsScope.RatingBars(
 private fun RowScope.RatingBar(
     rating: Int,
     lineCount: Int,
+    textHeight: Dp,
+    show: Boolean,
 ) {
+    val density = LocalDensity.current
+    val linesHeight = SectionHeight * lineCount
+
+    val transition = updateTransition(
+        targetState = show,
+        label = "bar-transition-$rating",
+    )
+
+    val textOffset by transition.animateIntOffset(
+        label = "text-offset",
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = 50f,
+                visibilityThreshold = IntOffset(1, 1),
+            )
+        },
+        targetValueByState = { state ->
+            when (state) {
+                true -> IntOffset(0, 0)
+                false -> IntOffset(0, density.run { textHeight.roundToPx() })
+            }
+        },
+    )
+    val textAlpha by transition.animateFloat(
+        label = "text-alpha",
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = 50f,
+            )
+        },
+        targetValueByState = { state ->
+            when (state) {
+                true -> 1f
+                false -> 0f
+            }
+        },
+    )
+    val barOffset by transition.animateIntOffset(
+        label = "bar-offset",
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = 50f,
+                visibilityThreshold = IntOffset(1, 1),
+            )
+        },
+        targetValueByState = { state ->
+            when (state) {
+                true -> IntOffset(0, 0)
+                false -> IntOffset(0, density.run { (linesHeight * 1.1f).roundToPx() })
+            }
+        },
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.weight(1f),
@@ -162,16 +255,16 @@ private fun RowScope.RatingBar(
             text = "$rating",
             disableScale = true,
             color = colorResource(UR.color.coolgrey_90),
+            modifier = Modifier
+                .offset { textOffset }
+                .padding(bottom = 8.dp)
+                .alpha(textAlpha),
         )
-        Spacer(
-            modifier = Modifier.height(8.dp),
-        )
-        repeat(lineCount.coerceAtLeast(1)) {
-            Spacer(
-                modifier = Modifier.height(SpaceHeight),
-            )
+        repeat(lineCount) {
             Box(
                 modifier = Modifier
+                    .offset { barOffset }
+                    .padding(top = SpaceHeight)
                     .fillMaxWidth()
                     .height(BarHeight)
                     .background(Color.Black),
@@ -230,8 +323,6 @@ private fun OopsiesSection(
             ),
         )
     }
-    val topOffset = LocalDensity.current.run { textMeasurement.size.width.toDp() } * 2.8f / 9
-    val bottomOffset = LocalDensity.current.run { textMeasurement.size.width.toDp() } * 6.5f / 9
 
     Column(
         modifier = Modifier
@@ -333,6 +424,7 @@ private fun RatingsHighPreview() {
                 ),
             ),
             measurements = measurements,
+            showBars = true,
         )
     }
 }
@@ -352,6 +444,7 @@ private fun RatingsLowPreview() {
                 ),
             ),
             measurements = measurements,
+            showBars = true,
         )
     }
 }
@@ -371,6 +464,7 @@ private fun RatingsNonePreview() {
                 ),
             ),
             measurements = measurements,
+            showBars = true,
         )
     }
 }
