@@ -113,7 +113,7 @@ private fun TopShowsStory(
                 .verticalScroll(scrollState),
         ) {
             story.shows.forEachIndexed { index, podcast ->
-                PodcastItem(index, podcast, animationProgress.value)
+                PodcastItem(podcast, index, measurements, animationProgress.value)
             }
         }
         Spacer(
@@ -132,15 +132,16 @@ private fun TopShowsStory(
 
 @Composable
 private fun PodcastItem(
-    index: Int,
     podcast: TopPodcast,
+    index: Int,
+    measurements: EndOfYearMeasurements,
     animationProgress: Float,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(100.dp * measurements.scale),
     ) {
         TextH20(
             text = "#${index + 1}",
@@ -156,7 +157,7 @@ private fun PodcastItem(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(100.dp)
+                .size(100.dp * measurements.scale)
                 .scale(animationProgress)
                 .alpha(animationProgress),
         ) {
@@ -168,7 +169,7 @@ private fun PodcastItem(
                 uuid = podcast.uuid,
                 elevation = 0.dp,
                 cornerSize = 4.dp,
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier.size(72.dp * measurements.scale),
             )
         }
         Spacer(
@@ -256,7 +257,7 @@ private fun Modifier.fadeScrollingEdges(
         },
 )
 
-@Preview(device = Devices.PortraitSmall)
+@Preview(device = Devices.PortraitRegular)
 @Composable
 fun TopShowsPreview() {
     PreviewBox { measurements ->
