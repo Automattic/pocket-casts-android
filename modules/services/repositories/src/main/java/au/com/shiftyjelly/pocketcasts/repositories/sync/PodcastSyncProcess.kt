@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -53,10 +56,13 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import java.time.Instant
 import java.util.Date
+import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.rx2.rxSingle
@@ -290,12 +296,20 @@ class PodcastSyncProcess(
         podcastManager.updatePodcast(podcast)
     }
 
-    private fun syncUpNext(): Completable {
-        return Completable.fromAction {
-            val startTime = SystemClock.elapsedRealtime()
-            UpNextSyncWorker.run(syncManager, context)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+    private fun syncUpNext() = Completable.create { emitter ->
+        val startTime = SystemClock.elapsedRealtime()
+        val workRequestId = UpNextSyncWorker.enqueue(syncManager, context)
+        workRequestId?.let {
+            ProcessLifecycleOwner.get().lifecycleScope.launch {
+                WorkManager.getInstance(context)
+                    .getWorkInfoByIdFlow(it).collectLatest {
+                        if (it.state.isFinished) {
+                            emitter.onComplete()
+                        }
+                    }
+            }
         }
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
     }
 
     private fun syncPlayHistory(): Completable {

@@ -1,12 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
 import android.content.Context
 import android.os.SystemClock
 import androidx.hilt.work.HiltWorker
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
@@ -16,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.jobs.JobIds
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -31,8 +31,8 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import io.reactivex.Completable
 import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
@@ -51,22 +51,31 @@ class UpNextSyncWorker @AssistedInject constructor(
     private val settings: Settings,
     private val syncManager: SyncManager,
     private val upNextQueue: UpNextQueue,
-    private val userEpisodeManager: UserEpisodeManager
+    private val userEpisodeManager: UserEpisodeManager,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
-        @JvmStatic
-        fun run(syncManager: SyncManager, context: Context) {
+        private const val UP_NEXT_SYNC_WORKER_TAG = "pocket_casts_up_next_sync_worker_tag"
+
+        fun enqueue(syncManager: SyncManager, context: Context): UUID? {
             // Don't run the job if Up Next syncing is turned off
             if (!syncManager.isLoggedIn()) {
-                return
+                return null
             }
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - scheduled")
-            val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-            val jobId = JobIds.UP_NEXT_SYNC_JOB_ID
-            scheduler.cancel(jobId)
-            val builder = JobInfo.Builder(jobId, ComponentName(context, UpNextSyncWorker::class.java)).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-            scheduler.schedule(builder.build())
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - scheduled")
+
+            WorkManager.getInstance(context).cancelAllWorkByTag(UP_NEXT_SYNC_WORKER_TAG)
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val workRequest = OneTimeWorkRequestBuilder<UpNextSyncWorker>()
+                .addTag(UP_NEXT_SYNC_WORKER_TAG)
+                .setConstraints(constraints)
+                .build()
+            WorkManager.getInstance(context).enqueue(workRequest)
+
+            return workRequest.id
         }
     }
 

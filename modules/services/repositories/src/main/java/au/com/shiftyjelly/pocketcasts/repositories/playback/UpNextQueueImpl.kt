@@ -326,6 +326,6 @@ class UpNextQueueImpl @Inject constructor(
         if (changes.isEmpty()) {
             return
         }
-        UpNextSyncWorker.run(syncManager, application)
+        UpNextSyncWorker.enqueue(syncManager, application)
     }
 }
