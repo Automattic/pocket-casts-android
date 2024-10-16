@@ -87,7 +87,7 @@ private fun TopShowsStory(
                             visibilityThreshold = 0.01f,
                         ),
                     )
-                    delay(5.seconds)
+                    delay(4.seconds)
                 } else {
                     animationProgress.animateTo(
                         targetValue = 0f,
@@ -97,7 +97,7 @@ private fun TopShowsStory(
                             visibilityThreshold = 0.01f,
                         ),
                     )
-                    delay(1500.milliseconds)
+                    delay(1200.milliseconds)
                 }
             }
         }
