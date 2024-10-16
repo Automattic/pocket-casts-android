@@ -117,7 +117,7 @@ private val SectionHeight = BarHeight + SpaceHeight
 private fun BoxWithConstraintsScope.RatingBars(
     stats: RatingStats,
 ) {
-    // Measure text heigh to account for available space for rating lines
+    // Measure text height to account for available space for rating lines
     val textMeasurer = rememberTextMeasurer()
     val fontSize = 22.nonScaledSp
     val ratingTextHeight = remember(maxHeight) {
