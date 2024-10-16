@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -216,50 +217,60 @@ private fun AbsentRatings(
 private fun OopsiesSection(
     measurements: EndOfYearMeasurements,
 ) {
-    Column(
-        modifier = Modifier.requiredWidth(measurements.width * 2),
-    ) {
-        OopsiesText(
-            modifier = Modifier.offset(x = measurements.width / 5),
-        )
-        OopsiesText(
-            modifier = Modifier.offset(x = -measurements.width / 5),
-        )
-    }
-}
-
-@Composable
-private fun OopsiesText(
-    modifier: Modifier = Modifier,
-) {
     // Measure text to postion things better
     val textMeasurer = rememberTextMeasurer()
     val fontSize = 227.nonScaledSp
     val textMeasurement = remember {
         textMeasurer.measure(
-            text = "OOPSIES",
+            text = "OOOOPSIES",
             style = TextStyle(
                 fontFamily = humaneFontFamily,
                 fontSize = fontSize,
             ),
         )
     }
+    val topOffset = LocalDensity.current.run { textMeasurement.size.width.toDp() } * 2.8f / 9
+    val bottomOffset = LocalDensity.current.run { textMeasurement.size.width.toDp() } * 6.5f / 9
+
+    Column(
+        modifier = Modifier
+            .offset(x = measurements.width / 2)
+            .requiredWidth(measurements.width * 2),
+    ) {
+        OopsiesText(
+            textMeasurement = textMeasurement,
+            modifier = Modifier.offset(x = -topOffset),
+        )
+        OopsiesText(
+            textMeasurement = textMeasurement,
+            modifier = Modifier.offset(x = -bottomOffset),
+        )
+    }
+}
+
+@Composable
+private fun OopsiesText(
+    textMeasurement: TextLayoutResult,
+    modifier: Modifier = Modifier,
+) {
     val textHeight = LocalDensity.current.run { textMeasurement.firstBaseline.toDp() } + 12.dp
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        repeat(3) {
-            Image(
-                painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.eoy_star_text_stop),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(colorResource(UR.color.coolgrey_90)),
-                modifier = Modifier.padding(horizontal = 8.dp),
-            )
+        repeat(3) { index ->
+            if (index != 0) {
+                Image(
+                    painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.eoy_star_text_stop),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(colorResource(UR.color.coolgrey_90)),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+            }
             Text(
-                text = "OOPSIES",
+                text = "OOOOPSIES",
                 fontFamily = humaneFontFamily,
-                fontSize = fontSize,
+                fontSize = 227.nonScaledSp,
                 maxLines = 1,
                 modifier = Modifier.requiredHeight(textHeight),
             )
@@ -343,7 +354,7 @@ private fun RatingsLowPreview() {
     }
 }
 
-@Preview(device = Devices.PortraitSmall)
+@Preview(device = Devices.PortraitRegular)
 @Composable
 private fun RatingsNonePreview() {
     PreviewBox { measurements ->
