@@ -105,7 +105,7 @@ class UpNextSyncWorker @AssistedInject constructor(
         }
     }
 
-    private fun clearSyncedData(upNextSyncRequest: UpNextSyncRequest, upNextChangeDao: UpNextChangeDao) {
+    private suspend fun clearSyncedData(upNextSyncRequest: UpNextSyncRequest, upNextChangeDao: UpNextChangeDao) {
         val latestChange = upNextSyncRequest.upNext.changes.maxByOrNull { it.modified }
         latestChange?.let {
             val latestActionTime = it.modified

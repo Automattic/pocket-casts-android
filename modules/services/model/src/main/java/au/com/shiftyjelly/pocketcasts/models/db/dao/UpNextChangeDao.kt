@@ -23,11 +23,7 @@ abstract class UpNextChangeDao {
     abstract fun observeAll(): Flowable<List<UpNextChange>>
 
     @Query("DELETE FROM up_next_changes WHERE modified <= :modified")
-    abstract fun deleteChangesOlderOrEqualTo(modified: Long)
-
-    fun deleteChangesOlderOrEqualToRx(modified: Long): Completable {
-        return Completable.fromAction { deleteChangesOlderOrEqualTo(modified) }
-    }
+    abstract suspend fun deleteChangesOlderOrEqualTo(modified: Long)
 
     @Query("DELETE FROM up_next_changes WHERE uuid = :uuid")
     abstract fun deleteByUuid(uuid: String)
