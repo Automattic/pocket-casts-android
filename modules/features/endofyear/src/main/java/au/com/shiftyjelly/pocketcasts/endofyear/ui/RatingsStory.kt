@@ -86,7 +86,7 @@ private fun PresentRatings(
         Column {
             TextH10(
                 text = stringResource(LR.string.eoy_story_ratings_title_1),
-                fontSize = 31.nonScaledSp,
+                disableScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -98,7 +98,8 @@ private fun PresentRatings(
                     Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_subtitle_2)
                     Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_subtitle_1, rating.numericalValue)
                 },
-                fontSize = 15.nonScaledSp,
+                fontSize = 15.sp,
+                disableScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -155,7 +156,7 @@ private fun RowScope.RatingBar(
     ) {
         TextH20(
             text = "$rating",
-            fontSize = 22.nonScaledSp,
+            disableScale = true,
             color = colorResource(UR.color.coolgrey_90),
         )
         Spacer(
@@ -283,7 +284,7 @@ private fun NoRatingsInfo(
         )
         TextH10(
             text = stringResource(LR.string.eoy_story_ratings_title_2),
-            fontSize = 31.nonScaledSp,
+            disableScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -292,7 +293,8 @@ private fun NoRatingsInfo(
         )
         TextP40(
             text = stringResource(LR.string.eoy_story_ratings_subtitle_3),
-            fontSize = 15.nonScaledSp,
+            fontSize = 15.sp,
+            disableScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
