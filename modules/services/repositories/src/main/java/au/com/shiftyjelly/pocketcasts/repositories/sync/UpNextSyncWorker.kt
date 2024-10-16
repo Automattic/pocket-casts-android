@@ -81,13 +81,13 @@ class UpNextSyncWorker @AssistedInject constructor(
         }
     }
 
-    private fun performSync() {
+    private suspend fun performSync() {
         val startTime = SystemClock.elapsedRealtime()
         val upNextChangeDao = appDatabase.upNextChangeDao()
         val changes = upNextChangeDao.findAll()
         val request = buildRequest(changes)
         try {
-            val response = syncManager.upNextSync(request) // TODO: Convert to suspend function
+            val response = syncManager.upNextSync(request)
             readResponse(response)
             clearSyncedData(request, upNextChangeDao)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
