@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,6 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -36,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -144,17 +141,7 @@ internal fun TopShowStory(
                 fontSize = 15.nonScaledSp,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            RowOutlinedButton(
-                text = stringResource(R.string.end_of_year_share_story),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent,
-                    contentColor = Color.Black,
-                ),
-                border = ButtonDefaults.outlinedBorder.copy(
-                    brush = SolidColor(Color.Black),
-                ),
-                onClick = {},
-            )
+            ShareStoryButton(onClick = {})
         }
 
         // Clip the rotating shape at top

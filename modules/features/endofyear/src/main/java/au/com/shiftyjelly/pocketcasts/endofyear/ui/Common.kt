@@ -1,8 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -10,8 +14,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal const val StoryRotationDegrees = -15f
 internal const val StoryRotationRadians = (StoryRotationDegrees * Math.PI / 180).toFloat()
@@ -43,6 +49,27 @@ internal data class EndOfYearMeasurements(
     val closeButtonBottomEdge: Dp,
 ) {
     val scale = width / 393.dp
+}
+
+@Composable
+internal fun ShareStoryButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    includePadding: Boolean = true,
+) {
+    RowOutlinedButton(
+        text = stringResource(LR.string.end_of_year_share_story),
+        colors = ButtonDefaults.outlinedButtonColors(
+            backgroundColor = Color.Transparent,
+            contentColor = Color.Black,
+        ),
+        border = ButtonDefaults.outlinedBorder.copy(
+            brush = SolidColor(Color.Black),
+        ),
+        onClick = onClick,
+        includePadding = includePadding,
+        modifier = modifier,
+    )
 }
 
 @Composable
