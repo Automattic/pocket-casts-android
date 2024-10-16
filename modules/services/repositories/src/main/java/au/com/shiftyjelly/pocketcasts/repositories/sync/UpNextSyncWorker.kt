@@ -79,17 +79,19 @@ class UpNextSyncWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork() = coroutineScope {
+        val startTime = SystemClock.elapsedRealtime()
         try {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - started")
             performSync()
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
             Result.success()
         } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
             Result.failure()
         }
     }
 
     private suspend fun performSync() {
-        val startTime = SystemClock.elapsedRealtime()
         val upNextChangeDao = appDatabase.upNextChangeDao()
         val changes = upNextChangeDao.findAll()
         val request = buildRequest(changes)
@@ -97,12 +99,8 @@ class UpNextSyncWorker @AssistedInject constructor(
             val response = syncManager.upNextSync(request)
             readResponse(response)
             clearSyncedData(request, upNextChangeDao)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
         } catch (e: HttpException) {
-            if (e.code() != 304) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
-                throw e
-            }
+            if (e.code() != 304) throw e
         }
     }
 
