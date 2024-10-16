@@ -188,9 +188,7 @@ private fun AbsentRatings(
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge),
     ) {
-        SubcomposeLayout(
-            modifier = Modifier,
-        ) { constraints ->
+        SubcomposeLayout { constraints ->
             val noRatingsInfo = subcompose("noRatingsInfo") {
                 NoRatingsInfo(
                     story = story,
