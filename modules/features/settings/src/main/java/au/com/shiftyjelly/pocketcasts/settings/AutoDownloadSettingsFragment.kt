@@ -157,7 +157,7 @@ class AutoDownloadSettingsFragment :
                 setOnPreferenceChangeListener { _, newValue ->
                     if (newValue is Boolean) {
                         viewModel.onNewEpisodesChange(newValue)
-                        onChangeNewEpisodes(newValue)
+                        handleNewEpisodesToggle(newValue)
                     }
                     true
                 }
@@ -236,9 +236,9 @@ class AutoDownloadSettingsFragment :
         updateView()
     }
 
-    private fun onChangeNewEpisodes(on: Boolean) {
+    private fun handleNewEpisodesToggle(isEnabled: Boolean) {
         lifecycleScope.launch {
-            updateNewEpisodesSwitch(on)
+            updateNewEpisodesSwitch(isEnabled)
             updatePodcastsSummary()
         }
     }
@@ -346,6 +346,7 @@ class AutoDownloadSettingsFragment :
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
             newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
         }
+        handleNewEpisodesToggle(viewModel.getAutoDownloadNewEpisodes())
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {
