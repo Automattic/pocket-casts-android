@@ -37,6 +37,8 @@ import io.reactivex.Observable
 import java.util.Locale
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.rx2.awaitSingleOrNull
 import retrofit2.HttpException
 
 @HiltWorker
@@ -159,50 +161,45 @@ class UpNextSyncWorker @AssistedInject constructor(
         }
     }
 
-    private fun readResponse(response: UpNextSyncResponse): Completable {
+    private suspend fun readResponse(response: UpNextSyncResponse) {
         if (settings.getUpNextServerModified() == 0L && response.episodes.isNullOrEmpty() && playbackManager.getCurrentEpisode() != null) {
             // Server sent empty up next for first log in and we have an up next list already, we should keep the local copy
             upNextQueue.changeList(playbackManager.upNextQueue.queueEpisodes) // Change list will automatically include the current episode
-            return Completable.complete()
+            return
         }
 
         if (!response.hasChanged(settings.getUpNextServerModified())) {
-            return Completable.complete()
+            return
         }
 
         // import missing podcasts
         val podcastUuids: List<String> = response.episodes?.mapNotNull { it.podcast }?.filter { it != Podcast.userPodcast.uuid } ?: emptyList()
-        val addMissingPodcast: Completable = Observable.fromIterable(podcastUuids).flatMapCompletable { podcastUuid ->
-            podcastManager.findOrDownloadPodcastRx(podcastUuid = podcastUuid).ignoreElement()
+        podcastUuids.forEach { podcastUuid ->
+            podcastManager.findOrDownloadPodcastRx(podcastUuid).await()
         }
 
         // import missing episodes
-        val findOrDownloadEpisodes: Observable<BaseEpisode> = Observable.fromIterable(response.episodes ?: emptyList()).concatMap { responseEpisode ->
+        val episodes = response.episodes?.mapNotNull { responseEpisode ->
             val episodeUuid = responseEpisode.uuid
             val podcastUuid = responseEpisode.podcast
-            if (podcastUuid == null) {
-                Observable.empty()
-            } else {
+            if (podcastUuid != null) {
                 if (podcastUuid == Podcast.userPodcast.uuid) {
-                    userEpisodeManager.downloadMissingUserEpisode(episodeUuid, placeholderTitle = responseEpisode.title, placeholderPublished = responseEpisode.published?.parseIsoDate()).toObservable()
+                    userEpisodeManager.downloadMissingUserEpisode(episodeUuid, placeholderTitle = responseEpisode.title, placeholderPublished = responseEpisode.published?.parseIsoDate())
+                        .awaitSingleOrNull()
                 } else {
                     val skeletonEpisode = responseEpisode.toSkeletonEpisode(podcastUuid)
-                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, skeletonEpisode, podcastManager, false, source = SourceView.UP_NEXT).toObservable()
+                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, skeletonEpisode, podcastManager, false, source = SourceView.UP_NEXT)
+                        .awaitSingleOrNull()
                 }
-            }
-        }
+            } else null
+        } ?: emptyList()
 
-        return addMissingPodcast
-            .andThen(findOrDownloadEpisodes).toList()
-            // import the server Up Next into the database
-            .flatMapCompletable { episodes -> upNextQueue.importServerChanges(episodes, playbackManager, downloadManager) }
-            // check the current episode it correct
-            .andThen(playbackManager.loadQueueRx())
-            // save the server Up Next modified so we only apply changes
-            .andThen(saveServerModified(response))
-    }
-
-    private fun saveServerModified(response: UpNextSyncResponse): Completable {
-        return Completable.fromAction { settings.setUpNextServerModified(response.serverModified) }
+        // import the server Up Next into the database
+        // TODO: Convert to suspend function
+        upNextQueue.importServerChanges(episodes, playbackManager, downloadManager)
+        // check the current episode it correct
+        playbackManager.loadQueue()
+        // save the server Up Next modified so we only apply changes
+        settings.setUpNextServerModified(response.serverModified)
     }
 }
