@@ -34,7 +34,6 @@ import dagger.assisted.AssistedInject
 import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import retrofit2.HttpException
@@ -114,7 +113,7 @@ class UpNextSyncWorker @AssistedInject constructor(
         }
     }
 
-    private fun buildRequest(changes: List<UpNextChange>): UpNextSyncRequest {
+    private suspend fun buildRequest(changes: List<UpNextChange>): UpNextSyncRequest {
         val requestChanges = mutableListOf<UpNextSyncRequest.Change>()
         for (change in changes) {
             requestChanges.add(buildChangeRequest(change))
@@ -127,12 +126,12 @@ class UpNextSyncWorker @AssistedInject constructor(
         return UpNextSyncRequest(deviceTime, version, upNext)
     }
 
-    private fun buildChangeRequest(change: UpNextChange): UpNextSyncRequest.Change {
+    private suspend fun buildChangeRequest(change: UpNextChange): UpNextSyncRequest.Change {
         // replace action
         if (change.type == UpNextChange.ACTION_REPLACE) {
             val uuids = change.uuids?.splitIgnoreEmpty(",") ?: listOf()
             val episodes = uuids.map { uuid ->
-                val episode = runBlocking { episodeManager.findEpisodeByUuid(uuid) }
+                val episode = episodeManager.findEpisodeByUuid(uuid)
                 val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else Podcast.userPodcast.uuid
                 UpNextSyncRequest.ChangeEpisode(
                     uuid,
@@ -151,7 +150,7 @@ class UpNextSyncWorker @AssistedInject constructor(
         // any other action
         else {
             val uuid = change.uuid
-            val episode = if (uuid == null) null else runBlocking { episodeManager.findEpisodeByUuid(uuid) }
+            val episode = if (uuid == null) null else episodeManager.findEpisodeByUuid(uuid)
             val publishedDate = episode?.publishedDate?.switchInvalidForNow()?.toIsoString()
             val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else Podcast.userPodcast.uuid
             return UpNextSyncRequest.Change(
