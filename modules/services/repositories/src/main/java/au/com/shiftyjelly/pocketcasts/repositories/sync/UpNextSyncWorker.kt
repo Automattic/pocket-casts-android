@@ -80,11 +80,10 @@ class UpNextSyncWorker @AssistedInject constructor(
 
     override suspend fun doWork() = coroutineScope {
         try {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - onStartJob")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - started")
             performSync()
             Result.success()
         } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed")
             Result.failure()
         }
     }
@@ -100,8 +99,10 @@ class UpNextSyncWorker @AssistedInject constructor(
             clearSyncedData(request, upNextChangeDao)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
         } catch (e: HttpException) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
-            if (e.code() != 304) throw e
+            if (e.code() != 304) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
+                throw e
+            }
         }
     }
 
