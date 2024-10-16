@@ -97,13 +97,11 @@ class UpNextSyncWorker @AssistedInject constructor(
         }
     }
 
-    private fun clearSyncedData(upNextSyncRequest: UpNextSyncRequest, upNextChangeDao: UpNextChangeDao): Completable {
-        val latestChange: UpNextSyncRequest.Change? = upNextSyncRequest.upNext.changes.maxByOrNull { it.modified }
-        return if (latestChange == null) {
-            Completable.complete()
-        } else {
-            val latestActionTime = latestChange.modified
-            upNextChangeDao.deleteChangesOlderOrEqualToRx(latestActionTime)
+    private fun clearSyncedData(upNextSyncRequest: UpNextSyncRequest, upNextChangeDao: UpNextChangeDao) {
+        val latestChange = upNextSyncRequest.upNext.changes.maxByOrNull { it.modified }
+        latestChange?.let {
+            val latestActionTime = it.modified
+            upNextChangeDao.deleteChangesOlderOrEqualTo(latestActionTime)
         }
     }
 
