@@ -8,17 +8,24 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -30,8 +37,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -46,12 +56,19 @@ import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.ScrollDirection
+import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlin.math.roundToLong
+import kotlin.math.tan
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -84,7 +101,7 @@ internal fun StoriesPage(
                 sizes = EndOfYearSizes(
                     width = this@BoxWithConstraints.maxWidth,
                     height = this@BoxWithConstraints.maxHeight,
-                    closeButtonBottomEdge = 36.dp,
+                    closeButtonBottomEdge = 44.dp,
                     coverFontSize = coverFontSize,
                     coverTextHeight = coverTextHeight,
                 ),
@@ -97,7 +114,7 @@ internal fun StoriesPage(
             colorFilter = ColorFilter.tint(Color.Black),
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 12.dp, end = 18.dp)
+                .padding(top = 20.dp, end = 18.dp)
                 .size(24.dp)
                 .clickable(
                     interactionSource = remember(::MutableInteractionSource),
@@ -164,7 +181,7 @@ private fun Stories(
     ) { index ->
         when (val story = stories[index]) {
             is Story.Cover -> CoverStory(story, sizes)
-            is Story.NumberOfShows -> StoryPlaceholder(story)
+            is Story.NumberOfShows -> NumberOfShowsStory(story, sizes)
             is Story.TopShow -> StoryPlaceholder(story)
             is Story.TopShows -> StoryPlaceholder(story)
             is Story.Ratings -> StoryPlaceholder(story)
@@ -241,6 +258,122 @@ private fun CoverStory(
     }
 }
 
+private val rotationDegrees = -15f
+private val rotationAngle = (rotationDegrees * Math.PI / 180).toFloat()
+
+@Composable
+private fun NumberOfShowsStory(
+    story: Story.NumberOfShows,
+    sizes: EndOfYearSizes,
+) {
+    val coverSize = sizes.width * 0.4f
+    val spacingSize = coverSize / 10
+    val carouselHeight = coverSize * 2 + spacingSize
+    val carouselRotationOffset = (sizes.width / 2) * tan(rotationAngle)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(story.backgroundColor),
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .rotate(rotationDegrees)
+                .offset(y = sizes.closeButtonBottomEdge + 8.dp - carouselRotationOffset)
+                .requiredWidth(sizes.width * 1.5f), // Increase the size to account for rotation
+        ) {
+            PodcastCoverCarousel(
+                podcastIds = story.topShowIds,
+                scrollDirection = ScrollDirection.Left,
+                coverSize = coverSize,
+                spacingSize = spacingSize,
+            )
+            Spacer(
+                modifier = Modifier.height(spacingSize),
+            )
+            PodcastCoverCarousel(
+                podcastIds = story.bottomShowIds,
+                scrollDirection = ScrollDirection.Right,
+                coverSize = coverSize,
+                spacingSize = spacingSize,
+            )
+        }
+
+        // Fake sticker: lH66LwxxgG8btQ8NrM0ldx-fi-3070_28391#986464596
+        val stickerWidth = 214.dp * (sizes.width / 393.dp)
+        val stickerHeight = 112.dp * (sizes.width / 393.dp)
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(
+                    x = stickerWidth / 3,
+                    y = sizes.closeButtonBottomEdge + 8.dp + carouselHeight,
+                )
+                .size(stickerWidth, stickerHeight)
+                .background(Color.Black, shape = CircleShape),
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to Color.Transparent,
+                        0.1f to story.backgroundColor,
+                    ),
+                ),
+        ) {
+            TextH10(
+                text = stringResource(LR.string.end_of_year_story_listened_to_numbers, story.showCount, story.epsiodeCount),
+                fontSize = 31.nonScaledSp,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            TextP40(
+                text = stringResource(LR.string.end_of_year_story_listened_to_numbers_subtitle),
+                fontSize = 15.nonScaledSp,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+            RowOutlinedButton(
+                text = stringResource(LR.string.end_of_year_share_story),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = Color.Transparent,
+                    contentColor = Color.Black,
+                ),
+                border = ButtonDefaults.outlinedBorder.copy(
+                    brush = SolidColor(Color.Black),
+                ),
+                onClick = {},
+            )
+        }
+    }
+}
+
+@Composable
+private fun PodcastCoverCarousel(
+    podcastIds: List<String>,
+    scrollDirection: ScrollDirection,
+    coverSize: Dp,
+    spacingSize: Dp,
+) {
+    ScrollingRow(
+        items = podcastIds,
+        scrollDirection = scrollDirection,
+        scrollByPixels = 2f,
+        horizontalArrangement = Arrangement.spacedBy(spacingSize),
+    ) { podcastId ->
+        PodcastImage(
+            uuid = podcastId,
+            elevation = 0.dp,
+            cornerSize = 4.dp,
+            modifier = Modifier.size(coverSize),
+        )
+    }
+}
+
 private data class EndOfYearSizes(
     val width: Dp = Dp.Unspecified,
     val height: Dp = Dp.Unspecified,
@@ -249,19 +382,20 @@ private data class EndOfYearSizes(
     val closeButtonBottomEdge: Dp = Dp.Unspecified,
 )
 
-private val Story.backgroundColor get() = when (this) {
-    is Story.Cover -> Color(0xFFEE661C)
-    is Story.NumberOfShows -> Color(0xFFEFECAD)
-    is Story.TopShow -> Color(0xFFEDB0F3)
-    is Story.TopShows -> Color(0xFFE0EFAD)
-    is Story.Ratings -> Color(0xFFEFECAD)
-    is Story.TotalTime -> Color(0xFFEDB0F3)
-    is Story.LongestEpisode -> Color(0xFFE0EFAD)
-    is Story.PlusInterstitial -> Color(0xFFEFECAD)
-    is Story.YearVsYear -> Color(0xFFEEB1F4)
-    is Story.CompletionRate -> Color(0xFFE0EFAD)
-    is Story.Ending -> Color(0xFFEE661C)
-}
+private val Story.backgroundColor
+    get() = when (this) {
+        is Story.Cover -> Color(0xFFEE661C)
+        is Story.NumberOfShows -> Color(0xFFEFECAD)
+        is Story.TopShow -> Color(0xFFEDB0F3)
+        is Story.TopShows -> Color(0xFFE0EFAD)
+        is Story.Ratings -> Color(0xFFEFECAD)
+        is Story.TotalTime -> Color(0xFFEDB0F3)
+        is Story.LongestEpisode -> Color(0xFFE0EFAD)
+        is Story.PlusInterstitial -> Color(0xFFEFECAD)
+        is Story.YearVsYear -> Color(0xFFEEB1F4)
+        is Story.CompletionRate -> Color(0xFFE0EFAD)
+        is Story.Ending -> Color(0xFFEE661C)
+    }
 
 private fun getSizeLimit(context: Context): DpSize? {
     return if (Util.isTablet(context)) {
@@ -311,4 +445,24 @@ fun CoverStoryPreview() {
             coverTextHeight = 210.dp,
         ),
     )
+}
+
+@Preview(device = Devices.PortraitRegular)
+@Composable
+fun NumberOfShowsPreview() {
+    BoxWithConstraints {
+        NumberOfShowsStory(
+            story = Story.NumberOfShows(
+                showCount = 20,
+                epsiodeCount = 125,
+                topShowIds = List(4) { "id-$it" },
+                bottomShowIds = List(4) { "id-$it" },
+            ),
+            sizes = EndOfYearSizes(
+                width = maxWidth,
+                height = maxHeight,
+                closeButtonBottomEdge = 44.dp,
+            ),
+        )
+    }
 }

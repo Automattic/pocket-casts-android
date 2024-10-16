@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.utils.extensions.padEnd
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -64,13 +65,24 @@ class EndOfYearViewModel @AssistedInject constructor(
         subscriptionTier: SubscriptionTier,
     ): List<Story> = buildList {
         add(Story.Cover)
-        add(
-            Story.NumberOfShows(
-                showCount = stats.playedPodcastCount,
-                epsiodeCount = stats.playedEpisodeCount,
-                showIds = stats.playedPodcastIds.shuffled().take(8),
-            ),
-        )
+        val showIds = stats.playedPodcastIds.shuffled().take(8)
+        if (showIds.isNotEmpty()) {
+            val showChunks = showIds.chunked(4)
+            val topShowIds = showChunks[0].padEnd(4)
+            val bottomShowIds = showChunks.getOrNull(1)
+                ?.plus(topShowIds)
+                ?.take(4)
+                .orEmpty()
+                .ifEmpty { showChunks[0].padEnd(8).takeLast(4) }
+            add(
+                Story.NumberOfShows(
+                    showCount = stats.playedPodcastCount,
+                    epsiodeCount = stats.playedEpisodeCount,
+                    topShowIds = topShowIds,
+                    bottomShowIds = bottomShowIds,
+                ),
+            )
+        }
         val topPodcast = stats.topPodcasts.firstOrNull()
         if (topPodcast != null) {
             add(Story.TopShow(topPodcast))
@@ -128,7 +140,8 @@ internal sealed interface Story {
     data class NumberOfShows(
         val showCount: Int,
         val epsiodeCount: Int,
-        val showIds: List<String>,
+        val topShowIds: List<String>,
+        val bottomShowIds: List<String>,
     ) : Story
 
     data class TopShow(
