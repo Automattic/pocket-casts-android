@@ -156,8 +156,8 @@ class AutoDownloadSettingsFragment :
             ?.apply {
                 setOnPreferenceChangeListener { _, newValue ->
                     if (newValue is Boolean) {
-                        onChangeNewEpisodes(newValue)
                         viewModel.onNewEpisodesChange(newValue)
+                        handleNewEpisodesToggle(newValue)
                     }
                     true
                 }
@@ -236,12 +236,9 @@ class AutoDownloadSettingsFragment :
         updateView()
     }
 
-    private fun onChangeNewEpisodes(on: Boolean) {
+    private fun handleNewEpisodesToggle(isEnabled: Boolean) {
         lifecycleScope.launch {
-            if (!on) {
-                async(Dispatchers.Default) { podcastManager.updateAllAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_OFF) }.await()
-            }
-            updateNewEpisodesSwitch(on)
+            updateNewEpisodesSwitch(isEnabled)
             updatePodcastsSummary()
         }
     }
@@ -256,10 +253,6 @@ class AutoDownloadSettingsFragment :
         } else {
             podcastsCategory.removePreference(podcastsPreference)
             podcastsCategory.removePreference(podcastsLimitPreference)
-
-            // Reset Limit Downloads to default value after disabling auto download toggle
-            viewModel.setLimitDownloads(AutoDownloadLimitSetting.TWO_LATEST_EPISODE)
-            updateLimitDownloadsSummary()
         }
     }
 
@@ -345,14 +338,15 @@ class AutoDownloadSettingsFragment :
     private fun updateView() {
         updatePodcastsSummary()
         updateFiltersSelectedSummary()
-        updateNewEpisodesSwitch()
 
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
+        newEpisodesPreference?.isChecked = viewModel.getAutoDownloadNewEpisodes()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
             newEpisodesPreference?.summary = getString(LR.string.settings_auto_download_new_episodes_description)
         }
+        handleNewEpisodesToggle(viewModel.getAutoDownloadNewEpisodes())
     }
 
     private fun countPodcastsAutoDownloading(): Single<Int> {
@@ -381,19 +375,6 @@ class AutoDownloadSettingsFragment :
                         else -> resources.getString(LR.string.settings_podcasts_selected_x, autoDownloadingCount)
                     }
                     podcastsPreference?.summary = summary
-                },
-            )
-    }
-
-    @SuppressLint("CheckResult")
-    private fun updateNewEpisodesSwitch() {
-        countPodcastsAutoDownloading()
-            .map { it > 0 }
-            .subscribeBy(
-                onError = { Timber.e(it) },
-                onSuccess = { on ->
-                    updateNewEpisodesSwitch(on)
-                    newEpisodesPreference?.isChecked = on
                 },
             )
     }

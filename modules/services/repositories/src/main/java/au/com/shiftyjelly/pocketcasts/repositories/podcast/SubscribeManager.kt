@@ -111,15 +111,17 @@ class SubscribeManager @Inject constructor(
                 // update the notification time as any podcasts added after this date will be ignored
                 settings.setNotificationLastSeenToNow()
 
-                if (subscribed && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD) && shouldAutoDownload) {
+                if (canDownloadEpisodesAfterSubscription(subscribed, shouldAutoDownload)) {
                     podcastDao.findByUuid(podcastUuid)?.let { podcast ->
                         val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
-                        val autoDownloadLimit = settings.autoDownloadLimit.value
+                        val numberOfEpisodes = AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)
 
-                        episodes.take(AutoDownloadLimitSetting.getNumberOfEpisodes(autoDownloadLimit)).forEach { episode ->
+                        episodes.take(numberOfEpisodes).forEach { episode ->
                             if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
                                 return@forEach
                             }
+
+                            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto Downloading $numberOfEpisodes episodes after subscribing to $podcastUuid")
 
                             DownloadHelper.addAutoDownloadedEpisodeToQueue(
                                 episode,
@@ -185,7 +187,8 @@ class SubscribeManager @Inject constructor(
                 podcast.isSubscribed = subscribed
                 podcast.grouping = settings.podcastGroupingDefault.value
                 podcast.showArchived = settings.showArchivedDefault.value
-                if (subscribed && shouldAutoDownload && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
+                if (canDownloadEpisodesAfterSubscription(subscribed, shouldAutoDownload)) {
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Update auto download status for $podcastUuid")
                     podcast.autoDownloadStatus = AUTO_DOWNLOAD_NEW_EPISODES
                 }
             }
@@ -196,6 +199,9 @@ class SubscribeManager @Inject constructor(
         // insert episodes
         return insertPodcastObservable.flatMap { podcast -> subscribeInsertEpisodes(podcast).toSingle { podcast } }
     }
+
+    private fun canDownloadEpisodesAfterSubscription(subscribed: Boolean, shouldAutoDownload: Boolean) =
+        subscribed && settings.autoDownloadNewEpisodes.value && shouldAutoDownload && FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)
 
     private fun downloadPodcast(podcastUuid: String): Single<Podcast> {
         // download the podcast

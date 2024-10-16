@@ -44,7 +44,11 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun getAutoDownloadUpNext() = settings.autoDownloadUpNext.value
 
+    fun getAutoDownloadNewEpisodes() = settings.autoDownloadNewEpisodes.value
+
     fun onNewEpisodesChange(newValue: Boolean) {
+        settings.autoDownloadNewEpisodes.set(newValue, updateModifiedAt = true)
+
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED,
             mapOf("enabled" to newValue),
