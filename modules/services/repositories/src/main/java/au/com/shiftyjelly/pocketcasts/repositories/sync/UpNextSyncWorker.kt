@@ -125,34 +125,32 @@ class UpNextSyncWorker @AssistedInject constructor(
         return UpNextSyncRequest(deviceTime, version, upNext)
     }
 
-    private suspend fun buildChangeRequest(change: UpNextChange): UpNextSyncRequest.Change {
-        // replace action
-        if (change.type == UpNextChange.ACTION_REPLACE) {
+    private suspend fun buildChangeRequest(change: UpNextChange) = when (change.type) {
+        UpNextChange.ACTION_REPLACE -> {
             val uuids = change.uuids?.splitIgnoreEmpty(",") ?: listOf()
             val episodes = uuids.map { uuid ->
                 val episode = episodeManager.findEpisodeByUuid(uuid)
                 val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else Podcast.userPodcast.uuid
                 UpNextSyncRequest.ChangeEpisode(
-                    uuid,
-                    episode?.title,
-                    episode?.downloadUrl,
-                    podcastUuid,
-                    episode?.publishedDate?.toIsoString(),
+                    uuid = uuid,
+                    title = episode?.title,
+                    url = episode?.downloadUrl,
+                    podcast = podcastUuid,
+                    published = episode?.publishedDate?.toIsoString(),
                 )
             }
-            return UpNextSyncRequest.Change(
-                UpNextChange.ACTION_REPLACE,
-                change.modified,
+            UpNextSyncRequest.Change(
+                action = UpNextChange.ACTION_REPLACE,
+                modified = change.modified,
                 episodes = episodes,
             )
         }
-        // any other action
-        else {
+        else -> {
             val uuid = change.uuid
             val episode = if (uuid == null) null else episodeManager.findEpisodeByUuid(uuid)
             val publishedDate = episode?.publishedDate?.switchInvalidForNow()?.toIsoString()
             val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else Podcast.userPodcast.uuid
-            return UpNextSyncRequest.Change(
+            UpNextSyncRequest.Change(
                 action = change.type,
                 modified = change.modified,
                 uuid = change.uuid,
