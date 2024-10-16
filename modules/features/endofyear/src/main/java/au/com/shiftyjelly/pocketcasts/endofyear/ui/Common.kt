@@ -60,8 +60,23 @@ internal fun ShareStoryButton(
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
 ) {
-    RowOutlinedButton(
+    OutlinedEoyButton(
         text = stringResource(LR.string.end_of_year_share_story),
+        onClick = onClick,
+        includePadding = includePadding,
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun OutlinedEoyButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    includePadding: Boolean = true,
+) {
+    RowOutlinedButton(
+        text = text,
         fontSize = 18.nonScaledSp,
         colors = ButtonDefaults.outlinedButtonColors(
             backgroundColor = Color.Transparent,
