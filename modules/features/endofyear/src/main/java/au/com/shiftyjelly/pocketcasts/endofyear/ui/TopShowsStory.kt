@@ -259,7 +259,7 @@ private fun Modifier.fadeScrollingEdges(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-fun TopShowsPreview() {
+private fun TopShowsPreview() {
     PreviewBox { measurements ->
         TopShowsStory(
             story = Story.TopShows(
