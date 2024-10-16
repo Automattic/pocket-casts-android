@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -15,9 +16,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
+import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 internal const val StoryRotationDegrees = -15f
 internal const val StoryRotationRadians = (StoryRotationDegrees * Math.PI / 180).toFloat()
@@ -59,12 +62,13 @@ internal fun ShareStoryButton(
 ) {
     RowOutlinedButton(
         text = stringResource(LR.string.end_of_year_share_story),
+        fontSize = 18.nonScaledSp,
         colors = ButtonDefaults.outlinedButtonColors(
             backgroundColor = Color.Transparent,
-            contentColor = Color.Black,
+            contentColor = colorResource(UR.color.coolgrey_90),
         ),
         border = ButtonDefaults.outlinedBorder.copy(
-            brush = SolidColor(Color.Black),
+            brush = SolidColor(colorResource(UR.color.coolgrey_90)),
         ),
         onClick = onClick,
         includePadding = includePadding,

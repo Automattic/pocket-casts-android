@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -32,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.localization.R
 import kotlin.math.tan
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 internal fun NumberOfShowsStory(
@@ -103,6 +105,7 @@ internal fun NumberOfShowsStory(
                     story.epsiodeCount,
                 ),
                 fontSize = 31.nonScaledSp,
+                color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
             Spacer(
@@ -111,6 +114,7 @@ internal fun NumberOfShowsStory(
             TextP40(
                 text = stringResource(R.string.end_of_year_story_listened_to_numbers_subtitle),
                 fontSize = 15.nonScaledSp,
+                color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
             ShareStoryButton(onClick = {})
