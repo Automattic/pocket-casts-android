@@ -280,7 +280,6 @@ Language: ru
     <string name="discover_category_health_abbreviation">Здоровье</string>
     <string name="eoy_story_top_podcasts_subtitle">Эти 5 набрали больше всего прослушиваний в 2023 году\"</string>
     <string name="eoy_story_top_podcasts_title">А ещё вы были на высоте в этих шоу!</string>
-    <string name="end_of_year_story_top_podcast_title">Шоу %1$s набрало больше всего прослушиваний в 2023 г.</string>
     <string name="end_of_year_share_story">Поделитесь этим</string>
     <string name="podcast_log_in_to_rate">Чтобы поставить оценку, необходимо войти в систему</string>
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>

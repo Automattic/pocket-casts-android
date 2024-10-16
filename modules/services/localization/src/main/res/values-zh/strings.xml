@@ -280,7 +280,6 @@ Language: zh_CN
     <string name="discover_category_health_abbreviation">保健</string>
     <string name="eoy_story_top_podcasts_subtitle">这是您在 2023 年收听率最高的 5 个节目”</string>
     <string name="eoy_story_top_podcasts_title">您也非常喜欢这些节目！</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s 是您在 2023 年收听率最高的节目</string>
     <string name="end_of_year_share_story">分享此故事</string>
     <string name="podcast_log_in_to_rate">您必须登录后才可以给予评级</string>
     <string name="podcast_submit_rating_no_internet">未发现互联网连接。 请连接到互联网，以提交评级。</string>

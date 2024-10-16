@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import android.content.Context
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,9 +19,11 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -37,11 +44,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -66,8 +80,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
+import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
+import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlin.math.roundToLong
+import kotlin.math.sqrt
 import kotlin.math.tan
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -182,7 +199,7 @@ private fun Stories(
         when (val story = stories[index]) {
             is Story.Cover -> CoverStory(story, sizes)
             is Story.NumberOfShows -> NumberOfShowsStory(story, sizes)
-            is Story.TopShow -> StoryPlaceholder(story)
+            is Story.TopShow -> TopShowStory(story, sizes)
             is Story.TopShows -> StoryPlaceholder(story)
             is Story.Ratings -> StoryPlaceholder(story)
             is Story.TotalTime -> StoryPlaceholder(story)
@@ -266,7 +283,7 @@ private fun NumberOfShowsStory(
     story: Story.NumberOfShows,
     sizes: EndOfYearSizes,
 ) {
-    val coverSize = sizes.width * 0.4f
+    val coverSize = 160.dp * sizes.scale
     val spacingSize = coverSize / 10
     val carouselHeight = coverSize * 2 + spacingSize
     val carouselRotationOffset = (sizes.width / 2) * tan(rotationAngle)
@@ -301,8 +318,8 @@ private fun NumberOfShowsStory(
         }
 
         // Fake sticker: lH66LwxxgG8btQ8NrM0ldx-fi-3070_28391#986464596
-        val stickerWidth = 214.dp * (sizes.width / 393.dp)
-        val stickerHeight = 112.dp * (sizes.width / 393.dp)
+        val stickerWidth = 214.dp * sizes.scale
+        val stickerHeight = 112.dp * sizes.scale
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -374,13 +391,147 @@ private fun PodcastCoverCarousel(
     }
 }
 
+@Composable
+private fun TopShowStory(
+    story: Story.TopShow,
+    sizes: EndOfYearSizes,
+) {
+    Box {
+        val shapeSize = sizes.width * 1.12f
+        val coverSize = shapeSize * sqrt(2f)
+        val coverOffset = sizes.closeButtonBottomEdge
+        PodcastImage(
+            uuid = story.show.uuid,
+            elevation = 0.dp,
+            roundCorners = false,
+            modifier = Modifier
+                .requiredSize(coverSize)
+                .offset(y = coverOffset),
+        )
+
+        val transition = rememberInfiniteTransition(label = "transition")
+        val rotation = transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(tween(40_000, easing = LinearEasing)),
+            label = "rotation",
+        )
+        val shapeSizePx = LocalDensity.current.run { shapeSize.toPx() }
+        val shapeOffsetPx = LocalDensity.current.run { (coverOffset * 0.6f + (coverSize - shapeSize) / 2).toPx() }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                .drawWithCache {
+                    val path = Path().apply {
+                        val dentSize = (shapeSizePx - size.width) / 2
+
+                        moveTo(-dentSize, shapeOffsetPx)
+                        lineTo(size.width / 2, (shapeOffsetPx) + dentSize)
+                        lineTo(size.width + dentSize, shapeOffsetPx)
+                        lineTo(size.width, shapeOffsetPx + shapeSizePx / 2)
+                        lineTo(size.width + dentSize, shapeOffsetPx + shapeSizePx)
+                        lineTo(size.width / 2, shapeOffsetPx + shapeSizePx - dentSize)
+                        lineTo(-dentSize, shapeOffsetPx + shapeSizePx)
+                        lineTo(0f, shapeOffsetPx + shapeSizePx / 2)
+                        lineTo(-dentSize, shapeOffsetPx)
+
+                        close()
+                    }
+
+                    onDrawWithContent {
+                        drawContent()
+
+                        rotate(rotation.value, pivot = Offset(x = size.width / 2, y = shapeOffsetPx + shapeSizePx / 2)) {
+                            drawPath(
+                                color = Color(0xFFFFFFFF),
+                                blendMode = BlendMode.DstOut,
+                                path = path,
+                            )
+                        }
+                    }
+                },
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(story.backgroundColor),
+            )
+        }
+
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            TextH10(
+                text = stringResource(
+                    LR.string.end_of_year_story_top_podcast_title,
+                    story.show.title,
+                ),
+                fontSize = 31.nonScaledSp,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            TextP40(
+                text = stringResource(
+                    LR.string.end_of_year_story_top_podcast_subtitle,
+                    story.show.playedEpisodeCount,
+                    StatsHelper.secondsToFriendlyString(
+                        story.show.playbackTime.inWholeSeconds,
+                        LocalContext.current.resources,
+                    ),
+                ),
+                fontSize = 15.nonScaledSp,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+            RowOutlinedButton(
+                text = stringResource(LR.string.end_of_year_share_story),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = Color.Transparent,
+                    contentColor = Color.Black,
+                ),
+                border = ButtonDefaults.outlinedBorder.copy(
+                    brush = SolidColor(Color.Black),
+                ),
+                onClick = {},
+            )
+        }
+
+        // Clip the rotating shape at top
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .height(sizes.closeButtonBottomEdge)
+                .background(story.backgroundColor),
+        )
+
+        // Fake sticker: lH66LwxxgG8btQ8NrM0ldx-fi-3070_23365#986383416
+        val stickerWidth = 208.dp * sizes.scale
+        val stickerHeight = 87.dp * sizes.scale
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(
+                    x = -stickerWidth / 3,
+                    y = sizes.closeButtonBottomEdge + stickerHeight / 2,
+                )
+                .size(stickerWidth, stickerHeight)
+                .background(Color.Black, shape = CircleShape),
+        )
+    }
+}
+
 private data class EndOfYearSizes(
     val width: Dp = Dp.Unspecified,
     val height: Dp = Dp.Unspecified,
     val coverFontSize: TextUnit = TextUnit.Unspecified,
     val coverTextHeight: Dp = Dp.Unspecified,
     val closeButtonBottomEdge: Dp = Dp.Unspecified,
-)
+) {
+    val scale = width / 393.dp
+}
 
 private val Story.backgroundColor
     get() = when (this) {
@@ -457,6 +608,29 @@ fun NumberOfShowsPreview() {
                 epsiodeCount = 125,
                 topShowIds = List(4) { "id-$it" },
                 bottomShowIds = List(4) { "id-$it" },
+            ),
+            sizes = EndOfYearSizes(
+                width = maxWidth,
+                height = maxHeight,
+                closeButtonBottomEdge = 44.dp,
+            ),
+        )
+    }
+}
+
+@Preview(device = Devices.PortraitRegular)
+@Composable
+fun TopShowPreview() {
+    BoxWithConstraints {
+        TopShowStory(
+            story = Story.TopShow(
+                show = TopPodcast(
+                    uuid = "podcast-id",
+                    title = "Podcast Title",
+                    author = "Podcast Author",
+                    playbackTimeSeconds = 200_250.0,
+                    playedEpisodeCount = 87,
+                ),
             ),
             sizes = EndOfYearSizes(
                 width = maxWidth,
