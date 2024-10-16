@@ -45,7 +45,7 @@ import retrofit2.HttpException
 
 @AndroidEntryPoint
 @SuppressLint("SpecifyJobSchedulerIdRange")
-class UpNextSyncJob : JobService() {
+class UpNextSyncWorker : JobService() {
 
     @Inject lateinit var settings: Settings
 
@@ -80,7 +80,7 @@ class UpNextSyncJob : JobService() {
             val scheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
             val jobId = JobIds.UP_NEXT_SYNC_JOB_ID
             scheduler.cancel(jobId)
-            val builder = JobInfo.Builder(jobId, ComponentName(context, UpNextSyncJob::class.java)).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            val builder = JobInfo.Builder(jobId, ComponentName(context, UpNextSyncWorker::class.java)).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
             scheduler.schedule(builder.build())
         }
     }

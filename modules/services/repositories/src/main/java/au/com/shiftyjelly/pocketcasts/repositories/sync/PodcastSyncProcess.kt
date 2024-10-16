@@ -293,7 +293,7 @@ class PodcastSyncProcess(
     private fun syncUpNext(): Completable {
         return Completable.fromAction {
             val startTime = SystemClock.elapsedRealtime()
-            UpNextSyncJob.run(syncManager, context)
+            UpNextSyncWorker.run(syncManager, context)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
         }
     }

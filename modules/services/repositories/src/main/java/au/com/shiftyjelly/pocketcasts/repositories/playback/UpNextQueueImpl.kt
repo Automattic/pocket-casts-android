@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncJob
+import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
@@ -329,6 +329,6 @@ class UpNextQueueImpl @Inject constructor(
         if (changes.isEmpty()) {
             return
         }
-        UpNextSyncJob.run(syncManager, application)
+        UpNextSyncWorker.run(syncManager, application)
     }
 }
