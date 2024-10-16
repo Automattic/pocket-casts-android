@@ -192,7 +192,9 @@ class UpNextSyncWorker @AssistedInject constructor(
                     episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, skeletonEpisode, podcastManager, false, source = SourceView.UP_NEXT)
                         .awaitSingleOrNull()
                 }
-            } else null
+            } else {
+                null
+            }
         } ?: emptyList()
 
         // import the server Up Next into the database

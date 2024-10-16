@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 
