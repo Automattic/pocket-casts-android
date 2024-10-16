@@ -38,6 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.components.ScrollDirection
+import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -45,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
+import kotlin.math.roundToLong
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -236,41 +239,42 @@ private fun OopsiesSection(
             .requiredWidth(measurements.width * 2),
     ) {
         OopsiesText(
+            scrollDirection = ScrollDirection.Left,
             textMeasurement = textMeasurement,
-            modifier = Modifier.offset(x = -topOffset),
         )
         OopsiesText(
+            scrollDirection = ScrollDirection.Right,
             textMeasurement = textMeasurement,
-            modifier = Modifier.offset(x = -bottomOffset),
         )
     }
 }
 
 @Composable
 private fun OopsiesText(
+    scrollDirection: ScrollDirection,
     textMeasurement: TextLayoutResult,
-    modifier: Modifier = Modifier,
 ) {
     val textHeight = LocalDensity.current.run { textMeasurement.firstBaseline.toDp() } + 12.dp
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
+    ScrollingRow(
+        scrollDelay = { (20 / it.density).roundToLong().coerceAtLeast(4L) },
+        items = listOf("OOOOPSIES"),
+        scrollDirection = scrollDirection,
     ) {
-        repeat(3) { index ->
-            if (index != 0) {
-                Image(
-                    painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.eoy_star_text_stop),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(colorResource(UR.color.coolgrey_90)),
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                )
-            }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
                 text = "OOOOPSIES",
                 fontFamily = humaneFontFamily,
                 fontSize = 227.nonScaledSp,
                 maxLines = 1,
                 modifier = Modifier.requiredHeight(textHeight),
+            )
+            Image(
+                painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.eoy_star_text_stop),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(colorResource(UR.color.coolgrey_90)),
+                modifier = Modifier.padding(horizontal = 8.dp),
             )
         }
     }
