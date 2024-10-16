@@ -1,13 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
-import android.annotation.SuppressLint
 import android.app.job.JobInfo
-import android.app.job.JobParameters
 import android.app.job.JobScheduler
-import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import android.os.SystemClock
+import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -31,43 +30,29 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.extensions.switchInvalidForNow
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import dagger.hilt.android.AndroidEntryPoint
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
+import java.util.Locale
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 
-@AndroidEntryPoint
-@SuppressLint("SpecifyJobSchedulerIdRange")
-class UpNextSyncWorker : JobService() {
-
-    @Inject lateinit var settings: Settings
-
-    @Inject lateinit var syncManager: SyncManager
-
-    @Inject lateinit var appDatabase: AppDatabase
-
-    @Inject lateinit var upNextQueue: UpNextQueue
-
-    @Inject lateinit var playbackManager: PlaybackManager
-
-    @Inject lateinit var podcastManager: PodcastManager
-
-    @Inject lateinit var episodeManager: EpisodeManager
-
-    @Inject lateinit var downloadManager: DownloadManager
-
-    @Inject lateinit var podcastCacheServiceManager: PodcastCacheServiceManagerImpl
-
-    @Inject lateinit var userEpisodeManager: UserEpisodeManager
-
-    private val disposables = CompositeDisposable()
+@HiltWorker
+class UpNextSyncWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val appDatabase: AppDatabase,
+    private val episodeManager: EpisodeManager,
+    private val downloadManager: DownloadManager,
+    private val playbackManager: PlaybackManager,
+    private val podcastManager: PodcastManager,
+    private val settings: Settings,
+    private val syncManager: SyncManager,
+    private val upNextQueue: UpNextQueue,
+    private val userEpisodeManager: UserEpisodeManager
+) : CoroutineWorker(context, workerParams) {
 
     companion object {
         @JvmStatic
@@ -85,43 +70,31 @@ class UpNextSyncWorker : JobService() {
         }
     }
 
-    override fun onStartJob(jobParameters: JobParameters): Boolean {
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - onStartJob")
-        performSync(jobParameters)
-        return true
+    override suspend fun doWork() = coroutineScope {
+        try {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - onStartJob")
+            performSync()
+            Result.success()
+        } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed")
+            Result.failure()
+        }
     }
 
-    override fun onStopJob(jobParameters: JobParameters): Boolean {
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - onStopJob")
-        disposables.clear()
-        return true
-    }
-
-    private fun performSync(jobParameters: JobParameters) {
+    private fun performSync() {
         val startTime = SystemClock.elapsedRealtime()
         val upNextChangeDao = appDatabase.upNextChangeDao()
-        upNextChangeDao
-            .findAllRx()
-            .map { changes -> buildRequest(changes) }
-            .flatMapCompletable { request ->
-                syncManager.upNextSync(request)
-                    .flatMapCompletable { response -> readResponse(response) }
-                    .andThen(clearSyncedData(request, upNextChangeDao))
-                    .onErrorComplete { it is HttpException && it.code() == 304 }
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { throwable ->
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "UpNextSyncJob - failed - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
-                    jobFinished(jobParameters, false)
-                },
-                onComplete = {
-                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - jobFinished - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
-                    jobFinished(jobParameters, false)
-                },
-            )
-            .addTo(disposables)
+        val changes = upNextChangeDao.findAll()
+        val request = buildRequest(changes)
+        try {
+            val response = syncManager.upNextSync(request) // TODO: Convert to suspend function
+            readResponse(response)
+            clearSyncedData(request, upNextChangeDao)
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
+        } catch (e: HttpException) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            if (e.code() != 304) throw e
+        }
     }
 
     private fun clearSyncedData(upNextSyncRequest: UpNextSyncRequest, upNextChangeDao: UpNextChangeDao): Completable {
