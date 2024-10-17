@@ -79,7 +79,7 @@ interface SyncService {
     fun syncUpdate(@FieldMap fields: Map<String, String>): Single<au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse>
 
     @POST("/up_next/sync")
-    fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): Single<UpNextSyncResponse>
+    suspend fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): UpNextSyncResponse
 
     @POST("/user/last_sync_at")
     fun getLastSyncAt(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<LastSyncAtResponse>

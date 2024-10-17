@@ -61,9 +61,6 @@
         <service android:name=".repositories.jobs.VersionMigrationsJob"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true"/>
-        <service android:name=".repositories.sync.UpNextSyncJob"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true"/>
 
         <!-- Work Manager -->
         <provider

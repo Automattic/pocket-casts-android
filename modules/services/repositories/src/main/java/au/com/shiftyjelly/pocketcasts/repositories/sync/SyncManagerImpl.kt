@@ -432,8 +432,8 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.namedSettings(request, token)
     }
 
-    override fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse> =
-        getCacheTokenOrLoginRxSingle { token ->
+    override suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse =
+        getCacheTokenOrLogin { token ->
             syncServiceManager.upNextSync(request, token)
         }
 
