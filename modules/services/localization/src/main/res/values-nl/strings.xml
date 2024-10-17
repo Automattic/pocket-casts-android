@@ -270,7 +270,6 @@ Language: nl
     <string name="end_of_year_story_longest_episode_subtitle">Het was niemand minder dan \'%1$s\' uit \'%2$s\'</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
-    <string name="end_of_year_listening_time_subtitle">We hopen dat je hebt genoten van elke minuut!</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Je hebt in totaal %2$s geluisterd naar %1$s afleveringen</string>
     <string name="end_of_year_story_top_categories_title">Wist je dat %1$s je favoriete categorie was</string>

@@ -69,7 +69,7 @@ internal fun StoriesPage(
         } else if (state is UiState.Synced) {
             Stories(
                 stories = state.stories,
-                sizes = EndOfYearMeasurements(
+                measurements = EndOfYearMeasurements(
                     width = this@BoxWithConstraints.maxWidth,
                     height = this@BoxWithConstraints.maxHeight,
                     closeButtonBottomEdge = 44.dp,
@@ -111,11 +111,11 @@ internal fun StoriesPage(
 @Composable
 private fun Stories(
     stories: List<Story>,
-    sizes: EndOfYearMeasurements,
+    measurements: EndOfYearMeasurements,
 ) {
     val pagerState = rememberPagerState(pageCount = { stories.size })
     val coroutineScope = rememberCoroutineScope()
-    val widthPx = LocalDensity.current.run { sizes.width.toPx() }
+    val widthPx = LocalDensity.current.run { measurements.width.toPx() }
 
     HorizontalPager(
         state = pagerState,
@@ -136,12 +136,12 @@ private fun Stories(
         },
     ) { index ->
         when (val story = stories[index]) {
-            is Story.Cover -> CoverStory(story, sizes)
-            is Story.NumberOfShows -> NumberOfShowsStory(story, sizes)
-            is Story.TopShow -> TopShowStory(story, sizes)
-            is Story.TopShows -> TopShowsStory(story, sizes)
-            is Story.Ratings -> RatingsStory(story, sizes)
-            is Story.TotalTime -> StoryPlaceholder(story)
+            is Story.Cover -> CoverStory(story, measurements)
+            is Story.NumberOfShows -> NumberOfShowsStory(story, measurements)
+            is Story.TopShow -> TopShowStory(story, measurements)
+            is Story.TopShows -> TopShowsStory(story, measurements)
+            is Story.Ratings -> RatingsStory(story, measurements)
+            is Story.TotalTime -> TotalTimeStory(story, measurements)
             is Story.LongestEpisode -> StoryPlaceholder(story)
             is Story.PlusInterstitial -> StoryPlaceholder(story)
             is Story.YearVsYear -> StoryPlaceholder(story)

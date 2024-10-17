@@ -270,7 +270,6 @@ Language: de
     <string name="end_of_year_story_longest_episode_subtitle">Es war keine geringere als „%1$s“ aus „%2$s“</string>
     <string name="end_of_year_story_longest_episode_title">Die längste von dir angehörte Folge war %1$s</string>
     <string name="end_of_year_replay">Erneut abspielen</string>
-    <string name="end_of_year_listening_time_subtitle">Wir hoffen, du hast jede Minute genossen!</string>
     <string name="end_of_year_listening_time_title">Dies ist die Gesamtzeit der von dir angehörten Podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du hast dir %1$s Folgen mit einer Gesamtdauer von %2$s angehört</string>
     <string name="end_of_year_story_top_categories_title">Schon gewusst? %1$s war deine Lieblingskategorie</string>

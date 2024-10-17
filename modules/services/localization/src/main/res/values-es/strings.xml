@@ -270,7 +270,6 @@ Language: es
     <string name="end_of_year_story_longest_episode_subtitle">Fue nada menos que «%1$s» de «%2$s».</string>
     <string name="end_of_year_story_longest_episode_title">El episodio más largo que escuchaste fue %1$s.</string>
     <string name="end_of_year_replay">Reproducir otra vez.</string>
-    <string name="end_of_year_listening_time_subtitle">¡Esperamos que te haya encantado cada minuto!</string>
     <string name="end_of_year_listening_time_title">Este fue tu tiempo total de escucha de pódcast.</string>
     <string name="end_of_year_story_top_categories_subtitle">Escuchaste %1$s episodios de un total de %2$s</string>
     <string name="end_of_year_story_top_categories_title">¿Sabías que %1$s era tu categoría favorita?</string>

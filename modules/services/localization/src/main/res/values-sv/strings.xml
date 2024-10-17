@@ -270,7 +270,6 @@ Language: sv_SE
     <string name="end_of_year_story_longest_episode_subtitle">Det var ingen mindre än \"%1$s\" från \"%2$s\"</string>
     <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>
-    <string name="end_of_year_listening_time_subtitle">Vi hoppas att du älskade varje minut av det!</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du lyssnade på %1$s avsnitt i sammanlagt %2$s</string>
     <string name="end_of_year_story_top_categories_title">Visste du att %1$s var din favoritkategori</string>

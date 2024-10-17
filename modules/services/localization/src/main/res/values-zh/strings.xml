@@ -270,7 +270,6 @@ Language: zh_CN
     <string name="end_of_year_story_longest_episode_subtitle">不是其他，而正是来自“%2$s”的“%1$s”</string>
     <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
     <string name="end_of_year_replay">再次播放</string>
-    <string name="end_of_year_listening_time_subtitle">希望您能享受其中的每分每秒！</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>
     <string name="end_of_year_story_top_categories_subtitle">您收听了 %1$s 集节目，总时长为 %2$s</string>
     <string name="end_of_year_story_top_categories_title">您是否知道 %1$s 是您最喜欢的分类？</string>

@@ -270,7 +270,6 @@ Language: ru
     <string name="end_of_year_story_longest_episode_subtitle">Это было не что иное, как «%1$s» из «%2$s»</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
-    <string name="end_of_year_listening_time_subtitle">Надеемся, что вам понравилось всё с начала до конца!</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
     <string name="end_of_year_story_top_categories_subtitle">Вы прослушали %1$s эпизодов общей продолжительностью %2$s</string>
     <string name="end_of_year_story_top_categories_title">Знаете ли вы, что вашей любимой категорией оказалась %1$s?</string>
