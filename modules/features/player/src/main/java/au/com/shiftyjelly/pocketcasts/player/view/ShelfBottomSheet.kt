@@ -240,6 +240,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Download -> {
+                playerViewModel.handleDownloadClickFromShelf()
             }
         }
         if (enabled) {

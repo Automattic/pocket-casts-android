@@ -215,6 +215,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             trackShelfAction(ShelfItem.Report.analyticsValue)
             openUrl(settings.getReportViolationUrl())
         }
+        binding.download?.setOnClickListener {
+            viewModel.handleDownloadClickFromShelf()
+        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
