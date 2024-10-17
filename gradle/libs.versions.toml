@@ -26,6 +26,7 @@ espresso = "3.6.1"
 firebase = "33.6.0"
 fragment = "1.8.5"
 glance = "1.0.0"
+gravatar = "2.1.0"
 google-services = "4.4.2"
 hilt = "2.53"
 hilt-compiler = "1.2.0"
@@ -123,6 +124,10 @@ fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragm
 # Glance
 glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
+
+# Gravatar
+gravatar = { module = "com.gravatar:gravatar", version.ref = "gravatar" }
+gravatar-qe = { module = "com.gravatar:gravatar-quickeditor", version.ref = "gravatar" }
 
 # Horologist
 horologist-audio-ui = { module = "com.google.android.horologist:horologist-audio-ui", version.ref = "horologist" }
