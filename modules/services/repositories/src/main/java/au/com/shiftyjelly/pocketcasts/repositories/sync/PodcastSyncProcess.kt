@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.content.Context
 import android.os.Build
 import android.os.SystemClock
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -62,6 +63,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
@@ -301,12 +303,8 @@ class PodcastSyncProcess(
         val workRequestId = UpNextSyncWorker.enqueue(syncManager, context)
         workRequestId?.let {
             ProcessLifecycleOwner.get().lifecycleScope.launch {
-                WorkManager.getInstance(context)
-                    .getWorkInfoByIdFlow(it).collectLatest {
-                        if (it.state.isFinished) {
-                            emitter.onComplete()
-                        }
-                    }
+                WorkManager.getInstance(context).getWorkInfoByIdFlow(it).first { it.state.isFinished }
+                emitter.onComplete()
             }
         } ?: emitter.onComplete()
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
