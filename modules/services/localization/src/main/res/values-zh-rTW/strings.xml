@@ -260,11 +260,7 @@ Language: zh_TW
     <string name="end_of_year_stories_year_over_share_text">我在 2023 年與 2022 年的收聽時間比較</string>
     <string name="eoy_year_over_year_title_skyrocketed">比起 2022 年，你的收聽時間可說是一飛沖天！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊啊啊…人就是要享受生活，對吧？</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">比起 2022 年，你的收聽時間稍微下降了</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">大家都說，成功的關鍵在於持之以恆…大概是這樣吧！</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">比起 2022 年，你的收聽時間大致保持不變</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">想要在 2024 年更進一步嗎？</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">比起 2022 年，你的收聽時間大幅下降了 %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">看看你的收聽統計和最愛 Podcast 等資料吧。</string>
     <string name="end_of_year_story_epilogue_title">謝謝你今年與我們一同收聽。\n我們 2024 年見！</string>
     <string name="end_of_year_story_longest_episode_subtitle">除了「%2$s」的「%1$s」之外，別無其他</string>

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -53,18 +54,17 @@ internal data class EndOfYearMeasurements(
     val closeButtonBottomEdge: Dp,
 ) {
     val scale = width / 393.dp
+    val smallDeviceFactor = if (width > 380.dp) 1f else 0.85f
 }
 
 @Composable
 internal fun ShareStoryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    includePadding: Boolean = true,
 ) {
     OutlinedEoyButton(
         text = stringResource(LR.string.end_of_year_share_story),
         onClick = onClick,
-        includePadding = includePadding,
         modifier = modifier,
     )
 }
@@ -74,7 +74,6 @@ internal fun OutlinedEoyButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    includePadding: Boolean = true,
 ) {
     RowOutlinedButton(
         text = text,
@@ -87,8 +86,8 @@ internal fun OutlinedEoyButton(
             brush = SolidColor(colorResource(UR.color.coolgrey_90)),
         ),
         onClick = onClick,
-        includePadding = includePadding,
-        modifier = modifier,
+        includePadding = false,
+        modifier = modifier.padding(horizontal = 24.dp, vertical = 16.dp),
     )
 }
 
