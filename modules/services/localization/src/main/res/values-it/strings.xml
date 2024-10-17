@@ -260,11 +260,7 @@ Language: it
     <string name="end_of_year_stories_year_over_share_text">Il mio tempo di ascolto nel 2023 rispetto al 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Rispetto al 2022, il tuo tempo di ascolto è salito alle stelle.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ma hai ancora tutta la vita davanti, giusto?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Rispetto al 2022, il tuo tempo di ascolto è leggermente diminuito</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Dicono che la costanza sia la chiave per il successo. O qualcosa del genere.</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Rispetto al 2022, il tuo tempo di ascolto è rimasto abbastanza costante</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Tutto pronto per superarlo nel 2024?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Rispetto al 2022, il tuo tempo di ascolto è aumentato notevolmente (%1$s%%)</string>
     <string name="end_of_year_prompt_card_summary">Visualizza le statistiche di ascolto, i migliori podcast e molto altro ancora.</string>
     <string name="end_of_year_story_epilogue_title">Ti ringraziamo per averci ascoltato quest\'anno.\nCi vediamo nel 2024!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Altro non era che \"%1$s\" da \"%2$s\"</string>
