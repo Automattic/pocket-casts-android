@@ -270,7 +270,6 @@ Language: fr
     <string name="end_of_year_story_longest_episode_subtitle">Ce n’était autre que « %1$s » de « %2$s »</string>
     <string name="end_of_year_story_longest_episode_title">%1$s est l’épisode le plus long que vous avez écouté</string>
     <string name="end_of_year_replay">Réécouter</string>
-    <string name="end_of_year_listening_time_subtitle">On espère que vous en avez apprécié chaque minute !</string>
     <string name="end_of_year_listening_time_title">Il s’agit de votre temps total d’écoute de podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Vous avez écouté %1$s épisode(s) pour une durée totale de %2$s</string>
     <string name="end_of_year_story_top_categories_title">Le saviez-vous ? %1$s est votre catégorie favorite</string>

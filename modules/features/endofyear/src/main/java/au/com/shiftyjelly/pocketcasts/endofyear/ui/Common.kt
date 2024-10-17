@@ -27,6 +27,7 @@ internal const val StoryRotationRadians = (StoryRotationDegrees * Math.PI / 180)
 
 internal val humaneFontFamily = FontFamily(
     Font(R.font.humane_regular, FontWeight.Normal),
+    Font(R.font.humane_bold, FontWeight.Bold),
 )
 
 internal val Story.backgroundColor

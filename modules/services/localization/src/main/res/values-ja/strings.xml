@@ -270,7 +270,6 @@ Language: ja_JP
     <string name="end_of_year_story_longest_episode_subtitle">%2$s の %1$s を超えるものはありません</string>
     <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
     <string name="end_of_year_replay">もう一度再生</string>
-    <string name="end_of_year_listening_time_subtitle">いつもお楽しみいただけましたら幸いです。</string>
     <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>
     <string name="end_of_year_story_top_categories_subtitle">%2$s話のエピソードで合計%1$s話聴きました</string>
     <string name="end_of_year_story_top_categories_title">%1$s があなたのお気に入りのカテゴリーだとお気づきでしたか ?</string>
