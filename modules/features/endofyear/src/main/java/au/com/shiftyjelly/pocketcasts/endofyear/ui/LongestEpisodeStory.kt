@@ -80,10 +80,6 @@ private fun LongestEpisodeStory(
     }
 }
 
-private val coverOffset = 18.dp
-private val baseCoverSize = 240.dp
-private val podcastCoverSizes = List(5) { it }.runningFold(baseCoverSize) { dp, _ -> dp * 0.9f }.reversed()
-
 @Composable
 private fun CoversSection(
     story: Story.LongestEpisode,
@@ -129,6 +125,11 @@ private fun CoversSection(
             }
         },
     )
+
+    val coverOffset = 19.dp
+    val baseCoverSize = if (measurements.width > 380.dp) 280.dp else 240.dp
+    val podcastCoverSizes = List(5) { it }.runningFold(baseCoverSize) { dp, _ -> dp * 0.9f }.reversed()
+
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = modifier.fillMaxWidth(),
@@ -154,13 +155,16 @@ private fun CoversSection(
             }
         }
         val stickerSize = DpSize(194.dp, 135.dp) * measurements.scale
+        val baseStickerOffset = coverOffset * (podcastCoverSizes.size - 1) * measurements.scale
+        val xFactor = if (measurements.width > 380.dp) 2f else 2.5f
+        val yFactor = if (measurements.width > 380.dp) 3f else 4f
         Image(
             painter = painterResource(IR.drawable.end_of_year_2024_sticker_7),
             contentDescription = null,
             modifier = Modifier
                 .offset(
-                    x = coverOffset * (podcastCoverSizes.size - 1) * measurements.scale + stickerSize.width / 2.5f,
-                    y = -coverOffset * (podcastCoverSizes.size - 1) * measurements.scale - stickerSize.height / 4,
+                    x = baseStickerOffset + stickerSize.width / xFactor,
+                    y = -baseStickerOffset * measurements.scale - stickerSize.height / yFactor,
                 )
                 .size(stickerSize),
         )
