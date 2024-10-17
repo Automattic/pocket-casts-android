@@ -5,6 +5,8 @@ import java.net.URLEncoder
 
 object Gravatar {
 
+    const val GRAVATAR_QE_REDIRECT_URL = "https://pocketcasts.com/gravatar-qe-redirect"
+
     fun getGravatarChangeAvatarUrl(email: String): String =
         "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars&is_app_origin=true"
 
