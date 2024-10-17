@@ -308,7 +308,7 @@ class PodcastSyncProcess(
                         }
                     }
             }
-        }
+        } ?: emitter.onComplete()
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
     }
 
