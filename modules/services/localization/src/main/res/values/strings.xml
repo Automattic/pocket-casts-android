@@ -1783,6 +1783,18 @@
     <string name="end_of_year_stories_theres_more">There\’s more!</string>>
     <!-- Subtitle explaining the user why they should susbcribe to Plus in the context of the end of year stories. -->
     <string name="end_of_year_stories_subscribe_to_plus">Subscribe to Plus and find out how your listening compares to 2022, other fun stats, and Premium features like bookmarks and folders.</string>
+    <!-- Title for the story showing the podcast ratings given by the user. -->
+    <string name="eoy_story_ratings_title_1">Let\'s see your ratings!</string>
+    <!-- Title for the story showing the podcast ratings given by the user when they gave no ratings. -->
+    <string name="eoy_story_ratings_title_2">Oh-oh! No podcast ratings to show you yet</string>
+    <!-- Subtitle for the story showing the podcast ratings given by the user when they gave high ratings. -->
+    <string name="eoy_story_ratings_subtitle_1">Wow, so many %1$d star ratings! Thanks for sharing the love with your favorite creators!</string>
+    <!-- Subtitle for the story showing the podcast ratings given by the user when they gave low ratings. -->
+    <string name="eoy_story_ratings_subtitle_2">Thanks for sharing your feedback with the creator community</string>
+    <!-- Subtitle for the story showing the podcast ratings given by the user when they gave no ratings. -->
+    <string name="eoy_story_ratings_subtitle_3">Did you know that you can rate shows now? Share the love for your favorite creators and help them get noticed!</string>
+    <!-- Label of a button for the story showing podcast ratings given by the user when they gave no ratings. -->
+    <string name="eoy_story_ratings_learn_button_label">Learn about ratings</string>
 
     <!-- Onboarding -->
 

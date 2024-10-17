@@ -140,7 +140,7 @@ private fun Stories(
             is Story.NumberOfShows -> NumberOfShowsStory(story, sizes)
             is Story.TopShow -> TopShowStory(story, sizes)
             is Story.TopShows -> TopShowsStory(story, sizes)
-            is Story.Ratings -> StoryPlaceholder(story)
+            is Story.Ratings -> RatingsStory(story, sizes)
             is Story.TotalTime -> StoryPlaceholder(story)
             is Story.LongestEpisode -> StoryPlaceholder(story)
             is Story.PlusInterstitial -> StoryPlaceholder(story)

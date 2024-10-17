@@ -79,7 +79,7 @@ internal fun CoverStory(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-fun CoverStoryPreview() {
+private fun CoverStoryPreview() {
     PreviewBox { measurements ->
         CoverStory(
             story = Story.Cover,

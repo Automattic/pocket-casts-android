@@ -39,12 +39,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import kotlin.random.Random
@@ -122,7 +122,7 @@ private fun TopShowsStory(
         Column {
             TextH10(
                 text = stringResource(LR.string.eoy_story_top_podcasts_title),
-                fontSize = 31.nonScaledSp,
+                disableScale = true,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
             ShareStoryButton(onClick = {})
@@ -145,7 +145,7 @@ private fun PodcastItem(
     ) {
         TextH20(
             text = "#${index + 1}",
-            fontSize = 22.nonScaledSp,
+            disableScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier
                 .offset { IntOffset(x = (50.dp * (1f - animationProgress)).roundToPx(), y = 0) }
@@ -184,13 +184,14 @@ private fun PodcastItem(
         ) {
             TextP40(
                 text = podcast.author,
-                fontSize = 15.nonScaledSp,
+                fontSize = 15.sp,
+                disableScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 maxLines = 1,
             )
             TextH20(
                 text = podcast.title,
-                fontSize = 22.nonScaledSp,
+                disableScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 maxLines = 2,
             )
@@ -259,7 +260,7 @@ private fun Modifier.fadeScrollingEdges(
 
 @Preview(device = Devices.PortraitRegular)
 @Composable
-fun TopShowsPreview() {
+private fun TopShowsPreview() {
     PreviewBox { measurements ->
         TopShowsStory(
             story = Story.TopShows(
