@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +31,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 internal fun TotalTimeStory(
@@ -46,6 +49,7 @@ internal fun TotalTimeStory(
             val subtitle = subcompose("subtitle") {
                 TextH10(
                     text = texts.subtitle,
+                    color = colorResource(UR.color.coolgrey_90),
                     disableScale = true,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
@@ -64,6 +68,7 @@ internal fun TotalTimeStory(
                     fontFamily = humaneFontFamily,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
+                    color = Color.Black,
                     // Humane font uses about 15% of its height for the ascent line
                     // We need to adjust height for it in order to center the text as we
                     // do not use any characters that go to the ascent line
