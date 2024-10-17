@@ -39,6 +39,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var autoPlayNextEpisodeSetting: UserSetting<Boolean>
 
+    @Mock private lateinit var autoDownloadNewEpisodesSetting: UserSetting<Boolean>
+
     @Mock private lateinit var useUpNextDarkThemeSetting: UserSetting<Boolean>
 
     @Mock private lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
@@ -60,6 +62,7 @@ class AppLifecycleObserverTest {
     @Before
     fun setUp() {
         whenever(settings.autoPlayNextEpisodeOnEmpty).thenReturn(autoPlayNextEpisodeSetting)
+        whenever(settings.autoDownloadNewEpisodes).thenReturn(autoDownloadNewEpisodesSetting)
         whenever(settings.useDarkUpNextTheme).thenReturn(useUpNextDarkThemeSetting)
 
         whenever(appLifecycleOwner.lifecycle).thenReturn(appLifecycle)
@@ -91,6 +94,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting).set(true, updateModifiedAt = false)
+        verify(autoDownloadNewEpisodesSetting).set(true, updateModifiedAt = false)
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
 
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
@@ -108,6 +112,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(autoDownloadNewEpisodesSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -124,6 +129,7 @@ class AppLifecycleObserverTest {
         verify(appLifecycleAnalytics).onNewApplicationInstall()
 
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(autoDownloadNewEpisodesSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting).set(false, updateModifiedAt = false)
         verify(appLifecycleAnalytics, never()).onApplicationUpgrade(any())
     }
@@ -140,6 +146,7 @@ class AppLifecycleObserverTest {
 
         verify(appLifecycleAnalytics, never()).onNewApplicationInstall()
         verify(autoPlayNextEpisodeSetting, never()).set(any(), any(), any(), any())
+        verify(autoDownloadNewEpisodesSetting, never()).set(any(), any(), any(), any())
         verify(useUpNextDarkThemeSetting, never()).set(any(), any(), any(), any())
     }
 }

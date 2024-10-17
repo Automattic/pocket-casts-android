@@ -110,8 +110,13 @@ class AppLifecycleObserver constructor(
                 // do nothing because feature has not been enabled on Wear OS yet
                 AppPlatform.WearOs -> {}
 
-                // For new users we want to auto play when the queue is empty by default
-                AppPlatform.Phone -> settings.autoPlayNextEpisodeOnEmpty.set(true, updateModifiedAt = false)
+                AppPlatform.Phone -> {
+                    // For new users we want to auto play when the queue is empty by default
+                    settings.autoPlayNextEpisodeOnEmpty.set(true, updateModifiedAt = false)
+
+                    // For new users we want to auto download new episodes by default
+                    settings.autoDownloadNewEpisodes.set(true, updateModifiedAt = false)
+                }
             }
         } else if (previousVersionCode < versionCode) {
             appLifecycleAnalytics.onApplicationUpgrade(previousVersionCode)
