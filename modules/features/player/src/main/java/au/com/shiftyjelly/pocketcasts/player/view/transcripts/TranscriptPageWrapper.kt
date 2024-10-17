@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.transcripts
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -19,7 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.RippleDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -27,9 +29,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material.ripple.RippleAlpha
-import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -141,7 +140,7 @@ fun TranscriptPageWrapper(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TranscriptToolbar(
     onCloseClick: () -> Unit,
@@ -167,7 +166,11 @@ fun TranscriptToolbar(
                 .fillMaxSize(),
         ) {
             val transition = updateTransition(expandSearch, label = "Searchbar transition")
-            CompositionLocalProvider(LocalRippleTheme provides ToolbarButtonRippleTheme) {
+            val toolbarButtonRippleConfiguration = RippleConfiguration(
+                color = Color.White,
+                rippleAlpha = RippleDefaults.rippleAlpha(Color.Black, lightTheme = MaterialTheme.colors.isLight),
+            )
+            CompositionLocalProvider(LocalRippleConfiguration provides toolbarButtonRippleConfiguration) {
                 CloseButton(
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -322,16 +325,6 @@ private fun SearchBarTrailingIcons(
         }
         Spacer(modifier = Modifier.width(8.dp))
     }
-}
-
-private object ToolbarButtonRippleTheme : RippleTheme {
-    @Composable
-    override fun defaultColor() =
-        RippleTheme.defaultRippleColor(Color.White, lightTheme = MaterialTheme.colors.isLight)
-
-    @Composable
-    override fun rippleAlpha(): RippleAlpha =
-        RippleTheme.defaultRippleAlpha(Color.Black, lightTheme = MaterialTheme.colors.isLight)
 }
 
 @Preview("Collapsed search bar", heightDp = 100)
