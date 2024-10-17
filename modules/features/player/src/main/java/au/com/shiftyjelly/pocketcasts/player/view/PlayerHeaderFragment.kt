@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.BookmarkFeatureControl
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -77,6 +78,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
@@ -258,6 +260,29 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
             headerViewModel.episode?.let { episode ->
                 loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
+
+                val downloadIcon = when {
+                    episode is PodcastEpisode && (episode.isDownloading || episode.isQueued) -> IR.drawable.ic_download
+                    episode is PodcastEpisode && episode.isDownloaded -> IR.drawable.ic_downloaded
+                    else -> IR.drawable.ic_download
+                }
+
+                binding.download?.apply {
+                    setImageResource(downloadIcon)
+
+                    contentDescription = when {
+                        episode is PodcastEpisode && (episode.isDownloading || episode.isQueued) -> context.getString(LR.string.episode_downloading)
+                        episode is PodcastEpisode && episode.isDownloaded -> context.getString(LR.string.remove_downloaded_file)
+                        else -> context.getString(LR.string.download)
+                    }
+
+                    val params = layoutParams
+                    params?.width = 0.dpToPx(context)
+                    params?.height = 24.dpToPx(context)
+                    layoutParams = params
+
+                    scaleType = ImageView.ScaleType.FIT_CENTER
+                }
             }
 
             binding.podcastTitle.setOnClickListener {

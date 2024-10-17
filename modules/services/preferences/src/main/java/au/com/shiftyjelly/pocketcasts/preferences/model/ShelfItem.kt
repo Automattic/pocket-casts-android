@@ -50,7 +50,13 @@ enum class ShelfItem(
                 else -> LR.string.download
             }
         },
-        iconId = { IR.drawable.auto_filter_downloaded },
+        iconId = {
+            when {
+                it is PodcastEpisode && (it.isDownloading || it.isQueued) -> IR.drawable.ic_download
+                it is PodcastEpisode && it.isDownloaded -> IR.drawable.ic_downloaded
+                else -> IR.drawable.ic_download
+            }
+        },
         showIf = { it is PodcastEpisode },
         analyticsValue = "download",
     ),
