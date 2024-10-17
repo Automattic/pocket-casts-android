@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -738,7 +739,10 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun checkForEpisodesToDownload(episodeUuidsAdded: List<String>, downloadManager: DownloadManager) {
         Timber.i("Auto download podcasts checkForEpisodesToDownload. Episodes %s", episodeUuidsAdded.size)
+
         val podcastUuidToAutoDownload = HashMap<String, Boolean>()
+        val podcastUuidToDownloadCount = HashMap<String, Int>()
+
         for (podcast in findSubscribed()) {
             podcastUuidToAutoDownload[podcast.uuid] = podcast.isAutoDownloadNewEpisodes
         }
@@ -770,8 +774,16 @@ class PodcastManagerImpl @Inject constructor(
                 continue
             }
 
+            val currentDownloadCount = podcastUuidToDownloadCount.getOrDefault(episode.podcastUuid, 0)
+            if (currentDownloadCount >= AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)) {
+                continue // Skip to the next episode since it already downloaded the limit of episodes for this podcast
+            }
+
             DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "podcast auto download " + episode.podcastUuid, downloadManager, episodeManager, source = SourceView.UNKNOWN)
             uuidToAdded[episodeUuid] = java.lang.Boolean.TRUE
+
+            // Update the track of how many episodes were downloaded for this podcast
+            podcastUuidToDownloadCount[episode.podcastUuid] = currentDownloadCount + 1
         }
     }
 
