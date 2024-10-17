@@ -238,6 +238,9 @@ class ShelfBottomSheet : BaseDialogFragment() {
             ShelfItem.Report -> {
                 openUrl(settings.getReportViolationUrl())
             }
+
+            ShelfItem.Download -> {
+            }
         }
         if (enabled) {
             analyticsTracker.track(

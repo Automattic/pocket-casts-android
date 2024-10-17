@@ -669,6 +669,7 @@
     <string name="episode_removed_from_up_next">Removed from up next</string>
     <string name="episode_in_up_next">In up next</string>
     <string name="episode_downloading">Downloading</string>
+    <string name="remove_downloaded_file">Remove downloaded file</string>
     <string name="episode_cover_description">Cover of %s episode</string>
 
     <!-- Supporter -->

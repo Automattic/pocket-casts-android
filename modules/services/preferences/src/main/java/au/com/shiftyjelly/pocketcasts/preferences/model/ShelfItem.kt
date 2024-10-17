@@ -41,6 +41,19 @@ enum class ShelfItem(
         showIf = { it is PodcastEpisode },
         analyticsValue = "transcript",
     ),
+    Download(
+        id = "download",
+        titleId = {
+            when {
+                it is PodcastEpisode && (it.isDownloading || it.isQueued) -> LR.string.episode_downloading
+                it is PodcastEpisode && it.isDownloaded -> LR.string.remove_downloaded_file
+                else -> LR.string.download
+            }
+        },
+        iconId = { IR.drawable.auto_filter_downloaded },
+        showIf = { it is PodcastEpisode },
+        analyticsValue = "download",
+    ),
     Share(
         id = "share",
         titleId = { LR.string.podcast_share_episode },

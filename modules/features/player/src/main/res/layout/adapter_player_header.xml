@@ -308,6 +308,13 @@
                 style="@style/shelf_item" />
 
             <ImageButton
+                android:id="@+id/download"
+                android:contentDescription="@string/download"
+                app:srcCompat="@drawable/auto_filter_downloaded"
+                app:tint="?attr/player_contrast_03"
+                style="@style/shelf_item" />
+
+            <ImageButton
                 android:id="@+id/podcast"
                 android:contentDescription="@string/go_to_podcast"
                 app:srcCompat="@drawable/ic_goto_32"

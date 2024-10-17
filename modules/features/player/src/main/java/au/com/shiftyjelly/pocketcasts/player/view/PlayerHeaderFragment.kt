@@ -157,6 +157,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             ShelfItem.Archive to binding.archive,
             ShelfItem.Bookmark to binding.bookmark,
             ShelfItem.Transcript to binding.transcript,
+            ShelfItem.Download to binding.download,
             ShelfItem.Report to binding.report,
         )
         viewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
