@@ -311,7 +311,8 @@
                 android:id="@+id/download"
                 android:contentDescription="@string/download"
                 android:layout_width="0dp"
-                android:layout_height="24dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
                 app:srcCompat="@drawable/auto_filter_downloaded"
                 app:tint="?attr/player_contrast_03"
                 style="@style/shelf_item" />

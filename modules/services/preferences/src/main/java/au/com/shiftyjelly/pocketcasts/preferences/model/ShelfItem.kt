@@ -53,7 +53,7 @@ enum class ShelfItem(
         iconId = {
             when {
                 it is PodcastEpisode && (it.isDownloading || it.isQueued) -> IR.drawable.ic_download
-                it is PodcastEpisode && it.isDownloaded -> IR.drawable.ic_downloaded
+                it is PodcastEpisode && it.isDownloaded -> IR.drawable.ic_downloaded_24dp
                 else -> IR.drawable.ic_download
             }
         },

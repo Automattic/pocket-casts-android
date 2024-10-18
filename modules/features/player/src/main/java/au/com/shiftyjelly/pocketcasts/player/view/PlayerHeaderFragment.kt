@@ -269,9 +269,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             headerViewModel.episode?.let { episode ->
                 loadArtwork(episode, headerViewModel.useEpisodeArtwork, binding.artwork)
 
+                val isPodcast = episode is PodcastEpisode
+
                 val downloadIcon = when {
-                    episode is PodcastEpisode && (episode.isDownloading || episode.isQueued) -> IR.drawable.ic_download
-                    episode is PodcastEpisode && episode.isDownloaded -> IR.drawable.ic_downloaded
+                    isPodcast && (episode.isDownloading || episode.isQueued) -> IR.drawable.ic_download
+                    isPodcast && episode.isDownloaded -> IR.drawable.ic_downloaded_24dp
                     else -> IR.drawable.ic_download
                 }
 
@@ -279,17 +281,20 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     setImageResource(downloadIcon)
 
                     contentDescription = when {
-                        episode is PodcastEpisode && (episode.isDownloading || episode.isQueued) -> context.getString(LR.string.episode_downloading)
-                        episode is PodcastEpisode && episode.isDownloaded -> context.getString(LR.string.remove_downloaded_file)
+                        isPodcast && (episode.isDownloading || episode.isQueued) -> context.getString(LR.string.episode_downloading)
+                        isPodcast && episode.isDownloaded -> context.getString(LR.string.remove_downloaded_file)
                         else -> context.getString(LR.string.download)
                     }
 
-                    val params = layoutParams
-                    params?.width = 0.dpToPx(context)
-                    params?.height = 24.dpToPx(context)
-                    layoutParams = params
+                    layoutParams = layoutParams?.apply {
+                        width = 0.dpToPx(context)
+                        height = 48.dpToPx(context)
+                    }
 
-                    scaleType = ImageView.ScaleType.FIT_CENTER
+                    scaleType = ImageView.ScaleType.CENTER
+
+                    val padding = 12.dpToPx(context)
+                    setPadding(padding, padding, padding, padding)
                 }
             }
 
