@@ -30,6 +30,7 @@ fun PlayerSeekBar.setSeekBarState(
     position: Duration,
     chapters: Chapters,
     playbackSpeed: Double,
+    adjustDuration: Boolean,
     tintColor: Int,
     bufferedUpTo: Int,
     isBuffering: Boolean,
@@ -40,6 +41,7 @@ fun PlayerSeekBar.setSeekBarState(
     setCurrentTime(position)
     setChapters(chapters)
     setTintColor(tintColor, theme)
+    setAdjustDuration(adjustDuration)
     this.isBuffering = isBuffering
     bufferedUpToInSecs = bufferedUpTo / 1000
 }

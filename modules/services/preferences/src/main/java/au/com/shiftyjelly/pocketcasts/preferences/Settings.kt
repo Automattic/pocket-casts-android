@@ -551,4 +551,6 @@ interface Settings {
     val showReferralWelcome: UserSetting<Boolean>
 
     val lastEoySyncTimestamp: UserSetting<Instant>
+
+    val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 }

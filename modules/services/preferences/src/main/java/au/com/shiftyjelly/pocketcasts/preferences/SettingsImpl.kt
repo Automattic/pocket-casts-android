@@ -1506,4 +1506,10 @@ class SettingsImpl @Inject constructor(
         fromString = { value -> runCatching { Instant.parse(value) }.getOrDefault(Instant.EPOCH) },
         toString = { value -> value.toString() },
     )
+
+    override val useRealTimeForPlaybackRemaingTime = UserSetting.BoolPref(
+        sharedPrefKey = "use_real_time_for_playback_remaining_time",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
 }
