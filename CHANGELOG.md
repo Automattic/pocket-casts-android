@@ -1,6 +1,8 @@
 7.76
 -----
-
+*   New Features
+    *   Add download button to playback actions
+        ([#3046](https://github.com/Automattic/pocket-casts-android/pull/3046))
 
 7.75
 -----
