@@ -171,7 +171,13 @@ internal sealed interface Story {
         val lastYearDuration: Duration,
         val thisYearDuration: Duration,
         val subscriptionTier: SubscriptionTier?,
-    ) : Story
+    ) : Story {
+        val yearOverYearChange get() = when {
+            lastYearDuration == thisYearDuration -> 1.0
+            lastYearDuration == Duration.ZERO -> Double.POSITIVE_INFINITY
+            else -> thisYearDuration / lastYearDuration
+        }
+    }
 
     data class CompletionRate(
         val listenedCount: Int,
