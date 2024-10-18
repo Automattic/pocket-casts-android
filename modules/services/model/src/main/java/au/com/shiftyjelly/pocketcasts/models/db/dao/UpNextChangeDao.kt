@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 
@@ -23,11 +22,7 @@ abstract class UpNextChangeDao {
     abstract fun observeAll(): Flowable<List<UpNextChange>>
 
     @Query("DELETE FROM up_next_changes WHERE modified <= :modified")
-    abstract fun deleteChangesOlderOrEqualTo(modified: Long)
-
-    fun deleteChangesOlderOrEqualToRx(modified: Long): Completable {
-        return Completable.fromAction { deleteChangesOlderOrEqualTo(modified) }
-    }
+    abstract suspend fun deleteChangesOlderOrEqualTo(modified: Long)
 
     @Query("DELETE FROM up_next_changes WHERE uuid = :uuid")
     abstract fun deleteByUuid(uuid: String)
