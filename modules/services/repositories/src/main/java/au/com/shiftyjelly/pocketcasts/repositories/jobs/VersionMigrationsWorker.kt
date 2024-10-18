@@ -166,7 +166,6 @@ class VersionMigrationsWorker @AssistedInject constructor(
         removeCustomEpisodes()
         removeOldTempPodcastDirectory()
         unscheduleEpisodeDetailsJob(applicationContext)
-        unscheduleRefreshJob(applicationContext)
 
         if (previousVersionCode < 6362) {
             upgradeTrimSilenceMode()
@@ -244,11 +243,6 @@ class VersionMigrationsWorker @AssistedInject constructor(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Unscheduling UpdateEpisodeDetailsJob ${jobInfo.id}")
             }
         }
-    }
-
-    private fun unscheduleRefreshJob(context: Context) {
-        val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as? JobScheduler ?: return
-        jobScheduler.cancel(JobIds.REFRESH_PODCASTS_JOB_ID)
     }
 
     private fun upgradeTrimSilenceMode() {
