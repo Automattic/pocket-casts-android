@@ -50,8 +50,9 @@ internal fun TotalTimeStory(
                 TextH10(
                     text = texts.subtitle,
                     color = colorResource(UR.color.coolgrey_90),
-                    disableScale = true,
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    fontScale = measurements.smallDeviceFactor,
+                    disableAutoScale = true,
+                    modifier = Modifier.padding(horizontal = 24.dp),
                 )
             }[0].measure(constraints)
 

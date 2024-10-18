@@ -125,7 +125,8 @@ internal fun TopShowStory(
                     R.string.end_of_year_story_top_podcast_title,
                     story.show.title,
                 ),
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -142,7 +143,7 @@ internal fun TopShowStory(
                     ),
                 ),
                 fontSize = 15.sp,
-                disableScale = true,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )

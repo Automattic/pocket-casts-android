@@ -124,7 +124,7 @@ private fun VerticalCard(
         )
         TextH70(
             text = data.topText(),
-            disableScale = true,
+            disableAutoScale = true,
             maxLines = 1,
             color = shareColors.cardTextSecondary,
             modifier = Modifier.padding(horizontal = width * 0.1f),
@@ -134,7 +134,7 @@ private fun VerticalCard(
         )
         TextH40(
             text = data.middleText(),
-            disableScale = true,
+            disableAutoScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardTextPrimary,
@@ -145,7 +145,7 @@ private fun VerticalCard(
         )
         TextH70(
             text = data.bottomText(),
-            disableScale = true,
+            disableAutoScale = true,
             maxLines = 2,
             textAlign = TextAlign.Center,
             color = shareColors.cardTextSecondary,

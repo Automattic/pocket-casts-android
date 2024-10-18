@@ -78,6 +78,7 @@ private fun YearVsYearStory(
         )
         TextInfo(
             story = story,
+            measurements = measurements,
         )
     }
 }
@@ -305,6 +306,7 @@ private class YearVsYearConfiguration(
 @Composable
 private fun TextInfo(
     story: Story.YearVsYear,
+    measurements: EndOfYearMeasurements,
 ) {
     Column(
         modifier = Modifier.background(
@@ -357,7 +359,8 @@ private fun TextInfo(
         }
         TextH10(
             text = title,
-            disableScale = true,
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -367,7 +370,7 @@ private fun TextInfo(
         TextP40(
             text = subtitle,
             fontSize = 15.sp,
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
