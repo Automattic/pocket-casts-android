@@ -10,11 +10,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.components.PagerProgressingIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
@@ -45,9 +49,11 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun StoriesPage(
     state: UiState,
+    pagerState: PagerState,
     onClose: () -> Unit,
 ) {
     val size = LocalContext.current.sizeLimit?.let(Modifier::size) ?: Modifier.fillMaxSize()
@@ -75,10 +81,11 @@ internal fun StoriesPage(
                     coverFontSize = coverFontSize,
                     coverTextHeight = coverTextHeight,
                 ),
+                pagerState = pagerState,
             )
         }
 
-        CloseButton(onClose)
+        TopControls(pagerState, state.storyProgress, onClose)
 
         // Use an invisible 'PLAYBACK' text to compute an appropriate font size.
         // The font should occupy the whole viewport's width with some padding.
@@ -111,8 +118,8 @@ internal fun StoriesPage(
 private fun Stories(
     stories: List<Story>,
     measurements: EndOfYearMeasurements,
+    pagerState: PagerState,
 ) {
-    val pagerState = rememberPagerState(pageCount = { stories.size })
     val coroutineScope = rememberCoroutineScope()
     val widthPx = LocalDensity.current.run { measurements.width.toPx() }
 
@@ -150,26 +157,42 @@ private fun Stories(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun BoxScope.CloseButton(
+internal fun BoxScope.TopControls(
+    pagerState: PagerState,
+    progress: Float,
     onClose: () -> Unit,
 ) {
-    Image(
-        painter = painterResource(IR.drawable.ic_close),
-        contentDescription = stringResource(LR.string.close),
-        colorFilter = ColorFilter.tint(Color.Black),
+    Column(
+        horizontalAlignment = Alignment.End,
         modifier = Modifier
-            .align(Alignment.TopEnd)
-            .padding(top = 20.dp, end = 18.dp)
-            .size(24.dp)
-            .clickable(
-                interactionSource = remember(::MutableInteractionSource),
-                indication = rememberRipple(color = Color.Black, bounded = false),
-                onClickLabel = stringResource(LR.string.close),
-                role = Role.Button,
-                onClick = onClose,
-            ),
-    )
+            .align(Alignment.TopCenter)
+            .padding(top = 8.dp, start = 16.dp, end = 16.dp),
+    ) {
+        PagerProgressingIndicator(
+            state = pagerState,
+            progress = progress,
+            activeColor = Color.Black,
+        )
+        Spacer(
+            modifier = Modifier.height(10.dp),
+        )
+        Image(
+            painter = painterResource(IR.drawable.ic_close),
+            contentDescription = stringResource(LR.string.close),
+            colorFilter = ColorFilter.tint(Color.Black),
+            modifier = Modifier
+                .size(24.dp)
+                .clickable(
+                    interactionSource = remember(::MutableInteractionSource),
+                    indication = rememberRipple(color = Color.Black, bounded = false),
+                    onClickLabel = stringResource(LR.string.close),
+                    role = Role.Button,
+                    onClick = onClose,
+                ),
+        )
+    }
 }
 
 @Composable

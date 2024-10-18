@@ -178,7 +178,7 @@ internal fun TopShowStory(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun TopShowPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 2) { measurements ->
         TopShowStory(
             story = Story.TopShow(
                 show = TopPodcast(
