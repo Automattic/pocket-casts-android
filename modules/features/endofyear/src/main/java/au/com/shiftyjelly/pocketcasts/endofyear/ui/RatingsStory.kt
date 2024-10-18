@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -33,7 +34,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -276,49 +276,41 @@ private fun AbsentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge),
     ) {
-        SubcomposeLayout { constraints ->
-            val noRatingsInfo = subcompose("noRatingsInfo") {
-                NoRatingsInfo(
-                    story = story,
-                )
-            }[0].measure(constraints)
-            val oopsiesSection = subcompose("oopsiesSection") {
-                OopsiesSection(
-                    measurements = measurements,
-                )
-            }[0].measure(constraints)
-
-            val emptySpaceHeight = constraints.maxHeight - noRatingsInfo.height
-            val oopsiesPosition = (emptySpaceHeight - oopsiesSection.height).coerceAtLeast(0) / 2
-
-            layout(constraints.maxWidth, constraints.maxHeight) {
-                oopsiesSection.place(0, oopsiesPosition)
-                noRatingsInfo.place(0, emptySpaceHeight)
-            }
-        }
+        OopsiesSection(
+            measurements = measurements,
+        )
+        NoRatingsInfo(
+            story = story,
+        )
     }
 }
 
 @Composable
-private fun OopsiesSection(
+private fun ColumnScope.OopsiesSection(
     measurements: EndOfYearMeasurements,
 ) {
-    val textFactory = rememberHumaneTextFactory(227.nonScaledSp)
+    val textFactory = rememberHumaneTextFactory(
+        fontSize = 227.nonScaledSp * measurements.smallDeviceFactor,
+    )
 
     Column(
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier
-            .offset(x = measurements.width / 2)
-            .requiredWidth(measurements.width * 2),
+            .weight(1f)
+            .requiredWidth(measurements.width * 1.5f),
     ) {
         OopsiesText(
             scrollDirection = ScrollDirection.Left,
             textFactory = textFactory,
+        )
+        Spacer(
+            modifier = Modifier.height(12.dp * measurements.smallDeviceFactor),
         )
         OopsiesText(
             scrollDirection = ScrollDirection.Right,
@@ -336,11 +328,11 @@ private fun OopsiesText(
         scrollDelay = { (20 / it.density).roundToLong().coerceAtLeast(4L) },
         items = listOf("OOOOPSIES"),
         scrollDirection = scrollDirection,
-    ) {
+    ) { text ->
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            textFactory.HumaneText("OOOOPSIES")
+            textFactory.HumaneText(text)
             Spacer(
                 modifier = Modifier.height(12.dp),
             )
