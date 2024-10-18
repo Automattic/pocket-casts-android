@@ -139,7 +139,7 @@ internal fun rememberHumaneTextFactory(
                         fontSize = fontSize,
                         fontWeight = fontWeight,
                     ),
-                ).firstBaseline * 1.02f
+                ).firstBaseline * 1.005f
                 firstBaseLinePx.toDp()
             },
         )
