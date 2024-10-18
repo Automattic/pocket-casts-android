@@ -88,7 +88,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Running VersionMigrationsWorker")
             val workRequest = OneTimeWorkRequestBuilder<VersionMigrationsWorker>().build()
-            WorkManager.getInstance(context).enqueueUniqueWork(VERSION_MIGRATIONS_WORKER_NAME, ExistingWorkPolicy.REPLACE, workRequest)
+            WorkManager.getInstance(context).enqueueUniqueWork(VERSION_MIGRATIONS_WORKER_NAME, ExistingWorkPolicy.KEEP, workRequest)
         }
 
         /**
