@@ -262,7 +262,6 @@ Language: es
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">La vida hay que vivirla, ¿no?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Dicen que la constancia es la clave del éxito, ¡o algo así!</string>
     <string name="end_of_year_prompt_card_summary">Consulta tus estadísticas de escuchas, los pódcast principales y más.</string>
-    <string name="end_of_year_story_epilogue_title">Gracias por escuchar con nosotros este año.\n¡Nos vemos en 2024!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Fue nada menos que «%1$s» de «%2$s».</string>
     <string name="end_of_year_story_longest_episode_title">El episodio más largo que escuchaste fue %1$s.</string>
     <string name="end_of_year_replay">Reproducir otra vez.</string>

@@ -262,7 +262,6 @@ Language: ko_KR
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
-    <string name="end_of_year_story_epilogue_title">올해 청취해 주셔서 감사합니다.\n2024년에 뵙겠습니다.</string>
     <string name="end_of_year_story_longest_episode_subtitle">다름 아닌 \"%2$s\"의 \"%1$s\"였습니다.</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>

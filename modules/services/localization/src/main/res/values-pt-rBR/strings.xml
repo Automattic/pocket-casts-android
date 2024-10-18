@@ -262,7 +262,6 @@ Language: pt_BR
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Poxa… tem sempre algo para se viver, né?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">E dizem que continuidade é a chave do sucesso… ou algo parecido.</string>
     <string name="end_of_year_prompt_card_summary">Veja suas estatísticas de streaming, principais podcasts e muito mais.</string>
-    <string name="end_of_year_story_epilogue_title">Agradecemos por nos escolher neste ano.\nNos vemos em 2024!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Não podia ser outro senão \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_story_longest_episode_title">O episódio mais longo que você ouviu foi %1$s</string>
     <string name="end_of_year_replay">Ouvir de novo</string>
