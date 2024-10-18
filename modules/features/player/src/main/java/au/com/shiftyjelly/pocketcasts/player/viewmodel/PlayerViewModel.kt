@@ -527,11 +527,6 @@ class PlayerViewModel @Inject constructor(
             onDeleteStart.invoke()
             launch {
                 episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
-                episodeAnalytics.trackEvent(
-                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-                    source = source,
-                    uuid = episode.uuid,
-                )
             }
         } else {
             onDownloadStart.invoke()

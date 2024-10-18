@@ -218,6 +218,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             openUrl(settings.getReportViolationUrl())
         }
         binding.download?.setOnClickListener {
+            trackShelfAction(ShelfItem.Download.analyticsValue)
             viewModel.handleDownloadClickFromShelf(
                 onDownloadStart = {
                     showSnackBar(text = getString(LR.string.episode_queued_for_download))
