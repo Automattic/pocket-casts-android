@@ -102,7 +102,7 @@ fun FeaturedPaywallCard(cardData: CardData) {
                     textAlign = TextAlign.Start,
                     fontWeight = FontWeight.W600,
                     color = Color.White,
-                    disableScale = true,
+                    disableAutoScale = true,
                     modifier = Modifier
                         .padding(bottom = 4.dp)
                         .align(Alignment.Start),
@@ -112,7 +112,7 @@ fun FeaturedPaywallCard(cardData: CardData) {
                     text = stringResource(cardData.descriptionResourceId),
                     textAlign = TextAlign.Start,
                     fontWeight = FontWeight.W400,
-                    disableScale = true,
+                    disableAutoScale = true,
                     color = colorResource(UR.color.coolgrey_50),
                     modifier = Modifier.align(Alignment.Start),
                 )

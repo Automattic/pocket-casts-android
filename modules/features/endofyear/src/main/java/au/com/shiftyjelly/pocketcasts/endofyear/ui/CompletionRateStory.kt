@@ -79,6 +79,7 @@ private fun CompletionRateStory(
         )
         CompletionRateInfo(
             story = story,
+            measurements = measurements,
         )
     }
 }
@@ -200,6 +201,7 @@ private fun BarsSection(
 @Composable
 private fun CompletionRateInfo(
     story: Story.CompletionRate,
+    measurements: EndOfYearMeasurements,
 ) {
     Column {
         Spacer(
@@ -226,7 +228,8 @@ private fun CompletionRateInfo(
                 LR.string.end_of_year_stories_year_completion_rate_title,
                 (story.completionRate * 100).roundToInt(),
             ),
-            disableScale = true,
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -240,7 +243,7 @@ private fun CompletionRateInfo(
                 story.completedCount,
             ),
             fontSize = 15.sp,
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )

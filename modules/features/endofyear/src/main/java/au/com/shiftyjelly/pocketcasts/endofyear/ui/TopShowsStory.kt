@@ -122,7 +122,8 @@ private fun TopShowsStory(
         Column {
             TextH10(
                 text = stringResource(LR.string.eoy_story_top_podcasts_title),
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
             ShareStoryButton(onClick = {})
@@ -145,7 +146,7 @@ private fun PodcastItem(
     ) {
         TextH20(
             text = "#${index + 1}",
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier
                 .offset { IntOffset(x = (50.dp * (1f - animationProgress)).roundToPx(), y = 0) }
@@ -185,13 +186,15 @@ private fun PodcastItem(
             TextP40(
                 text = podcast.author,
                 fontSize = 15.sp,
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 maxLines = 1,
             )
             TextH20(
                 text = podcast.title,
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 maxLines = 2,
             )
