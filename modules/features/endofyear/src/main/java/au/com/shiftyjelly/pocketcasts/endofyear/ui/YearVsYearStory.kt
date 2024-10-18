@@ -320,7 +320,7 @@ private fun TextInfo(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun YearVsYearThisYearPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 8) { measurements ->
         YearVsYearStory(
             story = Story.YearVsYear(
                 lastYearDuration = 2.hours,
@@ -336,7 +336,7 @@ private fun YearVsYearThisYearPreview() {
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun YearVsYearThisYearLargePreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 8) { measurements ->
         YearVsYearStory(
             story = Story.YearVsYear(
                 lastYearDuration = 0.hours,
@@ -352,7 +352,7 @@ private fun YearVsYearThisYearLargePreview() {
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun YearVsYearLastYearPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 8) { measurements ->
         YearVsYearStory(
             story = Story.YearVsYear(
                 lastYearDuration = 3.hours,
@@ -368,7 +368,7 @@ private fun YearVsYearLastYearPreview() {
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun YearVsYearEqualPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 8) { measurements ->
         YearVsYearStory(
             story = Story.YearVsYear(
                 lastYearDuration = 100.hours,

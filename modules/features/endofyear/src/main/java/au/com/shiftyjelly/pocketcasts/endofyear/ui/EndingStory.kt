@@ -157,7 +157,7 @@ private fun EndingInfo(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun EndingPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 10) { measurements ->
         EndingStory(
             story = Story.Ending,
             measurements = measurements,
