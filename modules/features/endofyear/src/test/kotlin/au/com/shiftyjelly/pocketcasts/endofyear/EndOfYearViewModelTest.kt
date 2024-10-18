@@ -27,6 +27,7 @@ import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -447,12 +448,63 @@ class EndOfYearViewModelTest {
         }
     }
 
+    @Test
+    fun `auto switch stories`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        viewModel.switchStory.test {
+            expectNoEvents()
+
+            viewModel.onStoryChanged(stories.getStoryOfType<Cover>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<NumberOfShows>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<TopShow>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<TopShows>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<Ratings>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<TotalTime>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<LongestEpisode>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<PlusInterstitial>())
+            expectNoEvents()
+
+            viewModel.onStoryChanged(stories.getStoryOfType<YearVsYear>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<CompletionRate>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<Ending>())
+            assertEquals(Unit, awaitItem())
+        }
+    }
+
     private suspend fun TurbineTestContext<UiState>.awaitStories(): List<Story> {
         return (awaitItem() as UiState.Synced).stories
     }
 
     private suspend inline fun <reified T : Story> TurbineTestContext<UiState>.awaitStory(): T {
-        return awaitStories().filterIsInstance<T>().single()
+        return awaitStories().getStoryOfType<T>()
+    }
+
+    private inline fun <reified T : Story> List<Story>.getStoryOfType(): T {
+        return filterIsInstance<T>().single()
     }
 
     private inline fun <reified T : Story> assertHasStory(stories: List<Story>) {
