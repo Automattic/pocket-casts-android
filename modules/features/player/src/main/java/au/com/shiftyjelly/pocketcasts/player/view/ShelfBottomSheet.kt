@@ -187,13 +187,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
 
             ShelfItem.Transcript -> {
                 if (!enabled) {
-                    parentFragment?.view?.let {
-                        val message = getString(LR.string.transcript_error_not_available)
-                        Snackbar.make(it, message, Snackbar.LENGTH_SHORT)
-                            .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
-                            .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
-                            .show()
-                    }
+                    showSnackBar(text = getString(LR.string.transcript_error_not_available))
                 } else {
                     playerViewModel.openTranscript()
                 }
@@ -240,7 +234,14 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Download -> {
-                playerViewModel.handleDownloadClickFromShelf()
+                playerViewModel.handleDownloadClickFromShelf(
+                    onDownloadStart = {
+                        showSnackBar(text = getString(LR.string.episode_queued_for_download))
+                    },
+                    onDeleteStart = {
+                        showSnackBar(text = getString(LR.string.episode_was_removed))
+                    },
+                )
             }
         }
         if (enabled) {
@@ -250,6 +251,15 @@ class ShelfBottomSheet : BaseDialogFragment() {
             )
         }
         dismiss()
+    }
+
+    private fun showSnackBar(text: CharSequence) {
+        parentFragment?.view?.let {
+            Snackbar.make(it, text, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
+                .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
+                .show()
+        }
     }
 
     companion object {

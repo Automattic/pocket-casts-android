@@ -218,7 +218,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             openUrl(settings.getReportViolationUrl())
         }
         binding.download?.setOnClickListener {
-            viewModel.handleDownloadClickFromShelf()
+            viewModel.handleDownloadClickFromShelf(
+                onDownloadStart = {
+                    showSnackBar(text = getString(LR.string.episode_queued_for_download))
+                },
+                onDeleteStart = {
+                    showSnackBar(text = getString(LR.string.episode_was_removed))
+                },
+            )
         }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
@@ -705,5 +712,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
+    }
+
+    private fun showSnackBar(text: CharSequence) {
+        parentFragment?.view?.let {
+            Snackbar.make(it, text, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
+                .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
+                .show()
+        }
     }
 }

@@ -520,25 +520,24 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun handleDownloadClickFromShelf() {
+    fun handleDownloadClickFromShelf(onDeleteStart: () -> Unit, onDownloadStart: () -> Unit) {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
+
         if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
-            deleteEpisodeFile(episode, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
+            onDeleteStart.invoke()
+            launch {
+                episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
+                episodeAnalytics.trackEvent(
+                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+                    source = source,
+                    uuid = episode.uuid,
+                )
+            }
         } else {
+            onDownloadStart.invoke()
             launch {
                 DownloadHelper.manuallyDownloadEpisodeNow(episode, "Player shelf", downloadManager, episodeManager, source = source)
             }
-        }
-    }
-
-    private fun deleteEpisodeFile(episode: BaseEpisode, removeFromUpNext: Boolean) {
-        launch {
-            episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = removeFromUpNext)
-            episodeAnalytics.trackEvent(
-                event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-                source = source,
-                uuid = episode.uuid,
-            )
         }
     }
 
