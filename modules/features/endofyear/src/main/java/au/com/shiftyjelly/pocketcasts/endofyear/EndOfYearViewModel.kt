@@ -183,7 +183,12 @@ internal sealed interface Story {
         val listenedCount: Int,
         val completedCount: Int,
         val subscriptionTier: SubscriptionTier?,
-    ) : Story
+    ) : Story {
+        val completionRate get() = when {
+            listenedCount == 0 -> 1.0
+            else -> completedCount.toDouble() / listenedCount
+        }
+    }
 
     data object Ending : Story
 }
