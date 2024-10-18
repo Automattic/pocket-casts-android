@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
-import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
+import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
@@ -244,7 +244,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
-                VersionMigrationsJob.run(
+                VersionMigrationsWorker.run(
                     podcastManager = podcastManager,
                     settings = settings,
                     syncManager = syncManager,

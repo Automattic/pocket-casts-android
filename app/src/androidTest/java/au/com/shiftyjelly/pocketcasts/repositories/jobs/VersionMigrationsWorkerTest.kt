@@ -10,7 +10,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class VersionMigrationsJobTest {
+class VersionMigrationsWorkerTest {
 
     @Test
     fun testUpgradeMultiSelectItems() {
@@ -20,7 +20,7 @@ class VersionMigrationsJobTest {
         val settings = mock<Settings>()
         whenever(settings.getMultiSelectItems()).thenReturn(resourceIds)
 
-        VersionMigrationsJob.upgradeMultiSelectItems(settings)
+        VersionMigrationsWorker.upgradeMultiSelectItems(settings)
 
         verify(settings).setMultiSelectItems(expectedItems)
     }
@@ -32,7 +32,7 @@ class VersionMigrationsJobTest {
         val settings = mock<Settings>()
         whenever(settings.getMultiSelectItems()).thenReturn(items)
 
-        VersionMigrationsJob.upgradeMultiSelectItems(settings)
+        VersionMigrationsWorker.upgradeMultiSelectItems(settings)
 
         verify(settings, never()).setMultiSelectItems(items)
     }

@@ -29,7 +29,7 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 @SuppressLint("SpecifyJobSchedulerIdRange")
-class VersionMigrationsJob : JobService() {
+class VersionMigrationsWorker : JobService() {
 
     companion object {
         fun run(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager, context: Context) {
@@ -78,7 +78,7 @@ class VersionMigrationsJob : JobService() {
             val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
             jobScheduler.cancel(JobIds.VERSION_MIGRATION_JOB_ID)
             jobScheduler.schedule(
-                JobInfo.Builder(JobIds.VERSION_MIGRATION_JOB_ID, ComponentName(context, VersionMigrationsJob::class.java))
+                JobInfo.Builder(JobIds.VERSION_MIGRATION_JOB_ID, ComponentName(context, VersionMigrationsWorker::class.java))
                     .setOverrideDeadline(500) // don't let Android wait for more than 500ms before kicking this off
                     .build(),
             )
