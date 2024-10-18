@@ -107,7 +107,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
                 }
             }
 
-            VersionMigrationsWorker.run(
+            VersionMigrationsWorker.performMigrations(
                 podcastManager = podcastManager,
                 settings = settings,
                 syncManager = syncManager,

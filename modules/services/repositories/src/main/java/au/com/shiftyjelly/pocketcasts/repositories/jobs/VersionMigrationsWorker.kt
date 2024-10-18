@@ -44,15 +44,15 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
     companion object {
         private const val VERSION_MIGRATIONS_WORKER_NAME = "version_migrations_worker"
-        fun run(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager, context: Context) {
-            runSync(podcastManager, settings, syncManager)
-            runAsync(settings, context)
+        fun performMigrations(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager, context: Context) {
+            performMigrationsSync(podcastManager, settings, syncManager)
+            enqueueAsyncMigrations(settings, context)
         }
 
         /**
-         * Run short migrations straight away.
+         * Perform short migrations straight away.
          */
-        private fun runSync(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager) {
+        private fun performMigrationsSync(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager) {
             performUpdateIfRequired(updateKey = "run_v7_20", settings = settings) {
                 // Upgrading to version 7.20.0 requires the folders from the servers to be added to the existing podcasts. In case the user doesn't have internet this is done as part of the regular sync process.
                 if (syncManager.isLoggedIn()) {
@@ -74,9 +74,9 @@ class VersionMigrationsWorker @AssistedInject constructor(
         }
 
         /**
-         * Run longer migrations in the background.
+         * Enqueue longer migrations as a background task.
          */
-        private fun runAsync(settings: Settings, context: Context) {
+        private fun enqueueAsyncMigrations(settings: Settings, context: Context) {
             val previousVersionCode = settings.getMigratedVersionCode()
             val versionCode = settings.getVersionCode()
 
@@ -129,7 +129,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsWorker - started")
-            performMigration()
+            performMigrationsAsync()
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsWorker - finished")
             Result.success()
         } catch (t: Throwable) {
@@ -139,7 +139,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
         }
     }
 
-    private fun performMigration() {
+    private fun performMigrationsAsync() {
         val previousVersionCode = settings.getMigratedVersionCode()
         val versionCode = settings.getVersionCode()
 

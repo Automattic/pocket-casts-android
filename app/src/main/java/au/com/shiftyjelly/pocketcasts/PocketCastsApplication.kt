@@ -244,7 +244,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
-                VersionMigrationsWorker.run(
+                VersionMigrationsWorker.performMigrations(
                     podcastManager = podcastManager,
                     settings = settings,
                     syncManager = syncManager,
