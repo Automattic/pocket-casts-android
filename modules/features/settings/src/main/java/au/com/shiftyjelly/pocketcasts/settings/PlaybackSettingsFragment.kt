@@ -316,6 +316,19 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_USE_REAL_TIME_FOR_PLAYBACK_REMAINING_TIME -> {
+                            UseRealTimeForPlaybackRemaingingTime(
+                                saved = settings.useRealTimeForPlaybackRemaingTime.flow.collectAsState().value,
+                                onSave = {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.SETTINGS_GENERAL_USE_REAL_TIME_FOR_PLAYBACK_REMAINING_TIME,
+                                        mapOf("enabled" to it),
+                                    )
+                                    settings.useRealTimeForPlaybackRemaingTime.set(it, updateModifiedAt = true)
+                                },
+                            )
+                        }
+
                         SettingsItems.SETTINGS_GENERAL_SLEEP_TIMER -> {
                             SettingSection(heading = stringResource(LR.string.settings_general_sleep_timer)) {
                                 AutoSleepTimerRestart(
@@ -609,13 +622,23 @@ class PlaybackSettingsFragment : BaseFragment() {
     private fun AutoPlayNextOnEmpty(
         saved: Boolean,
         onSave: (Boolean) -> Unit,
-    ) =
-        SettingRow(
-            primaryText = stringResource(LR.string.settings_autoplay),
-            secondaryText = stringResource(LR.string.settings_continuous_playback_summary),
-            toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
-        )
+    ) = SettingRow(
+        primaryText = stringResource(LR.string.settings_autoplay),
+        secondaryText = stringResource(LR.string.settings_continuous_playback_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+    )
+
+    @Composable
+    private fun UseRealTimeForPlaybackRemaingingTime(
+        saved: Boolean,
+        onSave: (Boolean) -> Unit,
+    ) = SettingRow(
+        primaryText = stringResource(LR.string.settings_real_time_playback),
+        secondaryText = stringResource(LR.string.settings_real_time_playback_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+    )
 
     private fun showSetAllGroupingDialog(grouping: PodcastGrouping) {
         ConfirmationDialog()
@@ -665,6 +688,7 @@ private enum class SettingsItems {
     SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY,
     SETTINGS_GENERAL_INTELLIGENT_PLAYBACK,
     SETTINGS_GENERAL_PLAY_UP_NEXT,
+    SETTINGS_USE_REAL_TIME_FOR_PLAYBACK_REMAINING_TIME,
     SETTINGS_GENERAL_SLEEP_TIMER,
 
     // The [scrollToAutoPlay] fragment argument handling depends on this item being last

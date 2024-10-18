@@ -55,4 +55,23 @@ class ChapterTest {
         assertEquals("30s", chapter.remainingTime(75.seconds, playbackSpeed = 1.5))
         assertEquals("23s", chapter.remainingTime(75.seconds, playbackSpeed = 2.0))
     }
+
+    @Test
+    fun `ignore remainging time using playback speed`() {
+        val chapter = Chapter(
+            title = "",
+            startTime = 0.seconds,
+            endTime = 120.seconds,
+        )
+
+        assertEquals("2m", chapter.remainingTime(0.seconds, playbackSpeed = 0.5, adjustRemainingTimeDuration = false))
+        assertEquals("2m", chapter.remainingTime(0.seconds, playbackSpeed = 1.0, adjustRemainingTimeDuration = false))
+        assertEquals("2m", chapter.remainingTime(0.seconds, playbackSpeed = 1.5, adjustRemainingTimeDuration = false))
+        assertEquals("2m", chapter.remainingTime(0.seconds, playbackSpeed = 2.0, adjustRemainingTimeDuration = false))
+
+        assertEquals("45s", chapter.remainingTime(75.seconds, playbackSpeed = 0.5, adjustRemainingTimeDuration = false))
+        assertEquals("45s", chapter.remainingTime(75.seconds, playbackSpeed = 1.0, adjustRemainingTimeDuration = false))
+        assertEquals("45s", chapter.remainingTime(75.seconds, playbackSpeed = 1.5, adjustRemainingTimeDuration = false))
+        assertEquals("45s", chapter.remainingTime(75.seconds, playbackSpeed = 2.0, adjustRemainingTimeDuration = false))
+    }
 }
