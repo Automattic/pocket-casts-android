@@ -151,7 +151,7 @@ private fun EndingInfo(
     }
 }
 
-@Preview(device = Devices.PortraitSmall)
+@Preview(device = Devices.PortraitRegular)
 @Composable
 private fun EndingPreview() {
     PreviewBox { measurements ->
