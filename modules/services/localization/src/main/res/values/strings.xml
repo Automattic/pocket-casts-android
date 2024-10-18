@@ -1740,8 +1740,8 @@
     <string name="end_of_year_story_longest_episode_subtitle">It was \"%1$s\" from \"%2$s\"</string>
     <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$s is the URL to the episode. -->
     <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in 2023 %1$s</string>
-    <!-- Title for the epilogue story -->
-    <string name="end_of_year_story_epilogue_title">Thank you for listening with us this year.\nSee you in 2024!</string>
+    <!-- Title for the epilogue story. %1$d is the yer. -->
+    <string name="end_of_year_story_epilogue_title">Thank you for listening with us this year.\nSee you in %1$d!</string>
     <!-- Subtitle for the epilogue story -->
     <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
