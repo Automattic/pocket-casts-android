@@ -1,6 +1,8 @@
 7.76
 -----
-
+*   Updates
+    *   Add a setting that control whether the remaining playback time adjusts for playback speed and skipped chapters 
+        ([#3044](https://github.com/Automattic/pocket-casts-android/pull/3044))
 
 7.75
 -----

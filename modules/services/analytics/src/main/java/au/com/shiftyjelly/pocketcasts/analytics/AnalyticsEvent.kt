@@ -509,6 +509,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
     SETTINGS_GENERAL_AUTOPLAY_TOGGLED("settings_general_autoplay_toggled"),
+    SETTINGS_GENERAL_USE_REAL_TIME_FOR_PLAYBACK_REMAINING_TIME("settings_use_real_time_for_playback_remaining_time"),
 
     /* Settings - Headphone controls */
     SETTINGS_HEADPHONE_CONTROLS_SHOWN("settings_headphone_controls_shown"),
