@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -143,7 +142,7 @@ private fun Stories(
             is Story.Ratings -> RatingsStory(story, measurements)
             is Story.TotalTime -> TotalTimeStory(story, measurements)
             is Story.LongestEpisode -> LongestEpisodeStory(story, measurements)
-            is Story.PlusInterstitial -> StoryPlaceholder(story)
+            is Story.PlusInterstitial -> PlusInterstitialStory(story, measurements)
             is Story.YearVsYear -> YearVsYearStory(story, measurements)
             is Story.CompletionRate -> CompletionRateStory(story, measurements)
             is Story.Ending -> EndingStory(story, measurements)
@@ -196,18 +195,6 @@ private fun ErrorMessage() {
             .padding(16.dp),
     ) {
         TextH10(text = "Whoops!")
-    }
-}
-
-@Composable
-private fun StoryPlaceholder(story: Story) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(story.backgroundColor),
-    ) {
-        TextP50("$story", color = Color.Black)
     }
 }
 

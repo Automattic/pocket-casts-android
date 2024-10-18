@@ -252,7 +252,6 @@ Language: it
     <string name="settings_use_dark_up_next_details">Se attivato, il Successivo utilizzerà sempre il tema scuro, oppure sarà applicato il tema corrente se disattivato</string>
     <string name="settings_use_dark_up_next">Usa il tema scuro per Successivo</string>
     <string name="end_of_year_stories_completion_rate_share_text">Il mio tasso di completamento del 2023</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Abbonati a Plus per mettere a confronto la tua esperienza di ascolto rispetto al 2022, scoprire altre statistiche divertenti e funzionalità del piano Premium come i segnalibri e le cartelle.</string>
     <string name="end_of_year_stories_theres_more">E c\'è di più.</string>
     <string name="end_of_year_stories_year_completion_rate">tasso di completamento</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Dei %1$d episodi iniziati, ne hai ascoltati integralmente un totale pari a: %2$d</string>
