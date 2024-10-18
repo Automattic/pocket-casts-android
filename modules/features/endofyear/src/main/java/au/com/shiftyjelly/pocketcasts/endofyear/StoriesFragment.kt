@@ -8,9 +8,12 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
@@ -22,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.flow.collect
 import android.R as AndroidR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -56,6 +60,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         }
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,10 +71,35 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 viewModel.syncData()
             }
             val state by viewModel.uiState.collectAsState()
+            val pagerState = rememberPagerState(pageCount = { (state as? UiState.Synced)?.stories?.size ?: 0 })
+
             StoriesPage(
                 state = state,
+                pagerState = pagerState,
                 onClose = ::dismiss,
             )
+
+            LaunchedEffect(state::class) {
+                if (state is UiState.Synced) {
+                    snapshotFlow { pagerState.currentPage }.collect { index ->
+                        val stories = (state as? UiState.Synced)?.stories
+                        if (stories != null) {
+                            viewModel.onStoryChanged(stories[index])
+                        }
+                    }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                viewModel.switchStory.collect {
+                    val stories = (state as? UiState.Synced)?.stories.orEmpty()
+                    if (stories.getOrNull(pagerState.currentPage) is Story.Ending) {
+                        dismiss()
+                    } else if (!pagerState.isScrollInProgress) {
+                        pagerState.scrollToPage(pagerState.currentPage + 1)
+                    }
+                }
+            }
         }
     }
 

@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -173,8 +175,10 @@ internal class HumaneTextFactory(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PreviewBox(
+    currentPage: Int,
     content: @Composable (EndOfYearMeasurements) -> Unit,
 ) {
     BoxWithConstraints {
@@ -187,6 +191,10 @@ internal fun PreviewBox(
                 closeButtonBottomEdge = 44.dp,
             ),
         )
-        CloseButton(onClose = {})
+        TopControls(
+            pagerState = rememberPagerState(initialPage = currentPage, pageCount = { 11 }),
+            progress = 0f,
+            onClose = {},
+        )
     }
 }

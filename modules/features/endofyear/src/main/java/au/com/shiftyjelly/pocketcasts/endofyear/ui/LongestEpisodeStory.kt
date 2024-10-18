@@ -251,7 +251,7 @@ private fun TextInfo(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun LongestEpisodePreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 6) { measurements ->
         LongestEpisodeStory(
             story = Story.LongestEpisode(
                 episode = LongestEpisode(

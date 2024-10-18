@@ -256,7 +256,7 @@ private fun CompletionRateInfo(
 private fun CompletionRatePreview(
     @PreviewParameter(CompletedCountProvider::class) count: Int,
 ) {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 9) { measurements ->
         CompletionRateStory(
             story = Story.CompletionRate(
                 listenedCount = 100,
