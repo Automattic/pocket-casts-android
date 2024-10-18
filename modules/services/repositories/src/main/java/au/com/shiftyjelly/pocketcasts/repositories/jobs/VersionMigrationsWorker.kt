@@ -139,7 +139,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
         }
     }
 
-    private fun performMigrationsAsync() {
+    private suspend fun performMigrationsAsync() {
         val previousVersionCode = settings.getMigratedVersionCode()
         val versionCode = settings.getVersionCode()
 
@@ -195,9 +195,9 @@ class VersionMigrationsWorker @AssistedInject constructor(
         }
     }
 
-    private fun removeCustomEpisodes() {
+    private suspend fun removeCustomEpisodes() {
         val customPodcastUuid = "customFolderPodcast"
-        val podcast: Podcast = podcastManager.findPodcastByUuid(customPodcastUuid) ?: return
+        val podcast: Podcast = podcastManager.findPodcastByUuidSuspend(customPodcastUuid) ?: return
         val episodes: List<PodcastEpisode> = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
         episodes.forEach { episode ->
             playbackManager.removeEpisode(
@@ -245,7 +245,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
         }
     }
 
-    private fun upgradeTrimSilenceMode() {
+    private suspend fun upgradeTrimSilenceMode() {
         try {
             val podcasts = podcastManager.findSubscribed()
             podcasts.forEach { podcast ->
