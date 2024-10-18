@@ -219,7 +219,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
         binding.download?.setOnClickListener {
             trackShelfAction(ShelfItem.Download.analyticsValue)
-            viewModel.handleDownloadClickFromShelf(
+            viewModel.handleDownloadClickFromPlaybackActions(
                 onDownloadStart = {
                     showSnackBar(text = getString(LR.string.episode_queued_for_download))
                 },

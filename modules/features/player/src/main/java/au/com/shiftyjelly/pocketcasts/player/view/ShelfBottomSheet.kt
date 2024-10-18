@@ -234,7 +234,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
             }
 
             ShelfItem.Download -> {
-                playerViewModel.handleDownloadClickFromShelf(
+                playerViewModel.handleDownloadClickFromPlaybackActions(
                     onDownloadStart = {
                         showSnackBar(text = getString(LR.string.episode_queued_for_download))
                     },

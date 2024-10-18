@@ -520,7 +520,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun handleDownloadClickFromShelf(onDeleteStart: () -> Unit, onDownloadStart: () -> Unit) {
+    fun handleDownloadClickFromPlaybackActions(onDeleteStart: () -> Unit, onDownloadStart: () -> Unit) {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
 
         if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
