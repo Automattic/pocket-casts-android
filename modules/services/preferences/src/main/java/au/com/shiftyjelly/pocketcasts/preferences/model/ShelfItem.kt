@@ -57,6 +57,7 @@ enum class ShelfItem(
                 else -> IR.drawable.ic_download
             }
         },
+        subtitleId = { episode -> LR.string.player_actions_hidden_for_custom.takeIf { episode is UserEpisode } },
         showIf = { it is PodcastEpisode },
         analyticsValue = "download",
     ),
