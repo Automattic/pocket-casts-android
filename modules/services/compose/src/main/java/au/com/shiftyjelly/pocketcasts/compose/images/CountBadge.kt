@@ -56,20 +56,20 @@ fun CountBadge(
                 color = textColor,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.W700,
-                disableScale = true,
+                disableAutoScale = true,
                 modifier = Modifier.padding(horizontal = 8.dp),
             )
 
             is CountBadgeStyle.Big -> TextH50(
                 text = text,
                 color = textColor,
-                disableScale = true,
+                disableAutoScale = true,
             )
 
             is CountBadgeStyle.Custom -> TextH70(
                 text = text,
                 color = textColor,
-                disableScale = true,
+                disableAutoScale = true,
             )
         }
     }

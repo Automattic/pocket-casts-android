@@ -114,7 +114,8 @@ private fun PresentRatings(
             )
             TextH10(
                 text = stringResource(LR.string.eoy_story_ratings_title_1),
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -127,7 +128,7 @@ private fun PresentRatings(
                     Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_subtitle_1, rating.numericalValue)
                 },
                 fontSize = 15.sp,
-                disableScale = true,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -251,7 +252,7 @@ private fun RowScope.RatingBar(
     ) {
         TextH20(
             text = "$rating",
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier
                 .offset { textOffset }
@@ -287,6 +288,7 @@ private fun AbsentRatings(
         )
         NoRatingsInfo(
             story = story,
+            measurements = measurements,
         )
     }
 }
@@ -349,6 +351,7 @@ private fun OopsiesText(
 @Composable
 private fun NoRatingsInfo(
     story: Story.Ratings,
+    measurements: EndOfYearMeasurements,
 ) {
     Column(
         modifier = Modifier.background(
@@ -363,7 +366,8 @@ private fun NoRatingsInfo(
         )
         TextH10(
             text = stringResource(LR.string.eoy_story_ratings_title_2),
-            disableScale = true,
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -373,7 +377,7 @@ private fun NoRatingsInfo(
         TextP40(
             text = stringResource(LR.string.eoy_story_ratings_subtitle_3),
             fontSize = 15.sp,
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )

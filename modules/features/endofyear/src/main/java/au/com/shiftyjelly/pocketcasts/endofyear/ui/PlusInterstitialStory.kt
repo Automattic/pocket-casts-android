@@ -53,6 +53,7 @@ internal fun PlusInterstitialStory(
         )
         PlusInfo(
             story = story,
+            measurements = measurements,
         )
     }
 }
@@ -119,6 +120,7 @@ private fun WaitText(
 @Composable
 private fun PlusInfo(
     story: Story.PlusInterstitial,
+    measurements: EndOfYearMeasurements,
 ) {
     Column(
         modifier = Modifier.background(
@@ -138,7 +140,8 @@ private fun PlusInfo(
         )
         TextH10(
             text = stringResource(LR.string.end_of_year_stories_theres_more),
-            disableScale = true,
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -148,7 +151,7 @@ private fun PlusInfo(
         TextP40(
             text = stringResource(LR.string.end_of_year_stories_subscribe_to_plus),
             fontSize = 15.sp,
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
