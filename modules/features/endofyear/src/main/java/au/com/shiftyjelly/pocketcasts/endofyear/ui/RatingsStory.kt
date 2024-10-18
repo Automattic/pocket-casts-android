@@ -20,9 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,7 +38,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -61,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import kotlin.math.roundToLong
 import kotlinx.coroutines.delay
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -311,18 +309,7 @@ private fun AbsentRatings(
 private fun OopsiesSection(
     measurements: EndOfYearMeasurements,
 ) {
-    // Measure text to postion things better
-    val textMeasurer = rememberTextMeasurer()
-    val fontSize = 227.nonScaledSp
-    val textMeasurement = remember {
-        textMeasurer.measure(
-            text = "OOOOPSIES",
-            style = TextStyle(
-                fontFamily = humaneFontFamily,
-                fontSize = fontSize,
-            ),
-        )
-    }
+    val textFactory = rememberHumaneTextFactory(227.nonScaledSp)
 
     Column(
         modifier = Modifier
@@ -331,11 +318,11 @@ private fun OopsiesSection(
     ) {
         OopsiesText(
             scrollDirection = ScrollDirection.Left,
-            textMeasurement = textMeasurement,
+            textFactory = textFactory,
         )
         OopsiesText(
             scrollDirection = ScrollDirection.Right,
-            textMeasurement = textMeasurement,
+            textFactory = textFactory,
         )
     }
 }
@@ -343,9 +330,8 @@ private fun OopsiesSection(
 @Composable
 private fun OopsiesText(
     scrollDirection: ScrollDirection,
-    textMeasurement: TextLayoutResult,
+    textFactory: HumaneTextFactory,
 ) {
-    val textHeight = LocalDensity.current.run { textMeasurement.firstBaseline.toDp() } + 12.dp
     ScrollingRow(
         scrollDelay = { (20 / it.density).roundToLong().coerceAtLeast(4L) },
         items = listOf("OOOOPSIES"),
@@ -354,15 +340,12 @@ private fun OopsiesText(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = "OOOOPSIES",
-                fontFamily = humaneFontFamily,
-                fontSize = 227.nonScaledSp,
-                maxLines = 1,
-                modifier = Modifier.requiredHeight(textHeight),
+            textFactory.HumaneText("OOOOPSIES")
+            Spacer(
+                modifier = Modifier.height(12.dp),
             )
             Image(
-                painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.eoy_star_text_stop),
+                painter = painterResource(IR.drawable.eoy_star_text_stop),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(colorResource(UR.color.coolgrey_90)),
                 modifier = Modifier.padding(horizontal = 8.dp),
