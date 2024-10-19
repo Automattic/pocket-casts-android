@@ -129,7 +129,8 @@ private fun BarsSection(
                 if (bars.isNotEmpty()) {
                     bars.removeLast()
                 }
-                val barsHeight = bars.sumOf { it.height }
+                val spaceHeightPx = LocalDensity.run { SpaceHeight.roundToPx() }
+                val barsHeightPx = (bars.sumOf { it.height } - spaceHeightPx).coerceAtLeast(0)
 
                 val completionBar = subcompose("completion-bar") {
                     val textFactory = rememberHumaneTextFactory(
@@ -137,9 +138,8 @@ private fun BarsSection(
                     )
                     val completedPercent = (story.completionRate * 100).roundToInt()
                     val completionHeight = LocalDensity.current.run {
-                        val totalHeight = (barsHeight * story.completionRate).roundToInt()
-                        totalHeight.toDp()
-                    } - if (completedPercent == 100) SpaceHeight else 0.dp // Acount for the top empty space
+                        (barsHeightPx * story.completionRate).roundToInt().toDp()
+                    }
 
                     val text = "$completedPercent%"
                     Box(
