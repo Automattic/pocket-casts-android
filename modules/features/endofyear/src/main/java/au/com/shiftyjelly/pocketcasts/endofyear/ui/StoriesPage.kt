@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -168,6 +169,7 @@ internal fun BoxScope.TopControls(
         horizontalAlignment = Alignment.End,
         modifier = Modifier
             .align(Alignment.TopCenter)
+            .fillMaxWidth()
             .padding(top = 8.dp, start = 16.dp, end = 16.dp),
     ) {
         PagerProgressingIndicator(
