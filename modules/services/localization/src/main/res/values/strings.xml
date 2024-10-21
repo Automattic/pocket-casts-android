@@ -1370,6 +1370,8 @@
     <string name="settings_sleep_timer_auto_restart_summary">If on, the sleep timer will restart automatically if you play an episode within 5 minutes after the last pause.</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
+    <string name="settings_real_time_playback">Adjust remaining time</string>
+    <string name="settings_real_time_playback_summary">If on, the player will show the remaining time, adjusted for playback speed and skipped chapters.</string>
     <string name="settings_autoplay">Autoplay</string>
     <string name="settings_continuous_playback_summary">If your Up Next queue is empty, we\'ll play episodes from the same podcast or list you\'re currently listening to.</string>
     <string name="settings_use_android_light_dark_mode">Use Android Light/Dark Mode</string>
@@ -1832,7 +1834,7 @@
     <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favorite podcasts or import them from another podcast player. You can always do this later.</string>
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_recommendations_more">More %s</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Unlock exclusive features with Pocket&#160;Casts&#160;Plus</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
     <string name="onboarding_upgrade_no_subscriptions_found">No subscriptions found.</string>
     <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
