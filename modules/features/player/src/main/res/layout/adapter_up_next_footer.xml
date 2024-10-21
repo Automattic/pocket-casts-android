@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="?attr/actionBarItemBackground"
-            android:contentDescription="@string/up_next_shuffle_button"
+            android:contentDescription="@string/up_next_shuffle_button_content_description"
             android:gravity="center_vertical"
             android:scaleType="center"
             android:visibility="gone"

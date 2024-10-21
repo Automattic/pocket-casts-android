@@ -6,7 +6,9 @@ import android.content.res.ColorStateList
 import android.graphics.ColorFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
@@ -46,6 +48,7 @@ import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.value.LottieValueCallback
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class UpNextAdapter(
@@ -100,7 +103,7 @@ class UpNextAdapter(
         val item = getItem(position)
         when (item) {
             is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
-            is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
+            is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item, holder.itemView.context)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
         }
     }
@@ -157,7 +160,7 @@ class UpNextAdapter(
 
     inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(header: PlayerViewModel.UpNextSummary) {
+        fun bind(header: PlayerViewModel.UpNextSummary, context: Context) {
             with(binding) {
                 emptyUpNextContainer.isVisible = header.episodeCount == 0
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
@@ -169,9 +172,30 @@ class UpNextAdapter(
                 }
 
                 shuffle.isVisible = FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
+                shuffle.setShuffleDisabledButton(context)
+
+                shuffle.setOnClickListener {
+                    shuffle.setShuffleEnabledButton(context)
+                }
 
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
+        }
+
+        private fun ImageButton.setShuffleDisabledButton(
+            context: Context,
+        ) {
+            this.setImageDrawable(ContextCompat.getDrawable(context, IR.drawable.shuffle))
+            this.contentDescription = context.getString(LR.string.up_next_shuffle_button_content_description)
+            this.setImageTintList(ColorStateList.valueOf(ThemeColor.primaryIcon02(theme)))
+        }
+
+        private fun ImageButton.setShuffleEnabledButton(
+            context: Context,
+        ) {
+            this.setImageDrawable(ContextCompat.getDrawable(context, IR.drawable.shuffle_enabled))
+            this.contentDescription = context.getString(LR.string.up_next_shuffle_disable_button_content_description)
+            this.setImageTintList(ColorStateList.valueOf(ThemeColor.primaryIcon01(theme)))
         }
     }
 

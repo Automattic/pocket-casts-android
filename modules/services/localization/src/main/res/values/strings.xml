@@ -1989,7 +1989,8 @@
     <string name="clear_before_adding">Clear Before Adding</string>
     <string name="dont_clear">Don\'t Clear</string>
     <string name="clear_up_next">Clear Up Next</string>
-    <string name="up_next_shuffle_button">Up next shuffle button</string>
+    <string name="up_next_shuffle_button_content_description">Up next shuffle button</string>
+    <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable button</string>
     <string name="clear_all">Clear All</string>
     <string name="clear_search">Clear Search</string>
     <string name="add_mode">Add Mode</string>
