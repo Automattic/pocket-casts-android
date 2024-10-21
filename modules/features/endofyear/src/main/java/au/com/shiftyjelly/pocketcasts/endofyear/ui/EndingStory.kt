@@ -51,6 +51,7 @@ internal fun EndingStory(
         )
         EndingInfo(
             story = story,
+            measurements = measurements,
         )
     }
 }
@@ -116,6 +117,7 @@ private fun ByeByeText(
 @Composable
 private fun EndingInfo(
     story: Story.Ending,
+    measurements: EndOfYearMeasurements,
 ) {
     Column(
         modifier = Modifier.background(
@@ -130,7 +132,8 @@ private fun EndingInfo(
         )
         TextH10(
             text = stringResource(LR.string.end_of_year_story_epilogue_title, 2025),
-            disableScale = true,
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -140,7 +143,7 @@ private fun EndingInfo(
         TextP40(
             text = stringResource(LR.string.end_of_year_story_epilogue_subtitle),
             fontSize = 15.sp,
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )

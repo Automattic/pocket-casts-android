@@ -91,7 +91,8 @@ internal fun NumberOfShowsStory(
                     story.showCount,
                     story.epsiodeCount,
                 ),
-                disableScale = true,
+                disableAutoScale = true,
+                fontScale = measurements.smallDeviceFactor,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -101,7 +102,7 @@ internal fun NumberOfShowsStory(
             TextP40(
                 text = stringResource(R.string.end_of_year_story_listened_to_numbers_subtitle),
                 fontSize = 15.sp,
-                disableScale = true,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )

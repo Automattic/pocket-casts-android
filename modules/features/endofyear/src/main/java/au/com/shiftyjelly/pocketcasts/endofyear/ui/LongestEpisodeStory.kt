@@ -76,6 +76,7 @@ private fun LongestEpisodeStory(
         )
         TextInfo(
             story = story,
+            measurements = measurements,
         )
     }
 }
@@ -206,6 +207,7 @@ private fun PodcastCover(
 @Composable
 private fun TextInfo(
     story: Story.LongestEpisode,
+    measurements: EndOfYearMeasurements,
 ) {
     Column(
         modifier = Modifier.background(
@@ -223,7 +225,8 @@ private fun TextInfo(
                 LR.string.end_of_year_story_longest_episode_title,
                 StatsHelper.secondsToFriendlyString(story.episode.duration.inWholeSeconds, LocalContext.current.resources),
             ),
-            disableScale = true,
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -237,7 +240,7 @@ private fun TextInfo(
                 story.episode.podcastTitle,
             ),
             fontSize = 15.sp,
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
