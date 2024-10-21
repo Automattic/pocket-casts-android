@@ -26,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -79,7 +82,8 @@ fun SegmentedTabBar(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .defaultMinSize(minWidth = 1.dp, minHeight = 1.dp),
+                            .defaultMinSize(minWidth = 1.dp, minHeight = 1.dp)
+                            .semantics { role = Role.Tab },
                     ) {
                         Text(
                             text = item,
