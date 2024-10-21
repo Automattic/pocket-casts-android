@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.profile.BuildConfig.GRAVATAR_APP_ID
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -46,10 +47,18 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
+import com.gravatar.quickeditor.GravatarQuickEditor
+import com.gravatar.quickeditor.ui.editor.AuthenticationMethod
+import com.gravatar.quickeditor.ui.editor.AvatarPickerContentLayout
+import com.gravatar.quickeditor.ui.editor.GravatarQuickEditorParams
+import com.gravatar.quickeditor.ui.oauth.OAuthParams
+import com.gravatar.types.Email
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -122,8 +131,34 @@ class AccountDetailsFragment : BaseFragment(), OnUserViewClickListener {
             if (signInState is SignInState.SignedIn) {
                 binding.btnChangeAvatar?.setOnClickListener {
                     analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
-                    Gravatar.refreshGravatarTimestamp()
-                    context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email))))
+                    if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
+                        GravatarQuickEditor.show(
+                            activity = requireActivity(),
+                            gravatarQuickEditorParams = GravatarQuickEditorParams {
+                                email = Email(signInState.email)
+                                avatarPickerContentLayout = AvatarPickerContentLayout.Horizontal
+                            },
+                            authenticationMethod = AuthenticationMethod.OAuth(
+                                OAuthParams {
+                                    clientId = GRAVATAR_APP_ID
+                                    redirectUri = Gravatar.GRAVATAR_QE_REDIRECT_URL
+                                },
+                            ),
+                            onAvatarSelected = {
+                                Gravatar.refreshGravatarTimestamp()
+                                binding.userView.signedInState = signInState
+                            },
+                            onDismiss = {},
+                        )
+                    } else {
+                        Gravatar.refreshGravatarTimestamp()
+                        context?.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(Gravatar.getGravatarChangeAvatarUrl(signInState.email)),
+                            ),
+                        )
+                    }
                 }
             }
 

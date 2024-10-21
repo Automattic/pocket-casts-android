@@ -106,6 +106,7 @@ fun ClickableTextHelper(
         }
     }
 
+    @Suppress("DEPRECATION")
     ClickableText(
         text = annotatedString,
         style = TextStyle(

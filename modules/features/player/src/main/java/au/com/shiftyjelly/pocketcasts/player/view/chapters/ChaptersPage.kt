@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChaptersPage(
     lazyListState: LazyListState,
@@ -55,7 +53,7 @@ fun ChaptersPage(
                 onSelectionChange = onSelectionChange,
                 onClick = { onChapterClick(state.chapter) },
                 onUrlClick = { onUrlClick(state.chapter) },
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
             )
             if (index < chapters.lastIndex) {
                 Divider(

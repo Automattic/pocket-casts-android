@@ -55,6 +55,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.config)
     implementation(libs.fragment.ktx)
+    implementation(libs.gravatar)
+    implementation(libs.gravatar.qe)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.media3.datasource)
     implementation(libs.media3.extractor)
