@@ -154,16 +154,11 @@ class UpNextAdapter(
     }
 
     inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.btnClear.setOnClickListener { listener.onClearUpNext() }
-        }
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
-                btnClear.isEnabled = header.episodeCount > 0
                 emptyUpNextContainer.isVisible = header.episodeCount == 0
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
-                btnClear.isVisible = playbackManager.getCurrentEpisode() != null
                 lblUpNextTime.isVisible = playbackManager.getCurrentEpisode() != null
                 lblUpNextTime.text = if (header.episodeCount == 0) {
                     root.resources.getString(LR.string.player_up_next_time_left, time)
