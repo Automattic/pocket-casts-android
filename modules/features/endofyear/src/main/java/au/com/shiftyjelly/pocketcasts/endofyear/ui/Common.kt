@@ -124,7 +124,7 @@ internal fun rememberHumaneTextFactory(
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
     // Humane font has a lot of empty space below first baseline
-    // that is used for lowercase charaters.
+    // that is used for lowercase characters.
     // However, our designs use capital letters only and do not account for that empty space
     // and we have to adjust texts' heights accordingly.
     return remember {

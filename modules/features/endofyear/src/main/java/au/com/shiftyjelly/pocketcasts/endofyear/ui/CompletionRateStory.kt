@@ -98,7 +98,7 @@ private fun BarsSection(
             .padding(horizontal = 24.dp),
     ) {
         // Subcomposition is needed because we need accurate measurements.
-        // Otherwhise completion rate of 100% won't match the bars' height exacty.
+        // Otherwise completion rate of 100% won't match the bars' height exactly.
         AnimatedVisibility(
             visible = showBars,
             enter = fadeIn(
@@ -169,9 +169,9 @@ private fun BarsSection(
                                 text = text,
                                 color = Color.Black,
                                 paddingValues = if (completedPercent == 0) {
-                                    PaddingValues(end = 16.dp)
+                                    PaddingValues()
                                 } else {
-                                    PaddingValues(bottom = 16.dp, end = 16.dp)
+                                    PaddingValues(bottom = 16.dp)
                                 },
                                 modifier = Modifier.offset(y = -completionHeight),
                             )
