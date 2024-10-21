@@ -7,44 +7,17 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <TextView
+        android:id="@+id/lblUpNextTime"
+        style="@style/P60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="16dp">
-
-        <androidx.constraintlayout.helper.widget.Flow
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="lblUpNextTime,btnClear"
-            app:flow_wrapMode="chain"
-            app:flow_horizontalStyle="spread_inside"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/lblUpNextTime"
-            style="@style/P60"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textColor="?attr/primary_text_02"
-            tools:text="2 episodes - 23 min." />
-
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClear"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/player_up_next_clear_queue"
-            android:textColor="@color/player_button_text_color" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:textColor="?attr/primary_text_02"
+        tools:text="2 episodes - 23 min." />
 
     <LinearLayout
         android:id="@+id/emptyUpNextContainer"

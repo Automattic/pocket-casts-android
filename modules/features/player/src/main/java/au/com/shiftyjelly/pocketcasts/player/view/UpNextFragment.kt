@@ -286,6 +286,10 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                     multiSelectHelper.isMultiSelecting = true
                     true
                 }
+                R.id.clear_up_next -> {
+                    onClearUpNext()
+                    true
+                }
                 else -> false
             }
         }
