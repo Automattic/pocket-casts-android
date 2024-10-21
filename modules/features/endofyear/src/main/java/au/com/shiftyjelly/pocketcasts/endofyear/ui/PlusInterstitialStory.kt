@@ -93,7 +93,7 @@ private fun WaitText(
 ) {
     ScrollingRow(
         scrollDelay = { (20 / it.density).roundToLong().coerceAtLeast(4L) },
-        items = listOf("THANKS", "MERCI", "GRACIAS", "OBRIGADO", "GRATKI"),
+        items = listOf("WAIT", "ATTENDEZ", "ESPERA", "ASPETTARE", "AGARDA"),
         scrollDirection = scrollDirection,
     ) { text ->
         Row(
