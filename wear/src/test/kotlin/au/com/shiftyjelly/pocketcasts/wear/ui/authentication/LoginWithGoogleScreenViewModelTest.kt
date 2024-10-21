@@ -1,3 +1,6 @@
+// ignore this until we upgrade to Credential Manager for authentication
+@file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import app.cash.turbine.test

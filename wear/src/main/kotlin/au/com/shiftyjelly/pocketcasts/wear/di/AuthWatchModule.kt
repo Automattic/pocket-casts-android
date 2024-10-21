@@ -1,3 +1,6 @@
+// ignore this until we upgrade to Credential Manager for authentication
+@file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
