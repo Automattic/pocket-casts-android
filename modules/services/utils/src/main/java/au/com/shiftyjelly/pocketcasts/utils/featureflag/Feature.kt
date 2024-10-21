@@ -125,10 +125,10 @@ enum class Feature(
     ),
     AUTO_DOWNLOAD(
         key = "auto_download",
-        title = "Auto download episodes",
+        title = "Auto download episodes after subscribing to a podcast",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     ;

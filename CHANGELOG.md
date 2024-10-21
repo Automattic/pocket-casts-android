@@ -1,6 +1,8 @@
 7.76
 -----
-
+*   New Features
+    *   Add the ability to auto download episodes after subscribing to a podcast
+        ([#3048](https://github.com/Automattic/pocket-casts-android/pull/3048))
 
 7.75
 -----
