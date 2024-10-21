@@ -233,7 +233,7 @@ internal sealed interface UiState {
 @Immutable
 internal sealed interface Story {
     val previewDuration: Duration? get() = 7.seconds
-    val isFree = true
+    val isFree: Boolean get() = true
 
     data object Cover : Story
 
