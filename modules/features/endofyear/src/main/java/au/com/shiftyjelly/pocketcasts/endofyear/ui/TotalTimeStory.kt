@@ -128,7 +128,7 @@ private data class ListeningTimeTexts(
 private fun TotalTimePreview(
     @PreviewParameter(PlaybackTimeProvider::class) duration: Duration,
 ) {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 5) { measurements ->
         TotalTimeStory(
             story = Story.TotalTime(
                 duration = duration,

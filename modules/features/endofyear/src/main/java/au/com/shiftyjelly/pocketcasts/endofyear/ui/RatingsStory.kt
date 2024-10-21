@@ -391,7 +391,7 @@ private fun NoRatingsInfo(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun RatingsHighPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 4) { measurements ->
         RatingsStory(
             story = Story.Ratings(
                 stats = RatingStats(
@@ -411,7 +411,7 @@ private fun RatingsHighPreview() {
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun RatingsLowPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 4) { measurements ->
         RatingsStory(
             story = Story.Ratings(
                 stats = RatingStats(
@@ -431,7 +431,7 @@ private fun RatingsLowPreview() {
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun RatingsNonePreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 4) { measurements ->
         RatingsStory(
             story = Story.Ratings(
                 stats = RatingStats(

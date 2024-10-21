@@ -140,7 +140,7 @@ private fun PodcastCoverCarousel(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun NumberOfShowsPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 1) { measurements ->
         NumberOfShowsStory(
             story = Story.NumberOfShows(
                 showCount = 20,
