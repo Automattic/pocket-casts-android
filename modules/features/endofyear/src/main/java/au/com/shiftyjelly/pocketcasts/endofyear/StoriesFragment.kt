@@ -29,12 +29,14 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import android.R as AndroidR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -86,6 +88,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 state = state,
                 pagerState = pagerState,
                 onChangeStory = storyChanger::change,
+                onLearnAboutRatings = ::openRatingsInfo,
                 onClickUpsell = ::startUpsellFlow,
                 onClose = ::dismiss,
             )
@@ -140,11 +143,6 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         super.onDismiss(dialog)
     }
 
-    private fun startUpsellFlow() {
-        val flow = OnboardingFlow.Upsell(OnboardingUpgradeSource.END_OF_YEAR)
-        OnboardingLauncher.openOnboardingFlow(requireActivity(), flow)
-    }
-
     override fun onResume() {
         super.onResume()
         viewModel.resumeStoryAutoProgress()
@@ -158,6 +156,19 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         // some other user actions such as a phone call.
         viewModel.pauseStoryAutoProgress()
         super.onPause()
+    }
+
+    private fun startUpsellFlow() {
+        val flow = OnboardingFlow.Upsell(OnboardingUpgradeSource.END_OF_YEAR)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), flow)
+    }
+
+    private fun openRatingsInfo() {
+        WebViewActivity.show(
+            requireActivity(),
+            getString(LR.string.podcast_ratings_page_title),
+            "https://support.pocketcasts.com/knowledge-base/ratings/",
+        )
     }
 
     enum class StoriesSource(val value: String) {
