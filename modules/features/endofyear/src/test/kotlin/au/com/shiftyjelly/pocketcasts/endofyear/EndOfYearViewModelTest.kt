@@ -495,6 +495,92 @@ class EndOfYearViewModelTest {
         }
     }
 
+    @Test
+    fun `get index of next story for paid account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.PLUS)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(1, viewModel.getNextStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(2, viewModel.getNextStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(3, viewModel.getNextStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(4, viewModel.getNextStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(5, viewModel.getNextStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(6, viewModel.getNextStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(7, viewModel.getNextStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(8, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(9, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(null, viewModel.getNextStoryIndex(stories.indexOf<Ending>()))
+    }
+
+    @Test
+    fun `get index of previous story for paid account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.PLUS)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(null, viewModel.getPreviousStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(0, viewModel.getPreviousStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(1, viewModel.getPreviousStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(2, viewModel.getPreviousStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(3, viewModel.getPreviousStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(4, viewModel.getPreviousStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(5, viewModel.getPreviousStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(8, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
+    }
+
+    @Test
+    fun `get index of next story for free account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(1, viewModel.getNextStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(2, viewModel.getNextStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(3, viewModel.getNextStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(4, viewModel.getNextStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(5, viewModel.getNextStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(6, viewModel.getNextStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(7, viewModel.getNextStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(null, viewModel.getNextStoryIndex(stories.indexOf<Ending>()))
+    }
+
+    @Test
+    fun `get index of previous story for free account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(null, viewModel.getPreviousStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(0, viewModel.getPreviousStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(1, viewModel.getPreviousStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(2, viewModel.getPreviousStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(3, viewModel.getPreviousStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(4, viewModel.getPreviousStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(5, viewModel.getPreviousStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
+    }
+
     private suspend fun TurbineTestContext<UiState>.awaitStories(): List<Story> {
         return (awaitItem() as UiState.Synced).stories
     }
@@ -505,6 +591,10 @@ class EndOfYearViewModelTest {
 
     private inline fun <reified T : Story> List<Story>.getStoryOfType(): T {
         return filterIsInstance<T>().single()
+    }
+
+    private inline fun <reified T : Story> List<Story>.indexOf(): Int {
+        return indexOfFirst { it is T }
     }
 
     private inline fun <reified T : Story> assertHasStory(stories: List<Story>) {

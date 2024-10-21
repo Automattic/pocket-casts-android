@@ -73,7 +73,11 @@ class EndOfYearViewModel @AssistedInject constructor(
         SyncState.Synced -> {
             val (stats, randomShowIds) = eoyStats.run(year, viewModelScope).await()
             val stories = createStories(stats, randomShowIds, subscriptionTier)
-            UiState.Synced(stories, progress)
+            UiState.Synced(
+                stories = stories,
+                isPaidAccount = subscriptionTier.isPaid,
+                storyProgress = progress,
+            )
         }
     }
 
@@ -144,6 +148,34 @@ class EndOfYearViewModel @AssistedInject constructor(
         }
     }
 
+    internal fun getNextStoryIndex(currentIndex: Int): Int? {
+        val state = uiState.value as? UiState.Synced ?: return null
+        val stories = state.stories
+
+        val nextStory = stories.getOrNull(currentIndex + 1) ?: return null
+        return if (state.isPaidAccount || nextStory.isFree) {
+            currentIndex + 1
+        } else {
+            stories.drop(currentIndex + 1)
+                .firstOrNull { it.isFree }
+                ?.let(stories::indexOf)
+        }.takeIf { it != -1 }
+    }
+
+    internal fun getPreviousStoryIndex(currentIndex: Int): Int? {
+        val state = uiState.value as? UiState.Synced ?: return null
+        val stories = state.stories
+
+        val previousStory = state.stories.getOrNull(currentIndex - 1) ?: return null
+        return if (state.isPaidAccount || previousStory.isFree) {
+            currentIndex - 1
+        } else {
+            state.stories.take(currentIndex)
+                .lastOrNull { it.isFree }
+                ?.let(stories::indexOf)
+        }?.takeIf { it != -1 }
+    }
+
     private fun getRandomShowIds(stats: EndOfYearStats): RandomShowIds? {
         val showIds = stats.playedPodcastIds
         return if (showIds.isNotEmpty()) {
@@ -182,6 +214,7 @@ internal sealed interface UiState {
     @Immutable
     data class Synced(
         val stories: List<Story>,
+        val isPaidAccount: Boolean,
         override val storyProgress: Float,
     ) : UiState
 }
@@ -189,6 +222,7 @@ internal sealed interface UiState {
 @Immutable
 internal sealed interface Story {
     val previewDuration: Duration? get() = 7.seconds
+    val isFree: Boolean get() = true
 
     data object Cover : Story
 
@@ -222,7 +256,7 @@ internal sealed interface Story {
     ) : Story
 
     data object PlusInterstitial : Story {
-        override val previewDuration: Duration? get() = null
+        override val previewDuration = null
     }
 
     data class YearVsYear(
@@ -230,6 +264,8 @@ internal sealed interface Story {
         val thisYearDuration: Duration,
         val subscriptionTier: SubscriptionTier?,
     ) : Story {
+        override val isFree = false
+
         val yearOverYearChange
             get() = when {
                 lastYearDuration == thisYearDuration -> 1.0
@@ -243,6 +279,8 @@ internal sealed interface Story {
         val completedCount: Int,
         val subscriptionTier: SubscriptionTier?,
     ) : Story {
+        override val isFree = false
+
         val completionRate
             get() = when {
                 listenedCount == 0 -> 1.0

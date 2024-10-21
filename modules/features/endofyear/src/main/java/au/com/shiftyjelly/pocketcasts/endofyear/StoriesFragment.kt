@@ -9,10 +9,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.BundleCompat
@@ -20,12 +24,16 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.StoriesPage
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import android.R as AndroidR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -72,11 +80,13 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
             }
             val state by viewModel.uiState.collectAsState()
             val pagerState = rememberPagerState(pageCount = { (state as? UiState.Synced)?.stories?.size ?: 0 })
+            val storyChanger = rememberStoryChanger(pagerState, viewModel)
 
             StoriesPage(
                 state = state,
                 pagerState = pagerState,
-                onUpsellClick = {},
+                onChangeStory = storyChanger::change,
+                onUpsellClick = ::startUpsellFlow,
                 onClose = ::dismiss,
             )
 
@@ -96,8 +106,8 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                     val stories = (state as? UiState.Synced)?.stories.orEmpty()
                     if (stories.getOrNull(pagerState.currentPage) is Story.Ending) {
                         dismiss()
-                    } else if (!pagerState.isScrollInProgress) {
-                        pagerState.scrollToPage(pagerState.currentPage + 1)
+                    } else {
+                        storyChanger.change(moveForward = true)
                     }
                 }
             }
@@ -107,6 +117,11 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         super.onDismiss(dialog)
+    }
+
+    private fun startUpsellFlow() {
+        val flow = OnboardingFlow.Upsell(OnboardingUpgradeSource.END_OF_YEAR)
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), flow)
     }
 
     enum class StoriesSource(val value: String) {
@@ -127,6 +142,37 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
             arguments = bundleOf(
                 ARG_SOURCE to source,
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun rememberStoryChanger(
+    pagerState: PagerState,
+    viewModel: EndOfYearViewModel,
+): StoryChanger {
+    val scope = rememberCoroutineScope()
+    return remember(pagerState) { StoryChanger(pagerState, viewModel, scope) }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private class StoryChanger(
+    private val pagerState: PagerState,
+    private val viewModel: EndOfYearViewModel,
+    private val scope: CoroutineScope,
+) {
+    fun change(moveForward: Boolean) {
+        if (!pagerState.isScrollInProgress) {
+            val currentPage = pagerState.currentPage
+            val nextIndex = if (moveForward) {
+                viewModel.getNextStoryIndex(currentPage)
+            } else {
+                viewModel.getPreviousStoryIndex(currentPage)
+            }
+            if (nextIndex != null) {
+                scope.launch { pagerState.scrollToPage(nextIndex) }
+            }
         }
     }
 }
