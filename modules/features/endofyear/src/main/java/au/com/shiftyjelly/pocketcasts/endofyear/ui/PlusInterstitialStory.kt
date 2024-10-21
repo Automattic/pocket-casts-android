@@ -41,7 +41,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun PlusInterstitialStory(
     story: Story.PlusInterstitial,
     measurements: EndOfYearMeasurements,
-    onUpsellClick: () -> Unit,
+    onClickUpsell: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -55,7 +55,7 @@ internal fun PlusInterstitialStory(
         PlusInfo(
             story = story,
             measurements = measurements,
-            onUpsellClick = onUpsellClick,
+            onClickUpsell = onClickUpsell,
         )
     }
 }
@@ -123,7 +123,7 @@ private fun WaitText(
 private fun PlusInfo(
     story: Story.PlusInterstitial,
     measurements: EndOfYearMeasurements,
-    onUpsellClick: () -> Unit,
+    onClickUpsell: () -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -160,7 +160,7 @@ private fun PlusInfo(
         )
         OutlinedEoyButton(
             text = stringResource(LR.string.eoy_story_stories_subscribe_to_plus_button_label),
-            onClick = onUpsellClick,
+            onClick = onClickUpsell,
         )
     }
 }
@@ -172,7 +172,7 @@ private fun PlusInterstitialPreview() {
         PlusInterstitialStory(
             story = Story.PlusInterstitial,
             measurements = measurements,
-            onUpsellClick = {},
+            onClickUpsell = {},
         )
     }
 }

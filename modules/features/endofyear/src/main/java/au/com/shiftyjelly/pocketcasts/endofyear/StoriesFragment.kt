@@ -86,7 +86,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 state = state,
                 pagerState = pagerState,
                 onChangeStory = storyChanger::change,
-                onUpsellClick = ::startUpsellFlow,
+                onClickUpsell = ::startUpsellFlow,
                 onClose = ::dismiss,
             )
 
