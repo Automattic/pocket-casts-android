@@ -7,11 +7,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
+import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBarDefaults
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -25,10 +43,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -93,6 +114,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         binding.globalEffectsCard.isVisible = podcast.overrideGlobalEffects
 
         imageRequestFactory.create(podcast).loadInto(binding.podcastEffectsImage)
+
+        if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
+            binding.setupEffectsSettingsSegmentedTabBar()
+        }
 
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
 
@@ -245,5 +270,49 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     private fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
         playbackManager.trackPlaybackEffectsEvent(event, props, SourceView.PLAYER_PLAYBACK_EFFECTS)
+    }
+
+    private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
+        effectsSettingsSegmentedTabBar.setContent {
+            val playingEpisodeState by viewModel.playingEpisodeLive.asFlow().collectAsStateWithLifecycle(null)
+            playingEpisodeState?.let {
+                val (_, podcastHeaderBackgroundColor) = it
+                EffectsSettingsSegmentedTabBar(
+                    modifier = Modifier
+                        .padding(top = 24.dp),
+                    selectedTabTextColor = Color(ColorUtils.colorIntToHexString(podcastHeaderBackgroundColor).toColorInt()),
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun EffectsSettingsSegmentedTabBar(
+        modifier: Modifier = Modifier,
+        selectedTabTextColor: Color = Color.Black,
+    ) {
+        SegmentedTabBar(
+            items = listOf(stringResource(LR.string.podcasts_all), stringResource(LR.string.podcast_this)),
+            defaultSelectedItemIndex = 0,
+            colors = SegmentedTabBarDefaults.colors.copy(
+                baseBackgroundColor = MaterialTheme.theme.colors.playerContrast06.copy(alpha = .1f),
+                selectedTabTextColor = selectedTabTextColor,
+                unSelectedTabTextColor = MaterialTheme.theme.colors.playerContrast02.copy(alpha = .5f),
+            ),
+            cornerRadius = 7.dp,
+            outerPadding = 2.dp,
+            tabContentPadding = PaddingValues(horizontal = 10.dp, vertical = 3.dp),
+            textStyle = SegmentedTabBarDefaults.textStyle.copy(
+                fontSize = 13.sp,
+            ),
+            modifier = modifier.fillMaxWidth(),
+            onItemSelected = {},
+        )
+    }
+
+    @Preview(widthDp = 360)
+    @Composable
+    private fun EffectsSettingsSegmentedBarPreview() {
+        EffectsSettingsSegmentedTabBar()
     }
 }

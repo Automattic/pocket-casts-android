@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -71,7 +72,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
-import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
+import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.images.OfferBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -255,16 +256,18 @@ private fun UpgradeLayoutOriginal(
                                 .padding(bottom = 24.dp),
                             contentAlignment = Alignment.Center,
                         ) {
-                            StyledToggle(
+                            SegmentedTabBar(
                                 items = state.subscriptionFrequencies
                                     .map { stringResource(id = it.localisedLabelRes) },
                                 defaultSelectedItemIndex = state.subscriptionFrequencies.indexOf(
                                     state.currentSubscriptionFrequency,
                                 ),
-                            ) {
-                                val selectedFrequency = state.subscriptionFrequencies[it]
-                                onSubscriptionFrequencyChanged(selectedFrequency)
-                            }
+                                onItemSelected = {
+                                    val selectedFrequency = state.subscriptionFrequencies[it]
+                                    onSubscriptionFrequencyChanged(selectedFrequency)
+                                },
+                                modifier = Modifier.width(IntrinsicSize.Max),
+                            )
                         }
 
                         FeatureCards(
