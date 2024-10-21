@@ -145,7 +145,7 @@ private fun Stories(
             is Story.LongestEpisode -> LongestEpisodeStory(story, measurements)
             is Story.PlusInterstitial -> StoryPlaceholder(story)
             is Story.YearVsYear -> YearVsYearStory(story, measurements)
-            is Story.CompletionRate -> StoryPlaceholder(story)
+            is Story.CompletionRate -> CompletionRateStory(story, measurements)
             is Story.Ending -> StoryPlaceholder(story)
         }
     }
