@@ -4,10 +4,22 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.UserTier
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = false)
-enum class SubscriptionTier(val label: String) {
-    NONE("none"),
-    PLUS("plus"),
-    PATRON("patron"),
+enum class SubscriptionTier(
+    val label: String,
+    val isPaid: Boolean,
+) {
+    NONE(
+        label = "none",
+        isPaid = false,
+    ),
+    PLUS(
+        label = "plus",
+        isPaid = true,
+    ),
+    PATRON(
+        label = "patron",
+        isPaid = true,
+    ),
     ;
     override fun toString() = label
 
