@@ -146,7 +146,7 @@ private fun Stories(
             is Story.PlusInterstitial -> StoryPlaceholder(story)
             is Story.YearVsYear -> YearVsYearStory(story, measurements)
             is Story.CompletionRate -> CompletionRateStory(story, measurements)
-            is Story.Ending -> StoryPlaceholder(story)
+            is Story.Ending -> EndingStory(story, measurements)
         }
     }
 }
