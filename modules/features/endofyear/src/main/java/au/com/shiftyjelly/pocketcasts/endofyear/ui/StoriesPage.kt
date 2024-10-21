@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun StoriesPage(
     state: UiState,
     pagerState: PagerState,
+    onUpsellClick: () -> Unit,
     onClose: () -> Unit,
 ) {
     val size = LocalContext.current.sizeLimit?.let(Modifier::size) ?: Modifier.fillMaxSize()
@@ -83,6 +84,7 @@ internal fun StoriesPage(
                     coverTextHeight = coverTextHeight,
                 ),
                 pagerState = pagerState,
+                onUpsellClick = onUpsellClick,
             )
         }
 
@@ -120,6 +122,7 @@ private fun Stories(
     stories: List<Story>,
     measurements: EndOfYearMeasurements,
     pagerState: PagerState,
+    onUpsellClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val widthPx = LocalDensity.current.run { measurements.width.toPx() }
@@ -150,7 +153,7 @@ private fun Stories(
             is Story.Ratings -> RatingsStory(story, measurements)
             is Story.TotalTime -> TotalTimeStory(story, measurements)
             is Story.LongestEpisode -> LongestEpisodeStory(story, measurements)
-            is Story.PlusInterstitial -> PlusInterstitialStory(story, measurements)
+            is Story.PlusInterstitial -> PlusInterstitialStory(story, measurements, onUpsellClick)
             is Story.YearVsYear -> YearVsYearStory(story, measurements)
             is Story.CompletionRate -> CompletionRateStory(story, measurements)
             is Story.Ending -> EndingStory(story, measurements)

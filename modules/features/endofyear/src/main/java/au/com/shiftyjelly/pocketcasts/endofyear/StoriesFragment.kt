@@ -76,6 +76,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
             StoriesPage(
                 state = state,
                 pagerState = pagerState,
+                onUpsellClick = {},
                 onClose = ::dismiss,
             )
 
