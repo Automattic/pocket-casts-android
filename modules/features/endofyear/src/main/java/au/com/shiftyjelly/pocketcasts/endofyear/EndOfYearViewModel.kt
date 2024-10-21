@@ -181,7 +181,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         return if (state.isPaidAccount || previousStory.isFree) {
             currentIndex - 1
         } else {
-           stories.take(currentIndex)
+            stories.take(currentIndex)
                 .lastOrNull { it.isFree }
                 ?.let(stories::indexOf)
         }?.takeIf { it != -1 }
