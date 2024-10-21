@@ -107,6 +107,7 @@ class PlayerViewModel @Inject constructor(
         val skipBackwardInSecs: Int = 30,
         val isSleepRunning: Boolean = false,
         val isEffectsOn: Boolean = false,
+        val adjustRemainingTimeDuration: Boolean = false,
         val playbackEffects: PlaybackEffects = PlaybackEffects(),
         val isBuffering: Boolean = false,
         val bufferedUpToMs: Int = 0,
@@ -123,7 +124,11 @@ class PlayerViewModel @Inject constructor(
         val isChaptersPresent: Boolean = !chapters.isEmpty
         val chapter: Chapter? = chapters.getChapter(positionMs.milliseconds)
         val chapterProgress: Float = chapter?.calculateProgress(positionMs.milliseconds) ?: 0f
-        val chapterTimeRemaining: String = chapter?.remainingTime(positionMs.milliseconds, playbackEffects.playbackSpeed) ?: ""
+        val chapterTimeRemaining: String = chapter?.remainingTime(
+            playbackPosition = positionMs.milliseconds,
+            playbackSpeed = playbackEffects.playbackSpeed,
+            adjustRemainingTimeDuration = adjustRemainingTimeDuration,
+        ) ?: ""
         val chapterSummary: String = chapters.getChapterSummary(positionMs.milliseconds)
         val isFirstChapter: Boolean = chapters.isFirstChapter(positionMs.milliseconds)
         val isLastChapter: Boolean = chapters.isLastChapter(positionMs.milliseconds)
@@ -179,6 +184,7 @@ class PlayerViewModel @Inject constructor(
         settings.skipForwardInSecs.flow.asObservable(coroutineContext),
         upNextExpandedObservable,
         chaptersExpandedObservable,
+        settings.useRealTimeForPlaybackRemaingTime.flow.asObservable(coroutineContext),
         settings.artworkConfiguration.flow.asObservable(coroutineContext),
         this::mergeListData,
     )
@@ -340,7 +346,16 @@ class PlayerViewModel @Inject constructor(
             }
     }
 
-    private fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, artworkConfiguration: ArtworkConfiguration): ListData {
+    private fun mergeListData(
+        upNextState: UpNextQueue.State,
+        playbackState: PlaybackState,
+        skipBackwardInSecs: Int,
+        skipForwardInSecs: Int,
+        upNextExpanded: Boolean,
+        chaptersExpanded: Boolean,
+        adjustRemainingTimeDuration: Boolean,
+        artworkConfiguration: ArtworkConfiguration,
+    ): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -377,6 +392,7 @@ class PlayerViewModel @Inject constructor(
                 isSleepRunning = playbackState.isSleepTimerRunning,
                 isEffectsOn = !effects.usingDefaultValues,
                 playbackEffects = effects,
+                adjustRemainingTimeDuration = adjustRemainingTimeDuration,
                 isBuffering = playbackState.isBuffering,
                 bufferedUpToMs = playbackState.bufferedMs,
                 theme = theme.activeTheme,
