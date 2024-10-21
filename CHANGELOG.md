@@ -3,6 +3,8 @@
 *   New Features
     *   Add the ability to auto download episodes after subscribing to a podcast
         ([#3048](https://github.com/Automattic/pocket-casts-android/pull/3048))
+    *   Modify avatar will use Gravatar native Quick Editor
+        ([#3055](https://github.com/Automattic/pocket-casts-android/pull/3055(
 
 7.75
 -----
