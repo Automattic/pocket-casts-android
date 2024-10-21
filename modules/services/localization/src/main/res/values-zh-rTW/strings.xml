@@ -252,7 +252,6 @@ Language: zh_TW
     <string name="settings_use_dark_up_next_details">啟用後，「接下來播放」將永遠使用深色系佈景主題；若停用，系統則將採用與屆時設定相符的主題</string>
     <string name="settings_use_dark_up_next">使用暗色系「接下來播放」佈景主題</string>
     <string name="end_of_year_stories_completion_rate_share_text">我的 2023 年完成率</string>
-    <string name="end_of_year_stories_subscribe_to_plus">訂閱 Plus，了解你的收聽狀況與 2022 年相比如何、其他有趣的統計資料，以及書籤和資料夾等進階版功能。</string>
     <string name="end_of_year_stories_theres_more">還有更多有趣內容！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">從你開始收聽的 %1$d 集起，你完整收聽了 %2$d 集</string>

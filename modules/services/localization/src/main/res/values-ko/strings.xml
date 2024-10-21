@@ -252,7 +252,6 @@ Language: ko_KR
     <string name="settings_use_dark_up_next_details">활성화되면 다음 에피소드에 항상 어두운 테마를 사용하고 비활성화되면 현재와 일치하는 테마를 사용합니다.</string>
     <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
     <string name="end_of_year_stories_completion_rate_share_text">나의 2023년 완료율</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독하며 2022년과 비교한 청취 수준, 기타 재미있는 통계, 북마크 및 폴더와 같은 프리미엄 기능을 알아보세요.</string>
     <string name="end_of_year_stories_theres_more">더 있습니다!</string>
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">시작하신 %1$d개 에피소드 중에서 총 %2$d개 완전히 청취</string>
