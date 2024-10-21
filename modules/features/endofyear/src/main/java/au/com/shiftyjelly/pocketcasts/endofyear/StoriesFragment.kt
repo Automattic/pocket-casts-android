@@ -90,17 +90,6 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 onClose = ::dismiss,
             )
 
-            LaunchedEffect(state::class) {
-                if (state is UiState.Synced) {
-                    snapshotFlow { pagerState.currentPage }.collect { index ->
-                        val stories = (state as? UiState.Synced)?.stories
-                        if (stories != null) {
-                            viewModel.onStoryChanged(stories[index])
-                        }
-                    }
-                }
-            }
-
             LaunchedEffect(Unit) {
                 viewModel.switchStory.collect {
                     val stories = (state as? UiState.Synced)?.stories.orEmpty()
@@ -108,6 +97,38 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                         dismiss()
                     } else {
                         storyChanger.change(moveForward = true)
+                    }
+                }
+            }
+
+            LaunchedEffect(state::class) {
+                if (state is UiState.Synced) {
+                    // Track displayed page to not report it twice from different events.
+                    // This can happen, for example, after the first launch.
+                    // Both currentPage and pageCount trigger an event when the pager is set up.
+                    var lastStory: Story? = null
+                    // Inform VM about a story changed due to explicit changes of the current page.
+                    launch {
+                        snapshotFlow { pagerState.currentPage }.collect { index ->
+                            val stories = (state as? UiState.Synced)?.stories
+                            val newStory = stories?.getOrNull(index)
+                            if (newStory != null && lastStory != newStory) {
+                                lastStory = newStory
+                                viewModel.onStoryChanged(newStory)
+                            }
+                        }
+                    }
+                    // Inform VM about a story changed due to a change in the stories list
+                    // This happens when a user sucessfully upgrades their account.
+                    launch {
+                        snapshotFlow { pagerState.pageCount }.collect {
+                            val stories = (state as? UiState.Synced)?.stories
+                            val newStory = stories?.getOrNull(pagerState.currentPage)
+                            if (newStory != null && lastStory != newStory) {
+                                lastStory = newStory
+                                viewModel.onStoryChanged(newStory)
+                            }
+                        }
                     }
                 }
             }
@@ -130,6 +151,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         USER_LOGIN("user_login"),
         UNKNOWN("unknown"),
         ;
+
         companion object {
             fun fromString(source: String) = entries.find { it.value == source } ?: UNKNOWN
         }
