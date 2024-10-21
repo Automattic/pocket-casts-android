@@ -32,12 +32,22 @@
                 style="@style/H30"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
                 android:text="@string/podcast_playback_effects"
                 android:textColor="?attr/player_contrast_01"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
+
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/effectsSettingsSegmentedTabBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/effectsTitle" />
 
             <ImageView
                 android:id="@+id/iconSpeed"
@@ -47,8 +57,8 @@
                 android:padding="2dp"
                 android:src="@drawable/ic_speed"
                 app:tint="?attr/player_contrast_02"
-                app:layout_constraintLeft_toLeftOf="@id/effectsTitle"
-                app:layout_constraintTop_toBottomOf="@id/effectsTitle" />
+                app:layout_constraintLeft_toLeftOf="@id/effectsSettingsSegmentedTabBar"
+                app:layout_constraintTop_toBottomOf="@id/effectsSettingsSegmentedTabBar" />
 
             <ImageButton
                 android:id="@+id/btnSpeedUp"

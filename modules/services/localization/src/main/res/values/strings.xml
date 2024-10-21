@@ -607,6 +607,7 @@
     <string name="podcast_supporter_cancelled">Support cancelled</string>
     <string name="podcast_supporter_manage">Manage</string>
     <string name="podcast_supporter_thanks">Thanks for your support</string>
+    <string name="podcast_this">This podcast</string>
     <string name="podcast_update_queued_failed_summary">Unable to update this feed, please try again later.</string>
     <string name="podcast_update_queued_failed_title">Update Failed</string>
     <string name="podcast_update_queued_success_summary">We\'ve queued an update for this podcast. Our server will re-check it and if it works you should have new episodes soon. Please check back in about an hour.</string>
