@@ -455,6 +455,7 @@ class EndOfYearViewModelTest {
         subscriptionTier.emit(SubscriptionTier.NONE)
 
         viewModel.syncData()
+        viewModel.resumeStoryAutoProgress()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         viewModel.switchStory.test {
@@ -492,6 +493,33 @@ class EndOfYearViewModelTest {
 
             viewModel.onStoryChanged(stories.getStoryOfType<Ending>())
             assertEquals(Unit, awaitItem())
+        }
+    }
+
+    @Test
+    fun `resume and pause stories auto switching`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        viewModel.switchStory.test {
+            expectNoEvents()
+
+            // Initially switching should be paused
+            viewModel.onStoryChanged(stories.getStoryOfType<Cover>())
+            expectNoEvents()
+
+            // Resume after pause
+            viewModel.resumeStoryAutoProgress()
+            assertEquals(Unit, awaitItem())
+
+            // Pause after resume
+            viewModel.pauseStoryAutoProgress()
+            viewModel.onStoryChanged(stories.getStoryOfType<NumberOfShows>())
+            expectNoEvents()
         }
     }
 

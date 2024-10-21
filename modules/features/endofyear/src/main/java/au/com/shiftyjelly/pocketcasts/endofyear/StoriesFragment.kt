@@ -145,6 +145,21 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         OnboardingLauncher.openOnboardingFlow(requireActivity(), flow)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.resumeStoryAutoProgress()
+    }
+
+    override fun onPause() {
+        // Pause auto progress when the fragment is not active.
+        // This makes sure that users see all stories and they
+        // won't auto switch for example when signing up takes
+        // some time or when the EoY flow is interruped by
+        // some other user actions such as a phone call.
+        viewModel.pauseStoryAutoProgress()
+        super.onPause()
+    }
+
     enum class StoriesSource(val value: String) {
         MODAL("modal"),
         PROFILE("profile"),

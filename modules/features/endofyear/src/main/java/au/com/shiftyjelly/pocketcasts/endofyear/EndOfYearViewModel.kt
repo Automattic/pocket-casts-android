@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode as LongestEpisodeData
@@ -47,6 +48,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
     private val _switchStory = MutableSharedFlow<Unit>()
     internal val switchStory get() = _switchStory.asSharedFlow()
+    private val isStoryAutoProgressEnabled = MutableStateFlow(false)
 
     internal val uiState = combine(
         syncState,
@@ -138,6 +140,7 @@ class EndOfYearViewModel @AssistedInject constructor(
                 countDownJob = launch {
                     var currentProgress = 0f
                     while (currentProgress < 1f) {
+                        isStoryAutoProgressEnabled.first { it }
                         currentProgress += 0.01f
                         progress.value = currentProgress
                         delay(progressDelay)
@@ -146,6 +149,14 @@ class EndOfYearViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    internal fun resumeStoryAutoProgress() {
+        isStoryAutoProgressEnabled.value = true
+    }
+
+    internal fun pauseStoryAutoProgress() {
+        isStoryAutoProgressEnabled.value = false
     }
 
     internal fun getNextStoryIndex(currentIndex: Int): Int? {
