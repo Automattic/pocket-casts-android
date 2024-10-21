@@ -24,8 +24,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.gravatar.quickeditor.GravatarQuickEditor
+import com.gravatar.types.Email
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -118,6 +122,20 @@ class UserManagerImpl @Inject constructor(
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
         if (wasInitiatedByUser || !settings.getFullySignedOut()) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
+
+            // Logout from Gravatar
+            if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
+                (getSignInState().blockingFirst() as? SignInState.SignedIn)?.email?.let { email ->
+                    applicationScope.launch {
+                        GravatarQuickEditor.logout(
+                            email = Email(
+                                email,
+                            ),
+                        )
+                    }
+                }
+            }
+
             subscriptionManager.clearCachedStatus()
             syncManager.signOut {
                 applicationScope.launch {
