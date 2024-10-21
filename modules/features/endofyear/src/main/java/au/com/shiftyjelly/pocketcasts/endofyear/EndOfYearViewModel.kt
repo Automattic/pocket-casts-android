@@ -181,7 +181,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         return if (state.isPaidAccount || previousStory.isFree) {
             currentIndex - 1
         } else {
-            state.stories.take(currentIndex)
+           stories.take(currentIndex)
                 .lastOrNull { it.isFree }
                 ?.let(stories::indexOf)
         }?.takeIf { it != -1 }
@@ -233,7 +233,7 @@ internal sealed interface UiState {
 @Immutable
 internal sealed interface Story {
     val previewDuration: Duration? get() = 7.seconds
-    val isFree: Boolean get() = true
+    val isFree = true
 
     data object Cover : Story
 
