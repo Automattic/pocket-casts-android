@@ -252,7 +252,6 @@ Language: ru
     <string name="settings_use_dark_up_next_details">При включённом параметре Up Next будет всегда использовать тёмную тему, а при выключенном — соответствовать текущей теме</string>
     <string name="settings_use_dark_up_next">Использовать тёмную тему Up Next</string>
     <string name="end_of_year_stories_completion_rate_share_text">Мои итоги 2023 года</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Оформите подписку Plus и узнайте, как изменились ваши слушательские привычки по сравнению с 2022 г., посмотрите другую любопытную статистику и ознакомьтесь с такими функциями тарифного плана Premium, как закладки и папки.</string>
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Из %1$d запущенных эпизодов всего вы дослушали до конца %2$d</string>
@@ -260,17 +259,11 @@ Language: ru
     <string name="end_of_year_stories_year_over_share_text">Время прослушивания в 2023 г. по сравнению с 2022 г.</string>
     <string name="eoy_year_over_year_title_skyrocketed">По сравнению с 2022 г. вы посвятили прослушиванию намного больше времени!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">И… как, вам хватает времени на всё остальное?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">По сравнению с 2022 г. вы стали слушать немного меньше.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Говорят, постоянство — ключ к успеху… или что-то в этом роде.</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Вы посвятили прослушиванию примерно столько же времени, сколько и в 2022 г.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Готовы превзойти свой рекорд в 2024 г.?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">По сравнению с 2022 г. ваше время прослушивания возросло сразу на %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">Просмотрите свой топ подкастов, статистику прослушивания и другие показатели.</string>
-    <string name="end_of_year_story_epilogue_title">Благодарим за то, что вы слушали вместе с нами в этом году.\nДо встречи в 2024 г.!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Это было не что иное, как «%1$s» из «%2$s»</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
-    <string name="end_of_year_listening_time_subtitle">Надеемся, что вам понравилось всё с начала до конца!</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
     <string name="end_of_year_story_top_categories_subtitle">Вы прослушали %1$s эпизодов общей продолжительностью %2$s</string>
     <string name="end_of_year_story_top_categories_title">Знаете ли вы, что вашей любимой категорией оказалась %1$s?</string>
@@ -280,7 +273,6 @@ Language: ru
     <string name="discover_category_health_abbreviation">Здоровье</string>
     <string name="eoy_story_top_podcasts_subtitle">Эти 5 набрали больше всего прослушиваний в 2023 году\"</string>
     <string name="eoy_story_top_podcasts_title">А ещё вы были на высоте в этих шоу!</string>
-    <string name="end_of_year_story_top_podcast_title">Шоу %1$s набрало больше всего прослушиваний в 2023 г.</string>
     <string name="end_of_year_share_story">Поделитесь этим</string>
     <string name="podcast_log_in_to_rate">Чтобы поставить оценку, необходимо войти в систему</string>
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>

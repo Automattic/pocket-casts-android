@@ -544,6 +544,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val autoDownloadNewEpisodes = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadNewEpisodes",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val autoDownloadOnlyWhenCharging = UserSetting.BoolPref(
         sharedPrefKey = "autoDownloadOnlyDownloadWhenCharging",
         defaultValue = false,

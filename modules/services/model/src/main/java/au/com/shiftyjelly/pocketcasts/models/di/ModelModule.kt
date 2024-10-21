@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import au.com.shiftyjelly.pocketcasts.model.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
@@ -64,6 +65,9 @@ object ModelModule {
 
     @Provides
     fun provideExternalDataDao(database: AppDatabase): ExternalDataDao = database.externalDataDao()
+
+    @Provides
+    fun endOfYearDao(database: AppDatabase): EndOfYearDao = database.endOfYearDao()
 }
 
 @Qualifier

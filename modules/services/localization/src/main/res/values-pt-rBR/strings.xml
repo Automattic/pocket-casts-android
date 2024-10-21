@@ -252,7 +252,6 @@ Language: pt_BR
     <string name="settings_use_dark_up_next_details">Com essa opção ativada, a lista Próximos sempre usará o tema escuro. Quando desativada, a lista usará o tema atual.</string>
     <string name="settings_use_dark_up_next">Usar tema escuro na fila Próximos</string>
     <string name="end_of_year_stories_completion_rate_share_text">Minha taxa de conclusão em 2023</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Assine o Plus e veja uma comparação do seu streaming neste ano e em 2022, outras estatísticas divertidas e funcionalidades Premium, como favoritos e pastas.</string>
     <string name="end_of_year_stories_theres_more">E tem mais!</string>
     <string name="end_of_year_stories_year_completion_rate">taxa de conclusão</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Dos %1$d episódios que você começou, você concluiu um total de %2$d</string>
@@ -260,17 +259,11 @@ Language: pt_BR
     <string name="end_of_year_stories_year_over_share_text">Meu tempo de streaming em 2023 em comparação com 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Em comparação com 2022, seu tempo de streaming disparou!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Poxa… tem sempre algo para se viver, né?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Em comparação com 2022, seu tempo de streaming diminuiu um pouco</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">E dizem que continuidade é a chave do sucesso… ou algo parecido.</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Em comparação com 2022, seu tempo de streaming permaneceu bastante consistente</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Tudo pronto para se superar em 2024?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Em comparação com 2022, seu tempo de streaming aumentou %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">Veja suas estatísticas de streaming, principais podcasts e muito mais.</string>
-    <string name="end_of_year_story_epilogue_title">Agradecemos por nos escolher neste ano.\nNos vemos em 2024!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Não podia ser outro senão \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_story_longest_episode_title">O episódio mais longo que você ouviu foi %1$s</string>
     <string name="end_of_year_replay">Ouvir de novo</string>
-    <string name="end_of_year_listening_time_subtitle">Esperamos que você tenha aproveitado cada minuto!</string>
     <string name="end_of_year_listening_time_title">Este foi o seu tempo total ouvindo podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Você ouviu %1$s episódios em um total de %2$s</string>
     <string name="end_of_year_story_top_categories_title">Você sabia que %1$s foi sua categoria favorita?</string>
@@ -280,7 +273,6 @@ Language: pt_BR
     <string name="discover_category_health_abbreviation">Saúde</string>
     <string name="eoy_story_top_podcasts_subtitle">Estes são os 5 mais ouvidos do seu 2023</string>
     <string name="eoy_story_top_podcasts_title">E você marcou presença nestes programas também!</string>
-    <string name="end_of_year_story_top_podcast_title">%1$s foi o seu programa mais ouvido em 2023</string>
     <string name="end_of_year_share_story">Compartilhar este story</string>
     <string name="podcast_log_in_to_rate">Faça login para avaliar</string>
     <string name="podcast_submit_rating_no_internet">Sem conexão com a Internet. Conecte-se à Internet para enviar a avaliação.</string>

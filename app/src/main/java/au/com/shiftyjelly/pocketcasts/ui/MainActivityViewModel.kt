@@ -115,7 +115,7 @@ class MainActivityViewModel
         return signInState.isExpiredTrial && !settings.getTrialFinishedSeen()
     }
 
-    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
+    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
     fun updateStoriesModalShowState(show: Boolean) {
         viewModelScope.launch {
             shouldShowStoriesModal.value = show &&

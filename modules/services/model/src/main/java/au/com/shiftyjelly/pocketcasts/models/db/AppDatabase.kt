@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConve
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.InstantConverter
-import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoDownloadLimitConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastGroupingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
@@ -35,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusCo
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
@@ -87,11 +87,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Transcript::class,
         UserPodcastRating::class,
     ],
-    version = 102,
+    version = 103,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
         AutoMigration(from = 88, to = 89, spec = AppDatabase.Companion.DeleteAutomaticallyCachedMigration::class),
+        AutoMigration(from = 102, to = 103, spec = AppDatabase.Companion.DeleteAutoDownloadLimitMigration::class),
     ],
 )
 @TypeConverters(
@@ -114,7 +115,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     PodcastGroupingTypeConverter::class,
     ChapterIndicesConverter::class,
     InstantConverter::class,
-    PodcastAutoDownloadLimitConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -131,6 +131,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun chapterDao(): ChapterDao
     abstract fun transcriptDao(): TranscriptDao
     abstract fun externalDataDao(): ExternalDataDao
+    abstract fun endOfYearDao(): EndOfYearDao
 
     fun databaseFiles() =
         openHelper.readableDatabase.path?.let {
@@ -860,6 +861,12 @@ abstract class AppDatabase : RoomDatabase() {
                 """.trimIndent(),
             )
         }
+
+        @DeleteColumn(
+            tableName = "podcasts",
+            columnName = "auto_download_limit",
+        )
+        class DeleteAutoDownloadLimitMigration : AutoMigrationSpec
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(

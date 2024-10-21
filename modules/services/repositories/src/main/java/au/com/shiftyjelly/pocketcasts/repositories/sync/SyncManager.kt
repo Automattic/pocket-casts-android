@@ -100,7 +100,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun exchangeSonos(): ExchangeSonosResponse
     fun getFilters(): Single<List<Playlist>>
     suspend fun loadStats(): StatsBundle
-    fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse>
+    suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse
     suspend fun getBookmarks(): List<Bookmark>
     suspend fun sendAnonymousFeedback(subject: String, inbox: String, message: String): Response<Void>
     suspend fun sendFeedback(subject: String, inbox: String, message: String): Response<Void>

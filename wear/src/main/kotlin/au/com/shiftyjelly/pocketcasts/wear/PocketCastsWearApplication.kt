@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
-import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
+import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -107,7 +107,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
                 }
             }
 
-            VersionMigrationsJob.run(
+            VersionMigrationsWorker.performMigrations(
                 podcastManager = podcastManager,
                 settings = settings,
                 syncManager = syncManager,

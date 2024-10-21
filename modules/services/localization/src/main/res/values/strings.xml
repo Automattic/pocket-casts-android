@@ -246,6 +246,9 @@
     <string name="download_warning_title">Download All</string>
     <string name="download_warning_limit_summary">Bulk downloads are limited to %1$d.</string>
 
+    <string name="episode_was_removed">Episode was removed</string>
+    <string name="episode_queued_for_download">Episode queued for download</string>
+
     <string name="download_queued_singular">1 episode queued for download</string>
     <string name="download_queued_plural">%1$d episodes queued for download</string>
 
@@ -669,6 +672,7 @@
     <string name="episode_removed_from_up_next">Removed from up next</string>
     <string name="episode_in_up_next">In up next</string>
     <string name="episode_downloading">Downloading</string>
+    <string name="remove_downloaded_file">Remove downloaded file</string>
     <string name="episode_cover_description">Cover of %s episode</string>
 
     <!-- Supporter -->
@@ -1701,7 +1705,8 @@
     <string name="end_of_year_replay">Play again</string>
     <string name="end_of_year_listening_time_title">This was your total time listening to podcasts</string>
     <string name="end_of_year_listening_time_title_english_only" translatable="false">This was your total time\nlistening to podcasts</string>
-    <string name="end_of_year_listening_time_subtitle">We hope you loved every minute of it!</string>
+    <!-- A suffix used to display total listening time in a year. Things like "12 hours 2 days", "20 days", "12 days 5 hours" preceed it so it is "10 days 5 hours total listening time" -->
+    <string name="end_of_year_listening_time_subtitle">total listening to podcasts</string>
     <string name="end_of_year_share_story">Share this story</string>
     <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>
     <string name="end_of_year_story_intro_title_english_only" translatable="false">Let’s celebrate your year\nof listening!</string>
@@ -1721,8 +1726,8 @@
     <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming to…</string>
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. -->
     <string name="end_of_year_story_listened_to_numbers_share_text">I listened to %1$d different podcasts and %2$d episodes in 2023</string>
-    <!-- Title for the story that display the most listened podcast by the user this year. %1$s is a placeholder for the podcast title and %2$s is a placeholder for the author. -->
-    <string name="end_of_year_story_top_podcast_title">%1$s was your most listened show in 2023</string>
+    <!-- Title for the story that display the most listened podcast by the user this year. %1$s is a placeholder for the podcast title. -->
+    <string name="end_of_year_story_top_podcast_title">Your top podcast in 2024 was %1$s</string>
     <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$d is a placeholder for the number of episodes and %2$s is a placeholder for the listened time. -->
     <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
     <!-- Text that appear when someone share the top podcast of the year story to Twitter. %1$s is the URL to the podcast. -->
@@ -1738,11 +1743,11 @@
     <!-- Title for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode length. -->
     <string name="end_of_year_story_longest_episode_title">The longest episode you listened to was %1$s</string>
     <!-- Subtitle for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode title and %2$s is a placeholder for the podcast title. -->
-    <string name="end_of_year_story_longest_episode_subtitle">It was none other than \"%1$s\" from \"%2$s\"</string>
+    <string name="end_of_year_story_longest_episode_subtitle">It was \"%1$s\" from \"%2$s\"</string>
     <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$s is the URL to the episode. -->
     <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in 2023 %1$s</string>
-    <!-- Title for the epilogue story -->
-    <string name="end_of_year_story_epilogue_title">Thank you for listening with us this year.\nSee you in 2024!</string>
+    <!-- Title for the epilogue story. %1$d is the yer. -->
+    <string name="end_of_year_story_epilogue_title">Thank you for listening with us this year.\nSee you in %1$d!</string>
     <!-- Subtitle for the epilogue story -->
     <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
@@ -1758,16 +1763,18 @@
     <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
     <!-- When loading the End of Year stats stories fails. -->
     <string name="end_of_year_stories_failed">Unable to load your end of year stories, check your internet connection.</string>
-    <!--Title of the story when this year's listening time is bigger than previous year. %1$s is the percentage -->
-    <string name="end_of_year_stories_year_over_year_title_went_up">Compared to 2022, your listening time went up a whopping %1$s%%</string>
-    <!-- Subtitle of the story that compares year listening time when this year's listening time is bigger than last's year -->
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Ready to top it in 2024?</string>
-    <!-- Title of the story when this year's listening time is almost the same as the previous year. %1$s is the percentage -->
-    <string name="end_of_year_stories_year_over_year_title_flat">Compared to 2022, your listening time stayed pretty consistent</string>
+    <!--Title of the story when this year's listening time is bigger than previous year. %1$s is the year, %2$s% is the percentage -->
+    <string name="end_of_year_stories_year_over_year_title_went_up">Compared to %1$s, your listening time went up a whopping %2$s%%</string>
+    <!--Title of the story when this year's listening time is bigger than previous year by more than 500%. %1$s is the year -->
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Compared to %1$s, your listening time went up by more than 500%%</string>
+    <!-- Subtitle of the story that compares year listening time when this year's listening time is bigger than last's year. %1$s is the year -->
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Ready to top it in %1$s?</string>
+    <!-- Title of the story when this year's listening time is almost the same as the previous year. %1$s is the yaer -->
+    <string name="end_of_year_stories_year_over_year_title_flat">Compared to %1$s, your listening time stayed pretty consistent</string>
     <!-- Subtitle of the story that compares year listening time when this year's listening time is almost the same as last's year -->
     <string name="end_of_year_stories_year_over_year_subtitle_flat">And they say consistency is the key to success… or something like that!</string>
-    <!-- Title of the story when this year's listening time is less than the previous year. %1$s is the percentage -->
-    <string name="end_of_year_stories_year_over_year_title_went_down">Compared to 2022, your listening time went down a little</string>
+    <!-- Title of the story when this year's listening time is less than the previous year. %1$s is the year -->
+    <string name="end_of_year_stories_year_over_year_title_went_down">Compared to %1$s, your listening time went down a little</string>
     <!-- Subtitle of the story that compares year listening time when this year's listening time is less than last's year -->
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… there’s a life to be lived, right?</string>
     <!-- Title of the story when this year's listening time is way bigger than previous year. -->
@@ -1784,7 +1791,21 @@
     <!-- Title of the story paywall. Telling the users that there are more stories to check. -->
     <string name="end_of_year_stories_theres_more">There\’s more!</string>>
     <!-- Subtitle explaining the user why they should susbcribe to Plus in the context of the end of year stories. -->
-    <string name="end_of_year_stories_subscribe_to_plus">Subscribe to Plus and find out how your listening compares to 2022, other fun stats, and Premium features like bookmarks and folders.</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Support Pocket Casts by subscribing to Plus and get more stats, plus Premium features like bookmarks, folders or preselect chapters!</string>
+    <!-- Label of a button to incetivise users to subscribe to Pocket Casts Plus. -->
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Check out Pocket Casts Plus</string>
+    <!-- Title for the story showing the podcast ratings given by the user. -->
+    <string name="eoy_story_ratings_title_1">Let\'s see your ratings!</string>
+    <!-- Title for the story showing the podcast ratings given by the user when they gave no ratings. -->
+    <string name="eoy_story_ratings_title_2">Oh-oh! No podcast ratings to show you yet</string>
+    <!-- Subtitle for the story showing the podcast ratings given by the user when they gave high ratings. -->
+    <string name="eoy_story_ratings_subtitle_1">Wow, so many %1$d star ratings! Thanks for sharing the love with your favorite creators!</string>
+    <!-- Subtitle for the story showing the podcast ratings given by the user when they gave low ratings. -->
+    <string name="eoy_story_ratings_subtitle_2">Thanks for sharing your feedback with the creator community</string>
+    <!-- Subtitle for the story showing the podcast ratings given by the user when they gave no ratings. -->
+    <string name="eoy_story_ratings_subtitle_3">Did you know that you can rate shows now? Share the love for your favorite creators and help them get noticed!</string>
+    <!-- Label of a button for the story showing podcast ratings given by the user when they gave no ratings. -->
+    <string name="eoy_story_ratings_learn_button_label">Learn about ratings</string>
 
     <!-- Onboarding -->
 

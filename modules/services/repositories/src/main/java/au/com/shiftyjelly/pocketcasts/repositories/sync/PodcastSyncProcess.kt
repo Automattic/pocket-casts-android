@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -53,10 +56,13 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import java.time.Instant
 import java.util.Date
+import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
 import kotlinx.coroutines.rx2.rxSingle
@@ -262,7 +268,7 @@ class PodcastSyncProcess(
 
     private fun importPodcast(podcastResponse: UserPodcastResponse?): Maybe<Podcast> {
         val podcastUuid = podcastResponse?.uuid ?: return Maybe.empty()
-        return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false)
+        return podcastManager.subscribeToPodcastRx(podcastUuid = podcastUuid, sync = false, shouldAutoDownload = false)
             .flatMap { podcast -> updatePodcastSyncValues(podcast, podcastResponse).toSingleDefault(podcast) }
             .toMaybe()
             .doOnError { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Could not import server podcast %s", podcastUuid) }
@@ -290,12 +296,16 @@ class PodcastSyncProcess(
         podcastManager.updatePodcast(podcast)
     }
 
-    private fun syncUpNext(): Completable {
-        return Completable.fromAction {
-            val startTime = SystemClock.elapsedRealtime()
-            UpNextSyncJob.run(syncManager, context)
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
-        }
+    private fun syncUpNext() = Completable.create { emitter ->
+        val startTime = SystemClock.elapsedRealtime()
+        val workRequestId = UpNextSyncWorker.enqueue(syncManager, context)
+        workRequestId?.let {
+            ProcessLifecycleOwner.get().lifecycleScope.launch {
+                WorkManager.getInstance(context).getWorkInfoByIdFlow(it).first { it.state.isFinished }
+                emitter.onComplete()
+            }
+        } ?: emitter.onComplete()
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
     }
 
     private fun syncPlayHistory(): Completable {
@@ -788,7 +798,7 @@ class PodcastSyncProcess(
         val isSubscribed = podcastSync.subscribed
         val podcastUuid = podcastSync.uuid
         if (podcastSync.subscribed && isSubscribed && podcastUuid != null) {
-            return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false)
+            return podcastManager.subscribeToPodcastRx(podcastUuid, sync = false, shouldAutoDownload = false)
                 .doOnSuccess { podcast ->
                     applyPodcastSyncUpdatesToPodcast(podcast, podcastSync)
                     podcastManager.updatePodcast(podcast)
