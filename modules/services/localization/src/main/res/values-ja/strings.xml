@@ -252,7 +252,6 @@ Language: ja_JP
     <string name="settings_use_dark_up_next_details">有効にすると、「次のエピソード待機リスト」では常にダークテーマを使用し、無効にすると現在のテーマと一致します</string>
     <string name="settings_use_dark_up_next">次のエピソード待機リストのダークテーマを使用</string>
     <string name="end_of_year_stories_completion_rate_share_text">My 2023完了率</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Plus に登録すると、2022年と比較した視聴内容、その他の楽しい統計、ブックマークやフォルダーなどのプレミアム機能をご利用いただけます。</string>
     <string name="end_of_year_stories_theres_more">その他にもございます !</string>
     <string name="end_of_year_stories_year_completion_rate">完了率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">開始した%1$d件のエピソードから合計%2$d件を最後まで聴きました</string>
@@ -260,13 +259,8 @@ Language: ja_JP
     <string name="end_of_year_stories_year_over_share_text">2023年と2022年の聴取時間の比較</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022年と比較して、聴取時間が急増しました !</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">生きてこその人生ですね。</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">2022年と比較して、聴取時間が少し減りました</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">一貫性が成功の鍵であるとかなんとか言われています。</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">2022年と比較して、聴取時間は一定していました</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">2024年でこの記録を上回る準備はできていますか ?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">2022年と比較して、聴取時間が%1$s%% に急増しました</string>
     <string name="end_of_year_prompt_card_summary">視聴統計、人気のポッドキャストなどを確認します。</string>
-    <string name="end_of_year_story_epilogue_title">本年もご視聴いただきありがとうございました。\n2024年もよろしくお願いいたします。</string>
     <string name="end_of_year_story_longest_episode_subtitle">%2$s の %1$s を超えるものはありません</string>
     <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
     <string name="end_of_year_replay">もう一度再生</string>

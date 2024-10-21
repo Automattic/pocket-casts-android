@@ -147,7 +147,7 @@ open class SyncServiceManager @Inject constructor(
         return service.syncUpdate(fields)
     }
 
-    fun upNextSync(request: UpNextSyncRequest, token: AccessToken): Single<UpNextSyncResponse> =
+    suspend fun upNextSync(request: UpNextSyncRequest, token: AccessToken): UpNextSyncResponse =
         service.upNextSync(addBearer(token), request)
 
     fun getLastSyncAt(token: AccessToken): Single<String> =

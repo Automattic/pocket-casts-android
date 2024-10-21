@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.localization.R
+import kotlin.math.roundToLong
 import kotlin.math.tan
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -40,10 +40,11 @@ internal fun NumberOfShowsStory(
     story: Story.NumberOfShows,
     measurements: EndOfYearMeasurements,
 ) {
-    val coverSize = 160.dp * measurements.scale
-    val spacingSize = coverSize / 10
-    val carouselHeight = coverSize * 2 + spacingSize
-    val carouselRotationOffset = (measurements.width / 2) * tan(StoryRotationRadians)
+    val smallCoverSize = 160.dp * measurements.scale
+    val smallSpacingSize = smallCoverSize / 10
+    val largeCoverSize = 200.dp * measurements.scale
+    val largeSpacingSize = smallCoverSize / 10
+    val carouselRotationOffset = (measurements.width / 1.5f) * tan(StoryRotationRadians)
 
     Box(
         modifier = Modifier
@@ -60,33 +61,19 @@ internal fun NumberOfShowsStory(
             PodcastCoverCarousel(
                 podcastIds = story.topShowIds,
                 scrollDirection = ScrollDirection.Left,
-                coverSize = coverSize,
-                spacingSize = spacingSize,
-            )
-            Spacer(
-                modifier = Modifier.height(spacingSize),
+                coverSize = smallCoverSize,
+                coverElevation = 0.dp,
+                spacingSize = smallSpacingSize,
             )
             PodcastCoverCarousel(
                 podcastIds = story.bottomShowIds,
                 scrollDirection = ScrollDirection.Right,
-                coverSize = coverSize,
-                spacingSize = spacingSize,
+                coverSize = largeCoverSize,
+                coverElevation = 12.dp,
+                spacingSize = largeSpacingSize,
+                modifier = Modifier.offset(y = -smallCoverSize / 6),
             )
         }
-
-        // Fake sticker: lH66LwxxgG8btQ8NrM0ldx-fi-3070_28391#986464596
-        val stickerWidth = 214.dp * measurements.scale
-        val stickerHeight = 112.dp * measurements.scale
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(
-                    x = stickerWidth / 3,
-                    y = measurements.closeButtonBottomEdge + 8.dp + carouselHeight,
-                )
-                .size(stickerWidth, stickerHeight)
-                .background(Color.Black, shape = CircleShape),
-        )
 
         Column(
             modifier = Modifier
@@ -104,7 +91,8 @@ internal fun NumberOfShowsStory(
                     story.showCount,
                     story.epsiodeCount,
                 ),
-                disableScale = true,
+                disableAutoScale = true,
+                fontScale = measurements.smallDeviceFactor,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -114,7 +102,7 @@ internal fun NumberOfShowsStory(
             TextP40(
                 text = stringResource(R.string.end_of_year_story_listened_to_numbers_subtitle),
                 fontSize = 15.sp,
-                disableScale = true,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -128,17 +116,21 @@ private fun PodcastCoverCarousel(
     podcastIds: List<String>,
     scrollDirection: ScrollDirection,
     coverSize: Dp,
+    coverElevation: Dp,
     spacingSize: Dp,
+    modifier: Modifier = Modifier,
 ) {
     ScrollingRow(
         items = podcastIds,
         scrollDirection = scrollDirection,
-        scrollByPixels = 2f,
+        scrollByPixels = 1f,
+        scrollDelay = { (60 / it.density).roundToLong().coerceAtLeast(4L) },
         horizontalArrangement = Arrangement.spacedBy(spacingSize),
+        modifier = modifier,
     ) { podcastId ->
         PodcastImage(
             uuid = podcastId,
-            elevation = 0.dp,
+            elevation = coverElevation,
             cornerSize = 4.dp,
             modifier = Modifier.size(coverSize),
         )
@@ -148,7 +140,7 @@ private fun PodcastCoverCarousel(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun NumberOfShowsPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 1) { measurements ->
         NumberOfShowsStory(
             story = Story.NumberOfShows(
                 showCount = 20,

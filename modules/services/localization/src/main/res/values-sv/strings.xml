@@ -252,7 +252,6 @@ Language: sv_SE
     <string name="settings_use_dark_up_next_details">När det är aktiverat kommer Up Next alltid att använda mörkt tema, eller matcha det aktuella temat när det är inaktiverat</string>
     <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
     <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad för 2023</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Prenumerera på Plus och ta reda på hur du lyssnar jämfört med 2022, annan rolig statistik och Premium-funktioner som bokmärken och mappar.</string>
     <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Av de %1$d avsnitt du började lyssna på lyssnade du sammanlagt på %2$d</string>
@@ -260,13 +259,8 @@ Language: sv_SE
     <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för 2023 jämfört med 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Jämfört med 2022 har din lyssningstid minskat något</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Och det sägs att kontinuitet är nyckeln till framgång … eller något i den stilen!</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Jämfört med 2022 var din lyssningstid ganska oförändrad</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Är du redo att toppa 2024?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med 2022 ökade din lyssningstid med hisnande %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
-    <string name="end_of_year_story_epilogue_title">Tack för att ni lyssnat med oss i år.\nVi ses 2024!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Det var ingen mindre än \"%1$s\" från \"%2$s\"</string>
     <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>

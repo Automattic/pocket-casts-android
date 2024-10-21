@@ -83,7 +83,7 @@ interface PodcastManager {
     suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Podcast.AutoAddUpNext, onlyIfValue: Podcast.AutoAddUpNext)
     fun updateExcludeFromAutoArchive(podcast: Podcast, excludeFromAutoArchive: Boolean)
     fun updateOverrideGlobalEffects(podcast: Podcast, override: Boolean)
-    fun updateTrimMode(podcast: Podcast, trimMode: TrimMode)
+    suspend fun updateTrimMode(podcast: Podcast, trimMode: TrimMode)
     fun updateVolumeBoosted(podcast: Podcast, override: Boolean)
     fun updatePlaybackSpeed(podcast: Podcast, speed: Double)
     fun updateEffects(podcast: Podcast, effects: PlaybackEffects)

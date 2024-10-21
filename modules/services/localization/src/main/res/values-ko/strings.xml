@@ -252,7 +252,6 @@ Language: ko_KR
     <string name="settings_use_dark_up_next_details">활성화되면 다음 에피소드에 항상 어두운 테마를 사용하고 비활성화되면 현재와 일치하는 테마를 사용합니다.</string>
     <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
     <string name="end_of_year_stories_completion_rate_share_text">나의 2023년 완료율</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독하며 2022년과 비교한 청취 수준, 기타 재미있는 통계, 북마크 및 폴더와 같은 프리미엄 기능을 알아보세요.</string>
     <string name="end_of_year_stories_theres_more">더 있습니다!</string>
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">시작하신 %1$d개 에피소드 중에서 총 %2$d개 완전히 청취</string>
@@ -260,13 +259,8 @@ Language: ko_KR
     <string name="end_of_year_stories_year_over_share_text">2022년 대비 내 2023년 청취 시간</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">2022년 대비 청취 시간이 조금 줄었습니다.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">2022년 대비 청취 시간이 상당히 일정하게 유지되었습니다.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">2024년에 정점을 찍을 준비가 되셨나요?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">2022년에 비해 청취 시간이 %1$s%%나 늘었습니다.</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
-    <string name="end_of_year_story_epilogue_title">올해 청취해 주셔서 감사합니다.\n2024년에 뵙겠습니다.</string>
     <string name="end_of_year_story_longest_episode_subtitle">다름 아닌 \"%2$s\"의 \"%1$s\"였습니다.</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>

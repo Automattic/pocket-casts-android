@@ -14,12 +14,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncJob
+import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -275,31 +274,29 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable {
-        return Completable.fromAction {
-            // don't write over the local Up Next with the server version if we are playing an episode
-            val playingEpisode = playbackManager.getCurrentEpisode()
-            if (playbackManager.isPlaying() && playingEpisode != null) {
-                val firstEpisode = episodes.firstOrNull()
-                if (firstEpisode != null && firstEpisode.uuid == playingEpisode.uuid) {
-                    saveChanges(UpNextAction.Import(episodes))
-
-                    episodes.forEach { downloadIfPossible(it, downloadManager) }
-                } else {
-                    // move the playing episode to the top
-                    val modifiedList = episodes.filterNot { it.uuid == playingEpisode.uuid }.toMutableList()
-                    modifiedList.add(0, playingEpisode)
-
-                    saveChanges(UpNextAction.Import(modifiedList))
-                    upNextChangeDao.savePlayNow(playingEpisode)
-
-                    modifiedList.forEach { downloadIfPossible(it, downloadManager) }
-                }
-            } else {
+    override suspend fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager) {
+        // don't write over the local Up Next with the server version if we are playing an episode
+        val playingEpisode = playbackManager.getCurrentEpisode()
+        if (playbackManager.isPlaying() && playingEpisode != null) {
+            val firstEpisode = episodes.firstOrNull()
+            if (firstEpisode != null && firstEpisode.uuid == playingEpisode.uuid) {
                 saveChanges(UpNextAction.Import(episodes))
 
                 episodes.forEach { downloadIfPossible(it, downloadManager) }
+            } else {
+                // move the playing episode to the top
+                val modifiedList = episodes.filterNot { it.uuid == playingEpisode.uuid }.toMutableList()
+                modifiedList.add(0, playingEpisode)
+
+                saveChanges(UpNextAction.Import(modifiedList))
+                upNextChangeDao.savePlayNow(playingEpisode)
+
+                modifiedList.forEach { downloadIfPossible(it, downloadManager) }
             }
+        } else {
+            saveChanges(UpNextAction.Import(episodes))
+
+            episodes.forEach { downloadIfPossible(it, downloadManager) }
         }
     }
 
@@ -329,6 +326,6 @@ class UpNextQueueImpl @Inject constructor(
         if (changes.isEmpty()) {
             return
         }
-        UpNextSyncJob.run(syncManager, application)
+        UpNextSyncWorker.enqueue(syncManager, application)
     }
 }

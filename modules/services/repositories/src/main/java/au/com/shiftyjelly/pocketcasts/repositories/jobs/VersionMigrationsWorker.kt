@@ -1,13 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.repositories.jobs
 
-import android.annotation.SuppressLint
-import android.app.job.JobInfo
-import android.app.job.JobParameters
 import android.app.job.JobScheduler
-import android.app.job.JobService
-import android.content.ComponentName
 import android.content.Context
 import androidx.core.text.isDigitsOnly
+import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -23,24 +24,35 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@AndroidEntryPoint
-@SuppressLint("SpecifyJobSchedulerIdRange")
-class VersionMigrationsJob : JobService() {
+@HiltWorker
+class VersionMigrationsWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val appDatabase: AppDatabase,
+    private val episodeManager: EpisodeManager,
+    private val fileStorage: FileStorage,
+    private val playbackManager: PlaybackManager,
+    private val podcastManager: PodcastManager,
+    private val settings: Settings,
+) : CoroutineWorker(context, workerParams) {
 
     companion object {
-        fun run(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager, context: Context) {
-            runSync(podcastManager, settings, syncManager)
-            runAsync(settings, context)
+        private const val VERSION_MIGRATIONS_WORKER_NAME = "version_migrations_worker"
+        fun performMigrations(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager, context: Context) {
+            performMigrationsSync(podcastManager, settings, syncManager)
+            enqueueAsyncMigrations(settings, context)
         }
 
         /**
-         * Run short migrations straight away.
+         * Perform short migrations straight away.
          */
-        private fun runSync(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager) {
+        private fun performMigrationsSync(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager) {
             performUpdateIfRequired(updateKey = "run_v7_20", settings = settings) {
                 // Upgrading to version 7.20.0 requires the folders from the servers to be added to the existing podcasts. In case the user doesn't have internet this is done as part of the regular sync process.
                 if (syncManager.isLoggedIn()) {
@@ -62,9 +74,9 @@ class VersionMigrationsJob : JobService() {
         }
 
         /**
-         * Run longer migrations in the background.
+         * Enqueue longer migrations as a background task.
          */
-        private fun runAsync(settings: Settings, context: Context) {
+        private fun enqueueAsyncMigrations(settings: Settings, context: Context) {
             val previousVersionCode = settings.getMigratedVersionCode()
             val versionCode = settings.getVersionCode()
 
@@ -74,14 +86,9 @@ class VersionMigrationsJob : JobService() {
             }
             Timber.i("Migrating from version $previousVersionCode to $versionCode")
 
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Running VersionMigrationsTask")
-            val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobScheduler.cancel(JobIds.VERSION_MIGRATION_JOB_ID)
-            jobScheduler.schedule(
-                JobInfo.Builder(JobIds.VERSION_MIGRATION_JOB_ID, ComponentName(context, VersionMigrationsJob::class.java))
-                    .setOverrideDeadline(500) // don't let Android wait for more than 500ms before kicking this off
-                    .build(),
-            )
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Running VersionMigrationsWorker")
+            val workRequest = OneTimeWorkRequestBuilder<VersionMigrationsWorker>().build()
+            WorkManager.getInstance(context).enqueueUniqueWork(VERSION_MIGRATIONS_WORKER_NAME, ExistingWorkPolicy.KEEP, workRequest)
         }
 
         /**
@@ -119,51 +126,20 @@ class VersionMigrationsJob : JobService() {
         }
     }
 
-    @Inject lateinit var podcastManager: PodcastManager
-
-    @Inject lateinit var episodeManager: EpisodeManager
-
-    @Inject lateinit var settings: Settings
-
-    @Inject lateinit var fileStorage: FileStorage
-
-    @Inject lateinit var appDatabase: AppDatabase
-
-    @Inject lateinit var playbackManager: PlaybackManager
-
-    @Volatile private var shouldKeepRunning = true
-
-    override fun onStartJob(jobParameters: JobParameters): Boolean {
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsTask onStartJob")
-
-        Thread {
-            var shouldReschedule = false
-            try {
-                if (!shouldKeepRunning) {
-                    shouldReschedule = true
-                } else {
-                    performMigration()
-                }
-            } catch (t: Throwable) {
-                Timber.e(t)
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "VersionMigrationsTask jobFinished failed.")
-            } finally {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsTask jobFinished shouldReschedule? $shouldReschedule")
-                jobFinished(jobParameters, shouldReschedule)
-            }
-        }.start()
-
-        return true
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        try {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsWorker - started")
+            performMigrationsAsync()
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsWorker - finished")
+            Result.success()
+        } catch (t: Throwable) {
+            Timber.e(t)
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "VersionMigrationsWorker - failed.")
+            Result.failure()
+        }
     }
 
-    override fun onStopJob(jobParameters: JobParameters): Boolean {
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "VersionMigrationsTask onStopJob")
-        shouldKeepRunning = false
-
-        return false
-    }
-
-    private fun performMigration() {
+    private suspend fun performMigrationsAsync() {
         val previousVersionCode = settings.getMigratedVersionCode()
         val versionCode = settings.getVersionCode()
 
@@ -190,7 +166,6 @@ class VersionMigrationsJob : JobService() {
         removeCustomEpisodes()
         removeOldTempPodcastDirectory()
         unscheduleEpisodeDetailsJob(applicationContext)
-        unscheduleRefreshJob(applicationContext)
 
         if (previousVersionCode < 6362) {
             upgradeTrimSilenceMode()
@@ -220,9 +195,9 @@ class VersionMigrationsJob : JobService() {
         }
     }
 
-    private fun removeCustomEpisodes() {
+    private suspend fun removeCustomEpisodes() {
         val customPodcastUuid = "customFolderPodcast"
-        val podcast: Podcast = podcastManager.findPodcastByUuid(customPodcastUuid) ?: return
+        val podcast: Podcast = podcastManager.findPodcastByUuidSuspend(customPodcastUuid) ?: return
         val episodes: List<PodcastEpisode> = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
         episodes.forEach { episode ->
             playbackManager.removeEpisode(
@@ -270,12 +245,7 @@ class VersionMigrationsJob : JobService() {
         }
     }
 
-    private fun unscheduleRefreshJob(context: Context) {
-        val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as? JobScheduler ?: return
-        jobScheduler.cancel(JobIds.REFRESH_PODCASTS_JOB_ID)
-    }
-
-    private fun upgradeTrimSilenceMode() {
+    private suspend fun upgradeTrimSilenceMode() {
         try {
             val podcasts = podcastManager.findSubscribed()
             podcasts.forEach { podcast ->

@@ -252,7 +252,6 @@ Language: de
     <string name="settings_use_dark_up_next_details">Wenn das dunkle Theme aktiviert ist, wird es in „Up Next“ immer verwendet. Wenn es deaktiviert ist, wird „Up Next“ an das aktuelle Theme angepasst</string>
     <string name="settings_use_dark_up_next">Dunkles „Up Next“-Theme verwenden</string>
     <string name="end_of_year_stories_completion_rate_share_text">Meine Abschlussquote 2023</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Abonniere Plus und vergleiche dein diesjähriges Audioerlebnis mit dem in 2022 und nutze weitere unterhaltsame Statistiken sowie Premium-Funktionen wie Lesezeichen und Ordner.</string>
     <string name="end_of_year_stories_theres_more">Es gibt noch mehr!</string>
     <string name="end_of_year_stories_year_completion_rate">Abschlussquote</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Von deinen %1$d angefangenen Episoden, hast du insgesamt %2$d vollständig angehört</string>
@@ -260,13 +259,8 @@ Language: de
     <string name="end_of_year_stories_year_over_share_text">Meine Audiozeit in 2023 im Vergleich zu 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Im Vergleich zu 2022 ist deine Audiozeit in die Höhe geschnellt!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Man muss das Leben genießen, nicht wahr?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Im Vergleich zu 2022 ist deine Audiozeit ein wenig zurückgegangen</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Man sagt, Beständigkeit ist der Schlüssel zum Erfolg … oder so ähnlich!</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Im Vergleich zu 2022 hat sich deine Audiozeit kaum verändert</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Bist du bereit, sie in 2024 zu überbieten?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Im Vergleich zu 2022 ist deine Audiozeit um ganze %1$s %% angestiegen</string>
     <string name="end_of_year_prompt_card_summary">Schau dir deine Audiostatistiken, Top-Podcasts und mehr an.</string>
-    <string name="end_of_year_story_epilogue_title">Vielen Dank, dass du dieses Jahr dein Audioerlebnis mit uns genossen hast.\nWir hören uns 2024!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Es war keine geringere als „%1$s“ aus „%2$s“</string>
     <string name="end_of_year_story_longest_episode_title">Die längste von dir angehörte Folge war %1$s</string>
     <string name="end_of_year_replay">Erneut abspielen</string>

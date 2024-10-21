@@ -252,7 +252,6 @@ Language: nl
     <string name="settings_use_dark_up_next_details">Indien ingeschakeld gebruikt Hierna altijd het donkere thema en indien uitgeschakeld gebruikt het het huidige thema</string>
     <string name="settings_use_dark_up_next">Donker thema voor Hierna gebruiken</string>
     <string name="end_of_year_stories_completion_rate_share_text">Mijn afrondingspercentage 2023</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Abonneer je op Plus en bekijk hoe jouw luistergedrag is veranderd ten opzichte van 2022, andere leuke statistieken en Premium-functies zoals bladwijzers en mappen.</string>
     <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Van de %1$d afleveringen waar je aan bent begonnen, heb je dit aantal helemaal afgekeken %2$d</string>
@@ -260,13 +259,8 @@ Language: nl
     <string name="end_of_year_stories_year_over_share_text">Mijn luistertijd in 2023, ten opzichte van 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Ten opzichte van 2022 is je luistertijd een klein beetje omlaag gegaan</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistentie is de sleutel tot succes… of zoiets!</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Ten opzichte van 2022 is je luistertijd redelijk hetzelfde gebleven</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Klaar om dit te overtreffen in 2024?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Ten opzichte van 2022 is je luistertijd verhoogd met maarliefst %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
-    <string name="end_of_year_story_epilogue_title">Bedankt dat je dit jaar met ons geluisterd hebt.\nWe zien je in 2024!</string>
     <string name="end_of_year_story_longest_episode_subtitle">Het was niemand minder dan \'%1$s\' uit \'%2$s\'</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
