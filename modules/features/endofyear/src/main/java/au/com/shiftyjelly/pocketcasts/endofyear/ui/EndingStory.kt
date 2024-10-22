@@ -29,7 +29,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
-import au.com.shiftyjelly.pocketcasts.endofyear.Story
+import au.com.shiftyjelly.pocketcasts.models.to.Story
 import kotlin.math.roundToLong
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR

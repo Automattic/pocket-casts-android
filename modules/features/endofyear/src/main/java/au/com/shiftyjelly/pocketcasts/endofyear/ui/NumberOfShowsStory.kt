@@ -29,8 +29,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ScrollDirection
 import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.to.Story
 import kotlin.math.roundToLong
 import kotlin.math.tan
 import au.com.shiftyjelly.pocketcasts.ui.R as UR

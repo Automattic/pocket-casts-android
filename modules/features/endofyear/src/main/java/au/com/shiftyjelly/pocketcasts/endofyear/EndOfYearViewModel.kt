@@ -3,8 +3,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
-import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
+import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
@@ -17,8 +16,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Year
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -30,7 +27,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode as LongestEpisodeData
 
 @HiltViewModel(assistedFactory = EndOfYearViewModel.Factory::class)
 class EndOfYearViewModel @AssistedInject constructor(
@@ -228,78 +224,6 @@ internal sealed interface UiState {
         val isPaidAccount: Boolean,
         override val storyProgress: Float,
     ) : UiState
-}
-
-@Immutable
-internal sealed interface Story {
-    val previewDuration: Duration? get() = 7.seconds
-    val isFree: Boolean get() = true
-
-    data object Cover : Story
-
-    @Immutable
-    data class NumberOfShows(
-        val showCount: Int,
-        val epsiodeCount: Int,
-        val topShowIds: List<String>,
-        val bottomShowIds: List<String>,
-    ) : Story
-
-    data class TopShow(
-        val show: TopPodcast,
-    ) : Story
-
-    @Immutable
-    data class TopShows(
-        val shows: List<TopPodcast>,
-    ) : Story
-
-    data class Ratings(
-        val stats: RatingStats,
-    ) : Story
-
-    data class TotalTime(
-        val duration: Duration,
-    ) : Story
-
-    data class LongestEpisode(
-        val episode: LongestEpisodeData,
-    ) : Story
-
-    data object PlusInterstitial : Story {
-        override val previewDuration = null
-    }
-
-    data class YearVsYear(
-        val lastYearDuration: Duration,
-        val thisYearDuration: Duration,
-        val subscriptionTier: SubscriptionTier?,
-    ) : Story {
-        override val isFree = false
-
-        val yearOverYearChange
-            get() = when {
-                lastYearDuration == thisYearDuration -> 1.0
-                lastYearDuration == Duration.ZERO -> Double.POSITIVE_INFINITY
-                else -> thisYearDuration / lastYearDuration
-            }
-    }
-
-    data class CompletionRate(
-        val listenedCount: Int,
-        val completedCount: Int,
-        val subscriptionTier: SubscriptionTier?,
-    ) : Story {
-        override val isFree = false
-
-        val completionRate
-            get() = when {
-                listenedCount == 0 -> 1.0
-                else -> completedCount.toDouble() / listenedCount
-            }
-    }
-
-    data object Ending : Story
 }
 
 private sealed interface SyncState {

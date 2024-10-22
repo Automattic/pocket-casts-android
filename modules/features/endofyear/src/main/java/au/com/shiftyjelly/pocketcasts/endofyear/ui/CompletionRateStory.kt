@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
-import au.com.shiftyjelly.pocketcasts.endofyear.Story
+import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
