@@ -173,30 +173,43 @@ class UpNextAdapter(
                 }
 
                 shuffle.isVisible = FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
-                shuffle.setShuffleDisabledButton()
+                shuffle.updateShuffleButton()
 
                 shuffle.setOnClickListener {
-                    shuffle.setShuffleEnabledButton()
+                    settings.upNextShuffle.set(!settings.upNextShuffle.value, updateModifiedAt = false)
+                    shuffle.updateShuffleButton()
                 }
 
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
         }
 
-        private fun ImageButton.setShuffleDisabledButton() {
-            this.setImageDrawable(ContextCompat.getDrawable(context, IR.drawable.shuffle))
-            this.contentDescription = context.getString(LR.string.up_next_shuffle_button_content_description)
-            this.setImageTintList(ColorStateList.valueOf(ThemeColor.primaryIcon02(theme)))
+        private fun ImageButton.updateShuffleButton() {
+            if (!FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)) return
 
-            TooltipCompat.setTooltipText(this, context.getString(LR.string.up_next_shuffle_button_content_description))
-        }
+            val isEnabled = settings.upNextShuffle.value
 
-        private fun ImageButton.setShuffleEnabledButton() {
-            this.setImageDrawable(ContextCompat.getDrawable(context, IR.drawable.shuffle_enabled))
-            this.contentDescription = context.getString(LR.string.up_next_shuffle_disable_button_content_description)
-            this.setImageTintList(ColorStateList.valueOf(ThemeColor.primaryIcon01(theme)))
+            this.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    if (isEnabled) IR.drawable.shuffle_enabled else IR.drawable.shuffle,
+                ),
+            )
 
-            TooltipCompat.setTooltipText(this, context.getString(LR.string.up_next_shuffle_button_content_description))
+            this.contentDescription = context.getString(
+                if (isEnabled) LR.string.up_next_shuffle_disable_button_content_description else LR.string.up_next_shuffle_button_content_description,
+            )
+
+            this.setImageTintList(
+                ColorStateList.valueOf(
+                    if (isEnabled) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
+                ),
+            )
+
+            TooltipCompat.setTooltipText(
+                this,
+                context.getString(LR.string.up_next_shuffle_button_content_description),
+            )
         }
     }
 
