@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.endofyear.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,6 +53,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun StoriesPage(
     state: UiState,
     pagerState: PagerState,
+    onChangeStory: (Boolean) -> Unit,
+    onClickUpsell: () -> Unit,
     onClose: () -> Unit,
 ) {
     val size = LocalContext.current.sizeLimit?.let(Modifier::size) ?: Modifier.fillMaxSize()
@@ -83,6 +83,8 @@ internal fun StoriesPage(
                     coverTextHeight = coverTextHeight,
                 ),
                 pagerState = pagerState,
+                onChangeStory = onChangeStory,
+                onClickUpsell = onClickUpsell,
             )
         }
 
@@ -120,8 +122,9 @@ private fun Stories(
     stories: List<Story>,
     measurements: EndOfYearMeasurements,
     pagerState: PagerState,
+    onChangeStory: (Boolean) -> Unit,
+    onClickUpsell: () -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val widthPx = LocalDensity.current.run { measurements.width.toPx() }
 
     HorizontalPager(
@@ -129,16 +132,8 @@ private fun Stories(
         userScrollEnabled = false,
         modifier = Modifier.pointerInput(Unit) {
             detectTapGestures { offset ->
-                if (!pagerState.isScrollInProgress) {
-                    coroutineScope.launch {
-                        val nextPage = if (offset.x > widthPx / 2) {
-                            pagerState.currentPage + 1
-                        } else {
-                            pagerState.currentPage - 1
-                        }
-                        pagerState.scrollToPage(nextPage)
-                    }
-                }
+                val moveForward = offset.x > widthPx / 2
+                onChangeStory(moveForward)
             }
         },
     ) { index ->
@@ -150,7 +145,7 @@ private fun Stories(
             is Story.Ratings -> RatingsStory(story, measurements)
             is Story.TotalTime -> TotalTimeStory(story, measurements)
             is Story.LongestEpisode -> LongestEpisodeStory(story, measurements)
-            is Story.PlusInterstitial -> PlusInterstitialStory(story, measurements)
+            is Story.PlusInterstitial -> PlusInterstitialStory(story, measurements, onClickUpsell)
             is Story.YearVsYear -> YearVsYearStory(story, measurements)
             is Story.CompletionRate -> CompletionRateStory(story, measurements)
             is Story.Ending -> EndingStory(story, measurements)
