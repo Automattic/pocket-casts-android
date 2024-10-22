@@ -3,6 +3,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <string-array name="available_languages" translatable="false" tools:ignore="InconsistentArrays">
     <item>en_US</item>
+    <item>ar</item>
     <item>ca</item>
     <item>de</item>
     <item>es</item>
