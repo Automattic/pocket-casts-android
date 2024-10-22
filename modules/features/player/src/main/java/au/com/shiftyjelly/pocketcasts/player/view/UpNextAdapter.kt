@@ -6,7 +6,10 @@ import android.content.res.ColorStateList
 import android.graphics.ColorFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.annotation.ColorInt
+import androidx.appcompat.widget.TooltipCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
@@ -35,6 +38,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -44,6 +49,7 @@ import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.value.LottieValueCallback
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class UpNextAdapter(
@@ -166,8 +172,31 @@ class UpNextAdapter(
                     root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
+                shuffle.isVisible = FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
+                shuffle.setShuffleDisabledButton()
+
+                shuffle.setOnClickListener {
+                    shuffle.setShuffleEnabledButton()
+                }
+
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
+        }
+
+        private fun ImageButton.setShuffleDisabledButton() {
+            this.setImageDrawable(ContextCompat.getDrawable(context, IR.drawable.shuffle))
+            this.contentDescription = context.getString(LR.string.up_next_shuffle_button_content_description)
+            this.setImageTintList(ColorStateList.valueOf(ThemeColor.primaryIcon02(theme)))
+
+            TooltipCompat.setTooltipText(this, context.getString(LR.string.up_next_shuffle_button_content_description))
+        }
+
+        private fun ImageButton.setShuffleEnabledButton() {
+            this.setImageDrawable(ContextCompat.getDrawable(context, IR.drawable.shuffle_enabled))
+            this.contentDescription = context.getString(LR.string.up_next_shuffle_disable_button_content_description)
+            this.setImageTintList(ColorStateList.valueOf(ThemeColor.primaryIcon01(theme)))
+
+            TooltipCompat.setTooltipText(this, context.getString(LR.string.up_next_shuffle_button_content_description))
         }
     }
 
