@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.horologist.auth.ui.googlesignin.signin.GoogleSignInScreen
+import com.google.android.horologist.compose.layout.ScreenScaffold
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import com.google.android.horologist.auth.composables.R as HR
@@ -20,31 +21,33 @@ fun LoginWithGoogleScreen(
     signInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
     onAuthCanceled: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<LoginWithGoogleScreenViewModel>()
-    val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
+    ScreenScaffold {
+        val viewModel = hiltViewModel<LoginWithGoogleScreenViewModel>()
+        val state by viewModel.state.collectAsState()
+        val context = LocalContext.current
 
-    CallOnce {
-        // Allow the user to sign in with a different account
-        viewModel.clearPreviousSignIn()
+        CallOnce {
+            // Allow the user to sign in with a different account
+            viewModel.clearPreviousSignIn()
+        }
+
+        GoogleSignInScreen(
+            viewModel = viewModel.googleSignInViewModel,
+            onAuthCancelled = {
+                Timber.i("Google sign in cancelled")
+                onAuthCanceled()
+            },
+            failedContent = {
+                val message = if (Network.isConnected(context)) {
+                    HR.string.horologist_auth_error_message
+                } else {
+                    LR.string.log_in_no_network
+                }
+                ErrorScreen(stringResource(message))
+            },
+            content = {
+                signInSuccessScreen(state.googleSignInAccount)
+            },
+        )
     }
-
-    GoogleSignInScreen(
-        viewModel = viewModel.googleSignInViewModel,
-        onAuthCancelled = {
-            Timber.i("Google sign in cancelled")
-            onAuthCanceled()
-        },
-        failedContent = {
-            val message = if (Network.isConnected(context)) {
-                HR.string.horologist_auth_error_message
-            } else {
-                LR.string.log_in_no_network
-            }
-            ErrorScreen(stringResource(message))
-        },
-        content = {
-            signInSuccessScreen(state.googleSignInAccount)
-        },
-    )
 }

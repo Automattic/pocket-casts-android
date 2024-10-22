@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
 import au.com.shiftyjelly.pocketcasts.compose.images.ProfileImage
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
+import com.google.android.horologist.compose.layout.ScreenScaffold
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object LoggingInScreen {
@@ -50,19 +51,21 @@ fun LoggingInScreen(
     withMinimumDelay: Boolean = false,
     onClose: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<LoggingInScreenViewModel>()
-    val state = viewModel.state.collectAsState().value
+    ScreenScaffold {
+        val viewModel = hiltViewModel<LoggingInScreenViewModel>()
+        val state = viewModel.state.collectAsState().value
 
-    if (viewModel.shouldClose(withMinimumDelay)) {
-        onClose()
+        if (viewModel.shouldClose(withMinimumDelay)) {
+            onClose()
+        }
+
+        Content(
+            email = state.email,
+            avatarUrl = avatarUrl,
+            name = name,
+            onClose = onClose,
+        )
     }
-
-    Content(
-        email = state.email,
-        avatarUrl = avatarUrl,
-        name = name,
-        onClose = onClose,
-    )
 }
 
 @Composable

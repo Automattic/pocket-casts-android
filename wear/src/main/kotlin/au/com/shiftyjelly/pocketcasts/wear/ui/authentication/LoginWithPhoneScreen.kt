@@ -13,58 +13,64 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
-import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun LoginWithPhoneScreen(
-    columnState: ScalingLazyColumnState,
     onDone: () -> Unit,
 ) {
-    ScalingLazyColumn(
-        columnState = columnState,
-        modifier = Modifier.clickable(onClick = onDone),
+    val columnState = rememberColumnState()
+
+    ScreenScaffold(
+        scrollState = columnState,
     ) {
-        item {
-            Text(
-                text = stringResource(LR.string.log_in_on_phone),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.title2,
-            )
-        }
+        ScalingLazyColumn(
+            columnState = columnState,
+            modifier = Modifier.clickable(onClick = onDone),
+        ) {
+            item {
+                Text(
+                    text = stringResource(LR.string.log_in_on_phone),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.title2,
+                )
+            }
 
-        item {
-            Spacer(Modifier.height(8.dp))
-        }
+            item {
+                Spacer(Modifier.height(8.dp))
+            }
 
-        item {
-            Text(
-                text = "1. ${stringResource(LR.string.log_in_watch_from_phone_instructions_1)}",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body2,
-            )
-        }
+            item {
+                Text(
+                    text = "1. ${stringResource(LR.string.log_in_watch_from_phone_instructions_1)}",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.body2,
+                )
+            }
 
-        item {
-            Spacer(Modifier.height(4.dp))
-        }
+            item {
+                Spacer(Modifier.height(4.dp))
+            }
 
-        item {
-            Text(
-                text = "2. ${stringResource(LR.string.log_in_watch_from_phone_instructions_2)}",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(bottom = 24.dp),
-            )
-        }
+            item {
+                Text(
+                    text = "2. ${stringResource(LR.string.log_in_watch_from_phone_instructions_2)}",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.padding(bottom = 24.dp),
+                )
+            }
 
-        item {
-            Text(
-                text = stringResource(LR.string.log_in_watch_from_phone_instructions_3, BuildConfig.VERSION_NAME),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(bottom = 24.dp),
-            )
+            item {
+                Text(
+                    text = stringResource(LR.string.log_in_watch_from_phone_instructions_3, BuildConfig.VERSION_NAME),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.padding(bottom = 24.dp),
+                )
+            }
         }
     }
 }
