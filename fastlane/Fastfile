@@ -34,23 +34,26 @@ BUILD_CODE_FORMATTER = Fastlane::Wpmreleasetoolkit::Versioning::SimpleBuildCodeF
 VERSION_FILE = Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile.new(version_properties_path: VERSION_PROPERTIES_PATH)
 
 SUPPORTED_LOCALES = [
-  { glotpress: 'ar', android: 'ar', google_play: 'ar', promo_config: {} },
-  { glotpress: 'de', android: 'de', google_play: 'de-DE',  promo_config: {} },
-  { glotpress: 'es', android: 'es', google_play: 'es-ES',  promo_config: {} },
-  { glotpress: 'es', android: 'es-rMX', google_play: 'es-MX', promo_config: {} },
-  { glotpress: 'en-gb', android: 'en-rGB', google_play: 'en-GB', promo_config: {} },
-  { glotpress: 'fr', android: 'fr', google_play: 'fr-FR', promo_config: {} },
-  { glotpress: 'fr', android: 'fr-rCA', google_play: 'fr-CA', promo_config: {} },
-  { glotpress: 'it', android: 'it', google_play: 'it-IT',  promo_config: {} },
-  { glotpress: 'ja', android: 'ja', google_play: 'ja-JP',  promo_config: {} },
-  { glotpress: 'ko', android: 'ko', google_play: 'ko-KR',  promo_config: {} },
-  { glotpress: 'nl', android: 'nl', google_play: 'nl-NL',  promo_config: {} },
-  { glotpress: 'nb', android: 'nb', google_play: 'nb-NB',  promo_config: {} },
-  { glotpress: 'pt-br', android: 'pt-rBR', google_play: 'pt-BR', promo_config: {} },
-  { glotpress: 'ru', android: 'ru', google_play: 'ru-RU',  promo_config: {} },
-  { glotpress: 'sv', android: 'sv', google_play: 'sv-SE',  promo_config: {} },
-  { glotpress: 'zh-cn', android: 'zh', google_play: 'zh-CN', promo_config: {} },
-  { glotpress: 'zh-tw', android: 'zh-rTW', google_play: 'zh-TW', promo_config: {} }
+  # There is an option argument 'google_play' that can be used for release notes.
+  # However, we don't translate them so we can skip it.
+  { glotpress: 'ar', android: 'ar', promo_config: {} },
+  { glotpress: 'ca', android: 'ca', promo_config: {} },
+  { glotpress: 'de', android: 'de', promo_config: {} },
+  { glotpress: 'es', android: 'es', promo_config: {} },
+  { glotpress: 'es', android: 'es-rMX', promo_config: {} },
+  { glotpress: 'en-gb', android: 'en-rGB', promo_config: {} },
+  { glotpress: 'fr', android: 'fr', promo_config: {} },
+  { glotpress: 'fr', android: 'fr-rCA', promo_config: {} },
+  { glotpress: 'it', android: 'it',  promo_config: {} },
+  { glotpress: 'ja', android: 'ja',  promo_config: {} },
+  { glotpress: 'ko', android: 'ko',  promo_config: {} },
+  { glotpress: 'nl', android: 'nl',  promo_config: {} },
+  { glotpress: 'nb', android: 'nb',  promo_config: {} },
+  { glotpress: 'pt-br', android: 'pt-rBR', promo_config: {} },
+  { glotpress: 'ru', android: 'ru',  promo_config: {} },
+  { glotpress: 'sv', android: 'sv',  promo_config: {} },
+  { glotpress: 'zh-cn', android: 'zh', promo_config: {} },
+  { glotpress: 'zh-tw', android: 'zh-rTW', promo_config: {} }
 ].freeze
 
 ########################################################################
