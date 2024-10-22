@@ -645,6 +645,7 @@
     <string name="thank_you_for_rating">Thank you for rating!</string>
     <string name="something_went_wrong_to_rate_this_podcast">Something went wrong. Please try again later</string>
     <string name="podcast_star_rating_content_description">Podcast Star Rating</string>
+    <string name="podcast_ratings_page_title">Ratings</string>
 
     <!-- Episodes -->
 

@@ -66,19 +66,26 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
-) = RatingsStory(story, measurements, showBars = false)
+    onLearnAboutRatings: () -> Unit,
+) = RatingsStory(
+    story = story,
+    measurements = measurements,
+    showBars = false,
+    onLearnAboutRatings = onLearnAboutRatings,
+)
 
 @Composable
 private fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     showBars: Boolean,
+    onLearnAboutRatings: () -> Unit,
 ) {
     val maxRatingCount = story.stats.max().second
     if (maxRatingCount != 0) {
         PresentRatings(story, measurements, showBars)
     } else {
-        AbsentRatings(story, measurements)
+        AbsentRatings(story, measurements, onLearnAboutRatings)
     }
 }
 
@@ -276,6 +283,7 @@ private fun RowScope.RatingBar(
 private fun AbsentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
+    onLearnAboutRatings: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -289,6 +297,7 @@ private fun AbsentRatings(
         NoRatingsInfo(
             story = story,
             measurements = measurements,
+            onLearnAboutRatings = onLearnAboutRatings,
         )
     }
 }
@@ -352,6 +361,7 @@ private fun OopsiesText(
 private fun NoRatingsInfo(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
+    onLearnAboutRatings: () -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -383,7 +393,7 @@ private fun NoRatingsInfo(
         )
         OutlinedEoyButton(
             text = stringResource(LR.string.eoy_story_ratings_learn_button_label),
-            onClick = {},
+            onClick = onLearnAboutRatings,
         )
     }
 }
@@ -404,6 +414,7 @@ private fun RatingsHighPreview() {
             ),
             measurements = measurements,
             showBars = true,
+            onLearnAboutRatings = {},
         )
     }
 }
@@ -424,6 +435,7 @@ private fun RatingsLowPreview() {
             ),
             measurements = measurements,
             showBars = true,
+            onLearnAboutRatings = {},
         )
     }
 }
@@ -444,6 +456,7 @@ private fun RatingsNonePreview() {
             ),
             measurements = measurements,
             showBars = true,
+            onLearnAboutRatings = {},
         )
     }
 }

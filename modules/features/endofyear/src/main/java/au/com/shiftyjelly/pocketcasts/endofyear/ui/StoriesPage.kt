@@ -54,6 +54,7 @@ internal fun StoriesPage(
     state: UiState,
     pagerState: PagerState,
     onChangeStory: (Boolean) -> Unit,
+    onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
     onClose: () -> Unit,
 ) {
@@ -84,6 +85,7 @@ internal fun StoriesPage(
                 ),
                 pagerState = pagerState,
                 onChangeStory = onChangeStory,
+                onLearnAboutRatings = onLearnAboutRatings,
                 onClickUpsell = onClickUpsell,
             )
         }
@@ -123,6 +125,7 @@ private fun Stories(
     measurements: EndOfYearMeasurements,
     pagerState: PagerState,
     onChangeStory: (Boolean) -> Unit,
+    onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
 ) {
     val widthPx = LocalDensity.current.run { measurements.width.toPx() }
@@ -142,7 +145,7 @@ private fun Stories(
             is Story.NumberOfShows -> NumberOfShowsStory(story, measurements)
             is Story.TopShow -> TopShowStory(story, measurements)
             is Story.TopShows -> TopShowsStory(story, measurements)
-            is Story.Ratings -> RatingsStory(story, measurements)
+            is Story.Ratings -> RatingsStory(story, measurements, onLearnAboutRatings)
             is Story.TotalTime -> TotalTimeStory(story, measurements)
             is Story.LongestEpisode -> LongestEpisodeStory(story, measurements)
             is Story.PlusInterstitial -> PlusInterstitialStory(story, measurements, onClickUpsell)
