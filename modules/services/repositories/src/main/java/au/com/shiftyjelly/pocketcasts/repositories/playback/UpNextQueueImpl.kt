@@ -28,6 +28,7 @@ import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -70,6 +71,7 @@ class UpNextQueueImpl @Inject constructor(
         data class PlayLast(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         data class Rearrange(val episodes: List<BaseEpisode>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         data class Remove(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class RemoveAndShuffle(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         data class Import(val episodes: List<BaseEpisode>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         object ClearAll : UpNextAction(null)
         object ClearAllIncludingChanges : UpNextAction(null)
@@ -89,13 +91,14 @@ class UpNextQueueImpl @Inject constructor(
             .addTo(disposables)
     }
 
-    private fun updateState(): UpNextQueue.State {
+    private fun updateState(shouldShuffleUpNext: Boolean = false): UpNextQueue.State {
         val state: UpNextQueue.State
         val episodes: MutableList<BaseEpisode> = upNextDao.findAllEpisodesSorted().toMutableList()
         if (episodes.isEmpty()) {
             state = UpNextQueue.State.Empty
         } else {
-            val episode: BaseEpisode = episodes.removeAt(0)
+            val index = if (shouldShuffleUpNext) Random.nextInt(episodes.size) else 0
+            val episode: BaseEpisode = episodes.removeAt(index)
             val previousState: UpNextQueue.State = changesObservable.blockingFirst()
             val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
             val podcast: Podcast? = if (previousState is UpNextQueue.State.Loaded && previousState.podcast?.uuid == podcastUuid) {
@@ -121,6 +124,7 @@ class UpNextQueueImpl @Inject constructor(
             is UpNextAction.PlayNext -> insertUpNextEpisode(episode = action.episode, position = 1)
             is UpNextAction.PlayLast -> insertUpNextEpisode(episode = action.episode, position = -1)
             is UpNextAction.Remove -> upNextDao.deleteByUuid(uuid = action.episode.uuid)
+            is UpNextAction.RemoveAndShuffle -> upNextDao.deleteByUuid(uuid = action.episode.uuid)
             is UpNextAction.Rearrange -> upNextDao.saveAll(episodes = action.episodes)
             is UpNextAction.Import -> upNextDao.saveAll(episodes = action.episodes)
             is UpNextAction.ClearUpNext -> upNextDao.deleteAllNotCurrent()
@@ -138,6 +142,7 @@ class UpNextQueueImpl @Inject constructor(
                 is UpNextAction.PlayNext -> upNextChangeDao.savePlayNext(action.episode)
                 is UpNextAction.PlayLast -> upNextChangeDao.savePlayLast(action.episode)
                 is UpNextAction.Remove -> upNextChangeDao.saveRemove(action.episode)
+                is UpNextAction.RemoveAndShuffle -> upNextChangeDao.saveRemove(action.episode)
                 is UpNextAction.Rearrange -> upNextChangeDao.saveReplace(action.episodes.map { it.uuid })
                 is UpNextAction.ClearUpNext -> upNextChangeDao.saveReplace(listOfNotNull(currentEpisode).map { it.uuid })
                 is UpNextAction.ClearAll -> upNextChangeDao.saveReplace(emptyList())
@@ -145,7 +150,8 @@ class UpNextQueueImpl @Inject constructor(
             }
         }
 
-        val state = updateState()
+        val shouldShuffleUpNext = action is UpNextAction.RemoveAndShuffle
+        val state = updateState(shouldShuffleUpNext = shouldShuffleUpNext)
         updateCurrentEpisodeState(state)
 
         action._onAdd?.invoke()
@@ -232,9 +238,13 @@ class UpNextQueueImpl @Inject constructor(
         episodes.forEach { playLastNow(it, downloadManager, null) }
     }
 
-    override suspend fun removeEpisode(episode: BaseEpisode) {
+    override suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean) {
         if (contains(episode.uuid)) {
-            saveChanges(UpNextAction.Remove(episode))
+            if (shouldShuffleUpNext) {
+                saveChanges(UpNextAction.RemoveAndShuffle(episode))
+            } else {
+                saveChanges(UpNextAction.Remove(episode))
+            }
         }
     }
 

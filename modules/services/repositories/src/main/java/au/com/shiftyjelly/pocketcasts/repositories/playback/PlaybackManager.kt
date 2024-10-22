@@ -1295,7 +1295,7 @@ open class PlaybackManager @Inject constructor(
             }
 
             // remove from Up Next
-            upNextQueue.removeEpisode(episode)
+            upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value)
 
             // stop the downloads
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
