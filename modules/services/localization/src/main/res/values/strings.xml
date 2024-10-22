@@ -645,6 +645,7 @@
     <string name="thank_you_for_rating">Thank you for rating!</string>
     <string name="something_went_wrong_to_rate_this_podcast">Something went wrong. Please try again later</string>
     <string name="podcast_star_rating_content_description">Podcast Star Rating</string>
+    <string name="podcast_ratings_page_title">Ratings</string>
 
     <!-- Episodes -->
 
@@ -1991,6 +1992,8 @@
     <string name="clear_before_adding">Clear Before Adding</string>
     <string name="dont_clear">Don\'t Clear</string>
     <string name="clear_up_next">Clear Up Next</string>
+    <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
+    <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
     <string name="clear_all">Clear All</string>
     <string name="clear_search">Clear Search</string>
     <string name="add_mode">Add Mode</string>
