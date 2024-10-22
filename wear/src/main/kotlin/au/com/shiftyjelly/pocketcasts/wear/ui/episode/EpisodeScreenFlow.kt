@@ -1,7 +1,6 @@
 
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -40,7 +39,6 @@ object EpisodeScreenFlow {
     private const val deleteDownloadNotificationScreen = "deleteDownloadNotificationScreen"
     private const val removeFromUpNextNotificationScreen = "removeFromUpNextNotificationScreen"
 
-    @OptIn(ExperimentalFoundationApi::class)
     fun NavGraphBuilder.episodeGraph(
         navigateToPodcast: (podcastUuid: String) -> Unit,
         navController: NavController,
