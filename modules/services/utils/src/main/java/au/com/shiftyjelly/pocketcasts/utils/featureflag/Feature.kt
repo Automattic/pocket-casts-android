@@ -131,6 +131,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    UP_NEXT_SHUFFLE(
+        key = "up_next_shuffle",
+        title = "Up Next Shuffle",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

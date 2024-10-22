@@ -5,6 +5,9 @@
         ([#3046](https://github.com/Automattic/pocket-casts-android/pull/3046))
     *   Add the ability to auto download episodes after subscribing to a podcast
         ([#3048](https://github.com/Automattic/pocket-casts-android/pull/3048))
+*   Updates
+    *   Move Up Next clear queue button to app bar
+        ([#3068](https://github.com/Automattic/pocket-casts-android/pull/3068))
 
 7.75
 -----

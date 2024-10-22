@@ -68,7 +68,7 @@ class MiniPlayerDialog(
             analyticsTracker = analyticsTracker,
             context = context,
         )
-        dialog.showOrClear(fragmentManager)
+        dialog.showOrClear(fragmentManager, tag = "mini_player_clear_dialog")
     }
 
     private fun markAsPlayed() {
