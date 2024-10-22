@@ -48,7 +48,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeMod
 class SharingClient(
     private val context: Context,
     private val mediaService: MediaService,
-    private val listeners: Set<SharingClient.Listener>,
+    private val listeners: Set<Listener>,
     private val displayPodcastCover: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
     private val showCustomCopyFeedback: Boolean = Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2,
     private val hostUrl: String = SERVER_SHORT_URL,
@@ -274,47 +274,56 @@ data class SharingRequest internal constructor(
     val cardType: CardType?,
     val backgroundImage: File?,
     val source: SourceView,
-    val analyticsEvent: AnalyticsEvent,
+    val analyticsEvent: AnalyticsEvent?,
     val analyticsProperties: Map<String, Any>,
 ) {
     companion object {
         fun podcast(
             podcast: PodcastModel,
         ) = Builder(Data.Podcast(podcast))
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun episode(
             podcast: PodcastModel,
             episode: PodcastEpisode,
         ) = Builder(Data.Episode(podcast, episode))
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun episodePosition(
             podcast: PodcastModel,
             episode: PodcastEpisode,
             position: Duration,
         ) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Episode))
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun bookmark(
             podcast: PodcastModel,
             episode: PodcastEpisode,
             position: Duration,
         ) = Builder(Data.EpisodePosition(podcast, episode, position, TimestampType.Bookmark))
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun episodeFile(
             podcast: Podcast,
             episode: PodcastEpisode,
         ) = Builder(Data.EpisodeFile(podcast, episode))
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun clipLink(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipLink(podcast, episode, range)).setPlatform(SocialPlatform.PocketCasts)
+        ) = Builder(Data.ClipLink(podcast, episode, range))
+            .setPlatform(PocketCasts)
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun audioClip(
             podcast: Podcast,
             episode: PodcastEpisode,
             range: Clip.Range,
-        ) = Builder(Data.ClipAudio(podcast, episode, range)).setCardType(CardType.Audio)
+        ) = Builder(Data.ClipAudio(podcast, episode, range))
+            .setCardType(CardType.Audio)
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun videoClip(
             podcast: Podcast,
@@ -325,6 +334,7 @@ data class SharingRequest internal constructor(
         ) = Builder(Data.ClipVideo(podcast, episode, range))
             .setCardType(cardType)
             .setBackgroundImage(backgroundImage)
+            .setAnalyticsEvent(AnalyticsEvent.PODCAST_SHARED)
 
         fun referralLink(
             referralCode: String,
@@ -336,7 +346,7 @@ data class SharingRequest internal constructor(
             ),
         )
             .setAnalyticsEvent(AnalyticsEvent.REFERRAL_PASS_SHARED)
-            .setAnalyticProperties(mapOf("code" to referralCode))
+            .addAnalyticsProperty("code", referralCode)
     }
 
     class Builder internal constructor(
@@ -346,8 +356,8 @@ data class SharingRequest internal constructor(
         private var cardType: CardType? = null
         private var source = SourceView.UNKNOWN
         private var backgroundImage: File? = null
-        private var analyticsEvent: AnalyticsEvent = AnalyticsEvent.PODCAST_SHARED
-        private var analyticsProperties: Map<String, Any> = emptyMap()
+        private var analyticsEvent: AnalyticsEvent? = null
+        private var analyticsProperties = HashMap<String, Any>()
 
         fun setPlatform(platform: SocialPlatform) = apply {
             this.platform = platform
@@ -369,8 +379,8 @@ data class SharingRequest internal constructor(
             this.analyticsEvent = analyticsEvent
         }
 
-        fun setAnalyticProperties(properties: Map<String, Any>) = apply {
-            this.analyticsProperties = properties
+        fun addAnalyticsProperty(key: String, value: Any) = apply {
+            analyticsProperties.put(key, value)
         }
 
         fun build() = SharingRequest(
@@ -380,8 +390,47 @@ data class SharingRequest internal constructor(
             backgroundImage = backgroundImage,
             source = source,
             analyticsEvent = analyticsEvent,
-            analyticsProperties = analyticsProperties,
+            analyticsProperties = buildMap {
+                put("type", data.analyticsValue)
+                put("source", source.analyticsValue)
+                put("action", platform.analyticsValue)
+                cardType?.let { type ->
+                    put("card_type", type.analyticsValue)
+                }
+                putAll(analyticsProperties)
+            },
         )
+
+        private val SharingRequest.Data.analyticsValue get() = when (this) {
+            is SharingRequest.Data.Podcast -> "podcast"
+            is SharingRequest.Data.Episode -> "episode"
+            is SharingRequest.Data.EpisodePosition -> when (type) {
+                TimestampType.Episode -> "current_time"
+                TimestampType.Bookmark -> "bookmark_time"
+            }
+            is SharingRequest.Data.EpisodeFile -> "episode_file"
+            is SharingRequest.Data.ClipLink -> "clip_link"
+            is SharingRequest.Data.ClipAudio -> "clip_audio"
+            is SharingRequest.Data.ClipVideo -> "clip_video"
+            is SharingRequest.Data.ReferralLink -> "referral_link"
+        }
+
+        private val SocialPlatform.analyticsValue get() = when (this) {
+            Instagram -> "ig_story"
+            WhatsApp -> "whats_app"
+            Telegram -> "telegram"
+            X -> "twitter"
+            Tumblr -> "tumblr"
+            PocketCasts -> "url"
+            More -> "system_sheet"
+        }
+
+        private val CardType.analyticsValue get() = when (this) {
+            CardType.Vertical -> "vertical"
+            CardType.Horizontal -> "horizontal"
+            CardType.Square -> "square"
+            CardType.Audio -> "audio"
+        }
     }
 
     internal sealed interface Sociable {
@@ -486,7 +535,7 @@ data class SharingRequest internal constructor(
     }
 }
 
-data class SharingResponse constructor(
+data class SharingResponse(
     val isSuccsessful: Boolean,
     val feedbackMessage: String?,
     val error: Throwable?,
