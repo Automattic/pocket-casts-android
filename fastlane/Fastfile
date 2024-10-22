@@ -34,7 +34,7 @@ BUILD_CODE_FORMATTER = Fastlane::Wpmreleasetoolkit::Versioning::SimpleBuildCodeF
 VERSION_FILE = Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile.new(version_properties_path: VERSION_PROPERTIES_PATH)
 
 SUPPORTED_LOCALES = [
-  # There is an option argument 'google_play' that can be used for release notes.
+  # There is an optional argument 'google_play' that can be used for release notes.
   # However, we don't translate them so we can skip it.
   { glotpress: 'ar', android: 'ar', promo_config: {} },
   { glotpress: 'ca', android: 'ca', promo_config: {} },
