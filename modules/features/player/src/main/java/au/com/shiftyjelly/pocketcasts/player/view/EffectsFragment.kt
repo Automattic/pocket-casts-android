@@ -84,6 +84,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEffectsBinding.inflate(inflater, container, false)
 
+        if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
+            binding?.setupEffectsSettingsSegmentedTabBar()
+        }
+
         viewModel.effectsLive.value?.let { update(it) } // Make sure the window is the correct size before opening or else it won't expand properly
         viewModel.effectsLive.observe(viewLifecycleOwner) { podcastEffectsPair ->
             update(podcastEffectsPair)
@@ -114,10 +118,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         binding.globalEffectsCard.isVisible = podcast.overrideGlobalEffects
 
         imageRequestFactory.create(podcast).loadInto(binding.podcastEffectsImage)
-
-        if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
-            binding.setupEffectsSettingsSegmentedTabBar()
-        }
 
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
 
