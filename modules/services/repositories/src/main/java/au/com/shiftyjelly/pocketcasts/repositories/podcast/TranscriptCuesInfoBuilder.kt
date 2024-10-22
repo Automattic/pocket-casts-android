@@ -52,17 +52,19 @@ class TranscriptCuesInfoBuilder @Inject constructor(
                 } else {
                     // Parse json following PodcastIndex.org transcript json spec: https://github.com/Podcastindex-org/podcast-namespace/blob/main/transcripts/transcripts.md#json
                     val transcriptCues = transcriptJsonConverter.fromString(jsonString)
-                    Collections.unmodifiableList(transcriptCues.map { cue ->
-                        val startTimeUs = cue.startTime?.toMicroSeconds ?: 0
-                        val endTimeUs = cue.endTime?.toMicroSeconds ?: 0
-                        CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(cue.body ?: "").build()),
-                            startTimeUs,
-                            endTimeUs - startTimeUs,
-                        ).toTranscriptCuesInfo(
-                            cuesAdditionalInfo = CuesAdditionalInfo(speaker = cue.speaker),
-                        )
-                    })
+                    Collections.unmodifiableList(
+                        transcriptCues.map { cue ->
+                            val startTimeUs = cue.startTime?.toMicroSeconds ?: 0
+                            val endTimeUs = cue.endTime?.toMicroSeconds ?: 0
+                            CuesWithTiming(
+                                ImmutableList.of(Cue.Builder().setText(cue.body ?: "").build()),
+                                startTimeUs,
+                                endTimeUs - startTimeUs,
+                            ).toTranscriptCuesInfo(
+                                cuesAdditionalInfo = CuesAdditionalInfo(speaker = cue.speaker),
+                            )
+                        },
+                    )
                 }
             }
 
