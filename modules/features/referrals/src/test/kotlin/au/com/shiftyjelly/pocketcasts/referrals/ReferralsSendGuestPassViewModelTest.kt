@@ -145,7 +145,15 @@ class ReferralsSendGuestPassViewModelTest {
             assertEquals(SourceView.REFERRALS, source)
             assertEquals(SocialPlatform.More, platform)
             assertEquals(AnalyticsEvent.REFERRAL_PASS_SHARED, analyticsEvent)
-            assertEquals(mapOf("code" to referralCode), analyticsProperties)
+            assertEquals(
+                mapOf(
+                    "code" to referralCode,
+                    "source" to SourceView.REFERRALS.analyticsValue,
+                    "type" to "referral_link",
+                    "action" to "system_sheet",
+                ),
+                analyticsProperties,
+            )
         }
     }
 
