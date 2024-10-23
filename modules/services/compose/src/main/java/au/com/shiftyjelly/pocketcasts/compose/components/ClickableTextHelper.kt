@@ -37,7 +37,7 @@ fun ClickableTextHelper(
     textAlign: TextAlign = TextAlign.Start,
     color: Color = MaterialTheme.theme.colors.primaryText01,
 ) {
-    data class TextData constructor(
+    data class TextData(
         val text: String,
         val tag: String? = null,
         val data: String? = null,
