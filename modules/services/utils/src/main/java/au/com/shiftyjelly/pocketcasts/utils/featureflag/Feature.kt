@@ -99,9 +99,17 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    REFERRALS(
-        key = "referrals",
-        title = "Referrals",
+    REFERRALS_CLAIM(
+        key = "referrals_claim",
+        title = "Referrals Claim",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    REFERRALS_SEND(
+        key = "referrals_send",
+        title = "Referrals Send",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,

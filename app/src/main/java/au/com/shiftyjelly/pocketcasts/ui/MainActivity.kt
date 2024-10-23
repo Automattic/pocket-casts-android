@@ -1356,7 +1356,7 @@ class MainActivity :
     }
 
     private fun openReferralClaim(code: String) {
-        if (!FeatureFlag.isEnabled(Feature.REFERRALS)) {
+        if (!FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM)) {
             return
         }
         settings.referralClaimCode.set(code, false)
