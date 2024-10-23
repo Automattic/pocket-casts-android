@@ -11,6 +11,14 @@ enum class Feature(
     val hasFirebaseRemoteFlag: Boolean,
     val hasDevToggle: Boolean,
 ) {
+    SYNC_EOY_DATA_ON_STARTUP(
+        key = "sync_eoy_data_on_startup",
+        title = "Whether the End of Year data should be synced on startup",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
     END_OF_YEAR_2024(
         key = "end_of_year_2024",
         title = "End of Year 2024",
