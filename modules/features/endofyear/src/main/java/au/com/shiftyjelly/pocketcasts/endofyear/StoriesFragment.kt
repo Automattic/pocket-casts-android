@@ -89,6 +89,8 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 state = state,
                 pagerState = pagerState,
                 onChangeStory = storyChanger::change,
+                onHoldStory = { viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory) },
+                onReleaseStory = { viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory) },
                 onLearnAboutRatings = ::openRatingsInfo,
                 onClickUpsell = ::startUpsellFlow,
                 onClose = ::dismiss,

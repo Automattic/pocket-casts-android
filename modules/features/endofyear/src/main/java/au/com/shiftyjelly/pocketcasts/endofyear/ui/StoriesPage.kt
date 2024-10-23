@@ -5,7 +5,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -45,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -54,6 +58,8 @@ internal fun StoriesPage(
     state: UiState,
     pagerState: PagerState,
     onChangeStory: (Boolean) -> Unit,
+    onHoldStory: () -> Unit,
+    onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
     onClose: () -> Unit,
@@ -85,6 +91,8 @@ internal fun StoriesPage(
                 ),
                 pagerState = pagerState,
                 onChangeStory = onChangeStory,
+                onHoldStory = onHoldStory,
+                onReleaseStory = onReleaseStory,
                 onLearnAboutRatings = onLearnAboutRatings,
                 onClickUpsell = onClickUpsell,
             )
@@ -125,6 +133,8 @@ private fun Stories(
     measurements: EndOfYearMeasurements,
     pagerState: PagerState,
     onChangeStory: (Boolean) -> Unit,
+    onHoldStory: () -> Unit,
+    onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
 ) {
@@ -134,9 +144,16 @@ private fun Stories(
         state = pagerState,
         userScrollEnabled = false,
         modifier = Modifier.pointerInput(Unit) {
-            detectTapGestures { offset ->
-                val moveForward = offset.x > widthPx / 2
-                onChangeStory(moveForward)
+            awaitEachGesture {
+                awaitFirstDown().consume()
+                val timeMark = TimeSource.Monotonic.markNow()
+                onHoldStory()
+                val up = waitForUpOrCancellation()?.also { it.consume() }
+                if (up != null && timeMark.elapsedNow() < 250.milliseconds) {
+                    val moveForward = up.position.x > widthPx / 2
+                    onChangeStory(moveForward)
+                }
+                onReleaseStory()
             }
         },
     ) { index ->
