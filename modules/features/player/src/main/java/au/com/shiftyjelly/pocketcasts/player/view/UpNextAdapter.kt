@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.TooltipCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
@@ -189,12 +188,7 @@ class UpNextAdapter(
 
             val isEnabled = settings.upNextShuffle.value
 
-            this.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    if (isEnabled) IR.drawable.shuffle_enabled else IR.drawable.shuffle,
-                ),
-            )
+            this.setImageResource(if (isEnabled) IR.drawable.shuffle_enabled else IR.drawable.shuffle)
 
             this.contentDescription = context.getString(
                 if (isEnabled) LR.string.up_next_shuffle_disable_button_content_description else LR.string.up_next_shuffle_button_content_description,
