@@ -91,6 +91,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 onChangeStory = storyChanger::change,
                 onLearnAboutRatings = ::openRatingsInfo,
                 onClickUpsell = ::startUpsellFlow,
+                onRestartPlayback = storyChanger::reset,
                 onRetry = viewModel::syncData,
                 onClose = ::dismiss,
             )
@@ -224,5 +225,9 @@ private class StoryChanger(
                 scope.launch { pagerState.scrollToPage(nextIndex) }
             }
         }
+    }
+
+    fun reset() {
+        scope.launch { pagerState.scrollToPage(0) }
     }
 }
