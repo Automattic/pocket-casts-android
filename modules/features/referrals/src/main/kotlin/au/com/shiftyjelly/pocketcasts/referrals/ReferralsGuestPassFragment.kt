@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil.setBackgroundColor
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import androidx.compose.ui.graphics.Color as ComposeColor
@@ -71,6 +72,7 @@ class ReferralsGuestPassFragment : BaseFragment() {
                     if (windowSize.widthSizeClass == WindowWidthSizeClass.Compact ||
                         windowSize.heightSizeClass == WindowHeightSizeClass.Compact
                     ) {
+                        delay(200) // To prevent race condition in updating activity's status bar color from tab fragments on fresh install
                         updateStatusAndNavColors()
                     }
                 }
