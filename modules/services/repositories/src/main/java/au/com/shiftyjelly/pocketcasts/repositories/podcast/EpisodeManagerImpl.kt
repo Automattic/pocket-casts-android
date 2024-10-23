@@ -655,7 +655,9 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean, shouldShuffleUpNext: Boolean) {
+    override fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean) {
+        val shouldShuffleUpNext = playbackManager.upNextQueue.currentEpisode?.uuid == episode.uuid && settings.upNextShuffle.value
+
         if (sync) {
             episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
         } else {
@@ -677,7 +679,7 @@ class EpisodeManagerImpl @Inject constructor(
         deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true, shouldShuffleUpNext = shouldShuffleUpNext)
 
         // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
     }
 
     override suspend fun findStaleDownloads(): List<PodcastEpisode> {
@@ -883,7 +885,8 @@ class EpisodeManagerImpl @Inject constructor(
                     episodeDao.archiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
                     playbackManager?.let { playbackManager ->
                         chunked.forEach {
-                            cleanUpEpisode(it, playbackManager)
+                            val shouldShuffleUpNext = playbackManager.upNextQueue.currentEpisode?.uuid == it.uuid && settings.upNextShuffle.value
+                            cleanUpEpisode(it, playbackManager, shouldShuffleUpNext)
                         }
                     }
                 }

@@ -86,7 +86,7 @@ interface EpisodeManager {
     suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
     fun clearPlaybackError(episode: BaseEpisode?)
     fun clearDownloadError(episode: PodcastEpisode?)
-    fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true, shouldShuffleUpNext: Boolean = false)
+    fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true)
     fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
     fun unarchive(episode: BaseEpisode)
     suspend fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
