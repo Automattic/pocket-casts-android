@@ -1024,7 +1024,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private val removeMutex = Mutex()
-    fun removeEpisode(episodeToRemove: BaseEpisode?, source: SourceView, userInitiated: Boolean = true) {
+    fun removeEpisode(episodeToRemove: BaseEpisode?, source: SourceView, userInitiated: Boolean = true, shouldShuffleUpNext: Boolean = false) {
         launch {
             if (episodeToRemove == null) {
                 return@launch
@@ -1046,7 +1046,7 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
 
-                upNextQueue.removeEpisode(episodeToRemove)
+                upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
                 if (userInitiated) {
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_REMOVED_FROM_UP_NEXT, source, episodeToRemove.uuid)
                 }

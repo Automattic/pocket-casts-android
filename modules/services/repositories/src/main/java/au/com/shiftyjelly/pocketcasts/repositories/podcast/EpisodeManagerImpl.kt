@@ -487,12 +487,12 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+    override fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
         if (episode == null) {
             return
         }
 
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
 
         episode.playingStatus = EpisodePlayingStatus.COMPLETED
 
