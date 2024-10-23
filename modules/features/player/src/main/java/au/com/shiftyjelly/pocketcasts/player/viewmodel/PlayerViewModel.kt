@@ -466,9 +466,9 @@ class PlayerViewModel @Inject constructor(
         playbackManager.playNextInQueue(sourceView = source)
     }
 
-    private fun markAsPlayedConfirmed(episode: BaseEpisode) {
+    private fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
         launch {
-            episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+            episodeManager.markAsPlayed(episode, playbackManager, podcastManager, shouldShuffleUpNext)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
         }
     }
@@ -480,12 +480,12 @@ class PlayerViewModel @Inject constructor(
             .setSummary(context.getString(LR.string.player_mark_as_played))
             .setIconId(R.drawable.ic_markasplayed)
             .setButtonType(ConfirmationDialog.ButtonType.Danger(context.getString(LR.string.player_mark_as_played_button)))
-            .setOnConfirm { markAsPlayedConfirmed(episode) }
+            .setOnConfirm { markAsPlayedConfirmed(episode, shouldShuffleUpNext = settings.upNextShuffle.value) }
     }
 
     private fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
-            episodeManager.archive(episode, playbackManager, true)
+            episodeManager.archive(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
     }
