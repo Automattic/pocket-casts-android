@@ -86,7 +86,7 @@ interface EpisodeManager {
     suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
     fun clearPlaybackError(episode: BaseEpisode?)
     fun clearDownloadError(episode: PodcastEpisode?)
-    fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true)
+    fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true, shouldShuffleUpNext: Boolean = false)
     fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
     fun unarchive(episode: BaseEpisode)
     suspend fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
@@ -103,7 +103,7 @@ interface EpisodeManager {
     fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager)
-    suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
+    suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true, shouldShuffleUpNext: Boolean = false)
 
     /** Utility methods  */
     suspend fun countEpisodes(): Int

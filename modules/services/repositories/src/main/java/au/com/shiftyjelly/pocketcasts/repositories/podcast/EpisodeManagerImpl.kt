@@ -530,7 +530,7 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.delete(episode)
     }
 
-    override suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean, removeFromUpNext: Boolean) {
+    override suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean, removeFromUpNext: Boolean, shouldShuffleUpNext: Boolean) {
         episode ?: return
 
         Timber.d("Deleting episode file ${episode.title}")
@@ -540,7 +540,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         // if the episode is currently playing, then stop it. Note: it will not be stopped if coming from the player as it is controlling the playback logic.
         if (removeFromUpNext) {
-            playbackManager?.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+            playbackManager?.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
         }
 
         cleanUpDownloadFiles(episode)
@@ -655,7 +655,7 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean) {
+    override fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean, shouldShuffleUpNext: Boolean) {
         if (sync) {
             episodeDao.updateArchived(true, System.currentTimeMillis(), episode.uuid)
         } else {
@@ -663,18 +663,18 @@ class EpisodeManagerImpl @Inject constructor(
         }
         episode.isArchived = true
         runBlocking {
-            cleanUpEpisode(episode, playbackManager)
+            cleanUpEpisode(episode, playbackManager, shouldShuffleUpNext)
         }
     }
 
     @Suppress("NAME_SHADOWING")
-    private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?) {
+    private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?, shouldShuffleUpNext: Boolean = false) {
         val playbackManager = playbackManager ?: return
         if (episode.isDownloaded || episode.isDownloading || episode.downloadTaskId != null) {
             // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
             downloadManager.removeEpisodeFromQueue(episode, "episode manager")
         }
-        deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true)
+        deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true, shouldShuffleUpNext = shouldShuffleUpNext)
 
         // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
         playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)

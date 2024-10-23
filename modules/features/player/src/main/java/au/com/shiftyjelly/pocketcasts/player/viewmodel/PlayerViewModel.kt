@@ -485,7 +485,7 @@ class PlayerViewModel @Inject constructor(
 
     private fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
-            episodeManager.archive(episode, playbackManager, true)
+            episodeManager.archive(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
     }
