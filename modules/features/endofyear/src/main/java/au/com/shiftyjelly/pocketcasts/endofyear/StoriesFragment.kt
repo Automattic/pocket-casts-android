@@ -146,7 +146,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.resumeStoryAutoProgress()
+        viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
     }
 
     override fun onPause() {
@@ -155,7 +155,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         // won't auto switch for example when signing up takes
         // some time or when the EoY flow is interruped by
         // some other user actions such as a phone call.
-        viewModel.pauseStoryAutoProgress()
+        viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
         super.onPause()
     }
 

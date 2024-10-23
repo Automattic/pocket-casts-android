@@ -456,7 +456,7 @@ class EndOfYearViewModelTest {
         subscriptionTier.emit(SubscriptionTier.NONE)
 
         viewModel.syncData()
-        viewModel.resumeStoryAutoProgress()
+        viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         viewModel.switchStory.test {
@@ -514,13 +514,42 @@ class EndOfYearViewModelTest {
             expectNoEvents()
 
             // Resume after pause
-            viewModel.resumeStoryAutoProgress()
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
             assertEquals(Unit, awaitItem())
 
             // Pause after resume
-            viewModel.pauseStoryAutoProgress()
+            viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
             viewModel.onStoryChanged(stories.getStoryOfType<NumberOfShows>())
             expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `pause story auto progress as long as there is at least one reason`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        viewModel.switchStory.test {
+            expectNoEvents()
+
+            // Initially switching should be paused
+            viewModel.onStoryChanged(stories.getStoryOfType<Cover>())
+            expectNoEvents()
+
+            viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory)
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            expectNoEvents()
+
+            viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            expectNoEvents()
+
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory)
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            assertEquals(Unit, awaitItem())
         }
     }
 
