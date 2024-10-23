@@ -63,7 +63,8 @@ class ReferralsViewModelTest {
 
     @Before
     fun setUp() {
-        FeatureFlag.setEnabled(Feature.REFERRALS, true)
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, true)
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, true)
         whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
         whenever(settings.playerOrUpNextBottomSheetState).thenReturn(flowOf(BottomSheetBehavior.STATE_COLLAPSED))
     }
@@ -86,13 +87,14 @@ class ReferralsViewModelTest {
     }
 
     @Test
-    fun `referrals gift icon is not shown if feature flag is disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.REFERRALS, false)
+    fun `referrals gift icon with tooltip is not shown if referrals send feature flag is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, false)
 
         initViewModel()
 
         viewModel.state.test {
             assertEquals(false, (awaitItem() as UiState.Loaded).showIcon)
+            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
         }
     }
 

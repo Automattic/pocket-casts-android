@@ -42,7 +42,7 @@ class ReferralsViewModel @Inject constructor(
                     userManager.getSignInState().asFlow(),
                     settings.playerOrUpNextBottomSheetState,
                 ) { signInState, playerBottomSheetState ->
-                    val eligibleToSendPass = FeatureFlag.isEnabled(Feature.REFERRALS) && signInState.isSignedInAsPlusOrPatron
+                    val eligibleToSendPass = FeatureFlag.isEnabled(Feature.REFERRALS_SEND) && signInState.isSignedInAsPlusOrPatron
                     val eligibleToClaimPass = FeatureFlag.isEnabled(Feature.REFERRALS) &&
                         (!signInState.isSignedIn || signInState.isSignedInAsFree) &&
                         settings.referralClaimCode.value.isNotEmpty()
