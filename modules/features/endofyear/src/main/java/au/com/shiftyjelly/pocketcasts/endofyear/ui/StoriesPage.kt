@@ -64,6 +64,7 @@ internal fun StoriesPage(
     onChangeStory: (Boolean) -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
+    onRestartPlayback: () -> Unit,
     onRetry: () -> Unit,
     onClose: () -> Unit,
 ) {
@@ -96,6 +97,7 @@ internal fun StoriesPage(
                 onChangeStory = onChangeStory,
                 onLearnAboutRatings = onLearnAboutRatings,
                 onClickUpsell = onClickUpsell,
+                onRestartPlayback = onRestartPlayback,
             )
         }
 
@@ -136,6 +138,7 @@ private fun Stories(
     onChangeStory: (Boolean) -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
+    onRestartPlayback: () -> Unit,
 ) {
     val widthPx = LocalDensity.current.run { measurements.width.toPx() }
 
@@ -160,7 +163,7 @@ private fun Stories(
             is Story.PlusInterstitial -> PlusInterstitialStory(story, measurements, onClickUpsell)
             is Story.YearVsYear -> YearVsYearStory(story, measurements)
             is Story.CompletionRate -> CompletionRateStory(story, measurements)
-            is Story.Ending -> EndingStory(story, measurements)
+            is Story.Ending -> EndingStory(story, measurements, onRestartPlayback)
         }
     }
 }

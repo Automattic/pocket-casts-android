@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun EndingStory(
     story: Story.Ending,
     measurements: EndOfYearMeasurements,
+    onRestartPlayback: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -52,6 +53,7 @@ internal fun EndingStory(
         EndingInfo(
             story = story,
             measurements = measurements,
+            onRestartPlayback = onRestartPlayback,
         )
     }
 }
@@ -118,6 +120,7 @@ private fun ByeByeText(
 private fun EndingInfo(
     story: Story.Ending,
     measurements: EndOfYearMeasurements,
+    onRestartPlayback: () -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -149,7 +152,7 @@ private fun EndingInfo(
         )
         OutlinedEoyButton(
             text = stringResource(LR.string.end_of_year_replay),
-            onClick = {},
+            onClick = onRestartPlayback,
         )
     }
 }
@@ -161,6 +164,7 @@ private fun EndingPreview() {
         EndingStory(
             story = Story.Ending,
             measurements = measurements,
+            onRestartPlayback = {},
         )
     }
 }
