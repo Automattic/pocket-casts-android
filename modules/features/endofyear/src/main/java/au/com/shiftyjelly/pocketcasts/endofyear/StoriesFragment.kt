@@ -91,6 +91,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 onChangeStory = storyChanger::change,
                 onLearnAboutRatings = ::openRatingsInfo,
                 onClickUpsell = ::startUpsellFlow,
+                onRetry = viewModel::syncData,
                 onClose = ::dismiss,
             )
 

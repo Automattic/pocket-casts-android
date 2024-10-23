@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -19,6 +20,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -36,12 +40,16 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerProgressingIndicator
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -56,6 +64,7 @@ internal fun StoriesPage(
     onChangeStory: (Boolean) -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
+    onRetry: () -> Unit,
     onClose: () -> Unit,
 ) {
     val size = LocalContext.current.sizeLimit?.let(Modifier::size) ?: Modifier.fillMaxSize()
@@ -70,7 +79,7 @@ internal fun StoriesPage(
         var coverTextHeight by remember { mutableStateOf(0.dp) }
 
         if (state is UiState.Failure) {
-            ErrorMessage()
+            ErrorMessage(onRetry)
         } else if (state is UiState.Syncing || !isTextSizeComputed) {
             LoadingIndicator()
         } else if (state is UiState.Synced) {
@@ -209,15 +218,33 @@ private fun LoadingIndicator() {
 }
 
 @Composable
-private fun ErrorMessage() {
-    Box(
-        contentAlignment = Alignment.Center,
+private fun ErrorMessage(
+    onRetry: () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .background(Story.Cover.backgroundColor)
-            .padding(16.dp),
+            .background(Story.Cover.backgroundColor),
     ) {
-        TextH10(text = "Whoops!")
+        TextH30(
+            text = stringResource(id = LR.string.end_of_year_stories_failed),
+            textAlign = TextAlign.Center,
+            color = Color.Black,
+            modifier = Modifier.padding(horizontal = 40.dp),
+        )
+        Button(
+            onClick = onRetry,
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFEEB1F4)),
+            modifier = Modifier.padding(top = 20.dp),
+        ) {
+            TextP40(
+                text = stringResource(id = LR.string.retry),
+                color = Color.Black,
+            )
+        }
     }
 }
 
@@ -233,3 +260,11 @@ private val Context.sizeLimit: DpSize?
             null
         }
     }
+
+@Preview(device = Devices.PortraitRegular)
+@Composable
+private fun ErrorMessagePreview() {
+    ErrorMessage(
+        onRetry = {},
+    )
+}
