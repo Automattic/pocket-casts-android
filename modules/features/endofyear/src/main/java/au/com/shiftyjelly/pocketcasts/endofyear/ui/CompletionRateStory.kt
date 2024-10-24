@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Placeable
@@ -40,8 +41,11 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -52,23 +56,28 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun CompletionRateStory(
     story: Story.CompletionRate,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) = CompletionRateStory(
     story = story,
     measurements = measurements,
-    onShareStory = onShareStory,
+    controller = controller,
     showBars = false,
+    onShareStory = onShareStory,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun CompletionRateStory(
     story: Story.CompletionRate,
     measurements: EndOfYearMeasurements,
+    controller: StoryCaptureController,
     showBars: Boolean,
-    onShareStory: () -> Unit,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 80.dp),
@@ -87,7 +96,8 @@ private fun CompletionRateStory(
         CompletionRateInfo(
             story = story,
             measurements = measurements,
-            onShareStory,
+            controller = controller,
+            onShareStory = onShareStory,
         )
     }
 }
@@ -210,7 +220,8 @@ private fun BarsSection(
 private fun CompletionRateInfo(
     story: Story.CompletionRate,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column {
         Spacer(
@@ -256,7 +267,11 @@ private fun CompletionRateInfo(
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        ShareStoryButton(onClick = onShareStory)
+        ShareStoryButton(
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
+        )
     }
 }
 
@@ -273,6 +288,7 @@ private fun CompletionRatePreview(
                 subscriptionTier = SubscriptionTier.PATRON,
             ),
             measurements = measurements,
+            controller = StoryCaptureController.preview(),
             showBars = true,
             onShareStory = {},
         )

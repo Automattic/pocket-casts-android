@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
@@ -42,9 +43,12 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -54,23 +58,28 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun LongestEpisodeStory(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) = LongestEpisodeStory(
     story = story,
     measurements = measurements,
-    onShareStory = onShareStory,
+    controller = controller,
     showCovers = false,
+    onShareStory = onShareStory,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun LongestEpisodeStory(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
+    controller: StoryCaptureController,
     showCovers: Boolean,
-    onShareStory: () -> Unit,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge),
@@ -84,6 +93,7 @@ private fun LongestEpisodeStory(
         TextInfo(
             story = story,
             measurements = measurements,
+            controller = controller,
             onShareStory = onShareStory,
         )
     }
@@ -216,7 +226,8 @@ private fun PodcastCover(
 private fun TextInfo(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -253,7 +264,11 @@ private fun TextInfo(
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        ShareStoryButton(onClick = onShareStory)
+        ShareStoryButton(
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
+        )
     }
 }
 
@@ -273,6 +288,7 @@ private fun LongestEpisodePreview() {
                 ),
             ),
             measurements = measurements,
+            controller = StoryCaptureController.preview(),
             showCovers = true,
             onShareStory = {},
         )

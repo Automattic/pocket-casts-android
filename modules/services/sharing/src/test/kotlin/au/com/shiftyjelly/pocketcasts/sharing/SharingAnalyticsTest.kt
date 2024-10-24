@@ -475,7 +475,7 @@ class SharingAnalyticsTest {
             topShowIds = emptyList(),
             bottomShowIds = emptyList(),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
@@ -502,7 +502,7 @@ class SharingAnalyticsTest {
                 playedEpisodeCount = 0,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
@@ -524,7 +524,7 @@ class SharingAnalyticsTest {
             shows = emptyList(),
             podcastListUrl = null,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
@@ -551,7 +551,7 @@ class SharingAnalyticsTest {
                 fives = 50,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
@@ -572,7 +572,7 @@ class SharingAnalyticsTest {
         val story = Story.TotalTime(
             duration = 12345.seconds,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
@@ -600,7 +600,7 @@ class SharingAnalyticsTest {
                 coverUrl = null,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
@@ -623,7 +623,7 @@ class SharingAnalyticsTest {
             thisYearDuration = Duration.ZERO,
             subscriptionTier = SubscriptionTier.NONE,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()
@@ -646,7 +646,7 @@ class SharingAnalyticsTest {
             completedCount = 0,
             subscriptionTier = SubscriptionTier.NONE,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
         analytics.onShare(request)
         val event = tracker.events.single()

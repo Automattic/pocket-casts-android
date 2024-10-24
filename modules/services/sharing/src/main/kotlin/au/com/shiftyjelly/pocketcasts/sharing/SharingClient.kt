@@ -250,7 +250,8 @@ class SharingClient(
                 )
                 Intent()
                     .setAction(Intent.ACTION_SEND)
-                    .setType("text/plain")
+                    .setType("image/png")
+                    .setExtraStream(data.screenshot)
                     .putExtra(EXTRA_TEXT, text)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
                     .toChooserIntent(pendingIntent.intentSender)
@@ -388,7 +389,8 @@ data class SharingRequest internal constructor(
         fun endOfYearStory(
             story: Story,
             year: Year,
-        ) = Builder(Data.EndOfYearStory(story, year))
+            screenshot: File,
+        ) = Builder(Data.EndOfYearStory(story, year, screenshot))
             .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
             .addAnalyticsProperty("story", story.analyticsValue)
     }
@@ -581,6 +583,7 @@ data class SharingRequest internal constructor(
         class EndOfYearStory internal constructor(
             val story: Story,
             val year: Year,
+            val screenshot: File,
         ) : Data {
             override val podcast = null
 
@@ -658,6 +661,8 @@ data class SharingRequest internal constructor(
                 }
                 is Story.Ending -> shortUrl
             }
+
+            override fun toString() = "EndOfYearStory(story=$story, year=$year)"
         }
     }
 }

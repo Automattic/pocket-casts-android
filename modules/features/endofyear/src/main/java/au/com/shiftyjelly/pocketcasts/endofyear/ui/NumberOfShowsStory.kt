@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
@@ -29,17 +30,22 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ScrollDirection
 import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.math.roundToLong
 import kotlin.math.tan
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun NumberOfShowsStory(
     story: Story.NumberOfShows,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     val smallCoverSize = 160.dp * measurements.scale
     val smallSpacingSize = smallCoverSize / 10
@@ -49,6 +55,7 @@ internal fun NumberOfShowsStory(
 
     Box(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor),
     ) {
@@ -107,7 +114,11 @@ internal fun NumberOfShowsStory(
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = onShareStory)
+            ShareStoryButton(
+                story = story,
+                controller = controller,
+                onShare = onShareStory,
+            )
         }
     }
 }
@@ -150,6 +161,7 @@ private fun NumberOfShowsPreview() {
                 bottomShowIds = List(4) { "id-$it" },
             ),
             measurements = measurements,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
     }

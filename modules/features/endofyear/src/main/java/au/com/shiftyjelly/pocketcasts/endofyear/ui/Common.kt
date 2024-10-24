@@ -10,9 +10,11 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -29,7 +31,10 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.R
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import java.io.File
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -69,13 +74,25 @@ internal data class EndOfYearMeasurements(
 
 @Composable
 internal fun ShareStoryButton(
-    onClick: () -> Unit,
+    story: Story,
+    controller: StoryCaptureController,
+    onShare: (File) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val scope = rememberCoroutineScope()
+
     OutlinedEoyButton(
         text = stringResource(LR.string.end_of_year_share_story),
-        onClick = onClick,
-        modifier = modifier,
+        onClick = {
+            scope.launch {
+                val file = controller.capture(story)
+                if (file != null) {
+                    onShare(file)
+                }
+            }
+        },
+        modifier = modifier
+            .onGloballyPositioned { controller.updateButtonHeightPx(story, it.size.height) },
     )
 }
 
