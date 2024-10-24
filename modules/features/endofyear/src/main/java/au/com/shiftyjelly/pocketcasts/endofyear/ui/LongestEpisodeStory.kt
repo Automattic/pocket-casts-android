@@ -64,7 +64,7 @@ internal fun LongestEpisodeStory(
     story = story,
     measurements = measurements,
     controller = controller,
-    showCovers = false,
+    areCoversVisible = false,
     onShareStory = onShareStory,
 )
 
@@ -74,7 +74,7 @@ private fun LongestEpisodeStory(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
     controller: StoryCaptureController,
-    showCovers: Boolean,
+    areCoversVisible: Boolean,
     onShareStory: (File) -> Unit,
 ) {
     Column(
@@ -87,7 +87,8 @@ private fun LongestEpisodeStory(
         CoversSection(
             story = story,
             measurements = measurements,
-            showCovers = showCovers,
+            areCoversVisible = areCoversVisible,
+            forceCoversVisible = controller.isSharing,
             modifier = Modifier.weight(1f),
         )
         TextInfo(
@@ -103,16 +104,17 @@ private fun LongestEpisodeStory(
 private fun CoversSection(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-    showCovers: Boolean,
+    areCoversVisible: Boolean,
+    forceCoversVisible: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    var areCoversVisible by remember { mutableStateOf(showCovers) }
+    var areVisible by remember { mutableStateOf(areCoversVisible) }
     LaunchedEffect(Unit) {
         delay(200)
-        areCoversVisible = true
+        areVisible = true
     }
 
-    val transition = updateTransition(areCoversVisible, "cover-transtion")
+    val transition = updateTransition(areVisible, "cover-transtion")
     val widthPx = LocalDensity.current.run { measurements.width.roundToPx() }
     val offset by transition.animateIntOffset(
         transitionSpec = {
@@ -124,7 +126,7 @@ private fun CoversSection(
         },
         targetValueByState = {
             when (it) {
-                true -> IntOffset(0, 0)
+                true -> IntOffset.Zero
                 false -> IntOffset(-widthPx / 2, widthPx / 2)
             }
         },
@@ -157,8 +159,8 @@ private fun CoversSection(
             contentAlignment = Alignment.BottomStart,
             modifier = Modifier
                 .offset(y = baseCoverSize * measurements.scale / 3)
-                .offset { offset }
-                .scale(scale),
+                .offset { if (forceCoversVisible) IntOffset.Zero else offset }
+                .scale(if (forceCoversVisible) 1f else scale),
         ) {
             podcastCoverSizes.forEachIndexed { index, size ->
                 PodcastCover(
@@ -289,7 +291,7 @@ private fun LongestEpisodePreview() {
             ),
             measurements = measurements,
             controller = StoryCaptureController.preview(),
-            showCovers = true,
+            areCoversVisible = true,
             onShareStory = {},
         )
     }

@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -62,7 +63,7 @@ internal fun CompletionRateStory(
     story = story,
     measurements = measurements,
     controller = controller,
-    showBars = false,
+    areBarsVisible = false,
     onShareStory = onShareStory,
 )
 
@@ -72,7 +73,7 @@ private fun CompletionRateStory(
     story: Story.CompletionRate,
     measurements: EndOfYearMeasurements,
     controller: StoryCaptureController,
-    showBars: Boolean,
+    areBarsVisible: Boolean,
     onShareStory: (File) -> Unit,
 ) {
     Column(
@@ -82,15 +83,16 @@ private fun CompletionRateStory(
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 80.dp),
     ) {
-        var areBarsVisible by remember { mutableStateOf(showBars) }
+        var areVisible by remember { mutableStateOf(areBarsVisible) }
         LaunchedEffect(Unit) {
             delay(350)
-            areBarsVisible = true
+            areVisible = true
         }
 
         BarsSection(
             story = story,
-            showBars = areBarsVisible,
+            areBarsVisible = areVisible,
+            forceBarsVisible = controller.isSharing,
             modifier = Modifier.weight(1f),
         )
         CompletionRateInfo(
@@ -108,109 +110,121 @@ private val SpaceHeight = 4.dp
 @Composable
 private fun BarsSection(
     story: Story.CompletionRate,
-    showBars: Boolean,
+    areBarsVisible: Boolean,
+    forceBarsVisible: Boolean,
     modifier: Modifier,
 ) {
+    val transition = updateTransition(
+        targetState = areBarsVisible,
+        label = "bars-transition",
+    )
+    val alpha by transition.animateFloat(
+        label = "alpha",
+        transitionSpec = {
+            tween(
+                durationMillis = if (forceBarsVisible) 0 else 300,
+                easing = CubicBezierEasing(0f, 0f, 0.58f, 1.0f),
+            )
+        },
+        targetValueByState = { state ->
+            when (state) {
+                true -> 1f
+                false -> 0f
+            }
+        },
+    )
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .alpha(if (forceBarsVisible) 1f else alpha),
     ) {
         // Subcomposition is needed because we need accurate measurements.
         // Otherwise completion rate of 100% won't match the bars' height exactly.
-        AnimatedVisibility(
-            visible = showBars,
-            enter = fadeIn(
-                animationSpec = tween(
-                    durationMillis = 300,
-                    easing = CubicBezierEasing(0f, 0f, 0.58f, 1.0f),
-                ),
-            ),
-        ) {
-            SubcomposeLayout { constraints ->
-                var accumulatedHeight = 0
-                val bars = ArrayList<Placeable>()
-                var index = 0
-                while (accumulatedHeight < constraints.maxHeight) {
-                    val bar = subcompose("bar-$index") {
-                        Box(
-                            modifier = Modifier
-                                .padding(top = SpaceHeight)
-                                .fillMaxWidth(0.58f)
-                                .height(BarHeight)
-                                .background(Color.Black),
-                        )
-                    }[0].measure(constraints)
-                    bars += bar
-                    accumulatedHeight += bar.height
-                    index++
-                }
-                if (bars.isNotEmpty()) {
-                    bars.removeAt(bars.size - 1)
-                }
-                val spaceHeightPx = LocalDensity.run { SpaceHeight.roundToPx() }
-                val barsHeightPx = (bars.sumOf { it.height } - spaceHeightPx).coerceAtLeast(0)
-
-                val completionBar = subcompose("completion-bar") {
-                    val textFactory = rememberHumaneTextFactory(
-                        fontSize = 112.nonScaledSp,
+        SubcomposeLayout { constraints ->
+            var accumulatedHeight = 0
+            val bars = ArrayList<Placeable>()
+            var index = 0
+            while (accumulatedHeight < constraints.maxHeight) {
+                val bar = subcompose("bar-$index") {
+                    Box(
+                        modifier = Modifier
+                            .padding(top = SpaceHeight)
+                            .fillMaxWidth(0.58f)
+                            .height(BarHeight)
+                            .background(Color.Black),
                     )
-                    val completedPercent = (story.completionRate * 100).roundToInt()
-                    val completionHeight = LocalDensity.current.run {
-                        (barsHeightPx * story.completionRate).roundToInt().toDp()
-                    }
+                }[0].measure(constraints)
+                bars += bar
+                accumulatedHeight += bar.height
+                index++
+            }
+            if (bars.isNotEmpty()) {
+                bars.removeAt(bars.size - 1)
+            }
+            val spaceHeightPx = LocalDensity.run { SpaceHeight.roundToPx() }
+            val barsHeightPx = (bars.sumOf { it.height } - spaceHeightPx).coerceAtLeast(0)
 
-                    val text = "$completedPercent%"
+            val completionBar = subcompose("completion-bar") {
+                val textFactory = rememberHumaneTextFactory(
+                    fontSize = 112.nonScaledSp,
+                )
+                val completedPercent = (story.completionRate * 100).roundToInt()
+                val completionHeight = LocalDensity.current.run {
+                    (barsHeightPx * story.completionRate).roundToInt().toDp()
+                }
+
+                val text = "$completedPercent%"
+                Box(
+                    contentAlignment = Alignment.BottomEnd,
+                    modifier = Modifier
+                        .fillMaxWidth(0.58f)
+                        .fillMaxHeight(),
+                ) {
                     Box(
                         contentAlignment = Alignment.BottomEnd,
                         modifier = Modifier
-                            .fillMaxWidth(0.58f)
-                            .fillMaxHeight(),
+                            .fillMaxWidth()
+                            .height(completionHeight)
+                            .background(Color.Black),
                     ) {
-                        Box(
-                            contentAlignment = Alignment.BottomEnd,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(completionHeight)
-                                .background(Color.Black),
-                        ) {
-                            if (completionHeight > textFactory.textHeight + 32.dp) {
-                                textFactory.HumaneText(
-                                    text = text,
-                                    color = story.backgroundColor,
-                                    paddingValues = PaddingValues(bottom = 16.dp, end = 16.dp),
-                                )
-                            }
-                        }
-
-                        if (completionHeight < textFactory.textHeight + 32.dp) {
+                        if (completionHeight > textFactory.textHeight + 32.dp) {
                             textFactory.HumaneText(
                                 text = text,
-                                color = Color.Black,
-                                paddingValues = if (completedPercent == 0) {
-                                    PaddingValues()
-                                } else {
-                                    PaddingValues(bottom = 16.dp)
-                                },
-                                modifier = Modifier.offset(y = -completionHeight),
+                                color = story.backgroundColor,
+                                paddingValues = PaddingValues(bottom = 16.dp, end = 16.dp),
                             )
                         }
                     }
-                }[0].measure(constraints)
 
-                layout(constraints.maxWidth, constraints.maxHeight) {
-                    bars.forEachIndexed { index, bar ->
-                        bar.place(
-                            x = 0,
-                            y = constraints.maxHeight - bar.height * (index + 1),
+                    if (completionHeight < textFactory.textHeight + 32.dp) {
+                        textFactory.HumaneText(
+                            text = text,
+                            color = Color.Black,
+                            paddingValues = if (completedPercent == 0) {
+                                PaddingValues()
+                            } else {
+                                PaddingValues(bottom = 16.dp)
+                            },
+                            modifier = Modifier.offset(y = -completionHeight),
                         )
                     }
+                }
+            }[0].measure(constraints)
 
-                    completionBar.place(
-                        x = constraints.maxWidth - completionBar.width,
-                        y = 0,
+            layout(constraints.maxWidth, constraints.maxHeight) {
+                bars.forEachIndexed { index, bar ->
+                    bar.place(
+                        x = 0,
+                        y = constraints.maxHeight - bar.height * (index + 1),
                     )
                 }
+
+                completionBar.place(
+                    x = constraints.maxWidth - completionBar.width,
+                    y = 0,
+                )
             }
         }
     }
@@ -289,7 +303,7 @@ private fun CompletionRatePreview(
             ),
             measurements = measurements,
             controller = StoryCaptureController.preview(),
-            showBars = true,
+            areBarsVisible = true,
             onShareStory = {},
         )
     }

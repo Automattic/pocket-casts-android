@@ -66,7 +66,7 @@ internal fun YearVsYearStory(
 ) = YearVsYearStory(
     story = story,
     measurements = measurements,
-    showCircles = false,
+    areCirclesVisible = false,
     controller = controller,
     onShareStory = onShareStory,
 )
@@ -76,7 +76,7 @@ internal fun YearVsYearStory(
 private fun YearVsYearStory(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
-    showCircles: Boolean,
+    areCirclesVisible: Boolean,
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
@@ -90,7 +90,8 @@ private fun YearVsYearStory(
         ComparisonSection(
             story = story,
             measurements = measurements,
-            showCircles = showCircles,
+            areCirclesVisible = areCirclesVisible,
+            forceCirclesVisible = controller.isSharing,
         )
         TextInfo(
             story = story,
@@ -105,7 +106,8 @@ private fun YearVsYearStory(
 private fun ColumnScope.ComparisonSection(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
-    showCircles: Boolean,
+    areCirclesVisible: Boolean,
+    forceCirclesVisible: Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -113,9 +115,16 @@ private fun ColumnScope.ComparisonSection(
             .weight(1f),
     ) {
         if (story.yearOverYearChange in 0.9..1.1) {
-            SameListeningTime(measurements)
+            SameListeningTime(
+                measurements = measurements,
+            )
         } else {
-            DifferentListeningTime(story, measurements, showCircles)
+            DifferentListeningTime(
+                story = story,
+                measurements = measurements,
+                areCirclesVisible = areCirclesVisible,
+                forceCirclesVisible = forceCirclesVisible,
+            )
         }
     }
 }
@@ -194,7 +203,8 @@ private fun BoxScope.SameListeningTime(
 private fun BoxScope.DifferentListeningTime(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
-    showCircles: Boolean,
+    areCirclesVisible: Boolean,
+    forceCirclesVisible: Boolean,
 ) {
     val (smallText, largeText) = if (story.thisYearDuration > story.lastYearDuration) {
         "2023" to "2024"
@@ -256,7 +266,7 @@ private fun BoxScope.DifferentListeningTime(
         )
     }
 
-    val scale = remember { Animatable(if (showCircles) 1f else 0f) }
+    val scale = remember { Animatable(if (areCirclesVisible) 1f else 0f) }
     LaunchedEffect(Unit) {
         delay(350)
         scale.animateTo(
@@ -272,7 +282,7 @@ private fun BoxScope.DifferentListeningTime(
     Box(
         modifier = Modifier
             .align(Alignment.CenterStart)
-            .scale(scale.value)
+            .scale(if (forceCirclesVisible) 1f else scale.value)
             .offset(configuration.lastYearOffset.x, configuration.lastYearOffset.y)
             .requiredSize(configuration.lastYearSize)
             .background(Color.White, CircleShape),
@@ -292,7 +302,7 @@ private fun BoxScope.DifferentListeningTime(
     Box(
         modifier = Modifier
             .align(Alignment.CenterEnd)
-            .scale(scale.value)
+            .scale(if (forceCirclesVisible) 1f else scale.value)
             .offset(configuration.thisYearOffset.x, configuration.thisYearOffset.y)
             .requiredSize(configuration.thisYearSize)
             .background(Color.Black, CircleShape),
@@ -413,7 +423,7 @@ private fun YearVsYearThisYearPreview() {
                 subscriptionTier = SubscriptionTier.PLUS,
             ),
             measurements = measurements,
-            showCircles = true,
+            areCirclesVisible = true,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
@@ -431,7 +441,7 @@ private fun YearVsYearThisYearLargePreview() {
                 subscriptionTier = SubscriptionTier.PATRON,
             ),
             measurements = measurements,
-            showCircles = true,
+            areCirclesVisible = true,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
@@ -449,7 +459,7 @@ private fun YearVsYearLastYearPreview() {
                 subscriptionTier = SubscriptionTier.PLUS,
             ),
             measurements = measurements,
-            showCircles = true,
+            areCirclesVisible = true,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
@@ -467,7 +477,7 @@ private fun YearVsYearEqualPreview() {
                 subscriptionTier = SubscriptionTier.PLUS,
             ),
             measurements = measurements,
-            showCircles = true,
+            areCirclesVisible = true,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
