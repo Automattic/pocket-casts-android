@@ -10,7 +10,8 @@ import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
-import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -20,41 +21,45 @@ object WearAboutScreen {
 
 @Composable
 fun WearAboutScreen(
-    columnState: ScalingLazyColumnState,
     onTermsOfServiceClick: () -> Unit,
     onPrivacyClick: () -> Unit,
 ) {
-    ScalingLazyColumn(
-        columnState = columnState,
+    val columnState = rememberColumnState()
+    ScreenScaffold(
+        scrollState = columnState,
     ) {
-        item {
-            Image(
-                painter = painterResource(IR.drawable.about_logo_pocketcasts),
-                contentDescription = stringResource(LR.string.settings_app_icon),
-            )
-        }
+        ScalingLazyColumn(
+            columnState = columnState,
+        ) {
+            item {
+                Image(
+                    painter = painterResource(IR.drawable.about_logo_pocketcasts),
+                    contentDescription = stringResource(LR.string.settings_app_icon),
+                )
+            }
 
-        item {
-            Text(
-                text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSecondary,
-                textAlign = TextAlign.Center,
-            )
-        }
+            item {
+                Text(
+                    text = stringResource(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.onSecondary,
+                    textAlign = TextAlign.Center,
+                )
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.settings_about_terms_of_serivce),
-                onClick = onTermsOfServiceClick,
-            )
-        }
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.settings_about_terms_of_serivce),
+                    onClick = onTermsOfServiceClick,
+                )
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.settings_about_privacy_policy),
-                onClick = onPrivacyClick,
-            )
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.settings_about_privacy_policy),
+                    onClick = onPrivacyClick,
+                )
+            }
         }
     }
 }

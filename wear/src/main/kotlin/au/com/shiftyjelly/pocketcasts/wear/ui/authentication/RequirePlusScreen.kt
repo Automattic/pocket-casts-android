@@ -21,7 +21,8 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
-import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -32,52 +33,57 @@ object RequirePlusScreen {
 
 @Composable
 fun RequirePlusScreen(
-    columnState: ScalingLazyColumnState,
     onContinueToLogin: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<RequirePlusViewModel>()
+    val columnState = rememberResponsiveColumnState()
 
-    CallOnce {
-        viewModel.onShown()
-    }
-
-    ScalingLazyColumn(
-        columnState = columnState,
+    ScreenScaffold(
+        scrollState = columnState,
     ) {
-        item {
-            SubscriptionBadge(
-                iconRes = UpgradeFeatureCard.PLUS.iconRes,
-                shortNameRes = UpgradeFeatureCard.PLUS.shortNameRes,
-                iconColor = Color.Black,
-                backgroundColor = colorResource(UR.color.plus_gold),
-                textColor = Color.Black,
-            )
+        val viewModel = hiltViewModel<RequirePlusViewModel>()
+
+        CallOnce {
+            viewModel.onShown()
         }
 
-        item { Spacer(Modifier.height(16.dp)) }
+        ScalingLazyColumn(
+            columnState = columnState,
+        ) {
+            item {
+                SubscriptionBadge(
+                    iconRes = UpgradeFeatureCard.PLUS.iconRes,
+                    shortNameRes = UpgradeFeatureCard.PLUS.shortNameRes,
+                    iconColor = Color.Black,
+                    backgroundColor = colorResource(UR.color.plus_gold),
+                    textColor = Color.Black,
+                )
+            }
 
-        item {
-            Text(
-                text = buildAnnotatedString {
-                    append(stringResource(LR.string.log_in_watch_requires_plus))
-                    append(" ")
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("play.pocketcasts.com")
-                    }
-                },
-                textAlign = TextAlign.Center,
-                modifier = Modifier.clickable { onContinueToLogin() },
-            )
-        }
+            item { Spacer(Modifier.height(16.dp)) }
 
-        item { Spacer(Modifier.height(16.dp)) }
+            item {
+                Text(
+                    text = buildAnnotatedString {
+                        append(stringResource(LR.string.log_in_watch_requires_plus))
+                        append(" ")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("play.pocketcasts.com")
+                        }
+                    },
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.clickable { onContinueToLogin() },
+                )
+            }
 
-        item {
-            WatchListChip(
-                title = stringResource(LR.string.log_in),
-                iconRes = IR.drawable.signin,
-                onClick = onContinueToLogin,
-            )
+            item { Spacer(Modifier.height(16.dp)) }
+
+            item {
+                WatchListChip(
+                    title = stringResource(LR.string.log_in),
+                    iconRes = IR.drawable.signin,
+                    onClick = onContinueToLogin,
+                )
+            }
         }
     }
 }

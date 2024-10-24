@@ -11,13 +11,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavGraphBuilder
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.navigation.composable
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
-import com.google.android.horologist.compose.layout.ScalingLazyColumnState
-import com.google.android.horologist.compose.navscaffold.scrollable
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberColumnState
 import java.util.concurrent.Executors
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
@@ -30,23 +31,23 @@ object UrlScreenRoutes {
 }
 
 fun NavGraphBuilder.settingsUrlScreens() {
-    @Suppress("DEPRECATION")
-    scrollable(UrlScreenRoutes.termsOfService) {
+    composable(
+        route = UrlScreenRoutes.termsOfService,
+    ) {
         UrlScreen(
             title = stringResource(LR.string.settings_about_terms_of_serivce),
             message = stringResource(LR.string.settings_about_terms_of_service_available_at, Settings.INFO_TOS_URL),
             url = Settings.INFO_TOS_URL,
-            columnState = it.columnState,
         )
     }
 
-    @Suppress("DEPRECATION")
-    scrollable(UrlScreenRoutes.privacy) {
+    composable(
+        route = UrlScreenRoutes.privacy,
+    ) {
         UrlScreen(
             title = stringResource(id = LR.string.settings_about_privacy_policy),
             message = stringResource(LR.string.settings_about_privacy_policy_available_at, Settings.INFO_PRIVACY_URL),
             url = Settings.INFO_PRIVACY_URL,
-            columnState = it.columnState,
         )
     }
 }
@@ -56,34 +57,39 @@ fun UrlScreen(
     title: String,
     message: String,
     url: String,
-    columnState: ScalingLazyColumnState,
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    val columnState = rememberColumnState()
 
-    ScalingLazyColumn(
-        columnState = columnState,
+    ScreenScaffold(
+        scrollState = columnState,
     ) {
-        item {
-            ScreenHeaderChip(text = title)
-        }
+        val coroutineScope = rememberCoroutineScope()
 
-        item {
-            Text(
-                text = message,
-                textAlign = TextAlign.Center,
-            )
-        }
+        ScalingLazyColumn(
+            columnState = columnState,
+        ) {
+            item {
+                ScreenHeaderChip(text = title)
+            }
 
-        item {
-            val context = LocalContext.current
-            WatchListChip(
-                title = stringResource(LR.string.settings_open_on_phone),
-                onClick = {
-                    coroutineScope.launch {
-                        openUrlOnPhone(url, context)
-                    }
-                },
-            )
+            item {
+                Text(
+                    text = message,
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            item {
+                val context = LocalContext.current
+                WatchListChip(
+                    title = stringResource(LR.string.settings_open_on_phone),
+                    onClick = {
+                        coroutineScope.launch {
+                            openUrlOnPhone(url, context)
+                        }
+                    },
+                )
+            }
         }
     }
 }

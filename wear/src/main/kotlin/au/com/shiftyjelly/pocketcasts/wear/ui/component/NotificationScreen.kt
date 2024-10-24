@@ -21,6 +21,7 @@ import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
+import com.google.android.horologist.compose.layout.ScreenScaffold
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -40,28 +41,32 @@ fun NotificationScreen(
         )
     },
 ) {
-    LaunchedEffect(closeAfterDuration) {
-        if (closeAfterDuration != null) {
-            delay(closeAfterDuration)
-            onClose()
-        }
-    }
-
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable { onClose() }
-            .padding(16.dp)
-            .fillMaxSize(),
+    ScreenScaffold(
+        timeText = null,
     ) {
-        icon()
-        Spacer(modifier = Modifier.height(4.dp))
-        TextH30(
-            text = text,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onPrimary,
-        )
+        LaunchedEffect(closeAfterDuration) {
+            if (closeAfterDuration != null) {
+                delay(closeAfterDuration)
+                onClose()
+            }
+        }
+
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clickable { onClose() }
+                .padding(16.dp)
+                .fillMaxSize(),
+        ) {
+            icon()
+            Spacer(modifier = Modifier.height(4.dp))
+            TextH30(
+                text = text,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.onPrimary,
+            )
+        }
     }
 }
 

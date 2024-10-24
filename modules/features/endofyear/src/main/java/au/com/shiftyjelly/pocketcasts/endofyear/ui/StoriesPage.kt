@@ -24,7 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -198,7 +198,7 @@ internal fun BoxScope.TopControls(
                 .size(24.dp)
                 .clickable(
                     interactionSource = remember(::MutableInteractionSource),
-                    indication = rememberRipple(color = Color.Black, bounded = false),
+                    indication = ripple(color = Color.Black, bounded = false),
                     onClickLabel = stringResource(LR.string.close),
                     role = Role.Button,
                     onClick = onClose,

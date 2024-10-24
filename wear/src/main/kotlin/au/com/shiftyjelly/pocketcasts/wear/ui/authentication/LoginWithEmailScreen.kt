@@ -29,68 +29,73 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
+import com.google.android.horologist.compose.layout.ScreenScaffold
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun LoginWithEmailScreen(
     onSignInSuccess: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<SignInViewModel>()
-    val signInState by viewModel.signInState.observeAsState()
-    val email by viewModel.email.observeAsState()
-    val password by viewModel.password.observeAsState()
+    ScreenScaffold(
+        timeText = {},
+    ) {
+        val viewModel = hiltViewModel<SignInViewModel>()
+        val signInState by viewModel.signInState.observeAsState()
+        val email by viewModel.email.observeAsState()
+        val password by viewModel.password.observeAsState()
 
-    var loading by remember { mutableStateOf(false) }
+        var loading by remember { mutableStateOf(false) }
 
-    when (signInState) {
-        null,
-        SignInState.Empty,
-        -> {
-            loading = false
+        when (signInState) {
+            null,
+            SignInState.Empty,
+            -> {
+                loading = false
 
-            if (email.isNullOrBlank()) {
-                val label = stringResource(LR.string.enter_email)
-                val launcher = getLauncher { viewModel.updateEmail(it) }
+                if (email.isNullOrBlank()) {
+                    val label = stringResource(LR.string.enter_email)
+                    val launcher = getLauncher { viewModel.updateEmail(it) }
+                    LaunchedEffect(Unit) {
+                        launchRemoteInput(label, launcher)
+                    }
+                } else if (password.isNullOrEmpty()) {
+                    val label = stringResource(LR.string.enter_password)
+                    val launcher = getLauncher {
+                        viewModel.updatePassword(it)
+                    }
+                    LaunchedEffect(Unit) {
+                        launchRemoteInput(label, launcher)
+                    }
+                } else {
+                    viewModel.signIn()
+                }
+            }
+
+            SignInState.Loading -> {
+                loading = true
+            }
+
+            is SignInState.Success -> {
                 LaunchedEffect(Unit) {
-                    launchRemoteInput(label, launcher)
+                    onSignInSuccess()
                 }
-            } else if (password.isNullOrEmpty()) {
-                val label = stringResource(LR.string.enter_password)
-                val launcher = getLauncher {
-                    viewModel.updatePassword(it)
-                }
-                LaunchedEffect(Unit) {
-                    launchRemoteInput(label, launcher)
-                }
-            } else {
-                viewModel.signIn()
+            }
+
+            is SignInState.Failure -> {
+                loading = false
+                val currentState = signInState as? SignInState.Failure
+                val message = currentState?.message
+                    ?: stringResource(
+                        currentState?.errors?.last()?.message
+                            ?: LR.string.error_login_failed,
+                    )
+                ErrorScreen(message)
             }
         }
 
-        SignInState.Loading -> {
-            loading = true
+        if (loading) {
+            Loading()
         }
-
-        is SignInState.Success -> {
-            LaunchedEffect(Unit) {
-                onSignInSuccess()
-            }
-        }
-
-        is SignInState.Failure -> {
-            loading = false
-            val currentState = signInState as? SignInState.Failure
-            val message = currentState?.message
-                ?: stringResource(
-                    currentState?.errors?.last()?.message
-                        ?: LR.string.error_login_failed,
-                )
-            ErrorScreen(message)
-        }
-    }
-
-    if (loading) {
-        Loading()
     }
 }
 

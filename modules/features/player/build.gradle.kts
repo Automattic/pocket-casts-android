@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.webkit)
     implementation(libs.compose.animation)
     implementation(libs.compose.material)
+    implementation(libs.compose.material.icons.core)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.webview)
