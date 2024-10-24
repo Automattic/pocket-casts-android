@@ -3,6 +3,9 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
@@ -36,11 +39,13 @@ import kotlinx.coroutines.launch
 class EndOfYearViewModel @AssistedInject constructor(
     @Assisted private val year: Year,
     @Assisted private val topListTitle: String,
+    @Assisted private val source: StoriesSource,
     private val endOfYearSync: EndOfYearSync,
     private val endOfYearManager: EndOfYearManager,
     subscriptionManager: SubscriptionManager,
     private val listServiceManager: ListServiceManager,
     private val sharingClient: StorySharingClient,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
 
@@ -84,6 +89,9 @@ class EndOfYearViewModel @AssistedInject constructor(
         viewModelScope.launch {
             syncState.emit(SyncState.Syncing)
             val isSynced = endOfYearSync.sync(year)
+            if (!isSynced) {
+                trackFailedToLoad()
+            }
             syncState.emit(if (isSynced) SyncState.Synced else SyncState.Failure)
         }
     }
@@ -156,6 +164,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
 
     internal fun onStoryChanged(story: Story) {
+        trackStoryShown(story)
         viewModelScope.launch {
             countDownJob?.cancelAndJoin()
             progress.value = 0f
@@ -217,6 +226,50 @@ class EndOfYearViewModel @AssistedInject constructor(
         viewModelScope.launch { sharingClient.shareStory(request) }
     }
 
+    internal fun trackFailedToLoad() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
+    }
+
+    internal fun trackStoriesShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORIES_SHOWN,
+            mapOf("source" to source.value),
+        )
+    }
+
+    internal fun trackStoriesClosed() {
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
+            mapOf("source" to "close_button"),
+        )
+    }
+
+    internal fun trackStoriesAutoFinished() {
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
+            mapOf("source" to "auto_progress"),
+        )
+    }
+
+    internal fun trackStoryShown(story: Story) {
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORY_SHOWN,
+            mapOf("story" to story.analyticsValue),
+        )
+    }
+
+    internal fun trackReplayStoriesTapped() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED)
+    }
+
+    internal fun trackUpsellShown() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_UPSELL_SHOWN)
+    }
+
+    internal fun trackLearnRatingsShown() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_LEARN_RATINGS_SHOWN)
+    }
+
     private fun getRandomShowIds(stats: EndOfYearStats): RandomShowIds? {
         val showIds = stats.playedPodcastIds
         return if (showIds.isNotEmpty()) {
@@ -243,6 +296,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         fun create(
             year: Year,
             topListTitle: String,
+            source: StoriesSource,
         ): EndOfYearViewModel
     }
 }
