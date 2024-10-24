@@ -29,6 +29,7 @@ dependencies {
     api(projects.modules.services.preferences)
     api(projects.modules.services.repositories)
     api(projects.modules.services.servers)
+    api(projects.modules.services.sharing)
     api(projects.modules.services.ui)
     api(projects.modules.services.utils)
     api(projects.modules.services.views)

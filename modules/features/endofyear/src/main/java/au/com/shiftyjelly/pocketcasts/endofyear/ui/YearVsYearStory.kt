@@ -57,13 +57,20 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun YearVsYearStory(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
-) = YearVsYearStory(story, measurements, showCircles = false)
+    onShareStory: () -> Unit,
+) = YearVsYearStory(
+    story = story,
+    measurements = measurements,
+    showCircles = false,
+    onShareStory = onShareStory,
+)
 
 @Composable
 private fun YearVsYearStory(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
     showCircles: Boolean,
+    onShareStory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -79,6 +86,7 @@ private fun YearVsYearStory(
         TextInfo(
             story = story,
             measurements = measurements,
+            onShareStory = onShareStory,
         )
     }
 }
@@ -307,6 +315,7 @@ private class YearVsYearConfiguration(
 private fun TextInfo(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -374,7 +383,7 @@ private fun TextInfo(
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        ShareStoryButton(onClick = {})
+        ShareStoryButton(onClick = onShareStory)
     }
 }
 
@@ -390,6 +399,7 @@ private fun YearVsYearThisYearPreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            onShareStory = {},
         )
     }
 }
@@ -406,6 +416,7 @@ private fun YearVsYearThisYearLargePreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            onShareStory = {},
         )
     }
 }
@@ -422,6 +433,7 @@ private fun YearVsYearLastYearPreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            onShareStory = {},
         )
     }
 }
@@ -438,6 +450,7 @@ private fun YearVsYearEqualPreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            onShareStory = {},
         )
     }
 }

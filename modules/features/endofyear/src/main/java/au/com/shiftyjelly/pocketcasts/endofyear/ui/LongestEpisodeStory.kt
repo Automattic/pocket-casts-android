@@ -54,13 +54,20 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun LongestEpisodeStory(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-) = LongestEpisodeStory(story, measurements, showCovers = false)
+    onShareStory: () -> Unit,
+) = LongestEpisodeStory(
+    story = story,
+    measurements = measurements,
+    onShareStory = onShareStory,
+    showCovers = false,
+)
 
 @Composable
 private fun LongestEpisodeStory(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
     showCovers: Boolean,
+    onShareStory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -77,6 +84,7 @@ private fun LongestEpisodeStory(
         TextInfo(
             story = story,
             measurements = measurements,
+            onShareStory = onShareStory,
         )
     }
 }
@@ -208,6 +216,7 @@ private fun PodcastCover(
 private fun TextInfo(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -244,7 +253,7 @@ private fun TextInfo(
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        ShareStoryButton(onClick = {})
+        ShareStoryButton(onClick = onShareStory)
     }
 }
 
@@ -265,6 +274,7 @@ private fun LongestEpisodePreview() {
             ),
             measurements = measurements,
             showCovers = true,
+            onShareStory = {},
         )
     }
 }

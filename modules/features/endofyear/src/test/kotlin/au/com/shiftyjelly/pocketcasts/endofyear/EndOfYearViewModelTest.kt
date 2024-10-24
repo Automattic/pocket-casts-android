@@ -25,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.list.PodcastList
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import java.time.Year
 import java.util.Date
 import junit.framework.TestCase.assertEquals
@@ -95,6 +97,7 @@ class EndOfYearViewModelTest {
             endOfYearManager = endOfYearManager,
             subscriptionManager = mock { on { subscriptionTier() }.doReturn(subscriptionTier) },
             listServiceManager = listServiceManager,
+            sharingClient = FakeSharingClient(),
         )
     }
 
@@ -733,5 +736,15 @@ class EndOfYearViewModelTest {
         )
 
         override fun extractShareListIdFromWebUrl(webUrl: String) = ""
+    }
+
+    private class FakeSharingClient : StorySharingClient {
+        override suspend fun shareStory(request: SharingRequest): SharingResponse {
+            return SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
+        }
     }
 }

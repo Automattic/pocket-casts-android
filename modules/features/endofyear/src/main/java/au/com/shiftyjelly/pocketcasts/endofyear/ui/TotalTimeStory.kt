@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun TotalTimeStory(
     story: Story.TotalTime,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -57,7 +58,7 @@ internal fun TotalTimeStory(
             }[0].measure(constraints)
 
             val shareButton = subcompose("share-button") {
-                ShareStoryButton(onClick = {})
+                ShareStoryButton(onClick = onShareStory)
             }[0].measure(constraints)
 
             val titleConstraints = constraints.copy(
@@ -134,6 +135,7 @@ private fun TotalTimePreview(
                 duration = duration,
             ),
             measurements = measurements,
+            onShareStory = {},
         )
     }
 }

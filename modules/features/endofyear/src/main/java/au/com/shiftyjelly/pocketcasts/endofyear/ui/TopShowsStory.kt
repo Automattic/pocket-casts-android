@@ -60,13 +60,20 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun TopShowsStory(
     story: Story.TopShows,
     measurements: EndOfYearMeasurements,
-) = TopShowsStory(story, measurements, initialAnimationProgress = 0f)
+    onShareStory: () -> Unit,
+) = TopShowsStory(
+    story = story,
+    measurements = measurements,
+    onShareStory = onShareStory,
+    initialAnimationProgress = 0f,
+)
 
 @Composable
 private fun TopShowsStory(
     story: Story.TopShows,
     measurements: EndOfYearMeasurements,
     initialAnimationProgress: Float,
+    onShareStory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -126,7 +133,7 @@ private fun TopShowsStory(
                 disableAutoScale = true,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = {})
+            ShareStoryButton(onClick = onShareStory)
         }
     }
 }
@@ -288,6 +295,7 @@ private fun TopShowsPreview() {
             ),
             measurements = measurements,
             initialAnimationProgress = 1f,
+            onShareStory = {},
         )
     }
 }

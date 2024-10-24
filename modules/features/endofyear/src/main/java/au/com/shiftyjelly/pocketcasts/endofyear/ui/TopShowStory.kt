@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun TopShowStory(
     story: Story.TopShow,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
 ) {
     Box {
         val shapeSize = measurements.width * 1.12f
@@ -147,7 +148,7 @@ internal fun TopShowStory(
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = {})
+            ShareStoryButton(onClick = onShareStory)
         }
 
         // Clip the rotating shape at top
@@ -190,6 +191,7 @@ private fun TopShowPreview() {
                 ),
             ),
             measurements = measurements,
+            onShareStory = {},
         )
     }
 }

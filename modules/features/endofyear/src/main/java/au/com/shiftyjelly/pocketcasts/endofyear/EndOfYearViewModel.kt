@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.extensions.padEnd
 import dagger.assisted.Assisted
@@ -39,6 +40,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     private val endOfYearManager: EndOfYearManager,
     subscriptionManager: SubscriptionManager,
     private val listServiceManager: ListServiceManager,
+    private val sharingClient: StorySharingClient,
 ) : ViewModel() {
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
 
@@ -208,6 +210,11 @@ class EndOfYearViewModel @AssistedInject constructor(
                 .lastOrNull { it.isFree }
                 ?.let(stories::indexOf)
         }?.takeIf { it != -1 }
+    }
+
+    internal fun share(story: Story) {
+        val request = SharingRequest.endOfYearStory(story, year).build()
+        viewModelScope.launch { sharingClient.shareStory(request) }
     }
 
     private fun getRandomShowIds(stats: EndOfYearStats): RandomShowIds? {
