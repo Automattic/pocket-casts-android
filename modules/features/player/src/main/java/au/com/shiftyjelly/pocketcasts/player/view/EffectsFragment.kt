@@ -114,7 +114,8 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
         val binding = binding ?: return
 
-        binding.globalEffectsCard.isVisible = podcast.overrideGlobalEffects
+        binding.globalEffectsCard.isVisible = !FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS) &&
+            podcast.overrideGlobalEffects
 
         imageRequestFactory.create(podcast).loadInto(binding.podcastEffectsImage)
 
