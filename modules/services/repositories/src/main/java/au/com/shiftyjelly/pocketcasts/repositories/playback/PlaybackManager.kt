@@ -1809,18 +1809,14 @@ open class PlaybackManager @Inject constructor(
             ) {
                 sendDataWarningNotification(episode)
                 val previousPlaybackState = playbackStateRelay.blockingFirst()
-                val playbackState = PlaybackState(
+                val playbackState = PlaybackState.buildInitialState(
                     state = PlaybackState.State.EMPTY, // Make sure an existing playback notification goes away
-                    isBuffering = false,
-                    isPrepared = true,
-                    isSleepTimerRunning = previousPlaybackState?.isSleepTimerRunning ?: false,
-                    title = episode.title,
-                    durationMs = episode.durationMs,
-                    positionMs = episode.playedUpToMs,
-                    episodeUuid = episode.uuid,
+                    episode = episode,
                     podcast = podcast,
-                    chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
-                    lastChangeFrom = LastChangeFrom.OnLoadCurrentEpisodeDataWarning.value,
+                    isPrepared = true,
+                    previousPlaybackState = previousPlaybackState,
+                    lastChangeFrom = LastChangeFrom.OnLoadCurrentEpisodeDataWarning,
+                    settings = settings,
                 )
                 withContext(Dispatchers.Main) {
                     playbackStateRelay.accept(playbackState)

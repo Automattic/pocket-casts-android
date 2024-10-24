@@ -56,10 +56,10 @@ data class PlaybackState(
             podcast: Podcast?,
             isPrepared: Boolean,
             previousPlaybackState: PlaybackState?,
-            sameEpisode: Boolean = previousPlaybackState != null && episode.uuid == previousPlaybackState.episodeUuid,
             lastChangeFrom: LastChangeFrom,
             settings: Settings,
         ): PlaybackState {
+            val sameEpisode: Boolean = previousPlaybackState != null && episode.uuid == previousPlaybackState.episodeUuid
             val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) {
                 podcast.playbackEffects
             } else {
