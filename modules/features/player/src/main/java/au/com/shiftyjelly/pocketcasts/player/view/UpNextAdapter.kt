@@ -176,7 +176,7 @@ class UpNextAdapter(
 
                 shuffle.setOnClickListener {
                     val newValue = !settings.upNextShuffle.value
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_TOGGLED, mapOf("enabled" to newValue))
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("enabled" to newValue))
 
                     settings.upNextShuffle.set(newValue, updateModifiedAt = false)
 
