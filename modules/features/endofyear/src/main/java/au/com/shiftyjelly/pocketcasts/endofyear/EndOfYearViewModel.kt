@@ -44,7 +44,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
     private val _switchStory = MutableSharedFlow<Unit>()
     internal val switchStory get() = _switchStory.asSharedFlow()
-    private val isStoryAutoProgressEnabled = MutableStateFlow(false)
+    private val storyAutoProgressPauseReasons = MutableStateFlow(setOf(StoryProgressPauseReason.ScreenInBackground))
 
     internal val uiState = combine(
         syncState,
@@ -136,7 +136,7 @@ class EndOfYearViewModel @AssistedInject constructor(
                 countDownJob = launch {
                     var currentProgress = 0f
                     while (currentProgress < 1f) {
-                        isStoryAutoProgressEnabled.first { it }
+                        storyAutoProgressPauseReasons.first { it.isEmpty() }
                         currentProgress += 0.01f
                         progress.value = currentProgress
                         delay(progressDelay)
@@ -147,12 +147,12 @@ class EndOfYearViewModel @AssistedInject constructor(
         }
     }
 
-    internal fun resumeStoryAutoProgress() {
-        isStoryAutoProgressEnabled.value = true
+    internal fun resumeStoryAutoProgress(reason: StoryProgressPauseReason) {
+        storyAutoProgressPauseReasons.value -= reason
     }
 
-    internal fun pauseStoryAutoProgress() {
-        isStoryAutoProgressEnabled.value = false
+    internal fun pauseStoryAutoProgress(reason: StoryProgressPauseReason) {
+        storyAutoProgressPauseReasons.value += reason
     }
 
     internal fun getNextStoryIndex(currentIndex: Int): Int? {
@@ -230,4 +230,9 @@ private sealed interface SyncState {
     data object Syncing : SyncState
     data object Failure : SyncState
     data object Synced : SyncState
+}
+
+internal enum class StoryProgressPauseReason {
+    ScreenInBackground,
+    UserHoldingStory,
 }
