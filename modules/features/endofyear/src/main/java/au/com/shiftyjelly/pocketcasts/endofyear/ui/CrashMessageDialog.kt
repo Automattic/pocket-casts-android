@@ -28,7 +28,7 @@ internal fun ScreenshotDetectedDialog(
                 text = stringResource(LR.string.share),
                 onClick = onShare,
             ),
-        )
+        ),
     )
 }
 
