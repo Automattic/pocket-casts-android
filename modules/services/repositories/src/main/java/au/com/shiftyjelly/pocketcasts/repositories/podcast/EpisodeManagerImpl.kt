@@ -677,7 +677,7 @@ class EpisodeManagerImpl @Inject constructor(
         deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true, shouldShuffleUpNext = shouldShuffleUpNext)
 
         // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
     }
 
     override suspend fun findStaleDownloads(): List<PodcastEpisode> {
