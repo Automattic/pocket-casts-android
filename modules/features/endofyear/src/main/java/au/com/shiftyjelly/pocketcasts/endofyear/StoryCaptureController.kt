@@ -21,6 +21,7 @@ import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.io.File
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -71,6 +72,7 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                 }
 
                 _isSharing = true
+                delay(50) // A small delay to settle stories animations before capturing a screenshot
                 val controller = captureController(story)
                 val file = runCatching {
                     val bitmap: Bitmap = withContext(Dispatchers.Default) {

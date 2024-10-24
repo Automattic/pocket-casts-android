@@ -129,7 +129,12 @@ private fun TopShowsStory(
                 .verticalScroll(scrollState),
         ) {
             story.shows.forEachIndexed { index, podcast ->
-                PodcastItem(podcast, index, measurements, animationProgress.value)
+                PodcastItem(
+                    podcast = podcast,
+                    index = index,
+                    measurements = measurements,
+                    animationProgress = if (controller.isSharing) 1f else animationProgress.value,
+                )
             }
         }
         Spacer(
