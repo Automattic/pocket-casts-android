@@ -330,4 +330,5 @@ internal enum class StoryProgressPauseReason {
     ScreenInBackground,
     UserHoldingStory,
     ScreenshotDialog,
+    TakingScreenshot,
 }
