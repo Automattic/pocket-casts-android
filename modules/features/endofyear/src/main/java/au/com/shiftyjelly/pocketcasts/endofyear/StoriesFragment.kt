@@ -202,6 +202,16 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                     }
                 }
             }
+
+            LaunchedEffect(Unit) {
+                snapshotFlow { captureController.isSharing }.collect { isSharing ->
+                    if (isSharing) {
+                        viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.TakingScreenshot)
+                    } else {
+                        viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.TakingScreenshot)
+                    }
+                }
+            }
         }
     }
 
