@@ -7,11 +7,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
+import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBarDefaults
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -29,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -62,6 +76,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEffectsBinding.inflate(inflater, container, false)
+
+        if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
+            binding?.setupEffectsSettingsSegmentedTabBar()
+        }
 
         viewModel.effectsLive.value?.let { update(it) } // Make sure the window is the correct size before opening or else it won't expand properly
         viewModel.effectsLive.observe(viewLifecycleOwner) { podcastEffectsPair ->
@@ -245,5 +263,40 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     private fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
         playbackManager.trackPlaybackEffectsEvent(event, props, SourceView.PLAYER_PLAYBACK_EFFECTS)
+    }
+
+    private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
+        effectsSettingsSegmentedTabBar.setContent {
+            EffectsSettingsSegmentedTabBar(
+                modifier = Modifier
+                    .padding(top = 24.dp),
+            )
+        }
+    }
+
+    @Composable
+    private fun EffectsSettingsSegmentedTabBar(
+        modifier: Modifier = Modifier,
+    ) {
+        SegmentedTabBar(
+            items = listOf(stringResource(LR.string.podcasts_all), stringResource(LR.string.podcast_this)),
+            defaultSelectedItemIndex = 0,
+            colors = SegmentedTabBarDefaults.colors.copy(
+                selectedTabBackgroundColor = MaterialTheme.theme.colors.playerContrast06.copy(alpha = .1f),
+                borderColor = MaterialTheme.theme.colors.playerContrast03.copy(alpha = .4f),
+            ),
+            cornerRadius = 120.dp,
+            textStyle = SegmentedTabBarDefaults.textStyle.copy(
+                fontSize = 13.sp,
+            ),
+            modifier = modifier.fillMaxWidth(),
+            onItemSelected = {},
+        )
+    }
+
+    @Preview(widthDp = 360)
+    @Composable
+    private fun EffectsSettingsSegmentedBarPreview() {
+        EffectsSettingsSegmentedTabBar()
     }
 }
