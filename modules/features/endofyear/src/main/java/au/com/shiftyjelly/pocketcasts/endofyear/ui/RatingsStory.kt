@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
@@ -53,9 +54,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.math.roundToLong
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -66,12 +70,14 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
     onLearnAboutRatings: () -> Unit,
 ) = RatingsStory(
     story = story,
     measurements = measurements,
-    showBars = false,
+    areBarsVisible = false,
+    controller = controller,
     onShareStory = onShareStory,
     onLearnAboutRatings = onLearnAboutRatings,
 )
@@ -80,27 +86,41 @@ internal fun RatingsStory(
 private fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
-    showBars: Boolean,
-    onShareStory: () -> Unit,
+    areBarsVisible: Boolean,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
     onLearnAboutRatings: () -> Unit,
 ) {
     val maxRatingCount = story.stats.max().second
     if (maxRatingCount != 0) {
-        PresentRatings(story, measurements, showBars, onShareStory)
+        PresentRatings(
+            story = story,
+            measurements = measurements,
+            areBarsVisible = areBarsVisible,
+            controller = controller,
+            onShareStory = onShareStory,
+        )
     } else {
-        AbsentRatings(story, measurements, onLearnAboutRatings)
+        AbsentRatings(
+            story = story,
+            measurements = measurements,
+            onLearnAboutRatings = onLearnAboutRatings,
+        )
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PresentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
-    showBars: Boolean,
-    onShareStory: () -> Unit,
+    areBarsVisible: Boolean,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 100.dp),
@@ -114,7 +134,8 @@ private fun PresentRatings(
         ) {
             RatingBars(
                 stats = story.stats,
-                showBars = showBars,
+                areBarsVisible = areBarsVisible,
+                forceBarsVisible = controller.isSharing,
             )
         }
         Column(
@@ -143,7 +164,11 @@ private fun PresentRatings(
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = onShareStory)
+            ShareStoryButton(
+                story = story,
+                controller = controller,
+                onShare = onShareStory,
+            )
         }
     }
 }
@@ -155,7 +180,8 @@ private val SectionHeight = BarHeight + SpaceHeight
 @Composable
 private fun BoxWithConstraintsScope.RatingBars(
     stats: RatingStats,
-    showBars: Boolean,
+    areBarsVisible: Boolean,
+    forceBarsVisible: Boolean,
 ) {
     // Measure text height to account for available space for rating lines
     val textMeasurer = rememberTextMeasurer()
@@ -172,10 +198,10 @@ private fun BoxWithConstraintsScope.RatingBars(
     }
     val maxLineCount = (maxHeight - ratingTextHeight) / SectionHeight
 
-    var show by remember { mutableStateOf(showBars) }
+    var areVisible by remember { mutableStateOf(areBarsVisible) }
     LaunchedEffect(Unit) {
         delay(350)
-        show = true
+        areVisible = true
     }
 
     Row(
@@ -188,7 +214,8 @@ private fun BoxWithConstraintsScope.RatingBars(
                 rating = rating.numericalValue,
                 lineCount = (maxLineCount * stats.relativeToMax(rating)).toInt().coerceAtLeast(1),
                 textHeight = ratingTextHeight,
-                show = show,
+                isVisible = areVisible,
+                forceVisible = forceBarsVisible,
             )
         }
     }
@@ -199,13 +226,14 @@ private fun RowScope.RatingBar(
     rating: Int,
     lineCount: Int,
     textHeight: Dp,
-    show: Boolean,
+    isVisible: Boolean,
+    forceVisible: Boolean,
 ) {
     val density = LocalDensity.current
     val linesHeight = SectionHeight * lineCount
 
     val transition = updateTransition(
-        targetState = show,
+        targetState = isVisible,
         label = "bar-transition-$rating",
     )
 
@@ -220,7 +248,7 @@ private fun RowScope.RatingBar(
         },
         targetValueByState = { state ->
             when (state) {
-                true -> IntOffset(0, 0)
+                true -> IntOffset.Zero
                 false -> IntOffset(0, density.run { textHeight.roundToPx() })
             }
         },
@@ -251,7 +279,7 @@ private fun RowScope.RatingBar(
         },
         targetValueByState = { state ->
             when (state) {
-                true -> IntOffset(0, 0)
+                true -> IntOffset.Zero
                 false -> IntOffset(0, density.run { (linesHeight * 1.1f).roundToPx() })
             }
         },
@@ -266,14 +294,14 @@ private fun RowScope.RatingBar(
             disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier
-                .offset { textOffset }
+                .offset { if (forceVisible) IntOffset.Zero else textOffset }
                 .padding(bottom = 8.dp)
-                .alpha(textAlpha),
+                .alpha(if (forceVisible) 1f else textAlpha),
         )
         repeat(lineCount) {
             Box(
                 modifier = Modifier
-                    .offset { barOffset }
+                    .offset { if (forceVisible) IntOffset.Zero else barOffset }
                     .padding(top = SpaceHeight)
                     .fillMaxWidth()
                     .height(BarHeight)
@@ -417,7 +445,8 @@ private fun RatingsHighPreview() {
                 ),
             ),
             measurements = measurements,
-            showBars = true,
+            areBarsVisible = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
         )
@@ -439,7 +468,8 @@ private fun RatingsLowPreview() {
                 ),
             ),
             measurements = measurements,
-            showBars = true,
+            areBarsVisible = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
         )
@@ -461,7 +491,8 @@ private fun RatingsNonePreview() {
                 ),
             ),
             measurements = measurements,
-            showBars = true,
+            areBarsVisible = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
         )

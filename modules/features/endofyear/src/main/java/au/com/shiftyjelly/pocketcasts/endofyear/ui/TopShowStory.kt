@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
@@ -39,20 +40,27 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.math.sqrt
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TopShowStory(
     story: Story.TopShow,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
-    Box {
+    Box(
+        modifier = Modifier.capturable(controller.captureController(story)),
+    ) {
         val shapeSize = measurements.width * 1.12f
         val coverSize = shapeSize * sqrt(2f)
         val coverOffset = measurements.closeButtonBottomEdge
@@ -148,7 +156,11 @@ internal fun TopShowStory(
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = onShareStory)
+            ShareStoryButton(
+                story = story,
+                controller = controller,
+                onShare = onShareStory,
+            )
         }
 
         // Clip the rotating shape at top
@@ -191,6 +203,7 @@ private fun TopShowPreview() {
                 ),
             ),
             measurements = measurements,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
     }

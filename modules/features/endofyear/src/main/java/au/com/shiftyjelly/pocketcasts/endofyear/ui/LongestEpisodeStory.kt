@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
@@ -42,9 +43,12 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -54,23 +58,28 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun LongestEpisodeStory(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) = LongestEpisodeStory(
     story = story,
     measurements = measurements,
+    controller = controller,
+    areCoversVisible = false,
     onShareStory = onShareStory,
-    showCovers = false,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun LongestEpisodeStory(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-    showCovers: Boolean,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    areCoversVisible: Boolean,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge),
@@ -78,12 +87,14 @@ private fun LongestEpisodeStory(
         CoversSection(
             story = story,
             measurements = measurements,
-            showCovers = showCovers,
+            areCoversVisible = areCoversVisible,
+            forceCoversVisible = controller.isSharing,
             modifier = Modifier.weight(1f),
         )
         TextInfo(
             story = story,
             measurements = measurements,
+            controller = controller,
             onShareStory = onShareStory,
         )
     }
@@ -93,16 +104,17 @@ private fun LongestEpisodeStory(
 private fun CoversSection(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-    showCovers: Boolean,
+    areCoversVisible: Boolean,
+    forceCoversVisible: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    var areCoversVisible by remember { mutableStateOf(showCovers) }
+    var areVisible by remember { mutableStateOf(areCoversVisible) }
     LaunchedEffect(Unit) {
         delay(200)
-        areCoversVisible = true
+        areVisible = true
     }
 
-    val transition = updateTransition(areCoversVisible, "cover-transtion")
+    val transition = updateTransition(areVisible, "cover-transtion")
     val widthPx = LocalDensity.current.run { measurements.width.roundToPx() }
     val offset by transition.animateIntOffset(
         transitionSpec = {
@@ -114,7 +126,7 @@ private fun CoversSection(
         },
         targetValueByState = {
             when (it) {
-                true -> IntOffset(0, 0)
+                true -> IntOffset.Zero
                 false -> IntOffset(-widthPx / 2, widthPx / 2)
             }
         },
@@ -147,8 +159,8 @@ private fun CoversSection(
             contentAlignment = Alignment.BottomStart,
             modifier = Modifier
                 .offset(y = baseCoverSize * measurements.scale / 3)
-                .offset { offset }
-                .scale(scale),
+                .offset { if (forceCoversVisible) IntOffset.Zero else offset }
+                .scale(if (forceCoversVisible) 1f else scale),
         ) {
             podcastCoverSizes.forEachIndexed { index, size ->
                 PodcastCover(
@@ -216,7 +228,8 @@ private fun PodcastCover(
 private fun TextInfo(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -253,7 +266,11 @@ private fun TextInfo(
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        ShareStoryButton(onClick = onShareStory)
+        ShareStoryButton(
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
+        )
     }
 }
 
@@ -273,7 +290,8 @@ private fun LongestEpisodePreview() {
                 ),
             ),
             measurements = measurements,
-            showCovers = true,
+            controller = StoryCaptureController.preview(),
+            areCoversVisible = true,
             onShareStory = {},
         )
     }
