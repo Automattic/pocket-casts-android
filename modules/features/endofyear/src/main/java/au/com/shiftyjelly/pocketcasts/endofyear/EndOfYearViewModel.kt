@@ -3,12 +3,15 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.extensions.padEnd
 import dagger.assisted.Assisted
@@ -31,24 +34,46 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = EndOfYearViewModel.Factory::class)
 class EndOfYearViewModel @AssistedInject constructor(
     @Assisted private val year: Year,
+    @Assisted private val topListTitle: String,
     private val endOfYearSync: EndOfYearSync,
     private val endOfYearManager: EndOfYearManager,
     subscriptionManager: SubscriptionManager,
+    private val listServiceManager: ListServiceManager,
 ) : ViewModel() {
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
-    private val progress = MutableStateFlow(0f)
-    private var countDownJob: Job? = null
-    private val eoyStats = CachedAction<Year, Pair<EndOfYearStats, RandomShowIds?>> {
+
+    private val eoyStatsAction = CachedAction<Year, Pair<EndOfYearStats, RandomShowIds?>> {
         val stats = endOfYearManager.getStats(year)
+        topPodcastsLinkAction.run(stats.topPodcasts, scope = viewModelScope)
         stats to getRandomShowIds(stats)
     }
+
+    private val topPodcastsLink = MutableStateFlow<String?>(null)
+    private val topPodcastsLinkAction = CachedAction<List<TopPodcast>, Unit> { topPodcasts ->
+        if (topPodcasts.isNotEmpty()) {
+            val podcasts = topPodcasts.map { Podcast(uuid = it.uuid) }
+            runCatching {
+                val link = listServiceManager.createPodcastList(
+                    title = topListTitle,
+                    description = "",
+                    podcasts = podcasts,
+                )
+                topPodcastsLink.emit(link)
+            }
+        }
+    }
+
+    private val progress = MutableStateFlow(0f)
+    private var countDownJob: Job? = null
+    private val storyAutoProgressPauseReasons = MutableStateFlow(setOf(StoryProgressPauseReason.ScreenInBackground))
+
     private val _switchStory = MutableSharedFlow<Unit>()
     internal val switchStory get() = _switchStory.asSharedFlow()
-    private val storyAutoProgressPauseReasons = MutableStateFlow(setOf(StoryProgressPauseReason.ScreenInBackground))
 
     internal val uiState = combine(
         syncState,
         subscriptionManager.subscriptionTier(),
+        topPodcastsLink,
         progress,
         ::createUiModel,
     ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing)
@@ -64,13 +89,14 @@ class EndOfYearViewModel @AssistedInject constructor(
     private suspend fun createUiModel(
         syncState: SyncState,
         subscriptionTier: SubscriptionTier,
+        topPodcastsLink: String?,
         progress: Float,
     ) = when (syncState) {
         SyncState.Syncing -> UiState.Syncing
         SyncState.Failure -> UiState.Failure
         SyncState.Synced -> {
-            val (stats, randomShowIds) = eoyStats.run(year, viewModelScope).await()
-            val stories = createStories(stats, randomShowIds, subscriptionTier)
+            val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
+            val stories = createStories(stats, randomShowIds, subscriptionTier, topPodcastsLink)
             UiState.Synced(
                 stories = stories,
                 isPaidAccount = subscriptionTier.isPaid,
@@ -83,6 +109,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         stats: EndOfYearStats,
         randomShowIds: RandomShowIds?,
         subscriptionTier: SubscriptionTier,
+        topPodcastsLink: String?,
     ): List<Story> = buildList {
         add(Story.Cover)
         if (randomShowIds != null) {
@@ -98,7 +125,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         val topPodcast = stats.topPodcasts.firstOrNull()
         if (topPodcast != null) {
             add(Story.TopShow(topPodcast))
-            add(Story.TopShows(stats.topPodcasts))
+            add(Story.TopShows(stats.topPodcasts, topPodcastsLink))
         }
         add(Story.Ratings(stats.ratingStats))
         add(Story.TotalTime(stats.playbackTime))
@@ -206,7 +233,10 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(year: Year): EndOfYearViewModel
+        fun create(
+            year: Year,
+            topListTitle: String,
+        ): EndOfYearViewModel
     }
 }
 

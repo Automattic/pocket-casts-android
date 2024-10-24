@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import app.cash.turbine.Turbine
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.Story.CompletionRate
@@ -21,11 +22,15 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.list.PodcastList
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.time.Year
+import java.util.Date
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -46,6 +51,7 @@ class EndOfYearViewModelTest {
 
     private val endOfYearSync = FakeEndOfYearSync()
     private val endOfYearManager = FakeEofYearManager()
+    private val listServiceManager = FakeListServiceManager()
     private val subscriptionTier = MutableStateFlow(SubscriptionTier.PLUS)
 
     private val stats = EndOfYearStats(
@@ -84,9 +90,11 @@ class EndOfYearViewModelTest {
     fun setUp() {
         viewModel = EndOfYearViewModel(
             year = Year.of(1000),
+            topListTitle = "Top list title",
             endOfYearSync = endOfYearSync,
             endOfYearManager = endOfYearManager,
             subscriptionManager = mock { on { subscriptionTier() }.doReturn(subscriptionTier) },
+            listServiceManager = listServiceManager,
         )
     }
 
@@ -267,8 +275,28 @@ class EndOfYearViewModelTest {
             val story = awaitStory<TopShows>()
 
             assertEquals(
-                TopShows(stats.topPodcasts),
+                TopShows(stats.topPodcasts, podcastListUrl = null),
                 story,
+            )
+        }
+    }
+
+    @Test
+    fun `top shows with podcast list link`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+
+        viewModel.syncData()
+        viewModel.uiState.test {
+            assertEquals(
+                TopShows(stats.topPodcasts, podcastListUrl = null),
+                awaitStory<TopShows>(),
+            )
+
+            listServiceManager.podcastListUrl.complete("podcast-list-url")
+            assertEquals(
+                TopShows(stats.topPodcasts, podcastListUrl = "podcast-list-url"),
+                awaitStory<TopShows>(),
             )
         }
     }
@@ -683,5 +711,27 @@ class EndOfYearViewModelTest {
         }
 
         override suspend fun reset() = Unit
+    }
+
+    private class FakeListServiceManager : ListServiceManager {
+        val podcastListUrl = CompletableDeferred<String>()
+
+        override suspend fun createPodcastList(
+            title: String,
+            description: String,
+            podcasts: List<Podcast>,
+            date: Date,
+            serverSecret: String
+        ) = podcastListUrl.await()
+
+        override suspend fun openPodcastList(listId: String) = PodcastList(
+            title = "",
+            description = "",
+            podcasts = emptyList(),
+            date = null,
+            hash = null,
+        )
+
+        override fun extractShareListIdFromWebUrl(webUrl: String) = ""
     }
 }

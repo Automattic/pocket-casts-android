@@ -25,8 +25,9 @@ sealed interface Story {
         val show: TopPodcast,
     ) : Story
 
-    data class TopShows(
+    data class TopShows constructor(
         val shows: List<TopPodcast>,
+        val podcastListUrl: String?,
     ) : Story
 
     data class Ratings(

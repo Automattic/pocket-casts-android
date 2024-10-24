@@ -58,7 +58,10 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
     private val viewModel by viewModels<EndOfYearViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<EndOfYearViewModel.Factory> { factory ->
-                factory.create(EndOfYearManager.YEAR_TO_SYNC)
+                factory.create(
+                    year = EndOfYearManager.YEAR_TO_SYNC,
+                    topListTitle = getString(LR.string.end_of_year_story_top_podcasts_share_text, "")
+                )
             }
         },
     )

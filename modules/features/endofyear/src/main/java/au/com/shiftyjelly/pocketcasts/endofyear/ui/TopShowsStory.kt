@@ -284,6 +284,7 @@ private fun TopShowsPreview() {
                         playedEpisodeCount = Random.nextInt(60, 100),
                     )
                 },
+                podcastListUrl = null,
             ),
             measurements = measurements,
             initialAnimationProgress = 1f,
