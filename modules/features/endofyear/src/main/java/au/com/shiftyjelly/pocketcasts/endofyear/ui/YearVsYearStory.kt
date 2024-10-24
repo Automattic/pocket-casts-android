@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
@@ -44,8 +45,11 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
 import kotlinx.coroutines.delay
@@ -57,23 +61,28 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun YearVsYearStory(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) = YearVsYearStory(
     story = story,
     measurements = measurements,
     showCircles = false,
+    controller = controller,
     onShareStory = onShareStory,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun YearVsYearStory(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
     showCircles: Boolean,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 8.dp),
@@ -86,6 +95,7 @@ private fun YearVsYearStory(
         TextInfo(
             story = story,
             measurements = measurements,
+            controller = controller,
             onShareStory = onShareStory,
         )
     }
@@ -315,7 +325,8 @@ private class YearVsYearConfiguration(
 private fun TextInfo(
     story: Story.YearVsYear,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier.background(
@@ -383,7 +394,11 @@ private fun TextInfo(
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        ShareStoryButton(onClick = onShareStory)
+        ShareStoryButton(
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
+        )
     }
 }
 
@@ -399,6 +414,7 @@ private fun YearVsYearThisYearPreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
     }
@@ -416,6 +432,7 @@ private fun YearVsYearThisYearLargePreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
     }
@@ -433,6 +450,7 @@ private fun YearVsYearLastYearPreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
     }
@@ -450,6 +468,7 @@ private fun YearVsYearEqualPreview() {
             ),
             measurements = measurements,
             showCircles = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
     }

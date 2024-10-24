@@ -51,9 +51,11 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerProgressingIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -63,8 +65,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun StoriesPage(
     state: UiState,
     pagerState: PagerState,
+    controller: StoryCaptureController,
     onChangeStory: (Boolean) -> Unit,
-    onShareStory: (Story) -> Unit,
+    onShareStory: (Story, File) -> Unit,
     onHoldStory: () -> Unit,
     onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
@@ -98,6 +101,7 @@ internal fun StoriesPage(
                     coverFontSize = coverFontSize,
                     coverTextHeight = coverTextHeight,
                 ),
+                controller = controller,
                 pagerState = pagerState,
                 onChangeStory = onChangeStory,
                 onShareStory = onShareStory,
@@ -142,8 +146,9 @@ private fun Stories(
     stories: List<Story>,
     measurements: EndOfYearMeasurements,
     pagerState: PagerState,
+    controller: StoryCaptureController,
     onChangeStory: (Boolean) -> Unit,
-    onShareStory: (Story) -> Unit,
+    onShareStory: (Story, File) -> Unit,
     onHoldStory: () -> Unit,
     onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
@@ -177,33 +182,39 @@ private fun Stories(
             is Story.NumberOfShows -> NumberOfShowsStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
             )
             is Story.TopShow -> TopShowStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
             )
             is Story.TopShows -> TopShowsStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
             )
             is Story.Ratings -> RatingsStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
                 onLearnAboutRatings = onLearnAboutRatings,
             )
             is Story.TotalTime -> TotalTimeStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
             )
             is Story.LongestEpisode -> LongestEpisodeStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
             )
             is Story.PlusInterstitial -> PlusInterstitialStory(
                 story = story,
@@ -213,12 +224,14 @@ private fun Stories(
             is Story.YearVsYear -> YearVsYearStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
             )
             is Story.CompletionRate -> CompletionRateStory(
                 story = story,
                 measurements = measurements,
-                onShareStory = { onShareStory(story) },
+                controller = controller,
+                onShareStory = { file -> onShareStory(story, file) },
             )
             is Story.Ending -> EndingStory(
                 story = story,

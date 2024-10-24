@@ -101,7 +101,7 @@ internal interface BackgroundAssetController {
             override fun captureController(type: VisualCardType) = controller
 
             override suspend fun capture(type: VisualCardType): Result<File> {
-                throw UnsupportedOperationException("Preview controller")
+                return Result.failure(UnsupportedOperationException("Preview controller"))
             }
         }
     }

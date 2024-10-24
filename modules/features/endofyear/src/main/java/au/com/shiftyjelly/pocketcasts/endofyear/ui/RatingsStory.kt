@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
@@ -53,9 +54,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.math.roundToLong
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -66,12 +70,14 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
     onLearnAboutRatings: () -> Unit,
 ) = RatingsStory(
     story = story,
     measurements = measurements,
     showBars = false,
+    controller = controller,
     onShareStory = onShareStory,
     onLearnAboutRatings = onLearnAboutRatings,
 )
@@ -81,26 +87,30 @@ private fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     showBars: Boolean,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
     onLearnAboutRatings: () -> Unit,
 ) {
     val maxRatingCount = story.stats.max().second
     if (maxRatingCount != 0) {
-        PresentRatings(story, measurements, showBars, onShareStory)
+        PresentRatings(story, measurements, showBars, controller, onShareStory)
     } else {
         AbsentRatings(story, measurements, onLearnAboutRatings)
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PresentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     showBars: Boolean,
-    onShareStory: () -> Unit,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 100.dp),
@@ -143,7 +153,11 @@ private fun PresentRatings(
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = onShareStory)
+            ShareStoryButton(
+                story = story,
+                controller = controller,
+                onShare = onShareStory,
+            )
         }
     }
 }
@@ -418,6 +432,7 @@ private fun RatingsHighPreview() {
             ),
             measurements = measurements,
             showBars = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
         )
@@ -440,6 +455,7 @@ private fun RatingsLowPreview() {
             ),
             measurements = measurements,
             showBars = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
         )
@@ -462,6 +478,7 @@ private fun RatingsNonePreview() {
             ),
             measurements = measurements,
             showBars = true,
+            controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
         )

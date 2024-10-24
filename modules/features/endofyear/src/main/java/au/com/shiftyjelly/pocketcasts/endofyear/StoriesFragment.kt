@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -99,14 +100,17 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
             LaunchedEffect(Unit) {
                 viewModel.syncData()
             }
+            val scope = rememberCoroutineScope()
             val state by viewModel.uiState.collectAsState()
             val pagerState = rememberPagerState(pageCount = { (state as? UiState.Synced)?.stories?.size ?: 0 })
             val storyChanger = rememberStoryChanger(pagerState, viewModel)
+            val captureController = rememberStoryCaptureController()
             var showScreenshotDialog by remember { mutableStateOf(false) }
 
             StoriesPage(
                 state = state,
                 pagerState = pagerState,
+                controller = captureController,
                 onChangeStory = storyChanger::change,
                 onShareStory = ::shareStory,
                 onHoldStory = { viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory) },
@@ -131,7 +135,15 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                         showScreenshotDialog = false
                         viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenshotDialog)
                         val stories = (state as? UiState.Synced)?.stories
-                        stories?.getOrNull(pagerState.currentPage)?.let(viewModel::share)
+                        val story = stories?.getOrNull(pagerState.currentPage)
+                        if (story != null) {
+                            scope.launch {
+                                val screenshot = captureController.capture(story)
+                                if (screenshot != null) {
+                                    viewModel.share(story, screenshot)
+                                }
+                            }
+                        }
                     },
                 )
             }
@@ -230,8 +242,8 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         )
     }
 
-    private fun shareStory(story: Story) {
-        viewModel.share(story)
+    private fun shareStory(story: Story, file: File) {
+        viewModel.share(story, file)
     }
 
     enum class StoriesSource(val value: String) {
