@@ -9,6 +9,8 @@ data class RatingStats(
 ) {
     private val max = maxOf(ones, twos, threes, fours, fives)
 
+    fun count() = ones + twos + threes + fours + fives
+
     fun count(rating: Rating) = when (rating) {
         Rating.One -> ones
         Rating.Two -> twos

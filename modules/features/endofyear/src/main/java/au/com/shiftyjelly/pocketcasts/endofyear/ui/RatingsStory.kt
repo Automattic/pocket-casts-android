@@ -66,11 +66,13 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
 ) = RatingsStory(
     story = story,
     measurements = measurements,
     showBars = false,
+    onShareStory = onShareStory,
     onLearnAboutRatings = onLearnAboutRatings,
 )
 
@@ -79,11 +81,12 @@ private fun RatingsStory(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     showBars: Boolean,
+    onShareStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
 ) {
     val maxRatingCount = story.stats.max().second
     if (maxRatingCount != 0) {
-        PresentRatings(story, measurements, showBars)
+        PresentRatings(story, measurements, showBars, onShareStory)
     } else {
         AbsentRatings(story, measurements, onLearnAboutRatings)
     }
@@ -94,6 +97,7 @@ private fun PresentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     showBars: Boolean,
+    onShareStory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -139,7 +143,7 @@ private fun PresentRatings(
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = {})
+            ShareStoryButton(onClick = onShareStory)
         }
     }
 }
@@ -414,6 +418,7 @@ private fun RatingsHighPreview() {
             ),
             measurements = measurements,
             showBars = true,
+            onShareStory = {},
             onLearnAboutRatings = {},
         )
     }
@@ -435,6 +440,7 @@ private fun RatingsLowPreview() {
             ),
             measurements = measurements,
             showBars = true,
+            onShareStory = {},
             onLearnAboutRatings = {},
         )
     }
@@ -456,6 +462,7 @@ private fun RatingsNonePreview() {
             ),
             measurements = measurements,
             showBars = true,
+            onShareStory = {},
             onLearnAboutRatings = {},
         )
     }

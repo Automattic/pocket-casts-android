@@ -284,7 +284,6 @@ Language: ar
     <string name="log_in">تسجيل الدخول</string>
     <string name="end_of_year_story_top_podcast_subtitle">لقد استمعتَ إلى ⁦%1$d⁩ من الحلقات بإجمالي ⁦%2$s⁩</string>
     <string name="end_of_year_story_top_podcasts_share_text">أهم حلقات البودكاست الخاصة بي في العام! %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">أهم حلقات البودكاست الخاصة بي في 2022</string>
     <string name="end_of_year_story_epilogue_subtitle">لا تنسَ المشاركة مع أصدقائك والتعبير عن مبدعي الحلقات الصوتية الذين تفضلهم</string>
     <string name="end_of_year_story_top_categories">أهم تصنيفاتك</string>
     <string name="end_of_year_story_top_categories_share_text">الأكثر استماعًا إلى تصنيفات الحلقات الصوتية</string>

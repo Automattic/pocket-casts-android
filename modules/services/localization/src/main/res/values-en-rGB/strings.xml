@@ -297,7 +297,6 @@ Language: en_GB
     <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
     <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favourite podcast creators</string>
-    <string name="end_of_year_story_top_podcasts_list_title">My top podcasts of 2022</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Let’s take a look at some of your favourites…</string>
     <string name="end_of_year_story_listened_to_categories">You listened to %1$d different categories this year</string>
     <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>

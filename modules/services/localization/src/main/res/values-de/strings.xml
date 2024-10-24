@@ -251,12 +251,10 @@ Language: de
     <string name="bookmark_not_found">Lesezeichen nicht gefunden</string>
     <string name="settings_use_dark_up_next_details">Wenn das dunkle Theme aktiviert ist, wird es in „Up Next“ immer verwendet. Wenn es deaktiviert ist, wird „Up Next“ an das aktuelle Theme angepasst</string>
     <string name="settings_use_dark_up_next">Dunkles „Up Next“-Theme verwenden</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Meine Abschlussquote 2023</string>
     <string name="end_of_year_stories_theres_more">Es gibt noch mehr!</string>
     <string name="end_of_year_stories_year_completion_rate">Abschlussquote</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Von deinen %1$d angefangenen Episoden, hast du insgesamt %2$d vollständig angehört</string>
     <string name="end_of_year_stories_year_completion_rate_title">Deine Abschlussquote lag dieses Jahr bei %1$d %%</string>
-    <string name="end_of_year_stories_year_over_share_text">Meine Audiozeit in 2023 im Vergleich zu 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Im Vergleich zu 2022 ist deine Audiozeit in die Höhe geschnellt!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Man muss das Leben genießen, nicht wahr?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Man sagt, Beständigkeit ist der Schlüssel zum Erfolg … oder so ähnlich!</string>
@@ -579,12 +577,8 @@ Language: de
     <string name="end_of_year_story_top_categories_share_text">Meine am häufigsten gehörten Podcast-Kategorien</string>
     <string name="end_of_year_story_top_categories">Deine Top-Kategorien</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergiss nicht, sie mit deinen Freunden zu teilen und deine bevorzugten Podcast-Ersteller dankend zu erwähnen</string>
-    <string name="end_of_year_story_longest_episode_share_text">Die längste Folge, die ich mir im Jahr 2023 angehört habe (%1$s)</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Meine Top-Podcasts 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Mein Lieblings-Podcast 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Du hast dir %1$d Folgen mit einer Gesamtdauer von %2$s angehört</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Ich habe mir im Jahr 2023 %1$d verschiedene Podcasts und %2$d Folgen angehört</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab eine, die dir besonders gut gefallen hat …</string>
     <string name="end_of_year_story_listened_to_numbers">Du hast dir insgesamt %1$d verschiedene Shows und %2$d Folgen angehört</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ich habe mir im Jahr 2023 %1$d unterschiedliche Kategorien angehört</string>

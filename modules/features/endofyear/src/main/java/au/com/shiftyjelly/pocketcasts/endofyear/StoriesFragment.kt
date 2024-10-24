@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -58,7 +57,11 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
     private val viewModel by viewModels<EndOfYearViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<EndOfYearViewModel.Factory> { factory ->
-                factory.create(EndOfYearManager.YEAR_TO_SYNC)
+                val year = EndOfYearManager.YEAR_TO_SYNC
+                factory.create(
+                    year = year,
+                    topListTitle = getString(LR.string.end_of_year_story_top_podcasts_list_title, year.value),
+                )
             }
         },
     )
@@ -83,7 +86,6 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -102,6 +104,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 state = state,
                 pagerState = pagerState,
                 onChangeStory = storyChanger::change,
+                onShareStory = ::shareStory,
                 onHoldStory = { viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory) },
                 onReleaseStory = { viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory) },
                 onLearnAboutRatings = ::openRatingsInfo,
@@ -120,6 +123,8 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                     onShare = {
                         showScreenshotDialog = false
                         viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenshotDialog)
+                        val stories = (state as? UiState.Synced)?.stories
+                        stories?.getOrNull(pagerState.currentPage)?.let(viewModel::share)
                     },
                 )
             }
@@ -215,6 +220,10 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         )
     }
 
+    private fun shareStory(story: Story) {
+        viewModel.share(story)
+    }
+
     enum class StoriesSource(val value: String) {
         MODAL("modal"),
         PROFILE("profile"),
@@ -238,7 +247,6 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun rememberStoryChanger(
     pagerState: PagerState,
@@ -248,7 +256,6 @@ private fun rememberStoryChanger(
     return remember(pagerState) { StoryChanger(pagerState, viewModel, scope) }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 private class StoryChanger(
     private val pagerState: PagerState,
     private val viewModel: EndOfYearViewModel,
