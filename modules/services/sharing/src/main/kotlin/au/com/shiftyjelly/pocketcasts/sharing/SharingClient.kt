@@ -631,8 +631,8 @@ data class SharingRequest internal constructor(
                     append(
                         context.getString(
                             LR.string.end_of_year_stories_year_over_share_text,
-                            year.value - 1,
                             year.value,
+                            year.value - 1,
                         ),
                     )
                     append(' ')

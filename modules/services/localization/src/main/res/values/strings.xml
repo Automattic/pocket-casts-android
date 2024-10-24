@@ -1780,14 +1780,14 @@
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… there’s a life to be lived, right?</string>
     <!-- Title of the story when this year's listening time is way bigger than previous year. -->
     <string name="eoy_year_over_year_title_skyrocketed">Compared to 2022, your listening time skyrocketed!</string>
-    <!-- Text for when a user shares the story comparing the previous year (%1$d) and this year (%2$d) listening time. -->
+    <!-- Text for when a user shares the story comparing the this year (%1$d) and previous year (%2$d) listening time. -->
     <string name="end_of_year_stories_year_over_share_text">My %1$d listening time compared to %2$d</string>
     <!-- Title for the completion rate. %1$d is the percentage.-->
     <string name="end_of_year_stories_year_completion_rate_title">Your completion rate this year was %1$d%%</string>
     <!-- Title for the completion rate. %1$d is the total of episodes listened this year, %2$d is the total of episodes fully listened to. -->
     <string name="end_of_year_stories_year_completion_rate_subtitle">From the %1$d episodes you started you listened fully to a total of %2$d</string>
-    <!-- Title for when sharing the completion rate story to social media. %1$d is the year -->
-    <string name="end_of_year_stories_completion_rate_share_text">My %1$d completion rate</string>
+    <!-- Title for when sharing the completion rate story to social media. %1$d is percentage -->
+    <string name="end_of_year_stories_completion_rate_share_text">My completion rate this year was %1$d</string>
     <string name="end_of_year_stories_year_completion_rate">completion rate</string>
     <!-- Title of the story paywall. Telling the users that there are more stories to check. -->
     <string name="end_of_year_stories_theres_more">There\’s more!</string>>

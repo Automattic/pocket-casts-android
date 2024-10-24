@@ -895,7 +895,7 @@ class SharingClientTest {
     @Test
     fun shareYearVsYearStory() = runTest {
         val text = buildString {
-            append(context.getString(LR.string.end_of_year_stories_year_over_share_text, 999, 1000))
+            append(context.getString(LR.string.end_of_year_stories_year_over_share_text, 1000, 999))
             append(" https://pca.st")
             append(" #pocketcasts #playback1000")
         }
