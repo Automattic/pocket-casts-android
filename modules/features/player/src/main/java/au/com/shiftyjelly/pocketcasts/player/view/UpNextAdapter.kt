@@ -175,7 +175,11 @@ class UpNextAdapter(
                 shuffle.updateShuffleButton()
 
                 shuffle.setOnClickListener {
-                    settings.upNextShuffle.set(!settings.upNextShuffle.value, updateModifiedAt = false)
+                    val newValue = !settings.upNextShuffle.value
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
+
+                    settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+
                     shuffle.updateShuffleButton()
                 }
 
