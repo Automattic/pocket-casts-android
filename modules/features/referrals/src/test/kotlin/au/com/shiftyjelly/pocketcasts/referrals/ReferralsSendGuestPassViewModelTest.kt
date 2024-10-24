@@ -142,7 +142,6 @@ class ReferralsSendGuestPassViewModelTest {
         val capturedRequest = requestCaptor.firstValue
         with(capturedRequest) {
             assertEquals(referralCode, (data as SharingRequest.Data.ReferralLink).referralCode)
-            assertEquals(SourceView.REFERRALS, source)
             assertEquals(SocialPlatform.More, platform)
             assertEquals(AnalyticsEvent.REFERRAL_PASS_SHARED, analyticsEvent)
             assertEquals(

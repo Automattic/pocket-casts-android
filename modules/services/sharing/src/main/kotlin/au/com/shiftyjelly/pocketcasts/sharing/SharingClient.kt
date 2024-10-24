@@ -10,6 +10,7 @@ import android.content.Intent.EXTRA_TEXT
 import android.content.Intent.EXTRA_TITLE
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.content.IntentSender
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.StringRes
@@ -242,12 +243,17 @@ class SharingClient(
                     append(" #pocketcasts #playback")
                     append(data.year.value)
                 }
+                val pendingIntent = ItemSharedReceiver.intent(
+                    context = context,
+                    event = AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
+                    values = mapOf("story" to data.story.analyticsValue),
+                )
                 Intent()
                     .setAction(Intent.ACTION_SEND)
                     .setType("text/plain")
                     .putExtra(EXTRA_TEXT, text)
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-                    .toChooserIntent()
+                    .toChooserIntent(pendingIntent.intentSender)
                     .share()
                 SharingResponse(
                     isSuccsessful = true,
@@ -268,8 +274,8 @@ class SharingClient(
         shareStarter.start(context, this)
     }
 
-    private fun Intent.toChooserIntent() = Intent
-        .createChooser(this, context.getString(LR.string.podcasts_share_via))
+    private fun Intent.toChooserIntent(sender: IntentSender? = null) = Intent
+        .createChooser(this, context.getString(LR.string.podcasts_share_via), sender)
         .addFlags(FLAG_ACTIVITY_NEW_TASK)
 
     private suspend fun Intent.setPodcastCover(podcast: Podcast) = apply {
@@ -383,6 +389,8 @@ data class SharingRequest internal constructor(
             story: Story,
             year: Year,
         ) = Builder(Data.EndOfYearStory(story, year))
+            .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+            .addAnalyticsProperty("story", story.analyticsValue)
     }
 
     class Builder internal constructor(

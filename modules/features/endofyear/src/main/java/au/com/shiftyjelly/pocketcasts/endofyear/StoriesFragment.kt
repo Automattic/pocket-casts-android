@@ -61,6 +61,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 factory.create(
                     year = year,
                     topListTitle = getString(LR.string.end_of_year_story_top_podcasts_list_title, year.value),
+                    source = source,
                 )
             }
         },
@@ -83,6 +84,9 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
         }
         screenshotDetector = ScreenshotCaptureDetector.create(activity) {
             screenshotDetectedFlow.tryEmit(Unit)
+        }
+        if (savedInstance == null) {
+            viewModel.trackStoriesShown()
         }
     }
 
@@ -111,7 +115,10 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 onClickUpsell = ::startUpsellFlow,
                 onRestartPlayback = storyChanger::reset,
                 onRetry = viewModel::syncData,
-                onClose = ::dismiss,
+                onClose = {
+                    viewModel.trackStoriesClosed()
+                    dismiss()
+                },
             )
 
             if (showScreenshotDialog) {
@@ -133,6 +140,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                 viewModel.switchStory.collect {
                     val stories = (state as? UiState.Synced)?.stories.orEmpty()
                     if (stories.getOrNull(pagerState.currentPage) is Story.Ending) {
+                        viewModel.trackStoriesAutoFinished()
                         dismiss()
                     } else {
                         storyChanger.change(moveForward = true)
@@ -208,11 +216,13 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
     }
 
     private fun startUpsellFlow() {
+        viewModel.trackUpsellShown()
         val flow = OnboardingFlow.Upsell(OnboardingUpgradeSource.END_OF_YEAR)
         OnboardingLauncher.openOnboardingFlow(requireActivity(), flow)
     }
 
     private fun openRatingsInfo() {
+        viewModel.trackLearnRatingsShown()
         WebViewActivity.show(
             requireActivity(),
             getString(LR.string.podcast_ratings_page_title),
@@ -276,6 +286,7 @@ private class StoryChanger(
     }
 
     fun reset() {
+        viewModel.trackReplayStoriesTapped()
         scope.launch { pagerState.scrollToPage(0) }
     }
 }
