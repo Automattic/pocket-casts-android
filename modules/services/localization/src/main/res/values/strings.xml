@@ -1807,6 +1807,10 @@
     <string name="eoy_story_ratings_subtitle_3">Did you know that you can rate shows now? Share the love for your favorite creators and help them get noticed!</string>
     <!-- Label of a button for the story showing podcast ratings given by the user when they gave no ratings. -->
     <string name="eoy_story_ratings_learn_button_label">Learn about ratings</string>
+    <!-- Title of a dialog when a user takes a screenshot of a story. -->
+    <string name="end_of_year_share_dialog_title">Share this story?</string>
+    <!-- Message of a dialog when a user takes a screenshot of a story. -->
+    <string name="end_of_year_share_dialog_message">Paste this image to your socials and give a shout out to your favourite shows and creators</string>
 
     <!-- Onboarding -->
 

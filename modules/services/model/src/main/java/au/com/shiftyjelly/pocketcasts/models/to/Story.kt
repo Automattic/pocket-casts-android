@@ -8,8 +8,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode as LongestEpisode
 sealed interface Story {
     val previewDuration: Duration? get() = 7.seconds
     val isFree: Boolean get() = true
+    val isShareble: Boolean get() = true
 
-    data object Cover : Story
+    data object Cover : Story {
+        override val isShareble = false
+    }
 
     data class NumberOfShows(
         val showCount: Int,
@@ -28,7 +31,9 @@ sealed interface Story {
 
     data class Ratings(
         val stats: RatingStats,
-    ) : Story
+    ) : Story {
+        override val isShareble get() = stats.max().second != 0
+    }
 
     data class TotalTime(
         val duration: Duration,
@@ -40,6 +45,7 @@ sealed interface Story {
 
     data object PlusInterstitial : Story {
         override val previewDuration = null
+        override val isShareble = false
     }
 
     data class YearVsYear(
@@ -71,5 +77,7 @@ sealed interface Story {
             }
     }
 
-    data object Ending : Story
+    data object Ending : Story {
+        override val isShareble get() = false
+    }
 }
