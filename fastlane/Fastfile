@@ -11,7 +11,7 @@ UI.user_error!('Please run fastlane via `bundle exec`') unless FastlaneCore::Hel
 ENV_FILE_NAME = '.pocketcastsandroid-env.default'
 USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
-PROTOTYPE_BUILD_DOMAIN = 'https://d2twmm2nzpx3bg.cloudfront.net'
+PROTOTYPE_BUILD_DOMAIN = 'https://cdn.a8c-ci.services'
 APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
 GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
 ORIGINALS_METADATA_DIR_PATH = File.join(PROJECT_ROOT_FOLDER, 'metadata')
