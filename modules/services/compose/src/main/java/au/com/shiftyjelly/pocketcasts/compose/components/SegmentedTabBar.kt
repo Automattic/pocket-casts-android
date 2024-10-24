@@ -23,10 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -51,14 +47,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun SegmentedTabBar(
     items: List<String>,
     modifier: Modifier = Modifier,
-    defaultSelectedItemIndex: Int = 0,
+    selectedIndex: Int = 0,
     colors: SegmentedTabBarColors = SegmentedTabBarDefaults.colors,
     cornerRadius: Dp = SegmentedTabBarDefaults.cornerRadius,
     border: BorderStroke = BorderStroke(SegmentedTabBarDefaults.borderThickness, colors.borderColor),
     textStyle: TextStyle = SegmentedTabBarDefaults.textStyle,
     onItemSelected: (selectedItemIndex: Int) -> Unit,
 ) {
-    var selectedIndex by remember { mutableIntStateOf(defaultSelectedItemIndex) }
     Surface(
         shape = RoundedCornerShape(cornerRadius),
         border = border,
@@ -79,7 +74,6 @@ fun SegmentedTabBar(
                         textStyle = textStyle,
                         colors = colors,
                         onItemSelected = {
-                            selectedIndex = index
                             onItemSelected(index)
                         },
                     )

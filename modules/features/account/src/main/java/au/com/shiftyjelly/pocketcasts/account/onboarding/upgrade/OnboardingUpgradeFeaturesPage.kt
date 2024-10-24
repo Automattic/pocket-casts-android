@@ -259,7 +259,7 @@ private fun UpgradeLayoutOriginal(
                             SegmentedTabBar(
                                 items = state.subscriptionFrequencies
                                     .map { stringResource(id = it.localisedLabelRes) },
-                                defaultSelectedItemIndex = state.subscriptionFrequencies.indexOf(
+                                selectedIndex = state.subscriptionFrequencies.indexOf(
                                     state.currentSubscriptionFrequency,
                                 ),
                                 onItemSelected = {
