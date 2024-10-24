@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
@@ -31,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentEffectsBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.PlaybackEffectsSettingsTab
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
@@ -49,6 +53,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.mapLatest
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -265,9 +271,23 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         playbackManager.trackPlaybackEffectsEvent(event, props, SourceView.PLAYER_PLAYBACK_EFFECTS)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
         effectsSettingsSegmentedTabBar.setContent {
+            val podcast by viewModel.effectsLive.asFlow()
+                .mapLatest { it.podcast }
+                .collectAsStateWithLifecycle(null)
+            if (podcast == null) return@setContent
+
             EffectsSettingsSegmentedTabBar(
+                selectedItem = if (podcast?.overrideGlobalEffects == true) {
+                    PlaybackEffectsSettingsTab.ThisPodcast
+                } else {
+                    PlaybackEffectsSettingsTab.AllPodcasts
+                },
+                onItemSelected = {
+                    viewModel.updatedOverrideGlobalEffects(requireNotNull(podcast), PlaybackEffectsSettingsTab.entries[it])
+                },
                 modifier = Modifier
                     .padding(top = 24.dp),
             )
@@ -277,10 +297,12 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     @Composable
     private fun EffectsSettingsSegmentedTabBar(
         modifier: Modifier = Modifier,
+        selectedItem: PlaybackEffectsSettingsTab,
+        onItemSelected: (selectedItemIndex: Int) -> Unit,
     ) {
         SegmentedTabBar(
-            items = listOf(stringResource(LR.string.podcasts_all), stringResource(LR.string.podcast_this)),
-            defaultSelectedItemIndex = 0,
+            items = PlaybackEffectsSettingsTab.entries.map { stringResource(it.labelResId) },
+            selectedIndex = PlaybackEffectsSettingsTab.entries.indexOf(selectedItem),
             colors = SegmentedTabBarDefaults.colors.copy(
                 selectedTabBackgroundColor = MaterialTheme.theme.colors.playerContrast06.copy(alpha = .1f),
                 borderColor = MaterialTheme.theme.colors.playerContrast03.copy(alpha = .4f),
@@ -290,13 +312,16 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
                 fontSize = 13.sp,
             ),
             modifier = modifier.fillMaxWidth(),
-            onItemSelected = {},
+            onItemSelected = onItemSelected,
         )
     }
 
     @Preview(widthDp = 360)
     @Composable
     private fun EffectsSettingsSegmentedBarPreview() {
-        EffectsSettingsSegmentedTabBar()
+        EffectsSettingsSegmentedTabBar(
+            selectedItem = PlaybackEffectsSettingsTab.AllPodcasts,
+            onItemSelected = {},
+        )
     }
 }
