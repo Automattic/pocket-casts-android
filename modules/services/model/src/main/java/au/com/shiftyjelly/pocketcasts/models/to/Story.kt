@@ -49,10 +49,10 @@ sealed interface Story {
         override val isShareble = false
     }
 
-    data class YearVsYear(
+    data class YearVsYear constructor(
         val lastYearDuration: Duration,
         val thisYearDuration: Duration,
-        val subscriptionTier: SubscriptionTier?,
+        val subscriptionTier: SubscriptionTier,
     ) : Story {
         override val isFree = false
 
@@ -67,7 +67,7 @@ sealed interface Story {
     data class CompletionRate(
         val listenedCount: Int,
         val completedCount: Int,
-        val subscriptionTier: SubscriptionTier?,
+        val subscriptionTier: SubscriptionTier,
     ) : Story {
         override val isFree = false
 

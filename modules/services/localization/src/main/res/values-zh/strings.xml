@@ -251,12 +251,10 @@ Language: zh_CN
     <string name="bookmark_not_found">未找到书签</string>
     <string name="settings_use_dark_up_next_details">启用后，“下一个”将始终使用深色主题；禁用后，将与当前主题匹配</string>
     <string name="settings_use_dark_up_next">使用深色的“下一个”主题</string>
-    <string name="end_of_year_stories_completion_rate_share_text">我在 2023 年的完成率</string>
     <string name="end_of_year_stories_theres_more">更多精彩有待进一步探索！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">从最初收听的 %1$d 集开始，您总共完整收听的时长为 %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">您今年的完成率为 %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">我的 2023 年收听时长与 2022 年的比较情况</string>
     <string name="eoy_year_over_year_title_skyrocketed">相比于 2022 年，您的收听时长飙升！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊哈…生活还得继续，不是吗？</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">人们常说，一致性是成功的关键…或诸如此类的话！</string>
@@ -579,12 +577,8 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_epilogue_subtitle">不要忘记共享给朋友，告诉他们您最喜欢的播客创作者</string>
-    <string name="end_of_year_story_longest_episode_share_text">2023 年我收听时间最长的剧集 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">我的 2022 年热门播客</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">2023 年我最喜欢的播客！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">您收听了 %1$d 部剧集，共 %2$s 部</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2023 年收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收听了 %1$d 种不同的分类</string>

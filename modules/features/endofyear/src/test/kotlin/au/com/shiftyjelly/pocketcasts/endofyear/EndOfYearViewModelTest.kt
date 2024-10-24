@@ -721,7 +721,7 @@ class EndOfYearViewModelTest {
             description: String,
             podcasts: List<Podcast>,
             date: Date,
-            serverSecret: String
+            serverSecret: String,
         ) = podcastListUrl.await()
 
         override suspend fun openPodcastList(listId: String) = PodcastList(

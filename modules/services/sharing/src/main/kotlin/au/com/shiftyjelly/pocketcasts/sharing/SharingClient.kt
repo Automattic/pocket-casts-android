@@ -18,8 +18,10 @@ import androidx.core.graphics.drawable.toBitmap
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
+import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfo
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.sharing.BuildConfig.META_APP_ID
@@ -38,6 +40,7 @@ import coil.executeBlocking
 import coil.imageLoader
 import java.io.File
 import java.io.FileOutputStream
+import java.time.Year
 import kotlin.time.Duration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -231,6 +234,34 @@ class SharingClient(
                 )
             }
         }
+
+        is SharingRequest.Data.EndOfYearStory -> {
+            if (data.story.isShareble) {
+                val text = buildString {
+                    append(data.sharingMessage(context, hostUrl))
+                    append(" #pocketcasts #playback")
+                    append(data.year.value)
+                }
+                Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .setType("text/plain")
+                    .putExtra(EXTRA_TEXT, text)
+                    .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                    .toChooserIntent()
+                    .share()
+                SharingResponse(
+                    isSuccsessful = true,
+                    feedbackMessage = null,
+                    error = null,
+                )
+            } else {
+                SharingResponse(
+                    isSuccsessful = false,
+                    feedbackMessage = context.getString(LR.string.end_of_year_cant_share_message),
+                    error = null,
+                )
+            }
+        }
     }
 
     private fun Intent.share() {
@@ -347,6 +378,11 @@ data class SharingRequest internal constructor(
         )
             .setAnalyticsEvent(AnalyticsEvent.REFERRAL_PASS_SHARED)
             .addAnalyticsProperty("code", referralCode)
+
+        fun endOfYearStory(
+            story: Story,
+            year: Year,
+        ) = Builder(Data.EndOfYearStory(story, year))
     }
 
     class Builder internal constructor(
@@ -401,18 +437,19 @@ data class SharingRequest internal constructor(
             },
         )
 
-        private val SharingRequest.Data.analyticsValue get() = when (this) {
-            is SharingRequest.Data.Podcast -> "podcast"
-            is SharingRequest.Data.Episode -> "episode"
-            is SharingRequest.Data.EpisodePosition -> when (type) {
+        private val Data.analyticsValue get() = when (this) {
+            is Data.Podcast -> "podcast"
+            is Data.Episode -> "episode"
+            is Data.EpisodePosition -> when (type) {
                 TimestampType.Episode -> "current_time"
                 TimestampType.Bookmark -> "bookmark_time"
             }
-            is SharingRequest.Data.EpisodeFile -> "episode_file"
-            is SharingRequest.Data.ClipLink -> "clip_link"
-            is SharingRequest.Data.ClipAudio -> "clip_audio"
-            is SharingRequest.Data.ClipVideo -> "clip_video"
-            is SharingRequest.Data.ReferralLink -> "referral_link"
+            is Data.EpisodeFile -> "episode_file"
+            is Data.ClipLink -> "clip_link"
+            is Data.ClipAudio -> "clip_audio"
+            is Data.ClipVideo -> "clip_video"
+            is Data.ReferralLink -> "referral_link"
+            is Data.EndOfYearStory -> "end_of_year_story"
         }
 
         private val SocialPlatform.analyticsValue get() = when (this) {
@@ -526,11 +563,93 @@ data class SharingRequest internal constructor(
             val referralCode: String,
             val referralsOfferInfo: ReferralsOfferInfo,
         ) : Data {
-            override val podcast: PodcastModel? = null
+            override val podcast = null
 
             fun sharingUrl(host: String) = ReferralsDeepLink(code = referralCode).toUri(host)
 
             override fun toString() = "ReferralLink(referralCode=$referralCode"
+        }
+
+        class EndOfYearStory internal constructor(
+            val story: Story,
+            val year: Year,
+        ) : Data {
+            override val podcast = null
+
+            fun sharingMessage(
+                context: Context,
+                shortUrl: String,
+            ) = when (story) {
+                is Story.Cover -> shortUrl
+                is Story.NumberOfShows -> buildString {
+                    append(
+                        context.getString(
+                            LR.string.end_of_year_story_listened_to_numbers_share_text,
+                            story.showCount,
+                            story.epsiodeCount,
+                            year.value,
+                        ),
+                    )
+                    append(' ')
+                    append(shortUrl)
+                }
+                is Story.TopShow -> context.getString(
+                    LR.string.end_of_year_story_top_podcast_share_text,
+                    year.value,
+                    "$shortUrl/podcast/${story.show.uuid}",
+                )
+                is Story.TopShows -> context.getString(LR.string.end_of_year_story_top_podcasts_share_text, story.podcastListUrl ?: shortUrl)
+                is Story.Ratings -> buildString {
+                    append(
+                        context.getString(
+                            LR.string.end_of_year_story_ratings_share_text,
+                            story.stats.count(),
+                            year.value,
+                            story.stats.max().first.numericalValue,
+                        ),
+                    )
+                    append(' ')
+                    append(shortUrl)
+                }
+                is Story.TotalTime -> buildString {
+                    append(
+                        context.getString(
+                            LR.string.end_of_year_story_listened_to_share_text,
+                            StatsHelper.secondsToFriendlyString(story.duration.inWholeSeconds, context.resources),
+                        ),
+                    )
+                    append(' ')
+                    append(shortUrl)
+                }
+                is Story.LongestEpisode -> context.getString(
+                    LR.string.end_of_year_story_longest_episode_share_text,
+                    year.value,
+                    "$shortUrl/episode/${story.episode.episodeId}",
+                )
+                is Story.PlusInterstitial -> shortUrl
+                is Story.YearVsYear -> buildString {
+                    append(
+                        context.getString(
+                            LR.string.end_of_year_stories_year_over_share_text,
+                            year.value - 1,
+                            year.value,
+                        ),
+                    )
+                    append(' ')
+                    append(shortUrl)
+                }
+                is Story.CompletionRate -> buildString {
+                    append(
+                        context.getString(
+                            LR.string.end_of_year_stories_completion_rate_share_text,
+                            year.value,
+                        ),
+                    )
+                    append(' ')
+                    append(shortUrl)
+                }
+                is Story.Ending -> shortUrl
+            }
         }
     }
 }

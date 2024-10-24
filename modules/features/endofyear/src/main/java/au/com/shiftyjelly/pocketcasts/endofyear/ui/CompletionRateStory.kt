@@ -210,7 +210,7 @@ private fun CompletionRateInfo(
         val badgeId = when (story.subscriptionTier) {
             SubscriptionTier.PLUS -> IR.drawable.end_of_year_2024_completion_rate_plus_badge
             SubscriptionTier.PATRON -> IR.drawable.end_of_year_2024_completion_rate_patron_badge
-            SubscriptionTier.NONE, null -> null
+            SubscriptionTier.NONE -> null
         }
 
         if (badgeId != null) {

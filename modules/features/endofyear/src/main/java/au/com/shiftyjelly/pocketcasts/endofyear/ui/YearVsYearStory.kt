@@ -319,7 +319,7 @@ private fun TextInfo(
         val badgeId = when (story.subscriptionTier) {
             SubscriptionTier.PLUS -> IR.drawable.end_of_year_2024_year_vs_year_plus_badge
             SubscriptionTier.PATRON -> IR.drawable.end_of_year_2024_year_vs_year_patron_badge
-            SubscriptionTier.NONE, null -> null
+            SubscriptionTier.NONE -> null
         }
         if (badgeId != null) {
             Image(
