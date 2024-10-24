@@ -36,7 +36,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.capturable)
+    implementation(projects.modules.services.capturable)
     implementation(libs.compose.animation)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)

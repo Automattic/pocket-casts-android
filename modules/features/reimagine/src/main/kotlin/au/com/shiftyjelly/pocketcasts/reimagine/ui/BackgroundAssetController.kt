@@ -1,14 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.reimagine.ui
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.scale
 import au.com.shiftyjelly.pocketcasts.sharing.CardType.Horizontal
@@ -22,27 +22,23 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal interface BackgroundAssetController {
-    fun captureController(type: VisualCardType): CaptureController
+@Composable
+internal fun rememberBackgroundAssetControler(
+    shareColors: ShareColors,
+): BackgroundAssetController {
+    val context = LocalContext.current
+    val verticalCardController = rememberCaptureController()
+    val horizontalCardController = rememberCaptureController()
+    val squareCardController = rememberCaptureController()
 
-    suspend fun capture(type: VisualCardType): Result<File>
-
-    companion object {
-        private const val BITMAP_WIDTH = 1080
-        private const val BITMAP_HEIGHT = 1920
-
-        fun create(context: Context, shareColors: ShareColors) = object : BackgroundAssetController {
-            private val verticalCardController = CaptureController()
-            private val horizontalCardController = CaptureController()
-            private val squareCardController = CaptureController()
-
+    return remember {
+        object : BackgroundAssetController {
             override fun captureController(type: VisualCardType) = when (type) {
                 Vertical -> verticalCardController
                 Horizontal -> horizontalCardController
                 Square -> squareCardController
             }
 
-            @OptIn(ExperimentalComposeApi::class)
             override suspend fun capture(type: VisualCardType) = runCatching {
                 val controller = captureController(type)
                 val capturedBitmap = controller.captureAsync().await()
@@ -86,7 +82,18 @@ internal interface BackgroundAssetController {
                 }
             }
         }
+    }
+}
 
+private const val BITMAP_WIDTH = 1080
+private const val BITMAP_HEIGHT = 1920
+
+internal interface BackgroundAssetController {
+    fun captureController(type: VisualCardType): CaptureController
+
+    suspend fun capture(type: VisualCardType): Result<File>
+
+    companion object {
         @Composable
         fun preview() = object : BackgroundAssetController {
             private val controller = rememberCaptureController()
