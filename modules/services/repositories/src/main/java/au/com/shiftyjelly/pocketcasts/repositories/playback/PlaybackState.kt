@@ -1,8 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.LastChangeFrom
 
 data class PlaybackState(
     val state: State = State.EMPTY,
@@ -45,4 +48,39 @@ data class PlaybackState(
 
     val isError: Boolean
         get() = state == State.ERROR
+
+    companion object {
+        fun buildInitialState(
+            state: State,
+            episode: BaseEpisode,
+            podcast: Podcast?,
+            isPrepared: Boolean,
+            previousPlaybackState: PlaybackState?,
+            sameEpisode: Boolean = previousPlaybackState != null && episode.uuid == previousPlaybackState.episodeUuid,
+            lastChangeFrom: LastChangeFrom,
+            settings: Settings,
+        ): PlaybackState {
+            val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) {
+                podcast.playbackEffects
+            } else {
+                settings.globalPlaybackEffects.value
+            }
+
+            return PlaybackState(
+                isBuffering = !episode.isDownloaded && state == State.PLAYING,
+                isPrepared = isPrepared,
+                isSleepTimerRunning = previousPlaybackState?.isSleepTimerRunning ?: false,
+                title = episode.title,
+                durationMs = episode.durationMs,
+                positionMs = episode.playedUpToMs,
+                episodeUuid = episode.uuid,
+                podcast = podcast,
+                chapters = if (sameEpisode) (previousPlaybackState?.chapters ?: Chapters()) else Chapters(),
+                playbackSpeed = playbackEffects.playbackSpeed,
+                trimMode = playbackEffects.trimMode,
+                isVolumeBoosted = playbackEffects.isVolumeBoosted,
+                lastChangeFrom = lastChangeFrom.value,
+            )
+        }
+    }
 }
