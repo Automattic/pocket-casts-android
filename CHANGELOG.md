@@ -7,6 +7,9 @@
         ([#3048](https://github.com/Automattic/pocket-casts-android/pull/3048))
     *   Add support for the Catalan laguage
         ([#3072](https://github.com/Automattic/pocket-casts-android/pull/3072))
+*   Bug Fixes
+    *   Keep the playing service in the foreground when casting
+        ([#3094](https://github.com/Automattic/pocket-casts-android/pull/3094))
 *   Updates
     *   Move Up Next clear queue button to app bar
         ([#3068](https://github.com/Automattic/pocket-casts-android/pull/3068))
