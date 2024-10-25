@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import app.cash.turbine.Turbine
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
@@ -93,11 +94,13 @@ class EndOfYearViewModelTest {
         viewModel = EndOfYearViewModel(
             year = Year.of(1000),
             topListTitle = "Top list title",
+            source = StoriesFragment.StoriesSource.UNKNOWN,
             endOfYearSync = endOfYearSync,
             endOfYearManager = endOfYearManager,
             subscriptionManager = mock { on { subscriptionTier() }.doReturn(subscriptionTier) },
             listServiceManager = listServiceManager,
             sharingClient = FakeSharingClient(),
+            analyticsTracker = AnalyticsTracker.test(),
         )
     }
 
@@ -687,11 +690,11 @@ class EndOfYearViewModelTest {
     }
 
     private inline fun <reified T : Story> assertHasStory(stories: List<Story>) {
-        assertTrue(stories.filterIsInstance<PlusInterstitial>().isNotEmpty())
+        assertTrue(stories.filterIsInstance<T>().isNotEmpty())
     }
 
     private inline fun <reified T : Story> assertDoesNotHaveStory(stories: List<Story>) {
-        assertTrue(stories.filterIsInstance<PlusInterstitial>().isEmpty())
+        assertTrue(stories.filterIsInstance<T>().isEmpty())
     }
 
     private class FakeEofYearManager : EndOfYearManager {
