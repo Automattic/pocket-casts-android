@@ -247,12 +247,26 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             )
         }
 
+        if (mode is Mode.Downloaded) {
+            binding?.manageDownloadsCard?.isVisible = true
+
+            binding?.manageDownloadsCard?.setContent {
+                ManageDownloadsCard(
+                    totalDownloadSize = 10,
+                    onManageDownloadsClick = {},
+                )
+            }
+        } else {
+            binding?.manageDownloadsCard?.isVisible = false
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
                     when (state) {
                         is State.Empty -> {
                             binding?.recyclerView?.isVisible = false
+                            binding?.manageDownloadsCard?.isVisible = false
                             binding?.emptyLayout?.isVisible = true
                             binding?.lblEmptyTitle?.setText(state.titleRes)
                             binding?.lblEmptySummary?.setText(state.summaryRes)
