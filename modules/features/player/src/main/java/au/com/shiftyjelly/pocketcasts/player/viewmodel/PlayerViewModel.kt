@@ -92,7 +92,7 @@ class PlayerViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    data class PodcastEffectsPair(val podcast: Podcast, val effects: PlaybackEffects)
+    data class PodcastEffectsData(val podcast: Podcast, val effects: PlaybackEffects, val showCustomEffectsSettings: Boolean = true)
     data class PlayerHeader(
         val positionMs: Int = 0,
         val durationMs: Int = -1,
@@ -253,7 +253,7 @@ class PlayerViewModel @Inject constructor(
 
     val upNextLive: LiveData<List<Any>> = upNextPlusData.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
-    val effectsObservable: Flowable<PodcastEffectsPair> = playbackStateObservable
+    val effectsObservable: Flowable<PodcastEffectsData> = playbackStateObservable
         .toFlowable(BackpressureStrategy.LATEST)
         .map { it.episodeUuid }
         .switchMap { episodeManager.observeEpisodeByUuidRx(it) }
@@ -264,7 +264,14 @@ class PlayerViewModel @Inject constructor(
                 Flowable.just(Podcast.userPodcast.copy(overrideGlobalEffects = false))
             }
         }
-        .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.globalPlaybackEffects.value) }
+        .map { podcast ->
+            val isUserPodcast = podcast.uuid == Podcast.userPodcast.uuid
+            PodcastEffectsData(
+                podcast = podcast,
+                effects = if (podcast.overrideGlobalEffects) podcast.playbackEffects else settings.globalPlaybackEffects.value,
+                showCustomEffectsSettings = !isUserPodcast,
+            )
+        }
         .doOnNext { Timber.i("Effects: Podcast: ${it.podcast.overrideGlobalEffects} ${it.effects}") }
         .observeOn(AndroidSchedulers.mainThread())
     val effectsLive = effectsObservable.toLiveData()

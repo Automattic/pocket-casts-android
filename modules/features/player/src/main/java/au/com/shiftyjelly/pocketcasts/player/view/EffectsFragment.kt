@@ -53,8 +53,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -108,9 +107,9 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         binding = null
     }
 
-    private fun update(podcastEffectsPair: PlayerViewModel.PodcastEffectsPair) {
-        val podcast = podcastEffectsPair.podcast
-        val effects = podcastEffectsPair.effects
+    private fun update(podcastEffectsData: PlayerViewModel.PodcastEffectsData) {
+        val podcast = podcastEffectsData.podcast
+        val effects = podcastEffectsData.effects
 
         val binding = binding ?: return
 
@@ -272,26 +271,27 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         playbackManager.trackPlaybackEffectsEvent(event, props, SourceView.PLAYER_PLAYBACK_EFFECTS)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
         effectsSettingsSegmentedTabBar.setContent {
-            val podcast by viewModel.effectsLive.asFlow()
-                .mapLatest { it.podcast }
+            val podcastEffectsData by viewModel.effectsLive.asFlow()
+                .distinctUntilChangedBy { it.podcast }
                 .collectAsStateWithLifecycle(null)
-            if (podcast == null) return@setContent
+            val podcast = podcastEffectsData?.podcast ?: return@setContent
 
-            EffectsSettingsSegmentedTabBar(
-                selectedItem = if (podcast?.overrideGlobalEffects == true) {
-                    PlaybackEffectsSettingsTab.ThisPodcast
-                } else {
-                    PlaybackEffectsSettingsTab.AllPodcasts
-                },
-                onItemSelected = {
-                    viewModel.updatedOverrideGlobalEffects(requireNotNull(podcast), PlaybackEffectsSettingsTab.entries[it])
-                },
-                modifier = Modifier
-                    .padding(top = 24.dp),
-            )
+            if (podcastEffectsData?.showCustomEffectsSettings == true) {
+                EffectsSettingsSegmentedTabBar(
+                    selectedItem = if (podcastEffectsData?.podcast?.overrideGlobalEffects == true) {
+                        PlaybackEffectsSettingsTab.ThisPodcast
+                    } else {
+                        PlaybackEffectsSettingsTab.AllPodcasts
+                    },
+                    onItemSelected = {
+                        viewModel.updatedOverrideGlobalEffects(podcast, PlaybackEffectsSettingsTab.entries[it])
+                    },
+                    modifier = Modifier
+                        .padding(top = 24.dp),
+                )
+            }
         }
     }
 
