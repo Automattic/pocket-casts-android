@@ -1,10 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -60,6 +61,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class StoriesActivity : ComponentActivity() {
@@ -311,10 +313,19 @@ class StoriesActivity : ComponentActivity() {
     companion object {
         private const val ARG_SOURCE = "source"
 
-        fun open(context: Context, source: StoriesSource) {
-            val intent = Intent(context, StoriesActivity::class.java)
+        fun open(activity: Activity, source: StoriesSource) {
+            val intent = Intent(activity, StoriesActivity::class.java)
                 .putExtra(ARG_SOURCE, source)
-            context.startActivity(intent)
+            activity.startActivity(intent)
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                    activity.overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, UR.anim.slide_in_up, UR.anim.slide_out_down)
+                }
+                else -> {
+                    @Suppress("DEPRECATION")
+                    activity.overridePendingTransition(UR.anim.slide_in_up, UR.anim.slide_out_down)
+                }
+            }
         }
     }
 }

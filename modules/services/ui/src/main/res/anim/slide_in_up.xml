@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<translate
+<set
     xmlns:android="http://schemas.android.com/apk/res/android"
-
-    android:fromYDelta="100%p"
-    android:toYDelta="0"
-
-    android:duration="@android:integer/config_shortAnimTime" />
+    android:shareInterpolator="false">
+    <translate
+        android:duration="@android:integer/config_shortAnimTime"
+        android:fromYDelta="100%"
+        android:toYDelta="0%" />
+</set>
