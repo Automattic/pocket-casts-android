@@ -261,7 +261,6 @@ Language: nl
     <string name="bookmark_not_found">Bladwijzer niet gevonden</string>
     <string name="settings_use_dark_up_next_details">Indien ingeschakeld gebruikt Hierna altijd het donkere thema en indien uitgeschakeld gebruikt het het huidige thema</string>
     <string name="settings_use_dark_up_next">Donker thema voor Hierna gebruiken</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Mijn afrondingspercentage 2023</string>
     <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Van de %1$d afleveringen waar je aan bent begonnen, heb je dit aantal helemaal afgekeken %2$d</string>

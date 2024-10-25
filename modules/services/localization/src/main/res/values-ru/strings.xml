@@ -261,7 +261,6 @@ Language: ru
     <string name="bookmark_not_found">Закладка не найдена</string>
     <string name="settings_use_dark_up_next_details">При включённом параметре Up Next будет всегда использовать тёмную тему, а при выключенном — соответствовать текущей теме</string>
     <string name="settings_use_dark_up_next">Использовать тёмную тему Up Next</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Мои итоги 2023 года</string>
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Из %1$d запущенных эпизодов всего вы дослушали до конца %2$d</string>

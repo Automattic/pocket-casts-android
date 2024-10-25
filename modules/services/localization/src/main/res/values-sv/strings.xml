@@ -261,7 +261,6 @@ Language: sv_SE
     <string name="bookmark_not_found">Bokmärke hittades inte</string>
     <string name="settings_use_dark_up_next_details">När det är aktiverat kommer Up Next alltid att använda mörkt tema, eller matcha det aktuella temat när det är inaktiverat</string>
     <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad för 2023</string>
     <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Av de %1$d avsnitt du började lyssna på lyssnade du sammanlagt på %2$d</string>

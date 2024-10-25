@@ -261,7 +261,6 @@ Language: pt_BR
     <string name="bookmark_not_found">Favorito não encontrado</string>
     <string name="settings_use_dark_up_next_details">Com essa opção ativada, a lista Próximos sempre usará o tema escuro. Quando desativada, a lista usará o tema atual.</string>
     <string name="settings_use_dark_up_next">Usar tema escuro na fila Próximos</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Minha taxa de conclusão em 2023</string>
     <string name="end_of_year_stories_theres_more">E tem mais!</string>
     <string name="end_of_year_stories_year_completion_rate">taxa de conclusão</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Dos %1$d episódios que você começou, você concluiu um total de %2$d</string>

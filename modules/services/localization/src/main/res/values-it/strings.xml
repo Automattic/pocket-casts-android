@@ -261,7 +261,6 @@ Language: it
     <string name="bookmark_not_found">Segnalibro non trovato</string>
     <string name="settings_use_dark_up_next_details">Se attivato, il Successivo utilizzerà sempre il tema scuro, oppure sarà applicato il tema corrente se disattivato</string>
     <string name="settings_use_dark_up_next">Usa il tema scuro per Successivo</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Il mio tasso di completamento del 2023</string>
     <string name="end_of_year_stories_theres_more">E c\'è di più.</string>
     <string name="end_of_year_stories_year_completion_rate">tasso di completamento</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Dei %1$d episodi iniziati, ne hai ascoltati integralmente un totale pari a: %2$d</string>

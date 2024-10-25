@@ -261,7 +261,6 @@ Language: fr
     <string name="bookmark_not_found">Impossible de trouver le favori</string>
     <string name="settings_use_dark_up_next_details">Quand l’option est activée, la File d’attente affichera toujours le thème sombre ou alors elle correspondra au thème actuel si l’option est désactivée</string>
     <string name="settings_use_dark_up_next">Utiliser le thème File d’attente sombre</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Mon taux d’achèvement en 2023</string>
     <string name="end_of_year_stories_theres_more">Ce n’est pas tout !</string>
     <string name="end_of_year_stories_year_completion_rate">taux d’achèvement</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Sur les %1$d épisode(s) que vous avez commencé(s), vous en avez écouté %2$d en totalité</string>
