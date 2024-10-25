@@ -147,6 +147,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    MANAGE_DOWNLOADED_EPISODES(
+        key = "manage_downloaded_episodes",
+        title = "Manage Downloaded Episodes",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {
