@@ -253,7 +253,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             binding?.manageDownloadsCard?.setContent {
                 ManageDownloadsCard(
                     totalDownloadSize = 10,
-                    onManageDownloadsClick = {},
+                    onManageDownloadsClick = { showCleanupSettings() },
                 )
             }
         } else {
