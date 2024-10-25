@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
@@ -61,6 +62,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -87,6 +89,7 @@ class PlayerViewModel @Inject constructor(
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -662,11 +665,11 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun updatedOverrideGlobalEffects(podcast: Podcast, selectedTab: PlaybackEffectsSettingsTab) {
+    fun onEffectsSettingsSegmentedTabSelected(podcast: Podcast, selectedTab: PlaybackEffectsSettingsTab) {
         val currentEpisode = playbackManager.getCurrentEpisode()
         val isCurrentPodcast = currentEpisode?.podcastOrSubstituteUuid == podcast.uuid
         if (!isCurrentPodcast) return
-        launch {
+        viewModelScope.launch(ioDispatcher) {
             val override = selectedTab == PlaybackEffectsSettingsTab.ThisPodcast
             podcastManager.updateOverrideGlobalEffects(podcast, override)
 

@@ -286,7 +286,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
                         PlaybackEffectsSettingsTab.AllPodcasts
                     },
                     onItemSelected = {
-                        viewModel.updatedOverrideGlobalEffects(podcast, PlaybackEffectsSettingsTab.entries[it])
+                        viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.entries[it])
                     },
                     modifier = Modifier
                         .padding(top = 24.dp),
