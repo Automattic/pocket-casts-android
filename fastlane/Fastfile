@@ -335,8 +335,16 @@ platform :android do
         skip_upload_screenshots: true,
         json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
       )
-
       release_assets << aab_artifact_path
+
+      signed_apk_artifact_path = signed_apk_artifact_path(app, version)
+      download_universal_apk_from_google_play(
+        package_name: APP_PACKAGE_NAME,
+        version_code: version_code_for_app(build_code, app),
+        destination: signed_apk_artifact_path,
+        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+      )
+      release_assets << signed_apk_artifact_path
     end
 
     create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
@@ -520,16 +528,13 @@ platform :android do
   # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
   # @param [Bool] prerelease If true, the GitHub Release will have the prerelease flag
   #
-  private_lane :create_gh_release do |options|
-    version = options[:version]
-    prerelease = options[:prerelease] || false
-    release_assets = options[:release_assets]
-
+  private_lane :create_gh_release do |version:, prerelease: false, release_assets: []|
     create_github_release(
       repository: GH_REPOSITORY,
       version: version,
       release_notes_file_path: nil,
       prerelease: prerelease,
+      is_draft: !prerelease,
       release_assets: release_assets.join(',')
     )
   end
@@ -539,6 +544,10 @@ platform :android do
   #####################################################################################
   def aab_artifact_path(app, version)
     File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version}.aab")
+  end
+
+  def signed_apk_artifact_path(app, version)
+    File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version}.apk")
   end
 
   def bundle_output_path(app)
@@ -651,5 +660,20 @@ platform :android do
     build_code_next = BUILD_CODE_CALCULATOR.next_build_code(build_code: build_code_current)
     # Return the formatted build code
     BUILD_CODE_FORMATTER.build_code(build_code: build_code_next)
+  end
+
+  # Returns the versionCode for a given app, adjusting for offset depending if it's the mobile, automotive or wear app
+  #
+  # See also `dependencies.gradle.kts` and its `versionCodeDifferenceBetweenAppAnd*` constants where those offsets are defined
+  #
+  def version_code_for_app(build_code, app)
+    case app
+    when APPS_AUTOMOTIVE
+      (build_code.to_i + 50_000).to_s
+    when APPS_WEAR
+      (build_code.to_i + 100_000).to_s
+    else
+      build_code
+    end
   end
 end
