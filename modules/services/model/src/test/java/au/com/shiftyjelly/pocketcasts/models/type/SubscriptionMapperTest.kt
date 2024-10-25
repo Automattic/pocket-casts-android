@@ -22,6 +22,8 @@ class SubscriptionMapperTest {
 
     @Before
     fun setUp() {
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, true)
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, true)
         subscriptionMapper = SubscriptionMapper()
     }
 
@@ -122,7 +124,6 @@ class SubscriptionMapperTest {
             offerID = Subscription.REFERRAL_OFFER_ID,
             productID = Subscription.PLUS_YEARLY_PRODUCT_ID,
         )
-        FeatureFlag.setEnabled(Feature.REFERRALS, true)
 
         val result = subscriptionMapper.mapFromProductDetails(productDetails, referralProductDetails = referralProductDetails)
 
@@ -138,7 +139,6 @@ class SubscriptionMapperTest {
             offerID = Subscription.REFERRAL_OFFER_ID,
             productID = Subscription.PLUS_YEARLY_PRODUCT_ID,
         )
-        FeatureFlag.setEnabled(Feature.REFERRALS, true)
 
         val result = subscriptionMapper.mapFromProductDetails(productDetails, referralProductDetails = referralProductDetails)
 
@@ -146,7 +146,7 @@ class SubscriptionMapperTest {
     }
 
     @Test
-    fun `returns null when referral feature not enabled`() {
+    fun `returns null when both referral claim and send feature not enabled`() {
         val referralProductDetails = mock<ReferralProductDetails> {
             on { offerId } doReturn Subscription.REFERRAL_OFFER_ID
         }
@@ -154,11 +154,46 @@ class SubscriptionMapperTest {
             offerID = Subscription.REFERRAL_OFFER_ID,
             productID = Subscription.PLUS_YEARLY_PRODUCT_ID,
         )
-        FeatureFlag.setEnabled(Feature.REFERRALS, false)
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, false)
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, false)
 
         val result = subscriptionMapper.mapFromProductDetails(productDetails, referralProductDetails = referralProductDetails)
 
         assertNull(result)
+    }
+
+    @Test
+    fun `returns subscription with referral when referral send feature enabled`() {
+        val referralProductDetails = mock<ReferralProductDetails> {
+            on { offerId } doReturn Subscription.REFERRAL_OFFER_ID
+        }
+        val productDetails = createProductDetails(
+            offerID = Subscription.REFERRAL_OFFER_ID,
+            productID = Subscription.PLUS_YEARLY_PRODUCT_ID,
+        )
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, false)
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, true)
+
+        val result = subscriptionMapper.mapFromProductDetails(productDetails, referralProductDetails = referralProductDetails)
+
+        assertTrue(result is Subscription.Trial)
+    }
+
+    @Test
+    fun `returns subscription with referral when referral claim feature enabled`() {
+        val referralProductDetails = mock<ReferralProductDetails> {
+            on { offerId } doReturn Subscription.REFERRAL_OFFER_ID
+        }
+        val productDetails = createProductDetails(
+            offerID = Subscription.REFERRAL_OFFER_ID,
+            productID = Subscription.PLUS_YEARLY_PRODUCT_ID,
+        )
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, true)
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, false)
+
+        val result = subscriptionMapper.mapFromProductDetails(productDetails, referralProductDetails = referralProductDetails)
+
+        assertTrue(result is Subscription.Trial)
     }
 
     private fun createProductDetails(

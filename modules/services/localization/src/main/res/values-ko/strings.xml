@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-08 09:54:03+0000
+Translation-Revision-Date: 2024-10-23 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="end_of_year_story_longest_episode_subtitle">\"%2$s\"의 \"%1$s\"이었습니다.</string>
+    <string name="end_of_year_listening_time_subtitle">청취한 팟캐스트의 총 개수</string>
+    <string name="eoy_story_ratings_learn_button_label">평가에 대해 알아보기</string>
+    <string name="eoy_story_ratings_subtitle_3">지금 프로그램을 평가할 수 있다는 사실을 알고 계셨나요? 좋아하는 창작자에 대한 애정을 공유하고 이들이 주목받을 수 있도록 도와주세요!</string>
+    <string name="eoy_story_ratings_subtitle_2">창작자 커뮤니티에 피드백을 공유해 주셔서 감사합니다.</string>
+    <string name="eoy_story_ratings_subtitle_1">와, 별 %1$d개짜리 평가가 많군요! 좋아하는 제작자에 대한 애정을 공유해 주셔서 감사합니다!</string>
+    <string name="eoy_story_ratings_title_2">이런! 아직 보여드릴 만한 팟캐스트 평가가 없습니다.</string>
+    <string name="eoy_story_ratings_title_1">회원님이 평가해 주세요!</string>
+    <string name="end_of_year_story_top_podcast_title">회원님의 2024년 상위 팟캐스트는 %1$s이었습니다.</string>
+    <string name="referrals_failed_to_load_offer">죄송합니다. 추천 링크를 가져오는 중에 문제가 발생했습니다.</string>
+    <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
+    <string name="referrals_banner_hide_label">배너 숨기기</string>
+    <string name="referrals_banner_long_press_label">추천 신청 패스 배너를 숨깁니다.</string>
+    <string name="end_of_year_prompt_card_title">2024년에 청취한 목록을\n살펴보세요!</string>
+    <string name="settings_auto_download_limit_auto_downloads">자동 다운로드 제한</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">모든 최신 에피소드</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">최신 에피소드 10개</string>
+    <string name="settings_auto_download_limit_five_latest_episode">최신 에피소드 5개</string>
+    <string name="settings_auto_download_limit_three_latest_episode">최신 에피소드 3개</string>
+    <string name="settings_auto_download_limit_two_latest_episode">최신 에피소드 2개</string>
+    <string name="settings_auto_download_limit_latest_episode">최신 에피소드</string>
+    <string name="settings_auto_download_limit_off">끄기</string>
+    <string name="settings_auto_download_limit">다운로드 제한</string>
+    <string name="settings_auto_download_new_episodes_description">새 에피소드가 릴리스되면 다운로드하고 저장할 에피소드 개수에 제한을 설정해서 저장 공간을 관리하세요.</string>
     <string name="referrals_redeem_code_failed">코드를 사용할 수 없습니다. 나중에 다시 시도해 주세요.</string>
     <string name="referrals_create_subscription_failed">구독을 생성할 수 없습니다. 나중에 다시 시도해 주세요.</string>
     <string name="referrals_guest_pass_card_title">%1$s 비회원 패스</string>
@@ -28,7 +52,6 @@ Language: ko_KR
     <string name="move_up">위로 이동</string>
     <string name="search_episodes_not_found_summary">해당 검색에 대한 에피소드를 찾을 수 없습니다. 다른 키워드를 사용해 보세요.</string>
     <string name="search_episodes_not_found_title">에피소드를 찾을 수 없음</string>
-    <string name="transcript_error_not_available">죄송합니다. 이 에피소드에 대본을 사용할 수 없습니다.</string>
     <string name="paywall_layout_reviews_review_six_date">3월 8일</string>
     <string name="paywall_layout_reviews_review_six_message">PC는 저의 오랜 동반자입니다. 다른 팟캐스트 앱을 사용하다가 언제나 단순성, Ul 및 지원 때문에 PC로 되돌아왔습니다. 특히 현재 팟캐스트 앱에 지쳤다면 분명히 확인해 볼 만한 가치가 있습니다.</string>
     <string name="paywall_layout_reviews_review_six_title">Go-To 팟캐스트 앱</string>
@@ -101,13 +124,10 @@ Language: ko_KR
     <string name="share_start_position">시작</string>
     <string name="share_clip_too_long_message">클립이 에피소드 길이를 초과합니다: %s</string>
     <string name="share_invalid_clip_message">클립 시작 시간은 클립 종료 시간 이전이어야 합니다</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts 플러스로 독점 기능 잠금 해제</string>
     <string name="go_to_next">다음으로 이동</string>
     <string name="go_to_previous">이전으로 이동</string>
     <string name="share_error_message">공유할 수 없습니다. 나중에 다시 시도해 주세요.</string>
     <string name="share_clip_sharing_clip">클립 생성 중…</string>
-    <string name="something_went_wrong_when_sending_feedback">문제가 발생했습니다. 피드백을 다시 제출해 주세요.</string>
-    <string name="thank_you_for_your_feedback">피드백을 보내주셔서 감사합니다!</string>
     <string name="share_clip_create_audio_description">.mp3 오디오 파일 생성</string>
     <string name="share_clip_create_audio_label">오디오 파일 생성</string>
     <string name="share_clip_edit_label">클립 편집</string>
@@ -116,24 +136,11 @@ Language: ko_KR
     <string name="share_clip_start_position">%s 시작</string>
     <string name="transcript_empty">대본이 비어 있습니다.</string>
     <string name="share_link_clip">클립 링크</string>
-    <string name="swipe_affordance_icon">밀기 유도 아이콘</string>
-    <string name="feedback_form_placeholder">에피소드 필터링 기준:</string>
-    <string name="send_feedback_title">Pocket Casts의 어린이 프로필에서 어떤 항목을 보고 싶으시나요?</string>
-    <string name="no_thank_you">아니요, 괜찮습니다.</string>
-    <string name="send_feedback">피드백 보내기</string>
-    <string name="kids_bottom_sheet_description">새 어린이 프로필이 준비되면 앱을 통해 알림을 받으실 수 있습니다! 어떤 항목을 보고 싶으신지 알려 주시겠어요?</string>
-    <string name="thank_you_for_your_interest">관심에 감사드립니다.</string>
     <string name="share_link_bookmark">북마크 링크</string>
     <string name="share_link_episode_position">에피소드 위치 링크</string>
     <string name="share_link_episode">에피소드 링크</string>
     <string name="share_link_podcast">팟캐스트 링크</string>
     <string name="share_link_copied_feedback">링크가 클립보드에 복사됨</string>
-    <string name="kids_profile_face_image">어린이 프로필 얼굴 이미지</string>
-    <string name="request_early_access">조기 접근 권한 요청</string>
-    <string name="kids_profile_banner_description">어린이용 콘텐츠만 이용할 수 있는 새 프로필로 구독을 깔끔하게 관리하세요.</string>
-    <string name="soon_label">지원 예정</string>
-    <string name="kids_profile_banner">어린이 프로필 배너</string>
-    <string name="kids_profile">어린이 프로필</string>
     <string name="pocket_casts_logo">Pocket Casts 로고</string>
     <string name="rate_pocket_casts">Pocket Casts 평가하기</string>
     <string name="pocket_casts_champion_dialog_description">처음부터 함께해 주셔서 감사합니다! 앱을 즐겨 사용하시는 회원님의 피드백을 듣고 싶습니다.</string>
@@ -159,6 +166,9 @@ Language: ko_KR
     <string name="settings_advanced_cache_entire_playing_episode">재생 중인 에피소드 캐시</string>
     <string name="playback">재생</string>
     <string name="podcast_share_clip">클립</string>
+    <string name="episode_queued_for_download">다운로드 대기 중인 에피소드</string>
+    <string name="episode_was_removed">에피소드 삭제됨</string>
+    <string name="remove_downloaded_file">다운로드한 파일 제거</string>
     <string name="settings_export_database_failed">데이터베이스 내보내기 실패</string>
     <string name="settings_export_database">데이터베이스 내보내기</string>
     <string name="settings_sleep_timer_auto_restart_summary">이 기능을 켜면 마지막 일시 중지 후 5분 이내에 에피소드를 재생하는 경우 절전 타이머가 자동으로 재시작됩니다.</string>
@@ -259,7 +269,6 @@ Language: ko_KR
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">다름 아닌 \"%2$s\"의 \"%1$s\"였습니다.</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>
     <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>
@@ -559,6 +568,7 @@ Language: ko_KR
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">데스크톱 및 웹 앱</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">즐겨 찾는 팟캐스트 찾기</string>
@@ -621,6 +631,7 @@ Language: ko_KR
     <string name="no_episodes_in_filter_x">%1$s 필터에 에피소드 없음</string>
     <string name="filter_x_not_found">%1$s 필터 찾을 수 없음</string>
     <string name="must_provide_filter_name">필터 이름을 제공해야 함</string>
+    <string name="end_of_year_launch_modal_primary_button_title">2024년에 청취한 목록 보기</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="settings_app_icon_halloween">핼러윈</string>
     <string name="settings_show_played_summary">재생을 마친 에피소드가 계속 표시됩니다.</string>

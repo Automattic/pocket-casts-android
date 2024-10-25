@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-10 09:54:03+0000
+Translation-Revision-Date: 2024-10-22 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="end_of_year_story_longest_episode_subtitle">Het was \'%1$s\' van \'%2$s\'</string>
+    <string name="end_of_year_listening_time_subtitle">totaal naar podcasts geluisterd</string>
+    <string name="eoy_story_ratings_learn_button_label">Meer informatie over beoordelingen</string>
+    <string name="eoy_story_ratings_subtitle_3">Wist je dat je nu shows kan beoordelen? Deel je liefde voor je favoriete makers en breng ze onder de aandacht!</string>
+    <string name="eoy_story_ratings_subtitle_2">Bedankt dat je je feedback deelt met de community van makers</string>
+    <string name="eoy_story_ratings_subtitle_1">Wauw, zoveel beoordelingen van %1$d sterren! Bedankt dat je je liefde voor je favoriete makers toont!</string>
+    <string name="eoy_story_ratings_title_2">Oh oh! Er zijn nog geen podcastbeoordelingen voor je</string>
+    <string name="eoy_story_ratings_title_1">Laten we naar je beoordelingen kijken!</string>
+    <string name="end_of_year_story_top_podcast_title">Je beste podcast in 2024 was %1$s</string>
+    <string name="referrals_failed_to_load_offer">Er is iets fout gegaan bij het ophalen van je verwijzingslink.</string>
+    <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
+    <string name="referrals_banner_hide_label">Deze banner verbergen</string>
+    <string name="referrals_banner_long_press_label">Banner verwijzing geslaagd verbergen</string>
+    <string name="end_of_year_prompt_card_title">Playback 2024\nis hier!</string>
+    <string name="settings_auto_download_limit_auto_downloads">Limiet automatische downloads</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">Alle nieuwste afleveringen</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">10 nieuwste afleveringen</string>
+    <string name="settings_auto_download_limit_five_latest_episode">5 nieuwste afleveringen</string>
+    <string name="settings_auto_download_limit_three_latest_episode">3 nieuwste afleveringen</string>
+    <string name="settings_auto_download_limit_two_latest_episode">2 nieuwste afleveringen</string>
+    <string name="settings_auto_download_limit_latest_episode">Nieuwste aflevering</string>
+    <string name="settings_auto_download_limit_off">Uit</string>
+    <string name="settings_auto_download_limit">Limiet downloads</string>
+    <string name="settings_auto_download_new_episodes_description">Download nieuwe afleveringen terwijl ze uitkomen en beheer je opslag door een limiet in te stellen voor hoeveel afleveringen er kunnen worden opgeslagen</string>
     <string name="referrals_redeem_code_failed">De code kon niet ingewisseld worden. Probeer het later opnieuw.</string>
     <string name="referrals_create_subscription_failed">Kan geen abonnement aanmaken. Probeer het later opnieuw.</string>
     <string name="referrals_guest_pass_card_title">%1$s gastenpas</string>
@@ -28,7 +52,6 @@ Language: nl
     <string name="move_up">Omhoog verplaatsen</string>
     <string name="search_episodes_not_found_summary">We kunnen geen aflevering vinden voor die zoekopdracht. Probeer een ander trefwoord.</string>
     <string name="search_episodes_not_found_title">Geen afleveringen gevonden</string>
-    <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
     <string name="paywall_layout_reviews_review_six_date">8 mrt</string>
     <string name="paywall_layout_reviews_review_six_message">PC is al jaren mijn favoriet. Ik heb andere podcastapps geprobeerd, maar kwam altijd weer terug naar PC vanwege de eenvoud, UI en support. Deze app is het zeker waard om even te bekijken, vooral als je je huidige podcastapp zat bent geworden.</string>
     <string name="paywall_layout_reviews_review_six_title">Favoriete podcastapp</string>
@@ -101,13 +124,10 @@ Language: nl
     <string name="share_start_position">Begin</string>
     <string name="share_clip_too_long_message">Clip overschrijdt duur van aflevering: %s</string>
     <string name="share_invalid_clip_message">Begin van clip moet voor eind van clip liggen</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Ontgrendel exclusieve functies met Pocket Casts Plus</string>
     <string name="go_to_next">Ga naar volgende</string>
     <string name="go_to_previous">Ga naar vorige</string>
     <string name="share_error_message">Delen is mislukt. Probeer het later opnieuw.</string>
     <string name="share_clip_sharing_clip">Clip aanmaken …</string>
-    <string name="something_went_wrong_when_sending_feedback">Er is iets fout gegaan. Probeer je feedback opnieuw in te dienen.</string>
-    <string name="thank_you_for_your_feedback">Bedankt voor je feedback!</string>
     <string name="share_clip_create_audio_description">Een .mp3-audiobestand genereren</string>
     <string name="share_clip_create_audio_label">Audiobestand aanmaken</string>
     <string name="share_clip_edit_label">Clip bewerken</string>
@@ -116,24 +136,11 @@ Language: nl
     <string name="share_clip_start_position">Start %s</string>
     <string name="transcript_empty">Transcriptie is leeg.</string>
     <string name="share_link_clip">Link clip</string>
-    <string name="swipe_affordance_icon">Affordance-pictogram vegen</string>
-    <string name="feedback_form_placeholder">Ik wil afleveringen filteren op</string>
-    <string name="send_feedback_title">Wat zijn je wensen voor een Kids-profiel voor Pocket Casts?</string>
-    <string name="no_thank_you">Nee, bedankt</string>
-    <string name="send_feedback">Feedback verzenden</string>
-    <string name="kids_bottom_sheet_description">Je ontvangt een melding via de app wanneer het nieuwe Kids-profiel klaar is! Wil je ons je wensen vertellen?</string>
-    <string name="thank_you_for_your_interest">Bedankt voor je interesse</string>
     <string name="share_link_bookmark">Link bladwijzer</string>
     <string name="share_link_episode_position">Link positie in aflevering</string>
     <string name="share_link_episode">Link aflevering</string>
     <string name="share_link_podcast">Link podcast</string>
     <string name="share_link_copied_feedback">Link naar klembord gekopieerd</string>
-    <string name="kids_profile_face_image">Gezichtsafbeelding Kids-profiel</string>
-    <string name="request_early_access">Vroegtijdige toegang aanvragen</string>
-    <string name="kids_profile_banner_description">Een nieuw profiel met alleen content voor kinderen, om je abonnementen overzichtelijk te houden.</string>
-    <string name="soon_label">Binnenkort</string>
-    <string name="kids_profile_banner">Banner Kids-profiel</string>
-    <string name="kids_profile">Kids-profiel</string>
     <string name="pocket_casts_logo">Pocket Casts logo</string>
     <string name="rate_pocket_casts">Pocket Casts beoordelen</string>
     <string name="pocket_casts_champion_dialog_description">Bedankt dat je al sinds het begin op ons vertrouwt! Als je onze app graag gebruikt, horen wij graag je feedback.</string>
@@ -159,6 +166,9 @@ Language: nl
     <string name="settings_advanced_cache_entire_playing_episode">Cache afspelende aflevering</string>
     <string name="playback">Afspelen</string>
     <string name="podcast_share_clip">Clip</string>
+    <string name="episode_queued_for_download">Aflevering in de wachtrij voor downloaden</string>
+    <string name="episode_was_removed">Aflevering is verwijderd</string>
+    <string name="remove_downloaded_file">Gedownload bestand verwijderen?</string>
     <string name="settings_export_database_failed">Exporteren van database mislukt</string>
     <string name="settings_export_database">Database exporteren</string>
     <string name="settings_sleep_timer_auto_restart_summary">Indien ingeschakeld, wordt de slaaptimer automatisch opnieuw opgestart als je een aflevering afspeelt binnen vijf minuten van de laatste pauzering.</string>
@@ -259,7 +269,6 @@ Language: nl
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistentie is de sleutel tot succes… of zoiets!</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Het was niemand minder dan \'%1$s\' uit \'%2$s\'</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
@@ -559,6 +568,7 @@ Language: nl
     <string name="onboarding_plus_feature_folders_text">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Desktop- en web-apps</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
     <string name="onboarding_recommendations_import">Importeren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Pas Pocket Casts aan je voorkeuren aan door je favoriete podcasts te selecteren of ze te importeren vanuit een andere podcast-speler. Je kunt dit later altijd nog doen.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Vind je favoriete podcasts</string>
@@ -621,6 +631,7 @@ Language: nl
     <string name="no_episodes_in_filter_x">Geen afleveringen in filter %1$s</string>
     <string name="filter_x_not_found">Filter %1$s niet gevonden</string>
     <string name="must_provide_filter_name">Je moet een filternaam opgeven</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Bekijk mijn Playback 2024</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Afleveringen die helemaal zijn afgespeeld, worden nog steeds weergegeven</string>

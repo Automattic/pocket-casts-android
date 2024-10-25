@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-09 15:54:04+0000
+Translation-Revision-Date: 2024-10-23 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="end_of_year_story_longest_episode_subtitle">Это был выпуск «%1$s» из «%2$s»</string>
+    <string name="end_of_year_listening_time_subtitle">общее время прослушивания подкастов</string>
+    <string name="eoy_story_ratings_learn_button_label">Подробнее об оценках</string>
+    <string name="eoy_story_ratings_subtitle_3">Знаете ли вы, что теперь можно оценивать шоу? Выразите признательность своим любимым авторам и помогите им стать популярнее!</string>
+    <string name="eoy_story_ratings_subtitle_2">Благодарим за то, что поделились своим мнением с сообществом авторов</string>
+    <string name="eoy_story_ratings_subtitle_1">Ого, сколько %1$d-звёздных оценок! Благодарим за то, что вы выразили признательность своим любимым авторам!</string>
+    <string name="eoy_story_ratings_title_2">Ой! Оценок подкастов ещё нет</string>
+    <string name="eoy_story_ratings_title_1">Давайте посмотрим ваши оценки!</string>
+    <string name="end_of_year_story_top_podcast_title">Ваш любимый подкаст в 2024 году: %1$s</string>
+    <string name="referrals_failed_to_load_offer">К сожалению, при получении ссылки на источник перехода возникла проблема.</string>
+    <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
+    <string name="referrals_banner_hide_label">Скрыть баннер</string>
+    <string name="referrals_banner_long_press_label">Скрыть баннер с требованием ссылки на источник перехода.</string>
+    <string name="end_of_year_prompt_card_title">Playback 2024\nуже стартует!</string>
+    <string name="settings_auto_download_limit_auto_downloads">Ограничить автоматические загрузки</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">Только последний выпуск</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">10 последних выпусков</string>
+    <string name="settings_auto_download_limit_five_latest_episode">5 последних выпусков</string>
+    <string name="settings_auto_download_limit_three_latest_episode">3 последних выпуска</string>
+    <string name="settings_auto_download_limit_two_latest_episode">2 последних выпуска</string>
+    <string name="settings_auto_download_limit_latest_episode">Последний выпуск</string>
+    <string name="settings_auto_download_limit_off">Выкл.</string>
+    <string name="settings_auto_download_limit">Ограничить загрузки</string>
+    <string name="settings_auto_download_new_episodes_description">Загружайте новые выпуски по мере выхода и управляйте магазином, устанавливая ограничения на сохранение выпусков.</string>
     <string name="referrals_redeem_code_failed">Не удалось использовать код. Повторите попытку позже.</string>
     <string name="referrals_create_subscription_failed">Не удалось создать подписку. Повторите попытку позже.</string>
     <string name="referrals_guest_pass_card_title">Гостевой пропуск %1$s</string>
@@ -28,7 +52,6 @@ Language: ru
     <string name="move_up">Перенести вверх</string>
     <string name="search_episodes_not_found_summary">Не удалось найти выпуск по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
     <string name="search_episodes_not_found_title">Выпуски не найдены</string>
-    <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="paywall_layout_reviews_review_six_date">8 марта</string>
     <string name="paywall_layout_reviews_review_six_message">PC уже много лет остаётся моим любимым приложением. Я пробовал другие приложения для подкастов, но всегда возвращался к PC: это самый простой вариант с лучшим пользовательским интерфейсом и поддержкой. Безусловно, стоит попробовать, особенно если вам надоело ваше нынешнее приложение для подкастов.</string>
     <string name="paywall_layout_reviews_review_six_title">Лучшее приложение для подкастов</string>
@@ -101,13 +124,10 @@ Language: ru
     <string name="share_start_position">Начало</string>
     <string name="share_clip_too_long_message">Клип превышает продолжительность эпизода: %s</string>
     <string name="share_invalid_clip_message">Время начала клипа должно предшествовать времени его окончания</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Получите эксклюзивные возможности в Pocket Casts Plus</string>
     <string name="go_to_next">К следующему</string>
     <string name="go_to_previous">К предыдущему</string>
     <string name="share_error_message">Не получается поделиться. Повторите попытку позже.</string>
     <string name="share_clip_sharing_clip">Идет создание клипа…</string>
-    <string name="something_went_wrong_when_sending_feedback">Что-то пошло не так. Попробуйте отправить отзыв ещё раз.</string>
-    <string name="thank_you_for_your_feedback">Спасибо за ваш отзыв!</string>
     <string name="share_clip_create_audio_description">Создать аудиофайл .mp3</string>
     <string name="share_clip_create_audio_label">Создать аудиофайл</string>
     <string name="share_clip_edit_label">Редактировать клип</string>
@@ -116,24 +136,11 @@ Language: ru
     <string name="share_clip_start_position">Запустить %s</string>
     <string name="transcript_empty">Расшифровка пуста.</string>
     <string name="share_link_clip">Ссылка на клип</string>
-    <string name="swipe_affordance_icon">Смахнуть значок доступности</string>
-    <string name="feedback_form_placeholder">Я хочу фильтровать выпуски по</string>
-    <string name="send_feedback_title">Что бы вы хотели видеть в профиле «Дети» Pocket Casts?</string>
-    <string name="no_thank_you">Нет, спасибо</string>
-    <string name="send_feedback">Отправить отзыв</string>
-    <string name="kids_bottom_sheet_description">Когда новый профиль «Дети» будет готов, вы получите уведомление в приложении. Желаете сообщить нам, что вы хотели бы увидеть?</string>
-    <string name="thank_you_for_your_interest">Благодарим за проявленный интерес!</string>
     <string name="share_link_bookmark">Ссылка-закладка</string>
     <string name="share_link_episode_position">Ссылка на расположение выпуска</string>
     <string name="share_link_episode">Ссылка на выпуск</string>
     <string name="share_link_podcast">Ссылка на подкаст</string>
     <string name="share_link_copied_feedback">Ссылка скопирована в буфер обмена</string>
-    <string name="kids_profile_face_image">Изображение лица в профиле «Дети»</string>
-    <string name="request_early_access">Запросить ранний доступ</string>
-    <string name="kids_profile_banner_description">Новый профиль исключительно с детским контентом, не затрагивающим ваши подписки.</string>
-    <string name="soon_label">Уже скоро</string>
-    <string name="kids_profile_banner">Баннер профиля «Дети»</string>
-    <string name="kids_profile">Профиль «Дети»</string>
     <string name="pocket_casts_logo">Логотип Pocket Casts</string>
     <string name="rate_pocket_casts">Оценить Pocket Casts</string>
     <string name="pocket_casts_champion_dialog_description">Благодарим за то, что вы с нами с самого начала! Если вам нравится наше приложение, мы будем рады получить ваш отзыв.</string>
@@ -159,6 +166,9 @@ Language: ru
     <string name="settings_advanced_cache_entire_playing_episode">Кешировать проигрываемый выпуск</string>
     <string name="playback">Воспроизведение</string>
     <string name="podcast_share_clip">Клип</string>
+    <string name="episode_queued_for_download">Выпуск в очереди на скачивание</string>
+    <string name="episode_was_removed">Выпуск удалён</string>
+    <string name="remove_downloaded_file">Удалить скачанный файл</string>
     <string name="settings_export_database_failed">Не удалось экспортировать базу данных</string>
     <string name="settings_export_database">Экспортировать базу данных</string>
     <string name="settings_sleep_timer_auto_restart_summary">В режиме «Включено» таймер сна будет автоматически перезапущен, если вы воспроизведёте выпуск в течение 5 минут после последней остановки.</string>
@@ -259,7 +269,6 @@ Language: ru
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">И… как, вам хватает времени на всё остальное?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Говорят, постоянство — ключ к успеху… или что-то в этом роде.</string>
     <string name="end_of_year_prompt_card_summary">Просмотрите свой топ подкастов, статистику прослушивания и другие показатели.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Это было не что иное, как «%1$s» из «%2$s»</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
@@ -559,6 +568,7 @@ Language: ru
     <string name="onboarding_plus_feature_folders_text">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Слушайте подкасты везде: в приложениях для Windows, macOS и веб-приложении.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Приложения для ПК и веб-приложения</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Всё, что вам нравится в Pocket Casts, и ещё больше</string>
     <string name="onboarding_recommendations_import">Импорт</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Переходите на Pocket Casts. Выберите любимые подкасты или импортируйте их из другого плеера. Вы всегда сможете сделать это позже.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Найти любимые подкасты</string>
@@ -621,6 +631,7 @@ Language: ru
     <string name="no_episodes_in_filter_x">Нет выпусков в фильтре %1$s</string>
     <string name="filter_x_not_found">Фильтр %1$s не найден</string>
     <string name="must_provide_filter_name">Укажите имя фильтра</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Просмотреть мой Playback 2024</string>
     <string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
     <string name="settings_app_icon_halloween">Хэллоуин</string>
     <string name="settings_show_played_summary">Выпуски, которые вы уже прослушали, будут по-прежнему отображаться</string>

@@ -28,7 +28,7 @@ class SubscriptionMapper @Inject constructor() {
                 ?.filter { it.offerSubscriptionPricingPhase == null } // Take the first if there are multiple SubscriptionOfferDetails without special offers
         } ?: emptyList()
 
-        val relevantSubscriptionOfferDetails = if (FeatureFlag.isEnabled(Feature.REFERRALS) && referralProductDetails != null) {
+        val relevantSubscriptionOfferDetails = if ((FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM) || FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) && referralProductDetails != null) {
             matchingSubscriptionOfferDetails.find { it.offerId == referralProductDetails.offerId }
         } else {
             val matchingSubscriptionOfferDetailsWithoutReferralOffer = matchingSubscriptionOfferDetails
@@ -80,7 +80,7 @@ class SubscriptionMapper @Inject constructor() {
             it.offerId in buildList {
                 add(Subscription.TRIAL_OFFER_ID)
                 referralProductDetails?.let {
-                    if (FeatureFlag.isEnabled(Feature.REFERRALS)) {
+                    if (FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM) || FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) {
                         add(referralProductDetails.offerId)
                     }
                 }

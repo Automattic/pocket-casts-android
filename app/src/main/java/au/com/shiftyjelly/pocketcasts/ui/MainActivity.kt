@@ -1357,17 +1357,13 @@ class MainActivity :
     }
 
     private fun openReferralClaim(code: String) {
-        if (!FeatureFlag.isEnabled(Feature.REFERRALS)) {
+        if (!FeatureFlag.isEnabled(Feature.REFERRALS_CLAIM)) {
             return
         }
         settings.referralClaimCode.set(code, false)
-        launch {
-            delay(1000) // To allow loading tabs and prevent race condition in updating activity's status bar color
-            withContext(Dispatchers.Main) {
-                val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
-                showBottomSheet(fragment)
-            }
-        }
+        openTab(VR.id.navigation_profile)
+        val fragment = ReferralsGuestPassFragment.newInstance(ReferralsGuestPassFragment.ReferralsPageType.Claim)
+        showBottomSheet(fragment)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
