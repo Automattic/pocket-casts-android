@@ -270,7 +270,6 @@ Language: zh_TW
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊啊啊…人就是要享受生活，對吧？</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">大家都說，成功的關鍵在於持之以恆…大概是這樣吧！</string>
     <string name="end_of_year_prompt_card_summary">看看你的收聽統計和最愛 Podcast 等資料吧。</string>
-    <string name="end_of_year_story_longest_episode_subtitle">除了「%2$s」的「%1$s」之外，別無其他</string>
     <string name="end_of_year_story_longest_episode_title">你收聽時間最長的一集為 %1$s</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_listening_time_title">這是你收聽 Podcast 的總時間。</string>

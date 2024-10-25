@@ -270,7 +270,6 @@ Language: fr
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… il faut vivre sa vie à fond, n’est-ce pas ?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">On dit que la constance est la clé du succès… ou un truc du genre !</string>
     <string name="end_of_year_prompt_card_summary">Retrouvez vos statistiques d’écoute, vos meilleurs podcasts et plus encore.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Ce n’était autre que « %1$s » de « %2$s »</string>
     <string name="end_of_year_story_longest_episode_title">%1$s est l’épisode le plus long que vous avez écouté</string>
     <string name="end_of_year_replay">Réécouter</string>
     <string name="end_of_year_listening_time_title">Il s’agit de votre temps total d’écoute de podcasts.</string>

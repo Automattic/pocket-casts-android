@@ -270,7 +270,6 @@ Language: zh_CN
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊哈…生活还得继续，不是吗？</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">人们常说，一致性是成功的关键…或诸如此类的话！</string>
     <string name="end_of_year_prompt_card_summary">查看您的收听统计数据、热门播客等。</string>
-    <string name="end_of_year_story_longest_episode_subtitle">不是其他，而正是来自“%2$s”的“%1$s”</string>
     <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>

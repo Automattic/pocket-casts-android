@@ -270,7 +270,6 @@ Language: ja_JP
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">生きてこその人生ですね。</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">一貫性が成功の鍵であるとかなんとか言われています。</string>
     <string name="end_of_year_prompt_card_summary">視聴統計、人気のポッドキャストなどを確認します。</string>
-    <string name="end_of_year_story_longest_episode_subtitle">%2$s の %1$s を超えるものはありません</string>
     <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
     <string name="end_of_year_replay">もう一度再生</string>
     <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>

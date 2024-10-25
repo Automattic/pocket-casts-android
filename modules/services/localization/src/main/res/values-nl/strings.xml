@@ -270,7 +270,6 @@ Language: nl
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistentie is de sleutel tot succes… of zoiets!</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Het was niemand minder dan \'%1$s\' uit \'%2$s\'</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
