@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.pager.rememberPagerState
@@ -64,6 +64,7 @@ internal val Story.backgroundColor
 internal data class EndOfYearMeasurements(
     val width: Dp,
     val height: Dp,
+    val statusBarInsets: WindowInsets,
     val coverFontSize: TextUnit,
     val coverTextHeight: Dp,
     val closeButtonBottomEdge: Dp,
@@ -192,25 +193,25 @@ internal class HumaneTextFactory(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PreviewBox(
     currentPage: Int,
     content: @Composable (EndOfYearMeasurements) -> Unit,
 ) {
     BoxWithConstraints {
-        content(
-            EndOfYearMeasurements(
-                width = maxWidth,
-                height = maxHeight,
-                coverFontSize = 260.sp,
-                coverTextHeight = 210.dp,
-                closeButtonBottomEdge = 44.dp,
-            ),
+        val measurements = EndOfYearMeasurements(
+            width = maxWidth,
+            height = maxHeight,
+            statusBarInsets = WindowInsets(top = 16.dp),
+            coverFontSize = 260.sp,
+            coverTextHeight = 210.dp,
+            closeButtonBottomEdge = 52.dp,
         )
+        content(measurements)
         TopControls(
             pagerState = rememberPagerState(initialPage = currentPage, pageCount = { 11 }),
             progress = 0f,
+            measurements = measurements,
             onClose = {},
         )
     }

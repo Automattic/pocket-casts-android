@@ -74,8 +74,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.SignInDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.SonosDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpgradeAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -747,8 +747,7 @@ class MainActivity :
     }
 
     private fun showStories(source: StoriesSource) {
-        StoriesFragment.newInstance(source)
-            .show(supportFragmentManager, "stories_dialog")
+        StoriesActivity.open(this, source)
     }
 
     @Suppress("DEPRECATION")

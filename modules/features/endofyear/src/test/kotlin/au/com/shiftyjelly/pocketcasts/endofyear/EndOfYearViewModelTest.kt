@@ -94,7 +94,7 @@ class EndOfYearViewModelTest {
         viewModel = EndOfYearViewModel(
             year = Year.of(1000),
             topListTitle = "Top list title",
-            source = StoriesFragment.StoriesSource.UNKNOWN,
+            source = StoriesActivity.StoriesSource.UNKNOWN,
             endOfYearSync = endOfYearSync,
             endOfYearManager = endOfYearManager,
             subscriptionManager = mock { on { subscriptionTier() }.doReturn(subscriptionTier) },
