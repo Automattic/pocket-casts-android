@@ -722,7 +722,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -753,7 +753,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -779,7 +779,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -805,7 +805,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -837,7 +837,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -868,7 +868,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -900,7 +900,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -928,7 +928,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
@@ -956,7 +956,7 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
         assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
