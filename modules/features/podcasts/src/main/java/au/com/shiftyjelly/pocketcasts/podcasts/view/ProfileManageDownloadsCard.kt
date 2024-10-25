@@ -16,6 +16,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,15 +26,18 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ManageDownloadsCard(
-    totalDownloadSize: Int,
+    totalDownloadSize: Long,
     onManageDownloadsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val formattedTotalDownloadSize = Util.formattedBytes(bytes = totalDownloadSize, context = LocalContext.current)
+
     Row(
         modifier = modifier
             .background(color = MaterialTheme.theme.colors.primaryUi01, RoundedCornerShape(8.dp))
@@ -66,7 +70,7 @@ fun ManageDownloadsCard(
             Spacer(modifier = Modifier.height(2.dp))
 
             TextP50(
-                text = stringResource(LR.string.save_x_gb_by_removing_played_episodes, totalDownloadSize),
+                text = stringResource(LR.string.save_x_by_removing_played_episodes, formattedTotalDownloadSize),
                 color = Color.Gray,
             )
 

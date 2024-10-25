@@ -52,6 +52,9 @@ class ManualCleanupViewModel
         data class DeleteButton(
             val isEnabled: Boolean = false,
         )
+
+        val playedDiskSpaceView: DiskSpaceView?
+            get() = diskSpaceViews.find { it.title == LR.string.played }
     }
 
     private var isFragmentChangingConfigurations: Boolean = false
