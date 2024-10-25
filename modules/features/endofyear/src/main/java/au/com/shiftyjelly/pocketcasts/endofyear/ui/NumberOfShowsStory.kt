@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun NumberOfShowsStory(
     story: Story.NumberOfShows,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
 ) {
     val smallCoverSize = 160.dp * measurements.scale
     val smallSpacingSize = smallCoverSize / 10
@@ -106,7 +107,7 @@ internal fun NumberOfShowsStory(
                 color = colorResource(UR.color.coolgrey_90),
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = {})
+            ShareStoryButton(onClick = onShareStory)
         }
     }
 }
@@ -149,6 +150,7 @@ private fun NumberOfShowsPreview() {
                 bottomShowIds = List(4) { "id-$it" },
             ),
             measurements = measurements,
+            onShareStory = {},
         )
     }
 }

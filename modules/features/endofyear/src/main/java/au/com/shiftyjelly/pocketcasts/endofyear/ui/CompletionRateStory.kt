@@ -52,13 +52,20 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun CompletionRateStory(
     story: Story.CompletionRate,
     measurements: EndOfYearMeasurements,
-) = CompletionRateStory(story, measurements, showBars = false)
+    onShareStory: () -> Unit,
+) = CompletionRateStory(
+    story = story,
+    measurements = measurements,
+    onShareStory = onShareStory,
+    showBars = false,
+)
 
 @Composable
 private fun CompletionRateStory(
     story: Story.CompletionRate,
     measurements: EndOfYearMeasurements,
     showBars: Boolean,
+    onShareStory: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -80,6 +87,7 @@ private fun CompletionRateStory(
         CompletionRateInfo(
             story = story,
             measurements = measurements,
+            onShareStory,
         )
     }
 }
@@ -128,7 +136,7 @@ private fun BarsSection(
                     index++
                 }
                 if (bars.isNotEmpty()) {
-                    bars.removeLast()
+                    bars.removeAt(bars.size - 1)
                 }
                 val spaceHeightPx = LocalDensity.run { SpaceHeight.roundToPx() }
                 val barsHeightPx = (bars.sumOf { it.height } - spaceHeightPx).coerceAtLeast(0)
@@ -202,6 +210,7 @@ private fun BarsSection(
 private fun CompletionRateInfo(
     story: Story.CompletionRate,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
 ) {
     Column {
         Spacer(
@@ -210,7 +219,7 @@ private fun CompletionRateInfo(
         val badgeId = when (story.subscriptionTier) {
             SubscriptionTier.PLUS -> IR.drawable.end_of_year_2024_completion_rate_plus_badge
             SubscriptionTier.PATRON -> IR.drawable.end_of_year_2024_completion_rate_patron_badge
-            SubscriptionTier.NONE, null -> null
+            SubscriptionTier.NONE -> null
         }
 
         if (badgeId != null) {
@@ -247,7 +256,7 @@ private fun CompletionRateInfo(
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        ShareStoryButton(onClick = {})
+        ShareStoryButton(onClick = onShareStory)
     }
 }
 
@@ -265,6 +274,7 @@ private fun CompletionRatePreview(
             ),
             measurements = measurements,
             showBars = true,
+            onShareStory = {},
         )
     }
 }

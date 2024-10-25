@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import au.com.shiftyjelly.pocketcasts.models.to.Story
-import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun TotalTimeStory(
     story: Story.TotalTime,
     measurements: EndOfYearMeasurements,
+    onShareStory: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -57,7 +58,7 @@ internal fun TotalTimeStory(
             }[0].measure(constraints)
 
             val shareButton = subcompose("share-button") {
-                ShareStoryButton(onClick = {})
+                ShareStoryButton(onClick = onShareStory)
             }[0].measure(constraints)
 
             val titleConstraints = constraints.copy(
@@ -134,6 +135,7 @@ private fun TotalTimePreview(
                 duration = duration,
             ),
             measurements = measurements,
+            onShareStory = {},
         )
     }
 }
