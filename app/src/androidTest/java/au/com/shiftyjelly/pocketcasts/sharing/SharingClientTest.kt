@@ -701,6 +701,7 @@ class SharingClientTest {
 
     @Test
     fun numberOfShowsStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_story_listened_to_numbers_share_text, 100, 200, 1000))
             append(" https://pca.st")
@@ -712,7 +713,7 @@ class SharingClientTest {
             topShowIds = emptyList(),
             bottomShowIds = emptyList(),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -721,13 +722,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareTopShowStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_story_top_podcast_share_text, 1000, "https://pca.st/podcast/podcast-id"))
             append(" #pocketcasts #playback1000")
@@ -741,7 +744,7 @@ class SharingClientTest {
                 playedEpisodeCount = 0,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -750,13 +753,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareTopShowsStoryWithCustomUrl() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_story_top_podcasts_share_text, "https://pca.st"))
             append(" #pocketcasts #playback1000")
@@ -765,7 +770,7 @@ class SharingClientTest {
             shows = emptyList(),
             podcastListUrl = null,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -774,13 +779,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareTopShowsStoryWithoutCustomUrl() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_story_top_podcasts_share_text, "podcast-list-url"))
             append(" #pocketcasts #playback1000")
@@ -789,7 +796,7 @@ class SharingClientTest {
             shows = emptyList(),
             podcastListUrl = "podcast-list-url",
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -798,13 +805,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareRatingsStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_story_ratings_share_text, 150, 1000, 5))
             append(" https://pca.st")
@@ -819,7 +828,7 @@ class SharingClientTest {
                 fives = 50,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -828,13 +837,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareTotalTimeStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(
                 context.getString(
@@ -848,7 +859,7 @@ class SharingClientTest {
         val story = Story.TotalTime(
             duration = 12345.seconds,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -857,13 +868,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareLongestEpisodeStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_story_longest_episode_share_text, 1000, "https://pca.st/episode/episode-id"))
             append(" #pocketcasts #playback1000")
@@ -878,7 +891,7 @@ class SharingClientTest {
                 coverUrl = null,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -887,13 +900,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareYearVsYearStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_stories_year_over_share_text, 1000, 999))
             append(" https://pca.st")
@@ -904,7 +919,7 @@ class SharingClientTest {
             thisYearDuration = Duration.ZERO,
             subscriptionTier = SubscriptionTier.NONE,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -913,13 +928,15 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareCompletionRateStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
             append(context.getString(LR.string.end_of_year_stories_completion_rate_share_text, 1000))
             append(" https://pca.st")
@@ -930,7 +947,7 @@ class SharingClientTest {
             completedCount = 0,
             subscriptionTier = SubscriptionTier.NONE,
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertTrue(response.isSuccsessful)
@@ -939,15 +956,17 @@ class SharingClientTest {
         val intent = shareStarter.requireChooserIntent
 
         assertEquals(ACTION_SEND, intent.action)
-        assertEquals("text/plain", intent.type)
+        assertEquals("image/png", intent.type)
         assertEquals(text, intent.getStringExtra(EXTRA_TEXT))
         assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+        assertEquals(FileUtil.getUriForFile(context, screenshot), IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java))
     }
 
     @Test
     fun shareCoverStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val story = Story.Cover
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
@@ -958,8 +977,9 @@ class SharingClientTest {
 
     @Test
     fun sharePlusInterstitialStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val story = Story.PlusInterstitial
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
@@ -970,8 +990,9 @@ class SharingClientTest {
 
     @Test
     fun shareEndingStory() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val story = Story.Ending
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)
@@ -982,6 +1003,7 @@ class SharingClientTest {
 
     @Test
     fun shareRatingsStoryWithoutAnyRatings() = runTest {
+        val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val story = Story.Ratings(
             stats = RatingStats(
                 ones = 0,
@@ -991,7 +1013,7 @@ class SharingClientTest {
                 fives = 0,
             ),
         )
-        val request = SharingRequest.endOfYearStory(story, Year.of(1000)).build()
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
         assertFalse(response.isSuccsessful)

@@ -22,6 +22,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.File
 import java.time.Year
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -221,8 +222,10 @@ class EndOfYearViewModel @AssistedInject constructor(
         }?.takeIf { it != -1 }
     }
 
-    internal fun share(story: Story) {
-        val request = SharingRequest.endOfYearStory(story, year).build()
+    internal fun share(story: Story, screenshot: File) {
+        val request = SharingRequest
+            .endOfYearStory(story, year, screenshot)
+            .build()
         viewModelScope.launch { sharingClient.shareStory(request) }
     }
 
@@ -327,4 +330,5 @@ internal enum class StoryProgressPauseReason {
     ScreenInBackground,
     UserHoldingStory,
     ScreenshotDialog,
+    TakingScreenshot,
 }
