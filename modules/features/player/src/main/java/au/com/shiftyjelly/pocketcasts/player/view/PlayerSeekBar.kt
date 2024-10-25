@@ -137,7 +137,13 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
             val elapsedTime = currentTime.toHhMmSs()
             elapsedTimeText.text = currentTime.toHhMmSs()
             elapsedTimeText.contentDescription = resources.getString(LR.string.player_played_up_to, elapsedTime)
-            val remaingingTime = (-remainingDuration()).toHhMmSs()
+            val timeLeft = remainingDuration()
+            val remaingingTime = buildString {
+                if (timeLeft > Duration.ZERO) {
+                    append('-')
+                }
+                append(timeLeft.toHhMmSs())
+            }
             remainingTimeText.text = remaingingTime
             remainingTimeText.contentDescription = resources.getString(LR.string.player_time_remaining, remaingingTime.removePrefix("-"))
         }
@@ -148,7 +154,7 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
             (duration - currentTime - chapters.skippedChaptersDuration(currentTime)) / playbackSpeed
         } else {
             duration - currentTime
-        }
+        }.coerceAtLeast(Duration.ZERO)
     }
 
     interface OnUserSeekListener {
