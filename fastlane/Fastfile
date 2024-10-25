@@ -534,6 +534,7 @@ platform :android do
       version: version,
       release_notes_file_path: nil,
       prerelease: prerelease,
+      is_draft: !prerelease,
       release_assets: release_assets.join(',')
     )
   end
