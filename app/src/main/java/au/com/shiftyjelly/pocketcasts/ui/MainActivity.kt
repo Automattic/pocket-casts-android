@@ -695,6 +695,7 @@ class MainActivity :
             fragmentManager = supportFragmentManager,
             analyticsTracker = analyticsTracker,
             episodeAnalytics = episodeAnalytics,
+            settings = settings,
         ).show(this)
     }
 

@@ -44,7 +44,11 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
     fun getAutoDownloadUpNext() = settings.autoDownloadUpNext.value
 
+    fun getAutoDownloadNewEpisodes() = settings.autoDownloadNewEpisodes.value
+
     fun onNewEpisodesChange(newValue: Boolean) {
+        settings.autoDownloadNewEpisodes.set(newValue, updateModifiedAt = true)
+
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED,
             mapOf("enabled" to newValue),
@@ -59,8 +63,8 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         setLimitDownloads(value)
 
         analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_TOGGLED,
-            mapOf("value" to value.analyticsString),
+            AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_CHANGED,
+            mapOf("value" to AutoDownloadLimitSetting.getNumberOfEpisodes(value)),
         )
     }
 

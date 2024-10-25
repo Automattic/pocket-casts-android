@@ -266,11 +266,11 @@ Language: ru
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Из %1$d запущенных эпизодов всего вы дослушали до конца %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Ваш процент завершения в этом году равен %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">Время прослушивания в 2023 г. по сравнению с 2022 г.</string>
     <string name="eoy_year_over_year_title_skyrocketed">По сравнению с 2022 г. вы посвятили прослушиванию намного больше времени!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">И… как, вам хватает времени на всё остальное?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Говорят, постоянство — ключ к успеху… или что-то в этом роде.</string>
     <string name="end_of_year_prompt_card_summary">Просмотрите свой топ подкастов, статистику прослушивания и другие показатели.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Это было не что иное, как «%1$s» из «%2$s»</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
@@ -589,12 +589,8 @@ Language: ru
     <string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
-    <string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в 2023 году: %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Мои любимые подкасты в 2022 году</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в 2023 году! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Вы прослушали %1$d выпусков (-а) общей продолжительностью %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Я прослушал(а) %1$d подкастов(а) и %2$d выпусков(а) в 2023 году</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_listened_to_numbers">Вы прослушали %1$d шоу и %2$d выпусков</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Я выбрал(а) %1$d рубрик(и) в 2023 году</string>

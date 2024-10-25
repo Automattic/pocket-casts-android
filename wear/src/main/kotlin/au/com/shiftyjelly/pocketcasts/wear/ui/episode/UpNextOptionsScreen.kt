@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -14,22 +16,33 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun UpNextOptionsScreen(
-    columnState: ScalingLazyColumnState,
     episodeScreenViewModelStoreOwner: ViewModelStoreOwner,
     onComplete: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
-    Content(
-        columnState = columnState,
-        upNextOptions = viewModel.upNextOptions,
-        onComplete = onComplete,
+    val columnState = rememberColumnState(
+        factory = ScalingLazyColumnDefaults.belowTimeText(
+            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
+        ),
     )
+    ScreenScaffold(
+        timeText = {},
+    ) {
+        val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
+        Content(
+            columnState = columnState,
+            upNextOptions = viewModel.upNextOptions,
+            onComplete = onComplete,
+        )
+    }
 }
 
 @Composable

@@ -6,8 +6,15 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
+import au.com.shiftyjelly.pocketcasts.models.to.Story
+import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.ReferralsOfferInfoMock
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
+import java.time.Year
 import java.util.Date
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -456,6 +463,201 @@ class SharingAnalyticsTest {
                 "type" to "referral_link",
                 "action" to "system_sheet",
                 "source" to "referrals",
+            ),
+        )
+    }
+
+    @Test
+    fun `log number of shows story sharing`() {
+        val story = Story.NumberOfShows(
+            showCount = 100,
+            epsiodeCount = 200,
+            topShowIds = emptyList(),
+            bottomShowIds = emptyList(),
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "number_of_shows",
+                "source" to "unknown",
+                "action" to "system_sheet",
+            ),
+        )
+    }
+
+    @Test
+    fun `log top 1 show story sharing`() {
+        val story = Story.TopShow(
+            show = TopPodcast(
+                uuid = "podcast-id",
+                title = "podcast-title",
+                author = "pocast-author",
+                playbackTimeSeconds = 0.0,
+                playedEpisodeCount = 0,
+            ),
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "top_1_show",
+                "source" to "unknown",
+                "action" to "system_sheet",
+            ),
+        )
+    }
+
+    @Test
+    fun `log top 5 shows story sharing`() {
+        val story = Story.TopShows(
+            shows = emptyList(),
+            podcastListUrl = null,
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "top_5_shows",
+                "source" to "unknown",
+                "action" to "system_sheet",
+            ),
+        )
+    }
+
+    @Test
+    fun `log ratings story sharing`() {
+        val story = Story.Ratings(
+            stats = RatingStats(
+                ones = 10,
+                twos = 20,
+                threes = 30,
+                fours = 40,
+                fives = 50,
+            ),
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "ratings",
+                "source" to "unknown",
+                "action" to "system_sheet",
+            ),
+        )
+    }
+
+    @Test
+    fun `log total time story sharing`() {
+        val story = Story.TotalTime(
+            duration = 12345.seconds,
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "total_time",
+                "source" to "unknown",
+                "action" to "system_sheet",
+            ),
+        )
+    }
+
+    @Test
+    fun `log longest episode story sharing`() {
+        val story = Story.LongestEpisode(
+            episode = LongestEpisode(
+                episodeId = "episode-id",
+                episodeTitle = "",
+                podcastId = "",
+                podcastTitle = "",
+                durationSeconds = 0.0,
+                coverUrl = null,
+            ),
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "longest_episode",
+                "source" to "unknown",
+                "action" to "system_sheet",
+            ),
+        )
+    }
+
+    @Test
+    fun `log year vs year story sharing`() {
+        val story = Story.YearVsYear(
+            lastYearDuration = Duration.ZERO,
+            thisYearDuration = Duration.ZERO,
+            subscriptionTier = SubscriptionTier.NONE,
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "year_vs_year",
+                "source" to "unknown",
+                "action" to "system_sheet",
+            ),
+        )
+    }
+
+    @Test
+    fun `log completion rate story sharing`() {
+        val story = Story.CompletionRate(
+            listenedCount = 0,
+            completedCount = 0,
+            subscriptionTier = SubscriptionTier.NONE,
+        )
+        val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
+
+        analytics.onShare(request)
+        val event = tracker.events.single()
+
+        event.assertType(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
+        event.assertProperties(
+            mapOf(
+                "type" to "end_of_year_story",
+                "story" to "completion_rate",
+                "source" to "unknown",
+                "action" to "system_sheet",
             ),
         )
     }

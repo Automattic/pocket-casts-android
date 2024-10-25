@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -122,8 +121,8 @@ class PodcastManagerImpl @Inject constructor(
     /**
      * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
      */
-    override fun subscribeToPodcast(podcastUuid: String, sync: Boolean) {
-        subscribeManager.subscribeOnQueue(podcastUuid, sync)
+    override fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean) {
+        subscribeManager.subscribeOnQueue(podcastUuid, sync, shouldAutoDownload)
     }
 
     override suspend fun subscribeToPodcastSuspend(podcastUuid: String, sync: Boolean): Podcast =
@@ -133,8 +132,8 @@ class PodcastManagerImpl @Inject constructor(
      * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
      * Do this now rather than adding it to a queue.
      */
-    override fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean): Single<Podcast> {
-        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true)
+    override fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
+        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload)
     }
 
     /**
@@ -142,12 +141,12 @@ class PodcastManagerImpl @Inject constructor(
      */
     override fun findOrDownloadPodcastRx(podcastUuid: String): Single<Podcast> {
         return findPodcastByUuidRx(podcastUuid)
-            .switchIfEmpty(subscribeManager.addPodcast(podcastUuid, sync = false, subscribed = false).toMaybe())
+            .switchIfEmpty(subscribeManager.addPodcast(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).toMaybe())
             .toSingle()
     }
 
-    override fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast> {
-        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed)
+    override fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
+        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload)
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {
@@ -637,11 +636,6 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateAutoDownloadStatus(autoDownloadStatus, podcast.uuid)
     }
 
-    override fun updateAutoDownloadLimit(podcast: Podcast, autoDownloadLimit: AutoDownloadLimitSetting) {
-        podcast.autoDownloadLimit = autoDownloadLimit
-        podcastDao.updateAutoDownloadLimit(autoDownloadLimit, podcast.uuid)
-    }
-
     override suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext) {
         podcastDao.updateAutoAddToUpNext(autoAddToUpNext, podcast.uuid)
     }
@@ -668,7 +662,7 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateOverrideGlobalEffects(override, podcast.uuid)
     }
 
-    override fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
+    override suspend fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
         podcast.trimMode = trimMode
         podcastDao.updateTrimSilenceMode(trimMode, podcast.uuid)
     }
@@ -685,7 +679,9 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun updateEffects(podcast: Podcast, effects: PlaybackEffects) {
         podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid)
-        updateTrimMode(podcast, effects.trimMode)
+        launch {
+            updateTrimMode(podcast, effects.trimMode)
+        }
     }
 
     override fun updateEpisodesSortType(podcast: Podcast, episodesSortType: EpisodesSortType) {
@@ -745,7 +741,10 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun checkForEpisodesToDownload(episodeUuidsAdded: List<String>, downloadManager: DownloadManager) {
         Timber.i("Auto download podcasts checkForEpisodesToDownload. Episodes %s", episodeUuidsAdded.size)
+
         val podcastUuidToAutoDownload = HashMap<String, Boolean>()
+        val podcastUuidToDownloadCount = HashMap<String, Int>()
+
         for (podcast in findSubscribed()) {
             podcastUuidToAutoDownload[podcast.uuid] = podcast.isAutoDownloadNewEpisodes
         }
@@ -777,8 +776,16 @@ class PodcastManagerImpl @Inject constructor(
                 continue
             }
 
+            val currentDownloadCount = podcastUuidToDownloadCount.getOrDefault(episode.podcastUuid, 0)
+            if (currentDownloadCount >= AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)) {
+                continue // Skip to the next episode since it already downloaded the limit of episodes for this podcast
+            }
+
             DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "podcast auto download " + episode.podcastUuid, downloadManager, episodeManager, source = SourceView.UNKNOWN)
             uuidToAdded[episodeUuid] = java.lang.Boolean.TRUE
+
+            // Update the track of how many episodes were downloaded for this podcast
+            podcastUuidToDownloadCount[episode.podcastUuid] = currentDownloadCount + 1
         }
     }
 
@@ -820,9 +827,6 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun refreshPodcastFeed(podcastUuid: String): Boolean {
         return refreshServiceManager.refreshPodcastFeed(podcastUuid).isSuccessful
     }
-
-    override suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast> =
-        podcastDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 
     override suspend fun findRandomPodcasts(limit: Int): List<Podcast> {
         return podcastDao.findRandomPodcasts(limit)

@@ -266,11 +266,11 @@ Language: ko_KR
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">시작하신 %1$d개 에피소드 중에서 총 %2$d개 완전히 청취</string>
     <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다.</string>
-    <string name="end_of_year_stories_year_over_share_text">2022년 대비 내 2023년 청취 시간</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">다름 아닌 \"%2$s\"의 \"%1$s\"였습니다.</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>
     <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>
@@ -589,12 +589,8 @@ Language: ko_KR
     <string name="end_of_year_story_top_categories_share_text">내가 가장 많이 청취하는 팟캐스트 카테고리</string>
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>
     <string name="end_of_year_story_epilogue_subtitle">잊지 말고 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사 보내기</string>
-    <string name="end_of_year_story_longest_episode_share_text">2023년에 내가 청취한 가장 긴 에피소드 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">나의 2022년 상위 팟캐스트</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">내가 즐겨찾는 2023년 팟캐스트입니다! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">총 %2$s 동안 %1$d개 에피소드를 청취하셨습니다.</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">내가 2023년에 청취한 팟캐스트는 %1$d가지, 에피소드는 %2$d개</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_listened_to_numbers">청취하신 총 프로그램 %1$d개, 에피소드 %2$d개</string>
     <string name="end_of_year_story_listened_to_categories_share_text">내가 2023년에 청취한 카테고리는 %1$d가지</string>

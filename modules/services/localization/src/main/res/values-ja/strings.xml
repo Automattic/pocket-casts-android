@@ -266,11 +266,11 @@ Language: ja_JP
     <string name="end_of_year_stories_year_completion_rate">完了率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">開始した%1$d件のエピソードから合計%2$d件を最後まで聴きました</string>
     <string name="end_of_year_stories_year_completion_rate_title">今年の完了率は%1$d%% です</string>
-    <string name="end_of_year_stories_year_over_share_text">2023年と2022年の聴取時間の比較</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022年と比較して、聴取時間が急増しました !</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">生きてこその人生ですね。</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">一貫性が成功の鍵であるとかなんとか言われています。</string>
     <string name="end_of_year_prompt_card_summary">視聴統計、人気のポッドキャストなどを確認します。</string>
+    <string name="end_of_year_story_longest_episode_subtitle">%2$s の %1$s を超えるものはありません</string>
     <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
     <string name="end_of_year_replay">もう一度再生</string>
     <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>
@@ -589,12 +589,8 @@ Language: ja_JP
     <string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>
     <string name="end_of_year_story_epilogue_subtitle">友達と共有したりお気に入りのポッドキャストクリエイターにエールを送ったりしましょう</string>
-    <string name="end_of_year_story_longest_episode_share_text">2023年に聴いた最長のエピソード: %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">2022年に再生数が多かったポッドキャスト</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">2023年のお気に入りのポッドキャストはこちら ! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">%1$d話のエピソードで合計%2$s聴きました</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">2023年は%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
     <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_share_text">2023年は%1$d個のカテゴリーを聴きました</string>

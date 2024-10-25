@@ -266,11 +266,11 @@ Language: fr
     <string name="end_of_year_stories_year_completion_rate">taux d’achèvement</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Sur les %1$d épisode(s) que vous avez commencé(s), vous en avez écouté %2$d en totalité</string>
     <string name="end_of_year_stories_year_completion_rate_title">Cette année, votre taux d’achèvement s’élève à %1$d %%</string>
-    <string name="end_of_year_stories_year_over_share_text">Mon temps d’écoute en 2023 par rapport à 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Par rapport à 2022, votre temps d’écoute a explosé !</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… il faut vivre sa vie à fond, n’est-ce pas ?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">On dit que la constance est la clé du succès… ou un truc du genre !</string>
     <string name="end_of_year_prompt_card_summary">Retrouvez vos statistiques d’écoute, vos meilleurs podcasts et plus encore.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Ce n’était autre que « %1$s » de « %2$s »</string>
     <string name="end_of_year_story_longest_episode_title">%1$s est l’épisode le plus long que vous avez écouté</string>
     <string name="end_of_year_replay">Réécouter</string>
     <string name="end_of_year_listening_time_title">Il s’agit de votre temps total d’écoute de podcasts.</string>
@@ -589,12 +589,8 @@ Language: fr
     <string name="end_of_year_story_top_categories_share_text">Mes catégories de podcasts les plus écoutés</string>
     <string name="end_of_year_story_top_categories">Vos meilleures catégories</string>
     <string name="end_of_year_story_epilogue_subtitle">N’oubliez pas de montrer votre soutien à vos créateurs de podcasts préférés et à partager ces podcasts avec vos amis</string>
-    <string name="end_of_year_story_longest_episode_share_text">L’épisode le plus long que j’ai écouté en 2023 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Mes meilleurs podcasts de 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mes meilleurs podcasts de l\'année ! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Mon podcast préféré de 2023 ! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Vous avez écouté %1$d épisodes pour une durée totale de %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">J’ai écouté %1$d podcasts différents et %2$d épisodes en 2023</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Vous avez écouté plusieurs fois une même émission…</string>
     <string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d émissions différentes et %2$d épisodes au total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">J’ai écouté %1$d catégories différentes en 2023</string>

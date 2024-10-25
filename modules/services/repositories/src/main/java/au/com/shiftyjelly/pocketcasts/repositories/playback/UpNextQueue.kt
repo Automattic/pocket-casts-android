@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.combineLatest
 import java.util.concurrent.TimeUnit
@@ -37,14 +36,14 @@ interface UpNextQueue {
     suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
     suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
-    suspend fun removeEpisode(episode: BaseEpisode)
+    suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false)
     suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     fun moveEpisode(from: Int, to: Int)
     fun changeList(episodes: List<BaseEpisode>)
     fun clearUpNext()
     fun removeAll()
     suspend fun removeAllIncludingChanges()
-    fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable
+    suspend fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
     fun contains(uuid: String): Boolean
     fun updateCurrentEpisodeState(state: State)
 

@@ -286,6 +286,10 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                     multiSelectHelper.isMultiSelecting = true
                     true
                 }
+                R.id.clear_up_next -> {
+                    onClearUpNext()
+                    true
+                }
                 else -> false
             }
         }
@@ -302,6 +306,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         playerViewModel.listDataLive.observe(viewLifecycleOwner) {
             adapter.isPlaying = it.podcastHeader.isPlaying
             toolbar.menu.findItem(R.id.menu_select)?.isVisible = it.upNextEpisodes.isNotEmpty()
+            toolbar.menu.findItem(R.id.clear_up_next)?.isVisible = it.upNextEpisodes.isNotEmpty()
         }
 
         view.isClickable = true
@@ -394,7 +399,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     override fun onClearUpNext() {
         playerViewModel.clearUpNext(context = requireContext(), upNextSource = upNextSource)
-            .showOrClear(parentFragmentManager)
+            .showClearUpNextConfirmationDialog(parentFragmentManager, tag = "up_next_clear_dialog")
     }
 
     override fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder) {

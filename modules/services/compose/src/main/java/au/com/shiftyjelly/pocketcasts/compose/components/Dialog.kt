@@ -94,7 +94,7 @@ private fun DialogTitle(text: String) {
 }
 
 @Composable
-private fun DialogText(text: String) {
+fun DialogText(text: String) {
     TextP40(
         text = text,
         modifier = Modifier

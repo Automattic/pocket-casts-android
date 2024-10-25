@@ -266,11 +266,11 @@ Language: es
     <string name="end_of_year_stories_year_completion_rate">tasa de finalización</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">De los %1$d episodios que has comenzado, has escuchado por completo un total de %2$d.</string>
     <string name="end_of_year_stories_year_completion_rate_title">Tu tasa de finalización de este año es de %1$d%%.</string>
-    <string name="end_of_year_stories_year_over_share_text">Mis escuchas de 2023, en comparación con las de 2022.</string>
     <string name="eoy_year_over_year_title_skyrocketed">En comparación con 2022, ¡tu tiempo de escucha se ha disparado!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">La vida hay que vivirla, ¿no?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Dicen que la constancia es la clave del éxito, ¡o algo así!</string>
     <string name="end_of_year_prompt_card_summary">Consulta tus estadísticas de escuchas, los pódcast principales y más.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Fue nada menos que «%1$s» de «%2$s».</string>
     <string name="end_of_year_story_longest_episode_title">El episodio más largo que escuchaste fue %1$s.</string>
     <string name="end_of_year_replay">Reproducir otra vez.</string>
     <string name="end_of_year_listening_time_title">Este fue tu tiempo total de escucha de pódcast.</string>
@@ -589,12 +589,8 @@ Language: es
     <string name="end_of_year_story_top_categories_share_text">Mis categorías de pódcast más escuchadas</string>
     <string name="end_of_year_story_top_categories">Tus categorías principales</string>
     <string name="end_of_year_story_epilogue_subtitle">No olvides compartirlos con tus amigos y mandar un saludo a tus creadores de pódcast favoritos</string>
-    <string name="end_of_year_story_longest_episode_share_text">El episodio más largo que escuché en 2023 %1$s.</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Mis pódcast favoritos de 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">¡Mis pódcast favoritos del año! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">¡Mi pódcast favorito de 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Escuchaste %1$d episodios de un total de %2$s.</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Escuché %1$d pódcast diferentes y %2$d episodios en 2023.</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Pero había uno al que siempre venías…</string>
     <string name="end_of_year_story_listened_to_numbers">Has escuchado %1$d programas diferentes y %2$d episodios en total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Escuché %1$d categorías diferentes en 2023.</string>

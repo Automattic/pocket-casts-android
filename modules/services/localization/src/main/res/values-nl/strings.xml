@@ -266,11 +266,11 @@ Language: nl
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Van de %1$d afleveringen waar je aan bent begonnen, heb je dit aantal helemaal afgekeken %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Je afrondingspercentage dit jaar was %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">Mijn luistertijd in 2023, ten opzichte van 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistentie is de sleutel tot succes… of zoiets!</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Het was niemand minder dan \'%1$s\' uit \'%2$s\'</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
@@ -589,12 +589,8 @@ Language: nl
     <string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
-    <string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in 2023 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in 2023 naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
     <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende shows en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2023 naar %1$d verschillende categorieën geluisterd</string>

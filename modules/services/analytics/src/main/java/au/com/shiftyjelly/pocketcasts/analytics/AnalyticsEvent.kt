@@ -220,7 +220,6 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED("podcast_settings_feed_error_fix_succeeded"),
     PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED("podcast_settings_feed_error_fix_failed"),
     PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED("podcast_settings_auto_download_toggled"),
-    PODCAST_SETTINGS_AUTO_DOWNLOAD_LIMIT_TOGGLED("podcast_settings_auto_download_limit_toggled"),
     PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED("podcast_settings_notifications_toggled"),
     PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED("podcast_settings_auto_add_up_next_toggled"),
     PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED("podcast_settings_auto_add_up_next_position_option_changed"),
@@ -316,6 +315,7 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_MULTI_SELECT_EXITED("up_next_multi_select_exited"),
     UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
     UP_NEXT_DISMISSED("up_next_dismissed"),
+    UP_NEXT_SHUFFLE_ENABLED("up_next_shuffle_enabled"),
 
     /* Player */
     PLAYER_SHOWN("player_shown"),
@@ -422,9 +422,9 @@ enum class AnalyticsEvent(val key: String) {
     END_OF_YEAR_STORY_SHOWN("end_of_year_story_shown"),
     END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
     END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
-    END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED("end_of_year_story_retry_button_tapped"),
     END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
     END_OF_YEAR_UPSELL_SHOWN("end_of_year_upsell_shown"),
+    END_OF_YEAR_LEARN_RATINGS_SHOWN("end_of_year_learn_ratings_shown"),
 
     /* Welcome */
     WELCOME_SHOWN("welcome_shown"),
@@ -475,7 +475,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_SHOWN("settings_auto_download_shown"),
     SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED("settings_auto_download_up_next_toggled"),
     SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED("settings_auto_download_new_episodes_toggled"),
-    SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_TOGGLED("settings_auto_download_limit_downloads_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_CHANGED("settings_auto_download_limit_downloads_changed"),
     SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED("settings_auto_download_podcasts_changed"),
     SETTINGS_AUTO_DOWNLOAD_FILTERS_CHANGED("settings_auto_download_filters_changed"),
     SETTINGS_AUTO_DOWNLOAD_ONLY_ON_WIFI_TOGGLED("settings_auto_download_only_on_wifi_toggled"),

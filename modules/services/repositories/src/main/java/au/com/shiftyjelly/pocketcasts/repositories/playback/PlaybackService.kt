@@ -243,12 +243,6 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             val isForegroundService = isForegroundService()
             val state = playbackState.state
 
-            // If we have switched to casting we need to remove the notification
-            if (isForegroundService && notification == null && playbackManager.isPlaybackRemote()) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground as player is remote")
-            }
-
             // If we are already showing a notification, update it no matter the state.
             if (notification != null && notificationHelper.isShowing(Settings.NotificationId.PLAYING.value)) {
                 Timber.d("Updating playback notification")
@@ -303,8 +297,11 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state removing notification: $removeNotification")
                         }
 
-                        @Suppress("DEPRECATION")
-                        stopForeground(removeNotification)
+                        // When paused keep the notification otherwise remove it
+                        stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
+                        if (removeNotification) {
+                            notificationManager.cancel(Settings.NotificationId.PLAYING.value)
+                        }
                     }
 
                     if (state == PlaybackStateCompat.STATE_ERROR) {
@@ -330,10 +327,6 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             useEpisodeArtwork: Boolean,
         ): Notification? {
             if (Util.isAutomotive(this@PlaybackService)) {
-                return null
-            }
-
-            if (playbackManager.isPlaybackRemote()) {
                 return null
             }
 

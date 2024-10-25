@@ -50,6 +50,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -106,6 +109,12 @@ class SubscriptionManagerImpl @Inject constructor(
 
     override fun observeSubscriptionStatus(): Flowable<Optional<SubscriptionStatus>> {
         return subscriptionStatus.toFlowable(BackpressureStrategy.LATEST)
+    }
+
+    override fun subscriptionTier(): Flow<SubscriptionTier> {
+        return observeSubscriptionStatus().asFlow().map { status ->
+            (status.get() as? SubscriptionStatus.Paid)?.tier ?: SubscriptionTier.NONE
+        }.distinctUntilChanged()
     }
 
     override fun getSubscriptionStatus(allowCache: Boolean): Single<SubscriptionStatus> {

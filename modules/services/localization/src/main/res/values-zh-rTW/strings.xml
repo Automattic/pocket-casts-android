@@ -266,11 +266,11 @@ Language: zh_TW
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">從你開始收聽的 %1$d 集起，你完整收聽了 %2$d 集</string>
     <string name="end_of_year_stories_year_completion_rate_title">你今年的完成率為 %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">我在 2023 年與 2022 年的收聽時間比較</string>
     <string name="eoy_year_over_year_title_skyrocketed">比起 2022 年，你的收聽時間可說是一飛沖天！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊啊啊…人就是要享受生活，對吧？</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">大家都說，成功的關鍵在於持之以恆…大概是這樣吧！</string>
     <string name="end_of_year_prompt_card_summary">看看你的收聽統計和最愛 Podcast 等資料吧。</string>
+    <string name="end_of_year_story_longest_episode_subtitle">除了「%2$s」的「%1$s」之外，別無其他</string>
     <string name="end_of_year_story_longest_episode_title">你收聽時間最長的一集為 %1$s</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_listening_time_title">這是你收聽 Podcast 的總時間。</string>
@@ -589,12 +589,8 @@ Language: zh_TW
     <string name="end_of_year_story_top_categories_share_text">我最常收聽的 Podcast 分類</string>
     <string name="end_of_year_story_top_categories">你最愛的分類</string>
     <string name="end_of_year_story_epilogue_subtitle">別忘了與朋友分享，並向你最喜愛的 Podcast 創作者致意</string>
-    <string name="end_of_year_story_longest_episode_share_text">我在 2023 年收聽時間最長的一集%1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">2022 年我最愛的 Podcast</string>
     <string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">2023 年我最愛的 Podcast！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集，總共 %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2023 年收聽了 %1$d 個不同的 Podcast，總共 %2$d 集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
     <string name="end_of_year_story_listened_to_numbers">你一共收聽了 %1$d 個不同節目和 %2$d 集內容</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收聽了 %1$d 個不同的分類</string>

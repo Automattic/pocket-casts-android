@@ -261,6 +261,8 @@ interface Settings {
 
     val shelfItems: UserSetting<List<ShelfItem>>
 
+    val upNextShuffle: UserSetting<Boolean>
+
     fun getVersion(): String
     fun getVersionCode(): Int
 
@@ -330,6 +332,7 @@ interface Settings {
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
     val autoDownloadUpNext: UserSetting<Boolean>
+    val autoDownloadNewEpisodes: UserSetting<Boolean>
 
     val artworkConfiguration: UserSetting<ArtworkConfiguration>
 

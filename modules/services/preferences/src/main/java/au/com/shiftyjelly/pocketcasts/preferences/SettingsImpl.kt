@@ -114,6 +114,12 @@ class SettingsImpl @Inject constructor(
         },
     )
 
+    override val upNextShuffle: UserSetting<Boolean> = UserSetting.BoolPref(
+        sharedPrefKey = "upNextShuffle",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
         val refreshDate = getLastRefreshDate()
@@ -540,6 +546,12 @@ class SettingsImpl @Inject constructor(
 
     override val autoDownloadUpNext = UserSetting.BoolPref(
         sharedPrefKey = "autoDownloadUpNext",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val autoDownloadNewEpisodes = UserSetting.BoolPref(
+        sharedPrefKey = "autoDownloadNewEpisodes",
         defaultValue = false,
         sharedPrefs = sharedPreferences,
     )

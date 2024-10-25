@@ -266,11 +266,11 @@ Language: sv_SE
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Av de %1$d avsnitt du började lyssna på lyssnade du sammanlagt på %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad i år var %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för 2023 jämfört med 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Och det sägs att kontinuitet är nyckeln till framgång … eller något i den stilen!</string>
     <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Det var ingen mindre än \"%1$s\" från \"%2$s\"</string>
     <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
@@ -589,12 +589,8 @@ Language: sv_SE
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_categories">Dina favoritkategorier</string>
     <string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
-    <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under 2023 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under 2023</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_listened_to_numbers">Du lyssnade sammanlagt på %1$d olika podcasts och %2$d avsnitt</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2023</string>
