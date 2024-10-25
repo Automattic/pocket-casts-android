@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -123,6 +124,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     lateinit var bookmarkManager: BookmarkManager
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
+    private val cleanUpViewModel: ManualCleanupViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
@@ -248,13 +250,14 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         }
 
         if (mode is Mode.Downloaded) {
-            binding?.manageDownloadsCard?.isVisible = true
-
-            binding?.manageDownloadsCard?.setContent {
-                ManageDownloadsCard(
-                    totalDownloadSize = 10,
-                    onManageDownloadsClick = { showCleanupSettings() },
-                )
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    cleanUpViewModel.state.collect { state ->
+                        state.playedDiskSpaceView?.let {
+                            updateManageDownloadsCard(it.episodesBytesSize)
+                        }
+                    }
+                }
             }
         } else {
             binding?.manageDownloadsCard?.isVisible = false
@@ -408,6 +411,20 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             menu = if (mode.showMenu) R.menu.menu_profile_list else null,
         )
         toolbar.setOnMenuItemClickListener(this)
+    }
+
+    private fun updateManageDownloadsCard(downloadedPlayedEpisodesSize: Long) {
+        binding?.manageDownloadsCard?.apply {
+            isVisible = downloadedPlayedEpisodesSize != 0L
+            if (isVisible) {
+                setContent {
+                    ManageDownloadsCard(
+                        totalDownloadSize = downloadedPlayedEpisodesSize,
+                        onManageDownloadsClick = { showCleanupSettings() },
+                    )
+                }
+            }
+        }
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
