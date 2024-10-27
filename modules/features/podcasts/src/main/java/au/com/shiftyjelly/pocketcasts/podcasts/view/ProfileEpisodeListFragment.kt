@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -416,7 +417,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     private fun updateManageDownloadsCard(downloadedEpisodesSize: Long) {
         binding?.manageDownloadsCard?.apply {
-            isVisible = downloadedEpisodesSize != 0L
+            isVisible = downloadedEpisodesSize != 0L && isDeviceRunningOnLowStorage()
             if (isVisible) {
                 setContent {
                     AppTheme(theme.activeTheme) {
