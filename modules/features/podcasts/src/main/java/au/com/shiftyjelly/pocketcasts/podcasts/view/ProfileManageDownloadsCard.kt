@@ -74,7 +74,7 @@ fun ManageDownloadsCard(
             Spacer(modifier = Modifier.height(2.dp))
 
             TextP50(
-                text = stringResource(LR.string.save_x_by_removing_played_episodes, formattedTotalDownloadSize),
+                text = stringResource(LR.string.save_space_by_managing_downloaded_episodes, formattedTotalDownloadSize),
                 color = MaterialTheme.theme.colors.primaryText02,
             )
 
