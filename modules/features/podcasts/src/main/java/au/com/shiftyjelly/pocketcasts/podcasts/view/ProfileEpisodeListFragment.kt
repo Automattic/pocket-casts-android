@@ -256,9 +256,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     cleanUpViewModel.state.collect { state ->
-                        state.playedDiskSpaceView?.let {
-                            updateManageDownloadsCard(it.episodesBytesSize)
-                        }
+                        updateManageDownloadsCard(state.diskSpaceViews.sumOf { it.episodesBytesSize })
                     }
                 }
             }
@@ -416,14 +414,14 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         toolbar.setOnMenuItemClickListener(this)
     }
 
-    private fun updateManageDownloadsCard(downloadedPlayedEpisodesSize: Long) {
+    private fun updateManageDownloadsCard(downloadedEpisodesSize: Long) {
         binding?.manageDownloadsCard?.apply {
-            isVisible = downloadedPlayedEpisodesSize != 0L
+            isVisible = downloadedEpisodesSize != 0L
             if (isVisible) {
                 setContent {
                     AppTheme(theme.activeTheme) {
                         ManageDownloadsCard(
-                            totalDownloadSize = downloadedPlayedEpisodesSize,
+                            totalDownloadSize = downloadedEpisodesSize,
                             onManageDownloadsClick = { showCleanupSettings() },
                         )
                     }
