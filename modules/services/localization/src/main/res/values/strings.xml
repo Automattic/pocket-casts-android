@@ -2190,4 +2190,10 @@
     <string name="referrals_create_subscription_failed">Could not create subscription. Please try again later.</string>
     <string name="referrals_redeem_code_failed">Could not redeem code. Please try again later.</string>
 
+    <!-- Manage Downloaded Episodes -->
+    <string name="pencil_clean_up_icon_content_description">Pencil Clean Up</string>
+    <string name="you_are_running_low_on_storage">You\'re running low on storage</string>
+    <string name="save_space_by_managing_downloaded_episodes">Save %1$s – by managing downloaded episodes.</string>
+    <string name="manage_downloads">Manage Downloads</string>
+
 </resources>
