@@ -415,7 +415,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         toolbar.setOnMenuItemClickListener(this)
     }
 
-    private fun updateManageDownloadsCard(downloadedEpisodesSize: Long) {
+    private suspend fun updateManageDownloadsCard(downloadedEpisodesSize: Long) {
         binding?.manageDownloadsCard?.apply {
             isVisible = downloadedEpisodesSize != 0L && isDeviceRunningOnLowStorage()
             if (isVisible) {

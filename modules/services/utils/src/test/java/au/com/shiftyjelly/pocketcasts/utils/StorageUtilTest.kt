@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
 import android.os.StatFs
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -18,31 +19,24 @@ class StorageUtilTest {
     }
 
     @Test
-    fun `test storage is low when available space is less than 10 percent`() {
+    fun `test storage is low when available space is less than 10 percent`() = runBlocking {
         whenever(statFs.blockCountLong).thenReturn(100L)
         whenever(statFs.blockSizeLong).thenReturn(1024L)
         whenever(statFs.availableBlocksLong).thenReturn(5L) // 5% available
 
-        val result = isDeviceLowOnFreeSpace(statFs)
+        val result = isDeviceRunningOnLowStorage(statFs)
 
         assertTrue(result)
     }
 
     @Test
-    fun `test storage is not low when available space is more than 10 percent`() {
+    fun `test storage is not low when available space is more than 10 percent`() = runBlocking {
         whenever(statFs.blockCountLong).thenReturn(100L)
         whenever(statFs.blockSizeLong).thenReturn(1024L)
         whenever(statFs.availableBlocksLong).thenReturn(20L) // 20% available
 
-        val result = isDeviceLowOnFreeSpace(statFs)
+        val result = isDeviceRunningOnLowStorage(statFs)
 
         assertFalse(result)
-    }
-
-    private fun isDeviceLowOnFreeSpace(statFs: StatFs): Boolean {
-        val totalStorage = statFs.blockCountLong * statFs.blockSizeLong
-        val availableStorage = statFs.availableBlocksLong * statFs.blockSizeLong
-
-        return availableStorage < totalStorage * 0.10
     }
 }
