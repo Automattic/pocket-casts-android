@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.stats
 
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

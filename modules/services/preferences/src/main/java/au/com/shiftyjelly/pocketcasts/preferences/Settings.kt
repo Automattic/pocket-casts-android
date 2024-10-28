@@ -261,6 +261,8 @@ interface Settings {
 
     val shelfItems: UserSetting<List<ShelfItem>>
 
+    val upNextShuffle: UserSetting<Boolean>
+
     fun getVersion(): String
     fun getVersionCode(): Int
 
@@ -552,4 +554,6 @@ interface Settings {
     val showReferralWelcome: UserSetting<Boolean>
 
     val lastEoySyncTimestamp: UserSetting<Instant>
+
+    val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 }

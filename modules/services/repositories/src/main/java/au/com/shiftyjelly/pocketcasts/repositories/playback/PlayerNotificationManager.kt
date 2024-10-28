@@ -8,6 +8,7 @@ import androidx.core.app.NotificationManagerCompat
 interface PlayerNotificationManager {
     fun enteredForeground(notification: Notification)
     fun notify(notificationId: Int, notification: Notification)
+    fun cancel(notificationId: Int)
 }
 
 class PlayerNotificationManagerImpl(context: Context) : PlayerNotificationManager {
@@ -22,5 +23,9 @@ class PlayerNotificationManagerImpl(context: Context) : PlayerNotificationManage
     @SuppressLint("MissingPermission")
     override fun notify(notificationId: Int, notification: Notification) {
         notificationManager.notify(notificationId, notification)
+    }
+
+    override fun cancel(notificationId: Int) {
+        notificationManager.cancel(notificationId)
     }
 }

@@ -8,8 +8,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.run
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -65,11 +63,11 @@ class EndOfYearSyncImpl @Inject constructor(
     }
 
     private fun isDataSynced(): Boolean {
-        return Duration.between(timestampSetting.value, clock.instant()) < Duration.ofHours(6)
+        return Duration.between(timestampSetting.value, clock.instant()) < Duration.ofDays(1)
     }
 
     private fun canSyncData(): Boolean {
-        return FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024) && syncManager.isLoggedIn()
+        return syncManager.isLoggedIn()
     }
 
     private suspend fun syncRatings() {

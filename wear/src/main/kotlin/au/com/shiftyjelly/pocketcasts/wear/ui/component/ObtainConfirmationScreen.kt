@@ -24,6 +24,7 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import com.google.android.horologist.compose.layout.ScreenScaffold
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,58 +34,62 @@ fun ObtainConfirmationScreen(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
 ) {
-    Column(
-        verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxSize(),
+    ScreenScaffold(
+        timeText = {},
     ) {
-        TextH30(
-            text = text,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onPrimary,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth(),
+        Column(
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxSize(),
         ) {
-            Button(
-                onClick = onCancel,
-                modifier = Modifier.size(52.dp),
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .background(color = MaterialTheme.colors.surface)
-                        .clip(CircleShape)
-                        .fillMaxSize(),
-                ) {
-                    Icon(
-                        painter = painterResource(IR.drawable.ic_close),
-                        tint = Color.White,
-                        contentDescription = stringResource(LR.string.cancel),
-                    )
-                }
-            }
+            TextH30(
+                text = text,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.onPrimary,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+            )
 
-            Button(
-                onClick = onConfirm,
-                modifier = Modifier.size(52.dp),
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .background(color = Color.Red)
-                        .clip(CircleShape)
-                        .fillMaxSize(),
+                Button(
+                    onClick = onCancel,
+                    modifier = Modifier.size(52.dp),
                 ) {
-                    Icon(
-                        painter = painterResource(IR.drawable.ic_check_black_24dp),
-                        tint = Color.Black,
-                        contentDescription = stringResource(LR.string.profile_confirm),
-                    )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .background(color = MaterialTheme.colors.surface)
+                            .clip(CircleShape)
+                            .fillMaxSize(),
+                    ) {
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_close),
+                            tint = Color.White,
+                            contentDescription = stringResource(LR.string.cancel),
+                        )
+                    }
+                }
+
+                Button(
+                    onClick = onConfirm,
+                    modifier = Modifier.size(52.dp),
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .background(color = Color.Red)
+                            .clip(CircleShape)
+                            .fillMaxSize(),
+                    ) {
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_check_black_24dp),
+                            tint = Color.Black,
+                            contentDescription = stringResource(LR.string.profile_confirm),
+                        )
+                    }
                 }
             }
         }

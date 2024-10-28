@@ -16,7 +16,8 @@ import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
-import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object HelpScreen {
@@ -24,24 +25,29 @@ object HelpScreen {
 }
 
 @Composable
-fun HelpScreen(columnState: ScalingLazyColumnState) {
+fun HelpScreen() {
     val viewModel = hiltViewModel<HelpScreenViewModel>()
     val state = viewModel.state.collectAsState().value
     val context = LocalContext.current
+    val columnState = rememberColumnState()
 
-    ScalingLazyColumn(columnState = columnState) {
-        item {
-            ScreenHeaderChip(text = LR.string.settings_title_help)
-        }
+    ScreenScaffold(
+        scrollState = columnState,
+    ) {
+        ScalingLazyColumn(columnState = columnState) {
+            item {
+                ScreenHeaderChip(text = LR.string.settings_title_help)
+            }
 
-        if (state == null) {
-            return@ScalingLazyColumn
-        } else if (state.isPhoneAvailable) {
-            phoneAvailableContent(
-                onEmailLogsToSupport = { viewModel.emailLogsToSupport(context) },
-            )
-        } else {
-            noPhoneAvailableContent()
+            if (state == null) {
+                return@ScalingLazyColumn
+            } else if (state.isPhoneAvailable) {
+                phoneAvailableContent(
+                    onEmailLogsToSupport = { viewModel.emailLogsToSupport(context) },
+                )
+            } else {
+                noPhoneAvailableContent()
+            }
         }
     }
 }

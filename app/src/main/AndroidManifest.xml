@@ -565,6 +565,11 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="androidx.mediarouter.media.MediaTransferReceiver"
+            android:exported="true">
+        </receiver>
+
         <service
                 android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService"
                 android:exported="true"

@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
@@ -45,8 +46,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.endofyear.Story
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
+import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -60,16 +64,28 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun TopShowsStory(
     story: Story.TopShows,
     measurements: EndOfYearMeasurements,
-) = TopShowsStory(story, measurements, initialAnimationProgress = 0f)
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
+) = TopShowsStory(
+    story = story,
+    measurements = measurements,
+    onShareStory = onShareStory,
+    controller = controller,
+    initialAnimationProgress = 0f,
+)
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TopShowsStory(
     story: Story.TopShows,
     measurements: EndOfYearMeasurements,
     initialAnimationProgress: Float,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Column(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 16.dp),
@@ -113,7 +129,12 @@ private fun TopShowsStory(
                 .verticalScroll(scrollState),
         ) {
             story.shows.forEachIndexed { index, podcast ->
-                PodcastItem(podcast, index, measurements, animationProgress.value)
+                PodcastItem(
+                    podcast = podcast,
+                    index = index,
+                    measurements = measurements,
+                    animationProgress = if (controller.isSharing) 1f else animationProgress.value,
+                )
             }
         }
         Spacer(
@@ -122,10 +143,15 @@ private fun TopShowsStory(
         Column {
             TextH10(
                 text = stringResource(LR.string.eoy_story_top_podcasts_title),
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            ShareStoryButton(onClick = {})
+            ShareStoryButton(
+                story = story,
+                controller = controller,
+                onShare = onShareStory,
+            )
         }
     }
 }
@@ -145,7 +171,7 @@ private fun PodcastItem(
     ) {
         TextH20(
             text = "#${index + 1}",
-            disableScale = true,
+            disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
             modifier = Modifier
                 .offset { IntOffset(x = (50.dp * (1f - animationProgress)).roundToPx(), y = 0) }
@@ -185,13 +211,15 @@ private fun PodcastItem(
             TextP40(
                 text = podcast.author,
                 fontSize = 15.sp,
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 maxLines = 1,
             )
             TextH20(
                 text = podcast.title,
-                disableScale = true,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
                 color = colorResource(UR.color.coolgrey_90),
                 maxLines = 2,
             )
@@ -261,7 +289,7 @@ private fun Modifier.fadeScrollingEdges(
 @Preview(device = Devices.PortraitRegular)
 @Composable
 private fun TopShowsPreview() {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 3) { measurements ->
         TopShowsStory(
             story = Story.TopShows(
                 shows = List(5) { index ->
@@ -281,9 +309,12 @@ private fun TopShowsPreview() {
                         playedEpisodeCount = Random.nextInt(60, 100),
                     )
                 },
+                podcastListUrl = null,
             ),
             measurements = measurements,
             initialAnimationProgress = 1f,
+            controller = StoryCaptureController.preview(),
+            onShareStory = {},
         )
     }
 }

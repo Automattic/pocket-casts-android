@@ -1,14 +1,27 @@
 7.76
 -----
-
+*   New Features
+    *   Add download button to playback actions
+        ([#3046](https://github.com/Automattic/pocket-casts-android/pull/3046))
+    *   Add the ability to auto download episodes after subscribing to a podcast
+        ([#3048](https://github.com/Automattic/pocket-casts-android/pull/3048))
+    *   Add support for the Catalan laguage
+        ([#3072](https://github.com/Automattic/pocket-casts-android/pull/3072))
+*   Bug Fixes
+    *   Keep the playing service in the foreground when casting
+        ([#3094](https://github.com/Automattic/pocket-casts-android/pull/3094))
+*   Updates
+    *   Move Up Next clear queue button to app bar
+        ([#3068](https://github.com/Automattic/pocket-casts-android/pull/3068))
 
 7.75
 -----
 *   Updates
     *   Add an advanced setting to display artwork in episode listing
         ([#2958](https://github.com/Automattic/pocket-casts-android/pull/2958))
-    *   Display remaining playback time using skipped chapters and playback speed
+    *   Add a setting that controls whether the remaining playback time adjusts for playback speed and skipped chapters 
         ([#2955](https://github.com/Automattic/pocket-casts-android/pull/2955))
+        ([#3044](https://github.com/Automattic/pocket-casts-android/pull/3044))
     *   Display buffer position more accurately for cached episode 
         ([#2987](https://github.com/Automattic/pocket-casts-android/pull/2987))
 *   Bug Fixes

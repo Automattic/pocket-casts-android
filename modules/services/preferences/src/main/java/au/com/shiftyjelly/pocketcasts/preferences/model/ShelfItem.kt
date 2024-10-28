@@ -41,6 +41,26 @@ enum class ShelfItem(
         showIf = { it is PodcastEpisode },
         analyticsValue = "transcript",
     ),
+    Download(
+        id = "download",
+        titleId = {
+            when {
+                it is PodcastEpisode && (it.isDownloading || it.isQueued) -> LR.string.episode_downloading
+                it is PodcastEpisode && it.isDownloaded -> LR.string.remove_downloaded_file
+                else -> LR.string.download
+            }
+        },
+        iconId = {
+            when {
+                it is PodcastEpisode && (it.isDownloading || it.isQueued) -> IR.drawable.ic_download
+                it is PodcastEpisode && it.isDownloaded -> IR.drawable.ic_downloaded_24dp
+                else -> IR.drawable.ic_download
+            }
+        },
+        subtitleId = { episode -> LR.string.player_actions_hidden_for_custom.takeIf { episode is UserEpisode } },
+        showIf = { it is PodcastEpisode },
+        analyticsValue = "download",
+    ),
     Share(
         id = "share",
         titleId = { LR.string.podcast_share_episode },

@@ -44,7 +44,7 @@ fun PocketCastsPill(
     TextH70(
         text = stringResource(id = LR.string.pocket_casts),
         color = Color.White,
-        disableScale = disableScale,
+        disableAutoScale = disableScale,
     )
 }
 

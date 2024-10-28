@@ -63,7 +63,8 @@ class ReferralsViewModelTest {
 
     @Before
     fun setUp() {
-        FeatureFlag.setEnabled(Feature.REFERRALS, true)
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, true)
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, true)
         whenever(referralOfferInfo.subscriptionWithOffer).thenReturn(mock<Subscription.Trial>())
         whenever(settings.playerOrUpNextBottomSheetState).thenReturn(flowOf(BottomSheetBehavior.STATE_COLLAPSED))
     }
@@ -86,8 +87,8 @@ class ReferralsViewModelTest {
     }
 
     @Test
-    fun `referrals gift icon is not shown if feature flag is disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.REFERRALS, false)
+    fun `referrals gift icon hidden if referrals send feature flag is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, false)
 
         initViewModel()
 
@@ -189,6 +190,17 @@ class ReferralsViewModelTest {
     }
 
     @Test
+    fun `tooltip hidden if referrals send feature flag is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS_SEND, false)
+
+        initViewModel()
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showTooltip)
+        }
+    }
+
+    @Test
     fun `profile banner is hidden if referral code is empty`() = runTest {
         initViewModel(
             referralCode = "",
@@ -242,6 +254,19 @@ class ReferralsViewModelTest {
         )
 
         viewModel.onHideBannerClick()
+
+        viewModel.state.test {
+            assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)
+        }
+    }
+
+    @Test
+    fun `profile banner is hidden if referrals claim feature is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.REFERRALS_CLAIM, false)
+        initViewModel(
+            signInState = SignInState.SignedOut,
+            referralCode = referralClaimCode,
+        )
 
         viewModel.state.test {
             assertEquals(false, (awaitItem() as UiState.Loaded).showProfileBanner)

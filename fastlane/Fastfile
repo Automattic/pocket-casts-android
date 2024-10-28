@@ -11,7 +11,7 @@ UI.user_error!('Please run fastlane via `bundle exec`') unless FastlaneCore::Hel
 ENV_FILE_NAME = '.pocketcastsandroid-env.default'
 USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
-PROTOTYPE_BUILD_DOMAIN = 'https://d2twmm2nzpx3bg.cloudfront.net'
+PROTOTYPE_BUILD_DOMAIN = 'https://cdn.a8c-ci.services'
 APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
 GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
 ORIGINALS_METADATA_DIR_PATH = File.join(PROJECT_ROOT_FOLDER, 'metadata')
@@ -34,23 +34,26 @@ BUILD_CODE_FORMATTER = Fastlane::Wpmreleasetoolkit::Versioning::SimpleBuildCodeF
 VERSION_FILE = Fastlane::Wpmreleasetoolkit::Versioning::AndroidVersionFile.new(version_properties_path: VERSION_PROPERTIES_PATH)
 
 SUPPORTED_LOCALES = [
-  { glotpress: 'ar', android: 'ar', google_play: 'ar', promo_config: {} },
-  { glotpress: 'de', android: 'de', google_play: 'de-DE',  promo_config: {} },
-  { glotpress: 'es', android: 'es', google_play: 'es-ES',  promo_config: {} },
-  { glotpress: 'es', android: 'es-rMX', google_play: 'es-MX', promo_config: {} },
-  { glotpress: 'en-gb', android: 'en-rGB', google_play: 'en-GB', promo_config: {} },
-  { glotpress: 'fr', android: 'fr', google_play: 'fr-FR', promo_config: {} },
-  { glotpress: 'fr', android: 'fr-rCA', google_play: 'fr-CA', promo_config: {} },
-  { glotpress: 'it', android: 'it', google_play: 'it-IT',  promo_config: {} },
-  { glotpress: 'ja', android: 'ja', google_play: 'ja-JP',  promo_config: {} },
-  { glotpress: 'ko', android: 'ko', google_play: 'ko-KR',  promo_config: {} },
-  { glotpress: 'nl', android: 'nl', google_play: 'nl-NL',  promo_config: {} },
-  { glotpress: 'nb', android: 'nb', google_play: 'nb-NB',  promo_config: {} },
-  { glotpress: 'pt-br', android: 'pt-rBR', google_play: 'pt-BR', promo_config: {} },
-  { glotpress: 'ru', android: 'ru', google_play: 'ru-RU',  promo_config: {} },
-  { glotpress: 'sv', android: 'sv', google_play: 'sv-SE',  promo_config: {} },
-  { glotpress: 'zh-cn', android: 'zh', google_play: 'zh-CN', promo_config: {} },
-  { glotpress: 'zh-tw', android: 'zh-rTW', google_play: 'zh-TW', promo_config: {} }
+  # There is an optional argument 'google_play' that can be used for release notes.
+  # However, we don't translate them so we can skip it.
+  { glotpress: 'ar', android: 'ar', promo_config: {} },
+  { glotpress: 'ca', android: 'ca', promo_config: {} },
+  { glotpress: 'de', android: 'de', promo_config: {} },
+  { glotpress: 'es', android: 'es', promo_config: {} },
+  { glotpress: 'es', android: 'es-rMX', promo_config: {} },
+  { glotpress: 'en-gb', android: 'en-rGB', promo_config: {} },
+  { glotpress: 'fr', android: 'fr', promo_config: {} },
+  { glotpress: 'fr', android: 'fr-rCA', promo_config: {} },
+  { glotpress: 'it', android: 'it',  promo_config: {} },
+  { glotpress: 'ja', android: 'ja',  promo_config: {} },
+  { glotpress: 'ko', android: 'ko',  promo_config: {} },
+  { glotpress: 'nl', android: 'nl',  promo_config: {} },
+  { glotpress: 'nb', android: 'nb',  promo_config: {} },
+  { glotpress: 'pt-br', android: 'pt-rBR', promo_config: {} },
+  { glotpress: 'ru', android: 'ru',  promo_config: {} },
+  { glotpress: 'sv', android: 'sv',  promo_config: {} },
+  { glotpress: 'zh-cn', android: 'zh', promo_config: {} },
+  { glotpress: 'zh-tw', android: 'zh-rTW', promo_config: {} }
 ].freeze
 
 ########################################################################
@@ -332,8 +335,16 @@ platform :android do
         skip_upload_screenshots: true,
         json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
       )
-
       release_assets << aab_artifact_path
+
+      signed_apk_artifact_path = signed_apk_artifact_path(app, version)
+      download_universal_apk_from_google_play(
+        package_name: APP_PACKAGE_NAME,
+        version_code: version_code_for_app(build_code, app),
+        destination: signed_apk_artifact_path,
+        json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+      )
+      release_assets << signed_apk_artifact_path
     end
 
     create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
@@ -517,16 +528,13 @@ platform :android do
   # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
   # @param [Bool] prerelease If true, the GitHub Release will have the prerelease flag
   #
-  private_lane :create_gh_release do |options|
-    version = options[:version]
-    prerelease = options[:prerelease] || false
-    release_assets = options[:release_assets]
-
+  private_lane :create_gh_release do |version:, prerelease: false, release_assets: []|
     create_github_release(
       repository: GH_REPOSITORY,
       version: version,
       release_notes_file_path: nil,
       prerelease: prerelease,
+      is_draft: !prerelease,
       release_assets: release_assets.join(',')
     )
   end
@@ -536,6 +544,10 @@ platform :android do
   #####################################################################################
   def aab_artifact_path(app, version)
     File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version}.aab")
+  end
+
+  def signed_apk_artifact_path(app, version)
+    File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version}.apk")
   end
 
   def bundle_output_path(app)
@@ -648,5 +660,20 @@ platform :android do
     build_code_next = BUILD_CODE_CALCULATOR.next_build_code(build_code: build_code_current)
     # Return the formatted build code
     BUILD_CODE_FORMATTER.build_code(build_code: build_code_next)
+  end
+
+  # Returns the versionCode for a given app, adjusting for offset depending if it's the mobile, automotive or wear app
+  #
+  # See also `dependencies.gradle.kts` and its `versionCodeDifferenceBetweenAppAnd*` constants where those offsets are defined
+  #
+  def version_code_for_app(build_code, app)
+    case app
+    when APPS_AUTOMOTIVE
+      (build_code.to_i + 50_000).to_s
+    when APPS_WEAR
+      (build_code.to_i + 100_000).to_s
+    else
+      build_code
+    end
   end
 end

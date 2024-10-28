@@ -142,10 +142,17 @@ class ReferralsSendGuestPassViewModelTest {
         val capturedRequest = requestCaptor.firstValue
         with(capturedRequest) {
             assertEquals(referralCode, (data as SharingRequest.Data.ReferralLink).referralCode)
-            assertEquals(SourceView.REFERRALS, source)
             assertEquals(SocialPlatform.More, platform)
             assertEquals(AnalyticsEvent.REFERRAL_PASS_SHARED, analyticsEvent)
-            assertEquals(mapOf("code" to referralCode), analyticsProperties)
+            assertEquals(
+                mapOf(
+                    "code" to referralCode,
+                    "source" to SourceView.REFERRALS.analyticsValue,
+                    "type" to "referral_link",
+                    "action" to "system_sheet",
+                ),
+                analyticsProperties,
+            )
         }
     }
 

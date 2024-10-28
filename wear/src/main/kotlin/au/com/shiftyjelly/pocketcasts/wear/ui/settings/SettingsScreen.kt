@@ -32,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberColumnState
 import com.google.android.horologist.compose.material.ToggleChip
 import com.google.android.horologist.compose.material.ToggleChipToggleControl
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -44,7 +46,6 @@ object SettingsScreen {
 
 @Composable
 fun SettingsScreen(
-    scrollState: ScalingLazyColumnState,
     signInClick: () -> Unit,
     navigateToPrivacySettings: () -> Unit,
     navigateToAbout: () -> Unit,
@@ -52,19 +53,24 @@ fun SettingsScreen(
 ) {
     val viewModel = hiltViewModel<SettingsViewModel>()
     val state by viewModel.state.collectAsState()
+    val scrollState = rememberColumnState()
 
-    Content(
+    ScreenScaffold(
         scrollState = scrollState,
-        state = state,
-        onWarnOnMeteredChanged = { viewModel.setWarnOnMeteredNetwork(it) },
-        onRefreshInBackgroundChanged = { viewModel.setRefreshPodcastsInBackground(it) },
-        signInClick = signInClick,
-        onSignOutClicked = viewModel::signOut,
-        onRefreshClicked = viewModel::refresh,
-        onPrivacyClicked = navigateToPrivacySettings,
-        onAboutClicked = navigateToAbout,
-        onHelpClicked = navigateToHelp,
-    )
+    ) {
+        Content(
+            scrollState = scrollState,
+            state = state,
+            onWarnOnMeteredChanged = { viewModel.setWarnOnMeteredNetwork(it) },
+            onRefreshInBackgroundChanged = { viewModel.setRefreshPodcastsInBackground(it) },
+            signInClick = signInClick,
+            onSignOutClicked = viewModel::signOut,
+            onRefreshClicked = viewModel::refresh,
+            onPrivacyClicked = navigateToPrivacySettings,
+            onAboutClicked = navigateToAbout,
+            onHelpClicked = navigateToHelp,
+        )
+    }
 }
 
 @Composable

@@ -6,32 +6,26 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 enum class AutoDownloadLimitSetting(
     val id: Int,
     @StringRes val titleRes: Int,
-    val analyticsString: String,
 ) {
     LATEST_EPISODE(
         id = 1,
         titleRes = LR.string.settings_auto_download_limit_latest_episode,
-        analyticsString = "latest_episode",
     ),
     TWO_LATEST_EPISODE(
         id = 2,
         titleRes = LR.string.settings_auto_download_limit_two_latest_episode,
-        analyticsString = "two_latest_episode",
     ),
     THREE_LATEST_EPISODE(
         id = 3,
         titleRes = LR.string.settings_auto_download_limit_three_latest_episode,
-        analyticsString = "three_latest_episode",
     ),
     FIVE_LATEST_EPISODE(
         id = 4,
         titleRes = LR.string.settings_auto_download_limit_five_latest_episode,
-        analyticsString = "five_latest_episode",
     ),
     TEN_LATEST_EPISODE(
         id = 5,
         titleRes = LR.string.settings_auto_download_limit_ten_latest_episode,
-        analyticsString = "ten_latest_episode",
     ),
     ;
 

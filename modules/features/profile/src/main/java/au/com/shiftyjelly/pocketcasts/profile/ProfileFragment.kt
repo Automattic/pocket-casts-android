@@ -211,7 +211,7 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
-        if (FeatureFlag.isEnabled(Feature.REFERRALS)) {
+        if (FeatureFlag.isEnabled(Feature.REFERRALS_SEND)) {
             binding.btnGift.setContent {
                 AppTheme(theme.activeTheme) {
                     ReferralsIconWithTooltip()
