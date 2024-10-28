@@ -3,6 +3,9 @@
 *   Updates
     *   Update account details header UI
         ([#3294](https://github.com/Automattic/pocket-casts-android/pull/3294))
+*   New Features
+    *   Modify avatar will use Gravatar native Quick Editor
+        ([#3055](https://github.com/Automattic/pocket-casts-android/pull/3055))
 
 7.78
 -----
