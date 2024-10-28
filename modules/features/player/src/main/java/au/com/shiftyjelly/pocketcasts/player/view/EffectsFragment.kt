@@ -53,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.distinctUntilChanged
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -274,7 +274,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
         effectsSettingsSegmentedTabBar.setContent {
             val podcastEffectsData by viewModel.effectsLive.asFlow()
-                .distinctUntilChangedBy { it.podcast }
+                .distinctUntilChanged { t1, t2 -> t1.podcast.uuid == t2.podcast.uuid && t1.podcast.playbackEffects == t2.podcast.playbackEffects }
                 .collectAsStateWithLifecycle(null)
             val podcast = podcastEffectsData?.podcast ?: return@setContent
 
