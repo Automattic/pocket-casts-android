@@ -181,6 +181,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         effects.playbackSpeed = speed
         updatedSpeed = speed
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
+        podcast.usedCustomEffectsBefore = true
         viewModel.saveEffects(effects, podcast)
 
         binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
@@ -220,12 +221,14 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             } else if (effects.trimMode != TrimMode.OFF && !isChecked) {
                 effects.trimMode = TrimMode.OFF
             }
+            podcast.usedCustomEffectsBefore = true
             viewModel.saveEffects(effects, podcast)
 
             updateTrimState()
         } else if (buttonView.id == binding.switchVolume.id) {
             trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
             effects.isVolumeBoosted = isChecked
+            podcast.usedCustomEffectsBefore = true
             viewModel.saveEffects(effects, podcast)
         }
     }
@@ -239,6 +242,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             val newTrimMode = TrimMode.values()[index + 1]
             if (effects.trimMode != newTrimMode) {
                 effects.trimMode = newTrimMode
+                podcast.usedCustomEffectsBefore = true
                 trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(PlaybackManager.AMOUNT_KEY to newTrimMode.analyticsVale))
                 viewModel.saveEffects(effects, podcast)
             }
