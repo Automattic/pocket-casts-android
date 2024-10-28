@@ -795,6 +795,7 @@ class MediaSessionManager(
                 val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)
                 if (podcast != null && podcast.overrideGlobalEffects) {
                     podcast.playbackSpeed = newSpeed
+                    podcast.usedCustomEffectsBefore = true
                     podcastManager.updatePlaybackSpeed(podcast = podcast, speed = newSpeed)
                     playbackManager.updatePlayerEffects(effects = podcast.playbackEffects)
                     return@launch
