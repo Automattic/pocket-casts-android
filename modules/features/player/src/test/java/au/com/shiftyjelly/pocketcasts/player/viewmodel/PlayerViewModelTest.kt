@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
@@ -69,6 +70,9 @@ class PlayerViewModelTest {
 
     @Mock
     private lateinit var bookmarkManager: BookmarkManager
+
+    @Mock
+    private lateinit var downloadManager: DownloadManager
 
     @Mock
     private lateinit var podcastManager: PodcastManager
@@ -192,6 +196,7 @@ class PlayerViewModelTest {
             userEpisodeManager = userEpisodeManager,
             podcastManager = podcastManager,
             bookmarkManager = bookmarkManager,
+            downloadManager = downloadManager,
             sleepTimer = sleepTimer,
             settings = settings,
             theme = theme,

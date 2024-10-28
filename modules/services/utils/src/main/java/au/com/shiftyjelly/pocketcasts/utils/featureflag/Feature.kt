@@ -163,14 +163,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
-    CUSTOM_PLAYBACK_SETTINGS(
-        key = "custom_playback_settings",
-        title = "Custom playback settings",
-        defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = true,
-    ),
     ;
 
     companion object {
