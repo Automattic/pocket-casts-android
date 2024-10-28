@@ -224,6 +224,7 @@ private fun Content(
                 OnboardingUpgradeSource.END_OF_YEAR,
                 OnboardingUpgradeSource.FILES,
                 OnboardingUpgradeSource.FOLDERS,
+                OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
                 OnboardingUpgradeSource.HEADPHONE_CONTROLS_SETTINGS,
                 OnboardingUpgradeSource.LOGIN,
                 OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION,
