@@ -97,7 +97,6 @@ dependencies {
     implementation(projects.modules.features.endofyear)
     implementation(projects.modules.features.filters)
     implementation(projects.modules.features.navigation)
-    implementation(projects.modules.features.nova)
     implementation(projects.modules.features.player)
     implementation(projects.modules.features.podcasts)
     implementation(projects.modules.features.profile)

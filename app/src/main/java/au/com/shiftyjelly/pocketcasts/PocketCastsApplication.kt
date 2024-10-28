@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.discover.worker.CuratedPodcastsSyncWorker
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
-import au.com.shiftyjelly.pocketcasts.nova.NovaLauncherBridge
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -119,8 +118,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var sleepTimerRestartWhenShakingDevice: SleepTimerRestartWhenShakingDevice
 
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
-
-    @Inject lateinit var novaLauncherBridge: NovaLauncherBridge
 
     @Inject lateinit var databaseExportHelper: DatabaseExportHelper
 
@@ -270,7 +267,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userEpisodeManager.monitorUploads(applicationContext)
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
-        novaLauncherBridge.monitorNovaLauncherIntegration()
         CuratedPodcastsSyncWorker.enqueuPeriodicWork(this)
         engageSdkBridge.registerIntegration()
 
