@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.settings.stats
+package au.com.shiftyjelly.pocketcasts.localization.helper
 
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDays

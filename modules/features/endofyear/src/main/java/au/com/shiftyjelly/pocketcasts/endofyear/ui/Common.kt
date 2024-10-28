@@ -1,16 +1,29 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -18,7 +31,10 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.R
-import au.com.shiftyjelly.pocketcasts.endofyear.Story
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
+import au.com.shiftyjelly.pocketcasts.models.to.Story
+import java.io.File
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -53,19 +69,30 @@ internal data class EndOfYearMeasurements(
     val closeButtonBottomEdge: Dp,
 ) {
     val scale = width / 393.dp
+    val smallDeviceFactor = if (width > 380.dp) 1f else 0.85f
 }
 
 @Composable
 internal fun ShareStoryButton(
-    onClick: () -> Unit,
+    story: Story,
+    controller: StoryCaptureController,
+    onShare: (File) -> Unit,
     modifier: Modifier = Modifier,
-    includePadding: Boolean = true,
 ) {
+    val scope = rememberCoroutineScope()
+
     OutlinedEoyButton(
         text = stringResource(LR.string.end_of_year_share_story),
-        onClick = onClick,
-        includePadding = includePadding,
-        modifier = modifier,
+        onClick = {
+            scope.launch {
+                val file = controller.capture(story)
+                if (file != null) {
+                    onShare(file)
+                }
+            }
+        },
+        modifier = modifier
+            .onGloballyPositioned { controller.updateButtonHeightPx(story, it.size.height) },
     )
 }
 
@@ -74,7 +101,6 @@ internal fun OutlinedEoyButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    includePadding: Boolean = true,
 ) {
     RowOutlinedButton(
         text = text,
@@ -87,13 +113,89 @@ internal fun OutlinedEoyButton(
             brush = SolidColor(colorResource(UR.color.coolgrey_90)),
         ),
         onClick = onClick,
-        includePadding = includePadding,
+        includePadding = false,
+        modifier = modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+    )
+}
+
+@Composable
+internal fun PlaybackText(
+    color: Color,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier,
+    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+) {
+    Text(
+        text = "PLAYBACK",
+        color = color,
+        fontSize = fontSize,
+        fontFamily = humaneFontFamily,
+        onTextLayout = onTextLayout,
         modifier = modifier,
     )
 }
 
 @Composable
+internal fun rememberHumaneTextFactory(
+    fontSize: TextUnit,
+    fontWeight: FontWeight = FontWeight.W500,
+): HumaneTextFactory {
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    // Humane font has a lot of empty space below first baseline
+    // that is used for lowercase characters.
+    // However, our designs use capital letters only and do not account for that empty space
+    // and we have to adjust texts' heights accordingly.
+    return remember {
+        HumaneTextFactory(
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            textHeight = density.run {
+                val firstBaseLinePx = textMeasurer.measure(
+                    text = "A",
+                    style = TextStyle(
+                        fontFamily = humaneFontFamily,
+                        fontSize = fontSize,
+                        fontWeight = fontWeight,
+                    ),
+                ).firstBaseline * 1.005f
+                firstBaseLinePx.toDp()
+            },
+        )
+    }
+}
+
+internal class HumaneTextFactory(
+    val fontSize: TextUnit,
+    val fontWeight: FontWeight,
+    val textHeight: Dp,
+) {
+    @Composable
+    fun HumaneText(
+        text: String,
+        modifier: Modifier = Modifier,
+        paddingValues: PaddingValues = PaddingValues(),
+        color: Color = colorResource(UR.color.coolgrey_90),
+    ) {
+        Text(
+            text = text,
+            color = color,
+            fontFamily = humaneFontFamily,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            maxLines = 1,
+            modifier = Modifier
+                .padding(paddingValues)
+                .requiredHeight(textHeight)
+                .then(modifier),
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
 internal fun PreviewBox(
+    currentPage: Int,
     content: @Composable (EndOfYearMeasurements) -> Unit,
 ) {
     BoxWithConstraints {
@@ -106,6 +208,10 @@ internal fun PreviewBox(
                 closeButtonBottomEdge = 44.dp,
             ),
         )
-        CloseButton(onClose = {})
+        TopControls(
+            pagerState = rememberPagerState(initialPage = currentPage, pageCount = { 11 }),
+            progress = 0f,
+            onClose = {},
+        )
     }
 }

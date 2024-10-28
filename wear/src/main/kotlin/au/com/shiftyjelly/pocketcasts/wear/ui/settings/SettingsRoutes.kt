@@ -2,16 +2,16 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.settings
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.wear.compose.navigation.composable
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationSubGraph
-import com.google.android.horologist.compose.navscaffold.scrollable
 
 fun NavGraphBuilder.settingsRoutes(navController: NavController) {
     settingsUrlScreens()
 
-    @Suppress("DEPRECATION")
-    scrollable(SettingsScreen.route) {
+    composable(
+        route = SettingsScreen.route,
+    ) {
         SettingsScreen(
-            scrollState = it.columnState,
             signInClick = { navController.navigate(authenticationSubGraph) },
             navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.route) },
             navigateToAbout = { navController.navigate(WearAboutScreen.route) },
@@ -19,22 +19,24 @@ fun NavGraphBuilder.settingsRoutes(navController: NavController) {
         )
     }
 
-    @Suppress("DEPRECATION")
-    scrollable(PrivacySettingsScreen.route) {
-        PrivacySettingsScreen(scrollState = it.columnState)
+    composable(
+        route = PrivacySettingsScreen.route,
+    ) {
+        PrivacySettingsScreen()
     }
 
-    @Suppress("DEPRECATION")
-    scrollable(WearAboutScreen.route) {
+    composable(
+        route = WearAboutScreen.route,
+    ) {
         WearAboutScreen(
-            columnState = it.columnState,
             onTermsOfServiceClick = { navController.navigate(UrlScreenRoutes.termsOfService) },
             onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) },
         )
     }
 
-    @Suppress("DEPRECATION")
-    scrollable(HelpScreen.route) {
-        HelpScreen(columnState = it.columnState)
+    composable(
+        route = HelpScreen.route,
+    ) {
+        HelpScreen()
     }
 }

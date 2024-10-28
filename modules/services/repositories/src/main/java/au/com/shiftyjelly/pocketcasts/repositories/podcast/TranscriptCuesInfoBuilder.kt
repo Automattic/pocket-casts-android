@@ -13,11 +13,11 @@ import au.com.shiftyjelly.pocketcasts.utils.exception.EmptyDataException
 import au.com.shiftyjelly.pocketcasts.utils.exception.ParsingException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.collect.ImmutableList
+import java.util.Collections
 import javax.inject.Inject
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import okhttp3.ResponseBody
-import okhttp3.internal.toImmutableList
 
 @UnstableApi
 class TranscriptCuesInfoBuilder @Inject constructor(
@@ -52,17 +52,19 @@ class TranscriptCuesInfoBuilder @Inject constructor(
                 } else {
                     // Parse json following PodcastIndex.org transcript json spec: https://github.com/Podcastindex-org/podcast-namespace/blob/main/transcripts/transcripts.md#json
                     val transcriptCues = transcriptJsonConverter.fromString(jsonString)
-                    transcriptCues.map { cue ->
-                        val startTimeUs = cue.startTime?.toMicroSeconds ?: 0
-                        val endTimeUs = cue.endTime?.toMicroSeconds ?: 0
-                        CuesWithTiming(
-                            ImmutableList.of(Cue.Builder().setText(cue.body ?: "").build()),
-                            startTimeUs,
-                            endTimeUs - startTimeUs,
-                        ).toTranscriptCuesInfo(
-                            cuesAdditionalInfo = CuesAdditionalInfo(speaker = cue.speaker),
-                        )
-                    }.toImmutableList()
+                    Collections.unmodifiableList(
+                        transcriptCues.map { cue ->
+                            val startTimeUs = cue.startTime?.toMicroSeconds ?: 0
+                            val endTimeUs = cue.endTime?.toMicroSeconds ?: 0
+                            CuesWithTiming(
+                                ImmutableList.of(Cue.Builder().setText(cue.body ?: "").build()),
+                                startTimeUs,
+                                endTimeUs - startTimeUs,
+                            ).toTranscriptCuesInfo(
+                                cuesAdditionalInfo = CuesAdditionalInfo(speaker = cue.speaker),
+                            )
+                        },
+                    )
                 }
             }
 

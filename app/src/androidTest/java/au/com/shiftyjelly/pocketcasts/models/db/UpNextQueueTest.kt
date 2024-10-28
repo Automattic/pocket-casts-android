@@ -250,4 +250,30 @@ class UpNextQueueTest {
         assertTrue("Current episode should still be first", currentEpisode?.uuid == uuids.first())
         assertTrue("Queue should be empty", upNextQueue.queueEpisodes.isEmpty())
     }
+
+    @Test
+    fun testRemoveAndShuffle() {
+        val uuids = mutableListOf<String>()
+        val episodes = mutableListOf<PodcastEpisode>()
+
+        runBlocking {
+            for (i in 0..5) {
+                val uuid = UUID.randomUUID().toString()
+                val episode = PodcastEpisode(uuid = uuid, publishedDate = Date())
+                uuids.add(uuid)
+                episodes.add(episode)
+                appDatabase.episodeDao().insert(episode)
+                upNextQueue.playLast(episode, downloadManager, null)
+            }
+
+            val initialEpisode = upNextQueue.currentEpisode
+            assertTrue("Initial current episode should be the first uuid", initialEpisode?.uuid == uuids.first())
+
+            upNextQueue.removeEpisode(initialEpisode!!, shouldShuffleUpNext = true)
+        }
+
+        val newCurrentEpisode = upNextQueue.currentEpisode
+        assertTrue("New current episode should not be the removed episode", newCurrentEpisode?.uuid != uuids.first())
+        assertTrue("New current episode should be one of the remaining episodes", uuids.contains(newCurrentEpisode?.uuid))
+    }
 }

@@ -11,6 +11,14 @@ enum class Feature(
     val hasFirebaseRemoteFlag: Boolean,
     val hasDevToggle: Boolean,
 ) {
+    SYNC_EOY_DATA_ON_STARTUP(
+        key = "sync_eoy_data_on_startup",
+        title = "Whether the End of Year data should be synced on startup",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = false,
+    ),
     END_OF_YEAR_2024(
         key = "end_of_year_2024",
         title = "End of Year 2024",
@@ -99,9 +107,17 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    REFERRALS(
-        key = "referrals",
-        title = "Referrals",
+    REFERRALS_CLAIM(
+        key = "referrals_claim",
+        title = "Referrals Claim",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    REFERRALS_SEND(
+        key = "referrals_send",
+        title = "Referrals Send",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
@@ -125,7 +141,23 @@ enum class Feature(
     ),
     AUTO_DOWNLOAD(
         key = "auto_download",
-        title = "Auto download episodes",
+        title = "Auto download episodes after subscribing to a podcast",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    UP_NEXT_SHUFFLE(
+        key = "up_next_shuffle",
+        title = "Up Next Shuffle",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    CUSTOM_PLAYBACK_SETTINGS(
+        key = "custom_playback_settings",
+        title = "Custom playback settings",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,

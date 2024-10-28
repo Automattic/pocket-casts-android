@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-09 09:54:03+0000
+Translation-Revision-Date: 2024-10-22 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="end_of_year_story_longest_episode_subtitle">从“%2$s”到“%1$s”</string>
+    <string name="end_of_year_listening_time_subtitle">播客收听总量</string>
+    <string name="eoy_story_ratings_learn_button_label">了解评分</string>
+    <string name="eoy_story_ratings_subtitle_3">您知道吗？现在可以对节目进行评分了。 对您所喜爱的创作者表达欣赏，并帮助他们获得关注！</string>
+    <string name="eoy_story_ratings_subtitle_2">感谢您与创作者社区分享反馈意见</string>
+    <string name="eoy_story_ratings_subtitle_1">哇，这么多 %1$d 星评价！ 感谢您对您所喜爱的创作者表达欣赏！</string>
+    <string name="eoy_story_ratings_title_2">哎呀！ 暂无播客评分可向您展示</string>
+    <string name="eoy_story_ratings_title_1">让我们看看您的评分！</string>
+    <string name="end_of_year_story_top_podcast_title">您的 2024 年热门播客为 %1$s</string>
+    <string name="referrals_failed_to_load_offer">很抱歉，获取您的推荐链接时出错了。</string>
+    <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
+    <string name="referrals_banner_hide_label">隐藏此横幅</string>
+    <string name="referrals_banner_long_press_label">隐藏推荐申领通行证横幅。</string>
+    <string name="end_of_year_prompt_card_title">2024 年播放记录\n可在此查看！</string>
+    <string name="settings_auto_download_limit_auto_downloads">限制自动下载次数</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">所有最新剧集</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">最新的 10 集剧集</string>
+    <string name="settings_auto_download_limit_five_latest_episode">最新的 5 集剧集</string>
+    <string name="settings_auto_download_limit_three_latest_episode">最新的 3 集剧集</string>
+    <string name="settings_auto_download_limit_two_latest_episode">最新的 2 集剧集</string>
+    <string name="settings_auto_download_limit_latest_episode">最新剧集</string>
+    <string name="settings_auto_download_limit_off">关闭</string>
+    <string name="settings_auto_download_limit">限制下载次数</string>
+    <string name="settings_auto_download_new_episodes_description">即时下载新发布的剧集，并通过设置保存剧集的数量限制来管理您的存储空间。</string>
     <string name="referrals_redeem_code_failed">无法兑换代码。 请稍后重试。</string>
     <string name="referrals_create_subscription_failed">无法创建订阅。 请稍后重试。</string>
     <string name="referrals_guest_pass_card_title">%1$s 访客通行证</string>
@@ -28,7 +52,6 @@ Language: zh_CN
     <string name="move_up">上移</string>
     <string name="search_episodes_not_found_summary">我们未搜索到任何相关剧集。 请尝试使用其他关键字。</string>
     <string name="search_episodes_not_found_title">未找到剧集</string>
-    <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="paywall_layout_reviews_review_six_date">3 月 8 日</string>
     <string name="paywall_layout_reviews_review_six_message">多年来，PC 一直是我的首选。 我也尝试过其他的播客应用程序，但因为它们在简洁性、Ul 和支持方面的不足，我最终总是会回到 PC。 如果您已经厌倦了当前所用的播客应用程序，这将尤其值得一试。</string>
     <string name="paywall_layout_reviews_review_six_title">首选播客应用程序</string>
@@ -101,13 +124,10 @@ Language: zh_CN
     <string name="share_start_position">开始时间</string>
     <string name="share_clip_too_long_message">片段超过剧集时长：%s</string>
     <string name="share_invalid_clip_message">片段开始时间必须在片段结束时间之前</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">通过 Pocket Casts Plus 解锁独家功能</string>
     <string name="go_to_next">转至下一个</string>
     <string name="go_to_previous">转至上一个</string>
     <string name="share_error_message">无法共享。 请稍后重试。</string>
     <string name="share_clip_sharing_clip">正在创建片段…</string>
-    <string name="something_went_wrong_when_sending_feedback">出错了。 请尝试重新提交您的反馈。</string>
-    <string name="thank_you_for_your_feedback">感谢您的反馈！</string>
     <string name="share_clip_create_audio_description">生成 .mp3 音频文件</string>
     <string name="share_clip_create_audio_label">创建音频文件</string>
     <string name="share_clip_edit_label">编辑片段</string>
@@ -116,24 +136,11 @@ Language: zh_CN
     <string name="share_clip_start_position">%s 开始时间</string>
     <string name="transcript_empty">文字转录稿为空。</string>
     <string name="share_link_clip">片段链接</string>
-    <string name="swipe_affordance_icon">轻扫功能图标</string>
-    <string name="feedback_form_placeholder">我想根据以下条件筛选剧集</string>
-    <string name="send_feedback_title">您希望在 Pocket Casts 的儿童个人资料中看到什么内容？</string>
-    <string name="no_thank_you">不用，谢谢</string>
-    <string name="send_feedback">发送反馈</string>
-    <string name="kids_bottom_sheet_description">当新的儿童个人资料准备就绪时，您会通过应用程序收到通知！ 想告诉我们您想看到的内容？</string>
-    <string name="thank_you_for_your_interest">感谢您的关注</string>
     <string name="share_link_bookmark">书签链接</string>
     <string name="share_link_episode_position">剧集位置链接</string>
     <string name="share_link_episode">剧集链接</string>
     <string name="share_link_podcast">播客链接</string>
     <string name="share_link_copied_feedback">已将链接复制到剪贴板</string>
-    <string name="kids_profile_face_image">儿童个人资料人脸图片</string>
-    <string name="request_early_access">请求抢先体验</string>
-    <string name="kids_profile_banner_description">仅包含儿童相关内容的新个人资料，可保持订阅界面整洁有序。</string>
-    <string name="soon_label">即将推出</string>
-    <string name="kids_profile_banner">儿童个人资料横幅</string>
-    <string name="kids_profile">儿童个人资料</string>
     <string name="pocket_casts_logo">Pocket Casts 徽标</string>
     <string name="rate_pocket_casts">为 Pocket Casts 评分</string>
     <string name="pocket_casts_champion_dialog_description">感谢您从一开始就与我们同在！ 如果您喜欢使用我们的应用程序，我们很乐意听取您的反馈意见。</string>
@@ -159,6 +166,9 @@ Language: zh_CN
     <string name="settings_advanced_cache_entire_playing_episode">缓存播放剧集</string>
     <string name="playback">播放</string>
     <string name="podcast_share_clip">片段</string>
+    <string name="episode_queued_for_download">剧集正在排队等待下载</string>
+    <string name="episode_was_removed">剧集已删除</string>
+    <string name="remove_downloaded_file">删除已下载的文件</string>
     <string name="settings_export_database_failed">数据库导出失败</string>
     <string name="settings_export_database">导出数据库</string>
     <string name="settings_sleep_timer_auto_restart_summary">如果打开，则如果您在最后一次暂停后的 5 分钟内播放了剧集，睡眠计时器将自动重启。</string>
@@ -251,23 +261,14 @@ Language: zh_CN
     <string name="bookmark_not_found">未找到书签</string>
     <string name="settings_use_dark_up_next_details">启用后，“下一个”将始终使用深色主题；禁用后，将与当前主题匹配</string>
     <string name="settings_use_dark_up_next">使用深色的“下一个”主题</string>
-    <string name="end_of_year_stories_completion_rate_share_text">我在 2023 年的完成率</string>
-    <string name="end_of_year_stories_subscribe_to_plus">订阅 Plus，了解您的收听情况与 2022 年的收听情况相比如何、其他有趣的统计信息，以及书签和文件夹等高级套餐功能。</string>
     <string name="end_of_year_stories_theres_more">更多精彩有待进一步探索！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">从最初收听的 %1$d 集开始，您总共完整收听的时长为 %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">您今年的完成率为 %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">我的 2023 年收听时长与 2022 年的比较情况</string>
     <string name="eoy_year_over_year_title_skyrocketed">相比于 2022 年，您的收听时长飙升！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊哈…生活还得继续，不是吗？</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">相比于 2022 年，您的收听时长略微减少</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">人们常说，一致性是成功的关键…或诸如此类的话！</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">相比于 2022 年，您的收听时长保持一致</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">准备在 2024 年进一步提升？</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">相比于 2022 年，您的收听时长激增 %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">查看您的收听统计数据、热门播客等。</string>
-    <string name="end_of_year_story_epilogue_title">感谢您今年收听我们的播客。\n2024 年再见！</string>
-    <string name="end_of_year_story_longest_episode_subtitle">不是其他，而正是来自“%2$s”的“%1$s”</string>
     <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>
@@ -567,6 +568,7 @@ Language: zh_CN
     <string name="onboarding_plus_feature_folders_text">将播客整理到文件夹中，让它们在所有设备中保持同步。</string>
     <string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">桌面和 Web 应用程序</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">您喜欢的 Pocket Casts 的一切，还有更多内容</string>
     <string name="onboarding_recommendations_import">导入</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">选择您喜欢的播客，或从其他播客播放器导入播客，定制您的 Pocket Casts。 您可以稍后完成此操作。</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">查找您喜欢的播客</string>
@@ -585,12 +587,8 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_epilogue_subtitle">不要忘记共享给朋友，告诉他们您最喜欢的播客创作者</string>
-    <string name="end_of_year_story_longest_episode_share_text">2023 年我收听时间最长的剧集 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">我的 2022 年热门播客</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">2023 年我最喜欢的播客！ %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">您收听了 %1$d 部剧集，共 %2$s 部</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">我在 2023 年收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收听了 %1$d 种不同的分类</string>
@@ -633,6 +631,7 @@ Language: zh_CN
     <string name="no_episodes_in_filter_x">过滤器 %1$s 中无剧集</string>
     <string name="filter_x_not_found">未找到过滤器 %1$s</string>
     <string name="must_provide_filter_name">必须提供过滤器名称</string>
+    <string name="end_of_year_launch_modal_primary_button_title">查看我的 2024 年播放记录</string>
     <string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
     <string name="settings_app_icon_halloween">万圣节</string>
     <string name="settings_show_played_summary">您已播放完的剧集仍会显示</string>

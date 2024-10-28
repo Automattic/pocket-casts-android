@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2024-10-07 15:54:03+0000
+Translation-Revision-Date: 2024-10-21 15:54:04+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="end_of_year_story_longest_episode_subtitle">Foi \"%1$s\" de \"%2$s\"</string>
+    <string name="end_of_year_listening_time_subtitle">no total ouvindo podcasts</string>
+    <string name="eoy_story_ratings_learn_button_label">Entenda as classificações</string>
+    <string name="eoy_story_ratings_subtitle_3">Sabia que agora você pode classificar programas? Compartilhe todo o seu amor por seus criadores favoritos para atrair mais ouvintes.</string>
+    <string name="eoy_story_ratings_subtitle_2">Obrigado por compartilhar seu feedback com a comunidade de criadores</string>
+    <string name="eoy_story_ratings_subtitle_1">Uau! Quantas classificações com %1$d estrelas. Obrigado por compartilhar todo o seu amor pelos seus criadores favoritos.</string>
+    <string name="eoy_story_ratings_title_2">Vish! Ainda não há classificações em podcasts</string>
+    <string name="eoy_story_ratings_title_1">Vamos ver suas classificações!</string>
+    <string name="end_of_year_story_top_podcast_title">Seu principal podcast em 2024 foi %1$s</string>
+    <string name="referrals_failed_to_load_offer">Ocorreu um erro ao buscar seu link de indicação.</string>
+    <string name="transcript_error_not_available">Não há transcrição disponível para este episódio.</string>
+    <string name="referrals_banner_hide_label">Ocultar este banner</string>
+    <string name="referrals_banner_long_press_label">Oculte o banner de aprovação da reivindicação de indicação.</string>
+    <string name="end_of_year_prompt_card_title">A retrospectiva de 2024\nestá disponível!</string>
+    <string name="settings_auto_download_limit_auto_downloads">Limitar downloads automáticos</string>
+    <string name="settings_auto_download_limit_all_latest_episodes">Todos os episódios mais recentes</string>
+    <string name="settings_auto_download_limit_ten_latest_episode">10 episódios mais recentes</string>
+    <string name="settings_auto_download_limit_five_latest_episode">5 episódios mais recentes</string>
+    <string name="settings_auto_download_limit_three_latest_episode">3 episódios mais recentes</string>
+    <string name="settings_auto_download_limit_two_latest_episode">2 episódios mais recentes</string>
+    <string name="settings_auto_download_limit_latest_episode">Episódio mais recente</string>
+    <string name="settings_auto_download_limit_off">Desativado</string>
+    <string name="settings_auto_download_limit">Limitar downloads</string>
+    <string name="settings_auto_download_new_episodes_description">Faça download de novos episódios assim que eles forem lançados, e gerencie seu armazenamento ao definir um limite de episódios salvos.</string>
     <string name="referrals_redeem_code_failed">Não foi possível resgatar o código. Tente novamente mais tarde.</string>
     <string name="referrals_create_subscription_failed">Não foi possível criar uma assinatura. Tente novamente mais tarde.</string>
     <string name="referrals_guest_pass_card_title">Passe de convidado %1$s</string>
@@ -28,7 +52,6 @@ Language: pt_BR
     <string name="move_up">Mover para cima</string>
     <string name="search_episodes_not_found_summary">Não encontramos nenhum episódio para essa pesquisa. Tente outra palavra-chave.</string>
     <string name="search_episodes_not_found_title">Nenhum episódio encontrado</string>
-    <string name="transcript_error_not_available">Não há transcrição disponível para este episódio.</string>
     <string name="paywall_layout_reviews_review_six_date">8 de março</string>
     <string name="paywall_layout_reviews_review_six_message">O PC tem sido meu preferido por anos. Já testei outros aplicativos de podcast, mas sempre volto para o PC pela simplicidade, interface de usuário e suporte. Vale a pena conferir, principalmente se você está cansado do seu aplicativo de podcast atual.</string>
     <string name="paywall_layout_reviews_review_six_title">O aplicativo ideal para podcast</string>
@@ -101,13 +124,10 @@ Language: pt_BR
     <string name="share_start_position">Início</string>
     <string name="share_clip_too_long_message">O clipe excede a duração do episódio: %s</string>
     <string name="share_invalid_clip_message">O início do clipe deve ser anterior ao final</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tenha acesso a funcionalidades exclusivas com o Pocket Casts Plus</string>
     <string name="go_to_next">Ir para seguinte</string>
     <string name="go_to_previous">Ir para anterior</string>
     <string name="share_error_message">Não foi possível compartilhar. Tente novamente mais tarde.</string>
     <string name="share_clip_sharing_clip">Criando clipe…</string>
-    <string name="something_went_wrong_when_sending_feedback">Ocorreu um erro. Tente enviar seu feedback novamente.</string>
-    <string name="thank_you_for_your_feedback">Agradecemos pelo feedback.</string>
     <string name="share_clip_create_audio_description">Gerar um arquivo de áudio .mp3</string>
     <string name="share_clip_create_audio_label">Criar arquivo de áudio</string>
     <string name="share_clip_edit_label">Editar clipe</string>
@@ -116,24 +136,11 @@ Language: pt_BR
     <string name="share_clip_start_position">Início de %s</string>
     <string name="transcript_empty">Transcrição em branco.</string>
     <string name="share_link_clip">Link do clipe</string>
-    <string name="swipe_affordance_icon">Deslizar ícone de acessibilidade</string>
-    <string name="feedback_form_placeholder">Gostaria de filtrar episódios por</string>
-    <string name="send_feedback_title">O que você gostaria de ver em um perfil infantil do Pocket Casts?</string>
-    <string name="no_thank_you">Não. Obrigado.</string>
-    <string name="send_feedback">Enviar feedback</string>
-    <string name="kids_bottom_sheet_description">Você receberá uma notificação pelo aplicativo quando o novo perfil infantil estiver pronto! Quer nos contar o que você gostaria de ver?</string>
-    <string name="thank_you_for_your_interest">Agradecemos o seu interesse</string>
     <string name="share_link_bookmark">Link de favorito</string>
     <string name="share_link_episode_position">Link de posição do episódio</string>
     <string name="share_link_episode">Link do episódio</string>
     <string name="share_link_podcast">Link do podcast</string>
     <string name="share_link_copied_feedback">Link de copiado para a área de transferência</string>
-    <string name="kids_profile_face_image">Imagem de rosto do perfil infantil</string>
-    <string name="request_early_access">Solicitar acesso antecipado</string>
-    <string name="kids_profile_banner_description">Um novo perfil com conteúdo exclusivo para crianças para manter suas assinaturas organizadas.</string>
-    <string name="soon_label">Em breve</string>
-    <string name="kids_profile_banner">Banner do perfil infantil</string>
-    <string name="kids_profile">Perfil infantil</string>
     <string name="pocket_casts_logo">Logotipo do Pocket Casts</string>
     <string name="rate_pocket_casts">Avaliar o Pocket Casts</string>
     <string name="pocket_casts_champion_dialog_description">Obrigado por estar conosco desde o início! Se você gosta de usar nosso aplicativo, não deixe de compartilhar seu feedback conosco.</string>
@@ -159,6 +166,9 @@ Language: pt_BR
     <string name="settings_advanced_cache_entire_playing_episode">Episódio de reprodução em cache</string>
     <string name="playback">Reprodução</string>
     <string name="podcast_share_clip">Clipe</string>
+    <string name="episode_queued_for_download">Episódio na fila para download</string>
+    <string name="episode_was_removed">Episódio removido</string>
+    <string name="remove_downloaded_file">Remover arquivo baixado</string>
     <string name="settings_export_database_failed">Falha ao exportar banco de dados</string>
     <string name="settings_export_database">Exportar banco de dados</string>
     <string name="settings_sleep_timer_auto_restart_summary">Quando ativado, o temporizador será reiniciado automaticamente se você reproduzir um episódio dentro de cinco minutos após a última pausa.</string>
@@ -251,23 +261,14 @@ Language: pt_BR
     <string name="bookmark_not_found">Favorito não encontrado</string>
     <string name="settings_use_dark_up_next_details">Com essa opção ativada, a lista Próximos sempre usará o tema escuro. Quando desativada, a lista usará o tema atual.</string>
     <string name="settings_use_dark_up_next">Usar tema escuro na fila Próximos</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Minha taxa de conclusão em 2023</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Assine o Plus e veja uma comparação do seu streaming neste ano e em 2022, outras estatísticas divertidas e funcionalidades Premium, como favoritos e pastas.</string>
     <string name="end_of_year_stories_theres_more">E tem mais!</string>
     <string name="end_of_year_stories_year_completion_rate">taxa de conclusão</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Dos %1$d episódios que você começou, você concluiu um total de %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Sua taxa de conclusão este ano foi de %1$d%%</string>
-    <string name="end_of_year_stories_year_over_share_text">Meu tempo de streaming em 2023 em comparação com 2022</string>
     <string name="eoy_year_over_year_title_skyrocketed">Em comparação com 2022, seu tempo de streaming disparou!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Poxa… tem sempre algo para se viver, né?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Em comparação com 2022, seu tempo de streaming diminuiu um pouco</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">E dizem que continuidade é a chave do sucesso… ou algo parecido.</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Em comparação com 2022, seu tempo de streaming permaneceu bastante consistente</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Tudo pronto para se superar em 2024?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Em comparação com 2022, seu tempo de streaming aumentou %1$s%%</string>
     <string name="end_of_year_prompt_card_summary">Veja suas estatísticas de streaming, principais podcasts e muito mais.</string>
-    <string name="end_of_year_story_epilogue_title">Agradecemos por nos escolher neste ano.\nNos vemos em 2024!</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Não podia ser outro senão \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_story_longest_episode_title">O episódio mais longo que você ouviu foi %1$s</string>
     <string name="end_of_year_replay">Ouvir de novo</string>
     <string name="end_of_year_listening_time_title">Este foi o seu tempo total ouvindo podcasts.</string>
@@ -567,6 +568,7 @@ Language: pt_BR
     <string name="onboarding_plus_feature_folders_text">Organize seus podcasts em pastas e mantenha a sincronização em todos os seus dispositivos.</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Ouça seus podcasts em mais lugares com os apps para Windows, macOS e Web.</string>
     <string name="onboarding_plus_feature_desktop_and_web_apps_title">Aplicativos para desktop e web</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tudo o que você adora no Pocket Casts e muito mais</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Deixe o Pocket Casts com a sua cara. Basta selecionar seus podcasts favoritos ou importá-los de outro reprodutor de podcast. Você pode fazer isso a qualquer momento.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Encontre seus podcasts favoritos</string>
@@ -585,12 +587,8 @@ Language: pt_BR
     <string name="end_of_year_story_top_categories_share_text">Categorias dos podcasts que mais ouvi</string>
     <string name="end_of_year_story_top_categories">Suas principais categorias</string>
     <string name="end_of_year_story_epilogue_subtitle">Não esqueça de compartilhar com seus amigos e agradecer a seus criadores favoritos</string>
-    <string name="end_of_year_story_longest_episode_share_text">O episódio mais longo que eu ouvi em 2023 %1$s</string>
-    <string name="end_of_year_story_top_podcasts_list_title">Meus principais podcasts de 2022</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meus principais podcasts do ano! %1$s</string>
-    <string name="end_of_year_story_top_podcast_share_text">Meu podcast favorito de 2023! %1$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Você ouviu %1$d episódios em um total de %2$s</string>
-    <string name="end_of_year_story_listened_to_numbers_share_text">Eu ouvi %1$d podcasts diferentes e %2$d episódios em 2023</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Mas tinha um que sempre fazia você pedir bis…</string>
     <string name="end_of_year_story_listened_to_numbers">Você ouviu %1$d programas diferentes e %2$d episódios no total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Eu ouvi %1$d categorias diferentes em 2023</string>
@@ -633,6 +631,7 @@ Language: pt_BR
     <string name="no_episodes_in_filter_x">Nenhum episódio no filtro %1$s</string>
     <string name="filter_x_not_found">Filtro %1$s não encontrado</string>
     <string name="must_provide_filter_name">É necessário fornecer um nome de filtro</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Ver minha retrospectiva de 2024</string>
     <string name="end_of_year_launch_modal_summary">Veja seus principais podcasts, categorias, estatísticas de reprodução e muito mais. Compartilhe com amigos e divulgue seus criadores favoritos!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Os episódios que você já terminou de reproduzir continuarão sendo exibidos</string>

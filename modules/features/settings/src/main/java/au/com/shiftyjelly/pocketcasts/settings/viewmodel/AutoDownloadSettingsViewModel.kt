@@ -63,8 +63,8 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         setLimitDownloads(value)
 
         analyticsTracker.track(
-            AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_TOGGLED,
-            mapOf("value" to value.analyticsString),
+            AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_CHANGED,
+            mapOf("value" to AutoDownloadLimitSetting.getNumberOfEpisodes(value)),
         )
     }
 

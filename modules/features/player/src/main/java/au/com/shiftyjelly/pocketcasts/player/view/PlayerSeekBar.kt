@@ -29,6 +29,7 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
     private var duration = Duration.ZERO
     private var chapters = Chapters()
     private var playbackSpeed = 1.0
+    private var adjustDuration = false
     private val seekBar = view.findViewById(R.id.seekBarInternal) as AppCompatSeekBar
     private val elapsedTimeText = view.findViewById(R.id.elapsedTime) as TextView
     private val remainingTimeText = view.findViewById(R.id.remainingTime) as TextView
@@ -50,6 +51,11 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
 
     init {
         setupSeekBar()
+    }
+
+    fun setAdjustDuration(adjust: Boolean) {
+        this.adjustDuration = adjust
+        updateTextViews()
     }
 
     fun setCurrentTime(currentTime: Duration) {
@@ -131,14 +137,24 @@ class PlayerSeekBar @JvmOverloads constructor(context: Context, attrs: Attribute
             val elapsedTime = currentTime.toHhMmSs()
             elapsedTimeText.text = currentTime.toHhMmSs()
             elapsedTimeText.contentDescription = resources.getString(LR.string.player_played_up_to, elapsedTime)
-            val remaingingTime = (-remainingDuration()).toHhMmSs()
+            val timeLeft = remainingDuration()
+            val remaingingTime = buildString {
+                if (timeLeft > Duration.ZERO) {
+                    append('-')
+                }
+                append(timeLeft.toHhMmSs())
+            }
             remainingTimeText.text = remaingingTime
             remainingTimeText.contentDescription = resources.getString(LR.string.player_time_remaining, remaingingTime.removePrefix("-"))
         }
     }
 
     private fun remainingDuration(): Duration {
-        return (duration - currentTime - chapters.skippedChaptersDuration(currentTime)) / playbackSpeed
+        return if (adjustDuration) {
+            (duration - currentTime - chapters.skippedChaptersDuration(currentTime)) / playbackSpeed
+        } else {
+            duration - currentTime
+        }.coerceAtLeast(Duration.ZERO)
     }
 
     interface OnUserSeekListener {

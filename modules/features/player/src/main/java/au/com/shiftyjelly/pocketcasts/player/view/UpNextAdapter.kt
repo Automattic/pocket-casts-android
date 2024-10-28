@@ -6,7 +6,9 @@ import android.content.res.ColorStateList
 import android.graphics.ColorFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.annotation.ColorInt
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
@@ -35,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -44,6 +48,7 @@ import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.value.LottieValueCallback
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class UpNextAdapter(
@@ -154,26 +159,58 @@ class UpNextAdapter(
     }
 
     inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.btnClear.setOnClickListener { listener.onClearUpNext() }
-        }
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
-                btnClear.isEnabled = header.episodeCount > 0
                 emptyUpNextContainer.isVisible = header.episodeCount == 0
                 val time = TimeHelper.getTimeDurationShortString(timeMs = (header.totalTimeSecs * 1000).toLong(), context = root.context)
-                btnClear.isVisible = playbackManager.getCurrentEpisode() != null
-                lblUpNextTime.isVisible = playbackManager.getCurrentEpisode() != null
+                lblUpNextTime.isVisible = hasEpisodeInProgress()
                 lblUpNextTime.text = if (header.episodeCount == 0) {
                     root.resources.getString(LR.string.player_up_next_time_left, time)
                 } else {
                     root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
+                shuffle.isVisible = hasEpisodeInProgress() && FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
+                shuffle.updateShuffleButton()
+
+                shuffle.setOnClickListener {
+                    val newValue = !settings.upNextShuffle.value
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
+
+                    settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+
+                    shuffle.updateShuffleButton()
+                }
+
                 root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
         }
+
+        private fun ImageButton.updateShuffleButton() {
+            if (!FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)) return
+
+            val isEnabled = settings.upNextShuffle.value
+
+            this.setImageResource(if (isEnabled) IR.drawable.shuffle_enabled else IR.drawable.shuffle)
+
+            this.contentDescription = context.getString(
+                if (isEnabled) LR.string.up_next_shuffle_disable_button_content_description else LR.string.up_next_shuffle_button_content_description,
+            )
+
+            this.setImageTintList(
+                ColorStateList.valueOf(
+                    if (isEnabled) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
+                ),
+            )
+
+            TooltipCompat.setTooltipText(
+                this,
+                context.getString(LR.string.up_next_shuffle_button_content_description),
+            )
+        }
+
+        private fun hasEpisodeInProgress() = playbackManager.getCurrentEpisode() != null
     }
 
     inner class PlayingViewHolder(val binding: AdapterUpNextPlayingBinding) : RecyclerView.ViewHolder(binding.root) {

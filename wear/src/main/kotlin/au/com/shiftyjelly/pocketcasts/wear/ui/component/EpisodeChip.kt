@@ -110,15 +110,12 @@ fun EpisodeChip(
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colors.onPrimary,
                     style = MaterialTheme.typography.button.merge(
-                        @Suppress("DEPRECATION")
-                        (
-                            TextStyle(
-                                platformStyle = PlatformTextStyle(
-                                    // So we can align the top of the text as closely as possible to the image
-                                    includeFontPadding = false,
-                                ),
-                            )
+                        TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                // So we can align the top of the text as closely as possible to the image
+                                includeFontPadding = false,
                             ),
+                        ),
                     ),
                     maxLines = 2,
                 )

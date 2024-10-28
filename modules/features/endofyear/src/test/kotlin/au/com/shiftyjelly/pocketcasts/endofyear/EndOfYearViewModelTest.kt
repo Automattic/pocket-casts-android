@@ -3,30 +3,40 @@ package au.com.shiftyjelly.pocketcasts.endofyear
 import app.cash.turbine.Turbine
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.CompletionRate
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.Cover
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.Ending
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.NumberOfShows
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.PlusInterstitial
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.Ratings
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.TopShow
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.TopShows
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.TotalTime
-import au.com.shiftyjelly.pocketcasts.endofyear.Story.YearVsYear
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
+import au.com.shiftyjelly.pocketcasts.models.to.Story
+import au.com.shiftyjelly.pocketcasts.models.to.Story.CompletionRate
+import au.com.shiftyjelly.pocketcasts.models.to.Story.Cover
+import au.com.shiftyjelly.pocketcasts.models.to.Story.Ending
+import au.com.shiftyjelly.pocketcasts.models.to.Story.LongestEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.Story.NumberOfShows
+import au.com.shiftyjelly.pocketcasts.models.to.Story.PlusInterstitial
+import au.com.shiftyjelly.pocketcasts.models.to.Story.Ratings
+import au.com.shiftyjelly.pocketcasts.models.to.Story.TopShow
+import au.com.shiftyjelly.pocketcasts.models.to.Story.TopShows
+import au.com.shiftyjelly.pocketcasts.models.to.Story.TotalTime
+import au.com.shiftyjelly.pocketcasts.models.to.Story.YearVsYear
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.list.PodcastList
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import java.time.Year
+import java.util.Date
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -44,6 +54,7 @@ class EndOfYearViewModelTest {
 
     private val endOfYearSync = FakeEndOfYearSync()
     private val endOfYearManager = FakeEofYearManager()
+    private val listServiceManager = FakeListServiceManager()
     private val subscriptionTier = MutableStateFlow(SubscriptionTier.PLUS)
 
     private val stats = EndOfYearStats(
@@ -82,9 +93,14 @@ class EndOfYearViewModelTest {
     fun setUp() {
         viewModel = EndOfYearViewModel(
             year = Year.of(1000),
+            topListTitle = "Top list title",
+            source = StoriesFragment.StoriesSource.UNKNOWN,
             endOfYearSync = endOfYearSync,
             endOfYearManager = endOfYearManager,
             subscriptionManager = mock { on { subscriptionTier() }.doReturn(subscriptionTier) },
+            listServiceManager = listServiceManager,
+            sharingClient = FakeSharingClient(),
+            analyticsTracker = AnalyticsTracker.test(),
         )
     }
 
@@ -265,8 +281,28 @@ class EndOfYearViewModelTest {
             val story = awaitStory<TopShows>()
 
             assertEquals(
-                TopShows(stats.topPodcasts),
+                TopShows(stats.topPodcasts, podcastListUrl = null),
                 story,
+            )
+        }
+    }
+
+    @Test
+    fun `top shows with podcast list link`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+
+        viewModel.syncData()
+        viewModel.uiState.test {
+            assertEquals(
+                TopShows(stats.topPodcasts, podcastListUrl = null),
+                awaitStory<TopShows>(),
+            )
+
+            listServiceManager.podcastListUrl.complete("podcast-list-url")
+            assertEquals(
+                TopShows(stats.topPodcasts, podcastListUrl = "podcast-list-url"),
+                awaitStory<TopShows>(),
             )
         }
     }
@@ -447,20 +483,218 @@ class EndOfYearViewModelTest {
         }
     }
 
+    @Test
+    fun `auto switch stories`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        viewModel.switchStory.test {
+            expectNoEvents()
+
+            viewModel.onStoryChanged(stories.getStoryOfType<Cover>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<NumberOfShows>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<TopShow>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<TopShows>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<Ratings>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<TotalTime>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<LongestEpisode>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<PlusInterstitial>())
+            expectNoEvents()
+
+            viewModel.onStoryChanged(stories.getStoryOfType<YearVsYear>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<CompletionRate>())
+            assertEquals(Unit, awaitItem())
+
+            viewModel.onStoryChanged(stories.getStoryOfType<Ending>())
+            assertEquals(Unit, awaitItem())
+        }
+    }
+
+    @Test
+    fun `resume and pause stories auto switching`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        viewModel.switchStory.test {
+            expectNoEvents()
+
+            // Initially switching should be paused
+            viewModel.onStoryChanged(stories.getStoryOfType<Cover>())
+            expectNoEvents()
+
+            // Resume after pause
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            assertEquals(Unit, awaitItem())
+
+            // Pause after resume
+            viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            viewModel.onStoryChanged(stories.getStoryOfType<NumberOfShows>())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `pause story auto progress as long as there is at least one reason`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        viewModel.switchStory.test {
+            expectNoEvents()
+
+            // Initially switching should be paused
+            viewModel.onStoryChanged(stories.getStoryOfType<Cover>())
+            expectNoEvents()
+
+            viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory)
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            expectNoEvents()
+
+            viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            expectNoEvents()
+
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory)
+            viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
+            assertEquals(Unit, awaitItem())
+        }
+    }
+
+    @Test
+    fun `get index of next story for paid account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.PLUS)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(1, viewModel.getNextStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(2, viewModel.getNextStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(3, viewModel.getNextStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(4, viewModel.getNextStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(5, viewModel.getNextStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(6, viewModel.getNextStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(7, viewModel.getNextStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(8, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(9, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(null, viewModel.getNextStoryIndex(stories.indexOf<Ending>()))
+    }
+
+    @Test
+    fun `get index of previous story for paid account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.PLUS)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(null, viewModel.getPreviousStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(0, viewModel.getPreviousStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(1, viewModel.getPreviousStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(2, viewModel.getPreviousStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(3, viewModel.getPreviousStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(4, viewModel.getPreviousStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(5, viewModel.getPreviousStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(8, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
+    }
+
+    @Test
+    fun `get index of next story for free account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(1, viewModel.getNextStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(2, viewModel.getNextStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(3, viewModel.getNextStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(4, viewModel.getNextStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(5, viewModel.getNextStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(6, viewModel.getNextStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(7, viewModel.getNextStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(null, viewModel.getNextStoryIndex(stories.indexOf<Ending>()))
+    }
+
+    @Test
+    fun `get index of previous story for free account`() = runTest {
+        endOfYearSync.isSynced.add(true)
+        endOfYearManager.stats.add(stats)
+        subscriptionTier.emit(SubscriptionTier.NONE)
+
+        viewModel.syncData()
+        val stories = (viewModel.uiState.first() as UiState.Synced).stories
+
+        assertEquals(null, viewModel.getPreviousStoryIndex(stories.indexOf<Cover>()))
+        assertEquals(0, viewModel.getPreviousStoryIndex(stories.indexOf<NumberOfShows>()))
+        assertEquals(1, viewModel.getPreviousStoryIndex(stories.indexOf<TopShow>()))
+        assertEquals(2, viewModel.getPreviousStoryIndex(stories.indexOf<TopShows>()))
+        assertEquals(3, viewModel.getPreviousStoryIndex(stories.indexOf<Ratings>()))
+        assertEquals(4, viewModel.getPreviousStoryIndex(stories.indexOf<TotalTime>()))
+        assertEquals(5, viewModel.getPreviousStoryIndex(stories.indexOf<LongestEpisode>()))
+        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
+    }
+
     private suspend fun TurbineTestContext<UiState>.awaitStories(): List<Story> {
         return (awaitItem() as UiState.Synced).stories
     }
 
     private suspend inline fun <reified T : Story> TurbineTestContext<UiState>.awaitStory(): T {
-        return awaitStories().filterIsInstance<T>().single()
+        return awaitStories().getStoryOfType<T>()
+    }
+
+    private inline fun <reified T : Story> List<Story>.getStoryOfType(): T {
+        return filterIsInstance<T>().single()
+    }
+
+    private inline fun <reified T : Story> List<Story>.indexOf(): Int {
+        return indexOfFirst { it is T }
     }
 
     private inline fun <reified T : Story> assertHasStory(stories: List<Story>) {
-        assertTrue(stories.filterIsInstance<PlusInterstitial>().isNotEmpty())
+        assertTrue(stories.filterIsInstance<T>().isNotEmpty())
     }
 
     private inline fun <reified T : Story> assertDoesNotHaveStory(stories: List<Story>) {
-        assertTrue(stories.filterIsInstance<PlusInterstitial>().isEmpty())
+        assertTrue(stories.filterIsInstance<T>().isEmpty())
     }
 
     private class FakeEofYearManager : EndOfYearManager {
@@ -483,5 +717,37 @@ class EndOfYearViewModelTest {
         }
 
         override suspend fun reset() = Unit
+    }
+
+    private class FakeListServiceManager : ListServiceManager {
+        val podcastListUrl = CompletableDeferred<String>()
+
+        override suspend fun createPodcastList(
+            title: String,
+            description: String,
+            podcasts: List<Podcast>,
+            date: Date,
+            serverSecret: String,
+        ) = podcastListUrl.await()
+
+        override suspend fun openPodcastList(listId: String) = PodcastList(
+            title = "",
+            description = "",
+            podcasts = emptyList(),
+            date = null,
+            hash = null,
+        )
+
+        override fun extractShareListIdFromWebUrl(webUrl: String) = ""
+    }
+
+    private class FakeSharingClient : StorySharingClient {
+        override suspend fun shareStory(request: SharingRequest): SharingResponse {
+            return SharingResponse(
+                isSuccsessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
+        }
     }
 }

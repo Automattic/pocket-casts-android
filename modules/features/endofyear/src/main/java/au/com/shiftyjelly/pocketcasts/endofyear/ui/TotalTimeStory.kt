@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -22,8 +23,11 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.endofyear.Story
-import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
+import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
+import au.com.shiftyjelly.pocketcasts.localization.helper.StatsHelper
+import au.com.shiftyjelly.pocketcasts.models.to.Story
+import dev.shreyaspatil.capturable.capturable
+import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -33,13 +37,17 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TotalTimeStory(
     story: Story.TotalTime,
     measurements: EndOfYearMeasurements,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
 ) {
     Box(
         modifier = Modifier
+            .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge),
@@ -50,13 +58,18 @@ internal fun TotalTimeStory(
                 TextH10(
                     text = texts.subtitle,
                     color = colorResource(UR.color.coolgrey_90),
-                    disableScale = true,
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    fontScale = measurements.smallDeviceFactor,
+                    disableAutoScale = true,
+                    modifier = Modifier.padding(horizontal = 24.dp),
                 )
             }[0].measure(constraints)
 
             val shareButton = subcompose("share-button") {
-                ShareStoryButton(onClick = {})
+                ShareStoryButton(
+                    story = story,
+                    controller = controller,
+                    onShare = onShareStory,
+                )
             }[0].measure(constraints)
 
             val titleConstraints = constraints.copy(
@@ -127,12 +140,14 @@ private data class ListeningTimeTexts(
 private fun TotalTimePreview(
     @PreviewParameter(PlaybackTimeProvider::class) duration: Duration,
 ) {
-    PreviewBox { measurements ->
+    PreviewBox(currentPage = 5) { measurements ->
         TotalTimeStory(
             story = Story.TotalTime(
                 duration = duration,
             ),
             measurements = measurements,
+            controller = StoryCaptureController.preview(),
+            onShareStory = {},
         )
     }
 }

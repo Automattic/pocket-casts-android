@@ -55,7 +55,7 @@ fun ChaptersPage(
                 onSelectionChange = onSelectionChange,
                 onClick = { onChapterClick(state.chapter) },
                 onUrlClick = { onUrlClick(state.chapter) },
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
             )
             if (index < chapters.lastIndex) {
                 Divider(
