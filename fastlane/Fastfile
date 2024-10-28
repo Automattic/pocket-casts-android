@@ -532,7 +532,7 @@ platform :android do
     create_github_release(
       repository: GH_REPOSITORY,
       version: version,
-      release_notes_file_path: nil,
+      release_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH,
       prerelease: prerelease,
       is_draft: !prerelease,
       release_assets: release_assets.join(',')
