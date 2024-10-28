@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -55,6 +57,7 @@ class PodcastEffectsViewModel
     fun updateTrimSilence(trimMode: TrimMode) {
         val podcast = this.podcast.value ?: return
         launch {
+            podcast.usedCustomEffectsBefore = true
             podcastManager.updateTrimMode(podcast, trimMode)
             if (shouldUpdatePlaybackManager()) {
                 playbackManager.updatePlayerEffects(podcast.playbackEffects)
@@ -65,6 +68,7 @@ class PodcastEffectsViewModel
     fun updateBoostVolume(boostVolume: Boolean) {
         val podcast = this.podcast.value ?: return
         launch {
+            podcast.usedCustomEffectsBefore = true
             podcastManager.updateVolumeBoosted(podcast, boostVolume)
             if (shouldUpdatePlaybackManager()) {
                 playbackManager.updatePlayerEffects(podcast.playbackEffects)
@@ -89,6 +93,7 @@ class PodcastEffectsViewModel
     private fun changePlaybackSpeed(speed: Double) {
         val podcast = this.podcast.value ?: return
         val roundedSpeed = speed.roundedSpeed()
+        podcast.usedCustomEffectsBefore = true
         podcastManager.updatePlaybackSpeed(podcast, roundedSpeed)
         updatedSpeed = roundedSpeed
         if (shouldUpdatePlaybackManager()) {
