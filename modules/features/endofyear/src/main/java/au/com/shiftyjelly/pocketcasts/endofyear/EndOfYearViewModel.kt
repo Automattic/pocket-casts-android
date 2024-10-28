@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
@@ -240,10 +240,10 @@ class EndOfYearViewModel @AssistedInject constructor(
         )
     }
 
-    internal fun trackStoriesClosed() {
+    internal fun trackStoriesClosed(source: String) {
         analyticsTracker.track(
             AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
-            mapOf("source" to "close_button"),
+            mapOf("source" to source),
         )
     }
 

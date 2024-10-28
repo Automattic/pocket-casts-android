@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.timber)
 
+    implementation(projects.modules.features.account)
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)

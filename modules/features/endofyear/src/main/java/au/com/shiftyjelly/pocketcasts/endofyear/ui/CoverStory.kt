@@ -63,7 +63,7 @@ internal fun CoverStory(
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .offset(x = 26.dp, y = 52.dp)
+                .offset(x = 26.dp, y = measurements.closeButtonBottomEdge + 8.dp)
                 .size(width = 172.dp, height = 163.dp),
         )
         Image(

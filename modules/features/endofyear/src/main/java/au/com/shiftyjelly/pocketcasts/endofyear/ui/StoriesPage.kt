@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,6 +69,7 @@ internal fun StoriesPage(
     state: UiState,
     pagerState: PagerState,
     controller: StoryCaptureController,
+    insets: WindowInsets,
     onChangeStory: (Boolean) -> Unit,
     onShareStory: (Story, File) -> Unit,
     onHoldStory: () -> Unit,
@@ -86,6 +90,16 @@ internal fun StoriesPage(
         var isTextSizeComputed by remember { mutableStateOf(false) }
         var coverFontSize by remember { mutableStateOf(24.sp) }
         var coverTextHeight by remember { mutableStateOf(0.dp) }
+        val measurements = remember(maxWidth, maxHeight, insets, coverFontSize, coverTextHeight) {
+            EndOfYearMeasurements(
+                width = maxWidth,
+                height = maxHeight,
+                statusBarInsets = insets,
+                coverFontSize = coverFontSize,
+                coverTextHeight = coverTextHeight,
+                closeButtonBottomEdge = density.run { insets.getTop(density).toDp() } + 36.dp,
+            )
+        }
 
         if (state is UiState.Failure) {
             ErrorMessage(onRetry)
@@ -94,13 +108,7 @@ internal fun StoriesPage(
         } else if (state is UiState.Synced) {
             Stories(
                 stories = state.stories,
-                measurements = EndOfYearMeasurements(
-                    width = this@BoxWithConstraints.maxWidth,
-                    height = this@BoxWithConstraints.maxHeight,
-                    closeButtonBottomEdge = 44.dp,
-                    coverFontSize = coverFontSize,
-                    coverTextHeight = coverTextHeight,
-                ),
+                measurements = measurements,
                 controller = controller,
                 pagerState = pagerState,
                 onChangeStory = onChangeStory,
@@ -113,7 +121,12 @@ internal fun StoriesPage(
             )
         }
 
-        TopControls(pagerState, state.storyProgress, onClose)
+        TopControls(
+            pagerState = pagerState,
+            progress = state.storyProgress,
+            measurements = measurements,
+            onClose = onClose,
+        )
 
         // Use an invisible 'PLAYBACK' text to compute an appropriate font size.
         // The font should occupy the whole viewport's width with some padding.
@@ -246,6 +259,7 @@ private fun Stories(
 internal fun BoxScope.TopControls(
     pagerState: PagerState,
     progress: Float,
+    measurements: EndOfYearMeasurements,
     onClose: () -> Unit,
 ) {
     Column(
@@ -253,7 +267,8 @@ internal fun BoxScope.TopControls(
         modifier = Modifier
             .align(Alignment.TopCenter)
             .fillMaxWidth()
-            .padding(top = 8.dp, start = 16.dp, end = 16.dp),
+            .windowInsetsPadding(measurements.statusBarInsets)
+            .padding(start = 16.dp, end = 16.dp),
     ) {
         PagerProgressingIndicator(
             state = pagerState,
@@ -268,14 +283,17 @@ internal fun BoxScope.TopControls(
             contentDescription = stringResource(LR.string.close),
             colorFilter = ColorFilter.tint(Color.Black),
             modifier = Modifier
-                .size(24.dp)
+                // Increase touch target of the image
+                .offset(x = 12.dp, y = -12.dp)
+                .size(48.dp)
                 .clickable(
                     interactionSource = remember(::MutableInteractionSource),
                     indication = ripple(color = Color.Black, bounded = false),
                     onClickLabel = stringResource(LR.string.close),
                     role = Role.Button,
                     onClick = onClose,
-                ),
+                )
+                .padding(12.dp),
         )
     }
 }
