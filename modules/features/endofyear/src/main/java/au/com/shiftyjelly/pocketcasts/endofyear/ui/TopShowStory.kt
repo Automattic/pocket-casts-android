@@ -5,18 +5,19 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,10 +29,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.math.sqrt
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -58,21 +61,54 @@ internal fun TopShowStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Box(
-        modifier = Modifier.capturable(controller.captureController(story)),
+    Box {
+        Column(
+            modifier = Modifier
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge),
+        ) {
+            TopShowCover(
+                story = story,
+                measurements = measurements,
+                controller = controller,
+            )
+            TopShowInfo(
+                story = story,
+                measurements = measurements,
+                controller = controller,
+                onShareStory = onShareStory,
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(measurements.closeButtonBottomEdge)
+                .background(story.backgroundColor),
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.TopShowCover(
+    story: Story.TopShow,
+    measurements: EndOfYearMeasurements,
+    controller: StoryCaptureController,
+) {
+    BoxWithConstraints(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .background(story.backgroundColor),
     ) {
-        val shapeSize = measurements.width * 1.12f
-        val coverSize = shapeSize * sqrt(2f)
-        val coverOffset = measurements.closeButtonBottomEdge
         PodcastImage(
             uuid = story.show.uuid,
             elevation = 0.dp,
             roundCorners = false,
-            modifier = Modifier
-                .requiredSize(coverSize)
-                .offset(y = coverOffset),
+            modifier = Modifier.requiredSize(maxOf(maxWidth, maxHeight)),
         )
-
         val transition = rememberInfiniteTransition(label = "transition")
         val rotation = transition.animateFloat(
             initialValue = 0f,
@@ -80,26 +116,26 @@ internal fun TopShowStory(
             animationSpec = infiniteRepeatable(tween(40_000, easing = LinearEasing)),
             label = "rotation",
         )
-        val shapeSizePx = LocalDensity.current.run { shapeSize.toPx() }
-        val shapeOffsetPx = LocalDensity.current.run { (coverOffset * 0.6f + (coverSize - shapeSize) / 2).toPx() }
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                 .drawWithCache {
+                    val widthPx = density.run { maxWidth.toPx() }
+                    val heightPx = density.run { maxHeight.toPx() }
+                    val edgeSize = heightPx / sqrt(2f)
+                    val dentSize = edgeSize / 20
+
                     val path = Path().apply {
-                        val dentSize = (shapeSizePx - size.width) / 2
-
-                        moveTo(-dentSize, shapeOffsetPx)
-                        lineTo(size.width / 2, (shapeOffsetPx) + dentSize)
-                        lineTo(size.width + dentSize, shapeOffsetPx)
-                        lineTo(size.width, shapeOffsetPx + shapeSizePx / 2)
-                        lineTo(size.width + dentSize, shapeOffsetPx + shapeSizePx)
-                        lineTo(size.width / 2, shapeOffsetPx + shapeSizePx - dentSize)
-                        lineTo(-dentSize, shapeOffsetPx + shapeSizePx)
-                        lineTo(0f, shapeOffsetPx + shapeSizePx / 2)
-                        lineTo(-dentSize, shapeOffsetPx)
-
+                        moveTo(0f, 0f)
+                        lineTo(edgeSize / 2, dentSize)
+                        lineTo(edgeSize, 0f)
+                        lineTo(edgeSize - dentSize, edgeSize / 2)
+                        lineTo(edgeSize, edgeSize)
+                        lineTo(edgeSize / 2, edgeSize - dentSize)
+                        lineTo(0f, edgeSize)
+                        lineTo(dentSize, edgeSize / 2)
+                        lineTo(0f, 0f)
                         close()
                     }
 
@@ -107,14 +143,19 @@ internal fun TopShowStory(
                         drawContent()
 
                         rotate(
-                            rotation.value,
-                            pivot = Offset(x = size.width / 2, y = shapeOffsetPx + shapeSizePx / 2),
+                            degrees = if (controller.isSharing) 0f else rotation.value,
+                            pivot = Offset(widthPx / 2, heightPx / 2),
                         ) {
-                            drawPath(
-                                color = Color(0xFFFFFFFF),
-                                blendMode = BlendMode.DstOut,
-                                path = path,
-                            )
+                            translate(
+                                left = (widthPx - edgeSize) / 2,
+                                top = (heightPx - edgeSize) / 2,
+                            ) {
+                                drawPath(
+                                    color = Color(0xFFFFFFFF),
+                                    blendMode = BlendMode.DstOut,
+                                    path = path,
+                                )
+                            }
                         }
                     }
                 },
@@ -125,65 +166,61 @@ internal fun TopShowStory(
                     .background(story.backgroundColor),
             )
         }
-
-        Column(
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) {
-            TextH10(
-                text = stringResource(
-                    R.string.end_of_year_story_top_podcast_title,
-                    story.show.title,
-                ),
-                fontScale = measurements.smallDeviceFactor,
-                disableAutoScale = true,
-                color = colorResource(UR.color.coolgrey_90),
-                modifier = Modifier.padding(horizontal = 24.dp),
-            )
-            Spacer(
-                modifier = Modifier.height(16.dp),
-            )
-            TextP40(
-                text = stringResource(
-                    R.string.end_of_year_story_top_podcast_subtitle,
-                    story.show.playedEpisodeCount,
-                    StatsHelper.secondsToFriendlyString(
-                        story.show.playbackTime.inWholeSeconds,
-                        LocalContext.current.resources,
-                    ),
-                ),
-                fontSize = 15.sp,
-                disableAutoScale = true,
-                color = colorResource(UR.color.coolgrey_90),
-                modifier = Modifier.padding(horizontal = 24.dp),
-            )
-            ShareStoryButton(
-                story = story,
-                controller = controller,
-                onShare = onShareStory,
-            )
-        }
-
-        // Clip the rotating shape at top
-        Box(
+        Image(
+            painter = painterResource(IR.drawable.end_of_year_2024_sticker_8),
+            contentDescription = null,
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth()
-                .height(measurements.closeButtonBottomEdge)
-                .background(story.backgroundColor),
+                .align(Alignment.TopStart)
+                .padding(start = 20.dp, top = 8.dp)
+                .size(
+                    width = 215.dp * measurements.scale,
+                    height = 103.dp * measurements.scale,
+                ),
         )
+    }
+}
 
-        // Fake sticker: lH66LwxxgG8btQ8NrM0ldx-fi-3070_23365#986383416
-        val stickerWidth = 208.dp * measurements.scale
-        val stickerHeight = 87.dp * measurements.scale
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(
-                    x = -stickerWidth / 3,
-                    y = measurements.closeButtonBottomEdge + stickerHeight / 2,
-                )
-                .size(stickerWidth, stickerHeight)
-                .background(Color.Black, shape = CircleShape),
+@Composable
+private fun TopShowInfo(
+    story: Story.TopShow,
+    measurements: EndOfYearMeasurements,
+    controller: StoryCaptureController,
+    onShareStory: (File) -> Unit,
+) {
+    Column(
+        modifier = Modifier.background(story.backgroundColor),
+    ) {
+        TextH10(
+            text = stringResource(
+                R.string.end_of_year_story_top_podcast_title,
+                story.show.title,
+            ),
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
+            color = colorResource(UR.color.coolgrey_90),
+            modifier = Modifier.padding(horizontal = 24.dp),
+        )
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        TextP40(
+            text = stringResource(
+                R.string.end_of_year_story_top_podcast_subtitle,
+                story.show.playedEpisodeCount,
+                StatsHelper.secondsToFriendlyString(
+                    story.show.playbackTime.inWholeSeconds,
+                    LocalContext.current.resources,
+                ),
+            ),
+            fontSize = 15.sp,
+            disableAutoScale = true,
+            color = colorResource(UR.color.coolgrey_90),
+            modifier = Modifier.padding(horizontal = 24.dp),
+        )
+        ShareStoryButton(
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
         )
     }
 }
