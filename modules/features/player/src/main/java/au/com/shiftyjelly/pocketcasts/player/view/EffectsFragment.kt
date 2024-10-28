@@ -274,7 +274,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
         effectsSettingsSegmentedTabBar.setContent {
             val podcastEffectsData by viewModel.effectsLive.asFlow()
-                .distinctUntilChanged { t1, t2 -> t1.podcast.uuid == t2.podcast.uuid && t1.podcast.playbackEffects == t2.podcast.playbackEffects }
+                .distinctUntilChanged { t1, t2 -> t1.podcast.uuid == t2.podcast.uuid && t1.podcast.playbackEffects.toData() == t2.podcast.playbackEffects.toData() }
                 .collectAsStateWithLifecycle(null)
             val podcast = podcastEffectsData?.podcast ?: return@setContent
 
