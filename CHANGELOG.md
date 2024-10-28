@@ -8,6 +8,7 @@
     *   Add support for the Catalan laguage
         ([#3072](https://github.com/Automattic/pocket-casts-android/pull/3072))
     *   Add referrals to the app
+        ([#3107](https://github.com/Automattic/pocket-casts-android/pull/3107))
 *   Bug Fixes
     *   Keep the playing service in the foreground when casting
         ([#3094](https://github.com/Automattic/pocket-casts-android/pull/3094))
