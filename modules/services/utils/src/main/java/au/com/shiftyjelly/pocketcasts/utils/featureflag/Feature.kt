@@ -179,6 +179,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    GRAVATAR_NATIVE_QUICK_EDITOR(
+        key = "gravatar_native_quick_editor",
+        title = "Gravatar native QE",
+        defaultValue = true,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     ;
 
     companion object {

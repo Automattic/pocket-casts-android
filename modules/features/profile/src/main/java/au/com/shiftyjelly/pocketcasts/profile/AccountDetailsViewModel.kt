@@ -25,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -65,7 +64,7 @@ class AccountDetailsViewModel
         }
     }
 
-    internal val headerState = signInState.asFlow().map { state ->
+    internal val headerState = combine(signInState.asFlow(), Gravatar.lastTimeStamp) { state, _ ->
         when (state) {
             is SignInState.SignedOut -> AccountHeaderState.empty()
             is SignInState.SignedIn -> {
@@ -185,6 +184,10 @@ class AccountDetailsViewModel
             mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked),
         )
         settings.marketingOptIn.set(isChecked, updateModifiedAt = true)
+    }
+
+    fun gravatarUpdated() {
+        Gravatar.refreshGravatarTimestamp()
     }
 
     companion object {

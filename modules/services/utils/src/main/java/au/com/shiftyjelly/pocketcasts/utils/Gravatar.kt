@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 object Gravatar {
 
+    const val GRAVATAR_QE_REDIRECT_URL = "https://pocketcasts.com/gravatar/oauth"
+
     fun getGravatarChangeAvatarUrl(email: String): String =
         "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars&is_app_origin=true"
 
