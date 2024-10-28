@@ -285,20 +285,20 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET override_global_effects = :override, override_global_effects_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
     abstract fun updateOverrideGlobalEffects(override: Boolean, uuid: String, modified: Date = Date())
 
-    @Query("UPDATE podcasts SET trim_silence_level = :trimMode, trim_silence_level_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
-    abstract fun updateTrimSilenceMode(trimMode: TrimMode, uuid: String, modified: Date = Date())
+    @Query("UPDATE podcasts SET trim_silence_level = :trimMode, trim_silence_level_modified = :modified, used_custom_effects_before= :usedCustomEffectsBefore, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateTrimSilenceMode(trimMode: TrimMode, uuid: String, modified: Date = Date(), usedCustomEffectsBefore: Boolean)
 
-    @Query("UPDATE podcasts SET volume_boosted = :volumeBoosted, volume_boosted_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
-    abstract fun updateVolumeBoosted(volumeBoosted: Boolean, uuid: String, modified: Date = Date())
+    @Query("UPDATE podcasts SET volume_boosted = :volumeBoosted, volume_boosted_modified = :modified, used_custom_effects_before= :usedCustomEffectsBefore, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updateVolumeBoosted(volumeBoosted: Boolean, uuid: String, modified: Date = Date(), usedCustomEffectsBefore: Boolean)
 
-    @Query("UPDATE podcasts SET playback_speed = :speed, playback_speed_modified = :modified, sync_status = 0 WHERE uuid = :uuid")
-    abstract fun updatePlaybackSpeed(speed: Double, uuid: String, modified: Date = Date())
+    @Query("UPDATE podcasts SET playback_speed = :speed, playback_speed_modified = :modified, used_custom_effects_before= :usedCustomEffectsBefore, sync_status = 0 WHERE uuid = :uuid")
+    abstract fun updatePlaybackSpeed(speed: Double, uuid: String, modified: Date = Date(), usedCustomEffectsBefore: Boolean)
 
     @Transaction
-    open fun updateEffects(speed: Double, volumeBoosted: Boolean, trimMode: TrimMode, uuid: String, modified: Date = Date()) {
-        updatePlaybackSpeed(speed, uuid, modified)
-        updateVolumeBoosted(volumeBoosted, uuid, modified)
-        updateTrimSilenceMode(trimMode, uuid, modified)
+    open fun updateEffects(speed: Double, volumeBoosted: Boolean, trimMode: TrimMode, uuid: String, modified: Date = Date(), usedCustomEffectsBefore: Boolean) {
+        updatePlaybackSpeed(speed, uuid, modified, usedCustomEffectsBefore)
+        updateVolumeBoosted(volumeBoosted, uuid, modified, usedCustomEffectsBefore)
+        updateTrimSilenceMode(trimMode, uuid, modified, usedCustomEffectsBefore)
     }
 
     @Query("UPDATE podcasts SET episodes_sort_order = :episodesSortType, episodes_sort_order_modified = :modified, sync_status = 0  WHERE uuid = :uuid")

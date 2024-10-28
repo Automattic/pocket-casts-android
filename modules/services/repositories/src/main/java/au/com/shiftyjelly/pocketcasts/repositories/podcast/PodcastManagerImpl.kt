@@ -664,21 +664,33 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun updateTrimMode(podcast: Podcast, trimMode: TrimMode) {
         podcast.trimMode = trimMode
-        podcastDao.updateTrimSilenceMode(trimMode, podcast.uuid)
+        podcastDao.updateTrimSilenceMode(
+            trimMode = trimMode,
+            uuid = podcast.uuid,
+            usedCustomEffectsBefore = podcast.usedCustomEffectsBefore,
+        )
     }
 
     override fun updateVolumeBoosted(podcast: Podcast, override: Boolean) {
         podcast.isVolumeBoosted = override
-        podcastDao.updateVolumeBoosted(override, podcast.uuid)
+        podcastDao.updateVolumeBoosted(
+            volumeBoosted = override,
+            uuid = podcast.uuid,
+            usedCustomEffectsBefore = podcast.usedCustomEffectsBefore,
+        )
     }
 
     override fun updatePlaybackSpeed(podcast: Podcast, speed: Double) {
         podcast.playbackSpeed = speed
-        podcastDao.updatePlaybackSpeed(speed, podcast.uuid)
+        podcastDao.updatePlaybackSpeed(
+            speed = speed,
+            uuid = podcast.uuid,
+            usedCustomEffectsBefore = podcast.usedCustomEffectsBefore,
+        )
     }
 
     override fun updateEffects(podcast: Podcast, effects: PlaybackEffects) {
-        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid)
+        podcastDao.updateEffects(effects.playbackSpeed, effects.isVolumeBoosted, effects.trimMode, podcast.uuid, usedCustomEffectsBefore = podcast.usedCustomEffectsBefore)
         launch {
             updateTrimMode(podcast, effects.trimMode)
         }
