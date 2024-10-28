@@ -332,9 +332,13 @@ class PodcastAdapter(
         holder.binding.top.subscribedButton.toCircle(true)
         holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
         holder.binding.top.folders.setImageResource(
-            if (podcast.folderUuid != null) R.drawable.ic_folder_check else IR.drawable.ic_folder,
+            when {
+                !isPlusOrPatronUser -> IR.drawable.folder_lock_light
+                podcast.folderUuid != null -> R.drawable.ic_folder_check
+                else -> IR.drawable.ic_folder
+            },
         )
-        holder.binding.top.folders.isVisible = podcast.isSubscribed && isPlusOrPatronUser
+        holder.binding.top.folders.isVisible = podcast.isSubscribed
         with(holder.binding.top.notifications) {
             val notificationsIconText =
                 context.getString(if (podcast.isShowNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off)
