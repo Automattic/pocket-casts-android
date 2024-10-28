@@ -189,6 +189,9 @@ class PlayerViewModelTest {
         whenever(episodeManager.observeEpisodeByUuidRx(anyOrNull())).thenReturn(Flowable.just(currentEpisode))
         whenever(podcast.playbackEffects).thenReturn(podcastPlaybackEffects)
         whenever(podcastManager.observePodcastByUuid(anyOrNull())).thenReturn(Flowable.just(podcast))
+        val useRealTimeForPlaybackRemainingTimeMock = mock<UserSetting<Boolean>>()
+        whenever(useRealTimeForPlaybackRemainingTimeMock.flow).thenReturn(MutableStateFlow(false))
+        whenever(settings.useRealTimeForPlaybackRemaingTime).thenReturn(useRealTimeForPlaybackRemainingTimeMock)
 
         viewModel = PlayerViewModel(
             playbackManager = playbackManager,
