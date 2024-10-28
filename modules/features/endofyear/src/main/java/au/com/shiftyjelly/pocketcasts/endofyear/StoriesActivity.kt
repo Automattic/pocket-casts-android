@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -13,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -61,7 +61,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class StoriesActivity : ComponentActivity() {
@@ -151,7 +150,12 @@ class StoriesActivity : ComponentActivity() {
 
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable {
+                    viewModel.trackStoriesClosed("tapped_outside")
+                    finish()
+                },
         ) {
             StoriesPage(
                 state = state,
@@ -167,7 +171,7 @@ class StoriesActivity : ComponentActivity() {
                 onRestartPlayback = storyChanger::reset,
                 onRetry = viewModel::syncData,
                 onClose = {
-                    viewModel.trackStoriesClosed()
+                    viewModel.trackStoriesClosed("close_button")
                     finish()
                 },
             )
@@ -317,15 +321,6 @@ class StoriesActivity : ComponentActivity() {
             val intent = Intent(activity, StoriesActivity::class.java)
                 .putExtra(ARG_SOURCE, source)
             activity.startActivity(intent)
-            when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                    activity.overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, UR.anim.slide_in_up, UR.anim.slide_out_down)
-                }
-                else -> {
-                    @Suppress("DEPRECATION")
-                    activity.overridePendingTransition(UR.anim.slide_in_up, UR.anim.slide_out_down)
-                }
-            }
         }
     }
 }

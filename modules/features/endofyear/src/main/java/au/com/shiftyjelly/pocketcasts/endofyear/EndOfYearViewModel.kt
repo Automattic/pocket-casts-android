@@ -240,10 +240,10 @@ class EndOfYearViewModel @AssistedInject constructor(
         )
     }
 
-    internal fun trackStoriesClosed() {
+    internal fun trackStoriesClosed(source: String) {
         analyticsTracker.track(
             AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
-            mapOf("source" to "close_button"),
+            mapOf("source" to source),
         )
     }
 
