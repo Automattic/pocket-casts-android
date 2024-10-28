@@ -310,6 +310,7 @@ data class Podcast(
     fun copyPlaybackEffects(
         sourcePodcast: Podcast,
     ) {
+        usedCustomEffectsBefore = sourcePodcast.usedCustomEffectsBefore
         sourcePodcast.overrideGlobalEffectsModified?.takeIf { overrideGlobalEffectsModified?.before(it) ?: true }?.let {
             overrideGlobalEffects = sourcePodcast.overrideGlobalEffects
             overrideGlobalEffectsModified = sourcePodcast.overrideGlobalEffectsModified
