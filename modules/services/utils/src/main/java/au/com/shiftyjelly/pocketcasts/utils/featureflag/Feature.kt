@@ -110,7 +110,7 @@ enum class Feature(
     REFERRALS_CLAIM(
         key = "referrals_claim",
         title = "Referrals Claim",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -118,7 +118,7 @@ enum class Feature(
     REFERRALS_SEND(
         key = "referrals_send",
         title = "Referrals Send",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
