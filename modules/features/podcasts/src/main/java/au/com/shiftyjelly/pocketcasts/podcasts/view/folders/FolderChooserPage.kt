@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,7 +69,10 @@ fun FolderChooserPage(
                 onNewFolderClick = onNewFolderClick,
                 modifier = Modifier.weight(1f),
             )
-            Card(elevation = 8.dp) {
+            Card(
+                elevation = if (isSystemInDarkTheme()) 0.dp else 8.dp,
+                backgroundColor = Color.Transparent
+            ) {
                 RowButton(
                     text = stringResource(LR.string.done),
                     onClick = { onCloseClick() },
@@ -99,8 +103,6 @@ private fun FolderList(
                 FolderMoveRow {
                     onNewFolderClick()
                 }
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider()
             }
         }
