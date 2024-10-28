@@ -71,7 +71,7 @@ fun FolderChooserPage(
             )
             Card(
                 elevation = if (isSystemInDarkTheme()) 0.dp else 8.dp,
-                backgroundColor = Color.Transparent
+                backgroundColor = Color.Transparent,
             ) {
                 RowButton(
                     text = stringResource(LR.string.done),
