@@ -289,6 +289,16 @@
                 <data android:pathPrefix="/get/"/>
             </intent-filter>
 
+            <!-- https://lists.pocketcasts.com/.well-known/assetlinks.json is needed for this to work -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"/>
+                <data android:host="pocketcasts.com"/>
+                <data android:pathPrefix="/gravatar-qe-redirect"/>
+            </intent-filter>
+
             <meta-data
                     android:name="android.app.shortcuts"
                     android:resource="@xml/shortcuts"/>
