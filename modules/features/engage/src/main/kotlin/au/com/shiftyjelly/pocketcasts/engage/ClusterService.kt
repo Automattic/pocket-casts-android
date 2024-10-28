@@ -222,9 +222,9 @@ internal class ClusterService(
                 .setName(podcast.title)
                 .addPosterImage(
                     Image.Builder()
-                        .setImageUri(Uri.parse(podcast.coverUrl))
-                        .setImageWidthInPixel(podcast.coverSize)
-                        .setImageHeightInPixel(podcast.coverSize)
+                        .setImageUri(Uri.parse(podcast.landscapeCoverUrl))
+                        .setImageWidthInPixel(podcast.landscapeCoverWidth)
+                        .setImageHeightInPixel(podcast.landscapeCoverHeight)
                         .build(),
                 )
                 .setInfoPageUri(podcast.uri(SourceView.ENGAGE_SDK_FEATURED))
