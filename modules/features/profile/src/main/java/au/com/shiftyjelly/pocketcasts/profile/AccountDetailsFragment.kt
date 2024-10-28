@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -23,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.profile.BuildConfig.GRAVATAR_APP_ID
 import au.com.shiftyjelly.pocketcasts.profile.champion.PocketCastsChampionBottomSheetDialog
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -41,9 +43,17 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.gravatar.quickeditor.GravatarQuickEditor
+import com.gravatar.quickeditor.ui.editor.AuthenticationMethod
+import com.gravatar.quickeditor.ui.editor.AvatarPickerContentLayout
+import com.gravatar.quickeditor.ui.editor.GravatarQuickEditorParams
+import com.gravatar.quickeditor.ui.oauth.OAuthParams
+import com.gravatar.types.Email
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
@@ -89,6 +99,10 @@ class AccountDetailsFragment : BaseFragment() {
     private val accountViewModel by viewModels<AccountDetailsViewModel>()
     private val upgradeBannerViewModel by viewModels<ProfileUpgradeBannerViewModel>()
 
+    private val gravatarQuickEditorLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+        accountViewModel.gravatarUpdated()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -130,9 +144,7 @@ class AccountDetailsFragment : BaseFragment() {
                 upgradeBannerViewModel.onFeatureCardChanged(featureCard)
             },
             onChangeAvatar = { email ->
-                analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
-                Gravatar.refreshGravatarTimestamp()
-                requireActivity().startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
+                openGravatarQuickEditor(email)
             },
             onChangeEmail = {
                 (requireActivity() as FragmentHostListener).addFragment(ChangeEmailFragment.newInstance())
@@ -275,6 +287,31 @@ class AccountDetailsFragment : BaseFragment() {
             wasInitiatedByUser = true,
         )
         activity?.finish()
+    }
+
+    private fun openGravatarQuickEditor(email: String) {
+        analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CHANGE_AVATAR)
+        if (FeatureFlag.isEnabled(Feature.GRAVATAR_NATIVE_QUICK_EDITOR)) {
+            GravatarQuickEditor.show(
+                activity = requireActivity(),
+                gravatarQuickEditorParams = GravatarQuickEditorParams {
+                    this.email = Email(email)
+                    avatarPickerContentLayout = AvatarPickerContentLayout.Horizontal
+                },
+                authenticationMethod = AuthenticationMethod.OAuth(
+                    OAuthParams {
+                        clientId = GRAVATAR_APP_ID
+                        redirectUri = Gravatar.GRAVATAR_QE_REDIRECT_URL
+                    },
+                ),
+                onAvatarSelected = {
+                    accountViewModel.gravatarUpdated()
+                },
+                onDismiss = {},
+            )
+        } else {
+            gravatarQuickEditorLauncher.launch(Intent(Intent.ACTION_VIEW, Uri.parse(Gravatar.getGravatarChangeAvatarUrl(email))))
+        }
     }
 
     private fun performSignOut() {
