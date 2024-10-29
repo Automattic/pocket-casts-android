@@ -24,7 +24,7 @@ enum class Feature(
         title = "End of Year 2024",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
     REPORT_VIOLATION(
