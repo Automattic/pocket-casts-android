@@ -114,13 +114,13 @@
     <string name="starred">Starred</string>
     <string name="stop_downloading">Stop downloading</string>
     <string name="stream">Stream</string>
-    <string name="subscribe">Subscribe</string>
+    <string name="subscribe">Follow</string>
     <string name="subscribe_to">Subscribe to %s</string>
     <string name="upgrade_to">Upgrade to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="get_pocket_casts_plus">Get Pocket Casts Plus</string>
     <string name="unplayed">Unplayed</string>
-    <string name="unsubscribe">Unsubscribe</string>
+    <string name="unsubscribe">Unfollow</string>
     <string name="up_next">Up Next</string>
     <string name="learn_more">Learn more.</string>
     <string name="today">Today</string>
@@ -603,8 +603,8 @@
     </plurals>
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
-    <string name="podcast_subscribed">Subscribed</string>
-    <string name="podcast_not_subscribed">Not Subscribed</string>
+    <string name="podcast_subscribed">Following</string>
+    <string name="podcast_not_subscribed">Not Following</string>
     <string name="podcast_support_this_podcast">Support This Show</string>
     <string name="podcast_supporter">SUPPORTER</string>
     <string name="podcast_supporter_cancelled">Support cancelled</string>
@@ -620,7 +620,7 @@
     <string name="podcast_share_open_fail">Unable to load details about shared podcast. If this problem persists, why not reach out to the person who shared with you, and ask them what\'s up.</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 Downloaded File</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Downloaded Files</string>
-    <string name="podcast_unsubscribe_warning">Unsubscribing will delete all downloaded files.</string>
+    <string name="podcast_unsubscribe_warning">Unfollowing will delete all downloaded files.</string>
     <string name="podcast_not_in_filters">Not included in any filters</string>
     <string name="podcast_included_in_filters">Included in %s</string>
     <string name="podcast_effects_summary_speed">Speed %s×</string>
