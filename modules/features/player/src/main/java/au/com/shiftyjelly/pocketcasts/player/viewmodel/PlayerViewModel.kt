@@ -691,7 +691,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun saveEffects(effects: PlaybackEffects, podcast: Podcast) {
-        launch {
+        viewModelScope.launch(ioDispatcher) {
             if (podcast.overrideGlobalEffects) {
                 podcastManager.updateEffects(podcast, effects)
             } else {

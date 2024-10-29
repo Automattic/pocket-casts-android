@@ -27,8 +27,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue.State
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Flowable
 import io.reactivex.Observable
@@ -39,6 +42,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,6 +59,9 @@ class PlayerViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val inMemoryFeatureFlagRule = InMemoryFeatureFlagRule()
 
     @get:Rule
     val coroutineRule = MainCoroutineRule()
@@ -122,6 +129,11 @@ class PlayerViewModelTest {
     private val podcastUuid = "podcastUuid"
     private lateinit var viewModel: PlayerViewModel
 
+    @Before
+    fun setUp() {
+        FeatureFlag.setEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS, true)
+    }
+
     @Test
     fun `does not override global effects when all podcasts effects settings segmented tab selected`() {
         initViewModel()
@@ -162,9 +174,44 @@ class PlayerViewModelTest {
         }
     }
 
+    @Test
+    fun `given FF on && custom effects settings not used before, when this podcasts effects settings segmented tab selected, then global effects applied to podcast and playback`() = runTest {
+        initViewModel(usedCustomEffectsBefore = false)
+
+        viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.ThisPodcast)
+
+        verify(podcastManager).updateEffects(podcast, globalEffects)
+        verify(playbackManager).updatePlayerEffects(globalEffects)
+    }
+
+    @Test
+    fun `given FF off && custom effects settings not used before, when this podcasts effects settings segmented tab selected, then podcast effects applied to podcast and playback`() = runTest {
+        FeatureFlag.setEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS, false)
+        initViewModel(usedCustomEffectsBefore = false)
+
+        viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.ThisPodcast)
+
+        verify(podcastManager).updateEffects(podcast, podcastPlaybackEffects)
+        verify(playbackManager).updatePlayerEffects(podcastPlaybackEffects)
+    }
+
+    @Test
+    fun `given custom effects settings used before, when this podcasts effects settings segmented tab selected, then podcast effects applied to podcast`() = runTest {
+        initViewModel(usedCustomEffectsBefore = true)
+
+        viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.ThisPodcast)
+
+        verify(podcastManager).updateEffects(podcast, podcastPlaybackEffects)
+        verify(playbackManager).updatePlayerEffects(podcastPlaybackEffects)
+    }
+
     private fun initViewModel(
         currentEpisode: BaseEpisode = podcastEpisode,
+        usedCustomEffectsBefore: Boolean = false,
+        selectedTab: PlaybackEffectsSettingsTab = PlaybackEffectsSettingsTab.ThisPodcast,
     ) {
+        whenever(podcast.shouldUsePodcastPlaybackEffects(selectedTab == PlaybackEffectsSettingsTab.ThisPodcast)).thenReturn(!FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS) || usedCustomEffectsBefore)
+        whenever(podcast.overrideGlobalEffects).thenReturn(selectedTab == PlaybackEffectsSettingsTab.ThisPodcast)
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
         whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)).thenReturn(Observable.just(State.Empty))

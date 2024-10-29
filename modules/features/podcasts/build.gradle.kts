@@ -72,6 +72,7 @@ dependencies {
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.images)
 
+    testImplementation(libs.androidx.arch.core)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
