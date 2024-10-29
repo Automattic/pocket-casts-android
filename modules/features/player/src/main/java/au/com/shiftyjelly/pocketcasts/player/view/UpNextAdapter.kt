@@ -81,6 +81,8 @@ class UpNextAdapter(
             notifyDataSetChanged()
         }
 
+    private var isSignedInAsPaidUser: Boolean = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -100,8 +102,7 @@ class UpNextAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
-        when (item) {
+        when (val item = getItem(position)) {
             is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
             is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
@@ -156,6 +157,10 @@ class UpNextAdapter(
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
         super.onViewDetachedFromWindow(holder)
         (holder as? UpNextEpisodeViewHolder)?.clearDisposable()
+    }
+
+    fun updateUserSignInState(isSignedInAsPaidUser: Boolean) {
+        this.isSignedInAsPaidUser = isSignedInAsPaidUser
     }
 
     inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
