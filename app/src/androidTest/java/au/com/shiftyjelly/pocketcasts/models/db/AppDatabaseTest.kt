@@ -173,6 +173,7 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_101_102,
                 // 102 to 103 added via auto migration
                 AppDatabase.MIGRATION_103_104,
+                AppDatabase.MIGRATION_104_105,
             )
             .build()
         // close the database and release any stream resources when the test finishes

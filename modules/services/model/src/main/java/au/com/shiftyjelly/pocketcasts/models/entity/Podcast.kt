@@ -114,6 +114,7 @@ data class Podcast(
     @ColumnInfo(name = "folder_uuid") internal var rawFolderUuid: String? = null,
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
+    @ColumnInfo(name = "used_custom_effects_before") var usedCustomEffectsBefore: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
     @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {
