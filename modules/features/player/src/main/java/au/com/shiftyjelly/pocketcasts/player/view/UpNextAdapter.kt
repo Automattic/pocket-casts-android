@@ -195,19 +195,29 @@ class UpNextAdapter(
         private fun ImageButton.updateShuffleButton() {
             if (!FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)) return
 
-            val isEnabled = settings.upNextShuffle.value
-
-            this.setImageResource(if (isEnabled) IR.drawable.shuffle_enabled else IR.drawable.shuffle)
+            this.setImageResource(
+                when {
+                    !isSignedInAsPaidUser -> IR.drawable.shuffle_plus_feature_icon
+                    settings.upNextShuffle.value -> IR.drawable.shuffle_enabled
+                    else -> IR.drawable.shuffle
+                },
+            )
 
             this.contentDescription = context.getString(
-                if (isEnabled) LR.string.up_next_shuffle_disable_button_content_description else LR.string.up_next_shuffle_button_content_description,
+                when {
+                    isSignedInAsPaidUser -> LR.string.up_next_shuffle_button_content_description
+                    settings.upNextShuffle.value -> LR.string.up_next_shuffle_disable_button_content_description
+                    else -> LR.string.up_next_shuffle_button_content_description
+                },
             )
 
-            this.setImageTintList(
-                ColorStateList.valueOf(
-                    if (isEnabled) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
-                ),
-            )
+            if (isSignedInAsPaidUser) {
+                this.setImageTintList(
+                    ColorStateList.valueOf(
+                        if (settings.upNextShuffle.value) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
+                    ),
+                )
+            }
 
             TooltipCompat.setTooltipText(
                 this,
