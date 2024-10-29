@@ -1820,6 +1820,7 @@
 
     <string name="onboarding_welcome_back">Welcome Back</string>
     <string name="not_now">Not now</string>
+    <string name="try_plus_now">Try Plus Now</string>
     <string name="onboarding_log_in">Log in</string>
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
@@ -2000,8 +2001,6 @@
     <string name="clear_before_adding">Clear Before Adding</string>
     <string name="dont_clear">Don\'t Clear</string>
     <string name="clear_up_next">Clear Up Next</string>
-    <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
-    <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
     <string name="clear_all">Clear All</string>
     <string name="clear_search">Clear Search</string>
     <string name="add_mode">Add Mode</string>
@@ -2195,5 +2194,12 @@
     <string name="you_are_running_low_on_storage">You\'re running low on storage</string>
     <string name="save_space_by_managing_downloaded_episodes">Save %1$s – by managing downloaded episodes.</string>
     <string name="manage_downloads">Manage Downloads</string>
+
+    <!-- Up Next Shuffle -->
+    <string name="up_next_shuffle_button_content_description">Up next shuffle</string>
+    <string name="up_next_shuffle_disable_button_content_description">Up next shuffle disable</string>
+    <string name="up_next_shuffle_your_episodes_with_plus">Shuffle your episodes with Plus</string>
+    <string name="up_next_shuffle_unlock_feature_description">Unlock this feature and many others like bookmarks, folders, preselect chapters or our desktop app with Pocket Casts Plus.</string>
+    <string name="swipe_affordance_content_description">Swipe Affordance</string>
 
 </resources>

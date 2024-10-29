@@ -180,11 +180,13 @@ class UpNextAdapter(
                 shuffle.updateShuffleButton()
 
                 shuffle.setOnClickListener {
-                    val newValue = !settings.upNextShuffle.value
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
-
-                    settings.upNextShuffle.set(newValue, updateModifiedAt = false)
-
+                    if (isSignedInAsPaidUser) {
+                        val newValue = !settings.upNextShuffle.value
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
+                        settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+                    } else {
+                        UpNextShufflePaywallBottomSheet().show(fragmentManager, "up_next_shuffle_paywall_dialog")
+                    }
                     shuffle.updateShuffleButton()
                 }
 
