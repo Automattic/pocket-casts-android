@@ -134,7 +134,7 @@ class PodcastEffectsViewModelTest {
     ) {
         podcast.uuid = podcastUuid
         episode.podcastUuid = podcastUuid
-        whenever(podcast.usedCustomEffectsBefore).thenReturn(usedCustomEffectsBefore)
+        whenever(podcast.shouldUsePodcastPlaybackEffects(true)).thenReturn(!FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS) || usedCustomEffectsBefore)
         whenever(podcast.playbackEffects).thenReturn(podcastPlaybackEffects)
         whenever(podcastManager.observePodcastByUuid(podcastUuid)).thenReturn(Flowable.just(podcast))
         whenever(settings.globalPlaybackEffects).thenReturn(userSettingsGlobalPlaybackEffects)
