@@ -9,6 +9,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.doOnLayout
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.UpNextShuffleDialog
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -27,8 +30,12 @@ class UpNextShufflePaywallBottomSheet : BottomSheetDialogFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     UpNextShuffleDialog(
-                        onTryPlusNowClick = {},
-                        onNotNowClick = {},
+                        onTryPlusNowClick = {
+                            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(OnboardingUpgradeSource.UP_NEXT_SHUFFLE))
+                        },
+                        onNotNowClick = {
+                            dismiss()
+                        },
                     )
                 }
             }
