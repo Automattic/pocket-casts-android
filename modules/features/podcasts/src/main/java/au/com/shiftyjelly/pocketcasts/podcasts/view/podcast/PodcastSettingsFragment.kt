@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSec
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -398,11 +400,12 @@ class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.L
     }
 
     private fun buildEffectsSummary(podcast: Podcast): String {
+        val effects = if (podcast.shouldUsePodcastPlaybackEffects(podcast.overrideGlobalEffects)) podcast.playbackEffects else settings.globalPlaybackEffects.value
         return if (podcast.overrideGlobalEffects) {
             listOf(
-                getString(LR.string.podcast_effects_summary_speed, podcast.playbackSpeed.toString()),
-                getString(if (podcast.isSilenceRemoved) LR.string.podcast_effects_summary_trim_silence_on else LR.string.podcast_effects_summary_trim_silence_off),
-                getString(if (podcast.isVolumeBoosted) LR.string.podcast_effects_summary_volume_boost_on else LR.string.podcast_effects_summary_volume_boost_off),
+                getString(LR.string.podcast_effects_summary_speed, String.format(Locale.ENGLISH, "%.1f", effects.playbackSpeed)),
+                getString(if (effects.trimMode != TrimMode.OFF) LR.string.podcast_effects_summary_trim_silence_on else LR.string.podcast_effects_summary_trim_silence_off),
+                getString(if (effects.isVolumeBoosted) LR.string.podcast_effects_summary_volume_boost_on else LR.string.podcast_effects_summary_volume_boost_off),
             ).joinToString()
         } else {
             getString(LR.string.podcast_effects_summary_default)

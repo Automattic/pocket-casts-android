@@ -709,7 +709,7 @@ class PlayerViewModel @Inject constructor(
             val override = selectedTab == PlaybackEffectsSettingsTab.ThisPodcast
             podcastManager.updateOverrideGlobalEffects(podcast, override)
 
-            val effects = if (override) podcast.playbackEffects else settings.globalPlaybackEffects.value
+            val effects = if (podcast.shouldUsePodcastPlaybackEffects(override)) podcast.playbackEffects else settings.globalPlaybackEffects.value
             podcast.overrideGlobalEffects = override
             saveEffects(effects, podcast)
         }

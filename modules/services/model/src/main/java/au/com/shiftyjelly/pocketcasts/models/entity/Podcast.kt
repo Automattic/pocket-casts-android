@@ -19,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.io.Serializable
 import java.net.MalformedURLException
 import java.net.URL
@@ -298,6 +300,9 @@ data class Podcast(
             }
         }
     }
+
+    fun shouldUsePodcastPlaybackEffects(override: Boolean) =
+        override && (!FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS) || usedCustomEffectsBefore)
 
     /**
      * Copies playback effect settings from a source podcast to this podcast

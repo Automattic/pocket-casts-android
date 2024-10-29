@@ -47,8 +47,12 @@ class PodcastEffectsViewModel
         val podcast = this.podcast.value ?: return
         launch {
             podcastManager.updateOverrideGlobalEffects(podcast, override)
+            val effects = if (podcast.shouldUsePodcastPlaybackEffects(override)) podcast.playbackEffects else settings.globalPlaybackEffects.value
+            if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
+                podcastManager.updateEffects(podcast, effects)
+            }
+
             if (shouldUpdatePlaybackManager()) {
-                val effects = if (override) podcast.playbackEffects else settings.globalPlaybackEffects.value
                 playbackManager.updatePlayerEffects(effects)
             }
         }
