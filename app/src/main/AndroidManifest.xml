@@ -53,7 +53,7 @@
         <activity
                 android:name=".ui.MainActivity"
                 android:configChanges="screenSize|smallestScreenSize|screenLayout"
-                android:launchMode="singleTop"
+                android:launchMode="singleTask"
                 android:colorMode="default"
                 android:exported="true"
                 android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
