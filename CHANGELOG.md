@@ -1,6 +1,8 @@
 7.77
 -----
-
+*   New Features
+    *   Add Playback 2024 summary
+        ([#3123](https://github.com/Automattic/pocket-casts-android/pull/3123))
 
 7.76
 -----
