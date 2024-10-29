@@ -60,8 +60,8 @@ fun UpNextShuffleDialog(
                 painterResource(IR.drawable.shuffle_plus_feature_icon),
                 contentDescription = stringResource(LR.string.up_next_shuffle_button_content_description),
                 modifier = modifier
+                    .padding(top = 8.dp, bottom = 12.dp)
                     .size(96.dp)
-                    .padding(top = 8.dp, bottom = 12.dp),
             )
 
             TextH30(
