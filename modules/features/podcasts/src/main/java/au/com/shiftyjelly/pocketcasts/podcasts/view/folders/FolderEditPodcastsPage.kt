@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNest
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.LargePageTitle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -196,7 +195,7 @@ private fun PodcastSelectRow(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val folderColor = MaterialTheme.theme.colors.getFolderColor(folder.color)
                     Icon(
-                        painter = painterResource(R.drawable.ic_folder_small),
+                        painter = painterResource(IR.drawable.ic_folder_bold),
                         contentDescription = null,
                         tint = folderColor,
                         modifier = Modifier.padding(end = 4.dp),
