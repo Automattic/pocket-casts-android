@@ -25,7 +25,7 @@ class CuratedPodcastsCrawler(
     suspend fun crawl(platform: String): Result<List<CuratedPodcast>> = coroutineScope {
         runCatching { service.getDiscoverFeedSuspend(platform) }.mapCatching { discover ->
             val feeds = discover.layout
-                .filterDiscoverRows()
+                .filterDisplayablePodcasts()
                 .mapNotNull { row -> row.id?.let { id -> fetchFeed(id, row.source) } }
                 .awaitAll()
             feeds.forEach { feed ->
@@ -57,7 +57,7 @@ class CuratedPodcastsCrawler(
         }
     }
 
-    private fun List<DiscoverRow>.filterDiscoverRows() = filter { row ->
+    private fun List<DiscoverRow>.filterDisplayablePodcasts() = filter { row ->
         val isSpecialList = row.id in CuratedPodcast.specialListIds
         (isSpecialList || row.curated) && !row.sponsored && row.type == ListType.PodcastList
     }
