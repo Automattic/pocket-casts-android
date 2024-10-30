@@ -84,7 +84,9 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_VIEW_APPEARED)
+            if (FeatureFlag.isEnabled(Feature.CUSTOM_PLAYBACK_SETTINGS)) {
+                viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_VIEW_APPEARED)
+            }
         }
     }
 
