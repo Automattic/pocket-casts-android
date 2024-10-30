@@ -50,7 +50,7 @@ fun ManageDownloadsCard(
                 color = MaterialTheme.theme.colors.primaryField03,
                 shape = RoundedCornerShape(8.dp),
             )
-            .padding(16.dp),
+            .padding(horizontal = 16.dp).padding(top = 16.dp),
 
     ) {
         Icon(
