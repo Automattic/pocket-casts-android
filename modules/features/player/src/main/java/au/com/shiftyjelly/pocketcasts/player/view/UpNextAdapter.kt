@@ -82,6 +82,7 @@ class UpNextAdapter(
         }
 
     private var isSignedInAsPaidUser: Boolean = false
+    private var isUpNextNotEmpty: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -163,6 +164,10 @@ class UpNextAdapter(
         this.isSignedInAsPaidUser = isSignedInAsPaidUser
     }
 
+    fun updateUpNextEmptyState(isUpNextNotEmpty: Boolean) {
+        this.isUpNextNotEmpty = isUpNextNotEmpty
+    }
+
     inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
@@ -176,7 +181,7 @@ class UpNextAdapter(
                     root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
-                shuffle.isVisible = hasEpisodeInProgress() && FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
+                shuffle.isVisible = isUpNextNotEmpty && FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
                 shuffle.updateShuffleButton()
 
                 shuffle.setOnClickListener {
