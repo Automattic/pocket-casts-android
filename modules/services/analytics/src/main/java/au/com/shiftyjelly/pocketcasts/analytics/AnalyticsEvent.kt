@@ -334,6 +334,8 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SLEEP_TIMER_SETTINGS_TAPPED("player_sleep_timer_settings_tapped"),
 
     /* Player - Playback effects */
+    PLAYBACK_EFFECT_SETTINGS_VIEW_APPEARED("playback_effect_settings_view_appeared"),
+    PLAYBACK_EFFECT_SETTINGS_CHANGED("playback_effect_settings_changed"),
     PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
     PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED("playback_effect_trim_silence_toggled"),
     PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED("playback_effect_trim_silence_amount_changed"),

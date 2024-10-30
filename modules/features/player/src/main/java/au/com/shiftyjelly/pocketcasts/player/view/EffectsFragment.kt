@@ -23,7 +23,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -43,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.Debouncer
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -54,6 +54,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -71,12 +72,20 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     private var binding: FragmentEffectsBinding? = null
     private val trimToggleGroupButtonIds = arrayOf(R.id.trimLow, R.id.trimMedium, R.id.trimHigh)
-    private var updatedSpeed: Double? = null
+    private var playbackSpeedTrackingDebouncer: Debouncer = Debouncer()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         imageRequestFactory = PocketCastsImageRequestFactory(context, cornerRadius = 4).themed()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_VIEW_APPEARED)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -103,7 +112,6 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     override fun onDestroyView() {
         super.onDestroyView()
-        trackSpeedChangeIfNeeded()
         binding = null
     }
 
@@ -179,11 +187,20 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
         val speed = amount.roundedSpeed()
         effects.playbackSpeed = speed
-        updatedSpeed = speed
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
         binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
+        launch {
+            playbackSpeedTrackingDebouncer.debounce {
+                viewModel.effectsLive.value?.effects?.playbackSpeed?.roundedSpeed()?.let { currentSpeed ->
+                    trackPlaybackEffectsEvent(
+                        event = AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED,
+                        props = mapOf(PlaybackManager.SPEED_KEY to currentSpeed),
+                    )
+                }
+            }
+        }
     }
 
     private fun updateTrimState() {
@@ -263,12 +280,8 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         }
     }
 
-    private fun trackSpeedChangeIfNeeded() {
-        updatedSpeed?.let { trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to it)) }
-    }
-
     private fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        playbackManager.trackPlaybackEffectsEvent(event, props, SourceView.PLAYER_PLAYBACK_EFFECTS)
+        viewModel.trackPlaybackEffectsEvent(event, props)
     }
 
     private fun FragmentEffectsBinding.setupEffectsSettingsSegmentedTabBar() {
