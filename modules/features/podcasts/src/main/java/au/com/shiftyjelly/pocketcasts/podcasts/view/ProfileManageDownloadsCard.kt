@@ -66,7 +66,7 @@ fun ManageDownloadsCard(
             modifier = Modifier.padding(end = 16.dp),
         ) {
             TextH40(
-                text = stringResource(LR.string.you_are_running_low_on_storage),
+                text = stringResource(LR.string.need_to_free_up_space),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.theme.colors.primaryText01,
             )
