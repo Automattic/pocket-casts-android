@@ -12,6 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -27,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentUpnextBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.player.viewmodel.UpNextViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -93,6 +95,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     lateinit var adapter: UpNextAdapter
     private val sourceView = SourceView.UP_NEXT
     private val playerViewModel: PlayerViewModel by activityViewModels()
+    private val upNextViewModel: UpNextViewModel by viewModels<UpNextViewModel>()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by activityViewModels()
     private var userRearrangingFrom: Int? = null
     private var userDraggingStart: Int? = null
@@ -307,6 +310,13 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             adapter.isPlaying = it.podcastHeader.isPlaying
             toolbar.menu.findItem(R.id.menu_select)?.isVisible = it.upNextEpisodes.isNotEmpty()
             toolbar.menu.findItem(R.id.clear_up_next)?.isVisible = it.upNextEpisodes.isNotEmpty()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            upNextViewModel.isSignedInAsPaidUser.collect { isSignedInAsPaidUser ->
+                adapter.updateUserSignInState(isSignedInAsPaidUser)
+                adapter.notifyDataSetChanged()
+            }
         }
 
         view.isClickable = true

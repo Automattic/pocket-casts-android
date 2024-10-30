@@ -81,6 +81,8 @@ class UpNextAdapter(
             notifyDataSetChanged()
         }
 
+    private var isSignedInAsPaidUser: Boolean = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -100,8 +102,7 @@ class UpNextAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
-        when (item) {
+        when (val item = getItem(position)) {
             is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
             is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
@@ -158,6 +159,10 @@ class UpNextAdapter(
         (holder as? UpNextEpisodeViewHolder)?.clearDisposable()
     }
 
+    fun updateUserSignInState(isSignedInAsPaidUser: Boolean) {
+        this.isSignedInAsPaidUser = isSignedInAsPaidUser
+    }
+
     inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
@@ -190,19 +195,29 @@ class UpNextAdapter(
         private fun ImageButton.updateShuffleButton() {
             if (!FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)) return
 
-            val isEnabled = settings.upNextShuffle.value
-
-            this.setImageResource(if (isEnabled) IR.drawable.shuffle_enabled else IR.drawable.shuffle)
+            this.setImageResource(
+                when {
+                    !isSignedInAsPaidUser -> IR.drawable.shuffle_plus_feature_icon
+                    settings.upNextShuffle.value -> IR.drawable.shuffle_enabled
+                    else -> IR.drawable.shuffle
+                },
+            )
 
             this.contentDescription = context.getString(
-                if (isEnabled) LR.string.up_next_shuffle_disable_button_content_description else LR.string.up_next_shuffle_button_content_description,
+                when {
+                    isSignedInAsPaidUser -> LR.string.up_next_shuffle_button_content_description
+                    settings.upNextShuffle.value -> LR.string.up_next_shuffle_disable_button_content_description
+                    else -> LR.string.up_next_shuffle_button_content_description
+                },
             )
 
-            this.setImageTintList(
-                ColorStateList.valueOf(
-                    if (isEnabled) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
-                ),
-            )
+            if (isSignedInAsPaidUser) {
+                this.setImageTintList(
+                    ColorStateList.valueOf(
+                        if (settings.upNextShuffle.value) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
+                    ),
+                )
+            }
 
             TooltipCompat.setTooltipText(
                 this,
