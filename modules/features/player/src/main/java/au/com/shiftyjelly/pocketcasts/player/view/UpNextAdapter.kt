@@ -33,10 +33,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -185,10 +189,14 @@ class UpNextAdapter(
                 shuffle.updateShuffleButton()
 
                 shuffle.setOnClickListener {
-                    val newValue = !settings.upNextShuffle.value
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
+                    if (isSignedInAsPaidUser) {
+                        val newValue = !settings.upNextShuffle.value
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
 
-                    settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+                        settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+                    } else {
+                        OnboardingLauncher.openOnboardingFlow(root.context.getActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.UP_NEXT_SHUFFLE))
+                    }
 
                     shuffle.updateShuffleButton()
                 }
