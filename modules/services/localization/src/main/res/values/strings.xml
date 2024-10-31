@@ -445,7 +445,7 @@
     <string name="podcasts_menu_search_podcasts">Search podcasts</string>
     <string name="podcasts_menu_share_podcasts">Share podcasts</string>
     <string name="podcasts_menu_sort_by">Sort by</string>
-    <string name="podcasts_no_subscriptions">No subscribed podcasts</string>
+    <string name="podcasts_no_subscriptions">No podcasts found</string>
     <string name="podcasts_plural">%d Podcasts</string>
     <string name="podcasts_share">Share podcasts</string>
     <string name="podcasts_share_0_selected">0 selected</string>
@@ -459,7 +459,7 @@
     <string name="podcasts_share_failed_description">Something went wrong creating your share page.</string>
     <string name="podcasts_share_select_all">Select all</string>
     <string name="podcasts_share_selected_podcasts">Share selected podcasts</string>
-    <string name="podcasts_share_subscribe_to_all">SUBSCRIBE TO ALL</string>
+    <string name="podcasts_share_subscribe_to_all">FOLLOW ALL</string>
     <string name="podcasts_share_title">Title</string>
     <string name="podcasts_share_create_error">Oops unable to share</string>
     <string name="podcasts_share_missing_title">Please enter a title for your list.</string>
@@ -477,7 +477,7 @@
     <string name="podcasts_sort_by_release_date">Episode release date</string>
     <string name="podcasts_sort_by_title">"Title (A - Z)"</string>
     <string name="podcasts_sort_order">Sort order</string>
-    <string name="podcasts_subscribe_on_phone">Subscribe to podcasts on your phone and they\'ll appear here.</string>
+    <string name="podcasts_subscribe_on_phone">Follow podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
     <string name="podcasts_time_to_add_some_podcasts_summary">You can add podcasts by searching above or if you are looking for some inspiration try the Discover tab.</string>
     <string name="podcasts_empty_folder">Your folder is empty</string>
