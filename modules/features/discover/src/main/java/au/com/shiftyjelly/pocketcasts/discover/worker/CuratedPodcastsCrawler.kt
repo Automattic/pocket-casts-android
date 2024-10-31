@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.discover.worker
 
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
+import au.com.shiftyjelly.pocketcasts.servers.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
@@ -13,14 +14,19 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 
-class CuratedPodcastsCrawler @Inject constructor(
+class CuratedPodcastsCrawler(
     private val service: ListWebService,
+    private val staticHostUrl: String,
 ) {
+    @Inject constructor(
+        service: ListWebService,
+    ) : this(service, BuildConfig.SERVER_STATIC_URL)
+
     suspend fun crawl(platform: String): Result<List<CuratedPodcast>> = coroutineScope {
         runCatching { service.getDiscoverFeedSuspend(platform) }.mapCatching { discover ->
             val feeds = discover.layout
                 .filterDisplayablePodcasts()
-                .map { fetchFeed(it.source) }
+                .mapNotNull { row -> row.id?.let { id -> fetchFeed(id, row.source) } }
                 .awaitAll()
             feeds.forEach { feed ->
                 feed.onFailure { Timber.d(it, "Failed to fetch a feed") }
@@ -56,7 +62,12 @@ class CuratedPodcastsCrawler @Inject constructor(
         (isSpecialList || row.curated) && !row.sponsored && row.type == ListType.PodcastList
     }
 
-    private fun CoroutineScope.fetchFeed(url: String): Deferred<Result<ListFeed>> {
-        return async { runCatching { service.getListFeedSuspend(url) } }
+    private fun CoroutineScope.fetchFeed(id: String, url: String): Deferred<Result<ListFeed>> {
+        val engageUrl = if (id == CuratedPodcast.FEATURED_LIST_ID) {
+            "$staticHostUrl/engage/featured.json"
+        } else {
+            url
+        }
+        return async { runCatching { service.getListFeedSuspend(engageUrl) } }
     }
 }

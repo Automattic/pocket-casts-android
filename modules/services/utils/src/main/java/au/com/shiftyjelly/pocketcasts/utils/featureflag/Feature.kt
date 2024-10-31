@@ -151,7 +151,7 @@ enum class Feature(
         key = "up_next_shuffle",
         title = "Up Next Shuffle",
         defaultValue = BuildConfig.DEBUG,
-        tier = FeatureTier.Free,
+        tier = FeatureTier.Plus(patronExclusiveAccessRelease = null),
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),

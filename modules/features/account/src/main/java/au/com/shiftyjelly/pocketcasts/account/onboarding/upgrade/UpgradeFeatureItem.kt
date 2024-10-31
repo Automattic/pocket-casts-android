@@ -34,7 +34,7 @@ enum class PlusUpgradeFeatureItem(
         title = LR.string.onboarding_plus_feature_desktop_and_web_apps_title,
     ),
     Folders(
-        image = IR.drawable.ic_folders,
+        image = IR.drawable.ic_folder,
         title = LR.string.onboarding_plus_feature_folders_and_bookmarks_title,
     ),
     SkipChapters(
@@ -115,7 +115,7 @@ enum class PlusUpgradeLayoutReviewsItem(
         title = LR.string.onboarding_plus_feature_desktop_and_web_apps_title,
     ),
     Folders(
-        image = IR.drawable.ic_folders,
+        image = IR.drawable.ic_folder,
         title = LR.string.onboarding_plus_feature_folders_and_bookmarks_title,
     ),
     SkipChapters(

@@ -16,6 +16,8 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.backgroundColor
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer.TAG_CRASH
 import dev.shreyaspatil.capturable.controller.CaptureController
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.io.File
@@ -117,7 +119,8 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                         }
                         file
                     }
-                }.getOrNull()
+                }.onFailure { LogBuffer.e(TAG_CRASH, it, "Failed to create a screenshot") }
+                    .getOrNull()
                 _isSharing = false
                 return file
             }

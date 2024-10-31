@@ -33,10 +33,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
@@ -81,6 +85,9 @@ class UpNextAdapter(
             notifyDataSetChanged()
         }
 
+    private var isSignedInAsPaidUser: Boolean = false
+    private var isUpNextNotEmpty: Boolean = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -100,8 +107,7 @@ class UpNextAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
-        when (item) {
+        when (val item = getItem(position)) {
             is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
             is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
@@ -158,6 +164,14 @@ class UpNextAdapter(
         (holder as? UpNextEpisodeViewHolder)?.clearDisposable()
     }
 
+    fun updateUserSignInState(isSignedInAsPaidUser: Boolean) {
+        this.isSignedInAsPaidUser = isSignedInAsPaidUser
+    }
+
+    fun updateUpNextEmptyState(isUpNextNotEmpty: Boolean) {
+        this.isUpNextNotEmpty = isUpNextNotEmpty
+    }
+
     inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
@@ -171,14 +185,18 @@ class UpNextAdapter(
                     root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
-                shuffle.isVisible = hasEpisodeInProgress() && FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
+                shuffle.isVisible = isUpNextNotEmpty && FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)
                 shuffle.updateShuffleButton()
 
                 shuffle.setOnClickListener {
-                    val newValue = !settings.upNextShuffle.value
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
+                    if (isSignedInAsPaidUser) {
+                        val newValue = !settings.upNextShuffle.value
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
 
-                    settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+                        settings.upNextShuffle.set(newValue, updateModifiedAt = false)
+                    } else {
+                        OnboardingLauncher.openOnboardingFlow(root.context.getActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.UP_NEXT_SHUFFLE))
+                    }
 
                     shuffle.updateShuffleButton()
                 }
@@ -190,19 +208,29 @@ class UpNextAdapter(
         private fun ImageButton.updateShuffleButton() {
             if (!FeatureFlag.isEnabled(Feature.UP_NEXT_SHUFFLE)) return
 
-            val isEnabled = settings.upNextShuffle.value
-
-            this.setImageResource(if (isEnabled) IR.drawable.shuffle_enabled else IR.drawable.shuffle)
+            this.setImageResource(
+                when {
+                    !isSignedInAsPaidUser -> IR.drawable.shuffle_plus_feature_icon
+                    settings.upNextShuffle.value -> IR.drawable.shuffle_enabled
+                    else -> IR.drawable.shuffle
+                },
+            )
 
             this.contentDescription = context.getString(
-                if (isEnabled) LR.string.up_next_shuffle_disable_button_content_description else LR.string.up_next_shuffle_button_content_description,
+                when {
+                    isSignedInAsPaidUser -> LR.string.up_next_shuffle_button_content_description
+                    settings.upNextShuffle.value -> LR.string.up_next_shuffle_disable_button_content_description
+                    else -> LR.string.up_next_shuffle_button_content_description
+                },
             )
 
-            this.setImageTintList(
-                ColorStateList.valueOf(
-                    if (isEnabled) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
-                ),
-            )
+            if (isSignedInAsPaidUser) {
+                this.setImageTintList(
+                    ColorStateList.valueOf(
+                        if (settings.upNextShuffle.value) ThemeColor.primaryIcon01(theme) else ThemeColor.primaryIcon02(theme),
+                    ),
+                )
+            }
 
             TooltipCompat.setTooltipText(
                 this,
