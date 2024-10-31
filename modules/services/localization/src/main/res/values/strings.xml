@@ -1275,8 +1275,8 @@
     <string name="settings_podcast_artwork">Podcast Artwork</string>
     <string name="settings_podcast_custom">Custom for this podcast</string>
     <string name="settings_podcast_episode_grouping">Podcast episode grouping</string>
-    <string name="settings_podcast_episode_grouping_summary">New podcasts you subscribe to will have their episodes grouped by %s.</string>
-    <string name="settings_podcast_episode_grouping_summary_none">New podcasts you subscribe to won\'t have their episodes grouped.</string>
+    <string name="settings_podcast_episode_grouping_summary">New podcasts you follow will have their episodes grouped by %s.</string>
+    <string name="settings_podcast_episode_grouping_summary_none">New podcasts you follow won\'t have their episodes grouped.</string>
     <string name="settings_podcast_episode_grouping_title_downloaded" translatable="false">@string/downloaded</string>
     <string name="settings_podcast_episode_grouping_title_none">None</string>
     <string name="settings_podcast_episode_grouping_title_season">Season</string>
@@ -1297,8 +1297,8 @@
     <string name="settings_show_archived" translatable="false">@string/show_archived</string>
     <string name="settings_show_archived_action_hide">Hide</string>
     <string name="settings_show_archived_action_show">Show</string>
-    <string name="settings_show_archived_summary_hide">New podcasts you subscribe to won\'t show archived episodes.</string>
-    <string name="settings_show_archived_summary_show">New podcasts you subscribe to will show archived episodes.</string>
+    <string name="settings_show_archived_summary_hide">New podcasts you follow won\'t show archived episodes.</string>
+    <string name="settings_show_archived_summary_show">New podcasts you follow will show archived episodes.</string>
     <string name="settings_show_artwork">Show artwork on lock screen</string>
     <string name="settings_show_artwork_details">This will also show artwork on connected Bluetooth devices, watches, etc.</string>
     <string name="settings_skip_back_time">Skip back time</string>
@@ -1338,7 +1338,7 @@
     <string name="settings_storage_store_on">Store podcasts on</string>
     <string name="settings_storage_fix_downloads">Fix downloads</string>
     <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
-    <string name="settings_subscribe_to_played">Subscribe to played podcasts</string>
+    <string name="settings_subscribe_to_played">Follow played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
     <string name="settings_theme">Theme</string>

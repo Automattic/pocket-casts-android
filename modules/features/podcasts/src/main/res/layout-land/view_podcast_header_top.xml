@@ -146,7 +146,7 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/animationSubscribedButton"
         app:layout_constraintEnd_toEndOf="@+id/animationSubscribedButton"
-        app:layout_constraintTop_toBottomOf="@+id/header" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <ImageView
         android:id="@+id/subscribedButton"
