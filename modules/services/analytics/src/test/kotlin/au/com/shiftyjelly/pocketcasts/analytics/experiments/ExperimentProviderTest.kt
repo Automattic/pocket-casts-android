@@ -71,6 +71,18 @@ class ExperimentProviderTest {
     }
 
     @Test
+    fun `should not initialize with empty uuid`() {
+        FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
+
+        `when`(accountStatusInfo.getUuid()).thenReturn("")
+
+        experimentProvider.initialize()
+
+        verify(repository, never()).initialize(eq(""), eq(null))
+        verify(accountStatusInfo).getUuid()
+    }
+
+    @Test
     fun `getVariation should return Control when repository returns Control`() {
         FeatureFlag.setEnabled(Feature.EXPLAT_EXPERIMENT, true)
 
