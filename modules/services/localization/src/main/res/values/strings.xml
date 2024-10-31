@@ -1186,8 +1186,8 @@
     <string name="settings_export_save_file">Save file</string>
     <string name="settings_export_save_file_summary">Export the OPML file to your storage.</string>
     <string name="settings_export_send_email">Send email</string>
-    <string name="settings_export_send_email_summary">Export your subscriptions in the super geeky (but widely supported) OPML format.</string>
-    <string name="settings_export_subscriptions">Export subscriptions</string>
+    <string name="settings_export_send_email_summary">Export your podcasts in the super geeky (but widely supported) OPML format.</string>
+    <string name="settings_export_subscriptions">Export podcasts</string>
     <string name="settings_general_defaults">Defaults</string>
     <string name="settings_general_player">Player</string>
     <string name="settings_general_sleep_timer">Sleep Timer</string>
@@ -1212,7 +1212,7 @@
     <string name="settings_help_phone_unavailable_message">Please try again when your phone is connected to your watch.</string>
     <string name="settings_import_choose_file">Choose an OPML file.</string>
     <string name="settings_import_file">Select file</string>
-    <string name="settings_import_file_summary">If you have podcast subscriptions in another app or service, Pocket Casts can import them from an OPML file.</string>
+    <string name="settings_import_file_summary">If you have podcasts in another app or service, Pocket Casts can import them from an OPML file.</string>
     <string name="settings_import_url">By URL</string>
     <string name="settings_import_url_summary">Import your podcasts from an OPML file using a URL.</string>
     <string name="settings_import_opml_progress">%1$d of %2$d podcasts</string>
@@ -1472,7 +1472,7 @@
     <string name="settings_opml_export_failed">Unable to save the OPML file.</string>
     <string name="settings_subscribe_to_played_summary">Podcasts you listen to will be automatically added to the Podcasts tab</string>
     <string name="settings_notification_default_sound">Default sound</string>
-    <string name="settings_import_title">Import subscriptions</string>
+    <string name="settings_import_title">Import podcasts</string>
     <string name="settings_export_database">Export database</string>
     <string name="settings_export_database_failed">Database export failed</string>
     <string name="settings_status_page">Status Page</string>
@@ -1488,7 +1488,7 @@
     <string name="settings_status_service_refresh">Refresh Service</string>
     <string name="settings_status_service_refresh_summary">The service used to find new episodes.</string>
     <string name="settings_status_service_account">Account Service</string>
-    <string name="settings_status_service_account_summary">The service used to store episode progress, subscriptions, filters, etc.</string>
+    <string name="settings_status_service_account_summary">The service used to store episode progress, podcasts you follow, filters, etc.</string>
     <string name="settings_status_service_discover"><![CDATA[Discover & Search]]></string>
     <string name="settings_status_service_discover_summary">The discover section of the app, including podcast search.</string>
     <string name="settings_status_service_ad_blocker_help_singular">The most common cause is that you have an ad-blocker configured on your phone or network. You’ll need to unblock the domain %s</string>
