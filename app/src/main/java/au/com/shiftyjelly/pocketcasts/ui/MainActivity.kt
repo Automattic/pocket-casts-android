@@ -742,10 +742,11 @@ class MainActivity :
         viewGroup.addView(
             ComposeView(viewGroup.context).apply {
                 setContent {
+                    val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
                     AppTheme(theme.activeTheme) {
                         LowStorageLaunchBottomSheet(
                             parent = viewGroup,
-                            shouldShow = true,
+                            shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L,
                             onManageDownloadsClick = {
                                 analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAN_UP))
                                 addFragment(ManualCleanupFragment.newInstance())
@@ -754,7 +755,7 @@ class MainActivity :
                             },
                             onMaybeLaterClick = {
                             },
-                            totalDownloadSize = 324234,
+                            totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
                         )
                     }
                 }
