@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
@@ -33,12 +34,14 @@ import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsVie
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
+import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -99,6 +102,8 @@ class AutoDownloadSettingsFragment :
 
     private val viewModel: AutoDownloadSettingsViewModel by viewModels()
 
+    private var lowStorageListener: LowStorageBottomSheetListener? = null
+
     private var podcastsCategory: PreferenceCategory? = null
     private lateinit var upNextPreference: SwitchPreference
     private var newEpisodesPreference: SwitchPreference? = null
@@ -158,6 +163,10 @@ class AutoDownloadSettingsFragment :
                     if (newValue is Boolean) {
                         viewModel.onNewEpisodesChange(newValue)
                         handleNewEpisodesToggle(newValue)
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            if (newValue && isDeviceRunningOnLowStorage()) lowStorageListener?.showModal()
+                        }
                     }
                     true
                 }
@@ -234,6 +243,16 @@ class AutoDownloadSettingsFragment :
 
         setupAutoDownloadLimitOptions()
         updateView()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        lowStorageListener = context as? LowStorageBottomSheetListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        lowStorageListener = null
     }
 
     private fun handleNewEpisodesToggle(isEnabled: Boolean) {
