@@ -127,7 +127,6 @@ internal fun LowStorageDialog(
 
             RowButton(
                 text = stringResource(LR.string.manage_downloads),
-                contentDescription = stringResource(LR.string.manage_downloads),
                 onClick = { onManageDownloadsClick.invoke() },
                 includePadding = false,
                 textColor = MaterialTheme.theme.colors.primaryInteractive02,

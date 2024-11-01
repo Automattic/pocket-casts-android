@@ -42,16 +42,16 @@ class StorageSettingsFragment : BaseFragment() {
     @Inject
     lateinit var settings: Settings
 
-    private var listener: LowStorageBottomSheetListener? = null
+    private var lowStorageListener: LowStorageBottomSheetListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listener = context as? LowStorageBottomSheetListener
+        lowStorageListener = context as? LowStorageBottomSheetListener
     }
 
     override fun onDetach() {
         super.onDetach()
-        listener = null
+        lowStorageListener = null
     }
 
     override fun onCreateView(
@@ -77,7 +77,7 @@ class StorageSettingsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                listener?.showModal()
+                lowStorageListener?.showModal()
                 viewModel.permissionRequest.collect { permissionRequest ->
                     if (permissionRequest == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
                         requestPermissionLauncher.launch(permissionRequest)
