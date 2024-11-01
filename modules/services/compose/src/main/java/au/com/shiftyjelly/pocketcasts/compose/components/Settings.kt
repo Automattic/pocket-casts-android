@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -76,15 +77,9 @@ fun SettingSection(
             modifier = Modifier.padding(vertical = verticalPadding),
         ) {
             if (heading != null) {
-                TextH40(
+                SettingSectionHeader(
                     text = heading,
-                    color = MaterialTheme.theme.colors.primaryInteractive01,
-                    modifier = Modifier.padding(
-                        start = if (indent) indentedStartPadding else horizontalPadding,
-                        end = horizontalPadding,
-                        top = verticalPadding,
-                        bottom = verticalPadding,
-                    ),
+                    indent = indent,
                 )
             }
             if (subHeading != null) {
@@ -109,6 +104,24 @@ fun SettingSection(
 }
 
 @Composable
+fun SettingSectionHeader(
+    text: String,
+    indent: Boolean = true,
+    paddingValues: PaddingValues = PaddingValues(
+        start = if (indent) indentedStartPadding else horizontalPadding,
+        end = horizontalPadding,
+        top = verticalPadding * 2,
+        bottom = verticalPadding,
+    ),
+) {
+    TextH40(
+        text = text,
+        color = MaterialTheme.theme.colors.primaryInteractive01,
+        modifier = Modifier.padding(paddingValues),
+    )
+}
+
+@Composable
 fun <T> SettingRadioDialogRow(
     primaryText: String,
     modifier: Modifier = Modifier,
@@ -116,6 +129,7 @@ fun <T> SettingRadioDialogRow(
     icon: Painter? = null,
     iconGradientColors: List<Color>? = null,
     options: List<T>,
+    indent: Boolean = true,
     savedOption: T,
     optionToLocalisedString: (T) -> String,
     onSave: (T) -> Unit,
@@ -127,6 +141,7 @@ fun <T> SettingRadioDialogRow(
         icon = icon,
         iconGradientColors = iconGradientColors,
         modifier = modifier.clickable { showDialog = true },
+        indent = indent,
     ) {
         if (showDialog) {
             RadioDialog(
