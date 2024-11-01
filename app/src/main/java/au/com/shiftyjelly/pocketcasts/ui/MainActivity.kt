@@ -17,12 +17,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -147,7 +143,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -748,14 +743,8 @@ class MainActivity :
             ComposeView(viewGroup.context).apply {
                 setContent {
                     val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
-                    var isLowStorage by remember { mutableStateOf(false) }
-
-                    LaunchedEffect(Unit) {
-                        isLowStorage = isDeviceRunningOnLowStorage()
-                    }
 
                     val shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L &&
-                        isLowStorage &&
                         FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
 
                     AppTheme(theme.activeTheme) {

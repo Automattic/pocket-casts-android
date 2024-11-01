@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.isDeviceRunningOnLowStorage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,7 +78,9 @@ class StorageSettingsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                lowStorageListener?.showModal()
+                if (isDeviceRunningOnLowStorage()) {
+                    lowStorageListener?.showModal()
+                }
                 viewModel.permissionRequest.collect { permissionRequest ->
                     if (permissionRequest == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
                         requestPermissionLauncher.launch(permissionRequest)
