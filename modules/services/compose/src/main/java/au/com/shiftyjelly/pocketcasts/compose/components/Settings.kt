@@ -110,7 +110,7 @@ fun SettingSectionHeader(
     paddingValues: PaddingValues = PaddingValues(
         start = if (indent) indentedStartPadding else horizontalPadding,
         end = horizontalPadding,
-        top = verticalPadding * 2,
+        top = verticalPadding,
         bottom = verticalPadding,
     ),
 ) {
