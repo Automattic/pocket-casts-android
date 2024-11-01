@@ -160,7 +160,7 @@ enum class Feature(
         title = "Custom playback settings",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     MANAGE_DOWNLOADED_EPISODES(
