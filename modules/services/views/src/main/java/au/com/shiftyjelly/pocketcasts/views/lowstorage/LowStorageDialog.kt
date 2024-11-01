@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.lowstorage
 
+import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.ModalBottomSheet
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -30,8 +35,47 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+fun LowStorageLaunchBottomSheet(
+    parent: ViewGroup,
+    modifier: Modifier = Modifier,
+    shouldShow: Boolean = true,
+    totalDownloadSize: Long,
+    onManageDownloadsClick: () -> Unit,
+    onMaybeLaterClick: () -> Unit,
+    onExpanded: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true,
+    )
+    val coroutineScope = rememberCoroutineScope()
+
+    ModalBottomSheet(
+        parent = parent,
+        shouldShow = shouldShow,
+        customSheetState = sheetState,
+        onExpanded = onExpanded,
+        customContent = {
+            LowStorageDialog(
+                modifier = modifier,
+                totalDownloadSize = totalDownloadSize,
+                onManageDownloadsClick = {
+                    coroutineScope.launch { sheetState.hide() }
+                    onManageDownloadsClick.invoke()
+                },
+                onMaybeLaterClick = {
+                    coroutineScope.launch { sheetState.hide() }
+                    onMaybeLaterClick.invoke()
+                },
+            )
+        },
+    )
+}
 
 @Composable
 internal fun LowStorageDialog(
@@ -119,4 +163,8 @@ fun PreviewLowStorageDialog(@PreviewParameter(ThemePreviewParameterProvider::cla
             onMaybeLaterClick = {},
         )
     }
+}
+
+interface LowStorageBottomSheetListener {
+    fun showModal()
 }

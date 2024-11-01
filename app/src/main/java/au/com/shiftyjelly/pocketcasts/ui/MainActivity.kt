@@ -95,6 +95,8 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFra
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Companion.CLEAN_UP
+import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Companion.OPTION_KEY
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
@@ -128,6 +130,7 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -150,6 +153,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
+import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageLaunchBottomSheet
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -190,6 +195,7 @@ class MainActivity :
     FragmentHostListener,
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
+    LowStorageBottomSheetListener,
     OnboardingLauncher,
     CoroutineScope,
     NotificationPermissionChecker {
@@ -723,6 +729,32 @@ class MainActivity :
                                 settings.setEndOfYearShowModal(false)
                                 viewModel.updateStoriesModalShowState(false)
                             },
+                        )
+                    }
+                }
+            },
+        )
+    }
+
+    private fun setupLowStorageLaunchBottomSheet() {
+        val viewGroup = binding.modalBottomSheet
+        viewGroup.removeAllViews()
+        viewGroup.addView(
+            ComposeView(viewGroup.context).apply {
+                setContent {
+                    AppTheme(theme.activeTheme) {
+                        LowStorageLaunchBottomSheet(
+                            parent = viewGroup,
+                            shouldShow = true,
+                            onManageDownloadsClick = {
+                                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAN_UP))
+                                addFragment(ManualCleanupFragment.newInstance())
+                            },
+                            onExpanded = {
+                            },
+                            onMaybeLaterClick = {
+                            },
+                            totalDownloadSize = 324234,
                         )
                     }
                 }
@@ -1622,5 +1654,11 @@ class MainActivity :
             .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
             .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
+    }
+
+    override fun showModal() {
+        launch(Dispatchers.Main) {
+            setupLowStorageLaunchBottomSheet()
+        }
     }
 }

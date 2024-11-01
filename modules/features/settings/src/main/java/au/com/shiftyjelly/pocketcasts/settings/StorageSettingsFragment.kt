@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewMode
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.lowstorage.LowStorageBottomSheetListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -39,6 +41,18 @@ class StorageSettingsFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
+
+    private var listener: LowStorageBottomSheetListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? LowStorageBottomSheetListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +77,7 @@ class StorageSettingsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                listener?.showModal()
                 viewModel.permissionRequest.collect { permissionRequest ->
                     if (permissionRequest == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
                         requestPermissionLauncher.launch(permissionRequest)

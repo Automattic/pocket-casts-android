@@ -83,11 +83,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     companion object {
+        const val OPTION_KEY = "option"
+        const val CLEAN_UP = "clean_up"
         private const val SELECT_ALL_KEY = "select_all"
-        private const val OPTION_KEY = "option"
         private const val AUTO_DOWNLOAD_SETTINGS = "auto_download_settings"
         private const val STOP_ALL_DOWNLOADS = "stop_all_downloads"
-        private const val CLEAN_UP = "clean_up"
         private const val CLEAR_HISTORY = "clear_history"
 
         fun newInstance(mode: Mode): ProfileEpisodeListFragment {
