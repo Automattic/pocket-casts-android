@@ -745,6 +745,7 @@ class MainActivity :
                     val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
 
                     val shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L &&
+                        settings.shouldShowLowStorageModalAfterSnooze() &&
                         FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
 
                     AppTheme(theme.activeTheme) {
@@ -758,6 +759,7 @@ class MainActivity :
                             onExpanded = {
                             },
                             onMaybeLaterClick = {
+                                settings.setDismissLowStorageModalTime(System.currentTimeMillis())
                             },
                             totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
                         )
