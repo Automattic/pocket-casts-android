@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNest
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.LargePageTitle
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -174,7 +173,7 @@ fun FolderMoveRow(modifier: Modifier = Modifier, onClick: () -> Unit) {
             modifier = Modifier.width(56.dp),
         ) {
             Icon(
-                painter = painterResource(R.drawable.folder_create),
+                painter = painterResource(IR.drawable.ic_folder_plus),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.primaryInteractive01,
             )

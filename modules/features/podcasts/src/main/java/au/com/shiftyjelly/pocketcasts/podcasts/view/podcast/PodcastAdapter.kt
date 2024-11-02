@@ -333,8 +333,8 @@ class PodcastAdapter(
         holder.binding.top.header.setBackgroundColor(ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor))
         holder.binding.top.folders.setImageResource(
             when {
-                !isPlusOrPatronUser -> IR.drawable.folder_lock_light
-                podcast.folderUuid != null -> R.drawable.ic_folder_check
+                !isPlusOrPatronUser -> IR.drawable.ic_folder_plus
+                podcast.folderUuid != null -> IR.drawable.ic_folder_check
                 else -> IR.drawable.ic_folder
             },
         )

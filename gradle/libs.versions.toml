@@ -284,7 +284,7 @@ material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 play-auth = "com.google.android.gms:play-services-auth:20.4.0"
 play-cast = "com.google.android.gms:play-services-cast-framework:21.5.0"
 play-oss-licenses = "com.google.android.gms:play-services-oss-licenses:17.0.1"
-play-review = "com.google.android.play:review-ktx:2.0.1"
+play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:18.0.0"
 reorderable = "sh.calvin.reorderable:reorderable:2.4.0"
 security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }

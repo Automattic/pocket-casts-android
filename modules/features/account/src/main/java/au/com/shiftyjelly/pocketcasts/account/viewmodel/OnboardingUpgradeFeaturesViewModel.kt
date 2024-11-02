@@ -107,7 +107,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         val upgradeLayout = when {
             showPatronOnly -> UpgradeLayout.Original
             FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT) -> {
-                when (val variation = experiments.getVariation(Experiment.PaywallUpgradeABTest)) {
+                when (val variation = experiments.getVariation(Experiment.PaywallUpgradeAATest)) {
                     is Variation.Control -> {
                         UpgradeLayout.Original
                     }

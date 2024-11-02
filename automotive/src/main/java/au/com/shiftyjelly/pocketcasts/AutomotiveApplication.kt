@@ -8,6 +8,7 @@ import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
@@ -59,6 +60,8 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     @Inject lateinit var initializeRemoteLogging: InitializeRemoteLogging
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
+
+    @Inject lateinit var experimentProvider: ExperimentProvider
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -120,5 +123,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
     private fun setupAnalytics() {
         analyticsTracker.clearAllData()
+        experimentProvider.initialize()
     }
 }
