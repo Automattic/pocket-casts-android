@@ -2154,6 +2154,7 @@
     <string name="paywall_layout_reviews_review_six_date">Mar 8</string>
 
     <string name="folders_plus_prompt">Organize your podcasts with Pocket Casts Plus, and more</string>
+    <string name="themes_plus_prompt">Get exclusive themes with Pocket Casts Plus, and more</string>
 
     <!-- Engage SDK -->
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
