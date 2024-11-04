@@ -106,7 +106,7 @@ internal fun LowStorageDialog(
             Icon(
                 painterResource(IR.drawable.pencil_cleanup),
                 contentDescription = stringResource(LR.string.pencil_clean_up_icon_content_description),
-                modifier = modifier
+                modifier = Modifier
                     .padding(bottom = 16.dp)
                     .size(40.dp),
                 tint = MaterialTheme.theme.colors.primaryInteractive01,
