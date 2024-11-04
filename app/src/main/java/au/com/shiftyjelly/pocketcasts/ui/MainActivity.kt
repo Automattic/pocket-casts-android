@@ -762,6 +762,7 @@ class MainActivity :
                                 analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
                             },
                             onMaybeLaterClick = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED, mapOf("source" to sourceView.analyticsValue))
                                 settings.setDismissLowStorageModalTime(System.currentTimeMillis())
                             },
                             totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
