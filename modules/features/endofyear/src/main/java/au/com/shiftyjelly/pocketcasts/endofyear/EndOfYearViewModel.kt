@@ -230,47 +230,60 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
 
     internal fun trackFailedToLoad() {
-        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
+        trackEvent(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
     }
 
     internal fun trackStoriesShown() {
-        analyticsTracker.track(
+        trackEvent(
             AnalyticsEvent.END_OF_YEAR_STORIES_SHOWN,
             mapOf("source" to source.value),
         )
     }
 
     internal fun trackStoriesClosed(source: String) {
-        analyticsTracker.track(
+        trackEvent(
             AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
             mapOf("source" to source),
         )
     }
 
     internal fun trackStoriesAutoFinished() {
-        analyticsTracker.track(
+        trackEvent(
             AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
             mapOf("source" to "auto_progress"),
         )
     }
 
     internal fun trackStoryShown(story: Story) {
-        analyticsTracker.track(
+        trackEvent(
             AnalyticsEvent.END_OF_YEAR_STORY_SHOWN,
             mapOf("story" to story.analyticsValue),
         )
     }
 
     internal fun trackReplayStoriesTapped() {
-        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED)
+        trackEvent(AnalyticsEvent.END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED)
     }
 
     internal fun trackUpsellShown() {
-        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_UPSELL_SHOWN)
+        trackEvent(AnalyticsEvent.END_OF_YEAR_UPSELL_SHOWN)
     }
 
     internal fun trackLearnRatingsShown() {
-        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_LEARN_RATINGS_SHOWN)
+        trackEvent(AnalyticsEvent.END_OF_YEAR_LEARN_RATINGS_SHOWN)
+    }
+
+    private fun trackEvent(
+        event: AnalyticsEvent,
+        properties: Map<String, Any> = emptyMap(),
+    ) {
+        analyticsTracker.track(
+            event,
+            buildMap {
+                putAll(properties)
+                put("year", year.value)
+            },
+        )
     }
 
     private fun getRandomShowIds(stats: EndOfYearStats): RandomShowIds? {
