@@ -95,10 +95,11 @@ internal fun LowStorageDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxWidth(),
         ) {
-            Image(
-                painterResource(IR.drawable.swipe_affordance),
+            Icon(
+                painter = painterResource(IR.drawable.swipe_affordance),
                 contentDescription = stringResource(LR.string.swipe_affordance_content_description),
-                modifier = modifier
+                tint = MaterialTheme.theme.colors.primaryIcon02,
+                modifier = Modifier
                     .width(56.dp)
                     .padding(top = 8.dp, bottom = 24.dp),
             )
