@@ -219,6 +219,8 @@ private fun Content(
             val userCreatedNewAccount = when (upgradeSource) {
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,
                 OnboardingUpgradeSource.APPEARANCE,
+                OnboardingUpgradeSource.ICONS,
+                OnboardingUpgradeSource.THEMES,
                 OnboardingUpgradeSource.BOOKMARKS,
                 OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
                 OnboardingUpgradeSource.END_OF_YEAR,
