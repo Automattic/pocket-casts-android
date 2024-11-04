@@ -55,6 +55,8 @@ sealed class UpgradeFeatureCard(
 
             source == OnboardingUpgradeSource.ICONS -> LR.string.icons_plus_prompt
 
+            source == OnboardingUpgradeSource.FILES -> LR.string.files_plus_prompt
+
             else -> LR.string.onboarding_plus_features_title
         }
     }
