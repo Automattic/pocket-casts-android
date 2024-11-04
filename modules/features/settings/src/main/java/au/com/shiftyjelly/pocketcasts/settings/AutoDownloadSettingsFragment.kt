@@ -238,6 +238,9 @@ class AutoDownloadSettingsFragment :
 
     private fun handleNewEpisodesToggle(isEnabled: Boolean) {
         lifecycleScope.launch {
+            if (!isEnabled) {
+                async(Dispatchers.IO) { podcastManager.updateAllAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_OFF) }.await()
+            }
             updateNewEpisodesSwitch(isEnabled)
             updatePodcastsSummary()
         }
