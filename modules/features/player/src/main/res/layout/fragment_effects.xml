@@ -172,7 +172,7 @@
                     app:strokeColor="@color/trim_stroke_color"
                     android:textAllCaps="false"
                     android:text="@string/player_effects_trim_mild"
-                    style="?attr/materialButtonOutlinedStyle"
+                    style="@style/TrimMode.Button.Left"
                     />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/trimMedium"
@@ -194,7 +194,7 @@
                     app:strokeColor="@color/trim_stroke_color"
                     android:textAllCaps="false"
                     android:text="@string/player_effects_trim_mad_max"
-                    style="?attr/materialButtonOutlinedStyle"
+                    style="@style/TrimMode.Button.Right"
                     />
             </com.google.android.material.button.MaterialButtonToggleGroup>
             <TextView
