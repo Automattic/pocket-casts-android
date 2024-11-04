@@ -749,8 +749,8 @@ class MainActivity :
                     val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
 
                     val shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L &&
-                        settings.shouldShowLowStorageModalAfterSnooze() &&
-                        FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
+                            settings.shouldShowLowStorageModalAfterSnooze() &&
+                            FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
 
                     AppTheme(theme.activeTheme) {
                         LowStorageLaunchBottomSheet(
