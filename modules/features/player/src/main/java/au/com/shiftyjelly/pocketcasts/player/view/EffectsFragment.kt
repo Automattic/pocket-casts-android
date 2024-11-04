@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
@@ -325,13 +324,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             items = PlaybackEffectsSettingsTab.entries.map { stringResource(it.labelResId) },
             selectedIndex = PlaybackEffectsSettingsTab.entries.indexOf(selectedItem),
             colors = SegmentedTabBarDefaults.colors.copy(
-                selectedTabBackgroundColor = MaterialTheme.theme.colors.playerContrast06.copy(alpha = .1f),
-                borderColor = MaterialTheme.theme.colors.playerContrast03.copy(alpha = .4f),
+                selectedTabBackgroundColor = MaterialTheme.theme.colors.playerContrast01,
+                borderColor = MaterialTheme.theme.colors.playerContrast03,
             ),
             cornerRadius = 120.dp,
-            textStyle = SegmentedTabBarDefaults.textStyle.copy(
-                fontSize = 13.sp,
-            ),
             modifier = modifier.fillMaxWidth(),
             onItemSelected = onItemSelected,
         )
