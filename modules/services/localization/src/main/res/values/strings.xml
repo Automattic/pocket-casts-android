@@ -2153,6 +2153,8 @@
     <string name="paywall_layout_reviews_review_six_message">PC has been my go-to for years. I\'ve tried other podcast apps and always come back to PC for their simplicity, Ul and support. Definitely worth checking it out, especially if you have grown tired of your current podcast app.</string>
     <string name="paywall_layout_reviews_review_six_date">Mar 8</string>
 
+    <string name="folders_plus_prompt">Organize your podcasts with Pocket Casts Plus, and more</string>
+
     <!-- Engage SDK -->
     <string name="engage_sdk_recently_played" translatable="false">@string/nova_launcher_recently_played</string>
     <string name="engage_sdk_new_releases" translatable="false">@string/nova_launcher_new_releases</string>

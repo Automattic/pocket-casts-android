@@ -49,6 +49,8 @@ sealed class UpgradeFeatureCard(
                 SubscriptionTier.fromFeatureTier(Feature.UP_NEXT_SHUFFLE) == SubscriptionTier.PLUS
             -> LR.string.up_next_shuffle_plus_prompt
 
+            source == OnboardingUpgradeSource.FOLDERS -> LR.string.folders_plus_prompt
+
             else -> LR.string.onboarding_plus_features_title
         }
     }
