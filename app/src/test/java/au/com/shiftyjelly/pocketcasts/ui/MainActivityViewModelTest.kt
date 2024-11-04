@@ -25,6 +25,7 @@ import io.reactivex.Flowable
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -85,6 +86,12 @@ class MainActivityViewModelTest {
 
     private val episode = UserEpisode(uuid = TEST_EPISODE_UUID, publishedDate = Date())
 
+    private val downloadedEpisodes = listOf(
+        PodcastEpisode(sizeInBytes = 1024L, uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        PodcastEpisode(sizeInBytes = 2048L, uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+        PodcastEpisode(sizeInBytes = 512L, uuid = "episode-uuid", title = "Episode Title", publishedDate = Date()),
+    )
+
     @Before
     fun setup() = runTest {
         whenever(playbackManager.playbackStateRelay).thenReturn(BehaviorRelay.create<PlaybackState>().toSerialized())
@@ -116,6 +123,15 @@ class MainActivityViewModelTest {
 
         viewModel.state.test {
             assertFalse(awaitItem().shouldShowWhatsNew)
+        }
+    }
+
+    @Test
+    fun `when episodeManager emits episodes, downloadedEpisodeState should update with total size`() = runTest {
+        initViewModel()
+
+        viewModel.downloadedEpisodeState.test {
+            assertEquals(downloadedEpisodes.sumOf { it.sizeInBytes }, awaitItem().downloadedEpisodes)
         }
     }
 
@@ -217,6 +233,8 @@ class MainActivityViewModelTest {
                 ),
             ),
         )
+
+        whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.just(downloadedEpisodes))
 
         viewModel = MainActivityViewModel(
             episodeManager = episodeManager,
