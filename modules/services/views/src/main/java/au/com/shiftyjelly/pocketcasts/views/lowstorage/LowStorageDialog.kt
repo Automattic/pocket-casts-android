@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.lowstorage
 
 import android.view.ViewGroup
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -97,7 +96,7 @@ internal fun LowStorageDialog(
         ) {
             Icon(
                 painter = painterResource(IR.drawable.swipe_affordance),
-                contentDescription = stringResource(LR.string.swipe_affordance_content_description),
+                contentDescription = stringResource(LR.string.drag_down_to_dismiss_content_description),
                 tint = MaterialTheme.theme.colors.primaryIcon02,
                 modifier = Modifier
                     .width(56.dp)
