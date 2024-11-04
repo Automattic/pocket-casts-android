@@ -9,6 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -49,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSectionHeader
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -144,10 +147,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                 items(settingsItemsKey.size) { item ->
                     when (settingsItemsKey[item]) {
                         SettingsItems.SETTINGS_HEADER_DEFAULTS -> {
-                            SettingSectionHeader(
-                                text = stringResource(LR.string.settings_general_defaults),
-                                indent = false,
-                            )
+                            Column {
+                                Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                SettingSectionHeader(
+                                    text = stringResource(LR.string.settings_general_defaults),
+                                    indent = false,
+                                )
+                            }
                         }
 
                         SettingsItems.SETTINGS_ROW_ACTION -> {
@@ -239,10 +245,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
 
                         SettingsItems.SETTINGS_HEADER_PLAYER -> {
-                            SettingSectionHeader(
-                                text = stringResource(LR.string.settings_general_player),
-                                indent = false,
-                            )
+                            Column {
+                                Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                SettingSectionHeader(
+                                    text = stringResource(LR.string.settings_general_player),
+                                    indent = false,
+                                )
+                            }
                         }
 
                         SettingsItems.SETTINGS_SKIP_FORWARD_TIME -> {
@@ -341,10 +350,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
 
                         SettingsItems.SETTINGS_HEADER_SLEEP_TIMER -> {
-                            SettingSectionHeader(
-                                text = stringResource(LR.string.settings_general_sleep_timer),
-                                indent = false,
-                            )
+                            Column {
+                                Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                SettingSectionHeader(
+                                    text = stringResource(LR.string.settings_general_sleep_timer),
+                                    indent = false,
+                                )
+                            }
                         }
 
                         SettingsItems.SETTINGS_SLEEP_TIMER_RESTART -> {
