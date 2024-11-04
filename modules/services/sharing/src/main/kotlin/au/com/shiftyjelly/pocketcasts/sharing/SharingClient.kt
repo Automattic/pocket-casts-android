@@ -246,7 +246,10 @@ class SharingClient(
                 val pendingIntent = ItemSharedReceiver.intent(
                     context = context,
                     event = AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
-                    values = mapOf("story" to data.story.analyticsValue),
+                    values = mapOf(
+                        "story" to data.story.analyticsValue,
+                        "year" to data.year.value,
+                    ),
                 )
                 Intent()
                     .setAction(Intent.ACTION_SEND)
@@ -393,6 +396,7 @@ data class SharingRequest internal constructor(
         ) = Builder(Data.EndOfYearStory(story, year, screenshot))
             .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
             .addAnalyticsProperty("story", story.analyticsValue)
+            .addAnalyticsProperty("year", year.value)
     }
 
     class Builder internal constructor(
