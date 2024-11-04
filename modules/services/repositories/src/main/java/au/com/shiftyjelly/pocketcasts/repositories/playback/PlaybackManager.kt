@@ -541,6 +541,7 @@ open class PlaybackManager @Inject constructor(
         when (sourceView) {
             SourceView.AUTO_PAUSE,
             SourceView.AUTO_PLAY,
+            SourceView.AUTO_DOWNLOAD,
             SourceView.CLIP_SHARING,
             SourceView.CHROMECAST,
             SourceView.DISCOVER,
@@ -568,6 +569,7 @@ open class PlaybackManager @Inject constructor(
             SourceView.UP_NEXT,
             SourceView.STATS,
             SourceView.WHATS_NEW,
+            SourceView.STORAGE_AND_DATA_USAGE,
             SourceView.NOTIFICATION_BOOKMARK,
             SourceView.METERED_NETWORK_CHANGE,
             SourceView.WIDGET_PLAYER_SMALL,

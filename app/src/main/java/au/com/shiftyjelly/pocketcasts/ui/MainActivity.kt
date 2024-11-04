@@ -740,7 +740,7 @@ class MainActivity :
         )
     }
 
-    private fun setupLowStorageLaunchBottomSheet() {
+    private fun setupLowStorageLaunchBottomSheet(sourceView: SourceView) {
         val viewGroup = binding.modalBottomSheet
         viewGroup.removeAllViews()
         viewGroup.addView(
@@ -761,6 +761,7 @@ class MainActivity :
                                 addFragment(ManualCleanupFragment.newInstance())
                             },
                             onExpanded = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
                             },
                             onMaybeLaterClick = {
                                 settings.setDismissLowStorageModalTime(System.currentTimeMillis())
@@ -1667,9 +1668,9 @@ class MainActivity :
             .show()
     }
 
-    override fun showModal() {
+    override fun showModal(sourceView: SourceView) {
         launch(Dispatchers.Main) {
-            setupLowStorageLaunchBottomSheet()
+            setupLowStorageLaunchBottomSheet(sourceView)
         }
     }
 }

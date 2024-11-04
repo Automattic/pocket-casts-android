@@ -665,4 +665,5 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Free Up Space */
     FREE_UP_SPACE_BANNER_SHOWN("free_up_space_banner_shown"),
+    FREE_UP_SPACE_MODAL_SHOWN("free_up_space_modal_shown"),
 }

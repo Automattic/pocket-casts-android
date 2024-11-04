@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.ModalBottomSheet
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -158,5 +159,5 @@ fun PreviewLowStorageDialog(@PreviewParameter(ThemePreviewParameterProvider::cla
 }
 
 interface LowStorageBottomSheetListener {
-    fun showModal()
+    fun showModal(sourceView: SourceView)
 }
