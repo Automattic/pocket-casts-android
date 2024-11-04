@@ -427,7 +427,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                         }
                         ManageDownloadsCard(
                             totalDownloadSize = downloadedEpisodesSize,
-                            onManageDownloadsClick = { showCleanupSettings() },
+                            onManageDownloadsClick = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to SourceView.DOWNLOADS.analyticsValue))
+                                showFragment(ManualCleanupFragment.newInstance())
+                            },
                         )
                     }
                 }
