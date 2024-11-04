@@ -3,6 +3,9 @@
 *   Updates
     *   Renamed the podcast action 'Subscribe' to 'Follow'
         ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))
+*   Bug Fixes
+    *   Use red color for the notification icons
+        ([#3154](https://github.com/Automattic/pocket-casts-android/pull/3154))
 
 7.76
 -----
