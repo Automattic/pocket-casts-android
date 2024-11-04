@@ -13,6 +13,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
@@ -34,9 +35,11 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         private const val TASK_NAME = "UpdateEpisodeDetailsTask"
         const val INPUT_EPISODE_UUIDS = "episode_uuids"
         private const val REQUEST_TIMEOUT_SECS = 20L
+        private const val RETRY_ATTEMPT_LIMIT = 3
 
         fun enqueue(episodes: List<PodcastEpisode>, context: Context) {
-            if (episodes.isEmpty()) {
+            // As Wear OS or Automotive are both have limited resources and they won't play audio don't check the episode content type and file size
+            if (episodes.isEmpty() || Util.isWearOs(context) || Util.isAutomotive(context)) {
                 return
             }
 
@@ -61,7 +64,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         }
 
         if (isStopped) {
-            return Result.retry()
+            return retryWithLimit()
         }
 
         val startTime = SystemClock.elapsedRealtime()
@@ -80,7 +83,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                     .build()
 
                 if (isStopped) {
-                    return Result.retry()
+                    return retryWithLimit()
                 }
 
                 try {
@@ -123,6 +126,15 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
             return Result.success()
         }
     }
+
+    private fun retryWithLimit(): Result =
+        if (runAttemptCount < RETRY_ATTEMPT_LIMIT) {
+            Result.retry()
+        } else {
+            info("Worker stopped after $runAttemptCount retries.")
+            // mark the worker as a success or it will won't process all the chain tasks
+            Result.success()
+        }
 
     /**
      * Log a message to the log buffer for support and to the console for debugging.
