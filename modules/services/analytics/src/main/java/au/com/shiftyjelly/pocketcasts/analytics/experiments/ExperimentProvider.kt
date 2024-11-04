@@ -26,7 +26,7 @@ class ExperimentProvider @Inject constructor(
 
     fun initialize() {
         if (FeatureFlag.isEnabled(Feature.EXPLAT_EXPERIMENT)) {
-            val uuid = accountStatusInfo.getUuid().takeIf { !it.isNullOrBlank() } ?: UUID.randomUUID().toString().replace("-", "")
+            val uuid = accountStatusInfo.getUuid().takeIf { !it.isNullOrBlank() } ?: UUID.randomUUID().toString()
 
             LogBuffer.i(TAG, "Initializing experiments with uuid: $uuid")
 
