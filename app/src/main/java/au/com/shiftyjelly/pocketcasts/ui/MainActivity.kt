@@ -112,6 +112,7 @@ import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.di.NotificationPermissionChecker
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -725,7 +726,10 @@ class MainActivity :
                                 showStoriesOrAccount(StoriesSource.MODAL.value)
                             },
                             onExpanded = {
-                                analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
+                                analyticsTracker.track(
+                                    AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,
+                                    mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+                                )
                                 settings.setEndOfYearShowModal(false)
                                 viewModel.updateStoriesModalShowState(false)
                             },
@@ -745,6 +749,7 @@ class MainActivity :
                     val downloadedEpisodesState by viewModel.downloadedEpisodeState.collectAsState()
 
                     val shouldShow = downloadedEpisodesState.downloadedEpisodes != 0L &&
+                        settings.shouldShowLowStorageModalAfterSnooze() &&
                         FeatureFlag.isEnabled(Feature.MANAGE_DOWNLOADED_EPISODES)
 
                     AppTheme(theme.activeTheme) {
@@ -758,6 +763,7 @@ class MainActivity :
                             onExpanded = {
                             },
                             onMaybeLaterClick = {
+                                settings.setDismissLowStorageModalTime(System.currentTimeMillis())
                             },
                             totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
                         )

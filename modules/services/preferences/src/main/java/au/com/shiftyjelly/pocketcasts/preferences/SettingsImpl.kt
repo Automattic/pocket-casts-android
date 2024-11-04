@@ -62,6 +62,8 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -318,6 +320,22 @@ class SettingsImpl @Inject constructor(
             else -> {}
         }
         refreshStateObservable.accept(refreshState)
+    }
+
+    override fun setDismissLowStorageModalTime(lastUpdateTime: Long) {
+        val editor = sharedPreferences.edit()
+        editor.putLong(Settings.LAST_DISMISS_LOW_STORAGE_MODAL_TIME, lastUpdateTime)
+        editor.apply()
+    }
+
+    override fun shouldShowLowStorageModalAfterSnooze(): Boolean {
+        val lastSnoozeTime = sharedPreferences.getLong(Settings.LAST_DISMISS_LOW_STORAGE_MODAL_TIME, 0)
+
+        if (lastSnoozeTime == 0L) return true
+
+        val timeSinceDismiss = (System.currentTimeMillis() - lastSnoozeTime).milliseconds
+
+        return timeSinceDismiss >= 7.days
     }
 
     override fun getRefreshState(): RefreshState? {

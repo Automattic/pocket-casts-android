@@ -206,7 +206,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1003"
+            line="1005"
             column="55"/>
     </issue>
 
@@ -217,7 +217,7 @@
         errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/au/com/shiftyjelly/pocketcasts/ui/MainActivity.kt"
-            line="1010"
+            line="1012"
             column="55"/>
     </issue>
 
