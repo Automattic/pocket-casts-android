@@ -3,6 +3,8 @@
 *   Updates
     *   Renamed the podcast action 'Subscribe' to 'Follow'
         ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))
+    *   Improve the performance of the refresh on Wear OS and Android Automotive
+        ([#3171](https://github.com/Automattic/pocket-casts-android/pull/3171))
 *   Bug Fixes
     *   Use red color for the notification icons
         ([#3154](https://github.com/Automattic/pocket-casts-android/pull/3154))
