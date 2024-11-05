@@ -95,8 +95,6 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFra
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
-import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Companion.CLEAN_UP
-import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment.Companion.OPTION_KEY
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
@@ -740,7 +738,7 @@ class MainActivity :
         )
     }
 
-    private fun setupLowStorageLaunchBottomSheet() {
+    private fun setupLowStorageLaunchBottomSheet(sourceView: SourceView) {
         val viewGroup = binding.modalBottomSheet
         viewGroup.removeAllViews()
         viewGroup.addView(
@@ -757,12 +755,14 @@ class MainActivity :
                             parent = viewGroup,
                             shouldShow = shouldShow,
                             onManageDownloadsClick = {
-                                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAN_UP))
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED, mapOf("source" to sourceView.analyticsValue))
                                 addFragment(ManualCleanupFragment.newInstance())
                             },
                             onExpanded = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MODAL_SHOWN, mapOf("source" to sourceView.analyticsValue))
                             },
                             onMaybeLaterClick = {
+                                analyticsTracker.track(AnalyticsEvent.FREE_UP_SPACE_MAYBE_LATER_TAPPED, mapOf("source" to sourceView.analyticsValue))
                                 settings.setDismissLowStorageModalTime(System.currentTimeMillis())
                             },
                             totalDownloadSize = downloadedEpisodesState.downloadedEpisodes,
@@ -1667,9 +1667,9 @@ class MainActivity :
             .show()
     }
 
-    override fun showModal() {
+    override fun showModal(sourceView: SourceView) {
         launch(Dispatchers.Main) {
-            setupLowStorageLaunchBottomSheet()
+            setupLowStorageLaunchBottomSheet(sourceView)
         }
     }
 }
