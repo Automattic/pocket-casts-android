@@ -27,7 +27,7 @@ fun <T> ScrollingRow(
     items: List<T>,
     modifier: Modifier = Modifier,
     scrollDirection: HorizontalDirection = HorizontalDirection.Right,
-    scrollSpeed: ScrollSpeed = ScrollSpeed(50.dp, 1.seconds),
+    scrollSpeed: ScrollSpeed = ScrollSpeed(500.dp, 10.seconds),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
     horizontalArrangement: Arrangement.Horizontal = if (!reverseLayout) Arrangement.Start else Arrangement.End,
@@ -62,7 +62,7 @@ fun <T> ScrollingColumn(
     items: List<T>,
     modifier: Modifier = Modifier,
     scrollDirection: VerticalDirection = VerticalDirection.Top,
-    scrollSpeed: ScrollSpeed = ScrollSpeed(100.dp, 1.seconds),
+    scrollSpeed: ScrollSpeed = ScrollSpeed(1000.dp, 10.seconds),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
     verticalArrangement: Arrangement.Vertical = if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
@@ -138,7 +138,10 @@ private fun AutoScrollEffect(
         if (direction.reverseScroll) {
             distance = -distance
         }
-        distance to tween<Float>(durationMillis = speed.duration.toInt(DurationUnit.MILLISECONDS), easing = LinearEasing)
+        distance to tween<Float>(
+            durationMillis = speed.duration.toInt(DurationUnit.MILLISECONDS),
+            easing = LinearEasing,
+        )
     }
     LaunchedEffect(Unit) {
         while (isActive) {
