@@ -8,6 +8,8 @@
 *   Updates
     *   Renamed the podcast action 'Subscribe' to 'Follow'
         ([#3120](https://github.com/Automattic/pocket-casts-android/pull/3120))
+    *   Improve the performance of the refresh on Wear OS and Android Automotive
+        ([#3171](https://github.com/Automattic/pocket-casts-android/pull/3171))
     *   Improve connection when some podcasts failed to play or download
         ([#3180](https://github.com/Automattic/pocket-casts-android/pull/3180))
 *   Bug Fixes
