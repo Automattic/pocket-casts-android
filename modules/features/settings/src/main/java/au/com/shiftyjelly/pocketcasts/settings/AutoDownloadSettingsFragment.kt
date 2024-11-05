@@ -20,6 +20,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -165,7 +166,7 @@ class AutoDownloadSettingsFragment :
                         handleNewEpisodesToggle(newValue)
 
                         viewLifecycleOwner.lifecycleScope.launch {
-                            if (newValue && isDeviceRunningOnLowStorage()) lowStorageListener?.showModal()
+                            if (newValue && isDeviceRunningOnLowStorage()) lowStorageListener?.showModal(SourceView.AUTO_DOWNLOAD)
                         }
                     }
                     true

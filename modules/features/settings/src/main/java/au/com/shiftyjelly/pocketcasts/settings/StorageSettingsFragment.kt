@@ -17,6 +17,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
@@ -79,7 +80,7 @@ class StorageSettingsFragment : BaseFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 if (isDeviceRunningOnLowStorage()) {
-                    lowStorageListener?.showModal()
+                    lowStorageListener?.showModal(SourceView.STORAGE_AND_DATA_USAGE)
                 }
                 viewModel.permissionRequest.collect { permissionRequest ->
                     if (permissionRequest == Manifest.permission.WRITE_EXTERNAL_STORAGE) {

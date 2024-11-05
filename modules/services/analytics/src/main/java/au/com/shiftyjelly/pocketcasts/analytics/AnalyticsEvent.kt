@@ -662,4 +662,10 @@ enum class AnalyticsEvent(val key: String) {
     REFERRAL_PASS_BANNER_HIDE_TAPPED("referral_pass_banner_hide_tapped"),
     REFERRAL_PURCHASE_SHOWN("referral_purchase_shown"),
     REFERRAL_PURCHASE_SUCCESS("referral_purchase_success"),
+
+    /* Free Up Space */
+    FREE_UP_SPACE_BANNER_SHOWN("free_up_space_banner_shown"),
+    FREE_UP_SPACE_MODAL_SHOWN("free_up_space_modal_shown"),
+    FREE_UP_SPACE_MANAGE_DOWNLOADS_TAPPED("free_up_space_manage_downloads_tapped"),
+    FREE_UP_SPACE_MAYBE_LATER_TAPPED("free_up_space_maybe_later_tapped"),
 }
