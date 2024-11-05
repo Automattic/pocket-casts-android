@@ -35,7 +35,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         private const val TASK_NAME = "UpdateEpisodeDetailsTask"
         const val INPUT_EPISODE_UUIDS = "episode_uuids"
         private const val REQUEST_TIMEOUT_SECS = 20L
-        private const val RETRY_ATTEMPT_LIMIT = 3
+        private const val ATTEMPT_LIMIT = 3
 
         fun enqueue(episodes: List<PodcastEpisode>, context: Context) {
             // As Wear OS or Automotive are both have limited resources and they won't play audio don't check the episode content type and file size
@@ -127,14 +127,16 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         }
     }
 
-    private fun retryWithLimit(): Result =
-        if (runAttemptCount < RETRY_ATTEMPT_LIMIT) {
+    private fun retryWithLimit(): Result {
+        val attempt = runAttemptCount + 1
+        return if (attempt < ATTEMPT_LIMIT) {
             Result.retry()
         } else {
-            info("Worker stopped after $runAttemptCount retries.")
+            info("Worker stopped after $attempt attempts.")
             // mark the worker as a success or it will won't process all the chain tasks
             Result.success()
         }
+    }
 
     /**
      * Log a message to the log buffer for support and to the console for debugging.
