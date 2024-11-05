@@ -14,7 +14,6 @@ Language: nl
     <string name="eoy_story_ratings_subtitle_1">Wauw, zoveel beoordelingen van %1$d sterren! Bedankt dat je je liefde voor je favoriete makers toont!</string>
     <string name="eoy_story_ratings_title_2">Oh oh! Er zijn nog geen podcastbeoordelingen voor je</string>
     <string name="eoy_story_ratings_title_1">Laten we naar je beoordelingen kijken!</string>
-    <string name="end_of_year_story_top_podcast_title">Je beste podcast in 2024 was %1$s</string>
     <string name="referrals_failed_to_load_offer">Er is iets fout gegaan bij het ophalen van je verwijzingslink.</string>
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
     <string name="referrals_banner_hide_label">Deze banner verbergen</string>
@@ -588,7 +587,6 @@ Language: nl
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>
     <string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
     <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende shows en %2$d afleveringen geluisterd</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2023 naar %1$d verschillende categorieën geluisterd</string>

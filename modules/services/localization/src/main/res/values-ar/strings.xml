@@ -282,7 +282,6 @@ Language: ar
     <string name="onboarding_forgot_password">هل نسيت كلمة المرور؟</string>
     <string name="onboarding_email_invalid_message">يرجى إدخال بريد إلكتروني صالح</string>
     <string name="log_in">تسجيل الدخول</string>
-    <string name="end_of_year_story_top_podcast_subtitle">لقد استمعتَ إلى ⁦%1$d⁩ من الحلقات بإجمالي ⁦%2$s⁩</string>
     <string name="end_of_year_story_top_podcasts_share_text">أهم حلقات البودكاست الخاصة بي في العام! %1$s</string>
     <string name="end_of_year_story_epilogue_subtitle">لا تنسَ المشاركة مع أصدقائك والتعبير عن مبدعي الحلقات الصوتية الذين تفضلهم</string>
     <string name="end_of_year_story_top_categories">أهم تصنيفاتك</string>
