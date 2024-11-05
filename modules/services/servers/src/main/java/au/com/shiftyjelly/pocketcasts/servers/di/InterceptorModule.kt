@@ -157,6 +157,13 @@ object InterceptorModule {
         return buildList {
             add(userAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.HEADERS
+                }
+                add(loggingInterceptor.toClientInterceptor())
+            }
         }
     }
 
@@ -185,6 +192,13 @@ object InterceptorModule {
         return buildList {
             add(userAgentInterceptor.toClientInterceptor())
             add(crashLoggingInterceptor.toClientInterceptor())
+
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.HEADERS
+                }
+                add(loggingInterceptor.toClientInterceptor())
+            }
         }
     }
 }

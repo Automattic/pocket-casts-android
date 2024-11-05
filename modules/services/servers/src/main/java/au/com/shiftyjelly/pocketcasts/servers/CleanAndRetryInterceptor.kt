@@ -12,6 +12,7 @@ internal class CleanAndRetryInterceptor(
         return if (response.isSuccessful || response.isRedirect) {
             response
         } else {
+            response.close()
             val cleanRequest = originalRequest.newBuilder()
                 .let { builder -> headersToRemove.fold(builder) { acc, header -> acc.removeHeader(header) } }
                 .build()
