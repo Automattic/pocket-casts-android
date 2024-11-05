@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.localization.helper
 
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -192,5 +193,41 @@ class DurationUtilTest {
         val text = duration.toFriendlyString(resources)
 
         assertEquals("1 day 3 minutes", text)
+    }
+
+    @Test
+    fun neagtiveDuration() {
+        val duration = -1.days - 2.hours - 3.minutes - 5.seconds
+
+        val text = duration.toFriendlyString(resources)
+
+        assertEquals("0 seconds", text)
+    }
+
+    @Test
+    fun zeroDuration() {
+        val duration = Duration.ZERO
+
+        val text = duration.toFriendlyString(resources)
+
+        assertEquals("0 seconds", text)
+    }
+
+    @Test
+    fun mismatchedMinAndMaxUnits() {
+        val duration = 1.days + 2.hours + 3.minutes + 4.seconds
+
+        val text = duration.toFriendlyString(resources, minUnit = FriendlyDurationUnit.Hour, maxUnit = FriendlyDurationUnit.Minute)
+
+        assertEquals("26 hours", text)
+    }
+
+    @Test
+    fun largeDuration() {
+        val duration = 100.days + 2.hours + 3.minutes + 4.seconds
+
+        val text = duration.toFriendlyString(resources)
+
+        assertEquals("100 days 2 hours", text)
     }
 }

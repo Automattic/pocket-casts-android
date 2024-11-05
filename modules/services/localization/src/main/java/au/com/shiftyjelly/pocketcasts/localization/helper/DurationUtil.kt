@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
  * - "10 hours"
  * - "10 days 14 hours 50 minutes 10 seconds"
  *
- * If the resulting string would be empty, the duration will be displayed in [minUnit].
+ * If the duration is negative or resulting string would be empty, the duration will be displayed in [minUnit].
  *
  * @param resources the [Resources] instance used to fetch pluralized strings.
  * @param maxPartCount the maximum number of consecutive time parts to include in the result.
@@ -39,7 +39,7 @@ fun Duration.toFriendlyString(
 ): String {
     val builder = StringBuilder()
     var usedParts = 0
-    var timeLeft = this
+    var timeLeft = coerceAtLeast(Duration.ZERO)
 
     val units = FriendlyDurationUnit.reversedEntries.filter { it in minUnit..maxUnit }
     for (unit in units) {
@@ -51,7 +51,7 @@ fun Duration.toFriendlyString(
         }
     }
     if (builder.isEmpty()) {
-        minUnit.append(builder, resources, this)
+        minUnit.append(builder, resources, coerceAtLeast(Duration.ZERO))
     }
     return builder.toString().trimEnd()
 }
