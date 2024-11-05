@@ -24,12 +24,14 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPod
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.toAutoDownloadStatus
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -157,7 +159,7 @@ class AutoDownloadSettingsFragment :
                 setOnPreferenceChangeListener { _, newValue ->
                     if (newValue is Boolean) {
                         viewModel.onNewEpisodesChange(newValue)
-                        handleNewEpisodesToggle(newValue)
+                        handleNewEpisodesToggle(newValue.toAutoDownloadStatus())
                     }
                     true
                 }
@@ -236,21 +238,28 @@ class AutoDownloadSettingsFragment :
         updateView()
     }
 
-    private fun handleNewEpisodesToggle(isEnabled: Boolean) {
+    private fun handleNewEpisodesToggle(status: Int) {
         lifecycleScope.launch {
-            if (!isEnabled) {
-                podcastManager.updateAllAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_OFF)
+            if (status == Podcast.AUTO_DOWNLOAD_OFF) {
+                viewModel.updateAllAutoDownloadStatus(Podcast.AUTO_DOWNLOAD_OFF)
             }
-            updateNewEpisodesSwitch(isEnabled)
+            updateNewEpisodesSwitch(status)
             updatePodcastsSummary()
         }
     }
 
-    private fun updateNewEpisodesSwitch(on: Boolean) {
+    private fun updateNewEpisodesSwitch(status: Int) {
         val podcastsPreference = podcastsPreference ?: return
         val podcastsLimitPreference = podcastsAutoDownloadLimitPreference ?: return
         val podcastsCategory = podcastsCategory ?: return
-        if (on) {
+
+        val isAutoDownloadEnabled = if (status == GLOBAL_AUTO_DOWNLOAD_NONE) {
+            viewModel.hasEpisodesWithAutoDownloadEnabled.value
+        } else {
+            status == Podcast.AUTO_DOWNLOAD_NEW_EPISODES
+        }
+
+        if (isAutoDownloadEnabled) {
             podcastsCategory.addPreference(podcastsPreference)
             podcastsCategory.addPreference(podcastsLimitPreference)
         } else {
@@ -343,7 +352,7 @@ class AutoDownloadSettingsFragment :
         updateFiltersSelectedSummary()
 
         upNextPreference.isChecked = viewModel.getAutoDownloadUpNext()
-        newEpisodesPreference?.isChecked = viewModel.getAutoDownloadNewEpisodes()
+        setupNewEpisodesToggle()
         autoDownloadOnlyDownloadOnWifi.isChecked = viewModel.getAutoDownloadUnmeteredOnly()
         autoDownloadOnlyWhenCharging.isChecked = viewModel.getAutoDownloadOnlyWhenCharging()
         if (FeatureFlag.isEnabled(Feature.AUTO_DOWNLOAD)) {
@@ -380,6 +389,27 @@ class AutoDownloadSettingsFragment :
                     podcastsPreference?.summary = summary
                 },
             )
+    }
+
+    @SuppressLint("CheckResult")
+    private fun setupNewEpisodesToggle() {
+        val value = viewModel.getAutoDownloadNewEpisodes()
+        when (value) {
+            Podcast.AUTO_DOWNLOAD_OFF -> {
+                newEpisodesPreference?.isChecked = false
+            }
+
+            Podcast.AUTO_DOWNLOAD_NEW_EPISODES -> {
+                newEpisodesPreference?.isChecked = true
+            }
+
+            else -> {
+                // This is the case where users have not set this toggle yet.
+                // In this case, we check if the user has auto download enabled for any podcast
+                // so we can enable the global auto-download status.
+                newEpisodesPreference?.isChecked = viewModel.hasEpisodesWithAutoDownloadEnabled.value
+            }
+        }
     }
 
     override fun onBackPressed(): Boolean {

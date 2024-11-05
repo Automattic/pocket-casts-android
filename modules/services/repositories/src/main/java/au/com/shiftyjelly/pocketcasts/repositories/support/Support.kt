@@ -13,6 +13,7 @@ import androidx.lifecycle.toPublisher
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.Companion.AUTO_DOWNLOAD_NEW_EPISODES
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -317,7 +318,7 @@ class Support @Inject constructor(
             output.append(eol)
             output.append("Auto downloads").append(eol)
             output.append("  Any podcast? ").append(yesNoString(autoDownloadOn[0])).append(eol)
-            output.append("  New Episodes? ").append(yesNoString(settings.autoDownloadNewEpisodes.value)).append(eol)
+            output.append("  New Episodes? ").append(yesNoString(settings.autoDownloadNewEpisodes.value == AUTO_DOWNLOAD_NEW_EPISODES)).append(eol)
             output.append("  Limit Downloads ").append(settings.autoDownloadLimit.value).append(eol)
             output.append("  Up Next? ").append(yesNoString(settings.autoDownloadUpNext.value)).append(eol)
             output.append("  Only on unmetered WiFi? ").append(yesNoString(settings.autoDownloadUnmeteredOnly.value)).append(eol)

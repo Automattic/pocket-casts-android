@@ -240,6 +240,9 @@ abstract class PodcastDao {
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1 AND auto_download_status = :downloadStatus")
     abstract fun countDownloadStatus(downloadStatus: Int): Int
 
+    @Query("SELECT COUNT(*) > 0 FROM podcasts WHERE subscribed = 1 AND auto_download_status = :downloadStatus")
+    abstract suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean
+
     fun exists(uuid: String): Boolean {
         return countByUuid(uuid) != 0
     }

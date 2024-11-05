@@ -93,6 +93,8 @@ interface Settings {
 
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 
+        const val GLOBAL_AUTO_DOWNLOAD_NONE = -1
+
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_EPISODE = "bookmarksSortTypeForEpisode"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PLAYER = "bookmarksSortTypeForPlayer"
         const val PREFERENCE_BOOKMARKS_SORT_TYPE_FOR_PODCAST = "bookmarksSortTypeForPodcast"
@@ -332,7 +334,7 @@ interface Settings {
     val autoDownloadUnmeteredOnly: UserSetting<Boolean>
     val autoDownloadOnlyWhenCharging: UserSetting<Boolean>
     val autoDownloadUpNext: UserSetting<Boolean>
-    val autoDownloadNewEpisodes: UserSetting<Boolean>
+    val autoDownloadNewEpisodes: UserSetting<Int>
 
     val artworkConfiguration: UserSetting<ArtworkConfiguration>
 

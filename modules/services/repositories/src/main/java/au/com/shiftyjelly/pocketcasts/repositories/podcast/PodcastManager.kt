@@ -126,6 +126,7 @@ interface PodcastManager {
     fun countSubscribedRx(): Single<Int>
     fun observeCountSubscribed(): Flowable<Int>
     fun countDownloadStatus(downloadStatus: Int): Int
+    suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean
     fun countDownloadStatusRx(downloadStatus: Int): Single<Int>
     fun countNotificationsOn(): Int
     fun countNotificationsOnRx(): Single<Int>
